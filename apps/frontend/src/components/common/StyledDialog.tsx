@@ -44,6 +44,7 @@ type StyledDialogProps = {
   title?: string;
   error?: boolean;
   extra?: JSX.Element;
+  tooltip?: React.ReactNode;
 } & DialogProps;
 
 function StyledDialog(props: StyledDialogProps) {
@@ -62,6 +63,7 @@ function StyledDialog(props: StyledDialogProps) {
           })}
         >
           {title}
+          {props.tooltip && props.tooltip}
         </DialogTitle>
         {extra}
 

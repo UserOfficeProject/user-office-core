@@ -9,14 +9,14 @@ import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
+import PostgresExperimentSafetyPdfTemplateDataSource from '../datasources/postgres/ExperimentSafetyPdfTemplateDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
-import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
-import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
+import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/ProposalPdfTemplateDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
@@ -27,6 +27,7 @@ import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActio
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
+import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -34,6 +35,7 @@ import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/Vi
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
+import StfcInternalReviewDataSource from '../datasources/stfc/StfcInternalReviewDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
 import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
@@ -45,7 +47,6 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { StfcDownloadService } from '../factory/StfcDownloadService';
 import { StfcFapDataColumns } from '../factory/xlsx/stfc/StfcFapDataColumns';
 import {
   callFapStfcPopulateRow,
@@ -69,7 +70,14 @@ mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, StfcInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
-mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  PostgresProposalPdfTemplateDataSource
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  PostgresExperimentSafetyPdfTemplateDataSource
+);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
@@ -93,7 +101,7 @@ mapClass(
 );
 mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
-mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
+mapClass(Tokens.InternalReviewDataSource, StfcInternalReviewDataSource);
 mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
@@ -102,6 +110,8 @@ mapClass(
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
+mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
@@ -124,7 +134,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
-
-mapClass(Tokens.DownloadService, StfcDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

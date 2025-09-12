@@ -71,8 +71,10 @@ export default function QuestionaryEditorModel(
       groupId: TemplateGroupId.PROPOSAL,
     },
     json: '',
-    pdfTemplate: null,
-    pdfCallCount: 0,
+    proposalPdfTemplate: null,
+    experimentSafetyPdfTemplate: null,
+    proposalPdfCallCount: 0,
+    experimentSafetyPdfCallCount: 0,
   };
 
   function reducer(state: Template, action: Event): Template {

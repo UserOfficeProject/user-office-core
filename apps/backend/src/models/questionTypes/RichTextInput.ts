@@ -102,6 +102,7 @@ export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
     config.tooltip = '';
     config.max = null;
     config.allowImages = false;
+    config.readPermissions = [];
 
     return config;
   },

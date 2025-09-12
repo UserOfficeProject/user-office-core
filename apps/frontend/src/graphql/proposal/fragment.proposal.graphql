@@ -21,4 +21,5 @@ fragment proposal on Proposal {
   fapMeetingDecisions {
     ...fapMeetingDecision
   }
+  fileId
 }

@@ -3,11 +3,13 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
   ... on DateConfig {
     small_label
     required
     tooltip
+    readPermissions
     minDate
     maxDate
     defaultDate
@@ -17,6 +19,7 @@ fragment fieldConfig on FieldConfig {
     html
     plain
     omitFromPdf
+    readPermissions
   }
   ... on FileUploadConfig {
     file_type
@@ -26,6 +29,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on IntervalConfig {
@@ -35,6 +39,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on NumberInputConfig {
@@ -45,22 +50,27 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on ProposalBasisConfig {
     tooltip
+    readPermissions
   }
 
   ... on ProposalEsiBasisConfig {
     tooltip
+    readPermissions
   }
 
   ... on SampleEsiBasisConfig {
     tooltip
+    readPermissions
   }
 
   ... on SampleBasisConfig {
     titlePlaceholder
+    readPermissions
   }
 
   ... on SampleDeclarationConfig {
@@ -72,6 +82,7 @@ fragment fieldConfig on FieldConfig {
     templateCategory
     required
     small_label
+    readPermissions
   }
 
   ... on SubTemplateConfig {
@@ -86,6 +97,7 @@ fragment fieldConfig on FieldConfig {
     templateCategory
     required
     small_label
+    readPermissions
   }
 
   ... on SelectionFromOptionsConfig {
@@ -95,6 +107,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
   ... on TextInputConfig {
     min
@@ -104,6 +117,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
     htmlQuestion
     isHtmlQuestion
     isCounterHidden
@@ -113,12 +127,14 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on RichTextInputConfig {
     small_label
     required
     tooltip
+    readPermissions
     max
     allowImages
   }
@@ -127,6 +143,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
     url
     jsonPath
     apiCallRequestHeaders {
@@ -141,29 +158,41 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on FapReviewBasisConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on TechnicalReviewBasisConfig {
     small_label
     required
     tooltip
+    readPermissions
   }
 
   ... on GenericTemplateBasisConfig {
     titlePlaceholder
     questionLabel
+    readPermissions
   }
 
   ... on FeedbackBasisConfig {
     small_label
     required
     tooltip
+    readPermissions
+  }
+
+  ... on ExperimentSafetyReviewBasisConfig {
+    small_label
+    required
+    tooltip
+    readPermissions
   }
 
   ... on InstrumentPickerConfig {
@@ -171,6 +200,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
     isMultipleSelect
     requestTime
     instruments {
@@ -184,6 +214,7 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    readPermissions
     isMultipleSelect
     techniques {
       id

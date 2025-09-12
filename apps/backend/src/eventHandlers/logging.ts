@@ -117,6 +117,7 @@ export default function createLoggingHandler() {
 
           break;
         }
+
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
@@ -393,6 +394,10 @@ export default function createLoggingHandler() {
             changedObjectId = (event as any)[event.key].primaryKey;
           } else if (typeof (event as any)[event.key].proposalPk === 'number') {
             changedObjectId = (event as any)[event.key].proposalPk;
+          } else if (
+            typeof (event as any)[event.key].experimentPk === 'number'
+          ) {
+            changedObjectId = (event as any)[event.key].experimentPk;
           } else {
             changedObjectId = (event as any)[event.key].id;
           }

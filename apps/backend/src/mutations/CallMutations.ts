@@ -7,6 +7,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { TagDataSource } from '../datasources/TagDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
@@ -19,6 +20,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -29,7 +31,9 @@ const createCallValidationSchema = mergeValidationSchemas(
 @injectable()
 export default class CallMutations {
   constructor(
-    @inject(Tokens.CallDataSource) private dataSource: CallDataSource
+    @inject(Tokens.CallDataSource) private dataSource: CallDataSource,
+    @inject(Tokens.TagDataSource)
+    private tagDataSource: TagDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -106,6 +110,16 @@ export default class CallMutations {
     }
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async orderCalls(
+    agent: UserWithRole | null,
+    args: CallOrderInput
+  ): Promise<boolean | Rejection> {
+    return this.dataSource.orderCalls(args).catch((err) => {
+      return rejection('Could not reorder calls', { agent, args }, err);
+    });
+  }
+
   // TODO: Need to add validation to duo-validation library
   // @ValidateArgs(assignInstrumentsToCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
@@ -113,6 +127,41 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToCallInput
   ): Promise<Call | Rejection> {
+    const callTags = await this.tagDataSource.getCallsTags(args.callId);
+
+    if (callTags.length > 0) {
+      let shareTag = true;
+
+      await Promise.all(
+        args.instrumentFapIds.map(async (instrumentFap) => {
+          const instrumentTag = await this.tagDataSource.getInstrumentsTags(
+            instrumentFap.instrumentId
+          );
+
+          if (instrumentTag.length === 0) {
+            shareTag = false;
+          }
+
+          const tagCrossover = instrumentTag.some((tagInstrument) =>
+            callTags.some((tagCall) => tagInstrument.id === tagCall.id)
+          );
+
+          if (!tagCrossover) {
+            shareTag = false;
+          }
+        })
+      );
+
+      if (!shareTag) {
+        return rejection(
+          'One or more instruments do not share a tag with the selected call',
+          {
+            args,
+          }
+        );
+      }
+    }
+
     return this.dataSource
       .assignInstrumentsToCall(args)
       .then((result) => result)

@@ -44,14 +44,14 @@ export class ReviewAuthorization {
     agent: UserWithRole | null,
     reviewOrReviewId: Review | number
   ): Promise<boolean> {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (isUserOfficer) {
+      return true;
+    }
+
     const review = await this.resolveReview(reviewOrReviewId);
     if (!review) {
       return false;
-    }
-
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
-    if (isUserOfficer) {
-      return true;
     }
 
     const isAuthor = review.userID === agent?.id;

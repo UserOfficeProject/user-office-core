@@ -1,4 +1,5 @@
 import { Call } from '../models/Call';
+import { ExperimentSafety } from '../models/Experiment';
 import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
@@ -15,7 +16,7 @@ import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
-interface GeneralEvent {
+export interface GeneralEvent {
   type: Event;
   key: string;
   loggedInUserId: number | null;
@@ -413,6 +414,47 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
   visitregistration: VisitRegistration;
 }
 
+interface ExperimentSafetyManagementDecisionSubmittedByISEvent
+  extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentSafetyManagementDecisionSubmittedByESREvent
+  extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentESFApprovedByIsEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_APPROVED_BY_IS;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentESFApprovedByESREvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_APPROVED_BY_ESR;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentESFRejectedByIsEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_REJECTED_BY_IS;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentESFRejectedByESREvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_REJECTED_BY_ESR;
+  experimentsafety: ExperimentSafety;
+}
+
+interface ExperimentSafetyStatusChangedByWorkflowEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW;
+  experimentsafety: ExperimentSafety;
+}
+interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER;
+  experimentsafety: ExperimentSafety;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -489,4 +531,12 @@ export type ApplicationEvent =
   | InternalReviewDeleted
   | VisitCreatedEvent
   | VisitRegistrationApprovedEvent
-  | VisitRegistrationCancelledEvent;
+  | VisitRegistrationCancelledEvent
+  | ExperimentESFApprovedByIsEvent
+  | ExperimentESFApprovedByESREvent
+  | ExperimentESFRejectedByIsEvent
+  | ExperimentESFRejectedByESREvent
+  | ExperimentSafetyManagementDecisionSubmittedByISEvent
+  | ExperimentSafetyManagementDecisionSubmittedByESREvent
+  | ExperimentSafetyStatusChangedByWorkflowEvent
+  | ExperimentSafetyStatusChangedByUserEvent;

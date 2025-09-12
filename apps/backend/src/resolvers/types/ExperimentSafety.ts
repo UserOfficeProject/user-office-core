@@ -13,10 +13,16 @@ import {
 import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
-import { ExperimentSafety as ExperimentSafetyOrigin } from '../../models/Experiment';
+import {
+  ExperimentSafety as ExperimentSafetyOrigin,
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+} from '../../models/Experiment';
+import { TemplateCategoryId } from '../../models/Template';
 import { ExperimentHasSample } from './ExperimentHasSample';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
+import { Status } from './Status';
 
 @ObjectType()
 @Directive('@key(fields: "experimentSafetyPk")')
@@ -36,8 +42,8 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Number)
   public createdBy: number;
 
-  @Field(() => String)
-  public status: string;
+  @Field(() => Number, { nullable: true })
+  public statusId: number | null;
 
   @Field(() => Number, { nullable: true })
   public safetyReviewQuestionaryId: number | null;
@@ -50,6 +56,18 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
 
   @Field(() => Date)
   public updatedAt: Date;
+
+  @Field(() => InstrumentScientistDecisionEnum, { nullable: true })
+  public instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+
+  @Field(() => String, { nullable: true })
+  public instrumentScientistComment: string | null;
+
+  @Field(() => ExperimentSafetyReviewerDecisionEnum, { nullable: true })
+  public experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+
+  @Field(() => String, { nullable: true })
+  public experimentSafetyReviewerComment: string | null;
 }
 
 @Resolver(() => ExperimentSafety)
@@ -104,6 +122,21 @@ export class ExperimentSafetyResolver {
     return questionary;
   }
 
+  @FieldResolver(() => Questionary)
+  async safetyReviewQuestionary(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary> {
+    const questionary =
+      await context.queries.questionary.getQuestionaryOrDefault(
+        context.user,
+        experimentSafety.safetyReviewQuestionaryId ?? 0,
+        TemplateCategoryId.EXPERIMENT_SAFETY_REVIEW
+      );
+
+    return questionary;
+  }
+
   @FieldResolver(() => [ExperimentHasSample])
   async samples(
     @Root() experimentSafety: ExperimentSafety,
@@ -113,5 +146,28 @@ export class ExperimentSafetyResolver {
       context.user,
       experimentSafety.experimentPk
     );
+  }
+
+  @FieldResolver(() => Status, { nullable: true })
+  async status(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<Status | null> {
+    if (experimentSafety.statusId === null) {
+      return null;
+    }
+
+    const status = await context.queries.status.getStatus(
+      context.user,
+      experimentSafety.statusId
+    );
+
+    if (status === null) {
+      throw new GraphQLError(
+        'Unexpected error. Experiment safety status does not exist'
+      );
+    }
+
+    return status;
   }
 }

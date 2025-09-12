@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import Participants from 'components/proposal/Participants';
+import UserManagementTable from 'components/common/UserManagementTable';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -85,7 +85,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           <Typography variant="h6">
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
-          <Participants
+          <UserManagementTable
             title="Visitors"
             setInvites={setVisitInvites}
             invites={visitInvites}

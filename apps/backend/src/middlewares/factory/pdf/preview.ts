@@ -1,22 +1,14 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../../config/Tokens';
-import {
-  PDFType,
-  MetaBase,
-  DownloadType,
-  DownloadService,
-} from '../../../factory/DownloadService';
-import { ProposalPDFData } from '../../../factory/pdf/proposal';
+import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
+import { FullProposalPDFData } from '../../../factory/pdf/proposal';
+import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
+import callFactoryService from '../../../factory/service';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
-
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 
 router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
   try {
@@ -68,17 +60,16 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
 
     const pdfTemplateIdNumber = parseInt(pdfTemplateId as string);
     if (!isNaN(pdfTemplateIdNumber)) {
-      const pdfTemplate = await factoryServices.getPdfTemplate(
+      const pdfTemplate = await factoryServices.getProposalPdfTemplate(
         userWithRole,
         pdfTemplateIdNumber
       );
-
       if (!pdfTemplate) {
         throw new Error('Could not get pdf template');
       }
 
       const dummyData = JSON.parse(pdfTemplate.dummyData) as {
-        data: ProposalPDFData;
+        data: FullProposalPDFData;
         userRole: Role;
       };
 
@@ -93,9 +84,72 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       throw new Error('Invalid request');
     }
 
-    downloadService.callFactoryService<ProposalPDFData, MetaBase>(
+    callFactoryService<FullProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
+      payload,
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
+    const { pdfTemplateId } = req.query;
+
+    if (!pdfTemplateId) {
+      res.status(400).send('Invalid request');
+    }
+    const factoryServices =
+      container.resolve<DownloadTypeServices>(FactoryServices);
+
+    const userWithRole = {
+      ...res.locals.agent,
+    };
+
+    const meta: MetaBase = {
+      collectionFilename: '',
+      singleFilename: '',
+    };
+
+    let payload = null;
+
+    const pdfTemplateIdNumber = parseInt(pdfTemplateId as string);
+    if (!isNaN(pdfTemplateIdNumber)) {
+      const pdfTemplate = await factoryServices.getExperimentSafetyPdfTemplate(
+        userWithRole,
+        pdfTemplateIdNumber
+      );
+      if (!pdfTemplate) {
+        throw new Error('Could not get pdf template');
+      }
+
+      const dummyData = JSON.parse(pdfTemplate.dummyData) as {
+        data: ExperimentSafetyPDFData;
+        userRole: Role;
+      };
+
+      payload = {
+        data: [{ ...dummyData.data, pdfTemplate: pdfTemplate }],
+        meta,
+        userRole: dummyData.userRole,
+      };
+    }
+
+    if (!payload) {
+      throw new Error('Invalid request');
+    }
+    callFactoryService<ExperimentSafetyPDFData, MetaBase>(
+      DownloadType.PDF,
+      PDFType.EXPERIMENT_SAFETY,
       payload,
       req,
       res,

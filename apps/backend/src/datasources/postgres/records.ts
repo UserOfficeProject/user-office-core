@@ -1,5 +1,9 @@
-import { PdfTemplateRecord } from 'knex/types/tables';
+import {
+  ProposalPdfTemplateRecord,
+  ExperimentSafetyPdfTemplateRecord,
+} from 'knex/types/tables';
 
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -10,7 +14,8 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
-import { ExperimentStatus } from '../../models/Experiment';
+import { Experiment, ExperimentStatus } from '../../models/Experiment';
+import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
@@ -18,10 +23,10 @@ import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
-import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
+import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -39,6 +44,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
+import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import {
@@ -73,8 +79,20 @@ import { FeedbackStatus } from './../../models/Feedback';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
 declare module 'knex/types/tables' {
-  export interface PdfTemplateRecord {
-    readonly pdf_template_id: number;
+  export interface ProposalPdfTemplateRecord {
+    readonly proposal_pdf_template_id: number;
+    readonly template_id: number;
+    readonly template_data: string;
+    readonly template_header: string;
+    readonly template_footer: string;
+    readonly template_sample_declaration: string;
+    readonly dummy_data: string;
+    readonly creator_id: number;
+    readonly created_at: Date;
+  }
+
+  export interface ExperimentSafetyPdfTemplateRecord {
+    readonly experiment_safety_pdf_template_id: number;
     readonly template_id: number;
     readonly template_data: string;
     readonly template_header: string;
@@ -86,7 +104,8 @@ declare module 'knex/types/tables' {
   }
 
   interface Tables {
-    pdf_templates: PdfTemplateRecord;
+    proposal_pdf_templates: ProposalPdfTemplateRecord;
+    experiment_safety_pdf_templates: ExperimentSafetyPdfTemplateRecord;
     techniques: TechniqueRecord;
     technique_has_instruments: TechniqueHasInstrumentsRecord;
   }
@@ -127,6 +146,8 @@ export interface ProposalRecord {
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
   readonly submitted_date: Date;
+  readonly experiment_sequence: number;
+  readonly file_id: string;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -339,10 +360,13 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
-  readonly pdf_template_id: number;
+  readonly proposal_pdf_template_id: number;
+  readonly experiment_safety_pdf_template_id: number;
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+  readonly sort_order: number;
+  readonly experiment_workflow_id: number;
 }
 
 export interface PageTextRecord {
@@ -483,6 +507,7 @@ export interface InstrumentRecord {
   readonly manager_user_id: number;
   readonly full_count: number;
   readonly selectable: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -522,6 +547,7 @@ export interface InstrumentWithManagementTimeRecord {
   readonly manager_user_id: number;
   readonly management_time_allocation: number;
   readonly submitted: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface TemplateCategoryRecord {
@@ -794,7 +820,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.experiment_sequence,
+    proposal.file_id
   );
 };
 
@@ -971,7 +999,8 @@ export const createBasicUserObject = (
     user.created_at,
     user.placeholder,
     user.email,
-    user.country
+    user.country,
+    user.user_title
   );
 };
 
@@ -1018,10 +1047,13 @@ export const createCallObject = (call: CallRecord) => {
     call.allocation_time_unit,
     call.title,
     call.description,
-    call.pdf_template_id,
+    call.proposal_pdf_template_id,
+    call.experiment_safety_pdf_template_id,
     call.fap_review_template_id,
     call.technical_review_template_id,
-    call.is_active
+    call.is_active,
+    call.sort_order,
+    call.experiment_workflow_id
   );
 };
 
@@ -1252,9 +1284,27 @@ export const createPredefinedMessageObject = (
 export const createQuantityObject = (quantity: QuantityRecord) =>
   new Quantity(quantity.quantity_id);
 
-export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
-  return new PdfTemplate(
-    pdfTemplate.pdf_template_id,
+export const createProposalPdfTemplateObject = (
+  pdfTemplate: ProposalPdfTemplateRecord
+) => {
+  return new ProposalPdfTemplate(
+    pdfTemplate.proposal_pdf_template_id,
+    pdfTemplate.template_id,
+    pdfTemplate.template_data,
+    pdfTemplate.template_header,
+    pdfTemplate.template_footer,
+    pdfTemplate.template_sample_declaration,
+    pdfTemplate.dummy_data,
+    pdfTemplate.creator_id,
+    pdfTemplate.created_at
+  );
+};
+
+export const createExperimentSafetyPdfTemplateObject = (
+  pdfTemplate: ExperimentSafetyPdfTemplateRecord
+) => {
+  return new ExperimentSafetyPdfTemplate(
+    pdfTemplate.experiment_safety_pdf_template_id,
     pdfTemplate.template_id,
     pdfTemplate.template_data,
     pdfTemplate.template_header,
@@ -1362,7 +1412,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
-  readonly template_id: string | null;
+  readonly template_id: EmailTemplateId | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1376,7 +1426,7 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_by,
     invite.is_email_sent,
     invite.expires_at,
-    invite.template_id
+    invite.template_id as EmailTemplateId | null
   );
 
 export interface RoleClaimRecord {
@@ -1396,6 +1446,20 @@ export interface CoProposerClaimRecord {
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
 
+export interface TagRecord {
+  readonly tag_id: number;
+  readonly name: string;
+  readonly short_code: string;
+}
+
+export const createTagObject = (tag: TagRecord) =>
+  new Tag(tag.tag_id, tag.name, tag.short_code);
+
+export interface TagUserRecord {
+  readonly tag_id: number;
+  readonly user_id: number;
+}
+
 export interface ExperimentRecord {
   readonly experiment_pk: number;
   readonly experiment_id: string;
@@ -1408,7 +1472,43 @@ export interface ExperimentRecord {
   readonly instrument_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+  readonly reference_number_sequence: number;
 }
+
+export interface ExperimentPaginatedRecord {
+  readonly experiment_pk: number;
+  readonly experiment_id: string;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly scheduled_event_id: number;
+  readonly proposal_pk: number;
+  readonly status: ExperimentStatus;
+  readonly local_contact_id: number;
+  readonly instrument_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+  readonly reference_number_sequence: number;
+  readonly full_count: number;
+}
+
+export const createExperimentPaginatedObject = (
+  experiment: ExperimentPaginatedRecord
+) => {
+  return new Experiment(
+    experiment.experiment_pk,
+    experiment.experiment_id,
+    experiment.starts_at,
+    experiment.ends_at,
+    experiment.scheduled_event_id,
+    experiment.proposal_pk,
+    experiment.status,
+    experiment.local_contact_id,
+    experiment.instrument_id,
+    experiment.created_at,
+    experiment.updated_at,
+    experiment.reference_number_sequence
+  );
+};
 
 export interface ExperimentSafetyRecord {
   readonly experiment_safety_pk: number;
@@ -1416,11 +1516,15 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_id: number;
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
-  readonly status: string;
+  readonly status_id: number | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+  readonly instrument_scientist_decision: number;
+  readonly instrument_scientist_decision_comment: string;
+  readonly experiment_safety_reviewer_decision: number;
+  readonly experiment_safety_reviewer_decision_comment: string;
 }
 
 export interface ExperimentHasSampleRecord {
@@ -1430,4 +1534,15 @@ export interface ExperimentHasSampleRecord {
   readonly sample_esi_questionary_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+}
+
+export interface ExperimentSafetyEventsRecord {
+  readonly experiment_pk: number;
+  readonly experiment_safety_management_decision_submitted_by_is: boolean;
+  readonly experiment_safety_management_decision_submitted_by_esr: boolean;
+  readonly experiment_esf_submitted: boolean;
+  readonly experiment_esf_approved_by_is: boolean;
+  readonly experiment_esf_rejected_by_is: boolean;
+  readonly experiment_esf_approved_by_esr: boolean;
+  readonly experiment_esf_rejected_by_esr: boolean;
 }

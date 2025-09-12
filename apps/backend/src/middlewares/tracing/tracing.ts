@@ -9,7 +9,11 @@ import { containerDetector } from '@opentelemetry/resource-detector-container';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { envDetector, processDetector } from '@opentelemetry/resources';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import {
+  BatchSpanProcessor,
+  ReadableSpan,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-node';
 
 const collectorOptions = {
   url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
@@ -17,12 +21,54 @@ const collectorOptions = {
 
 const collectorTraceExporter = new OTLPTraceExporter(collectorOptions);
 
+class AttributeFilterProcessor implements SpanProcessor {
+  private masklist: string[];
+
+  constructor(masklist: string[]) {
+    this.masklist = masklist;
+  }
+
+  onStart(): void {}
+
+  onEnd(span: ReadableSpan): void {
+    // Mask specified attributes
+    for (const key of this.masklist) {
+      const value = span.attributes[key];
+      if (typeof value === 'string') {
+        span.attributes[key] = this.maskToken(value);
+      }
+    }
+  }
+
+  private maskToken(token: string): string {
+    const visibleChars = 6;
+    if (token.length <= visibleChars) return '*'.repeat(token.length);
+    const maskedPart = '*'.repeat(token.length - visibleChars);
+
+    return maskedPart + token.slice(-visibleChars);
+  }
+
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+const attributeMasklist = [
+  'graphql.variables.token',
+  'graphql.variables.externalToken',
+];
+
 const otelSDK = new NodeSDK({
   traceExporter: collectorTraceExporter,
   resource: resourceFromAttributes({
     ['service.name']: process.env.OTEL_SERVICE_NAME || 'proposal-backend',
   }),
   spanProcessors: [
+    new AttributeFilterProcessor(attributeMasklist),
     new BatchSpanProcessor(collectorTraceExporter, {
       maxQueueSize: 1024,
       maxExportBatchSize: 1024,
@@ -70,4 +116,8 @@ export default async function startTracing() {
     console.log('Tracing initialising', {});
     otelSDK.start();
   }
+}
+
+export function isTracingEnabled(): boolean {
+  return !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 }

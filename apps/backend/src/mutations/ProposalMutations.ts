@@ -41,11 +41,12 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { statusActionEngine } from '../statusActionEngine';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
+import InstrumentMutations from './InstrumentMutations';
 
 @injectable()
 export default class ProposalMutations {
@@ -593,7 +594,7 @@ export default class ProposalMutations {
       );
 
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      statusActionEngine(statusEngineReadyProposals);
+      proposalStatusActionEngine(statusEngineReadyProposals);
     } else {
       rejection('Could not change statuses to all of the selected proposals', {
         result,
@@ -839,6 +840,33 @@ export default class ProposalMutations {
         true
       );
 
+      const sourceProposalInstrumentId =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(
+          sourceProposal.primaryKey
+        );
+
+      if (sourceProposalInstrumentId.length > 0) {
+        const instrumentMutations = container.resolve(InstrumentMutations);
+
+        try {
+          instrumentMutations.assignProposalsToInstrumentsInternal(agent, {
+            instrumentIds: sourceProposalInstrumentId.map(
+              (instrument) => instrument.id
+            ),
+            proposalPks: [clonedProposal.primaryKey],
+          });
+        } catch (error) {
+          logger.logWarn(
+            'Could not assign cloned proposals to the same instruments',
+            {
+              error,
+              clonedProposal,
+              sourceProposal,
+            }
+          );
+        }
+      }
+
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
@@ -859,6 +887,8 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
+        experimentSequence: null,
+        fileId: null,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
@@ -881,12 +911,9 @@ export default class ProposalMutations {
       }
 
       const proposalGenericTemplates =
-        await this.genericTemplateDataSource.getGenericTemplates(
-          {
-            filter: { proposalPk: sourceProposal.primaryKey },
-          },
-          agent
-        );
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
 
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =

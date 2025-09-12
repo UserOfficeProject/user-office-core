@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import Autocomplete from '@mui/material/Autocomplete';
 import MUITextField from '@mui/material/TextField';
 import { Field } from 'formik';
@@ -82,7 +83,6 @@ export const QuestionTemplateRelationIntervalForm = (
               data-cy="units"
             />
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}
