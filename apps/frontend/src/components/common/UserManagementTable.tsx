@@ -12,6 +12,7 @@ import React, { useContext, useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 
 import InviteUser from '../proposal/InviteUser';
@@ -56,6 +57,7 @@ const UserManagementTable = ({
   const isLegacyInviteFlow = featuresMap.get(
     FeatureId.EMAIL_INVITE_LEGACY
   )?.isEnabled;
+  const currentUser = useContext(UserContext)?.user;
 
   const removeUser = (user: BasicUserDetails) => {
     const newUsers = users.filter((u) => u.id !== user.id);
@@ -92,7 +94,10 @@ const UserManagementTable = ({
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
-      excludeEmails={invites.map((invite) => invite.email)}
+      excludeEmails={[
+        ...(invites?.map((invite) => invite.email) || []),
+        ...(currentUser.email ? [currentUser.email.toLowerCase()] : []),
+      ]}
       allowInviteByEmail={allowInviteByEmail}
     />
   );
