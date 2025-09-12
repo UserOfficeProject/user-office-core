@@ -1,3 +1,4 @@
+import { DialogContent, DialogContentText } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -34,8 +35,14 @@ const NotifyProposal = ({ close, notifyProposals }: NotifyProposalProps) => {
                 padding: '22px 0 0',
               }}
             >
-              Notify selected proposals
+              Notify results
             </Typography>
+            <DialogContent dividers>
+              <DialogContentText>
+                This action will trigger emails to be sent to principal
+                investigators
+              </DialogContentText>
+            </DialogContent>
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -45,7 +52,7 @@ const NotifyProposal = ({ close, notifyProposals }: NotifyProposalProps) => {
                   component={CheckboxWithLabel}
                   type="checkbox"
                   Label={{
-                    label: 'Set notified flag',
+                    label: 'Set proposals as notified',
                   }}
                   data-cy="setNotifiedflag"
                 />
