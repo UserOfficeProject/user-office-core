@@ -21,7 +21,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
     reviewMutations.updateReview(dummyUserWithRole, {
       reviewID: 10,
       comment: 'Good proposal',
-      grade: 9,
+      grade: '9',
       status: ReviewStatus.DRAFT,
       fapID: 1,
       questionaryID: 1,
@@ -34,7 +34,7 @@ test('A user can not submit a review on a proposal', () => {
     reviewMutations.updateReview(dummyUserNotOnProposalWithRole, {
       reviewID: 1,
       comment: 'Good proposal',
-      grade: 9,
+      grade: '9',
       status: ReviewStatus.DRAFT,
       fapID: 1,
       questionaryID: 1,
@@ -50,7 +50,7 @@ test('A Fap chair can not modify Fap review if it is submitted', () => {
     reviewMutations.updateReview(dummyFapChairWithRole, {
       reviewID: 5,
       comment: 'Good proposal test',
-      grade: 9,
+      grade: '9',
       status: ReviewStatus.SUBMITTED,
       fapID: 1,
       questionaryID: 1,
@@ -66,7 +66,7 @@ test('A Fap secretary can not modify Fap review if it is submitted', () => {
     reviewMutations.updateReview(dummyFapSecretaryWithRole, {
       reviewID: 5,
       comment: 'Good proposal test',
-      grade: 9,
+      grade: '9',
       status: ReviewStatus.SUBMITTED,
       fapID: 1,
       questionaryID: 1,

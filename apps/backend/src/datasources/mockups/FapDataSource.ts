@@ -96,7 +96,7 @@ export const dummyFapReview = new Review(
   1,
   1,
   'Dummy Fap review',
-  7,
+  '7',
   0,
   1,
   1,
