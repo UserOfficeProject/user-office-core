@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
   # used to proxy the core UI FE and BE requests to the right container
   # Core FE is accessible on localhost:33000/
