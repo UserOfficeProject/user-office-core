@@ -112,8 +112,10 @@ export enum PREPARE_DOWNLOAD_TYPE {
   PDF_SAMPLE,
   PDF_SHIPMENT_LABEL,
   PDF_GENERIC_TEMPLATE,
+  PDF_EXPERIMENT_SAFETY,
   ZIP_ATTACHMENT,
   ZIP_PROPOSAL,
+  ZIP_EXPERIMENT_SAFETY,
   XLSX_PROPOSAL,
   XLSX_FAP,
   XLSX_CALL_FAP,
@@ -154,6 +156,8 @@ function generateLink(
       return '/download/pdf/shipment-label/' + ids;
     case PREPARE_DOWNLOAD_TYPE.PDF_GENERIC_TEMPLATE:
       return '/download/pdf/generic-template/' + ids;
+    case PREPARE_DOWNLOAD_TYPE.PDF_EXPERIMENT_SAFETY:
+      return '/download/pdf/experiment-safety/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL:
       return '/download/xlsx/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL_TECHNIQUE:
@@ -178,6 +182,8 @@ function generateLink(
       return `/download/zip/attachment/${ids}?questionIds=${options?.questionIds}`;
     case PREPARE_DOWNLOAD_TYPE.ZIP_PROPOSAL:
       return '/download/zip/proposal/' + ids;
+    case PREPARE_DOWNLOAD_TYPE.ZIP_EXPERIMENT_SAFETY:
+      return '/download/zip/experiment-safety/' + ids;
     default:
       throw new Error('Unknown type:' + type);
   }

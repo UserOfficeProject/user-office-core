@@ -2,6 +2,7 @@ import { updateDataAccessUsersValidationSchema } from '@user-office-software/duo
 import { inject, injectable } from 'tsyringe';
 
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
@@ -24,7 +25,9 @@ export default class DataAccessUsersMutations {
     @inject(Tokens.DataAccessUsersAuthorization)
     private dataAccessUsersAuth: DataAccessUsersAuthorization,
     @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @ValidateArgs(updateDataAccessUsersValidationSchema)
@@ -40,6 +43,19 @@ export default class DataAccessUsersMutations {
         (await this.dataAccessUsersAuth.hasWriteRights(agent, proposalPk));
       if (!hasWriteRights) {
         return rejection('You do not have write rights for this proposal');
+      }
+
+      const alreadyMemberIds: number[] = [];
+      for (const userId of args.userIds) {
+        if (await this.proposalAuth.isMemberOfProposal(userId, proposalPk)) {
+          alreadyMemberIds.push(userId);
+        }
+      }
+      if (alreadyMemberIds.length > 0) {
+        return rejection(
+          'User can not be symultaneously a data access user and a member of the proposal',
+          { alreadyMemberIds }
+        );
       }
 
       const result = await this.dataSource.updateDataAccessUsers(

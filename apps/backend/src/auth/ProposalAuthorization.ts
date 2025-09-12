@@ -53,22 +53,29 @@ export class ProposalAuthorization {
   }
 
   isPrincipalInvestigatorOfProposal(
-    agent: UserJWT | null,
+    agentOrUserId: UserJWT | number | null,
     proposal: Proposal | null
   ) {
-    if (agent == null || proposal == null) {
+    if (agentOrUserId == null || proposal == null) {
       return false;
     }
-    if (agent.id === proposal.proposerId) {
+    let userId: number;
+    if (typeof agentOrUserId === 'number') {
+      userId = agentOrUserId;
+    } else {
+      userId = agentOrUserId.id;
+    }
+
+    if (userId === proposal.proposerId) {
       return true;
     }
   }
 
   async isMemberOfProposal(
-    agent: UserJWT | null,
+    agentOrUserId: UserJWT | number | null,
     proposalOrPk: Proposal | number | null
   ) {
-    if (agent == null || proposalOrPk == null) {
+    if (agentOrUserId == null || proposalOrPk == null) {
       return false;
     }
 
@@ -83,14 +90,21 @@ export class ProposalAuthorization {
       proposal = proposalOrPk;
     }
 
-    if (this.isPrincipalInvestigatorOfProposal(agent, proposal)) {
+    let userId: number;
+    if (typeof agentOrUserId === 'number') {
+      userId = agentOrUserId;
+    } else {
+      userId = agentOrUserId.id;
+    }
+
+    if (this.isPrincipalInvestigatorOfProposal(userId, proposal)) {
       return true;
     }
 
     return this.userDataSource
       .getProposalUsers(proposal.primaryKey)
       .then((users) => {
-        return users.some((user) => user.id === agent.id);
+        return users.some((user) => user.id === userId);
       });
   }
 

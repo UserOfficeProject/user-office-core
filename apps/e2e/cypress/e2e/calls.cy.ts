@@ -4,7 +4,6 @@ import {
   CreateInstrumentMutationVariables,
   FeatureId,
   TemplateGroupId,
-  UpdateCallInput,
   WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -38,6 +37,7 @@ context('Calls tests', () => {
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: DateTime.fromJSDate(faker.date.past()),
     endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
@@ -62,6 +62,7 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: twoDaysAgo.toISO(),
     endCall: yesterday.toISO(),
     startReview: currentDayStart,
@@ -210,7 +211,7 @@ context('Calls tests', () => {
         cy.get('[role="presentation"]').contains(esiTemplateName).click();
       }
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="next-step"]').click();
@@ -263,7 +264,7 @@ context('Calls tests', () => {
 
       cy.contains('Create').click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.contains('Loading...').should('not.exist');
 
       cy.get('[role="presentation"]')
@@ -694,7 +695,7 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[aria-label="Deactivate call"]')
+        .find('[aria-label="Archive call"]')
         .click();
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -704,31 +705,11 @@ context('Calls tests', () => {
         'not.contain',
         newCall.shortCode
       );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
-
-      cy.finishedLoading();
-
+      cy.contains('Archived').click();
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[aria-label="Activate call"]')
+        .find('[aria-label="Unarchive call"]')
         .click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.notification({ variant: 'success', text: 'successfully' });
-
-      cy.get('[data-cy="calls-table"]').should(
-        'not.contain',
-        newCall.shortCode
-      );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="calls-table"]').should('contain', newCall.shortCode);
     });
 
     it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
@@ -851,24 +832,79 @@ context('Calls tests', () => {
         });
     });
 
+    it('User officer can reorder how calls appear to a user', () => {
+      cy.createCall({
+        ...newInactiveCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      let firstTableRowTextBeforeSorting: string;
+      let firstTableRowTextAfterSorting: string;
+      cy.contains('Calls').click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="order-calls-button"]').first().click();
+      cy.contains('Drag to order calls');
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .then((element) => {
+          firstTableRowTextBeforeSorting = element.text();
+        });
+      //reorder
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .dragElement([
+          { direction: 'left', length: 0 },
+          { direction: 'down', length: 1 },
+        ]);
+
+      cy.get('[data-cy="call-list-drag-item"]')
+        .last()
+        .then((element) => {
+          firstTableRowTextAfterSorting = element.text();
+          expect(firstTableRowTextBeforeSorting).not.equal(
+            firstTableRowTextAfterSorting
+          );
+        });
+
+      //Open calls
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newCall,
+        proposalWorkflowId: initialDBData.proposal.id,
+        startCall: yesterday,
+        endCall: DateTime.now().plus({ days: 5 }),
+        endCallInternal: DateTime.now().plus({ days: 6 }),
+      });
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newInactiveCall,
+        shortCode: initialDBData.call.shortCode,
+        endCall: DateTime.now().plus({ days: 31, hours: 1 }),
+        proposalWorkflowId: initialDBData.proposal.id,
+      });
+      //check order for users
+      cy.logout();
+      cy.login('user2', initialDBData.roles.user);
+      cy.contains('New Proposal').click();
+
+      cy.get('[data-cy="call-list"]').find('li:first-child');
+      cy.contains(newCall.shortCode);
+    });
+
     it('User officer can filter calls by their status', () => {
       cy.createCall({
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
-
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
 
       cy.finishedLoading();
 
@@ -878,7 +914,7 @@ context('Calls tests', () => {
       cy.contains(newCall.shortCode);
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
+      cy.get('[role="listbox"]').contains('Closed').click();
 
       cy.finishedLoading();
 
@@ -898,7 +934,7 @@ context('Calls tests', () => {
       ).should('have.length', 3);
     });
 
-    it('User officer can filter active internal calls by their status', function () {
+    it('User officer can filter active calls by their status', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
@@ -906,13 +942,6 @@ context('Calls tests', () => {
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
 
       cy.contains('Calls').click();
@@ -936,10 +965,10 @@ context('Calls tests', () => {
       }).then(() => {
         cy.reload();
         cy.get('[data-cy="call-status-filter"]').click();
-        cy.get('[role="listbox"]').contains('Active Internal').click();
+        cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
-        ).should('have.length', 1);
+        ).should('have.length', 2);
       });
     });
 
@@ -947,7 +976,7 @@ context('Calls tests', () => {
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('All').click();
 
       cy.contains(newCall.shortCode)
         .parent()

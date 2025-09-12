@@ -2,6 +2,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import { Button } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { FieldProps, getIn } from 'formik';
 import { Field } from 'formik';
 import { DateTime } from 'luxon';
@@ -19,23 +20,18 @@ const HourSelector = ({
 }: {
   label: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChange: (e: string) => void;
   disabled?: boolean;
 }) => (
   <div>
     <label>{label}</label>
-    <select value={value} onChange={onChange} disabled={disabled}>
-      {Array.from({ length: 24 }, (_, i) =>
-        [
-          `${i.toString().padStart(2, '0')}:00`,
-          `${i.toString().padStart(2, '0')}:30`,
-        ].map((hour) => (
-          <option key={hour} value={hour}>
-            {hour}
-          </option>
-        ))
-      )}
-    </select>
+    <TimePicker
+      value={DateTime.fromFormat(value, 'HH:mm')}
+      onChange={(e) => onChange(e?.toFormat('HH:mm') ?? value)}
+      ampm={false}
+      disabled={disabled}
+      slotProps={{ popper: { disablePortal: true } }}
+    />
   </div>
 );
 
@@ -225,13 +221,13 @@ export default function DayTimeRangePicker({
             <HourSelector
               label="Start Hour:"
               value={startHour}
-              onChange={(e) => setStartHour(e.target.value)}
+              onChange={(e) => setStartHour(e)}
               disabled={disabled}
             />
             <HourSelector
               label="End Hour:"
               value={endHour}
-              onChange={(e) => setEndHour(e.target.value)}
+              onChange={(e) => setEndHour(e)}
               disabled={disabled}
             />
           </div>

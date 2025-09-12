@@ -30,7 +30,7 @@ import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
-import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -250,7 +250,7 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.INVITE_ACCEPTED: {
+      case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
         const { invite } = event;
 
         const claims = await coProposerClaimDataSource.findByInviteId(

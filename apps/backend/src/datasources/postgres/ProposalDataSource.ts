@@ -727,7 +727,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         // data access
         .orWhereIn('p.proposal_pk', function () {
-          // co-proposer
           this.select('proposal_pk')
             .from('data_access_user_has_proposal')
             .where('user_id', id);

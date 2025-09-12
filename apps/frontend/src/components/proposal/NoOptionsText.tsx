@@ -12,6 +12,7 @@ interface NoOptionsTextProps {
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
+  isEmailSearchOnly: boolean;
   allowInviteByEmail?: boolean;
 }
 
@@ -22,6 +23,7 @@ function NoOptionsText({
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
+  isEmailSearchOnly,
   allowInviteByEmail = false,
 }: NoOptionsTextProps) {
   const isEmailInviteEnabled = allowInviteByEmail;
@@ -32,6 +34,14 @@ function NoOptionsText({
         {getFullUserNameWithInstitution(exactEmailMatch)}
       </MenuItem>
     );
+  }
+
+  if (isEmailSearchOnly) {
+    if (isValidEmail(query)) {
+      return <>No results found for &quot;{query}&quot;</>;
+    } else {
+      return <>Enter a full email address</>;
+    }
   }
 
   if ((query as string).length < minSearchLength) {

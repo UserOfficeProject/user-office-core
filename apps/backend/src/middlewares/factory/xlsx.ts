@@ -3,12 +3,11 @@ import { container } from 'tsyringe';
 
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
-import {
+import callFactoryService, {
   XLSXType,
   XLSXMetaBase,
   DownloadType,
-  DownloadService,
-} from '../../factory/DownloadService';
+} from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
   CallExtraFapDataColumns,
@@ -24,10 +23,6 @@ import {
 const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
 
 const router = express.Router();
-
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
@@ -70,7 +65,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },
@@ -115,7 +110,7 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.FAP,
       { data, meta, userRole },
@@ -156,7 +151,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.CALL_FAP,
       { data, meta, userRole },
@@ -224,7 +219,7 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },

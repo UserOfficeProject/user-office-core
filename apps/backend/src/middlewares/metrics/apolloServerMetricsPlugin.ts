@@ -13,31 +13,32 @@ interface MetricLabels {
   operation: string;
   operation_type: OperationType;
   status: 'success' | 'error';
+  client_name: string;
 }
 
 const graphqlRequestDuration = new Histogram({
   name: 'graphql_request_duration_seconds',
   help: 'Duration of GraphQL requests in seconds',
-  labelNames: ['operation', 'operation_type', 'status'],
+  labelNames: ['operation', 'operation_type', 'status', 'client_name'],
   buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], // 10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s
 });
 
 const graphqlRequestCounter = new Counter({
   name: 'graphql_requests_total',
   help: 'Total number of GraphQL requests',
-  labelNames: ['operation', 'operation_type', 'status'],
+  labelNames: ['operation', 'operation_type', 'status', 'client_name'],
 });
 
 const graphqlErrorCounter = new Counter({
   name: 'graphql_errors_total',
   help: 'Total number of GraphQL errors',
-  labelNames: ['operation', 'operation_type', 'error_code'],
+  labelNames: ['operation', 'operation_type', 'error_code', 'client_name'],
 });
 
 const graphqlResponseSize = new Histogram({
   name: 'graphql_response_size_bytes',
   help: 'Size of the GraphQL response in bytes',
-  labelNames: ['operation', 'operation_type', 'status'],
+  labelNames: ['operation', 'operation_type', 'status', 'client_name'],
   buckets: [1000, 5000, 10000, 50000, 100000, 500000, 1000000], // 1KB, 5KB, 10KB, 50KB, 100KB, 500KB, 1MB
 });
 
@@ -47,13 +48,17 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
   async requestDidStart(requestContext: GraphQLRequestContext<BaseContext>) {
     const { request } = requestContext;
 
-    const operationName = request.operationName || 'anonymous';
+    const operationName =
+      request.operationName || getOperationNameFromQuery(request.query);
     const operationType = getOperationType(request.query);
+    const clientName =
+      request.http?.headers.get('apollographql-client-name') || 'unknown';
 
     const labels: MetricLabels = {
       operation: operationName,
       operation_type: operationType,
       status: 'success',
+      client_name: clientName,
     };
 
     const end = graphqlRequestDuration.startTimer(labels);
@@ -105,6 +110,16 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
     };
   },
 });
+
+function getOperationNameFromQuery(query?: string): string {
+  if (!query) return 'anonymous';
+
+  const match = query.match(
+    /^(query|mutation|subscription)\s+([a-zA-Z0-9_]+)\s*\(/
+  );
+
+  return match ? match[2] : 'anonymous';
+}
 
 function getOperationType(query: string | undefined): OperationType {
   if (!query) return 'unknown';

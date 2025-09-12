@@ -12,6 +12,7 @@ import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposer
 import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -19,10 +20,10 @@ import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTem
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalReviewDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
-import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import PredefinedMessageDataSourceMock from '../datasources/mockups/PredefinedMessageDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
+import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -47,7 +48,6 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
@@ -66,7 +66,14 @@ mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteDataSource, InviteDataSourceMock);
 mapClass(Tokens.RoleClaimDataSource, RoleClaimDataSourceMock);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
-mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  ProposalPdfTemplateDataSourceMock
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  ExperimentSafetyPdfTemplateDataSourceMock
+);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
@@ -111,8 +118,6 @@ mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () =>
   setLogger(new ConsoleLogger({ colorize: true }))
 );
-
-mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
