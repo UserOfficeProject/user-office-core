@@ -1,6 +1,10 @@
 import { logger } from '@user-office-software/duo-logger';
 import Knex from 'knex';
 
+import addExtensions from './databaseExtensions';
+
+addExtensions();
+
 const db = Knex({
   client: 'postgresql',
   connection: process.env.DATABASE_URL,
