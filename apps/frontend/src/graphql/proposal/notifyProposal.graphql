@@ -1,5 +1,5 @@
-mutation notifyProposal($proposalPk: Int!) {
-  notifyProposal(proposalPk: $proposalPk) {
+mutation notifyProposal($proposalPk: Int!, $setNotified: Boolean!) {
+  notifyProposal(proposalPk: $proposalPk, setNotified: $setNotified) {
     primaryKey
   }
 }
