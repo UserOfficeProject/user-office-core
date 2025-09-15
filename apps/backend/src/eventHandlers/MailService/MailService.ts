@@ -52,7 +52,7 @@ export abstract class MailService {
 
       try {
         const tempDir = mkdtempSync(tempDirPath);
-        const tempFilePath = path.join(tempDir, emailTemplate.name);
+        const tempFilePath = path.join(tempDir, emailTemplate.id.toString());
 
         logger.logInfo('Creating email template', {
           templateId: options.content.db_template_id,
