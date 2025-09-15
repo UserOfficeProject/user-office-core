@@ -67,7 +67,7 @@ export const proposalDownloadActionHandler = async (
     );
 
     const { collectProposalPDFDataTokenAccess } = await import(
-      '../factory/pdf/proposal'
+      '../factory/pdf/proposal.js'
     );
 
     let proposalPDFData: ProposalPDFData;
