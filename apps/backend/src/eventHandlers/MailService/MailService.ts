@@ -54,6 +54,12 @@ export abstract class MailService {
         const tempDir = mkdtempSync(tempDirPath);
         const tempFilePath = path.join(tempDir, emailTemplate.name);
 
+        logger.logInfo('Creating email template', {
+          templateId: options.content.db_template_id,
+          dbTemplateId: options.content.db_template_id,
+          tempFilePath,
+        });
+
         writeFileSync(tempFilePath + '.html.pug', emailTemplate.body);
 
         writeFileSync(

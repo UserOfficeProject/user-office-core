@@ -21,6 +21,8 @@ export class SMTPMailService extends MailService {
   constructor() {
     super();
 
+    logger.logInfo('Initializing SMTPMailService', {});
+
     const attachments = [];
 
     if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
@@ -114,6 +116,8 @@ export class SMTPMailService extends MailService {
     if (process.env.NODE_ENV === 'test') {
       sendMailResults.id = 'test';
     }
+
+    logger.logInfo('Preparing to send email', { ...options });
 
     const template = await this.getEmailTemplate(options);
 

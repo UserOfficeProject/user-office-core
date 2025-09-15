@@ -460,6 +460,11 @@ const sendMail = async (
     return;
   }
 
+  logger.logInfo(
+    `Preparing to send email(s) using template: ${templateMessage} (${templateMessageId}) to ${recipientsWithData.length} recipient(s).`,
+    { recipientsWithData }
+  );
+
   const emailTemplate =
     await emailTemplateDataSource.getEmailTemplate(templateMessageId);
 
