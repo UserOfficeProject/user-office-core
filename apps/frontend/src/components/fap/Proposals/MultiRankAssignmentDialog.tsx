@@ -100,7 +100,6 @@ export const MultiRankAssignmentDialog = ({
                           user.rank === row.rank &&
                           row.rank !== null
                       )}
-                      //TOTO Highlight conflivting ranks
                       sx={{ width: 100 }}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         setUsersWithRank((prev) =>

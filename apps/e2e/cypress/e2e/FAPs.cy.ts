@@ -693,12 +693,7 @@ context('Fap reviews tests', () => {
 
       cy.assignReviewersToFap({
         fapId: createdFapId,
-        memberIds: [fapMembers.reviewer.id],
-      });
-
-      cy.assignReviewersToFap({
-        fapId: createdFapId,
-        memberIds: [fapMembers.reviewer2.id],
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
       });
 
       cy.login('officer');
