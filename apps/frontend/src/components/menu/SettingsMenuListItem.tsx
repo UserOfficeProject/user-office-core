@@ -4,6 +4,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import Settings from '@mui/icons-material/Settings';
+import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
 import { ListItemButton } from '@mui/material';
@@ -51,7 +52,7 @@ const SettingsMenuListItem = () => {
 
   return (
     <>
-      <Tooltip title="Settings">
+      <Tooltip title="Configuration Settings">
         <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
             {isExpanded ? (
@@ -66,7 +67,7 @@ const SettingsMenuListItem = () => {
               </>
             )}
           </ListItemIcon>
-          <ListItemText primary="Settings" />
+          <ListItemText primary="Configuration Settings" />
         </ListItemButton>
       </Tooltip>
 
@@ -77,6 +78,14 @@ const SettingsMenuListItem = () => {
               <FunctionsIcon />
             </ListItemIcon>
             <ListItemText primary="Units" />
+          </ListItemButton>
+        </Tooltip>
+        <Tooltip title="Pages">
+          <ListItemButton component={NavLink} to="/PageEditor">
+            <ListItemIcon>
+              <SettingsApplications />
+            </ListItemIcon>
+            <ListItemText primary="Pages" />
           </ListItemButton>
         </Tooltip>
 
