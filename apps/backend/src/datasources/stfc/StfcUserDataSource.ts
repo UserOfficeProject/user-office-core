@@ -575,6 +575,11 @@ export class StfcUserDataSource implements UserDataSource {
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)
       );
+
+      if (subtractUsers && subtractUsers.length > 0) {
+        const usersToRemove = new Set(subtractUsers);
+        userDetails = userDetails.filter((user) => !usersToRemove.has(user.id));
+      }
     } else {
       const { users } = await postgresUserDataSource.getUsers({
         filter: undefined,

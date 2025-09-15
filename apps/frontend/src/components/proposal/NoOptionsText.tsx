@@ -13,6 +13,7 @@ interface NoOptionsTextProps {
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
+  isEmailSearchOnly: boolean;
 }
 
 function NoOptionsText({
@@ -22,6 +23,7 @@ function NoOptionsText({
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
+  isEmailSearchOnly,
 }: NoOptionsTextProps) {
   const featureContext = useContext(FeatureContext);
   const isEmailInviteEnabled = !!featureContext.featuresMap.get(
@@ -34,6 +36,14 @@ function NoOptionsText({
         {getFullUserNameWithInstitution(exactEmailMatch)}
       </MenuItem>
     );
+  }
+
+  if (isEmailSearchOnly) {
+    if (isValidEmail(query)) {
+      return <>No results found for &quot;{query}&quot;</>;
+    } else {
+      return <>Enter a full email address</>;
+    }
   }
 
   if ((query as string).length < minSearchLength) {
