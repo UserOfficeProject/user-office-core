@@ -10,18 +10,21 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 
 type NotifyProposalProps = {
   close: () => void;
-  notifyProposals: (notify: boolean) => void;
+  ignoreNotifiedFlag: (notify: boolean) => void;
 };
 
-const NotifyProposal = ({ close, notifyProposals }: NotifyProposalProps) => {
+const NotifyProposal = ({
+  close,
+  ignoreNotifiedFlag: notifyProposals,
+}: NotifyProposalProps) => {
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="sm">
       <Formik
         initialValues={{
-          setNotifiedFlag: false,
+          ignoreNotifiedFlag: false,
         }}
         onSubmit={async (values): Promise<void> => {
-          await notifyProposals(values.setNotifiedFlag);
+          await notifyProposals(values.ignoreNotifiedFlag);
           close();
         }}
       >
@@ -44,15 +47,15 @@ const NotifyProposal = ({ close, notifyProposals }: NotifyProposalProps) => {
               </DialogContentText>
             </DialogContent>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={6}>
               <Grid item xs={12}>
                 <Field
-                  id="setNotifiedFlag"
-                  name="setNotifiedFlag"
+                  id="ignoreNotifiedFlag"
+                  name="ignoreNotifiedFlag"
                   component={CheckboxWithLabel}
                   type="checkbox"
                   Label={{
-                    label: 'Set proposals as notified',
+                    label: 'Force notification (even if already notified)',
                   }}
                   data-cy="setNotifiedflag"
                 />

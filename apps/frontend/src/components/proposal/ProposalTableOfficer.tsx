@@ -479,13 +479,13 @@ const ProposalTableOfficer = ({
   };
 
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
-  const emailProposals = (setNotified: boolean): void => {
+  const emailProposals = (ignoreNotifiedFlag: boolean): void => {
     getSelectedProposalPks().forEach(async (proposalPk) => {
       await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
         proposalPk,
-        setNotified,
+        ignoreNotifiedFlag,
       });
 
       refreshTableData();
@@ -990,7 +990,7 @@ const ProposalTableOfficer = ({
         <DialogContent>
           <NotifyProposal
             close={(): void => setOpenNotifyProposal(false)}
-            notifyProposals={emailProposals}
+            ignoreNotifiedFlag={emailProposals}
           />
         </DialogContent>
       </Dialog>

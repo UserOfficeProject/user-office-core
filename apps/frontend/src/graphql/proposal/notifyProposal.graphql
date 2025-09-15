@@ -1,5 +1,8 @@
-mutation notifyProposal($proposalPk: Int!, $setNotified: Boolean!) {
-  notifyProposal(proposalPk: $proposalPk, setNotified: $setNotified) {
+mutation notifyProposal($proposalPk: Int!, $ignoreNotifiedFlag: Boolean!) {
+  notifyProposal(
+    proposalPk: $proposalPk
+    ignoreNotifiedFlag: $ignoreNotifiedFlag
+  ) {
     primaryKey
   }
 }

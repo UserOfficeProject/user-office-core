@@ -16,7 +16,7 @@ export class NotifyProposalArgs {
   @Field(() => Int)
   public proposalPk: number;
   @Field(() => Boolean)
-  public setNotified: boolean;
+  public ignoreNotifiedFlag: boolean;
 }
 
 @Resolver()
@@ -29,7 +29,7 @@ export class NotifyProposalMutation {
   ) {
     return context.mutations.proposal.notify(context.user, {
       proposalPk: args.proposalPk,
-      setNotified: args.setNotified,
+      ignoreNotifiedFlag: args.ignoreNotifiedFlag,
     });
   }
 }
