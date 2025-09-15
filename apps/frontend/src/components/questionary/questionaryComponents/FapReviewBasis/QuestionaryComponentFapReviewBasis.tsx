@@ -203,8 +203,6 @@ const fapReviewBasisPreSubmit =
     const fapReview = (state as FapReviewSubmissionState).fapReview;
     const { id, comment, grade, fapID, status, questionaryID } = fapReview;
 
-    console.log('grade pre submit', grade);
-
     const returnValue = state.questionary.questionaryId;
 
     if (id > 0) {
