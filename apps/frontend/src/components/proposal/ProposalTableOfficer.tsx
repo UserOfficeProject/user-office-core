@@ -836,16 +836,6 @@ const ProposalTableOfficer = ({
       icon: EmailIcon,
       tooltip: 'Notify users final result',
       onClick: () => {
-        // confirm(
-        //   () => {
-        //     emailProposals(true);
-        //   },
-        //   {
-        //     title: 'Notify results',
-        //     description:
-        //       'This action will trigger emails to be sent to principal investigators.',
-        //   }
-        // )();
         setOpenNotifyProposal(true);
       },
       position: 'toolbarOnSelect',
