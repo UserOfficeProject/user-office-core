@@ -71,30 +71,27 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.prev_connection_id
     );
   }
+
+  private async getInitialStatus(workflowType: WorkflowType) {
+    const shortCode =
+      workflowType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
+
+    const initialStatus = (await database()
+      .select('status_id')
+      .from('statuses')
+      .where('short_code', shortCode)
+      .andWhere('entity_type', workflowType)
+      .first()) as number;
+
+    return initialStatus;
+  }
+
   async createWorkflow(
     newWorkflowInput: CreateWorkflowInput
   ): Promise<Workflow> {
-    let defaultStatusId: number | null = null;
-
-    if (newWorkflowInput.entityType === WorkflowType.PROPOSAL) {
-      const defaultProposalStatus = await database()
-        .select('status_id')
-        .from('statuses')
-        .where('is_default', true)
-        .andWhere('entity_type', WorkflowType.PROPOSAL)
-        .first();
-
-      defaultStatusId = defaultProposalStatus?.status_id;
-    } else if (newWorkflowInput.entityType === WorkflowType.EXPERIMENT) {
-      const defaultExperimentStatus = await database()
-        .select('status_id')
-        .from('statuses')
-        .where('is_default', true)
-        .andWhere('entity_type', WorkflowType.EXPERIMENT)
-        .first();
-
-      defaultStatusId = defaultExperimentStatus?.status_id;
-    }
+    const defaultStatusId = await this.getInitialStatus(
+      newWorkflowInput.entityType
+    );
 
     if (!defaultStatusId) {
       throw new GraphQLError(
