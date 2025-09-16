@@ -130,6 +130,15 @@ export class SMTPMailService extends MailService {
       return { results: sendMailResults };
     }
 
+    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+      logger.logInfo('Skipping email sending', {
+        templateId: options.content.template_id,
+        dbTemplateId: options.content.db_template_id,
+      });
+
+      return { results: sendMailResults };
+    }
+
     options.recipients.forEach((participant) => {
       emailPromises.push(
         this.emailTemplates.send({

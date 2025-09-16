@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   EmailStatusActionRecipients,
+  EmailTemplate,
   FeatureId,
   FeatureUpdateAction,
   Event as PROPOSAL_EVENTS,
@@ -36,12 +37,12 @@ const newCall = {
 
 let proposal1Id: string;
 let proposal2Id: string;
-//let emailTemplate1: EmailTemplate | null;
-//let emailTemplate2: EmailTemplate | null;
+let emailTemplate1: EmailTemplate | null;
+let emailTemplate2: EmailTemplate | null;
 
 context('Status actions tests', () => {
   beforeEach(function () {
-    cy.resetDB();
+    cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
 
     cy.updateFeature({
@@ -49,13 +50,13 @@ context('Status actions tests', () => {
       featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
     });
 
-    // cy.getEmailTemplate({ emailTemplateId: 1 }).then((result) => {
-    //   emailTemplate1 = result.emailTemplate;
-    // });
+    cy.getEmailTemplate({ emailTemplateId: 1 }).then((result) => {
+      emailTemplate1 = result.emailTemplate;
+    });
 
-    // cy.getEmailTemplate({ emailTemplateId: 2 }).then((result) => {
-    //   emailTemplate2 = result.emailTemplate;
-    // });
+    cy.getEmailTemplate({ emailTemplateId: 2 }).then((result) => {
+      emailTemplate2 = result.emailTemplate;
+    });
   });
 
   describe('Status actions workflow tests', () => {
@@ -143,7 +144,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 100,
+              id: emailTemplate1?.id,
               name: 'template-name-1',
             },
             combineEmails: true,
@@ -237,8 +238,8 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 100,
-              name: 'template-name-1',
+              id: emailTemplate2?.id,
+              name: 'template-name-2',
             },
           },
         ],
@@ -308,8 +309,8 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 100,
-              name: 'template-name-1',
+              id: emailTemplate1?.id,
+              name: 'PI-email-template',
             },
           },
         ],
@@ -461,7 +462,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 100,
+              id: emailTemplate1?.id,
               name: 'template-name-1',
             },
             otherRecipientEmails: [faker.internet.email()],
@@ -579,7 +580,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 100,
+              id: emailTemplate1?.id,
               name: 'template-name-1',
             },
             otherRecipientEmails: [statusActionEmail],
@@ -691,7 +692,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 100,
+              id: emailTemplate1?.id,
               name: 'template-name-1',
             },
           },
@@ -702,7 +703,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 100,
+              id: emailTemplate1?.id,
               name: 'template-name-1',
             },
             otherRecipientEmails: [faker.internet.email()],
