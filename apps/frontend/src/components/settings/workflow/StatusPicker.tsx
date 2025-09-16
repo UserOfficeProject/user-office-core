@@ -29,7 +29,9 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
         (status.description &&
           status.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
-    .filter((status) => status.shortCode !== 'DRAFT'); // Exclude DRAFT status
+    .filter(
+      (status) => ['DRAFT', 'AWAITING_ESF'].includes(status.shortCode) === false
+    ); // Exclude DRAFT and 'AWAITING_ESF' status
 
   return (
     <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>

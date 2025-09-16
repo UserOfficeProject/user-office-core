@@ -1,9 +1,10 @@
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Status } from '../../models/Status';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
-import { Workflow, WorkflowType } from '../../models/Workflow';
+import { Workflow } from '../../models/Workflow';
 import {
   WorkflowConnection,
   NextAndPreviousStatuses,
@@ -19,9 +20,14 @@ import {
   WorkflowConnectionRecord,
   WorkflowRecord,
 } from './records';
+import StatusDataSource from './StatusDataSource';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
+  constructor(
+    @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
+  ) {}
+
   private createWorkflowObject(workflow: WorkflowRecord) {
     return new Workflow(
       workflow.workflow_id,
@@ -72,28 +78,14 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
-  private async getInitialStatus(workflowType: WorkflowType) {
-    const shortCode =
-      workflowType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
-
-    const initialStatus = (await database()
-      .select('status_id')
-      .from('statuses')
-      .where('short_code', shortCode)
-      .andWhere('entity_type', workflowType)
-      .first()) as number;
-
-    return initialStatus;
-  }
-
   async createWorkflow(
     newWorkflowInput: CreateWorkflowInput
   ): Promise<Workflow> {
-    const defaultStatusId = await this.getInitialStatus(
+    const initialStatus = await this.statusDataSource.getInitialStatus(
       newWorkflowInput.entityType
     );
 
-    if (!defaultStatusId) {
+    if (!initialStatus) {
       throw new GraphQLError(
         `Could not find default status for ${newWorkflowInput.entityType}`
       );
@@ -109,14 +101,16 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       .returning('*');
 
     if (!workflowRecord) {
-      throw new GraphQLError('Could not create status');
+      throw new GraphQLError(
+        `Could not create workflow ${newWorkflowInput.name}`
+      );
     }
 
     await this.addWorkflowStatus({
       sortOrder: 0,
       nextStatusId: null,
       prevStatusId: null,
-      statusId: defaultStatusId,
+      statusId: initialStatus.id,
       workflowId: workflowRecord.workflow_id,
       posX: 0,
       posY: 0,
