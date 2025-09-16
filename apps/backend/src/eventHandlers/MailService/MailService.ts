@@ -67,12 +67,17 @@ export abstract class MailService {
           '= `' + emailTemplate.subject + '`'
         );
 
-        const templatePath =
-          this.getEmailTemplatePath('html', tempFilePath) + '.pug';
-
         if (
-          !(await (this.emailTemplates as any).templateExists(templatePath))
+          !(await (this.emailTemplates as any).templateExists(
+            tempFilePath + '.html.pug'
+          ))
         ) {
+          logger.logWarn('Email template does not exist', {
+            templateId: options.content.db_template_id,
+            dbTemplateId: options.content.db_template_id,
+            tempFilePath,
+          });
+
           return null;
         }
 

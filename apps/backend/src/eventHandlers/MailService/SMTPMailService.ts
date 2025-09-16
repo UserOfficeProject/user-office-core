@@ -123,7 +123,7 @@ export class SMTPMailService extends MailService {
 
     if (!template) {
       logger.logError('Email template not found', {
-        templateId: options.content.db_template_id,
+        templateId: options.content.template_id,
         dbTemplateId: options.content.db_template_id,
       });
 
