@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
 import { ClientError, RequestOptions, Variables } from 'graphql-request';
-import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/esm/types';
 import { jwtDecode } from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
@@ -13,6 +12,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, getSdk, SettingsId } from 'generated/sdk';
 import { RequestQuery } from 'utils/utilTypes';
 
+import { VariablesAndRequestHeadersArgs } from '../../../node_modules/graphql-request/build/esm/types';
 const endpoint = '/graphql';
 
 const clientNameHeader = 'apollographql-client-name';
