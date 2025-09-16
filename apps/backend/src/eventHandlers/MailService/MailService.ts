@@ -67,6 +67,15 @@ export abstract class MailService {
           '= `' + emailTemplate.subject + '`'
         );
 
+        const templatePath =
+          this.getEmailTemplatePath('html', tempFilePath) + '.pug';
+
+        if (
+          !(await (this.emailTemplates as any).templateExists(templatePath))
+        ) {
+          return null;
+        }
+
         return { name: emailTemplate.name, path: tempFilePath };
       } catch (err) {
         logger.logWarn('Could not create email template', {
