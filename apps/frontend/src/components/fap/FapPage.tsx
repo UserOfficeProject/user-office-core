@@ -35,7 +35,7 @@ const FapPage = () => {
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     useFapProposalsData(
       parseInt(id as string),
-      call ? parseInt(call) : null,
+      call ? parseInt(call) : -1,
       instrument ? parseInt(instrument) : null
     );
 

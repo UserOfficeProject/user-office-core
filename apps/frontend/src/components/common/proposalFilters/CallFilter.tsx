@@ -13,6 +13,7 @@ type CallFilterProps = {
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
+  shouldShowCurrent?: boolean;
   callId: number | null;
 };
 
@@ -22,6 +23,7 @@ const CallFilter = ({
   callId,
   onChange,
   shouldShowAll,
+  shouldShowCurrent,
 }: CallFilterProps) => {
   const [, setSearchParams] = useSearchParams();
 
@@ -41,8 +43,14 @@ const CallFilter = ({
     id: 0,
     shortCode: 'All',
   };
+  const currentOption: CallOption = {
+    id: -1,
+    shortCode: 'Current',
+  };
+
   const options: CallOption[] = [
-    ...(shouldShowAll ? [allOption] : []), // Add all call option if should show all.
+    ...(shouldShowCurrent ? [currentOption] : []),
+    ...(shouldShowAll ? [allOption] : []),
     ...sortedCalls,
   ];
 
@@ -68,7 +76,7 @@ const CallFilter = ({
             onChange={(_, call) => {
               setSearchParams((searchParams) => {
                 searchParams.delete('call');
-                if (call?.id) searchParams.set('call', String(call.id));
+                searchParams.set('call', String(call.id));
 
                 return searchParams;
               });
@@ -79,7 +87,11 @@ const CallFilter = ({
             options={options}
             value={
               options.find((v) => v.id === callId) ||
-              (shouldShowAll ? allOption : undefined)
+              (currentOption
+                ? currentOption
+                : shouldShowAll
+                  ? allOption
+                  : undefined)
             }
             data-cy="call-filter"
             renderInput={(params) => <TextField {...params} />}

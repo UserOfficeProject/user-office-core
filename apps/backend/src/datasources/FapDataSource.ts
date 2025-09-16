@@ -71,11 +71,14 @@ export interface FapDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
-  getFapProposals(filter: {
-    fapId: number;
-    callId?: number | null;
-    instrumentId?: number | null;
-  }): Promise<FapProposal[]>;
+  getFapProposals(
+    filter: {
+      fapId: number;
+      callId?: number | null;
+      instrumentId?: number | null;
+    },
+    currentUerId?: number
+  ): Promise<FapProposal[]>;
   getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number

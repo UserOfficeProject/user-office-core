@@ -305,11 +305,14 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
-  async getFapProposals(filter: {
-    fapId: number;
-    callId?: number | null;
-    instrumentId?: number | null;
-  }): Promise<FapProposal[]> {
+  async getFapProposals(
+    filter: {
+      fapId: number;
+      callId?: number | null;
+      instrumentId?: number | null;
+    },
+    currentUserNumber?: number
+  ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -322,14 +325,32 @@ export default class PostgresFapDataSource implements FapDataSource {
             'p.status_id': 's.status_id',
           })
           .where(function () {
-            this.where('s.short_code', 'ilike', 'FAP_%');
+            this.where('p.submitted', true);
           });
 
-        if (filter.callId) {
+        if (filter.callId && filter.callId > 0) {
           query.andWhere('fp.call_id', filter.callId);
+        } else if (filter.callId === -1) {
+          // -1 is the value we use for "current"
+          query.andWhere(function () {
+            this.where('s.short_code', 'ilike', 'FAP_%');
+          });
         }
+
         if (filter.instrumentId) {
           query.andWhere('fp.instrument_id', filter.instrumentId);
+        }
+
+        if (currentUserNumber) {
+          query.andWhere((query) => {
+            query.whereNot('p.proposer_id', currentUserNumber);
+          });
+          query.whereNotExists(function () {
+            this.select('*')
+              .from('proposal_user as pu')
+              .whereRaw('pu.proposal_pk = fp.proposal_pk')
+              .andWhere('pu.user_id', currentUserNumber);
+          });
         }
       })
       .where('fp.fap_id', filter.fapId)
@@ -506,7 +527,8 @@ export default class PostgresFapDataSource implements FapDataSource {
   async getFapProposalsByInstrument(
     instrumentId: number,
     callId: number,
-    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number },
+    currentUserNumber?: number
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select([

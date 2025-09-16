@@ -42,6 +42,7 @@ const FapProposalsAndAssignments = ({
             calls={calls}
             isLoading={loadingCalls}
             shouldShowAll={true}
+            shouldShowCurrent={true}
             callId={call ? +call : null}
           />
         </Grid>
@@ -58,7 +59,6 @@ const FapProposalsAndAssignments = ({
       <FapProposalsAndAssignmentsTable
         data={fapData}
         onAssignmentsUpdate={onFapUpdate}
-        selectedCallId={call ? +call : null}
         selectedInstrumentId={instrument ? +instrument : null}
         fapProposals={fapProposals}
       />

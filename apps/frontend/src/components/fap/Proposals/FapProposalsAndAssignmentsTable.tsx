@@ -63,8 +63,6 @@ type FapProposalsAndAssignmentsTableProps = {
   data: Fap;
   /** Call this function in case of Fap assigned members update */
   onAssignmentsUpdate: (fap: Fap) => void;
-  /** Call id that we want to filter by */
-  selectedCallId: number | null;
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
   selectedInstrumentId: number | null;
