@@ -143,7 +143,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
             combineEmails: true,
@@ -237,7 +237,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
           },
@@ -308,7 +308,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
           },
@@ -461,7 +461,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
             otherRecipientEmails: [faker.internet.email()],
@@ -579,7 +579,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
             otherRecipientEmails: [statusActionEmail],
@@ -691,7 +691,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
           },
@@ -702,7 +702,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 0,
+              id: 100,
               name: 'template-name-1',
             },
             otherRecipientEmails: [faker.internet.email()],
