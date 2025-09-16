@@ -983,7 +983,7 @@ const ProposalTableOfficer = ({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={openNotifiyProposal}
-        maxWidth="xs"
+        maxWidth="sm"
         onClose={(): void => setOpenNotifyProposal(false)}
         fullWidth
       >

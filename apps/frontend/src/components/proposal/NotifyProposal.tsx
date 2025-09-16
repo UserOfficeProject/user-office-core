@@ -55,7 +55,8 @@ const NotifyProposal = ({
                   component={CheckboxWithLabel}
                   type="checkbox"
                   Label={{
-                    label: 'Force notification (even if already notified)',
+                    label:
+                      'Force notification (send email even if already notified)',
                   }}
                   data-cy="setNotifiedflag"
                 />
