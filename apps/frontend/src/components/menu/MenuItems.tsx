@@ -22,11 +22,11 @@ import { FeatureId, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
-import { ProposalMenuListItem } from './ProposalMenuListItem';
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
+import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
@@ -132,7 +132,24 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Calls" />
         </ListItemButton>
       </Tooltip>
-      <ProposalMenuListItem />
+      <Tooltip title="Proposals">
+        <ListItemButton component={NavLink} to="/Proposals">
+          <ListItemIcon>
+            <FolderOpen />
+          </ListItemIcon>
+          <ListItemText primary="Proposals" />
+        </ListItemButton>
+      </Tooltip>
+      {isTechniqueProposalsEnabled && (
+        <Tooltip title={t('Technique Proposals')}>
+          <ListItemButton component={NavLink} to={techniqueProposalUrl}>
+            <ListItemIcon>
+              <Topic />
+            </ListItemIcon>
+            <ListItemText primary={t('Technique Proposals')} />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
@@ -182,6 +199,21 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
+      <Tooltip title="Proposal workflows">
+        <ListItemButton
+          component={NavLink}
+          selected={
+            location.pathname.includes('/ProposalWorkflows') ||
+            location.pathname.includes('ProposalWorkflowEditor')
+          }
+          to={'/ProposalWorkflows'}
+        >
+          <ListItemIcon>
+            <ProposalWorkflowIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal workflows" />
+        </ListItemButton>
+      </Tooltip>
 
       {isUserManagementEnabled && (
         <Tooltip title="Institutions">

@@ -19,12 +19,10 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 
 import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
-import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 
 const menuMap = {
   Units: '/Units',
   ProposalStatuses: '/ProposalStatuses',
-  ProposalWorkflows: '/ProposalWorkflows',
   ExperimentWorkflows: '/ExperimentWorkflows',
   ApiAccessTokens: '/ApiAccessTokens',
   Features: '/Features',
@@ -99,22 +97,6 @@ const SettingsMenuListItem = () => {
               <ProposalSettingsIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal statuses" />
-          </ListItemButton>
-        </Tooltip>
-
-        <Tooltip title="Proposal workflows">
-          <ListItemButton
-            component={NavLink}
-            selected={
-              location.pathname.includes('/ProposalWorkflows') ||
-              location.pathname.includes('ProposalWorkflowEditor')
-            }
-            to={menuMap['ProposalWorkflows']}
-          >
-            <ListItemIcon>
-              <ProposalWorkflowIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal workflows" />
           </ListItemButton>
         </Tooltip>
 
