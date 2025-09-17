@@ -500,7 +500,7 @@ export const collectProposalPDFData = async (
 };
 
 export const collectProposalPDFDataTokenAccess = async (
-  proposalPk: number,
+  proposalKey: number,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<FullProposalPDFData> => {
@@ -512,9 +512,9 @@ export const collectProposalPDFDataTokenAccess = async (
   let proposal = null;
   const proposalFilter = options?.filter ?? null;
   if (proposalFilter && proposalFilter === 'id') {
-    proposal = await proposalDataSource.getProposalById(proposalPk.toString());
+    proposal = await proposalDataSource.getProposalById(proposalKey.toString());
   } else {
-    proposal = await proposalDataSource.get(proposalPk);
+    proposal = await proposalDataSource.get(proposalKey);
   }
 
   if (proposal === null) {
@@ -714,6 +714,11 @@ export const collectProposalPregeneratedPdfData = async (
     );
   }
 
+  if (!proposal.fileId) {
+    // Proposal does not have a pregenerated PDF
+    return null;
+  }
+
   const pi = await baseContext.queries.user.getBasic(user, proposal.proposerId);
 
   if (isRejection(pi) || pi == null) {
@@ -732,41 +737,26 @@ export const collectProposalPregeneratedPdfData = async (
     );
   }
 
-  if (proposal.fileId) {
-    notify?.(
-      `${proposal.proposalId}_${
-        pi.lastname
-      }_${proposal.created.getUTCFullYear()}.pdf`
-    );
+  notify?.(
+    `${proposal.proposalId}_${
+      pi.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
+  );
 
-    logger.logInfo(`Pregenerated PDF found for proposal PK ${proposalPk}`, {
-      proposalPk: proposal.primaryKey,
+  return {
+    proposal: {
+      primaryKey: proposal.primaryKey,
       proposalId: proposal.proposalId,
       fileId: proposal.fileId,
-    });
-
-    return {
-      proposal: {
-        primaryKey: proposal.primaryKey,
-        proposalId: proposal.proposalId,
-        fileId: proposal.fileId,
-        created: proposal.created,
-      },
-      principalInvestigator: pi,
-      isPregeneratedPdfData: true,
-    };
-  } else {
-    logger.logInfo(`Pregenerated PDF not found for proposal PK ${proposalPk}`, {
-      proposalPk: proposal.primaryKey,
-      proposalId: proposal.proposalId,
-    });
-
-    return null;
-  }
+      created: proposal.created,
+    },
+    principalInvestigator: pi,
+    isPregeneratedPdfData: true,
+  };
 };
 
 export const collectProposalPregeneratedPdfDataTokenAccess = async (
-  proposalPk: number,
+  proposalKey: number,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<PregeneratedProposalPDFData | null> => {
@@ -777,26 +767,31 @@ export const collectProposalPregeneratedPdfDataTokenAccess = async (
   let proposal = null;
   const proposalFilter = options?.filter ?? null;
   if (proposalFilter && proposalFilter === 'id') {
-    proposal = await proposalDataSource.getProposalById(proposalPk.toString());
+    proposal = await proposalDataSource.getProposalById(proposalKey.toString());
   } else {
-    proposal = await proposalDataSource.get(proposalPk);
+    proposal = await proposalDataSource.get(proposalKey);
   }
 
   const propIdentifier = proposalFilter === 'id' ? 'ID' : 'PK';
 
   if (!proposal || isRejection(proposal)) {
     logger.logError(
-      `Could not fetch proposal with ${propIdentifier} ${proposalPk} for pregenerated proposal download`,
+      `Could not fetch proposal with ${propIdentifier} ${proposalKey} for pregenerated proposal download`,
       {
         reason: proposal?.reason || 'Proposal is null',
-        proposal: proposalPk,
+        proposal: proposalKey,
         requestedBy: 'API key',
       }
     );
 
     throw new Error(
-      `Could not fetch proposal with ${propIdentifier} ${proposalPk} for pregenerated proposal download`
+      `Could not fetch proposal with ${propIdentifier} ${proposalKey} for pregenerated proposal download`
     );
+  }
+
+  if (!proposal.fileId) {
+    // Proposal does not have a pregenerated PDF
+    return null;
   }
 
   const userDataSource = container.resolve<UserDataSource>(
@@ -820,41 +815,20 @@ export const collectProposalPregeneratedPdfDataTokenAccess = async (
     );
   }
 
-  if (proposal.fileId) {
-    notify?.(
-      `${proposal.proposalId}_${
-        pi.lastname
-      }_${proposal.created.getUTCFullYear()}.pdf`
-    );
+  notify?.(
+    `${proposal.proposalId}_${
+      pi.lastname
+    }_${proposal.created.getUTCFullYear()}.pdf`
+  );
 
-    logger.logInfo(
-      `Pregenerated PDF found for proposal PK ${proposal.primaryKey}`,
-      {
-        proposalPk: proposal.primaryKey,
-        proposalId: proposal.proposalId,
-        fileId: proposal.fileId,
-      }
-    );
-
-    return {
-      proposal: {
-        primaryKey: proposal.primaryKey,
-        proposalId: proposal.proposalId,
-        fileId: proposal.fileId,
-        created: proposal.created,
-      },
-      principalInvestigator: pi,
-      isPregeneratedPdfData: true,
-    };
-  } else {
-    logger.logInfo(
-      `Pregenerated PDF not found for proposal PK ${proposal.primaryKey}`,
-      {
-        proposalPk: proposal.primaryKey,
-        proposalId: proposal.proposalId,
-      }
-    );
-
-    return null;
-  }
+  return {
+    proposal: {
+      primaryKey: proposal.primaryKey,
+      proposalId: proposal.proposalId,
+      fileId: proposal.fileId,
+      created: proposal.created,
+    },
+    principalInvestigator: pi,
+    isPregeneratedPdfData: true,
+  };
 };
