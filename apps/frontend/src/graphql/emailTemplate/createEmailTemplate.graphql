@@ -1,0 +1,19 @@
+mutation createEmailTemplate(
+  $createdByUserId: Int!
+  $name: String!
+  $description: String
+  $subject: String!
+  $body: String!
+) {
+  createEmailTemplate(
+    createEmailTemplateInput: {
+      createdByUserId: $createdByUserId
+      name: $name
+      description: $description
+      subject: $subject
+      body: $body
+    }
+  ) {
+    ...emailTemplate
+  }
+}

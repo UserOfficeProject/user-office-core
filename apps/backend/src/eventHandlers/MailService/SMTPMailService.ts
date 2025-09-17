@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -17,19 +18,25 @@ import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
-  private emailTemplates: EmailTemplates<any>;
-
   constructor() {
     super();
+
+    logger.logInfo('Initializing SMTPMailService', {});
 
     const attachments = [];
 
     if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
-      attachments.push({
-        filename: 'logo.png',
-        path: process.env.EMAIL_FOOTER_IMAGE_PATH,
-        cid: 'logo1',
-      });
+      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
+        attachments.push({
+          filename: 'logo.png',
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+          cid: 'logo1',
+        });
+      } else {
+        logger.logWarn('Email footer image path does not exist', {
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        });
+      }
     }
 
     let smtpTransport:
@@ -65,15 +72,10 @@ export class SMTPMailService extends MailService {
           relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
         },
       },
-      getPath: this.getEmailTemplatePath,
+      getPath: (type, template) => {
+        return `${template}.${type}`;
+      },
     });
-  }
-
-  private getEmailTemplatePath(type: string, template: string): string {
-    return path.join(
-      process.env.EMAIL_TEMPLATE_PATH || '',
-      `${template}.${type}`
-    );
   }
 
   private getSmtpAuthOptions() {
@@ -115,15 +117,23 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const template =
-      this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
+    logger.logInfo('Preparing to send email', { ...options });
 
-    if (
-      !(await (this.emailTemplates as any).templateExists(template)) &&
-      process.env.NODE_ENV !== 'test'
-    ) {
-      logger.logError('Template does not exist', {
-        templateId: template,
+    const template = await this.getEmailTemplate(options);
+
+    if (!template) {
+      logger.logError('Email template not found', {
+        templateId: options.content.template_id,
+        dbTemplateId: options.content.db_template_id,
+      });
+
+      return { results: sendMailResults };
+    }
+
+    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+      logger.logInfo('Skipping email sending', {
+        templateId: options.content.template_id,
+        dbTemplateId: options.content.db_template_id,
       });
 
       return { results: sendMailResults };
@@ -132,7 +142,7 @@ export class SMTPMailService extends MailService {
     options.recipients.forEach((participant) => {
       emailPromises.push(
         this.emailTemplates.send({
-          template: options.content.template_id,
+          template: template.path,
           message: {
             ...(typeof participant.address !== 'string'
               ? {

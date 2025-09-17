@@ -59,6 +59,7 @@ export const groupProposalsByProperties = (
 export type EmailReadyType = {
   id: EmailStatusActionRecipients;
   proposals: WorkflowEngineProposalType[];
+  templateId: number;
   template: string;
   email: string;
   firstName?: string;
@@ -214,7 +215,8 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         emailReadyUsersWithProposals.push({
           id: recipientsWithEmailTemplate.recipient.name,
           proposals: [proposal],
-          template: recipientsWithEmailTemplate.emailTemplate.id,
+          template: recipientsWithEmailTemplate.emailTemplate.name,
+          templateId: recipientsWithEmailTemplate.emailTemplate.id,
           email: recipient.email,
           firstName: recipient.firstname,
           lastName: recipient.lastname,

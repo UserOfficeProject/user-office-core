@@ -1,6 +1,6 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import { logger } from '@user-office-software/duo-logger';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -13,7 +13,8 @@ import {
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
-import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
+import { essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
 const mockMailService = {

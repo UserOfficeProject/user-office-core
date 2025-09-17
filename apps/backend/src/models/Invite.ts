@@ -1,4 +1,4 @@
-import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 
 export class Invite {
   constructor(

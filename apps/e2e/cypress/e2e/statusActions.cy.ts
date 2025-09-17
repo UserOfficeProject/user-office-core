@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
 import {
-  Event as PROPOSAL_EVENTS,
-  EmailStatusActionRecipients,
-  StatusActionType,
   AllocationTimeUnits,
-  FeatureUpdateAction,
+  EmailStatusActionRecipients,
+  EmailTemplate,
   FeatureId,
+  FeatureUpdateAction,
+  Event as PROPOSAL_EVENTS,
+  StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -36,15 +37,25 @@ const newCall = {
 
 let proposal1Id: string;
 let proposal2Id: string;
+let emailTemplate1: EmailTemplate | null;
+let emailTemplate2: EmailTemplate | null;
 
 context('Status actions tests', () => {
   beforeEach(function () {
-    cy.resetDB();
+    cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
       featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
+    });
+
+    cy.getEmailTemplate({ emailTemplateId: 1 }).then((result) => {
+      emailTemplate1 = result.emailTemplate;
+    });
+
+    cy.getEmailTemplate({ emailTemplateId: 2 }).then((result) => {
+      emailTemplate2 = result.emailTemplate;
     });
   });
 
@@ -132,7 +143,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: emailTemplate1?.id,
+              name: 'template-name-1',
+            },
             combineEmails: true,
           },
         ],
@@ -223,7 +237,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: emailTemplate2?.id,
+              name: 'template-name-2',
+            },
           },
         ],
       };
@@ -291,7 +308,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: emailTemplate1?.id,
+              name: 'PI-email-template',
+            },
           },
         ],
       };
@@ -441,7 +461,10 @@ context('Status actions tests', () => {
               description:
                 'Other email recipients manually added by their email',
             },
-            emailTemplate: { id: 'my-first-email', name: 'My First Email' },
+            emailTemplate: {
+              id: emailTemplate1?.id,
+              name: 'template-name-1',
+            },
             otherRecipientEmails: [faker.internet.email()],
           },
         ],
@@ -557,8 +580,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: emailTemplate1?.id,
+              name: 'template-name-1',
             },
             otherRecipientEmails: [statusActionEmail],
           },
@@ -668,7 +691,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: emailTemplate1?.id,
+              name: 'template-name-1',
+            },
           },
           {
             recipient: {
@@ -677,8 +703,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: emailTemplate1?.id,
+              name: 'template-name-1',
             },
             otherRecipientEmails: [faker.internet.email()],
           },

@@ -7,6 +7,8 @@ import { ResultsPromise } from './SparkPost';
 export class SkipSendMailService extends MailService {
   constructor() {
     super();
+
+    logger.logInfo('Initializing SkipSendMailService', {});
   }
 
   async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
