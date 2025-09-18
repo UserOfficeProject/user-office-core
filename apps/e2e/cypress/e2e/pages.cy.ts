@@ -11,7 +11,7 @@ context('Page tests', () => {
   it('Should be able update FAQ', () => {
     cy.login('officer');
     cy.visit('/');
-
+    cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
 
     cy.contains('Set user homepage');

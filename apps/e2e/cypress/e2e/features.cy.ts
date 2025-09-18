@@ -19,7 +19,9 @@ context('Features tests', () => {
         'Instrument'
       );
 
-      cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
+      cy.get('[data-cy="officer-menu-items"]')
+        .contains('Configuration Settings')
+        .click();
       cy.get('[data-cy="officer-menu-items"]').contains('Features').click();
 
       cy.get('[data-cy="features-table"]')
