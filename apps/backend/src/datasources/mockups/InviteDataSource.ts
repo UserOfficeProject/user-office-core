@@ -17,7 +17,6 @@ export class InviteDataSourceMock implements InviteDataSource {
     this.init();
   }
 
-
   async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const coProposerClaims =
       await this.coProposerDataSource.findByProposalPk(proposalPk);
