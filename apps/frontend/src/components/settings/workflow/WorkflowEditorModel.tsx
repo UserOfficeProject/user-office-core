@@ -169,6 +169,7 @@ const WorkflowEditorModel = (
     api()
       .getWorkflow({
         workflowId: parseInt(workflowId),
+        entityType: entityType,
       })
       .then((data) => {
         memoizedDispatch({
