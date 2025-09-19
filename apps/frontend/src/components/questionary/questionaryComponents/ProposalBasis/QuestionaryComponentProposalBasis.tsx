@@ -192,7 +192,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 }
 
 const proposalBasisPreSubmit =
-  () =>
+  (isInvitesEnabled: boolean) =>
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const proposal = (state as ProposalSubmissionState).proposal;
     const { primaryKey, title, abstract, users, proposer, callId } = proposal;
@@ -208,19 +208,24 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
-      const invites = await api.setCoProposerInvites({
-        input: {
-          proposalPk: result.updateProposal.primaryKey,
-          emails: proposal.coProposerInvites.map((invite) => invite.email),
-        },
-      });
+      let invites;
+      if (isInvitesEnabled) {
+        invites = await api.setCoProposerInvites({
+          input: {
+            proposalPk: result.updateProposal.primaryKey,
+            emails: proposal.coProposerInvites.map((invite) => invite.email),
+          },
+        });
+      }
+
+      const coProposerInvites = invites?.setCoProposerInvites ?? [];
 
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_LOADED',
         itemWithQuestionary: {
           ...proposal,
           ...result.updateProposal,
-          ...{ coProposerInvites: invites.setCoProposerInvites },
+          ...(isInvitesEnabled ? { coProposerInvites } : {}),
         },
       });
     } else {
@@ -235,19 +240,25 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
-      const invites = await api.setCoProposerInvites({
-        input: {
-          proposalPk: updateProposal.primaryKey,
-          emails: proposal.coProposerInvites.map((invite) => invite.email),
-        },
-      });
+      let invites;
+      if (isInvitesEnabled) {
+        invites = await api.setCoProposerInvites({
+          input: {
+            proposalPk: updateProposal.primaryKey,
+            emails: proposal.coProposerInvites.map((invite) => invite.email),
+          },
+        });
+      }
+
+      const coProposerInvites = invites?.setCoProposerInvites ?? [];
+
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
         itemWithQuestionary: {
           ...proposal,
           ...createProposal,
           ...updateProposal,
-          ...{ coProposerInvites: invites.setCoProposerInvites },
+          ...(isInvitesEnabled ? { coProposerInvites } : {}),
         },
       });
       returnValue = createProposal.questionaryId;
