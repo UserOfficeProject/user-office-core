@@ -1,7 +1,7 @@
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
-import { Chip } from '@mui/material';
+import { Chip, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -15,8 +15,8 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 
-import InviteUser from '../proposal/InviteUser';
 import ParticipantModal from '../proposal/ParticipantModal';
+import ParticipantSelector from '../proposal/ParticipantSelector';
 
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */
@@ -24,17 +24,20 @@ export type UserManagementTableProps = {
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
   invites: Invite[];
-  setInvites: (invites: Invite[]) => void;
+  setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
   title: string;
   preserveSelf?: boolean;
   addButtonLabel?: string;
+  addButtonTooltip?: string;
   /** Disable the add button */
   disabled?: boolean;
   /** Custom actions to be passed to PeopleTable */
   onUserAction?: (action: string, user: BasicUserDetails) => void;
   /** Additional excluded user IDs for invite flow */
   excludeUserIds?: number[];
+  /** If true, allows to add users by entering their email. Set this to true and listen to setInvites */
+  allowEmailInvites?: boolean;
 };
 
 const UserManagementTable = ({
@@ -46,9 +49,11 @@ const UserManagementTable = ({
   title,
   preserveSelf,
   addButtonLabel = 'Add',
+  addButtonTooltip = 'Add a participant',
   disabled = false,
   onUserAction,
   excludeUserIds = [],
+  allowEmailInvites = false,
 }: UserManagementTableProps) => {
   const [modalOpen, setOpen] = useState(false);
   const { featuresMap } = useContext(FeatureContext);
@@ -71,7 +76,7 @@ const UserManagementTable = ({
     invites: Invite[];
   }) => {
     setUsers([...users, ...props.users]);
-    setInvites([...invites, ...props.invites]);
+    setInvites?.([...invites, ...props.invites]);
     setOpen(false);
   };
 
@@ -83,15 +88,17 @@ const UserManagementTable = ({
   };
 
   const handleDeleteInvite = (invite: Invite) => {
-    setInvites(invites.filter((i) => i.email !== invite.email));
+    setInvites?.(invites.filter((i) => i.email !== invite.email));
   };
 
   const InviteComponent = (
-    <InviteUser
+    <ParticipantSelector
       modalOpen={modalOpen}
+      title="Add co-proposers"
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
+      allowEmailInvites={allowEmailInvites}
       excludeEmails={[
         ...(invites?.map((invite) => invite.email) || []),
         ...(currentUser.email ? [currentUser.email.toLowerCase()] : []),
@@ -194,16 +201,18 @@ const UserManagementTable = ({
               marginTop: theme.spacing(1),
             })}
           >
-            <Button
-              variant="outlined"
-              onClick={openModal}
-              data-cy="add-participant-button"
-              size="small"
-              startIcon={<PersonAddIcon />}
-              disabled={disabled}
-            >
-              {addButtonLabel}
-            </Button>
+            <Tooltip title={addButtonTooltip}>
+              <Button
+                variant="outlined"
+                onClick={openModal}
+                data-cy="add-participant-button"
+                size="small"
+                startIcon={<PersonAddIcon />}
+                disabled={disabled}
+              >
+                {addButtonLabel}
+              </Button>
+            </Tooltip>
           </ActionButtonContainer>
         </div>
       </FormControl>

@@ -2,43 +2,54 @@ import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
-import { SxProps, Theme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
-import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { BasicUserData } from 'hooks/user/useUserData';
+import {
+  QuestionaryContext,
+  createMissingContextErrorMessage,
+} from 'components/questionary/QuestionaryContext';
+import { BasicUserDetails } from 'generated/sdk';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
-import ParticipantModal from './ParticipantModal';
+import ParticipantSelector from './ParticipantSelector';
+import { ProposalContextType } from './ProposalContainer';
 
-export default function ProposalParticipant(props: {
-  principalInvestigator: BasicUserData | null | undefined;
+interface PrincipalInvestigatorProps {
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
-  sx?: SxProps<Theme>;
-  loadingPrincipalInvestigator?: boolean;
-}) {
+  disabled?: boolean;
+}
+
+export default function PrincipalInvestigator(
+  props: PrincipalInvestigatorProps
+) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
+  const { state } = useContext(QuestionaryContext) as ProposalContextType;
+  if (!state) {
+    throw new Error(createMissingContextErrorMessage());
+  }
+  const { proposer, users } = state.proposal;
+
   return (
-    <Box sx={props.sx}>
-      <ParticipantModal
-        show={isPickerOpen}
-        userRole={UserRole.USER}
-        title={'Set Principal Investigator'}
-        close={() => {
-          setIsPickerOpen(false);
-        }}
-        selectedUsers={
-          !!props.principalInvestigator ? [props.principalInvestigator?.id] : []
-        }
-        addParticipants={(users: BasicUserDetails[]) => {
-          props.setPrincipalInvestigator(users[0]);
-          setIsPickerOpen(false);
-        }}
-        participant={true}
-      />
+    <Box sx={{ margin: '2px' }}>
+      {isPickerOpen && (
+        <ParticipantSelector
+          modalOpen={isPickerOpen}
+          title={'Set Principal Investigator'}
+          onClose={() => setIsPickerOpen(false)}
+          onAddParticipants={(participants) => {
+            props.setPrincipalInvestigator(participants.users[0]);
+            setIsPickerOpen(false);
+          }}
+          excludeUserIds={[users.map((u) => u.id)].flat()}
+          preset={proposer ? [proposer] : []}
+          multiple={false}
+          allowEmailInvites={false}
+        />
+      )}
+
       <FormControl
         sx={{
           flexDirection: 'row',
@@ -49,7 +60,7 @@ export default function ProposalParticipant(props: {
       >
         <TextField
           label="Principal Investigator"
-          value={getFullUserNameWithInstitution(props.principalInvestigator)}
+          value={getFullUserNameWithInstitution(proposer)}
           InputLabelProps={{ shrink: true }}
           InputProps={{
             readOnly: true,
@@ -67,7 +78,7 @@ export default function ProposalParticipant(props: {
                 padding: '5px',
                 marginLeft: theme.spacing(1),
               })}
-              disabled={props.loadingPrincipalInvestigator}
+              disabled={props.disabled}
             >
               <EditIcon data-cy="edit-proposer-button" fontSize="small" />
             </IconButton>
