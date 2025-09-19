@@ -1,8 +1,7 @@
 import { MenuItem, Typography } from '@mui/material';
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { FeatureContext } from 'context/FeatureContextProvider';
-import { BasicUserDetails, FeatureId } from 'generated/sdk';
+import { BasicUserDetails } from 'generated/sdk';
 import { isValidEmail } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
@@ -14,6 +13,7 @@ interface NoOptionsTextProps {
   excludeEmails?: string[];
   minSearchLength?: number;
   isEmailSearchOnly: boolean;
+  allowInviteByEmail?: boolean;
 }
 
 function NoOptionsText({
@@ -24,11 +24,9 @@ function NoOptionsText({
   excludeEmails = [],
   minSearchLength = 3,
   isEmailSearchOnly,
+  allowInviteByEmail = false,
 }: NoOptionsTextProps) {
-  const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
-    FeatureId.EMAIL_INVITE
-  )?.isEnabled;
+  const isEmailInviteEnabled = allowInviteByEmail;
 
   if (exactEmailMatch) {
     return (

@@ -35,6 +35,7 @@ export type UserManagementTableProps = {
   onUserAction?: (action: string, user: BasicUserDetails) => void;
   /** Additional excluded user IDs for invite flow */
   excludeUserIds?: number[];
+  allowInviteByEmail?: boolean;
 };
 
 const UserManagementTable = ({
@@ -49,6 +50,7 @@ const UserManagementTable = ({
   disabled = false,
   onUserAction,
   excludeUserIds = [],
+  allowInviteByEmail = false,
 }: UserManagementTableProps) => {
   const [modalOpen, setOpen] = useState(false);
   const { featuresMap } = useContext(FeatureContext);
@@ -96,6 +98,7 @@ const UserManagementTable = ({
         ...(invites?.map((invite) => invite.email) || []),
         ...(currentUser.email ? [currentUser.email.toLowerCase()] : []),
       ]}
+      allowInviteByEmail={allowInviteByEmail}
     />
   );
 
