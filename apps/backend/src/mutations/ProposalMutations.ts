@@ -380,13 +380,21 @@ export default class ProposalMutations {
   @Authorized([Roles.USER_OFFICER])
   async notify(
     user: UserWithRole | null,
-    { proposalPk }: { proposalPk: number }
+    {
+      proposalPk,
+      ignoreNotifiedFlag,
+    }: { proposalPk: number; ignoreNotifiedFlag: boolean }
   ): Promise<unknown> {
     const proposal = await this.proposalDataSource.get(proposalPk);
 
-    if (!proposal || proposal.notified || !proposal.finalStatus) {
+    if (
+      !proposal ||
+      (proposal.notified && !ignoreNotifiedFlag) ||
+      !proposal.finalStatus
+    ) {
       return rejection('Can not notify proposal', { proposal });
     }
+
     proposal.notified = true;
     const result = await this.proposalDataSource.update(proposal);
 
