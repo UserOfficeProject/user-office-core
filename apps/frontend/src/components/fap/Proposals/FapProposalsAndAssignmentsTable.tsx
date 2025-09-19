@@ -51,7 +51,7 @@ type ProposalReview = {
   id: number;
   userID: number;
   comment: string | null;
-  grade: number | null;
+  grade: string | null;
   status: ReviewStatus;
   fapID: number;
   proposalPk?: number;

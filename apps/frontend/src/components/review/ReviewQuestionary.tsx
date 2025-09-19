@@ -37,7 +37,7 @@ export function createFapReviewStub(
 ): FapReviewWithQuestionary {
   return {
     id: 0,
-    grade: 0,
+    grade: '0',
     comment: '',
     fapID: 0,
     reviewer: reviewer,

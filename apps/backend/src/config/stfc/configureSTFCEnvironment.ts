@@ -115,10 +115,6 @@ async function enableDefaultStfcFeatures() {
     settingsValue: '1200000',
   });
   await db.updateSettings({
-    settingsId: SettingsId.GRADE_PRECISION,
-    settingsValue: '0.01',
-  });
-  await db.updateSettings({
     settingsId: SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS,
     settingsValue: 'FEASIBILITY',
   });
