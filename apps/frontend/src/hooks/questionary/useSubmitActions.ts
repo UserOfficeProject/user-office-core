@@ -1,3 +1,5 @@
+import React, { useContext } from 'react';
+
 import { fapReviewBasisPreSubmit } from 'components/questionary/questionaryComponents/FapReviewBasis/QuestionaryComponentFapReviewBasis';
 import { feedbackBasisPreSubmit } from 'components/questionary/questionaryComponents/FeedbackBasis/QuestionaryComponentFeedbackBasis';
 import { genericTemplateBasisPreSubmit } from 'components/questionary/questionaryComponents/GenericTemplateBasis/QuestionaryComponentGenericTemplateBasis';
@@ -6,7 +8,8 @@ import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponen
 import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
 import { technicalReviewBasisPreSubmit } from 'components/questionary/questionaryComponents/TechnicalReviewBasis/QuestionaryComponentTechnicalReviewBasis';
 import { visitBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
-import { Answer, DataType, Sdk } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { Answer, DataType, FeatureId, Sdk } from 'generated/sdk';
 import {
   Event,
   QuestionarySubmissionState,
@@ -22,13 +25,17 @@ export type SubmitAction = (
 ) => Promise<number | null>;
 
 export function usePreSubmitActions() {
+  const featureContext = useContext(FeatureContext);
+  const isInvitesEnabled =
+    featureContext.featuresMap.get(FeatureId.EMAIL_INVITE)?.isEnabled ?? false;
+
   return (answers: Answer[]): SubmitAction[] => {
     const actions = answers.flatMap((answer) => {
       switch (answer.question.dataType) {
         case DataType.SAMPLE_BASIS:
           return sampleBasisPreSubmit();
         case DataType.PROPOSAL_BASIS:
-          return proposalBasisPreSubmit();
+          return proposalBasisPreSubmit(isInvitesEnabled);
         case DataType.SHIPMENT_BASIS:
           return shipmentBasisPreSubmit();
         case DataType.VISIT_BASIS:
