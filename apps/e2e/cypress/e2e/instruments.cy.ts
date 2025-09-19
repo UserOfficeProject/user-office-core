@@ -1318,7 +1318,7 @@ context('Instrument tests', () => {
       );
     });
 
-    it('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
+    it.only('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');

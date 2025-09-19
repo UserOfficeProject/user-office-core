@@ -83,14 +83,13 @@ export interface ExperimentDataSource {
     sampleId: number,
     isSubmitted: boolean
   ): Promise<ExperimentHasSample>;
-  getAllExperiments(
+  getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string,
-    instrumentScientistUserId?: number
+    searchText?: string
   ): Promise<{
     totalCount: number;
     experiments: Experiment[];

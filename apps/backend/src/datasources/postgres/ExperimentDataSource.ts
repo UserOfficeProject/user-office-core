@@ -566,14 +566,13 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async getAllExperiments(
+  async getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string,
-    instrumentScientistUserId?: number
+    searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
     //print all arguments
 
@@ -587,14 +586,17 @@ export default class PostgresExperimentDataSource
       );
 
     // Add instrument scientist filtering if provided
-    if (instrumentScientistUserId) {
+    if (filter?.instrumentScientistUserId) {
       query
         .join(
           'instrument_has_scientists',
           'experiments.instrument_id',
           'instrument_has_scientists.instrument_id'
         )
-        .where('instrument_has_scientists.user_id', instrumentScientistUserId);
+        .where(
+          'instrument_has_scientists.user_id',
+          filter.instrumentScientistUserId
+        );
     }
 
     return query

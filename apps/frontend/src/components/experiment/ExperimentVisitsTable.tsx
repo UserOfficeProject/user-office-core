@@ -15,7 +15,7 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   SettingsId,
   VisitRegistrationStatus,
-  GetAllExperimentsQuery,
+  GetExperimentsQuery,
   GetExperimentQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -26,7 +26,7 @@ import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type RowType = NonNullable<
   NonNullable<
-    NonNullable<GetAllExperimentsQuery['allExperiments']>['experiments']
+    NonNullable<GetExperimentsQuery['allExperiments']>['experiments']
   >[0]['visit']
 >['registrations'][0];
 

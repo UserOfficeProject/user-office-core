@@ -23,7 +23,12 @@ export default class ExperimentQueries {
     private instrumentDataSource: InstrumentDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSafetyByExperimentPk(
     agent: UserWithRole | null,
     experimentPk: number
@@ -34,7 +39,12 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSafety(
     agent: UserWithRole | null,
     experimentSafetyPk: number
@@ -45,7 +55,12 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSample(
     agent: UserWithRole | null,
     args: ExperimentSampleArgs
@@ -58,7 +73,12 @@ export default class ExperimentQueries {
     return experimentSample;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSamples(
     agent: UserWithRole | null,
     experimentPk: number
@@ -69,8 +89,12 @@ export default class ExperimentQueries {
     return experimentSamples;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async getAllExperiments(
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
+  async getExperiments(
     agent: UserWithRole | null,
     filter: ExperimentsFilter = {},
     first?: number,
@@ -84,18 +108,23 @@ export default class ExperimentQueries {
       instrumentScientistUserId = agent!.id;
     }
 
-    return this.dataSource.getAllExperiments(
+    filter['instrumentScientistUserId'] = instrumentScientistUserId;
+
+    return this.dataSource.getExperiments(
       filter,
       first,
       offset,
       sortField,
       sortDirection,
-      searchText,
-      instrumentScientistUserId
+      searchText
     );
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperiment(
     agent: UserWithRole | null,
     experimentPk: number

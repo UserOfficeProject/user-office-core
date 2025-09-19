@@ -101,7 +101,7 @@ export default function ExperimentsTable({
           experimentStartDate,
           experimentEndDate,
         } = experimentsFilter;
-        const { allExperiments } = await api().getAllExperiments({
+        const { allExperiments } = await api().getExperiments({
           filter: {
             callId,
             instrumentId,

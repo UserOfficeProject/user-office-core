@@ -117,7 +117,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     this.init();
   }
 
-  async getAllExperiments(
+  async getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
