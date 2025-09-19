@@ -2,11 +2,13 @@ mutation updateVisit(
   $visitId: Int!
   $team: [Int!]
   $teamLeadUserId: Int
+  $inviteEmails: [String!]
 ) {
   updateVisit(
     visitId: $visitId
     team: $team
     teamLeadUserId: $teamLeadUserId
+    inviteEmails: $inviteEmails
   ) {
     ...visit
 
@@ -19,6 +21,10 @@ mutation updateVisit(
       user {
         ...basicUserDetails
       }
+    }
+
+    registrationInvites {
+      ...invite
     }
 
     proposal {

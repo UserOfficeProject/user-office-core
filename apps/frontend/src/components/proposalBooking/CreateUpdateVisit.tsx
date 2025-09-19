@@ -1,13 +1,13 @@
 import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UserManagementTable from 'components/common/UserManagementTable';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -18,12 +18,16 @@ interface CreateUpdateVisitProps {
 }
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();
+  const [visitInvites, setVisitInvites] = useState<Invite[]>(
+    event.visit?.registrationInvites || []
+  );
 
-  const visit = event.visit;
+  const { visit } = event;
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
     teamLeadUserId: visit?.teamLead.id || null,
+    inviteEmails: visit?.registrationInvites || [],
   };
 
   return (
@@ -45,6 +49,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
                 .includes(teamLeadUserId);
             },
           }),
+        inviteEmails: Yup.array().default([]),
       })}
       onSubmit={async (values): Promise<void> => {
         if (visit) {
@@ -53,6 +58,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               visitId: visit.id,
               team: values.team.map((user) => user.id),
               teamLeadUserId: values.teamLeadUserId,
+              inviteEmails: visitInvites.map((invite) => invite.email),
             })
             .then(({ updateVisit }) => {
               if (updateVisit) {
@@ -81,8 +87,8 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           </Typography>
           <UserManagementTable
             title="Visitors"
-            setInvites={() => {}}
-            invites={[]}
+            setInvites={setVisitInvites}
+            invites={visitInvites}
             setUsers={(team: BasicUserDetails[]) => {
               setFieldValue('team', team);
             }}

@@ -21,12 +21,28 @@ export class UpdateVisitArgs {
 
   @Field(() => Int, { nullable: true })
   teamLeadUserId?: number;
+
+  @Field(() => [String!], { nullable: true })
+  inviteEmails?: string[];
 }
 
 @Resolver()
 export class UpdateVisitMutation {
   @Mutation(() => Visit)
-  updateVisit(@Args() args: UpdateVisitArgs, @Ctx() context: ResolverContext) {
-    return context.mutations.visit.updateVisit(context.user, args);
+  async updateVisit(
+    @Args() args: UpdateVisitArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    const result = await context.mutations.visit.updateVisit(
+      context.user,
+      args
+    );
+
+    await context.mutations.invite.setVisitRegistrationInvites(context.user, {
+      visitId: args.visitId,
+      emails: args.inviteEmails ?? [],
+    });
+
+    return result;
   }
 }

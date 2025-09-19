@@ -69,13 +69,13 @@ export default function createLoggingHandler() {
             event.type,
             json,
             proposalPKey.toString(),
-            `Co-proposer invite issued to ${invite.email} accepted by userId: ${event.loggedInUserId}`,
+            `Co-proposer invite issued to ${invite.email} accepted by userId ${event.loggedInUserId}`,
             event.impersonatingUserId
           );
 
           break;
         }
-        case Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT: {
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
           const { invite, proposalPKey } = event;
 
           eventLogsDataSource.set(
@@ -83,12 +83,41 @@ export default function createLoggingHandler() {
             event.type,
             json,
             proposalPKey.toString(),
-            `Co-proposer invite sent to: ${invite.email} by userId: ${event.loggedInUserId}`,
+            `Co-proposer invite issued to ${invite.email} by userId ${event.loggedInUserId}`,
             event.impersonatingUserId
           );
 
           break;
         }
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
+          const { invite, proposalPKey: proposalPk } = event;
+
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPk.toString(),
+            `Visit invite issued to ${invite.email} by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED: {
+          const { invite, proposalPKey } = event;
+
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Visit invite sent to ${invite.email} accepted by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
+
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(

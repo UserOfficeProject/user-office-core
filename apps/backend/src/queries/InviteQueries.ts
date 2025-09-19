@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { Authorized } from '../decorators';
@@ -14,7 +15,8 @@ export default class InviteQueries {
     public dataSource: InviteDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.VisitAuthorization) private visitAuth: VisitAuthorization
   ) {}
 
   @Authorized()
@@ -29,6 +31,27 @@ export default class InviteQueries {
 
     const invites = await this.dataSource.findCoProposerInvites(
       proposalPk,
+      false
+    );
+
+    return invites;
+  }
+
+  @Authorized()
+  async getVisitRegistrationInvites(
+    agent: UserWithRole | null,
+    visitId: number
+  ) {
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      this.visitAuth.hasReadRights(agent, visitId);
+
+    if (!hasReadRights) {
+      return [];
+    }
+
+    const invites = await this.dataSource.findVisitRegistrationInvites(
+      visitId,
       false
     );
 
