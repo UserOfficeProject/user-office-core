@@ -560,11 +560,11 @@ function createIntervalQuestion(
 
   cy.contains('Add Interval').click();
 
-  cy.get('[data-cy=question]').clear().type(question);
-
   if (options?.key) {
     cy.get('[data-cy=natural_key]').clear().type(options.key);
   }
+
+  cy.get('[data-cy=question]').clear().type(question);
 
   if (options?.units && options.units.length > 0) {
     for (const unit of options.units) {

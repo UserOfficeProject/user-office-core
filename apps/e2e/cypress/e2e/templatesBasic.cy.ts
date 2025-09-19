@@ -839,8 +839,12 @@ context('Template Basic tests', () => {
 
       /* Test bad inputs */
       for (const question of questions) {
-        cy.get(`[data-cy="${question.id}.min"] input`).type(question.badInput);
-        cy.get(`[data-cy="${question.id}.max"] input`).type(question.badInput);
+        cy.get(`[data-natural-key="${question.id}-Min"] input`).type(
+          question.badInput
+        );
+        cy.get(`[data-natural-key="${question.id}-Max"] input`).type(
+          question.badInput
+        );
       }
       cy.get('[data-cy="save-and-continue-button"]').focus();
       cy.get('[data-cy="save-and-continue-button"]').click();
@@ -850,10 +854,10 @@ context('Template Basic tests', () => {
 
       /* Test good inputs */
       for (const question of questions) {
-        cy.get(`[data-cy="${question.id}.min"] input`)
+        cy.get(`[data-natural-key="${question.id}-Min"] input`)
           .clear()
           .type(question.goodInput);
-        cy.get(`[data-cy="${question.id}.max"] input`)
+        cy.get(`[data-natural-key="${question.id}-Max"] input`)
           .clear()
           .type(question.goodInput);
       }
