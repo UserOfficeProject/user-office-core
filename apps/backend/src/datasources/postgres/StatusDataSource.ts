@@ -2,6 +2,8 @@ import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Status } from '../../models/Status';
+import { WorkflowType } from '../../models/Workflow';
+import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
 import { StatusRecord } from './records';
@@ -59,7 +61,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return statuses.map((status) => this.createStatusObject(status));
   }
 
-  async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
+  async updateStatus(status: UpdateStatusInput): Promise<Status> {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
         {
@@ -100,6 +102,22 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .from('statuses')
       .where('entity_type', entityType)
       .andWhere('is_default', true)
+      .first();
+
+    return status ? this.createStatusObject(status) : null;
+  }
+
+  async getInitialStatus(
+    entityType: Status['entityType']
+  ): Promise<Status | null> {
+    const shortCode =
+      entityType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
+
+    const status: StatusRecord = await database
+      .select()
+      .from('statuses')
+      .where('entity_type', entityType)
+      .andWhere('short_code', shortCode)
       .first();
 
     return status ? this.createStatusObject(status) : null;

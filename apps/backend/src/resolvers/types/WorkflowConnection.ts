@@ -40,20 +40,14 @@ export class WorkflowConnection
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
 
-  @Field()
-  public droppableGroupId: string;
-}
+  @Field(() => Int)
+  public posX: number;
 
-@ObjectType()
-export class WorkflowConnectionGroup {
-  @Field(() => String)
-  public groupId: string;
+  @Field(() => Int)
+  public posY: number;
 
-  @Field(() => String, { nullable: true })
-  public parentGroupId: string | null;
-
-  @Field(() => [WorkflowConnection])
-  public connections: WorkflowConnection[];
+  @Field(() => Int, { nullable: true })
+  public prevConnectionId: number | null;
 }
 
 @Resolver(() => WorkflowConnection)

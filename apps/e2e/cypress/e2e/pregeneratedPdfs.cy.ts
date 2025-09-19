@@ -110,11 +110,12 @@ context('Pregenerated PDF tests', () => {
     });
 
     cy.addWorkflowStatus({
-      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
       statusId: initialDBData.proposalStatuses.editableSubmitted.id,
       workflowId: initialDBData.workflows.defaultWorkflow.id,
       sortOrder: 1,
       prevStatusId: initialDBData.proposalStatuses.draft.id,
+      posX: 0,
+      posY: 200,
     }).then((result) => {
       const connection = result.addWorkflowStatus;
       if (connection) {

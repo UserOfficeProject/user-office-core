@@ -23,7 +23,7 @@ const getProposalWorkflowByCallId = (callId: number) => {
 
 export const getProposalWorkflowConnectionByStatusId = (
   workflowId: number,
-  statusId: number,
+  statusId?: number,
   prevStatusId?: number
 ) => {
   const workflowDataSource = container.resolve<WorkflowDataSource>(
@@ -181,81 +181,80 @@ export const workflowEngine = async (
          * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
          * We go through each record and based on the currentEvent we move the proposal into the right direction
          */
-        return Promise.all(
+
+        const response = await Promise.all(
           currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            if (!currentWorkflowConnection.nextStatusId) {
-              return;
-            }
-
-            if (!proposalWithEvents.proposalEvents) {
-              return;
-            }
-
             const nextWorkflowConnections =
               await getProposalWorkflowConnectionByStatusId(
                 proposalWorkflow.id,
-                currentWorkflowConnection.nextStatusId,
+                undefined,
                 currentWorkflowConnection.statusId
               );
 
-            if (!nextWorkflowConnections?.length) {
-              return;
-            }
+            return Promise.all(
+              nextWorkflowConnections.map(async (nextWorkflowConnection) => {
+                if (!proposalWithEvents.proposalEvents) {
+                  return;
+                }
+                const workflowDataSource =
+                  container.resolve<WorkflowDataSource>(
+                    Tokens.WorkflowDataSource
+                  );
 
-            const workflowDataSource = container.resolve<WorkflowDataSource>(
-              Tokens.WorkflowDataSource
+                const statusChangingEvents =
+                  await workflowDataSource.getStatusChangingEventsByConnectionIds(
+                    [nextWorkflowConnection.id]
+                  );
+
+                if (!statusChangingEvents) {
+                  return;
+                }
+
+                const eventThatTriggeredStatusChangeIsStatusChangingEvent =
+                  statusChangingEvents.find(
+                    (statusChangingEvent) =>
+                      proposalWithEvents.currentEvent ===
+                      statusChangingEvent.statusChangingEvent
+                  );
+
+                if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
+                  return;
+                }
+
+                if (
+                  shouldMoveToNextStatus(
+                    statusChangingEvents,
+                    proposalWithEvents.proposalEvents
+                  )
+                ) {
+                  const updatedProposal =
+                    await proposalDataSource.updateProposalStatus(
+                      proposalWithEvents.proposalPk,
+                      nextWorkflowConnection.statusId
+                    );
+
+                  if (updatedProposal) {
+                    await checkIfConditionsForNextStatusAreMet({
+                      nextWorkflowConnections,
+                      proposalWorkflow,
+                      workflowDataSource,
+                      proposalWithEvents,
+                    });
+
+                    return {
+                      ...updatedProposal,
+                      workflowId: proposalWorkflow.id,
+                      prevStatusId: currentWorkflowConnection.statusId,
+                      callShortCode: call.shortCode,
+                    };
+                  }
+                }
+              })
             );
-
-            const statusChangingEvents =
-              await workflowDataSource.getStatusChangingEventsByConnectionIds(
-                nextWorkflowConnections.map((connection) => connection.id)
-              );
-
-            if (!statusChangingEvents) {
-              return;
-            }
-
-            const eventThatTriggeredStatusChangeIsStatusChangingEvent =
-              statusChangingEvents.find(
-                (statusChangingEvent) =>
-                  proposalWithEvents.currentEvent ===
-                  statusChangingEvent.statusChangingEvent
-              );
-
-            if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
-              return;
-            }
-
-            if (
-              shouldMoveToNextStatus(
-                statusChangingEvents,
-                proposalWithEvents.proposalEvents
-              )
-            ) {
-              const updatedProposal =
-                await proposalDataSource.updateProposalStatus(
-                  proposalWithEvents.proposalPk,
-                  currentWorkflowConnection.nextStatusId
-                );
-
-              if (updatedProposal) {
-                await checkIfConditionsForNextStatusAreMet({
-                  nextWorkflowConnections,
-                  proposalWorkflow,
-                  workflowDataSource,
-                  proposalWithEvents,
-                });
-
-                return {
-                  ...updatedProposal,
-                  workflowId: proposalWorkflow.id,
-                  prevStatusId: currentWorkflowConnection.statusId,
-                  callShortCode: call.shortCode,
-                };
-              }
-            }
           })
-        );
+        ).then((results) => results.flat());
+
+        return response;
       })
     )
   ).flat();

@@ -7,10 +7,6 @@ import { MailService } from '../eventHandlers/MailService/MailService';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { WorkflowType } from '../models/Workflow';
-import {
-  WorkflowConnection,
-  WorkflowConnectionWithStatus,
-} from '../models/WorkflowConnections';
 
 @injectable()
 export default class WorkflowQueries {
@@ -43,58 +39,9 @@ export default class WorkflowQueries {
     return workflows;
   }
 
-  getUniqueDroppableGroupIds(list: WorkflowConnection[]) {
-    const flags = new Set();
-
-    return (
-      list
-        .map((item) => ({
-          droppableGroupId: item.droppableGroupId,
-          prevStatusId: item.prevStatusId,
-        }))
-        // remove duplicates
-        .filter((item) => {
-          if (flags.has(item.droppableGroupId)) {
-            return false;
-          }
-          flags.add(item.droppableGroupId);
-
-          return true;
-        })
-    );
-  }
-
-  groupWorkflowConnectionsByDroppableArea(
-    workflowConnections: WorkflowConnectionWithStatus[]
-  ) {
-    const groupedWorkflowConnections = this.getUniqueDroppableGroupIds(
-      workflowConnections
-    ).map((item) => ({
-      groupId: item.droppableGroupId,
-      parentGroupId:
-        workflowConnections.find(
-          (element) => element.statusId === item.prevStatusId
-        )?.droppableGroupId || null,
-      connections: workflowConnections.filter(
-        (workflowConnection) =>
-          workflowConnection.droppableGroupId === item.droppableGroupId
-      ),
-    }));
-
-    return groupedWorkflowConnections;
-  }
-
   @Authorized()
-  async workflowConnectionGroups(
-    agent: UserWithRole | null,
-    workflowId: number
-  ) {
-    const workflowConnections =
-      await this.dataSource.getWorkflowConnections(workflowId);
-    const groupedWorkflowConnections =
-      this.groupWorkflowConnectionsByDroppableArea(workflowConnections);
-
-    return groupedWorkflowConnections;
+  async getWorkflowConnections(agent: UserWithRole | null, workflowId: number) {
+    return this.dataSource.getWorkflowConnections(workflowId);
   }
 
   @Authorized([Roles.USER_OFFICER])
