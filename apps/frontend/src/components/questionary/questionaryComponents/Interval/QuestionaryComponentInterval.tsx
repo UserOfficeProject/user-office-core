@@ -24,7 +24,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { id, question },
+    question: { id, question, naturalKey },
   } = answer;
   const theme = useTheme();
   const config = answer.config as IntervalConfig;
@@ -154,6 +154,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             onBlur={() => onComplete(stateValue)}
             value={stateValue.min}
             data-cy={minFieldId}
+            data-natural-key={`${naturalKey}-Min`}
             type="number"
             name={minFieldId}
             margin="dense"
@@ -198,6 +199,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             onBlur={() => onComplete(stateValue)}
             value={stateValue.max}
             data-cy={maxFieldId}
+            data-natural-key={`${naturalKey}-Max`}
             type="number"
             name={maxFieldId}
             margin="dense"
