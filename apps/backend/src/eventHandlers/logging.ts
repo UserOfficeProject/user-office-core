@@ -359,6 +359,19 @@ export default function createLoggingHandler() {
             }
           }
           break;
+        case Event.DATA_ACCESS_USERS_UPDATED:
+          {
+            const description = 'Data access users updated';
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              event.proposalPKey.toString(),
+              description,
+              event.impersonatingUserId
+            );
+          }
+          break;
         default: {
           let changedObjectId: number;
           if (typeof (event as any)[event.key].primaryKey === 'number') {

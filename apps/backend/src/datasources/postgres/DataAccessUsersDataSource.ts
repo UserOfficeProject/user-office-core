@@ -1,12 +1,18 @@
 import { Rejection } from '../../models/Rejection';
 import { BasicUserDetails } from '../../models/User';
-import { DataAccessUsersDataSource } from '../DataAccessUsersDataSource';
+import {
+  DataAccessUsersDataSource,
+  UserWithInstitution,
+} from '../DataAccessUsersDataSource';
 import database from './database';
 import {
   CountryRecord,
   InstitutionRecord,
   UserRecord,
   createBasicUserObject,
+  createUserObject,
+  createInstitutionObject,
+  createCountryObject,
 } from './records';
 
 export default class PostgresDataAccessUsersDataSource
@@ -25,6 +31,29 @@ export default class PostgresDataAccessUsersDataSource
       .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
         users.map((user) => createBasicUserObject(user))
       );
+  }
+
+  async getDataAccessUsersWithInstitution(
+    proposalPk: number
+  ): Promise<UserWithInstitution[]> {
+    return database
+      .select('i.*', 'c.*', 'u.*')
+      .from('users as u')
+      .join('data_access_user_has_proposal as dauhp', {
+        'u.user_id': 'dauhp.user_id',
+      })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
+      .where('dauhp.proposal_pk', proposalPk)
+      .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
+        return users.map((user) => {
+          return {
+            user: createUserObject(user),
+            institution: createInstitutionObject(user),
+            country: createCountryObject(user),
+          };
+        });
+      });
   }
 
   async updateDataAccessUsers(
