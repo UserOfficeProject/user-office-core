@@ -53,7 +53,7 @@ export function QuestionaryComponentTechniquePicker(
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
     const newValue = event.target.value;
 
-    let techniques: number[] | number = [] || {};
+    let techniques: number[] | number = [];
 
     if (Array.isArray(newValue) && newValue.length > 0) {
       techniques = newValue
