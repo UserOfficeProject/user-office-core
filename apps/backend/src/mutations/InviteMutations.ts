@@ -69,9 +69,9 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    await this.processRoleClaims(agent!.id, invite);
-    await this.processCoProposerClaims(agent!.id, invite);
-    await this.processVisitRegistrationClaims(agent!.id, invite);
+    await this.processAcceptedRoleClaims(agent!.id, invite);
+    await this.processAcceptedCoProposerClaims(agent!.id, invite);
+    await this.processAcceptedVisitRegistrationClaims(agent!.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
@@ -239,7 +239,10 @@ export default class InviteMutations {
 
     return invites;
   }
-  private async processRoleClaims(claimerUserId: number, invite: Invite) {
+  private async processAcceptedRoleClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
     const inviteId = invite.id;
     const roleClaims = await this.roleClaimDataSource.findByInviteId(inviteId);
 
@@ -260,7 +263,10 @@ export default class InviteMutations {
     }
   }
 
-  private async processCoProposerClaims(claimerUserId: number, invite: Invite) {
+  private async processAcceptedCoProposerClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
     const inviteId = invite.id;
     const coProposerClaim =
       await this.coProposerClaimDataSource.findByInviteId(inviteId);
@@ -291,7 +297,7 @@ export default class InviteMutations {
       });
     }
   }
-  private async processVisitRegistrationClaims(
+  private async processAcceptedVisitRegistrationClaims(
     claimerUserId: number,
     invite: Invite
   ) {
