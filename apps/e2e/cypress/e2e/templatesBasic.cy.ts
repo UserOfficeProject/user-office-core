@@ -1139,7 +1139,7 @@ context('Template Basic tests', () => {
 
       cy.visit('/Proposals');
 
-      cy.get('[data-cy="view-proposal').click();
+      cy.get('[data-cy="view-proposal"]').first().click();
 
       cy.contains(booleanQuestion).should('exist');
 

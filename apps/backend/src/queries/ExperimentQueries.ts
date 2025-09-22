@@ -124,6 +124,7 @@ export default class ExperimentQueries {
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
     Roles.EXPERIMENT_SAFETY_REVIEWER,
+    Roles.USER,
   ])
   async getExperiment(
     agent: UserWithRole | null,
