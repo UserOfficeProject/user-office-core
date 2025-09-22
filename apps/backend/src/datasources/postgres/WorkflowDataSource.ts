@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { container, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { Status } from '../../models/Status';
@@ -24,9 +24,9 @@ import StatusDataSource from './StatusDataSource';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
-  protected statusDataSource: StatusDataSource = container.resolve(
-    Tokens.UserDataSource
-  );
+  constructor(
+    @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
+  ) {}
 
   private createWorkflowObject(workflow: WorkflowRecord) {
     return new Workflow(

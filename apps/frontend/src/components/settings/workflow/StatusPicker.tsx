@@ -9,6 +9,7 @@ import {
 import React, { useState } from 'react';
 
 import { Status } from 'generated/sdk';
+import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
 interface StatusPickerProps {
   statuses: Status[];
@@ -30,8 +31,8 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
           status.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(
-      (status) => ['DRAFT', 'AWAITING_ESF'].includes(status.shortCode) === false
-    ); // Exclude DRAFT and 'AWAITING_ESF' status
+      (status) => WORKFLOW_INITIAL_STATUSES.includes(status.shortCode) === false
+    );
 
   return (
     <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>

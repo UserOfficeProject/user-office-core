@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import { Status } from 'generated/sdk';
+import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
 const Container = styled(Paper)({
   borderRadius: '15px',
@@ -75,7 +76,11 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
 
   return (
     <div data-cy={`connection_${data.status.shortCode}`}>
-      <StyledHandle type="target" position={Position.Top} />
+      <StyledHandle
+        type="target"
+        position={Position.Top}
+        hidden={WORKFLOW_INITIAL_STATUSES.includes(data.status.shortCode)}
+      />
       <Container>
         <Title>
           <TitleContent onClick={handleToggleExpand}>
@@ -84,7 +89,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
               {data.status.name}
             </Typography>
           </TitleContent>
-          {['DRAFT', 'AWAITING_ESF'].includes(data.status.shortCode) ===
+          {WORKFLOW_INITIAL_STATUSES.includes(data.status.shortCode) ===
             false && (
             <IconButton
               size="small"
