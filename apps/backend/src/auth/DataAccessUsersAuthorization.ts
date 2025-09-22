@@ -3,8 +3,8 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserWithRole } from '../models/User';
-import { UserJWT } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
@@ -12,7 +12,9 @@ export class DataAccessUsersAuthorization {
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    protected proposalAuth: ProposalAuthorization
   ) {}
 
   private async resolveProposal(
@@ -29,17 +31,6 @@ export class DataAccessUsersAuthorization {
     return proposal;
   }
 
-  private isPrincipalInvestigatorOfProposal(
-    agent: UserJWT | null,
-    proposal: Proposal | null
-  ) {
-    if (agent == null || proposal == null) {
-      return false;
-    }
-
-    return agent.id === proposal.proposerId;
-  }
-
   public async hasWriteRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
@@ -54,7 +45,7 @@ export class DataAccessUsersAuthorization {
     }
     const hasAccess =
       this.userAuth.isUserOfficer(agent) ||
-      this.isPrincipalInvestigatorOfProposal(agent, proposal);
+      this.proposalAuth.isMemberOfProposal(agent, proposal);
 
     return hasAccess;
   }
