@@ -1,0 +1,44 @@
+name: build
+on: [push, workflow_dispatch]
+
+permissions:
+  actions: read   # needed for listing runners
+
+jobs:
+  choose-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runs_on: ${{ steps.pick.outputs.runs_on }}
+    steps:
+      - id: pick
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const res = await github.request(
+              'GET /repos/{owner}/{repo}/actions/runners',
+              { owner: context.repo.owner, repo: context.repo.repo, per_page: 100 }
+            )
+            const want = ['self-hosted','Linux','X64']  // your labels
+            const ok = (r) =>
+              r.status === 'online' &&
+              !r.busy &&
+              want.every(l => r.labels.some(lbl => lbl.name === l))
+            const useSelfHosted = res.data.runners?.some(ok)
+            // Output JSON so we can fromJSON() later
+            core.setOutput('runs_on', useSelfHosted
+              ? '["self-hosted","Linux","X64"]'
+              : '"ubuntu-latest"'
+            )
+
+  build:
+    needs: choose-runner
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
+    steps:
+      - id: fake-build
+        run: |
+          echo "Using runner labels: ${{ needs.choose-runner.outputs.runs_on }}"
+          echo "Runner name: $(hostname)"
+          sleep 3
+          echo "Build complete"
+
+      
