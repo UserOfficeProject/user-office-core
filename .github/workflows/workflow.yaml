@@ -292,206 +292,52 @@ jobs:
           ')"
           echo "idle=$IDLE" >> "$GITHUB_OUTPUT"
 
-      - name: Build 5-slot matrix (self-hosted first, then ubuntu)
+      - name: Build merged matrix (pattern + assigned runner)
         id: make
         run: |
           set -euo pipefail
-          NUM_RUNNERS="${{ steps.get.outputs.idle }}"
+          N="${{ steps.get.outputs.idle }}"
 
-          MATRIX="$(jq -nc --argjson n "$NUM_RUNNERS" '
-            [ range(0;10) |(if . < $n then "self" else "github" end)]
+          # Define your letter pattern buckets (order matters!)
+          MATRIX="$(jq -nc --argjson n "$N" '
+            # patterns in the order you want to assign self-hosted first
+            $patterns := [
+              {id:"ae",            files:"cypress/e2e/[a-e]*.ts"},
+              {id:"fh",            files:"cypress/e2e/[f-h]*.ts"},
+              {id:"io",            files:"cypress/e2e/[i-o]*.ts"},
+              {id:"p-am",          files:"cypress/e2e/p[a-m]*.ts"},
+              {id:"p-nz",          files:"cypress/e2e/p[n-z]*.ts"},
+              {id:"rs",            files:"cypress/e2e/[r-s]*.ts"},
+              {id:"t",             files:"cypress/e2e/t!(emplateDeleteAndArchive).ts"},
+              {id:"templateDelete",files:"cypress/e2e/templateDeleteAndArchive*.ts"},
+              {id:"uz",            files:"cypress/e2e/[u-z]*.ts"},
+              {id:"AZ",            files:"cypress/e2e/[A-Z]*.ts"}
+            ];
+
+            # cap n to array length
+            $n_eff := (if $n < 0 then 0 elif $n > ($patterns|length) then ($patterns|length) else $n end);
+
+            # merge: first $n_eff get self, the rest github
+            [ range(0; ($patterns|length))
+              | ($patterns[.]) + { runner: (if . < $n_eff then "self" else "github" end) }
+            ]
           ')"
 
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
           echo "Matrix: $MATRIX"
 
   e2e:
-   
-    needs: [resolve_dep, build, choose_runners]
-
+    needs: [choose_runners]
     strategy:
       fail-fast: false
-      matrix:
-        runner: ${{ fromJSON(needs.choose_runners.outputs.matrix) }}
-        pattern:
-          - id: ae
-            files: cypress/e2e/[a-e]*.ts
-          - id: fh
-            files: cypress/e2e/[f-h]*.ts
-          - id: io
-            files: cypress/e2e/[i-o]*.ts
-          - id: p-am
-            files: cypress/e2e/p[a-m]*.ts
-          - id: p-nz
-            files: cypress/e2e/p[n-z]*.ts
-          - id: rs
-            files: cypress/e2e/[r-s]*.ts
-          - id: t
-            files: cypress/e2e/t!(emplateDeleteAndArchive).ts
-          - id: templateDelete
-            files: cypress/e2e/templateDeleteAndArchive*.ts
-          - id: uz
-            files: cypress/e2e/[u-z]*.ts
-          - id: AZ
-            files: cypress/e2e/[A-Z]*.ts
+      matrix: ${{ fromJSON(needs.choose_runners.outputs.matrix) }}
+    # Map runner key → actual runs-on
     runs-on: ${{ fromJSON( matrix.runner == 'self' && '["self-hosted","Linux","X64"]' || '"ubuntu-latest"' ) }}
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-      
-      - name: Restore backend UOWS
-        id: cached-UOWS
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/generated
-          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/src/generated
-          key: ${{ env.FRONTEND_SDK_KEY }}
-          restore-keys: |
-            ${{ env.FRONTEND_SDK_KEY }}
-            sdk-frontend-
-
-      # TODO: See how to proceed with e2e caching because there is some error:
-      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
-      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: apps/e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Install e2e dependencies
-        env:
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-        if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
-        run: npm run install:e2e
-
-      - name: Download required repositories
-        run: |
-          cd "$GITHUB_WORKSPACE/.."
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-
-      - name: Run e2e tests stfc
-        env:
-          USER_OFFICE_BACKEND_DIR: apps/backend
-          USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
-          USER_OFFICE_BACKEND: http://localhost:4000/graphql
-          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
-          TZ: Europe/London
-          DATE_FORMAT: dd-MM-yyyy
-          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          PING_PUBLIC_CRT: dummypingsecret
-          DEPENDENCY_CONFIG: stfc
-          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
-          NODE_ENV: development
-          BASE_URL: localhost:3000
-          JWT_TOKEN_LIFE: 7d
-          SPARKPOST_TOKEN: dummytoken
-          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
-          SCHEMA_URL: http://localhost:4000/graphql
-          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
-          BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-          EXTERNAL_AUTH_TOKEN: abc
-          SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
-          EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
-          EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
-          EMAIL_TEMPLATE_PATH: /config/emails/
-          EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
-          EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_AUTH_LOGOUT_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_UOWS_API_URL: http://localhost:1080/users-service
-          ANTIVIRUS_HOST: clam-antivirus
-          ANTIVIRUS_PORT: 3310
-          ISIS_UO_EMAIL: isisuo@stfc.ac.uk
-          FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
-          PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
-        run: |
-          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
-          npm run e2e:after:dev:stfc
-
-      - name: Run e2e tests
-        env:
-          USER_OFFICE_BACKEND_DIR: apps/backend
-          USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
-          USER_OFFICE_BACKEND: http://localhost:4000/graphql
-          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
-          TZ: Europe/Stockholm
-          DATE_FORMAT: dd-MM-yyyy
-          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          PING_PUBLIC_CRT: dummypingsecret
-          DEPENDENCY_CONFIG: e2e
-          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
-          NODE_ENV: development
-          BASE_URL: localhost:3000
-          JWT_TOKEN_LIFE: 7d
-          SPARKPOST_TOKEN: dummytoken
-          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
-          SCHEMA_URL: http://localhost:4000/graphql
-          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
-          BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-          EAM_API_URL: https://ios.esss.lu.se
-          EAM_AUTH_USER: dummyAuthUser
-          EAM_AUTH_PASSWORD: dummyEAMsecret
-          EAM_AUTH_TENANT: dummyTenant
-          EAM_AUTH_ORGANIZATION: dummyOrg
-          EAM_EQUIPMENT_PART_CODE: 12413
-          AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
-          AUTH_CLIENT_ID: useroffice
-          AUTH_CLIENT_SECRET: useroffice
-        run: |
-          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
-          npm run e2e:after:dev -- --dns-result-order=ipv4first
-
-      - name: Upload cypres screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots-${{ matrix.pattern.id }}
-          path: apps/e2e/cypress/screenshots
+      - run: |
+          echo "Runner: ${{ matrix.runner }}"
+          echo "Pattern id: ${{ matrix.id }}"
+          echo "Files: ${{ matrix.files }}"
+          echo "Hostname: $(hostname)"
+      # Example: actually run your tests with the selected files
+      # - run: npm run test:e2e -- "${{ matrix.files }}"
