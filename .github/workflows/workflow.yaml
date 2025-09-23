@@ -1,34 +1,68 @@
-name: build
-on: [push, workflow_dispatch]
+# name: build
+# on: [push, workflow_dispatch]
+
+# permissions:
+#   actions: write   # needed for listing runners
+
+# jobs:
+#   choose-runner:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       runs_on: ${{ steps.pick.outputs.runs_on }}
+#     steps:
+#       - id: pick
+#         uses: actions/github-script@v7
+#         with:
+#           script: |
+#             const useSelfHosted = Math.random() < 0.5
+#             core.setOutput('runs_on', useSelfHosted
+#               ? '["self-hosted","Linux","X64"]'
+#               : '"ubuntu-latest"'
+#             )
+
+#   build:
+#     needs: choose-runner
+#     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
+#     steps:
+#       - id: fake-build
+#         run: |
+#           echo "Using runner labels: ${{ needs.choose-runner.outputs.runs_on }}"
+#           echo "Runner name: $(hostname)"
+#           sleep 3
+#           echo "Build complete"
+
+name: list-runners
+on: [workflow_dispatch]
 
 permissions:
-  actions: write   # needed for listing runners
+  actions: read
 
 jobs:
-  choose-runner:
+  list:
     runs-on: ubuntu-latest
-    outputs:
-      runs_on: ${{ steps.pick.outputs.runs_on }}
     steps:
-      - id: pick
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const isEven = ((context.runNumber / 2)  % 2) === 0
-            core.setOutput('runs_on', isEven
-              ? '["self-hosted","Linux","X64"]'
-              : '"ubuntu-latest"'
-            )
-
-  build:
-    needs: choose-runner
-    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
-    steps:
-      - id: fake-build
+      - name: List repo runners via curl
+        env:
+          OWNER: ${{ github.repository_owner }}
         run: |
-          echo "Using runner labels: ${{ needs.choose-runner.outputs.runs_on }}"
-          echo "Runner name: $(hostname)"
-          sleep 3
-          echo "Build complete"
+          set -euo pipefail
+          REPO="${GITHUB_REPOSITORY#*/}"
 
-      
+          curl -sS \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100" \
+          | jq -r '
+              .runners // [] |
+              if length==0 then
+                "No runners found for this repository."
+              else
+                "Found \(length) runners:",
+                (.[]
+                  | "- id=\(.id) name=\(.name) status=\(.status) busy=\(.busy) labels=[\(.labels|map(.name)|join(\", \"))]"
+                )
+              end
+            '
+
+
