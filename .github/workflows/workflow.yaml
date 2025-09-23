@@ -31,20 +31,22 @@
 #           sleep 3
 #           echo "Build complete"
 
-name: list-runners
+name: build
 on: [push, workflow_dispatch]
 
 permissions:
   actions: read
 
 jobs:
-  list:
+  choose:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.make.outputs.matrix }}
     steps:
-      - name: List repo runners via curl
+      - name: Get idle runner count (repo-level)
+        id: get
         env:
           OWNER: ${{ github.repository_owner }}
-          # Use GITHUB_TOKEN (works for repo-level runners) or your PAT in GH_API_TOKEN
           AUTH: ${{ secrets.GH_API_TOKEN != '' && secrets.GH_API_TOKEN || github.token }}
         run: |
           set -euo pipefail
@@ -58,9 +60,42 @@ jobs:
               "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100"
           )"
 
-          IDLE_SELF_RUNNERS="$(echo "$RESPONSE" | jq '[(.runners // [])[] | select(.busy == false)] | length')"
+          IDLE="$(echo "$RESPONSE" | jq '[(.runners // [])[] | select(.busy == false)] | length')"
+          echo "idle=$IDLE" >> "$GITHUB_OUTPUT"
 
-          echo $IDLE_SELF_RUNNERS
+      - name: Build 5-slot matrix (self-hosted first, then ubuntu)
+        id: make
+        run: |
+          set -euo pipefail
+          # Clamp to [0..5]
+          N="${{ steps.get.outputs.idle }}"
+          if [ "$N" -gt 5 ]; then N=5; fi
+          if [ "$N" -lt 0 ]; then N=0; fi
+
+          MATRIX="$(jq -n --argjson n "$N" '
+            [ range(0;5) | {
+                slot: (.+1),
+                # runs_on is either an array (labels) or a string; we’ll fromJSON() it later
+                runs_on: (if . < $n then ["self-hosted","Linux","X64"] else "ubuntu-latest" end)
+              } ]
+          ')"
+
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "Matrix: $MATRIX"
+
+  build:
+    needs: choose
+    strategy:
+      # [{slot:1,runs_on:[...]}, {slot:2,runs_on:"ubuntu-latest"}, ...]
+      matrix: ${{ fromJSON(needs.choose.outputs.matrix) }}
+    # Use whatever came in each matrix entry
+    runs-on: ${{ fromJSON(toJson(matrix.runs_on)) }}
+    steps:
+      - run: |
+          echo "Slot: ${{ matrix.slot }}"
+          echo "runs-on: ${{ toJson(matrix.runs_on) }}"
+          echo "Host: $(hostname)"
+
 
 
 
