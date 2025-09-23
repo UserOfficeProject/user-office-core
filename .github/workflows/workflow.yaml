@@ -67,6 +67,7 @@ jobs:
         id: make
         run: |
           set -euo pipefail
+          NUM_RUNNERS="${{ steps.get.outputs.idle }}"
 
           MATRIX="$(jq -nc --argjson n "$NUM_RUNNERS" '
             [ range(0;5) |(if . < $n then "self" else "github" end)]
