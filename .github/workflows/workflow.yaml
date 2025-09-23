@@ -32,7 +32,7 @@
 #           echo "Build complete"
 
 name: list-runners
-on: [workflow_dispatch]
+on: [push, workflow_dispatch]
 
 permissions:
   actions: read
