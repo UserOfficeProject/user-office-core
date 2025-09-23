@@ -34,6 +34,9 @@
 name: build
 on: [push, workflow_dispatch]
 
+permissions:
+  actions: read
+
 jobs:
   choose:
     runs-on: ubuntu-latest
@@ -41,6 +44,7 @@ jobs:
       matrix: ${{ steps.make.outputs.matrix }}
     steps:
       - name: Get idle runner count (repo-level)
+        id: get
         env:
           OWNER: ${{ github.repository_owner }}
           AUTH: ${{ secrets.GH_API_TOKEN != '' && secrets.GH_API_TOKEN || github.token }}
@@ -57,7 +61,7 @@ jobs:
           IDLE="$(echo "$RESPONSE" | jq '[(.runners // [])[] | select(.busy == false)] | length')"
           echo "idle=$IDLE" >> "$GITHUB_OUTPUT"
 
-      - name: Build runner matrix
+      - name: Build 5-slot matrix (self-hosted first, then ubuntu)
         id: make
         run: |
           set -euo pipefail
