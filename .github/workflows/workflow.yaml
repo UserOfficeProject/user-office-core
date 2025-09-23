@@ -1,28 +1,14 @@
-
-
-
-
 name: E2E and build testing.
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the develop and master branches
 on:
   pull_request:
     branches: [develop]
 
-env:
-  NODE_VERSION: 22.x
-  FRONTEND_SDK_KEY: sdk-frontend-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  
-
-
   count_runners:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.make.outputs.matrix }}
+      idle: ${{ steps.get.outputs.idle }}
     steps:
       - name: Get idle runner count
         id: get
@@ -49,53 +35,52 @@ jobs:
 
 
 
-  # e2e:
+  e2e:
    
-  #   needs: [count_runners]
+    needs: [count_runners]
 
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
+    strategy:
+      fail-fast: false
+      matrix:
         
-  #       pattern:
-  #         - id: ae
-  #           idx: 0
-  #           files: cypress/e2e/[a-e]*.ts
-  #         - id: fh
-  #           idx: 1
-  #           files: cypress/e2e/[f-h]*.ts
-  #         - id: io
-  #           idx: 2
-  #           files: cypress/e2e/[i-o]*.ts
-  #         - id: p-am
-  #           idx: 3
-  #           files: cypress/e2e/p[a-m]*.ts
-  #         - id: p-nz
-  #           idx: 4
-  #           files: cypress/e2e/p[n-z]*.ts
-  #         - id: rs
-  #           idx: 5
-  #           files: cypress/e2e/[r-s]*.ts
-  #         - id: t
-  #           idx: 6
-  #           files: cypress/e2e/t!(emplateDeleteAndArchive).ts
-  #         - id: templateDelete
-  #           idx: 7
-  #           files: cypress/e2e/templateDeleteAndArchive*.ts
-  #         - id: uz
-  #           idx: 8
-  #           files: cypress/e2e/[u-z]*.ts
-  #         - id: AZ
-  #           idx: 9
-  #           files: cypress/e2e/[A-Z]*.ts
-  #   runs-on: ${{  matrix.pattern.idx < needs.count_runners.outputs.idle && '["self-hosted","Linux","X64"]' || '"ubuntu-latest"'  }}
+        pattern:
+          - id: ae
+            idx: 0
+            files: cypress/e2e/[a-e]*.ts
+          - id: fh
+            idx: 1
+            files: cypress/e2e/[f-h]*.ts
+          - id: io
+            idx: 2
+            files: cypress/e2e/[i-o]*.ts
+          - id: p-am
+            idx: 3
+            files: cypress/e2e/p[a-m]*.ts
+          - id: p-nz
+            idx: 4
+            files: cypress/e2e/p[n-z]*.ts
+          - id: rs
+            idx: 5
+            files: cypress/e2e/[r-s]*.ts
+          - id: t
+            idx: 6
+            files: cypress/e2e/t!(emplateDeleteAndArchive).ts
+          - id: templateDelete
+            idx: 7
+            files: cypress/e2e/templateDeleteAndArchive*.ts
+          - id: uz
+            idx: 8
+            files: cypress/e2e/[u-z]*.ts
+          - id: AZ
+            idx: 9
+            files: cypress/e2e/[A-Z]*.ts
+    runs-on: ${{  matrix.pattern.idx < needs.count_runners.outputs.idle && '["self-hosted","Linux","X64"]' || '"ubuntu-latest"'  }}
 
-  #   steps:
-  #     - run: |
-  #         echo "Running on $(uname -a)"
-  #         echo "Runner is self-hosted: ${{ runner.self_hosted }}"
-  #         echo "Runner OS: ${{ runner.os }}"
-  #         echo "Runner temp directory: ${{ runner.temp }}"
-  #         echo "Runner tool cache directory: ${{ runner.tool_cache }}"
-  #       name: Display runner info
+    steps:
+      - run: |
+          echo "Running on $(uname -a)"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Runner temp directory: ${{ runner.temp }}"
+          echo "Runner tool cache directory: ${{ runner.tool_cache }}"
+        name: Display runner info
 
