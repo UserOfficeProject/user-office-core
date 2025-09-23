@@ -58,7 +58,7 @@ jobs:
               "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100"
           )"
 
-          IDLE_SELF_RUNNERS="${echo "$json" | jq '[(.runners // [])[] | select(.busy == false)] | length'}"
+          IDLE_SELF_RUNNERS="$(echo "$RESPONSE" | jq '[(.runners // [])[] | select(.busy == false)] | length')"
 
           echo $IDLE_SELF_RUNNERS
 
