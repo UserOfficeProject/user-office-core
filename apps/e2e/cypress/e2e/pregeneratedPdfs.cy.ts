@@ -516,7 +516,7 @@ context('Pregenerated PDF tests', () => {
   });
 
   it('User officer can download pregenerated and generated PDFs in a zip', () => {
-    cy.login('user1', initialDBData.roles.user).then(() => {
+    cy.login('officer', initialDBData.roles.userOfficer).then(() => {
       const token = window.localStorage.getItem('token');
 
       if (!token) {
