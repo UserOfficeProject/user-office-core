@@ -80,7 +80,7 @@ jobs:
               } ]
           ')"
 
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "matrix=yadda" >> "$GITHUB_OUTPUT"
           echo "Matrix: $MATRIX"
 
   build:
