@@ -1,41 +1,270 @@
-# name: build
-# on: [push, workflow_dispatch]
 
-# permissions:
-#   actions: write   # needed for listing runners
 
-# jobs:
-#   choose-runner:
-#     runs-on: ubuntu-latest
-#     outputs:
-#       runs_on: ${{ steps.pick.outputs.runs_on }}
-#     steps:
-#       - id: pick
-#         uses: actions/github-script@v7
-#         with:
-#           script: |
-#             const useSelfHosted = Math.random() < 0.5
-#             core.setOutput('runs_on', useSelfHosted
-#               ? '["self-hosted","Linux","X64"]'
-#               : '"ubuntu-latest"'
-#             )
 
-#   build:
-#     needs: choose-runner
-#     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
-#     steps:
-#       - id: fake-build
-#         run: |
-#           echo "Using runner labels: ${{ needs.choose-runner.outputs.runs_on }}"
-#           echo "Runner name: $(hostname)"
-#           sleep 3
-#           echo "Build complete"
 
-name: build
-on: [push, workflow_dispatch]
+name: E2E and build testing.
 
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop and master branches
+on:
+  pull_request:
+    branches: [develop]
+
+env:
+  NODE_VERSION: 22.x
+  FRONTEND_SDK_KEY: sdk-frontend-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  choose:
+  resolve_dep:
+    runs-on: ubuntu-latest
+    outputs:
+      FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+
+    steps:
+      - name: Resolve required repositories
+        id: resolve_rep
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        run: |
+          # this assumes the result is an array, and .name property is used
+          check_feature() {
+            # first param is the branch, everything after is endpoint for curl
+            local branch=$1
+            local found=0
+            shift
+            for endpoint in $@; do
+              local json=$(curl -s $endpoint)
+              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
+              # to track what we found
+              >&2 echo "$endpoint -> $branch_found"
+              if [[ $branch_found != "" ]]; then
+                found=$((found += 1))
+              fi
+            done
+            echo $found
+          }
+
+          FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
+          )
+
+          TAG_TO_CHECK="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+
+          echo "Checking if GHCR tag '$TAG_TO_CHECK' exists"
+          if gh api \
+            -H "Accept: application/vnd.github+json" \
+            --paginate \
+            /orgs/userofficeproject/packages/container/user-office-factory/versions \
+            | jq -e --arg TAG "$TAG_TO_CHECK" '.[] | select(.metadata.container.tags[]? == $TAG)' > /dev/null; then
+            CHECK_IF_IMAGE_EXISTS=true
+          else
+            CHECK_IF_IMAGE_EXISTS=false
+          fi
+
+          echo "CHECK_IF_IMAGE_EXISTS=$CHECK_IF_IMAGE_EXISTS"
+
+          if [[ $CHECK_IF_IMAGE_EXISTS == true ]]; then
+              FACTORY_TAGS=$((FACTORY_TAGS+1))
+          fi
+
+          if [[ $CHECK_IF_IMAGE_EXISTS == null  ]]; then 
+              FACTORY_TAGS=$((FACTORY_TAGS+1))
+          fi
+
+          FACTORY_TAG=develop
+          if [[ $FACTORY_TAGS == "2" ]]; then
+            FACTORY_TAG="${{ github.head_ref }}"
+          fi
+
+          echo "FACTORY_TAG=${FACTORY_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Resolved
+        run: |
+          echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
+
+  install-and-cache:
+    name: Run install and cache
+    needs: resolve_dep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install root dependencies
+        if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
+        # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
+        # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
+        run: npm ci --ignore-scripts
+
+      - name: Cache backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install backend dependencies
+        if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
+        run: npm run install:backend
+
+      - name: Cache UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
+      - name: Generate backend UOWS
+        if: steps.cached-UOWS.outputs.cache-hit != 'true'
+        run: |
+          cd apps/backend
+          npm run generate:uows
+
+      - name: Cache frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install frontend dependencies
+        if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
+        run: npm run install:frontend
+
+      - name: Cache frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/src/generated
+          key: ${{ env.FRONTEND_SDK_KEY }}
+
+      - name: Generate frontend SDK
+        run: |
+          cp apps/frontend/example.development.env apps/frontend/.env
+          npm run generate:sdk
+
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: install-and-cache
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/src/generated
+          key: ${{ env.FRONTEND_SDK_KEY }}
+          restore-keys: |
+            ${{ env.FRONTEND_SDK_KEY }}
+            sdk-frontend-
+
+      - run: npm ci
+      
+      - run: npm run build
+        env:
+          NODE_ENV: development
+          JWT_SECRET: ${{secrets.secret}}
+          JWT_TOKEN_LIFE: 7d
+          SPARKPOST_TOKEN: wrong_token_for_test
+
+  test_backend:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
+      - name: Run backend unit tests
+        env:
+          TZ: Europe/Stockholm
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
+          DEPENDENCY_CONFIG: e2e
+          JWT_SECRET: dummysecret
+          NODE_ENV: development
+          JWT_TOKEN_LIFE: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run test:backend
+
+
+
+
+  choose_runners:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.make.outputs.matrix }}
@@ -70,25 +299,199 @@ jobs:
           NUM_RUNNERS="${{ steps.get.outputs.idle }}"
 
           MATRIX="$(jq -nc --argjson n "$NUM_RUNNERS" '
-            [ range(0;5) |(if . < $n then "self" else "github" end)]
+            [ range(0;10) |(if . < $n then "self" else "github" end)]
           ')"
 
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
           echo "Matrix: $MATRIX"
 
-  build:
-    needs: choose
+  e2e:
+   
+    needs: [resolve_dep, build, choose_runners]
+
     strategy:
+      fail-fast: false
       matrix:
-        runner: ${{ fromJSON(needs.choose.outputs.matrix) }}
-    runs-on: ${{ fromJSON( matrix.runner == 'self'
-                           && '["self-hosted","Linux","X64"]'
-                           || '"ubuntu-latest"' ) }}
+        runner: ${{ fromJSON(needs.choose_runners.outputs.matrix) }}
+        pattern:
+          - id: ae
+            files: cypress/e2e/[a-e]*.ts
+          - id: fh
+            files: cypress/e2e/[f-h]*.ts
+          - id: io
+            files: cypress/e2e/[i-o]*.ts
+          - id: p-am
+            files: cypress/e2e/p[a-m]*.ts
+          - id: p-nz
+            files: cypress/e2e/p[n-z]*.ts
+          - id: rs
+            files: cypress/e2e/[r-s]*.ts
+          - id: t
+            files: cypress/e2e/t!(emplateDeleteAndArchive).ts
+          - id: templateDelete
+            files: cypress/e2e/templateDeleteAndArchive*.ts
+          - id: uz
+            files: cypress/e2e/[u-z]*.ts
+          - id: AZ
+            files: cypress/e2e/[A-Z]*.ts
+    runs-on: ${{ fromJSON( matrix.runner == 'self' && '["self-hosted","Linux","X64"]' || '"ubuntu-latest"' ) }}
+
     steps:
-      - run: |
-          echo "Runner key: ${{ matrix.runner }}"
-          echo "Hostname: $(hostname)"
+      - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
+      - name: Restore node_modules
+        id: cached-node-modules-root
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore backend node_modules
+        id: cached-node-modules-backend
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/node_modules
+          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore frontend node_modules
+        id: cached-node-modules-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/node_modules
+          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore frontend SDK
+        id: cached-sdk-frontend
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/src/generated
+          key: ${{ env.FRONTEND_SDK_KEY }}
+          restore-keys: |
+            ${{ env.FRONTEND_SDK_KEY }}
+            sdk-frontend-
+
+      # TODO: See how to proceed with e2e caching because there is some error:
+      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
+      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
+      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
+      # - name: Cache e2e node_modules
+      #   env:
+      #     CYPRESS_CACHE_FOLDER: cache/Cypress
+      #   id: cached-node-modules-e2e
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: apps/e2e/node_modules
+      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install e2e dependencies
+        env:
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+        if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
+        run: npm run install:e2e
+
+      - name: Download required repositories
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+
+      - name: Run e2e tests stfc
+        env:
+          USER_OFFICE_BACKEND_DIR: apps/backend
+          USER_OFFICE_FRONTEND_DIR: apps/frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
+          USER_OFFICE_BACKEND: http://localhost:4000/graphql
+          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+          TZ: Europe/London
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
+          DEPENDENCY_CONFIG: stfc
+          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
+          BASE_URL: localhost:3000
+          JWT_TOKEN_LIFE: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          SCHEMA_URL: http://localhost:4000/graphql
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
+          BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+          EXTERNAL_AUTH_TOKEN: abc
+          SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
+          EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
+          EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
+          EMAIL_TEMPLATE_PATH: /config/emails/
+          EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
+          EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
+          EXTERNAL_AUTH_LOGOUT_URL: http://localhost:9003/auth/Login.aspx
+          EXTERNAL_UOWS_API_URL: http://localhost:1080/users-service
+          ANTIVIRUS_HOST: clam-antivirus
+          ANTIVIRUS_PORT: 3310
+          ISIS_UO_EMAIL: isisuo@stfc.ac.uk
+          FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
+          PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run e2e:after:dev:stfc
+
+      - name: Run e2e tests
+        env:
+          USER_OFFICE_BACKEND_DIR: apps/backend
+          USER_OFFICE_FRONTEND_DIR: apps/frontend
+          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
+          USER_OFFICE_BACKEND: http://localhost:4000/graphql
+          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+          TZ: Europe/Stockholm
+          DATE_FORMAT: dd-MM-yyyy
+          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+          PING_PUBLIC_CRT: dummypingsecret
+          DEPENDENCY_CONFIG: e2e
+          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+          NODE_ENV: development
+          BASE_URL: localhost:3000
+          JWT_TOKEN_LIFE: 7d
+          SPARKPOST_TOKEN: dummytoken
+          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+          SCHEMA_URL: http://localhost:4000/graphql
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
+          BUILD_TAG: ${{ github.sha }}
+          CYPRESS_CACHE_FOLDER: .cache/Cypress
+          EAM_API_URL: https://ios.esss.lu.se
+          EAM_AUTH_USER: dummyAuthUser
+          EAM_AUTH_PASSWORD: dummyEAMsecret
+          EAM_AUTH_TENANT: dummyTenant
+          EAM_AUTH_ORGANIZATION: dummyOrg
+          EAM_EQUIPMENT_PART_CODE: 12413
+          AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
+          AUTH_CLIENT_ID: useroffice
+          AUTH_CLIENT_SECRET: useroffice
+        run: |
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          npm run e2e:after:dev -- --dns-result-order=ipv4first
+
+      - name: Upload cypres screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-${{ matrix.pattern.id }}
+          path: apps/e2e/cypress/screenshots
