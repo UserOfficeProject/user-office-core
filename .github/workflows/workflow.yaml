@@ -67,20 +67,12 @@ jobs:
         id: make
         run: |
           set -euo pipefail
-          # Clamp to [0..5]
-          N="${{ steps.get.outputs.idle }}"
-          if [ "$N" -gt 5 ]; then N=5; fi
-          if [ "$N" -lt 0 ]; then N=0; fi
 
-          MATRIX="$(jq -n --argjson n "$N" '
-            [ range(0;5) | {
-                slot: (.+1),
-                # runs_on is either an array (labels) or a string; we’ll fromJSON() it later
-                runs_on: (if . < $n then ["self-hosted","Linux","X64"] else "ubuntu-latest" end)
-              } ]
+          MATRIX="$(jq -nc --argjson n "$NUM_RUNNERS" '
+            [ range(0;5) |(if . < $n then "self" else "github" end)]
           ')"
 
-          echo "matrix=yadda" >> "$GITHUB_OUTPUT"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
           echo "Matrix: $MATRIX"
 
   build:
