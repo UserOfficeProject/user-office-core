@@ -79,15 +79,15 @@ jobs:
   build:
     needs: choose
     strategy:
-      # [{slot:1,runs_on:[...]}, {slot:2,runs_on:"ubuntu-latest"}, ...]
-      matrix: ${{ fromJSON(needs.choose.outputs.matrix) }}
-    # Use whatever came in each matrix entry
-    runs-on: ${{ fromJSON(toJson(matrix.runs_on)) }}
+      matrix:
+        runner: ${{ fromJSON(needs.choose.outputs.matrix) }}
+    runs-on: ${{ fromJSON( matrix.runner == 'self'
+                           && '["self-hosted","Linux","X64"]'
+                           || '"ubuntu-latest"' ) }}
     steps:
       - run: |
-          echo "Slot: ${{ matrix.slot }}"
-          echo "runs-on: ${{ toJson(matrix.runs_on) }}"
-          echo "Host: $(hostname)"
+          echo "Runner key: ${{ matrix.runner }}"
+          echo "Hostname: $(hostname)"
 
 
 
