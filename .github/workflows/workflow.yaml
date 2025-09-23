@@ -73,7 +73,7 @@ jobs:
           - id: AZ
             idx: 9
             files: cypress/e2e/[A-Z]*.ts
-    runs-on: ${{  matrix.pattern.idx < needs.count_runners.outputs.idle && '["self-hosted","Linux","X64"]' || '"ubuntu-latest"'  }}
+    runs-on: ${{  matrix.pattern.idx < needs.count_runners.outputs.idle && '["self-hosted","Linux","X64"]' || 'ubuntu-latest'  }}
 
     steps:
       - run: |
