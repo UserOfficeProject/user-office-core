@@ -14,7 +14,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const isEven = (context.runNumber % 2) === 0
+            const isEven = ((context.runNumber / 2)  % 2) === 0
             core.setOutput('runs_on', isEven
               ? '["self-hosted","Linux","X64"]'
               : '"ubuntu-latest"'
