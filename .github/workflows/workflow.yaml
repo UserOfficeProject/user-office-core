@@ -55,7 +55,12 @@ jobs:
               "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100"
           )"
 
-          IDLE="$(echo "$RESPONSE" | jq '[(.runners // [])[] | select(.busy == false)] | length')"
+          IDLE="$(echo "$RESPONSE" | jq '
+            [ (.runners // [])[]?
+              | select(.status == "online" and (.busy | not))
+              | select([.labels[]?.name] | index("self-hosted") and index("Linux") and index("X64"))
+            ] | length
+          ')"
           echo "idle=$IDLE" >> "$GITHUB_OUTPUT"
 
       - name: Build 5-slot matrix (self-hosted first, then ubuntu)
