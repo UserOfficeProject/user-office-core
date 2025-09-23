@@ -58,24 +58,7 @@ jobs:
               "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100"
           )"
 
-          echo "Raw response:" >&2
-          echo "$RESPONSE" | jq '.' >&2 || echo "$RESPONSE" >&2
+          echo "Response: $RESPONSE"
 
-          echo "" >&2
-          echo "Processed output:" >&2
-          # Pass jq program via here-doc to avoid shell/YAML escaping issues
-          jq -r '
-            .runners // [] as $r
-            | if ($r|length) == 0 then
-                "No runners found for this repository."
-              else
-                "Found \($r|length) runners:",
-                ( $r[] |
-                  "- id=\(.id) name=\(.name) status=\(.status) busy=\(.busy) labels=[\([.labels[].name] | join(\", \"))]"
-                )
-              end
-          ' <<'JQ'
-          $RESPONSE
-          JQ
 
 
