@@ -2,7 +2,7 @@ name: build
 on: [push, workflow_dispatch]
 
 permissions:
-  actions: read   # needed for listing runners
+  actions: write   # needed for listing runners
 
 jobs:
   choose-runner:
