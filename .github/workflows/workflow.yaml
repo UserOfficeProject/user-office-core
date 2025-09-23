@@ -58,15 +58,15 @@ jobs:
 
           echo "\nProcessed output:" >&2
           echo "$RESPONSE" | jq -r '
-            .runners // [] |
-            if length==0 then
-              "No runners found for this repository."
-            else
-              "Found \(length) runners:",
-              (.[]
-                | "- id=\(.id) name=\(.name) status=\(.status) busy=\(.busy) labels=[\(.labels|map(.name)|join(\", "))]"
-              )
-            end
+            def line:
+              "- id=\(.id) name=\(.name) status=\(.status) busy=\(.busy) labels=[\(.labels|map(.name)|join(\", \"))]";
+            .runners // [] as $r
+            | if ($r|length)==0 then
+                "No runners found for this repository."
+              else
+                "Found \($r|length) runners:",
+                ($r[] | line)
+              end
           '
 
 
