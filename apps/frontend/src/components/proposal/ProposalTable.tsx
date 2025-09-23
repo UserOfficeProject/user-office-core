@@ -288,14 +288,22 @@ const ProposalTable = ({
               },
             };
           },
-          {
-            icon: GetAppIcon,
-            tooltip: 'Download proposal',
-            onClick: (event, rowData) =>
-              downloadPDFProposal(
-                [(rowData as PartialProposalsDataType).primaryKey],
-                (rowData as PartialProposalsDataType).title
-              ),
+          (rowData) => {
+            const isSubmitted = rowData.submitted;
+
+            return {
+              icon: GetAppIcon,
+              tooltip: !isSubmitted
+                ? 'Only submitted proposals can be downloaded'
+                : 'Download Proposal',
+              disabled: !isSubmitted,
+
+              onClick: (event, rowData) =>
+                downloadPDFProposal(
+                  [(rowData as PartialProposalsDataType).primaryKey],
+                  (rowData as PartialProposalsDataType).title
+                ),
+            };
           },
           (rowData) => {
             const isPI = rowData.proposerId === userContext.user.id;
