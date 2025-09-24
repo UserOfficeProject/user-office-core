@@ -631,9 +631,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('title ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_id ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_status_name ILIKE ?', `%${filter.text}%`)
-              .orWhereRaw('users.email ILIKE', `%${filter.text}%`)
-              .orWhereRaw('users.firstname ILIKE', `%${filter.text}%`)
-              .orWhereRaw('users.lastname ILIKE', `%${filter.text}%`)
+              .orWhereRaw('users.email ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.firstname ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.lastname ILIKE ?', `%${filter.text}%`)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -653,7 +653,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             ).orWhereRaw(
               // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
               // eslint-disable-next-line prettier/prettier
-              'jsonb_path_exists(instruments, \'$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)\')',
+              "jsonb_path_exists(instruments, '$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)')",
               { userId: user.id }
             );
           });
