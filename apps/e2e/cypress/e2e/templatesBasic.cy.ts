@@ -504,7 +504,7 @@ context('Template Basic tests', () => {
                     cy.get(
                       `[data-cy=proposals-count-${initialDBData.template.id}]`
                     )
-                      .contains('1')
+                      .contains('2')
                       .click();
 
                     cy.get('[data-cy=proposals-modal]').contains(

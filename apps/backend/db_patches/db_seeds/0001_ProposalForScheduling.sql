@@ -1,7 +1,8 @@
 DO
 $DO$
 DECLARE  
-  questionary_id_var int;
+  questionary_id_var1 int;
+  questionary_id_var2 int;
   technical_review_template_id_var int;
   technical_review_questionary_id_var int;
 BEGIN
@@ -26,9 +27,17 @@ BEGIN
   INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
 
   SELECT questionaries.questionary_id
-  INTO questionary_id_var
+  INTO questionary_id_var1
   FROM questionaries
   WHERE template_id = 1;
+
+  INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
+
+  SELECT questionaries.questionary_id
+  INTO questionary_id_var2
+  FROM questionaries
+  WHERE template_id = 1
+  AND questionary_id <> questionary_id_var1;
 
   SELECT templates.template_id 
   INTO technical_review_template_id_var
@@ -70,7 +79,7 @@ BEGIN
      , '999999'          
      , 1                 
      , 1                 
-     , questionary_id_var
+     , questionary_id_var1
      , NULL              
      , NULL              
      , true              
@@ -110,7 +119,7 @@ BEGIN
      , '222222'          
      , 1                 
      , 1                 
-     , questionary_id_var
+     , questionary_id_var2
      , NULL              
      , NULL              
      , true              

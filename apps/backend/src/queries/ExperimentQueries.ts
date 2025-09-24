@@ -3,7 +3,6 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
-import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -18,9 +17,7 @@ export default class ExperimentQueries {
   constructor(
     @inject(Tokens.ExperimentDataSource)
     public dataSource: ExperimentDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.InstrumentDataSource)
-    private instrumentDataSource: InstrumentDataSource
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized([

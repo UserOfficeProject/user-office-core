@@ -1,22 +1,47 @@
 DO
 $DO$
+DECLARE  
+  exp_safety_review_template_category_id_var int;
+  exp_safety_review_template_id_var int;
+  exp_safety_review_template_topic_id_var int;
+  instrument_id_1_var int;
+  instrument_id_2_var int;
   BEGIN
+    -- Get instrument ids
+    SELECT instrument_id INTO instrument_id_1_var FROM instruments WHERE name='Instrument 1' limit 1;
+    SELECT instrument_id INTO instrument_id_2_var FROM instruments WHERE name='Instrument 2' limit 1;
 
     INSERT INTO experiments(
       experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
-      VALUES (996,'000001', 996, '2030-01-07 10:00:00', '2030-01-07 11:00:00', 1, 'ACTIVE', 1, 1);
-   
+      VALUES (996,'000001', 996, '2030-01-07 10:00:00', '2030-01-07 11:00:00', 1, 'ACTIVE', 1, instrument_id_1_var);
+
     INSERT INTO experiments(
     experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, instrument_id)
-    VALUES (997, '000002', 997, '2020-01-07 10:00:00', '2020-01-07 11:00:00', 2, 'ACTIVE', 2);
+    VALUES (997, '000002', 997, '2020-01-07 10:00:00', '2020-01-07 11:00:00', 2, 'ACTIVE', instrument_id_2_var);
 
     INSERT INTO experiments(
     experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
-    VALUES (998, '000003', 998, '2030-01-07 12:00:00', '2030-01-07 13:00:00', 1, 'DRAFT', 1, 1);
+    VALUES (998, '000003', 998, '2030-01-07 12:00:00', '2030-01-07 13:00:00', 1, 'DRAFT', 1, instrument_id_1_var);
 
     INSERT INTO experiments(
     experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
-    VALUES (999, '000004', 999, '2030-02-07 12:00:00', '2030-02-07 13:00:00', 1, 'COMPLETED', 1, 1);
+    VALUES (999, '000004', 999, '2030-02-07 12:00:00', '2030-02-07 13:00:00', 1, 'COMPLETED', 1, instrument_id_2_var);
+    
+    -- Get Experiment Safety Review (ESR) Template category id, template id and topic id
+    SELECT template_categories.template_category_id
+      INTO exp_safety_review_template_category_id_var
+      FROM template_categories
+      WHERE name = 'Experiment Safety Review' limit 1;
+
+    select templates.template_id
+      INTO exp_safety_review_template_id_var
+      from templates
+      where group_id = 'EXPERIMENT_SAFETY_REVIEW_TEMPLATE' limit 1;
+    
+    select topics.topic_id 
+      INTO exp_safety_review_template_topic_id_var
+      from topics
+      where template_id = exp_safety_review_template_id_var limit 1;
 
       -- Insert Questions for Experiment Safety Review (ESR) Template
       -- BOOLEAN Question for Experiment Safety Review (ESR) Template
@@ -36,7 +61,7 @@ $DO$
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_boolean_question', 12
+        'experiment_safety_review_boolean_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -44,7 +69,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_boolean_question', 4, 4, 3, '{
+        'experiment_safety_review_boolean_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 3, '{
                 "tooltip": "",
                 "required": false,
                 "small_label": "",
@@ -69,7 +94,7 @@ $DO$
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_date_question', 12
+        'experiment_safety_review_date_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -77,7 +102,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_date_question', 4, 4, 4, '{ "tooltip": "","required": false,"small_label": "" , "readPermissions":[]}'
+        'experiment_safety_review_date_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 4, '{ "tooltip": "","required": false,"small_label": "" , "readPermissions":[]}'
       );
 
     -- INTERVAL Question for Experiment Safety Review (ESR) Template
@@ -107,7 +132,7 @@ $DO$
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_interval_question', 12
+        'experiment_safety_review_interval_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -115,7 +140,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_interval_question', 4, 4, 6, '{
+        'experiment_safety_review_interval_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 6, '{
             "units": [
                 {
                     "id": "meter",
@@ -165,7 +190,7 @@ $DO$
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_number_question', 12
+        'experiment_safety_review_number_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -173,7 +198,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_number_question', 4, 4, 7, '{
+        'experiment_safety_review_number_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 7, '{
             "units": [
                 {
                     "id": "meter",
@@ -210,7 +235,7 @@ $DO$
         '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_rich_text_input_question', 12
+        'experiment_safety_review_rich_text_input_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -218,7 +243,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_rich_text_input_question', 4, 4, 
+        'experiment_safety_review_rich_text_input_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 
         8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
       );
     -- Selection from options Question for Experiment Safety Review (ESR) Template
@@ -234,7 +259,7 @@ $DO$
         '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_selection_from_options_question', 12
+        'experiment_safety_review_selection_from_options_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -243,7 +268,7 @@ $DO$
     VALUES 
       (
         'experiment_safety_review_selection_from_options_question', 
-        4, 4, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
+        exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
       );
 
     -- Text input Question for Experiment Safety Review (ESR) Template
@@ -259,7 +284,7 @@ $DO$
         '{ "tooltip": "","required": false,"small_label": "","readPermissions":[] }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
-        'experiment_safety_review_text_input_question', 12
+        'experiment_safety_review_text_input_question', exp_safety_review_template_category_id_var
       );
     INSERT INTO templates_has_questions(
       question_id, template_id, topic_id, 
@@ -267,7 +292,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_text_input_question', 4, 4, 11, '{ "tooltip": "", "required": false, "small_label": "","readPermissions":[] }'
+        'experiment_safety_review_text_input_question', exp_safety_review_template_id_var, exp_safety_review_template_topic_id_var, 11, '{ "tooltip": "", "required": false, "small_label": "","readPermissions":[] }'
       );
   END;
 $DO$
