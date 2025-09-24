@@ -166,13 +166,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     proposalPk: state.proposal.primaryKey,
                   });
 
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: submitProposal,
-                  });
+                  const { proposal } = await api().getProposal({
+                    primaryKey: submitProposal.primaryKey,
+                  }); // refetching proposal after event handling is done in backend
+
                   dispatch({
                     type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: submitProposal,
+                    itemWithQuestionary: proposal!,
                   });
                 } finally {
                   setSubmitDisabled(true);

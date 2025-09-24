@@ -283,6 +283,11 @@ context('Proposal tests', () => {
 
       cy.contains('OK').click();
 
+      cy.get('[data-cy="questionary-stepper"').contains('New proposal').click();
+
+      cy.get('#title-input').should('have.value', title);
+      cy.get('#abstract-input').should('have.value', modifiedAbstract);
+
       cy.contains('Dashboard').click();
       cy.contains(title);
       cy.contains('submitted');
