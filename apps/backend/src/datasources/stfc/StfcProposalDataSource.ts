@@ -120,6 +120,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
+          const jsonPath = `$[*].name ? (@.type() == "string" && @ like_regex "${filter.text}" flag "i")`;
           query.where(function () {
             this.where('title', 'ilike', `%${filter.text}%`)
               .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
@@ -129,10 +130,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
               .orWhere('principal_investigator', 'in', stfcUserIds)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-              .orWhereRaw(
-                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-                { searchText: filter.text }
-              );
+              .orWhereRaw('jsonb_path_exists(instruments, ?)', [jsonPath]);
           });
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
