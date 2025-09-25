@@ -209,7 +209,7 @@ const logout = () => {
   localStorage.removeItem('expToken');
   localStorage.removeItem('impersonatingUserId');
 
-  cy.visit('/external-auth');
+  cy.visit(Cypress.config('baseUrl') || '/');
 };
 
 const createUserByEmailInvite = (
