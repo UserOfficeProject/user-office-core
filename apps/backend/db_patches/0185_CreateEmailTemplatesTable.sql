@@ -69,6 +69,10 @@ BEGIN
                   IF connection_loop_var.config IS NOT NULL THEN
                         SELECT jsonb_array_length(connection_loop_var.config->'recipientsWithEmailTemplate') INTO array_size_var;
 
+                        IF array_size_var IS NULL THEN
+                              array_size_var := 0;
+                        END IF;
+
                         FOR array_loop_var IN 0..array_size_var-1 LOOP
                               SELECT connection_loop_var.config->'recipientsWithEmailTemplate'->array_loop_var->'emailTemplate'->>'name' INTO template_name;
 
