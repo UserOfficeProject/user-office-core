@@ -779,7 +779,7 @@ context('Template Basic tests', () => {
           fieldName: 'numberField2',
           badInput: '1{leftarrow}-',
           goodInput: '1',
-          failureMessage: 'Value must be a negative number',
+          failureMessage: 'Value must be a positive number',
         },
         {
           id: generateId(),
@@ -788,7 +788,7 @@ context('Template Basic tests', () => {
           fieldName: 'numberField3',
           badInput: '1',
           goodInput: '1{leftarrow}-',
-          failureMessage: 'Value must be a positive number',
+          failureMessage: 'Value must be a negative number',
         },
         {
           id: generateId(),
