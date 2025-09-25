@@ -2,12 +2,14 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { EmailTemplateDataSourceMock } from '../datasources/mockups/EmailTemplateDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
@@ -55,6 +57,7 @@ import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
+mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
@@ -100,6 +103,7 @@ mapClass(Tokens.TagDataSource, TagDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
