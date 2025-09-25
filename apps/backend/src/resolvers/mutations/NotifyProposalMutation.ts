@@ -27,9 +27,6 @@ export class NotifyProposalMutation {
     args: NotifyProposalArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.proposal.notify(context.user, {
-      proposalPk: args.proposalPk,
-      ignoreNotifiedFlag: args.ignoreNotifiedFlag,
-    });
+    return context.mutations.proposal.notify(context.user, args);
   }
 }

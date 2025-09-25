@@ -38,6 +38,7 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
+import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
@@ -380,16 +381,13 @@ export default class ProposalMutations {
   @Authorized([Roles.USER_OFFICER])
   async notify(
     user: UserWithRole | null,
-    {
-      proposalPk,
-      ignoreNotifiedFlag,
-    }: { proposalPk: number; ignoreNotifiedFlag: boolean }
+    notifyArgs: NotifyProposalArgs
   ): Promise<unknown> {
-    const proposal = await this.proposalDataSource.get(proposalPk);
+    const proposal = await this.proposalDataSource.get(notifyArgs.proposalPk);
 
     if (
       !proposal ||
-      (proposal.notified && !ignoreNotifiedFlag) ||
+      (proposal.notified && !notifyArgs.ignoreNotifiedFlag) ||
       !proposal.finalStatus
     ) {
       return rejection('Can not notify proposal', { proposal });
