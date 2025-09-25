@@ -902,9 +902,17 @@ export default class ProposalMutations {
       const proposalUsers = await this.userDataSource.getProposalUsers(
         sourceProposal.primaryKey
       );
+      const proposalUserIds = proposalUsers.map((user) => user.id);
+
+      const hasWriteRightsOnClonedProposal =
+        await this.proposalAuth.hasWriteRights(agent, clonedProposal);
+      if (!hasWriteRightsOnClonedProposal) {
+        proposalUserIds.push(agent!.id);
+      }
+
       await this.proposalDataSource.setProposalUsers(
         clonedProposal.primaryKey,
-        proposalUsers.map((user) => user.id)
+        proposalUserIds
       );
 
       const proposalSamples = await this.sampleDataSource.getSamples({

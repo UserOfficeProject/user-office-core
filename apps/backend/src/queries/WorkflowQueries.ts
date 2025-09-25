@@ -22,8 +22,16 @@ export default class WorkflowQueries {
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async getWorkflow(agent: UserWithRole | null, id: number) {
+  async getWorkflow(
+    agent: UserWithRole | null,
+    id: number,
+    entityType: WorkflowType
+  ) {
     const workflow = await this.dataSource.getWorkflow(id);
+
+    if (workflow?.entityType !== entityType) {
+      return null;
+    }
 
     return workflow;
   }

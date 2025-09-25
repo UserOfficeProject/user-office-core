@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import UserManagementTable, {
   UserManagementTableProps,
 } from 'components/common/UserManagementTable';
-import { BasicUserDetails } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
 type ProposalParticipantsProps = Omit<
@@ -27,12 +28,18 @@ const ProposalParticipants = ({
     }
   };
 
+  const featureContext = useContext(FeatureContext);
+  const allowInviteByEmail = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
   return (
     <UserManagementTable
       {...props}
       disabled={loadingPrincipalInvestigator}
       onUserAction={setPrincipalInvestigator ? handleUserAction : undefined}
       excludeUserIds={principalInvestigator ? [principalInvestigator.id] : []}
+      allowInviteByEmail={allowInviteByEmail}
     />
   );
 };
