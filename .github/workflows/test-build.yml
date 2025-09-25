@@ -294,36 +294,36 @@ jobs:
       matrix:
         pattern:
           - id: ae
-            idx: 0
+            order: 0
             files: cypress/e2e/[a-e]*.ts
           - id: fh
-            idx: 1
+            order: 1
             files: cypress/e2e/[f-h]*.ts
           - id: io
-            idx: 2
+            order: 2
             files: cypress/e2e/[i-o]*.ts
           - id: p-am
-            idx: 3
+            order: 3
             files: cypress/e2e/p[a-m]*.ts
           - id: p-nz
-            idx: 4
+            order: 4
             files: cypress/e2e/p[n-z]*.ts
           - id: rs
-            idx: 5
+            order: 5
             files: cypress/e2e/[r-s]*.ts
           - id: t
-            idx: 6
+            order: 6
             files: cypress/e2e/t!(emplateDeleteAndArchive).ts
           - id: templateDelete
-            idx: 7
+            order: 7
             files: cypress/e2e/templateDeleteAndArchive*.ts
           - id: uz
-            idx: 8
+            order: 8
             files: cypress/e2e/[u-z]*.ts
           - id: AZ
-            idx: 9
+            order: 9
             files: cypress/e2e/[A-Z]*.ts
-    runs-on: ${{  matrix.pattern.idx < needs.count_self_hosted_runners.outputs.idle && 'self-hosted' || 'ubuntu-latest'  }}
+    runs-on: ${{  matrix.pattern.order < needs.count_self_hosted_runners.outputs.idle && 'self-hosted' || 'ubuntu-latest'  }}
  
     steps:
       - uses: actions/checkout@v4
