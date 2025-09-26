@@ -4,6 +4,7 @@ import {
   dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { DataAccessUsersAuthorization } from './DataAccessUsersAuthorization';
 
@@ -23,6 +24,12 @@ describe('DataAccessUsersAuthorization', () => {
           dummyPrincipalInvestigatorWithRole,
           1
         )
+      ).resolves.toEqual(true);
+    });
+
+    test('Co Proposer Has write rights to manage data access users for their proposal', async () => {
+      return expect(
+        dataAccessUsersAuth.hasWriteRights(dummyUserWithRole, 1)
       ).resolves.toEqual(true);
     });
 

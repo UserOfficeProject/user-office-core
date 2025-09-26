@@ -235,7 +235,13 @@ declare global {
        */
       createIntervalQuestion: (
         title: string,
-        options?: { units?: string[] }
+        options?: {
+          key?: string;
+          isRequired?: boolean;
+          units?: string[];
+          valueConstraint?: string;
+          firstTopic?: boolean;
+        }
       ) => void;
 
       /**
