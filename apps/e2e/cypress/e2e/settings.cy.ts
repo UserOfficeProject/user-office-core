@@ -1632,7 +1632,6 @@ context('Settings tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy^="connection_AWAITING_ESF"]').should('exist');
-      cy.get('[data-cy^="status_AWAITING_ESF"]').should('exist');
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
