@@ -4,6 +4,8 @@ import React, { FunctionComponent } from 'react';
 import { DownloadableFileList } from 'components/common/DownloadableFileList';
 import UOLoader from 'components/common/UOLoader';
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
+import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import stripHtml from 'utils/stripHtml';
 
 import ReviewQuestionaryDetails from './ReviewQuestionaryDetails';
@@ -14,6 +16,13 @@ export default function TechnicalReviewQuestionaryReview(
     data: TechnicalReviewWithQuestionary;
   } & TableProps<FunctionComponent<unknown>>
 ) {
+  const internalUser = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.FAP_SECRETARY,
+    UserRole.INSTRUMENT_SCIENTIST,
+    UserRole.INTERNAL_REVIEWER,
+  ]);
+
   const { data, ...restProps } = props;
 
   const fileId: { id: string }[] = data.files ? JSON.parse(data.files) : [];
@@ -37,16 +46,20 @@ export default function TechnicalReviewQuestionaryReview(
       label: `Time allocation(${data.proposal?.call?.allocationTimeUnit}s)`,
       value: data.timeAllocation?.toString() || '',
     },
-    {
-      label: 'Comment',
-      value: stripHtml(data.comment || ''),
-    },
-    {
-      label: 'Internal Documents',
-      value: <DownloadableFileList fileIds={fileId.map((file) => file.id)} />,
-    },
-    { label: 'Public Comment', value: stripHtml(data.publicComment || '') },
+    { label: 'Comment', value: stripHtml(data.publicComment || '') },
   ];
+
+  internalUser &&
+    additionalDetails.push(
+      {
+        label: 'Internal Comment',
+        value: stripHtml(data.comment || ''),
+      },
+      {
+        label: 'Internal Documents',
+        value: <DownloadableFileList fileIds={fileId.map((file) => file.id)} />,
+      }
+    );
 
   return (
     <ReviewQuestionaryDetails
