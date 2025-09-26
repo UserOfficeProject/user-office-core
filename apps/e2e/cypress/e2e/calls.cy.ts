@@ -1068,6 +1068,20 @@ context('Calls tests', () => {
       id: initialDBData.call.id,
       ...newCall,
       shortCode: initialDBData.call.shortCode,
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 59 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('1 minute remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      shortCode: initialDBData.call.shortCode,
       endCall: DateTime.now().plus({ seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
@@ -1160,6 +1174,21 @@ context('Calls tests', () => {
       cy.contains(initialDBData.call.shortCode)
         .parent()
         .contains('7 hours remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      shortCode: initialDBData.call.shortCode,
+      endCall: yesterday,
+      endCallInternal: DateTime.now().plus({ minutes: 1, seconds: 59 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains(initialDBData.call.shortCode)
+        .parent()
+        .contains('1 minute remaining');
     });
 
     cy.updateCall({
