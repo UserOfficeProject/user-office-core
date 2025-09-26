@@ -5,6 +5,7 @@ import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
+import DataAccessUsersMutations from '../mutations/DataAccessUsersMutations';
 import ExperimentMutations from '../mutations/ExperimentMutation';
 import ExperimentSafetyPdfTemplateMutations from '../mutations/ExperimentSafetyPdfTemplateMutations';
 import FapMutations from '../mutations/FapMutations';
@@ -33,6 +34,7 @@ import VisitMutations from '../mutations/VisitMutations';
 import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
+import DataAccessUsersQueries from '../queries/DataAccessUsersQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import ExperimentQueries from '../queries/ExperimentQueries';
 import ExperimentSafetyPdfTemplateQueries from '../queries/ExperimentSafetyPdfTemplateQueries';
@@ -67,6 +69,7 @@ import WorkflowQueries from '../queries/WorkflowQueries';
 interface ResolverContextQueries {
   admin: AdminQueries;
   call: CallQueries;
+  dataAccessUsers: DataAccessUsersQueries;
   eventLogs: EventLogQueries;
   feedback: FeedbackQueries;
   file: FileQueries;
@@ -102,6 +105,7 @@ interface ResolverContextQueries {
 interface ResolverContextMutations {
   admin: AdminMutations;
   call: CallMutations;
+  dataAccessUsers: DataAccessUsersMutations;
   feedback: FeedbackMutations;
   file: FileMutations;
   genericTemplate: GenericTemplateMutations;

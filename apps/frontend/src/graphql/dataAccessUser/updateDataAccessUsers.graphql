@@ -1,0 +1,8 @@
+mutation updateDataAccessUsers(
+  $proposalPk: Int!
+  $userIds: [Int!]!
+) {
+  updateDataAccessUsers(proposalPk: $proposalPk, userIds: $userIds) {
+    ...basicUserDetails
+  }
+}

@@ -1,13 +1,14 @@
 import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UserManagementTable from 'components/common/UserManagementTable';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -29,6 +30,11 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
     teamLeadUserId: visit?.teamLead.id || null,
     inviteEmails: visit?.registrationInvites || [],
   };
+
+  const featureContext = useContext(FeatureContext);
+  const allowInviteByEmail = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
 
   return (
     <Formik
@@ -93,6 +99,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               setFieldValue('team', team);
             }}
             users={values.team || []}
+            allowInviteByEmail={allowInviteByEmail}
           />
           <ErrorMessage name="team" />
 
