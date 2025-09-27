@@ -37,6 +37,7 @@ context('Technique Proposal tests', () => {
 
   let callWorkflowId: number; // Workflow with QUICK_REVIEW status
 
+  faker.seed(1); // sometimes faker generates the same value twice in a row. This seed is safe to use
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
@@ -139,31 +140,31 @@ context('Technique Proposal tests', () => {
   };
 
   const technique1 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique2 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique3 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique4 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique5 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
@@ -174,35 +175,35 @@ context('Technique Proposal tests', () => {
   const scientist4 = initialDBData.users.placeholderUser;
 
   const instrument1 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist1.id,
   };
 
   const instrument2 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist2.id,
   };
 
   const instrument3 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist3.id,
   };
 
   const instrument4 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist4.id,
   };
 
   const instrument5 = {
-    name: faker.lorem.word({ length: 10 }),
+    name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist2.id,
