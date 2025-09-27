@@ -1358,6 +1358,11 @@ context('Settings tests', () => {
 
       cy.get('[title="fit view"]').click();
 
+      cy.get('[data-cy="connection_DRAFT"]').should('exist');
+      cy.get('[data-cy="connection_FEASIBILITY_REVIEW"]').should('exist');
+      cy.get('[data-cy="connection_FAP_SELECTION"]').should('exist');
+      cy.get('[data-cy="connection_NOT_FEASIBLE"]').should('exist');
+
       cy.connectReactFlowNodes(draft, feasibilityReview);
       cy.finishedLoading();
       cy.get('[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]').should(
@@ -1796,6 +1801,11 @@ context('Settings tests', () => {
       cy.finishedLoading();
 
       cy.get('[title="fit view"]').click();
+
+      cy.get('[data-cy="connection_AWAITING_ESF"]').should('exist');
+      cy.get('[data-cy="connection_ESF_IS_REVIEW"]').should('exist');
+      cy.get('[data-cy="connection_ESF_ESR_REVIEW"]').should('exist');
+      cy.get('[data-cy="connection_ESF_REJECTED"]').should('exist');
 
       cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
       cy.finishedLoading();
