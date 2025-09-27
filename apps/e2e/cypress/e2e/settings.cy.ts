@@ -1328,7 +1328,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(fapSelection, {
         clientX: 300,
-        clientY: 500,
+        clientY: 800,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1342,7 +1342,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(notFeasible, {
         clientX: 900,
-        clientY: 500,
+        clientY: 800,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1767,7 +1767,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(esfEsrReview, {
         clientX: 300,
-        clientY: 500,
+        clientY: 800,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1781,7 +1781,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(esfRejected, {
         clientX: 900,
-        clientY: 500,
+        clientY: 800,
       });
       cy.finishedLoading();
       cy.notification({
