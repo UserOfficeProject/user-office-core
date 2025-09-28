@@ -1808,13 +1808,13 @@ context('Settings tests', () => {
       cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_REJECTED"]`).should(
         'exist'
       );
-    });
 
-    cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
-    cy.finishedLoading();
-    cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).should(
-      'exist'
-    );
+      cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
+      cy.finishedLoading();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).should(
+        'exist'
+      );
+    });
   });
   describe('API access tokens tests', () => {
     const accessTokenName = faker.lorem.words(2);
