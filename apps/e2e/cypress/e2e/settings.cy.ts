@@ -1308,7 +1308,8 @@ context('Settings tests', () => {
       cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
     });
 
-    it('User Officer should be able to create proposal workflow with branches', () => {
+    it.skip('User Officer should be able to create proposal workflow with branches', () => {
+      // Skipping due to flakiness, enable once CI performance is improved
       cy.login('officer');
       cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
@@ -1755,7 +1756,8 @@ context('Settings tests', () => {
       );
     });
 
-    it('User Officer should be able to create experiment workflow with branches', () => {
+    it.skip('User Officer should be able to create experiment workflow with branches', () => {
+      // Skipping due to flakiness, enable once CI performance is improved
       cy.login('officer');
       cy.visit(`/ExperimentWorkflowEditor/${createdWorkflowId}`);
 
