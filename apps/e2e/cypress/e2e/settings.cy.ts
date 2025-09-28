@@ -1358,19 +1358,25 @@ context('Settings tests', () => {
 
       cy.get('[title="fit view"]').click();
 
-      cy.connectReactFlowNodes(feasibilityReview, fapSelection);
+      cy.connectReactFlowNodes(feasibilityReview, fapSelection, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(
         `[aria-label="Edge from FEASIBILITY_REVIEW to FAP_SELECTION"]`
       ).should('exist');
 
-      cy.connectReactFlowNodes(feasibilityReview, notFeasible);
+      cy.connectReactFlowNodes(feasibilityReview, notFeasible, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(
         `[aria-label="Edge from FEASIBILITY_REVIEW to NOT_FEASIBLE"]`
       ).should('exist');
 
-      cy.connectReactFlowNodes(draft, feasibilityReview);
+      cy.connectReactFlowNodes(draft, feasibilityReview, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get('[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]').should(
         'exist'
@@ -1707,7 +1713,9 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
+      cy.connectReactFlowNodes(awaitingEsf, esfIsReview, {
+        force: true,
+      });
 
       cy.reload();
 
@@ -1797,19 +1805,25 @@ context('Settings tests', () => {
 
       cy.get('[title="fit view"]').click();
 
-      cy.connectReactFlowNodes(esfIsReview, esfEsrReview);
+      cy.connectReactFlowNodes(esfIsReview, esfEsrReview, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_ESR_REVIEW"]`).should(
         'exist'
       );
 
-      cy.connectReactFlowNodes(esfIsReview, esfRejected);
+      cy.connectReactFlowNodes(esfIsReview, esfRejected, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_REJECTED"]`).should(
         'exist'
       );
 
-      cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
+      cy.connectReactFlowNodes(awaitingEsf, esfIsReview, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).should(
         'exist'
