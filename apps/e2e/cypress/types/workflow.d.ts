@@ -9,6 +9,7 @@ import {
   AddWorkflowStatusMutation,
   AddConnectionStatusActionsMutation,
   AddConnectionStatusActionsMutationVariables,
+  Status,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -82,6 +83,41 @@ declare global {
        *    cy.addFeasibilityReviewToDefaultWorkflow()
        */
       addFeasibilityReviewToDefaultWorkflow: () => Cypress.Chainable<AddWorkflowStatusMutation>;
+
+      /**
+       * Drags a status element into the workflow canvas area
+       * @param sourceSelector - Status object representing the status to be dragged
+       * @param options - Additional options for the drag operation
+       * @example
+       * cy.dragStatusIntoWorkflow(initialDBData.proposalStatuses.draft, { clientX: 100, clientY: 200 });
+       */
+      dragStatusIntoWorkflow(
+        sourceSelector: Pick<Status, 'shortCode' | 'id'>,
+        options?: {
+          clientX?: number;
+          clientY?: number;
+          dataFormat?: string;
+        }
+      ): Chainable<Element>;
+
+      /**
+       * Simulates connecting two ReactFlow nodes by dragging from source handle to target handle
+       * @param sourceStatus - Status object representing the source node
+       * @param targetStatus - Status object representing the target node
+       * @param options - Additional options for the connection operation
+       * @example
+       * cy.connectReactFlowNodes(
+       *   initialDBData.proposalStatuses.draft,
+       *   initialDBData.proposalStatuses.feasibilityReview
+       * );
+       */
+      connectReactFlowNodes(
+        sourceStatus: Pick<Status, 'shortCode'>,
+        targetStatus: Pick<Status, 'shortCode'>,
+        options?: {
+          force?: boolean;
+        }
+      ): Chainable<Element>;
     }
   }
 }
