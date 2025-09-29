@@ -129,11 +129,12 @@ context('Proposal tests', () => {
       }).then((result) => {
         if (result.createWorkflow) {
           cy.addWorkflowStatus({
-            droppableGroupId: 'proposalWorkflowConnections_0',
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
             sortOrder: 1,
             prevStatusId: 1,
+            posX: 0,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }

@@ -1,7 +1,65 @@
+import { Country } from '../../models/Country';
+import { Institution } from '../../models/Institution';
 import { Rejection } from '../../models/Rejection';
-import { BasicUserDetails } from '../../models/User';
-import { DataAccessUsersDataSource } from '../DataAccessUsersDataSource';
+import { BasicUserDetails, User } from '../../models/User';
+import {
+  DataAccessUsersDataSource,
+  UserWithInstitution,
+} from '../DataAccessUsersDataSource';
 import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
+
+// Mock full user objects for getDataAccessUsersWithInstitution
+export const dummyDataAccessFullUser = new User(
+  100,
+  'Dr.',
+  'Jane',
+  'Smith',
+  'jane.smith',
+  'Jane',
+  'jane.smith.oidc',
+  'refresh-token',
+  'oauth-issuer',
+  'female',
+  new Date('1985-01-15'),
+  10,
+  'Data Access Institute',
+  'Research Department',
+  'Data Analyst',
+  'jane.smith@dataaccess.org',
+  '+1-555-0100',
+  false,
+  '2023-01-15 10:30:00+00',
+  '2023-01-15 10:30:00+00'
+);
+
+export const dummyDataAccessFullUser2 = new User(
+  101,
+  'Dr.',
+  'Bob',
+  'Johnson',
+  'bob.johnson',
+  'Bob',
+  'bob.johnson.oidc',
+  'refresh-token',
+  'oauth-issuer',
+  'male',
+  new Date('1982-02-20'),
+  11,
+  'Research Center',
+  'Advanced Research',
+  'Senior Researcher',
+  'bob.johnson@research.org',
+  '+1-555-0101',
+  false,
+  '2023-02-20 14:15:00+00',
+  '2023-02-20 14:15:00+00'
+);
+
+export const dummyInstitution = new Institution(10, 'Data Access Institute', 1);
+export const dummyInstitution2 = new Institution(11, 'Research Center', 2);
+
+export const dummyCountry = new Country(1, 'Denmark');
+export const dummyCountry2 = new Country(2, 'United Kingdom');
 
 export default class MockDataAccessUsersDataSource
   implements DataAccessUsersDataSource
@@ -19,6 +77,32 @@ export default class MockDataAccessUsersDataSource
 
     if (userIds.includes(basicDummyUserNotOnProposal.id)) {
       users.push(basicDummyUserNotOnProposal);
+    }
+
+    return users;
+  }
+
+  async getDataAccessUsersWithInstitution(
+    proposalPk: number
+  ): Promise<UserWithInstitution[]> {
+    const userIds = this.mockData.get(proposalPk) || [];
+
+    // Return mock users with institution and country based on stored user IDs
+    const users: UserWithInstitution[] = [];
+
+    if (userIds.includes(100)) {
+      users.push({
+        user: dummyDataAccessFullUser,
+        institution: dummyInstitution,
+        country: dummyCountry,
+      });
+    }
+    if (userIds.includes(101)) {
+      users.push({
+        user: dummyDataAccessFullUser2,
+        institution: dummyInstitution2,
+        country: dummyCountry2,
+      });
     }
 
     return users;
