@@ -37,6 +37,7 @@ context('Technique Proposal tests', () => {
 
   let callWorkflowId: number; // Workflow with QUICK_REVIEW status
 
+  faker.seed(1); // sometimes faker generates the same value twice in a row. This seed is safe to use
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
