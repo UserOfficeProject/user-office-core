@@ -18,13 +18,14 @@ import {
   createProposalViewObject,
   ProposalViewRecord,
 } from '../postgres/records';
+import PostgresStatusDataSource from '../postgres/StatusDataSource';
 import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
-  new PostgresWorkflowDataSource(),
+  new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
   new PostgresAdminDataSource()
 );
 

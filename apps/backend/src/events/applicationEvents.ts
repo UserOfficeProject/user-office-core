@@ -392,6 +392,11 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
   visitregistration: VisitRegistration;
 }
 
+interface UserDataAccessUpdatedEvent extends GeneralEvent {
+  type: Event.DATA_ACCESS_USERS_UPDATED;
+  proposalPKey: number;
+}
+
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
   extends GeneralEvent {
   type: Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS;
@@ -521,6 +526,7 @@ export type ApplicationEvent =
   | InternalReviewDeleted
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
+  | UserDataAccessUpdatedEvent
   | ExperimentESFApprovedByIsEvent
   | ExperimentESFApprovedByESREvent
   | ExperimentESFRejectedByIsEvent
