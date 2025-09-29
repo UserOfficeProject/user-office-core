@@ -8,6 +8,7 @@ export class Workflow {
     public id: number,
     public name: string,
     public description: string,
-    public entityType: WorkflowType
+    public entityType: WorkflowType,
+    public connectionLineType: string
   ) {}
 }
