@@ -1,123 +1,94 @@
 import {
-  Draggable,
-  DraggingStyle,
-  Droppable,
-  NotDraggingStyle,
-} from '@hello-pangea/dnd';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import React from 'react';
+  List,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
+import React, { useState } from 'react';
 
 import { Status } from 'generated/sdk';
+import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
-const StatusPicker = ({ statuses }: { statuses: Status[] }) => {
-  const theme = useTheme();
-  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
+interface StatusPickerProps {
+  statuses: Status[];
+  onDragStart: (status: Status) => void;
+}
 
-  const getItemStyle = (
-    isDragging: boolean,
-    draggableStyle: DraggingStyle | NotDraggingStyle | undefined
-  ) => ({
-    padding: theme.spacing(1),
-    margin: '1px',
-    backgroundColor: isDragging ? theme.palette.grey[200] : 'white',
-    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    boxShadow: theme.shadows[2],
-    maxWidth: '100%',
-    minWidth: '200px',
-    ...draggableStyle,
-  });
+const StatusPicker: React.FC<StatusPickerProps> = ({
+  statuses,
+  onDragStart,
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const getItems = () =>
-    statuses.map((status, index) => (
-      <Draggable
-        key={`${status.shortCode}_${status.id}`}
-        draggableId={`${status.shortCode}_${status.id}`}
-        index={index}
-      >
-        {(provided, snapshot) => (
-          <Grid
-            item
-            xs={12}
-            data-cy={`status_${status.shortCode}_${status.id}`}
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            style={getItemStyle(
-              snapshot.isDragging,
-              provided.draggableProps.style
-            )}
-            sx={{
-              '&:hover': {
-                backgroundColor: `${theme.palette.grey[100]} !important`,
-              },
-            }}
-          >
-            <Box fontSize="1rem">{status.name}</Box>
-            <Box fontSize="small" mt={1} color={theme.palette.grey[800]}>
-              {status.description}
-            </Box>
-          </Grid>
-        )}
-      </Draggable>
-    ));
-
-  const getListStyle = (isDraggingOver: boolean) => ({
-    background: isDraggingOver ? theme.palette.primary.light : 'transparent',
-    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    overflow: 'hidden',
-  });
+  // Filter statuses based on search term
+  const filteredStatuses = statuses
+    .filter(
+      (status) =>
+        status.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (status.description &&
+          status.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .filter(
+      (status) => WORKFLOW_INITIAL_STATUSES.includes(status.shortCode) === false
+    );
 
   return (
-    <Grid
-      container
-      sx={{
-        alignItems: 'flex-start',
-        alignContent: 'flex-start',
-        flexBasis: '100%',
-        height: '100%',
-        maxHeight: isExtraLargeScreen ? '1400px' : '850px',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        backgroundColor: theme.palette.grey[200],
-        marginLeft: theme.spacing(1),
-        boxShadow: theme.shadows[3],
-      }}
-      className="tinyScroll"
-      data-cy="status-picker"
-    >
-      <Grid
-        item
-        xs={12}
-        sx={{
-          flexGrow: 1,
-          color: theme.palette.grey[900],
-          fontWeight: 'bold',
-          padding: theme.spacing(1),
-        }}
-      >
-        Statuses
-      </Grid>
-      {statuses && !!statuses.length && (
-        <Droppable droppableId="statusPicker">
-          {(provided, snapshot) => (
-            <Grid
-              item
-              xs={12}
-              ref={provided.innerRef}
-              style={getListStyle(snapshot.isDraggingOver)}
-              sx={{ minHeight: '180px', overflow: 'auto !important' }}
-              className="tinyScroll"
-            >
-              {getItems()}
-              {provided.placeholder}
-            </Grid>
-          )}
-        </Droppable>
-      )}
-    </Grid>
+    <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>
+      <Typography variant="h6" component="h2" gutterBottom>
+        Available Statuses
+      </Typography>
+      <Typography variant="body2" color="textSecondary" paragraph>
+        Drag a status into the diagram to add it to the workflow.
+      </Typography>
+
+      <TextField
+        fullWidth
+        size="small"
+        placeholder="Search statuses..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: '10px' }}
+        variant="outlined"
+      />
+
+      <List dense style={{ maxHeight: '400px', overflow: 'auto' }}>
+        {filteredStatuses.map((status) => (
+          <ListItemButton
+            key={status.id}
+            draggable
+            onDragStart={(event) => {
+              event.dataTransfer.setData(
+                'application/reactflow',
+                status.id.toString()
+              );
+              event.dataTransfer.effectAllowed = 'move';
+              onDragStart(status);
+            }}
+            data-cy={`status_${status.shortCode}`}
+            style={{
+              marginBottom: '5px',
+              border: '1px solid #e0e0e0',
+              borderRadius: '4px',
+              backgroundColor: '#f5f5f5',
+            }}
+          >
+            <ListItemText
+              primary={status.name}
+              secondary={status.description}
+              primaryTypographyProps={{ variant: 'subtitle2' }}
+              secondaryTypographyProps={{ variant: 'caption' }}
+            />
+          </ListItemButton>
+        ))}
+        {filteredStatuses.length === 0 && searchTerm && (
+          <Typography color="textSecondary">
+            No statuses match your search
+          </Typography>
+        )}
+      </List>
+    </Paper>
   );
 };
 
