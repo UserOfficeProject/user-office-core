@@ -151,15 +151,17 @@ export default class InviteMutations {
       ...newInvites,
     ];
 
-    await this.eventBus.publish({
-      type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
-      array: invites,
-      key: 'array',
-      loggedInUserId: agent?.id,
-      inputArgs: JSON.stringify(args),
-      impersonatingUserId: agent ? agent.impersonatingUserId : null,
-      proposalPKey: proposalPk,
-    } as ApplicationEvent);
+    if (invites.length > 0) {
+      await this.eventBus.publish({
+        type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+        array: invites,
+        key: 'array',
+        loggedInUserId: agent?.id,
+        inputArgs: JSON.stringify(args),
+        impersonatingUserId: agent ? agent.impersonatingUserId : null,
+        proposalPKey: proposalPk,
+      } as ApplicationEvent);
+    }
 
     return invites;
   }
