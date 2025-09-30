@@ -72,7 +72,11 @@ export default class SampleMutations {
       );
     }
 
-    if (proposal.submitted && args.isPostProposalSubmission !== true) {
+    if (
+      proposal.submitted &&
+      args.isPostProposalSubmission !== true &&
+      !this.userAuth.isUserOfficer(agent)
+    ) {
       return rejection(
         'Can not create sample because proposal is already submitted',
         { agent, args }
