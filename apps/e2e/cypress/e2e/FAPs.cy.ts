@@ -319,6 +319,8 @@ function initializationBeforeTests() {
                 proposerId: initialDBData.users.user1.id,
               });
 
+              cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
               // Manually changing the proposal status to be shown in the Faps. -------->
               cy.changeProposalsStatus({
                 statusId: initialDBData.proposalStatuses.fapReview.id,
@@ -1621,6 +1623,8 @@ context('Fap reviews tests', () => {
             abstract: proposal3.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+
+          cy.submitProposal({ proposalPk: createdProposal.primaryKey });
 
           cy.addProposalTechnicalReview({
             proposalPk: firstCreatedProposalPk,
