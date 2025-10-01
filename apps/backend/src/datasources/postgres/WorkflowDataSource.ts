@@ -1,14 +1,17 @@
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Status } from '../../models/Status';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
-import { Workflow, WorkflowType } from '../../models/Workflow';
+import { Workflow } from '../../models/Workflow';
 import {
   WorkflowConnection,
   NextAndPreviousStatuses,
   WorkflowConnectionWithStatus,
 } from '../../models/WorkflowConnections';
+import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
+import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
@@ -17,15 +20,21 @@ import {
   WorkflowConnectionRecord,
   WorkflowRecord,
 } from './records';
+import StatusDataSource from './StatusDataSource';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
+  constructor(
+    @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
+  ) {}
+
   private createWorkflowObject(workflow: WorkflowRecord) {
     return new Workflow(
       workflow.workflow_id,
       workflow.name,
       workflow.description,
-      workflow.entity_type
+      workflow.entity_type,
+      workflow.connection_line_type
     );
   }
 
@@ -39,8 +48,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.status_id,
       workflowConnection.next_status_id,
       workflowConnection.prev_status_id,
-      workflowConnection.droppable_group_id,
-      workflowConnection.parent_droppable_group_id
+      workflowConnection.pos_x,
+      workflowConnection.pos_y,
+      workflowConnection.prev_connection_id
     );
   }
 
@@ -62,47 +72,22 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       },
       workflowConnection.next_status_id,
       workflowConnection.prev_status_id,
-      workflowConnection.droppable_group_id,
-      workflowConnection.parent_droppable_group_id
+      workflowConnection.pos_x,
+      workflowConnection.pos_y,
+      workflowConnection.prev_connection_id
     );
   }
+
   async createWorkflow(
-    newWorkflowInput: Omit<Workflow, 'id'>
+    newWorkflowInput: CreateWorkflowInput
   ): Promise<Workflow> {
-    let defaultStatusId: number | null = null;
-    let droppableGroupId: string | null = null;
+    const initialStatus = await this.statusDataSource.getInitialStatus(
+      newWorkflowInput.entityType
+    );
 
-    if (newWorkflowInput.entityType === WorkflowType.PROPOSAL) {
-      const defaultProposalStatus = await database()
-        .select('status_id')
-        .from('statuses')
-        .where('is_default', true)
-        .andWhere('entity_type', WorkflowType.PROPOSAL)
-        .first();
-
-      defaultStatusId = defaultProposalStatus?.status_id;
-      droppableGroupId = 'proposalWorkflowConnections_0';
-    } else if (newWorkflowInput.entityType === WorkflowType.EXPERIMENT) {
-      const defaultExperimentStatus = await database()
-        .select('status_id')
-        .from('statuses')
-        .where('is_default', true)
-        .andWhere('entity_type', WorkflowType.EXPERIMENT)
-        .first();
-
-      defaultStatusId = defaultExperimentStatus?.status_id;
-      droppableGroupId = 'experimentWorkflowConnections_0';
-    }
-
-    if (!defaultStatusId) {
+    if (!initialStatus) {
       throw new GraphQLError(
         `Could not find default status for ${newWorkflowInput.entityType}`
-      );
-    }
-
-    if (!droppableGroupId) {
-      throw new GraphQLError(
-        `Could not find droppable group id for ${newWorkflowInput.entityType}`
       );
     }
 
@@ -116,17 +101,20 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       .returning('*');
 
     if (!workflowRecord) {
-      throw new GraphQLError('Could not create status');
+      throw new GraphQLError(
+        `Could not create workflow ${newWorkflowInput.name}`
+      );
     }
 
     await this.addWorkflowStatus({
       sortOrder: 0,
-      droppableGroupId: droppableGroupId,
       nextStatusId: null,
       prevStatusId: null,
-      parentDroppableGroupId: null,
-      statusId: defaultStatusId,
+      statusId: initialStatus.id,
       workflowId: workflowRecord.workflow_id,
+      posX: 0,
+      posY: 0,
+      prevConnectionId: null,
     });
 
     return this.createWorkflowObject(workflowRecord);
@@ -153,15 +141,14 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         return workflows.map((workflow) => this.createWorkflowObject(workflow));
       });
   }
-  async updateWorkflow(
-    workflow: Omit<Workflow, 'entityType'>
-  ): Promise<Workflow> {
+  async updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow> {
     return database
       .update(
         {
           workflow_id: workflow.id,
           name: workflow.name,
           description: workflow.description,
+          connection_line_type: workflow.connectionLineType,
         },
         ['*']
       )
@@ -191,35 +178,19 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       });
   }
   async getWorkflowConnections(
-    workflowId: WorkflowConnection['workflowId'],
-    droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: boolean | undefined
+    workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]> {
-    const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
-    const andConditionIfParentDroppableGroupIdDefined =
-      byParentGroupId &&
-      !!droppableGroupId &&
-      `AND parent_droppable_group_id = '${droppableGroupId}'`;
-    const andWhereCondition =
-      !byParentGroupId && !!droppableGroupId
-        ? andConditionIfDroppableGroupIdDefined
-        : byParentGroupId && !!droppableGroupId
-          ? andConditionIfParentDroppableGroupIdDefined
-          : '';
-
     const getUniqueOrderedWorkflowConnectionsQuery = `
       SELECT * FROM (
-        SELECT DISTINCT ON (wc.status_id, wc.sort_order, wc.droppable_group_id) *
+        SELECT *
         FROM workflow_connections as wc
         LEFT JOIN
           statuses as s
         ON
           s.status_id = wc.status_id
         WHERE workflow_id = ${workflowId}
-        ${andWhereCondition}
       ) t
       ORDER BY
-        droppable_group_id ASC,
         sort_order ASC
     `;
 
@@ -234,9 +205,28 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         )
       : [];
   }
+
+  async getWorkflowConnection(
+    connectionId: WorkflowConnection['id']
+  ): Promise<WorkflowConnectionWithStatus | null> {
+    const query = `
+      SELECT wc.*, s.*
+      FROM workflow_connections as wc
+      LEFT JOIN statuses as s ON s.status_id = wc.status_id
+      WHERE wc.workflow_connection_id = ?
+    `;
+
+    const result = await database.raw(query, [connectionId]);
+    const workflowConnection: (WorkflowConnectionRecord & StatusRecord) | null =
+      result.rows[0] || null;
+
+    return workflowConnection
+      ? this.createWorkflowConnectionWithStatusObject(workflowConnection)
+      : null;
+  }
   async getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'],
+    statusId: Status['id'] | undefined,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]> {
     const workflowConnectionRecords: (WorkflowConnectionRecord &
@@ -247,8 +237,11 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         's.status_id': 'wc.status_id',
       })
       .where('workflow_id', workflowId)
-      .andWhere('wc.status_id', statusId)
       .modify((query) => {
+        if (statusId) {
+          query.andWhere('wc.status_id', statusId);
+        }
+
         if (nextStatusId) {
           query.andWhere('wc.next_status_id', nextStatusId);
         }
@@ -293,9 +286,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         next_status_id: newWorkflowStatusInput.nextStatusId,
         prev_status_id: newWorkflowStatusInput.prevStatusId,
         sort_order: newWorkflowStatusInput.sortOrder,
-        droppable_group_id: newWorkflowStatusInput.droppableGroupId,
-        parent_droppable_group_id:
-          newWorkflowStatusInput.parentDroppableGroupId,
+        pos_x: newWorkflowStatusInput.posX,
+        pos_y: newWorkflowStatusInput.posY,
+        prev_connection_id: newWorkflowStatusInput.prevConnectionId,
       })
       .into('workflow_connections as wc')
       .returning('*')
@@ -311,50 +304,64 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
-  async upsertWorkflowStatuses(connections: WorkflowConnection[]) {
-    const dataToInsert = connections.map((connection) => ({
-      workflow_connection_id: connection.id,
-      workflow_id: connection.workflowId,
-      status_id: connection.statusId,
-      next_status_id: connection.nextStatusId,
-      prev_status_id: connection.prevStatusId,
-      sort_order: connection.sortOrder,
-      droppable_group_id: connection.droppableGroupId,
-      parent_droppable_group_id: connection.parentDroppableGroupId,
-    }));
-
+  async updateWorkflowStatus(connection: WorkflowConnection) {
     const result = await database.raw(
-      `? ON CONFLICT (workflow_connection_id)
-                  DO UPDATE SET
-                  status_id = EXCLUDED.status_id,
-                  next_status_id = EXCLUDED.next_status_id,
-                  prev_status_id = EXCLUDED.prev_status_id,
-                  sort_order = EXCLUDED.sort_order,
-                  droppable_group_id = EXCLUDED.droppable_group_id,
-                  parent_droppable_group_id = EXCLUDED.parent_droppable_group_id
-                RETURNING *;`,
-      [database('workflow_connections').insert(dataToInsert)]
+      `WITH updated AS (
+        INSERT INTO workflow_connections (
+          workflow_connection_id, workflow_id, status_id, next_status_id, 
+          prev_status_id, sort_order, pos_x, pos_y, prev_connection_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (workflow_connection_id)
+        DO UPDATE SET
+          status_id = EXCLUDED.status_id,
+          next_status_id = EXCLUDED.next_status_id,
+          prev_status_id = EXCLUDED.prev_status_id,
+          sort_order = EXCLUDED.sort_order,
+          pos_x = EXCLUDED.pos_x,
+          pos_y = EXCLUDED.pos_y,
+          prev_connection_id = EXCLUDED.prev_connection_id
+        RETURNING *
+      )
+      SELECT wc.*, s.*
+      FROM updated wc
+      LEFT JOIN statuses s ON s.status_id = wc.status_id;`,
+      [
+        connection.id,
+        connection.workflowId,
+        connection.statusId,
+        connection.nextStatusId,
+        connection.prevStatusId,
+        connection.sortOrder,
+        connection.posX,
+        connection.posY,
+        connection.prevConnectionId,
+      ]
     );
 
-    return result.rows as WorkflowConnectionRecord[];
+    if (!result.rows[0]) {
+      throw new GraphQLError('Could not update workflow status');
+    }
+
+    return this.createWorkflowConnectionWithStatusObject(result.rows[0]);
   }
 
-  async updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]> {
-    const connectionsResult =
-      await this.upsertWorkflowStatuses(workflowStatuses);
-    if (connectionsResult) {
-      // NOTE: Return result as WorkflowConnection[] but do not care about name and description.
-      return connectionsResult.map((connection) =>
-        this.createWorkflowConnectionObject({
-          ...connection,
-        })
-      );
-    } else {
-      return [];
+  async deleteWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnection | null> {
+    const deletedConnection: WorkflowConnectionRecord[] = await database(
+      'workflow_connections'
+    )
+      .where('workflow_connection_id', connectionId)
+      .del()
+      .returning('*');
+
+    if (deletedConnection.length === 0) {
+      return null;
     }
+
+    return this.createWorkflowConnectionObject(deletedConnection[0]);
   }
+
   async deleteWorkflowStatus(
     statusId: number,
     workflowId: number,

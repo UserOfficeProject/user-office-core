@@ -36,6 +36,7 @@ fragment fieldConfig on FieldConfig {
     units {
       ...unit
     }
+    numberValueConstraint
     small_label
     required
     tooltip
