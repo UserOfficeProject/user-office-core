@@ -148,6 +148,13 @@ const AssignedInstrumentsTable = ({
           return { isValid: true };
         }
 
+        // NOTE: We sometimes don't know how much availability time is needed, so null is allowed
+        if (rowData.availabilityTime === null) {
+          return {
+            isValid: true,
+          };
+        }
+
         if (rowData.availabilityTime && +rowData.availabilityTime > 0) {
           // NOTE: Preventing inputs grater than 32-bit integer.
           if (+rowData.availabilityTime >= MAX_32_BIT_INTEGER) {

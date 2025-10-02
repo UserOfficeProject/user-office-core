@@ -182,14 +182,12 @@ const CallGeneralInfo = ({
       (value) => value.id === proposalWorkflowId
     );
     if (selectedProposalWorkFlow) {
-      const result = selectedProposalWorkFlow.workflowConnectionGroups.some(
-        (workGroup) => {
-          return workGroup.connections.some((connectionStatus) => {
-            return (
-              connectionStatus.status.shortCode ===
-              ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-            );
-          });
+      const result = selectedProposalWorkFlow.workflowConnections.some(
+        (connectionStatus) => {
+          return (
+            connectionStatus.status.shortCode ===
+            ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+          );
         }
       );
       setInternalCallDate({ showField: result, isValueSet: true });

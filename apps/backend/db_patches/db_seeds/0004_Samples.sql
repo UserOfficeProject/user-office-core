@@ -7,6 +7,9 @@ DECLARE
   sample_decl_question_topic_id_var INTEGER;
   sample_decl_category_id_var INTEGER;
   proposal_pk_var INTEGER;
+  proposal_template_id_var INTEGER;
+  proposal_category_id_var INTEGER;
+  sample_esi_template_id INTEGER;
 BEGIN
 
   -- GET First Proposal Pk
@@ -27,8 +30,17 @@ INSERT INTO public.questionaries(
 	template_id, created_at, creator_id)
 	VALUES ( sample_declr_template_id_var, '2021-07-20 13:59:08.597908+00', 2) RETURNING questionary_id INTO sample_declr_questionary_id;
 
-	-- Get Sample Declaration Template category id
+-- Get Sample Declaration Template category id
 SELECT template_category_id INTO sample_decl_category_id_var FROM template_categories WHERE name = 'Sample declaration' LIMIT 1;
+
+-- Get Proposal Template category id
+SELECT template_category_id INTO proposal_category_id_var FROM template_categories WHERE name = 'Proposal' LIMIT 1;
+
+-- Get Proposal Template id
+SELECT template_id INTO proposal_template_id_var FROM templates WHERE name = 'default template' LIMIT 1;
+
+-- Get Sample ESI Template id
+SELECT template_id INTO sample_esi_template_id FROM templates WHERE name = 'default sample esi template' LIMIT 1;
 
 	-- BOOLEAN Question for Sample Declaration Template
 INSERT INTO questions(
@@ -426,29 +438,30 @@ INSERT INTO public.templates_has_questions(
   -- need to softcode
 INSERT INTO public.questions(
 	question_id, data_type, question, default_config, created_at, updated_at, natural_key, category_id)
-	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":7,"esiTemplateId":6,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":"","readPermissions":[]}',
-			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', 1);
+	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', 
+	jsonb_set(
+		jsonb_set('{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":0,"esiTemplateId":0,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":"","readPermissions":[]}', '{templateId}', sample_declr_template_id_var::text::jsonb),
+		'{esiTemplateId}', sample_esi_template_id::text::jsonb),
+			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', proposal_category_id_var);
 	
   -- need to softcode the template_id 1
 INSERT INTO public.topics(
 	 topic_title, is_enabled, sort_order, template_id)
-	VALUES ('Topic title', true, 1, 1) RETURNING topic_id INTO sample_decl_question_topic_id_var;
+	VALUES ('Topic title', true, 1, proposal_template_id_var) RETURNING topic_id INTO sample_decl_question_topic_id_var;
 	
     -- need to softcode
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_declaration_question', 1, sample_decl_question_topic_id_var, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":7,"esiTemplateId":6,"small_label":"","required":false,"minEntries":null,"maxEntries":null, "readPermissions":[]}', 'AND');
+	VALUES ('sample_declaration_question', proposal_template_id_var, sample_decl_question_topic_id_var, 0, 
+	jsonb_set(
+		jsonb_set('{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":0,"esiTemplateId":0,"small_label":"","required":false,"minEntries":null,"maxEntries":null, "readPermissions":[]}', '{templateId}', sample_declr_template_id_var::text::jsonb),
+		'{esiTemplateId}', sample_esi_template_id::text::jsonb), 'AND');
 
--- INSERT INTO public.questionaries(
--- 	template_id, created_at, creator_id)
--- 	VALUES ( sample_declr_template_id_var, '2021-07-20 13:59:08.597908+00', 2)
--- 	RETURNING id INTO questionary_id_var;
 	
 INSERT INTO public.samples(
 	title, creator_id, questionary_id, safety_status, created_at, safety_comment, proposal_pk, question_id, shipment_id)
 	VALUES ('My sample title', 2, sample_declr_questionary_id, 0, '2021-07-20 13:59:08.602853+00', '', proposal_pk_var, 'sample_declaration_question', null);
 	
-  -- Not sure how it works
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
 	VALUES (sample_declr_questionary_id, sample_declr_topic_id_var, true);
@@ -460,8 +473,6 @@ INSERT INTO public.topic_completenesses(
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
 	VALUES (3, sample_decl_question_topic_id_var, true);
-
-
 
 END;
 $DO$
