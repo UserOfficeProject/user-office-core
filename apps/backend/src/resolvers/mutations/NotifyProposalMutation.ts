@@ -15,6 +15,8 @@ import { Proposal } from '../types/Proposal';
 export class NotifyProposalArgs {
   @Field(() => Int)
   public proposalPk: number;
+  @Field(() => Boolean)
+  public ignoreNotifiedFlag: boolean;
 }
 
 @Resolver()
@@ -25,8 +27,6 @@ export class NotifyProposalMutation {
     args: NotifyProposalArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.proposal.notify(context.user, {
-      proposalPk: args.proposalPk,
-    });
+    return context.mutations.proposal.notify(context.user, args);
   }
 }
