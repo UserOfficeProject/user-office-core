@@ -257,8 +257,6 @@ context('PageTable component tests', () => {
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('[data-cy="assign-selected-users"]').click();
-
-      cy.logout();
     });
   });
 

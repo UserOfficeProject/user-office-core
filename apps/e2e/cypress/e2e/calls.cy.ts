@@ -1069,7 +1069,7 @@ context('Calls tests', () => {
       id: initialDBData.call.id,
       ...newCall,
       shortCode: initialDBData.call.shortCode,
-      endCall: DateTime.now().plus({ minutes: 1, seconds: 50 }),
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
@@ -1182,7 +1182,7 @@ context('Calls tests', () => {
       ...newCall,
       shortCode: initialDBData.call.shortCode,
       endCall: yesterday,
-      endCallInternal: DateTime.now().plus({ minutes: 1, seconds: 30 }),
+      endCallInternal: DateTime.now().plus({ minutes: 1, seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
