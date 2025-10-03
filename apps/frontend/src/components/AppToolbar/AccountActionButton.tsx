@@ -148,7 +148,11 @@ const AccountActionButton = () => {
         >
           <ProfileInfo />
           <Divider style={{ marginBottom: '7px' }} />
-          <MenuItem onClick={handleManageAccountClick} disabled={isLoggingOut}>
+          <MenuItem
+            onClick={handleManageAccountClick}
+            disabled={isLoggingOut}
+            data-cy="manage-account-button"
+          >
             <Box paddingRight={1} paddingTop={1}>
               <ManageAccounts />
             </Box>
