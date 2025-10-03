@@ -42,6 +42,9 @@ export class ExperimentsFilter {
 
   @Field(() => Int, { nullable: true })
   public experimentSafetyStatusId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public instrumentScientistUserId?: number;
 }
 
 @ArgsType()
@@ -99,7 +102,7 @@ export class ExperimentsQuery {
     @Args() args: ExperimentsArgs,
     @Ctx() context: ResolverContext
   ): Promise<ExperimentsQueryResult> {
-    return context.queries.experiment.getAllExperiments(
+    return context.queries.experiment.getExperiments(
       context.user,
       args.filter,
       args.first,
