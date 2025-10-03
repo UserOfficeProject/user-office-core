@@ -414,6 +414,10 @@ export default function createLoggingHandler() {
           } else {
             changedObjectId = (event as any)[event.key].id;
           }
+
+          if (!changedObjectId) {
+            return;
+          }
           const description = event.description || '';
 
           await eventLogsDataSource.set(
