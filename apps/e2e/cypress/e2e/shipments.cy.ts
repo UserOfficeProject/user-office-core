@@ -127,7 +127,13 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=select-proposal-dropdown]').click();
 
-    cy.get('[role="listbox"]').contains(existingProposal.title).click();
+    cy.get('[role="listbox"]')
+      .find('li')
+      .filter(
+        (index: number, el: HTMLElement) =>
+          !!el.textContent && el.textContent.trim() === existingProposal.title
+      )
+      .click();
 
     cy.get('[data-cy=samples-dropdown]').click();
 

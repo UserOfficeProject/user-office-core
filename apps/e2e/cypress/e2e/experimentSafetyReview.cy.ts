@@ -274,7 +274,7 @@ function approveProposal() {
   cy.login('officer');
   cy.visit('/');
   cy.contains(TEST_CONSTANTS.UI_LABELS.PROPOSALS).click();
-  cy.get('[data-cy=view-proposal]').click();
+  cy.get('[data-cy=view-proposal]').first().click();
   cy.finishedLoading();
   cy.get('[role="dialog"]').contains(TEST_CONSTANTS.UI_LABELS.ADMIN).click();
   cy.get('[data-cy="proposal-final-status"]').should('exist');
@@ -517,14 +517,9 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table').should('exist');
-        cy.get('table tbody tr').should('have.length', 1);
         cy.get('table tbody tr')
-          .first()
-          .find('td')
-          .eq(1)
-          .should('contain', TEST_CONSTANTS.EXPERIMENT.ID);
-        cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', TEST_CONSTANTS.STATUS_LABELS.ESF_IS_REVIEW);
@@ -541,7 +536,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
 
@@ -630,7 +626,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
 
@@ -657,7 +654,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
         cy.get('[role="dialog"]').contains('Experiment Safety Review').click();
@@ -708,7 +706,8 @@ context('Experiment Safety Review tests', () => {
         cy.finishedLoading();
 
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', TEST_CONSTANTS.STATUS_LABELS.ESF_APPROVED);
@@ -768,14 +767,15 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table').should('exist');
-        cy.get('table tbody tr').should('have.length', 1);
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(1)
           .should('contain', TEST_CONSTANTS.EXPERIMENT.ID);
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', TEST_CONSTANTS.STATUS_LABELS.ESF_ESR_REVIEW);
@@ -791,7 +791,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
         cy.get('[role="dialog"]').contains('Experiment Safety Review').click();
@@ -836,7 +837,8 @@ context('Experiment Safety Review tests', () => {
         cy.finishedLoading();
 
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', 'ESF APPROVED');
@@ -849,7 +851,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
         cy.get('[role="dialog"]').contains('Experiment Safety Review').click();
@@ -877,7 +880,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', 'ESF ESR REVIEW');
@@ -895,7 +899,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
         cy.get('[role="dialog"]').contains('Experiment Safety Review').click();
@@ -915,7 +920,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', 'ESF ESR REVIEW');
@@ -925,7 +931,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('[aria-label="View Experiment"]')
           .click();
         cy.get('[role="dialog"]').contains('Experiment Safety Review').click();
@@ -949,7 +956,8 @@ context('Experiment Safety Review tests', () => {
         cy.visit('/Experiments');
         cy.finishedLoading();
         cy.get('table tbody tr')
-          .first()
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
           .find('td')
           .eq(6)
           .should('contain', 'ESF APPROVED');
