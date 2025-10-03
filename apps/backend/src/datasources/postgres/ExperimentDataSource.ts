@@ -13,7 +13,6 @@ import {
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
-  ExperimentsArgs,
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
@@ -567,7 +566,7 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async getAllExperiments(
+  async getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
@@ -575,23 +574,45 @@ export default class PostgresExperimentDataSource
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
-    return database('experiments')
+    //print all arguments
+
+    const query = database('experiments')
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .join(
         'proposals',
         'proposals.proposal_pk',
         '=',
         'experiments.proposal_pk'
-      )
+      );
+
+    // Add instrument scientist filtering if provided
+    if (filter?.instrumentScientistUserId) {
+      query
+        .join(
+          'instrument_has_scientists',
+          'experiments.instrument_id',
+          'instrument_has_scientists.instrument_id'
+        )
+        .where(
+          'instrument_has_scientists.user_id',
+          filter.instrumentScientistUserId
+        );
+    }
+
+    return query
       .modify((query) => {
         if (filter?.experimentEndDate) {
-          query.where('ends_at', '<=', filter.experimentEndDate);
+          query.where('experiments.ends_at', '<=', filter.experimentEndDate);
         }
         if (filter?.experimentStartDate) {
-          query.where('starts_at', '>=', filter.experimentStartDate);
+          query.where(
+            'experiments.starts_at',
+            '>=',
+            filter.experimentStartDate
+          );
         }
         if (filter?.instrumentId) {
-          query.where('instrument_id', filter.instrumentId);
+          query.where('experiments.instrument_id', filter.instrumentId);
         }
         if (filter?.experimentSafetyStatusId) {
           query
@@ -670,60 +691,6 @@ export default class PostgresExperimentDataSource
           ),
         };
       });
-  }
-
-  async getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
-    return database('experiments')
-      .select('*')
-      .modify((query) => {
-        if (filter?.experimentEndDate) {
-          query.where('ends_at', '<=', filter.experimentEndDate);
-        }
-        if (filter?.experimentStartDate) {
-          query.where('starts_at', '>=', filter.experimentStartDate);
-        }
-        if (filter?.instrumentId) {
-          query.where('instrument_id', filter.instrumentId);
-        }
-        if (filter?.callId) {
-          query
-            .leftJoin(
-              'proposals',
-              'proposals.proposal_pk',
-              'experiments.proposal_pk'
-            )
-            .where('proposals.call_id', filter.callId);
-        }
-        const { from, to } = filter?.overlaps || {};
-        if (from && to) {
-          query.where((builder) =>
-            builder
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '>=', from)
-                  .andWhere('experiments.starts_at', '<=', to)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.ends_at', '>=', from)
-                  .andWhere('experiments.ends_at', '<=', to)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '<=', from)
-                  .andWhere('experiments.ends_at', '>=', from)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '<=', to)
-                  .andWhere('experiments.ends_at', '>=', to)
-              )
-          );
-        }
-      })
-      .then((rows: ExperimentRecord[]) =>
-        rows.map((row) => createExperimentObject(row))
-      );
   }
 
   async getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]> {
