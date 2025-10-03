@@ -26,7 +26,7 @@ export function useAllExperiments(
     async (componentController?: { unmounted: boolean }) => {
       setLoading(true);
       api()
-        .getAllExperiments({
+        .getExperiments({
           filter: {
             callId,
           },

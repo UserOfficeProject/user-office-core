@@ -9,8 +9,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized, EventBus } from '../decorators';
-import { Event } from '../events/event.enum';
+import { Authorized } from '../decorators';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { ShipmentStatus } from '../models/Shipment';
@@ -159,7 +158,6 @@ export default class ShipmentMutations {
     }
   }
 
-  @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateShipment(agent: UserWithRole | null, args: UpdateShipmentArgs) {
     const hasWriteRights =
       this.userAuth.isApiToken(agent) ||

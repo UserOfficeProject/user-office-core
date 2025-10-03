@@ -211,11 +211,13 @@ function createWorkflowAndEsiTemplate() {
         'FEASIBILITY'
       ) {
         cy.addWorkflowStatus({
-          droppableGroupId: 'proposalWorkflowConnections_0',
           statusId: initialDBData.proposalStatuses.feasibilityReview.id,
           workflowId: createdWorkflowId,
           sortOrder: 1,
           prevStatusId: 1,
+          posX: 0,
+          posY: 200,
+          prevConnectionId: 1,
         });
       }
 
