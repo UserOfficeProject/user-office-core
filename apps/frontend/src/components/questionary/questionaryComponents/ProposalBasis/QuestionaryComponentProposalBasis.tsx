@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import TextField from 'components/common/FormikUITextField';
@@ -11,12 +11,15 @@ import CoProposers from 'components/proposal/CoProposers';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import PrincipalInvestigator from 'components/proposal/PrincipalInvestigator';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
+import ProposalParticipantLegacy from 'components/proposal/ProposalParticipantLegacy';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
+import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
@@ -38,12 +41,24 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
   const [textLen, setTextLen] = useState(state?.proposal.abstract ?? 0);
+  const { featuresMap } = useContext(FeatureContext);
+  const isLegacyInviteFlow = featuresMap.get(
+    FeatureId.EMAIL_INVITE_LEGACY
+  )?.isEnabled;
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
   const { proposer, users } = state.proposal;
+  const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
+  const [piData, setPIData] = useState<BasicUserDetails | null>(null);
+
+  useEffect(() => {
+    if (userData !== null) {
+      setPIData(userData);
+    }
+  }, [userData]);
 
   const coProposersChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
@@ -73,6 +88,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       },
     });
 
+    setPIData(user);
     // Remove the new PI from the co-proposers list (if present) and add the old PI (if present) to the co-proposers list
     coProposersChanged(
       users
@@ -157,9 +173,19 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       >
         {counter}
       </InputAdornment>
-      <PrincipalInvestigator
-        setPrincipalInvestigator={principalInvestigatorChanged}
-      />
+      {isLegacyInviteFlow ? (
+        <ProposalParticipantLegacy
+          principalInvestigator={piData}
+          setPrincipalInvestigator={principalInvestigatorChanged}
+          sx={{ margin: theme.spacing(2, 0) }}
+          loadingPrincipalInvestigator={loading}
+        />
+      ) : (
+        <PrincipalInvestigator
+          setPrincipalInvestigator={principalInvestigatorChanged}
+        />
+      )}
+
       <CoProposers
         setPrincipalInvestigator={principalInvestigatorChanged}
         setUsers={coProposersChanged}
