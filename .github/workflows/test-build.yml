@@ -277,7 +277,7 @@ jobs:
           - id: rs
             files: cypress/e2e/[r-s]*.ts
           - id: t
-            files: cypress/e2e/t!(templatesBasic).ts
+            files: cypress/e2e/t!(emplatesBasic).ts
           - id: templateDelete
             files: cypress/e2e/templatesBasic*.ts
           - id: uz
