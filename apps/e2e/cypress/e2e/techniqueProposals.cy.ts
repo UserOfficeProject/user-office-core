@@ -37,6 +37,7 @@ context('Technique Proposal tests', () => {
 
   let callWorkflowId: number; // Workflow with QUICK_REVIEW status
 
+  faker.seed(1); // sometimes faker generates the same value twice in a row. This seed is safe to use
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
@@ -256,10 +257,11 @@ context('Technique Proposal tests', () => {
 
       if (result.createWorkflow) {
         cy.addWorkflowStatus({
-          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
           statusId: quickReviewStatus.id as number,
           workflowId: callWorkflowId,
           sortOrder: 1,
+          posX: 0,
+          posY: 200,
         });
       }
 

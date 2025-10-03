@@ -504,7 +504,7 @@ context('Template Basic tests', () => {
                     cy.get(
                       `[data-cy=proposals-count-${initialDBData.template.id}]`
                     )
-                      .contains('1')
+                      .contains('2')
                       .click();
 
                     cy.get('[data-cy=proposals-modal]').contains(
@@ -1240,7 +1240,7 @@ context('Template Basic tests', () => {
 
       cy.visit('/Proposals');
 
-      cy.get('[data-cy="view-proposal').click();
+      cy.get('[data-cy="view-proposal"]').first().click();
 
       cy.contains(booleanQuestion).should('exist');
 

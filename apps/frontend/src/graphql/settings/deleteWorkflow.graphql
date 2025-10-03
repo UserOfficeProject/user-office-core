@@ -3,5 +3,6 @@ mutation deleteWorkflow($id: Int!) {
     id
     name
     description
+    connectionLineType
   }
 }

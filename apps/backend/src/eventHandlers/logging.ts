@@ -359,6 +359,19 @@ export default function createLoggingHandler() {
             }
           }
           break;
+        case Event.DATA_ACCESS_USERS_UPDATED:
+          {
+            const description = 'Data access users updated';
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              event.proposalPKey.toString(),
+              description,
+              event.impersonatingUserId
+            );
+          }
+          break;
         default: {
           let changedObjectId: number;
           if (typeof (event as any)[event.key].primaryKey === 'number') {
@@ -371,6 +384,10 @@ export default function createLoggingHandler() {
             changedObjectId = (event as any)[event.key].experimentPk;
           } else {
             changedObjectId = (event as any)[event.key].id;
+          }
+
+          if (!changedObjectId) {
+            return;
           }
           const description = event.description || '';
 
