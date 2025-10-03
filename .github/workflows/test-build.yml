@@ -273,7 +273,9 @@ jobs:
           - id: p-am
             files: cypress/e2e/p[a-m]*.ts
           - id: p-nz
-            files: cypress/e2e/p[n-z]*.ts
+            files: cypress/e2e/p[n-z]!(oposals)*.ts
+          - id: proposals
+            files: cypress/e2e/proposals*.ts
           - id: rs
             files: cypress/e2e/[r-s]*.ts
           - id: t
