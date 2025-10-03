@@ -13,28 +13,27 @@ mutation createWorkflow(
     id
     name
     description
-    workflowConnectionGroups {
-      groupId
-      parentGroupId
-      connections {
-        id
-        sortOrder
-        workflowId
-        statusId
-        status {
-          ...status
-        }
-        nextStatusId
-        prevStatusId
-        droppableGroupId
-        statusChangingEvents {
-          statusChangingEventId
-          workflowConnectionId
-          statusChangingEvent
-        }
-        statusActions {
-          ...connectionStatusAction
-        }
+    connectionLineType
+    workflowConnections {
+      id
+      sortOrder
+      workflowId
+      statusId
+      status {
+        ...status
+      }
+      nextStatusId
+      prevStatusId
+      prevConnectionId
+      posX
+      posY
+      statusChangingEvents {
+        statusChangingEventId
+        workflowConnectionId
+        statusChangingEvent
+      }
+      statusActions {
+        ...connectionStatusAction
       }
     }
   }

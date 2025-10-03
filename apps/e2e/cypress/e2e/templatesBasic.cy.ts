@@ -504,7 +504,7 @@ context('Template Basic tests', () => {
                     cy.get(
                       `[data-cy=proposals-count-${initialDBData.template.id}]`
                     )
-                      .contains('1')
+                      .contains('2')
                       .click();
 
                     cy.get('[data-cy=proposals-modal]').contains(
@@ -757,6 +757,107 @@ context('Template Basic tests', () => {
       /* Test good inputs */
       for (const question of questions) {
         cy.get(`[data-natural-key="${question.id}"] input`)
+          .clear()
+          .type(question.goodInput);
+      }
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage).should('not.exist');
+      }
+    });
+
+    it('should render the Interval question field accepting only positive, negative numbers if set', () => {
+      const generateId = () =>
+        `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
+
+      const questions = [
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive numbers',
+          fieldName: 'numberField2',
+          badInput: '1{leftarrow}-',
+          goodInput: '1',
+          failureMessage: 'Value must be a positive number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative numbers',
+          fieldName: 'numberField3',
+          badInput: '1',
+          goodInput: '1{leftarrow}-',
+          failureMessage: 'Value must be a negative number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative integers',
+          fieldName: 'numberField4',
+          badInput: '1.1{leftarrow}{leftarrow}{leftarrow}-',
+          goodInput: '-1',
+          failureMessage: 'Value must be negative whole number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive integers',
+          fieldName: 'numberField5',
+          badInput: '1.1',
+          goodInput: '1',
+          failureMessage: 'Value must be positive whole number',
+        },
+      ];
+
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
+
+      /* Create questions */
+      for (const question of questions) {
+        cy.createIntervalQuestion(question.title, {
+          key: question.id,
+          units: ['kelvin'],
+          valueConstraint: question.valueConstraint,
+          firstTopic: true,
+        });
+      }
+
+      cy.logout();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      /* Test questions exist */
+      for (const question of questions) {
+        cy.contains(question.title);
+      }
+
+      /* Test bad inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}-Min"] input`).type(
+          question.badInput
+        );
+        cy.get(`[data-natural-key="${question.id}-Max"] input`).type(
+          question.badInput
+        );
+      }
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage);
+      }
+
+      /* Test good inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}-Min"] input`)
+          .clear()
+          .type(question.goodInput);
+        cy.get(`[data-natural-key="${question.id}-Max"] input`)
           .clear()
           .type(question.goodInput);
       }
@@ -1139,7 +1240,7 @@ context('Template Basic tests', () => {
 
       cy.visit('/Proposals');
 
-      cy.get('[data-cy="view-proposal').click();
+      cy.get('[data-cy="view-proposal"]').first().click();
 
       cy.contains(booleanQuestion).should('exist');
 
