@@ -4,7 +4,6 @@ import { Tokens } from '../../config/Tokens';
 import { ExperimentSafetyPdfTemplateDataSource } from '../../datasources/ExperimentSafetyPdfTemplateDataSource';
 import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemplateDataSource';
 import { FactoryServicesAuthorized } from '../../decorators';
-import { MetaBase } from '../../factory/DownloadService';
 import {
   collectExperimentPDFData,
   collectExperimentPDFDataTokenAccess,
@@ -13,8 +12,12 @@ import {
 import {
   collectProposalPDFData,
   collectProposalPDFDataTokenAccess,
-  ProposalPDFData,
+  collectProposalPregeneratedPdfData,
+  collectProposalPregeneratedPdfDataTokenAccess,
+  FullProposalPDFData,
+  PregeneratedProposalPDFData,
 } from '../../factory/pdf/proposal';
+import { MetaBase } from '../../factory/service';
 import {
   collectProposalAttachmentData,
   ProposalAttachmentData,
@@ -30,10 +33,16 @@ export type DownloadOptions = {
 export interface DownloadTypeServices {
   getPdfProposals(
     agent: UserWithRole,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null>;
+  ): Promise<FullProposalPDFData[] | null>;
+  getPregeneratedPdfProposals(
+    agent: UserWithRole,
+    proposalKeys: number[],
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
+  ): Promise<PregeneratedProposalPDFData[]>;
   getPdfExperimentsSafety(
     agent: UserWithRole,
     experimentPks: number[],
@@ -58,17 +67,17 @@ export default class FactoryServices implements DownloadTypeServices {
   @FactoryServicesAuthorized()
   async getPdfProposals(
     agent: UserWithRole | null,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null> {
+  ): Promise<FullProposalPDFData[] | null> {
     let data = null;
     if (agent) {
       data = await Promise.all(
-        proposalPks.map((proposalPk, indx) => {
+        proposalKeys.map((proposalKey, indx) => {
           if (agent?.isApiAccessToken)
             return collectProposalPDFDataTokenAccess(
-              proposalPk,
+              proposalKey,
               options,
               indx === 0
                 ? (filename: string) =>
@@ -77,7 +86,7 @@ export default class FactoryServices implements DownloadTypeServices {
             );
 
           return collectProposalPDFData(
-            proposalPk,
+            proposalKey,
             agent,
             indx === 0
               ? (filename: string) =>
@@ -92,6 +101,45 @@ export default class FactoryServices implements DownloadTypeServices {
   }
 
   @FactoryServicesAuthorized()
+  async getPregeneratedPdfProposals(
+    agent: UserWithRole | null,
+    proposalKeys: number[],
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
+  ): Promise<PregeneratedProposalPDFData[]> {
+    if (!agent) {
+      return [];
+    }
+
+    const allProposalData = await Promise.all(
+      proposalKeys.map((proposalKey, indx) => {
+        if (agent?.isApiAccessToken)
+          return collectProposalPregeneratedPdfDataTokenAccess(
+            proposalKey,
+            options,
+            indx === 0
+              ? (filename: string) =>
+                  (proposalFileMeta.singleFilename = filename)
+              : undefined
+          );
+
+        return collectProposalPregeneratedPdfData(
+          proposalKey,
+          agent,
+          indx === 0
+            ? (filename: string) => (proposalFileMeta.singleFilename = filename)
+            : undefined
+        );
+      })
+    );
+
+    const pregeneratedProposalData = allProposalData.filter(
+      (item): item is PregeneratedProposalPDFData => item !== null
+    );
+
+    return pregeneratedProposalData;
+  }
+
   async getPdfExperimentsSafety(
     agent: UserWithRole,
     experimentPks: number[],

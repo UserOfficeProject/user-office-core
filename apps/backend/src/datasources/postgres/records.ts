@@ -359,6 +359,7 @@ export interface CallRecord {
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+  readonly sort_order: number;
   readonly experiment_workflow_id: number;
 }
 
@@ -590,6 +591,7 @@ export interface WorkflowRecord {
   readonly description: string;
   readonly full_count: number;
   readonly entity_type: WorkflowType;
+  readonly connection_line_type: string;
 }
 
 export interface WorkflowConnectionRecord {
@@ -599,8 +601,9 @@ export interface WorkflowConnectionRecord {
   readonly status_id: number;
   readonly next_status_id: number | null;
   readonly prev_status_id: number | null;
-  readonly droppable_group_id: string;
-  readonly parent_droppable_group_id: string;
+  readonly pos_x: number;
+  readonly pos_y: number;
+  readonly prev_connection_id: number | null;
 }
 
 export interface StatusChangingEventRecord {
@@ -1045,6 +1048,7 @@ export const createCallObject = (call: CallRecord) => {
     call.fap_review_template_id,
     call.technical_review_template_id,
     call.is_active,
+    call.sort_order,
     call.experiment_workflow_id
   );
 };

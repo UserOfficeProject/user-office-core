@@ -6,6 +6,8 @@ export const Tokens = {
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
+  DataAccessUsersDataSource: Symbol('DataAccessUsersDataSource'),
+  DataAccessUsersAuthorization: Symbol('DataAccessUsersAuthorization'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
@@ -49,7 +51,6 @@ export const Tokens = {
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
   PopulateCallRow: Symbol('PopulateCallRow'),
-  DownloadService: Symbol('DownloadService'),
   StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'

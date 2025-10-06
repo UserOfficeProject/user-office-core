@@ -33,6 +33,7 @@ export class Call {
     public fapReviewTemplateId: number,
     public technicalReviewTemplateId: number,
     public isActive: boolean,
+    public sort_order: number,
     public experimentWorkflowId: number | undefined
   ) {}
 }

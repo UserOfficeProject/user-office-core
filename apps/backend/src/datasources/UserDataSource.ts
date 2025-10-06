@@ -18,7 +18,8 @@ export interface UserDataSource {
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
     email: string,
-    role?: UserRole
+    role?: UserRole,
+    currentRole?: UserRole
   ): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
   // Read

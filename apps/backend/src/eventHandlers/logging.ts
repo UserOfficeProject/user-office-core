@@ -3,7 +3,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -34,11 +33,6 @@ export default function createLoggingHandler() {
     Tokens.ProposalDataSource
   );
 
-  const coProposerClaimDataSource =
-    container.resolve<CoProposerClaimDataSource>(
-      Tokens.CoProposerClaimDataSource
-    );
-
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
@@ -67,54 +61,31 @@ export default function createLoggingHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.EMAIL_INVITE:
-        case Event.EMAIL_INVITES:
-        case Event.INVITE_ACCEPTED:
-          let invites;
-          if ('invite' in event) {
-            invites = [event.invite];
-          } else {
-            invites = event.array;
-          }
-          for (const invite of invites) {
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              invite.id.toString(),
-              event.type === Event.INVITE_ACCEPTED
-                ? `Invite accepted: ${invite.email}`
-                : `Invite sent: ${invite.email}`
-            );
-          }
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
+          const { invite, proposalPKey } = event;
+
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer invite issued to ${invite.email} accepted by userId: ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
           break;
+        }
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT: {
+          const { invite, proposalPKey } = event;
 
-        case Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT:
-        case Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED: {
-          let invites;
-          if ('invite' in event) {
-            invites = [event.invite];
-          } else {
-            invites = event.array;
-          }
-          for (const invite of invites) {
-            const coProposerInvites =
-              await coProposerClaimDataSource.findByInviteId(invite.id);
-
-            await Promise.all(
-              coProposerInvites.map(async (coProposerInvite) => {
-                return eventLogsDataSource.set(
-                  event.loggedInUserId,
-                  event.type,
-                  json,
-                  coProposerInvite.proposalPk.toString(),
-                  event.type === Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED
-                    ? `Co-proposer invite accepted: ${invite.email}`
-                    : `Co-proposer invite sent: ${invite.email}`
-                );
-              })
-            );
-          }
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer invite sent to: ${invite.email} by userId: ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
 
           break;
         }
@@ -388,6 +359,19 @@ export default function createLoggingHandler() {
             }
           }
           break;
+        case Event.DATA_ACCESS_USERS_UPDATED:
+          {
+            const description = 'Data access users updated';
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              event.proposalPKey.toString(),
+              description,
+              event.impersonatingUserId
+            );
+          }
+          break;
         default: {
           let changedObjectId: number;
           if (typeof (event as any)[event.key].primaryKey === 'number') {
@@ -400,6 +384,10 @@ export default function createLoggingHandler() {
             changedObjectId = (event as any)[event.key].experimentPk;
           } else {
             changedObjectId = (event as any)[event.key].id;
+          }
+
+          if (!changedObjectId) {
+            return;
           }
           const description = event.description || '';
 

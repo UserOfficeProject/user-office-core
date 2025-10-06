@@ -2,7 +2,6 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
 import { UserJWT } from '../models/User';
@@ -34,8 +33,7 @@ export class QuestionaryAuthorization {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource,
-    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
+    private templateDataSource: TemplateDataSource
   ) {
     this.authorizers.set(
       TemplateGroupId.PROPOSAL,

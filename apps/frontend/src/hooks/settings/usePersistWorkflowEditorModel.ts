@@ -6,7 +6,6 @@ import {
 } from 'components/settings/workflow/WorkflowEditorModel';
 import {
   ConnectionHasActionsInput,
-  IndexWithGroupId,
   WorkflowConnection,
   Workflow,
 } from 'generated/sdk';
@@ -22,7 +21,8 @@ export function usePersistWorkflowEditorModel() {
   const updateWorkflowMetadata = async (
     id: number,
     name: string,
-    description: string
+    description: string,
+    connectionLineType: string
   ) => {
     return api({
       toastSuccessMessage: 'Workflow updated successfully!',
@@ -31,6 +31,7 @@ export function usePersistWorkflowEditorModel() {
         id,
         name,
         description,
+        connectionLineType,
       })
       .then((data) => data.updateWorkflow);
   };
@@ -55,55 +56,23 @@ export function usePersistWorkflowEditorModel() {
     const insertNewStatusInWorkflow = async (
       workflowId: number,
       sortOrder: number,
-      droppableGroupId: string,
-      parentDroppableGroupId: string,
       statusId: number,
       nextStatusId: number,
-      prevStatusId: number
+      prevStatusId: number,
+      posX: number,
+      posY: number
     ) => {
       return api({ toastSuccessMessage: 'Workflow status added successfully' })
         .addWorkflowStatus({
           workflowId,
           sortOrder,
-          droppableGroupId,
-          parentDroppableGroupId,
           statusId,
           nextStatusId,
           prevStatusId,
+          posY,
+          posX,
         })
         .then((data) => data.addWorkflowStatus);
-    };
-
-    const reorderStatusesInWorkflow = async (
-      from: IndexWithGroupId,
-      to: IndexWithGroupId,
-      workflowId: number
-    ) => {
-      return api({
-        toastSuccessMessage: 'Workflow statuses reordered successfully',
-      })
-        .moveWorkflowStatus({
-          from,
-          to,
-          workflowId,
-        })
-        .then((data) => data.moveWorkflowStatus);
-    };
-
-    const deleteWorkflowStatus = async (
-      statusId: number,
-      workflowId: number,
-      sortOrder: number
-    ) => {
-      return api({
-        toastSuccessMessage: 'Workflow status removed successfully',
-      })
-        .deleteWorkflowStatus({
-          statusId,
-          workflowId,
-          sortOrder,
-        })
-        .then((data) => data.deleteWorkflowStatus);
     };
 
     const addStatusChangingEventsToConnection = async (
@@ -118,6 +87,16 @@ export function usePersistWorkflowEditorModel() {
           statusChangingEvents,
         })
         .then((data) => data.addStatusChangingEventsToConnection);
+    };
+
+    const deleteWorkflowConnection = async (connectionId: number) => {
+      return api({
+        toastSuccessMessage: 'Workflow status removed successfully',
+      })
+        .deleteWorkflowConnection({
+          connectionId,
+        })
+        .then((data) => data.deleteWorkflowConnection);
     };
 
     const addStatusActionToConnection = async (
@@ -143,10 +122,15 @@ export function usePersistWorkflowEditorModel() {
 
       switch (action.type) {
         case EventType.UPDATE_WORKFLOW_METADATA_REQUESTED: {
-          const { id, name, description } = action.payload;
+          const { id, name, description, connectionLineType } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await updateWorkflowMetadata(id, name, description);
+            const result = await updateWorkflowMetadata(
+              id,
+              name,
+              description,
+              connectionLineType
+            );
 
             if (result) {
               dispatch({
@@ -158,65 +142,69 @@ export function usePersistWorkflowEditorModel() {
             return result;
           });
         }
-        case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
-          const { source, destination } = action.payload;
-
-          return executeAndMonitorCall(async () => {
-            try {
-              const result = await reorderStatusesInWorkflow(
-                source,
-                destination,
-                state.id
-              );
-
-              return result;
-            } catch (error) {
-              dispatch({
-                type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
-                payload: {
-                  source: destination,
-                  destination: source,
-                },
-              });
-            }
-          });
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
-          dispatch({
-            type: EventType.WORKFLOW_STATUS_DELETED,
-            payload: action.payload,
-          });
-
-          const groupToRemoveFrom = state.workflowConnectionGroups.find(
-            (workflowConnectionGroup) =>
-              workflowConnectionGroup.groupId ===
-              action.payload.source.droppableId
+          // Find the workflow connection to remove based on connectionId
+          const workflowConnectionToRemove = state.workflowConnections.find(
+            (connection) => connection.id === action.payload.connectionId
           );
-          const workflowConnectionToRemove =
-            groupToRemoveFrom?.connections[action.payload.source.index];
 
           if (workflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
-              try {
-                const result = await deleteWorkflowStatus(
-                  workflowConnectionToRemove.statusId,
-                  workflowConnectionToRemove.workflowId,
-                  workflowConnectionToRemove.sortOrder
-                );
+              const result = await deleteWorkflowConnection(
+                workflowConnectionToRemove.id
+              );
 
-                return result;
-              } catch (error) {
-                dispatch({
-                  type: EventType.WORKFLOW_STATUS_ADDED,
-                  payload: {
-                    ...workflowConnectionToRemove,
-                    source: action.payload.source,
-                  },
-                });
-              }
+              dispatch({
+                type: EventType.WORKFLOW_STATUS_DELETED,
+                payload: action.payload,
+              });
+
+              return result;
             });
           }
 
           break;
+        case EventType.WORKFLOW_STATUS_UPDATE_REQUESTED: {
+          const {
+            connectionId,
+            posX,
+            posY,
+            prevStatusId,
+            nextStatusId,
+            prevConnectionId,
+          } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            try {
+              const result = await api({
+                toastErrorMessage: 'Failed to update workflow status',
+              })
+                .updateWorkflowStatus({
+                  id: connectionId,
+                  posX,
+                  posY,
+                  prevStatusId,
+                  nextStatusId,
+                  prevConnectionId,
+                })
+                .then((data) => data.updateWorkflowStatus);
+
+              if (result) {
+                // Dispatch the result to update the state
+                dispatch({
+                  type: EventType.WORKFLOW_STATUS_UPDATED,
+                  payload: result,
+                });
+              }
+
+              return result;
+            } catch (error) {
+              console.error('Failed to update workflow status:', error);
+            }
+          });
+
+          break;
+        }
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
           const {
             workflowId,
@@ -224,10 +212,11 @@ export function usePersistWorkflowEditorModel() {
             statusId,
             nextStatusId,
             prevStatusId,
-            parentDroppableGroupId,
-            droppableGroupId,
+            posX,
+            posY,
           } = action.payload;
 
+          // Immediately add to state so it shows up in the UI
           dispatch({
             type: EventType.WORKFLOW_STATUS_ADDED,
             payload: {
@@ -240,29 +229,27 @@ export function usePersistWorkflowEditorModel() {
               const result = await insertNewStatusInWorkflow(
                 workflowId,
                 sortOrder,
-                droppableGroupId,
-                parentDroppableGroupId,
                 statusId,
                 nextStatusId,
-                prevStatusId
+                prevStatusId,
+                posX,
+                posY
               );
 
+              // Update the connection with the real ID from the API
               dispatch({
                 type: EventType.WORKFLOW_STATUS_UPDATED,
-                payload: {
-                  ...action.payload,
-                  id: result.id,
-                },
+                payload: { ...action.payload, ...result },
               });
 
               return result;
             } catch (error) {
+              // Remove from state if API call failed
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
-                payload: {
-                  source: { index: sortOrder, droppableId: droppableGroupId },
-                },
+                payload: { ...action.payload },
               });
+              throw error;
             }
           });
         }
@@ -301,6 +288,22 @@ export function usePersistWorkflowEditorModel() {
               payload: {
                 workflowConnection: workflowConnection,
                 statusActions: result,
+              },
+            });
+
+            return result;
+          });
+        }
+        case EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED: {
+          const { connectionId } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await deleteWorkflowConnection(connectionId);
+
+            dispatch({
+              type: EventType.WORKFLOW_CONNECTION_DELETED,
+              payload: {
+                connectionId,
               },
             });
 
