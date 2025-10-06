@@ -23,7 +23,7 @@ export type UserManagementTableProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
-  invites: Invite[];
+  invites?: Invite[];
   setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
   title: string;
@@ -42,7 +42,7 @@ export type UserManagementTableProps = {
 const UserManagementTable = ({
   users,
   setUsers,
-  invites,
+  invites = [],
   setInvites,
   sx,
   title,

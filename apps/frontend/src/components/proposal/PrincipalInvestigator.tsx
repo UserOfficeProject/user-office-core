@@ -46,7 +46,7 @@ export default function PrincipalInvestigator(
           excludeUserIds={[users.map((u) => u.id)].flat()}
           preset={proposer ? [proposer] : []}
           multiple={false}
-          allowEmailInvites={false}
+          allowInviteByEmail={false}
         />
       )}
 

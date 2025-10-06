@@ -70,11 +70,10 @@ function ParticipantSelector({
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
-  allowInviteByEmail,
+  allowInviteByEmail = false,
   confirm,
   preset = [],
   multiple = true,
-  allowEmailInvites = false,
 }: ParticipantSelectorProps & WithConfirmProps) {
   // multiple selection enabled by default
   const api = useDataApi();
@@ -377,7 +376,7 @@ function ParticipantSelector({
               <NoOptionsText
                 query={query}
                 onAddEmail={(email) =>
-                  allowEmailInvites
+                  allowInviteByEmail
                     ? addValidEmailToSelection(email)
                     : undefined
                 }
