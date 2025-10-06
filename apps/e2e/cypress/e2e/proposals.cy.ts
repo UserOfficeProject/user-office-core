@@ -4,6 +4,7 @@ import {
   DataType,
   FeatureId,
   FeatureUpdateAction,
+  ProposalEndStatus,
   SettingsId,
   TemplateCategoryId,
   TemplateGroupId,
@@ -133,11 +134,12 @@ context('Proposal tests', () => {
       }).then((result) => {
         if (result.createWorkflow) {
           cy.addWorkflowStatus({
-            droppableGroupId: 'proposalWorkflowConnections_0',
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
             sortOrder: 1,
             prevStatusId: 1,
+            posX: 0,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -154,6 +156,38 @@ context('Proposal tests', () => {
           });
         }
       });
+    });
+
+    it('Should be able add user to proposal though data access feature', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.DATA_ACCESS_USERS)) {
+        this.skip();
+      }
+      cy.submitProposal({ proposalPk: createdProposalPk });
+
+      cy.updateProposalManagementDecision({
+        proposalPk: createdProposalPk,
+        finalStatus: ProposalEndStatus.ACCEPTED,
+        managementTimeAllocations: [
+          { instrumentId: initialDBData.instrument1.id, value: 5 },
+        ],
+        managementDecisionSubmitted: true,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.get('[data-testid="PeopleIcon"]').click();
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('#Email-input').type(initialDBData.users.user3.email);
+      cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="save-data-access-users-modal"]').click();
+      cy.logout();
+      cy.login('user3', initialDBData.roles.user);
+      cy.get('[data-testid="VisibilityIcon"]').click();
+      cy.get('[data-cy="questionary-details-view"]').contains(
+        createdProposalId
+      );
+      cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
     });
 
     it('Copy to clipboard should work for Proposal ID', () => {
@@ -1055,7 +1089,7 @@ context('Proposal tests', () => {
     it('User officer should reopen proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.get('[aria-label="View proposal"]').click();
+      cy.get('[aria-label="View proposal"]').first().click();
       cy.get('[role="tablist"]').contains('Proposal').click();
       cy.get('[data-cy=button-submit-proposal]').should('be.disabled');
 

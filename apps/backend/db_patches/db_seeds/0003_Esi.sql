@@ -5,6 +5,8 @@ DECLARE
 	proposal_esi_template_topic_id INTEGER;
 	sample_esi_template_id INTEGER;
 	sample_esi_template_topic_id INTEGER;
+  proposal_category_id INTEGER;
+  sample_category_id INTEGER;
 BEGIN
 
 	INSERT INTO templates(name, description, is_archived, group_id) VALUES 
@@ -35,6 +37,13 @@ BEGIN
 
 	UPDATE public.call SET esi_template_id=proposal_esi_template_id;
 
+
+  -- Get Proposal category id
+  SELECT template_category_id INTO proposal_category_id FROM template_categories WHERE name='Proposal' limit 1;
+
+  -- Get Sample category id
+  SELECT template_category_id INTO sample_category_id FROM template_categories WHERE name='Sample declaration' limit 1;
+
 	-- Insert Questions for Proposal ESI template
 	-- BOOLEAN Question for Proposal ESI Template
 INSERT INTO questions(
@@ -53,7 +62,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_boolean_question', 1
+    'proposal_esi_boolean_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -61,7 +70,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_boolean_question', 5, 5, 3, '{
+    'proposal_esi_boolean_question', proposal_esi_template_id, proposal_esi_template_topic_id, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": "",
@@ -86,7 +95,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_date_question', 1
+    'proposal_esi_date_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -94,7 +103,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_date_question', 5, 5, 4, '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }'
+    'proposal_esi_date_question', proposal_esi_template_id, proposal_esi_template_topic_id, 4, '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }'
   );
 
 -- INTERVAL Question for Proposal ESI Template
@@ -124,7 +133,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_interval_question', 1
+    'proposal_esi_interval_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -132,7 +141,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_interval_question', 5, 5, 6, '{
+    'proposal_esi_interval_question', proposal_esi_template_id, proposal_esi_template_topic_id, 6, '{
         "units": [
             {
                 "id": "meter",
@@ -182,7 +191,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_number_question', 1
+    'proposal_esi_number_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -190,7 +199,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_number_question', 5, 5, 7, '{
+    'proposal_esi_number_question', proposal_esi_template_id, proposal_esi_template_topic_id, 7, '{
         "units": [
             {
                 "id": "meter",
@@ -227,7 +236,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_rich_text_input_question', 1
+    'proposal_esi_rich_text_input_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -235,7 +244,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_rich_text_input_question', 5, 5, 
+    'proposal_esi_rich_text_input_question', proposal_esi_template_id, proposal_esi_template_topic_id, 
     8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 -- Selection from options Question for Proposal ESI Template
@@ -252,7 +261,7 @@ VALUES
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'proposal_esi_selection_from_options_question', 
-    1
+    proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -261,7 +270,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'proposal_esi_selection_from_options_question', 
-    5, 5, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
+    proposal_esi_template_id, proposal_esi_template_topic_id, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
   );
 
 -- Text input Question for Proposal ESI Template
@@ -277,7 +286,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'proposal_esi_text_input_question', 1
+    'proposal_esi_text_input_question', proposal_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -285,7 +294,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_text_input_question', 5, 5, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
+    'proposal_esi_text_input_question', proposal_esi_template_id, proposal_esi_template_topic_id, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 
 -- 	-- Insert Questions for Sample ESI template
@@ -306,7 +315,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_boolean_question', 2
+    'sample_esi_boolean_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -314,7 +323,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_boolean_question', 6, 6, 3, '{
+    'sample_esi_boolean_question', sample_esi_template_id, sample_esi_template_topic_id, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": "",
@@ -339,7 +348,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_date_question', 2
+    'sample_esi_date_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -347,7 +356,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_date_question', 6, 6, 4, '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }'
+    'sample_esi_date_question', sample_esi_template_id, sample_esi_template_topic_id, 4, '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }'
   );
 
 -- INTERVAL Question for Sample ESI Template
@@ -377,7 +386,7 @@ VALUES
       }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_interval_question', 2
+    'sample_esi_interval_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -385,7 +394,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_interval_question', 6, 6, 6, '{
+    'sample_esi_interval_question', sample_esi_template_id, sample_esi_template_topic_id, 6, '{
         "units": [
             {
                 "id": "meter",
@@ -435,7 +444,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_number_question', 2
+    'sample_esi_number_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -443,7 +452,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_number_question', 6, 6, 7, '{
+    'sample_esi_number_question', sample_esi_template_id, sample_esi_template_topic_id, 7, '{
         "units": [
             {
                 "id": "meter",
@@ -480,7 +489,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_rich_text_input_question', 2
+    'sample_esi_rich_text_input_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -488,7 +497,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_rich_text_input_question', 6, 6, 
+    'sample_esi_rich_text_input_question', sample_esi_template_id, sample_esi_template_topic_id, 
     8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 -- Selection from options Question for Sample ESI Template
@@ -514,7 +523,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_esi_selection_from_options_question', 
-    6, 6, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
+    sample_esi_template_id, sample_esi_template_topic_id, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
   );
 
 
@@ -532,7 +541,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'sample_esi_text_input_question', 2
+    'sample_esi_text_input_question', sample_category_id
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -540,7 +549,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_text_input_question', 6, 6, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
+    'sample_esi_text_input_question', sample_esi_template_id, sample_esi_template_topic_id, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 
 	

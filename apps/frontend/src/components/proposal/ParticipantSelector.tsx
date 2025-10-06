@@ -49,7 +49,7 @@ interface ParticipantSelectorProps {
   excludeEmails?: string[];
   preset?: UserOrEmail[];
   multiple?: boolean;
-  allowEmailInvites?: boolean;
+  allowInviteByEmail?: boolean;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -70,6 +70,7 @@ function ParticipantSelector({
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
+  allowInviteByEmail,
   confirm,
   preset = [],
   multiple = true,
@@ -392,7 +393,7 @@ function ParticipantSelector({
                   ) || []
                 }
                 isEmailSearchOnly={isEmailSearchOnly}
-                allowEmailInvites={allowEmailInvites}
+                allowInviteByEmail={allowInviteByEmail}
               />
             ) : null
           }

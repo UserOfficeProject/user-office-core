@@ -546,11 +546,23 @@ function createNumberInputQuestion(
 
 function createIntervalQuestion(
   question: string,
-  options?: { units?: string[] }
+  options?: {
+    key?: string;
+    isRequired?: boolean;
+    units?: string[];
+    valueConstraint?: string;
+    firstTopic?: boolean;
+  }
 ) {
-  openQuestionsMenu();
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic,
+  });
 
   cy.contains('Add Interval').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
 
   cy.get('[data-cy=question]').clear().type(question);
 
@@ -559,6 +571,11 @@ function createIntervalQuestion(
       cy.get('[data-cy=units]').find('[aria-label=Open]').click();
       cy.contains(unit).click();
     }
+  }
+
+  if (options?.valueConstraint) {
+    cy.get('[data-cy="numberValueConstraint"]').click();
+    cy.contains(options?.valueConstraint).click();
   }
 
   cy.contains('Save').click();

@@ -17,6 +17,7 @@ interface NoOptionsTextProps {
   allowEmailInvites?: boolean;
   /* If true, only allow searching users by entering their email */
   isEmailSearchOnly: boolean;
+  allowInviteByEmail?: boolean;
 }
 
 function NoOptionsText({
@@ -26,8 +27,8 @@ function NoOptionsText({
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
-  allowEmailInvites,
   isEmailSearchOnly,
+  allowInviteByEmail = false,
 }: NoOptionsTextProps) {
   const featureContext = useContext(FeatureContext);
   const isEmailInviteFeatureEnabled = !!featureContext.featuresMap.get(
@@ -35,7 +36,8 @@ function NoOptionsText({
   )?.isEnabled;
 
   // email invite will be enabled if both the prop and the feature flag are true
-  const isEmailInviteEnabled = allowEmailInvites && isEmailInviteFeatureEnabled;
+  const isEmailInviteEnabled =
+    allowInviteByEmail && isEmailInviteFeatureEnabled;
 
   if (exactEmailMatch) {
     return (

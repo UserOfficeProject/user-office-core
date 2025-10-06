@@ -36,8 +36,7 @@ export type UserManagementTableProps = {
   onUserAction?: (action: string, user: BasicUserDetails) => void;
   /** Additional excluded user IDs for invite flow */
   excludeUserIds?: number[];
-  /** If true, allows to add users by entering their email. Set this to true and listen to setInvites */
-  allowEmailInvites?: boolean;
+  allowInviteByEmail?: boolean;
 };
 
 const UserManagementTable = ({
@@ -53,7 +52,7 @@ const UserManagementTable = ({
   disabled = false,
   onUserAction,
   excludeUserIds = [],
-  allowEmailInvites = false,
+  allowInviteByEmail = false,
 }: UserManagementTableProps) => {
   const [modalOpen, setOpen] = useState(false);
   const { featuresMap } = useContext(FeatureContext);
@@ -98,11 +97,11 @@ const UserManagementTable = ({
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
-      allowEmailInvites={allowEmailInvites}
       excludeEmails={[
         ...(invites?.map((invite) => invite.email) || []),
         ...(currentUser.email ? [currentUser.email.toLowerCase()] : []),
       ]}
+      allowInviteByEmail={allowInviteByEmail}
     />
   );
 
