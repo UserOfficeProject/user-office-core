@@ -305,14 +305,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
-  async getFapProposals(
-    filter: {
-      fapId: number;
-      callId?: number | null;
-      instrumentId?: number | null;
-    },
-    currentUserNumber?: number
-  ): Promise<FapProposal[]> {
+  async getFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -339,18 +336,6 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         if (filter.instrumentId) {
           query.andWhere('fp.instrument_id', filter.instrumentId);
-        }
-
-        if (currentUserNumber) {
-          query.andWhere((query) => {
-            query.whereNot('p.proposer_id', currentUserNumber);
-          });
-          query.whereNotExists(function () {
-            this.select('*')
-              .from('proposal_user as pu')
-              .whereRaw('pu.proposal_pk = fp.proposal_pk')
-              .andWhere('pu.user_id', currentUserNumber);
-          });
         }
       })
       .where('fp.fap_id', filter.fapId)
@@ -527,8 +512,7 @@ export default class PostgresFapDataSource implements FapDataSource {
   async getFapProposalsByInstrument(
     instrumentId: number,
     callId: number,
-    { fapId, proposalPk }: { fapId?: number; proposalPk?: number },
-    currentUserNumber?: number
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select([
