@@ -46,7 +46,7 @@ export default function TechnicalReviewQuestionaryReview(
       label: `Time allocation(${data.proposal?.call?.allocationTimeUnit}s)`,
       value: data.timeAllocation?.toString() || '',
     },
-    { label: 'Comment', value: stripHtml(data.publicComment || '') },
+    { label: 'Public Comment', value: stripHtml(data.publicComment || '') },
   ];
 
   internalUser &&
