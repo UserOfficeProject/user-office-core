@@ -34,6 +34,16 @@ declare module 'knex' {
         query: string,
         userInput: string
       ): QueryBuilder;
+
+      whereJsonbPathLike(
+        column: string, 
+        userInput: string
+      ) : QueryBuilder;
+
+      orWhereJsonbPathLike(
+        column: string, 
+        userInput: string
+      ) : QueryBuilder;
     }
   }
 }
