@@ -8,7 +8,6 @@ import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import Help from '@mui/icons-material/Help';
 import NoteAdd from '@mui/icons-material/NoteAdd';
 import People from '@mui/icons-material/People';
-import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -27,6 +26,7 @@ import SettingsMenuListItem from './SettingsMenuListItem';
 import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
+import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
@@ -124,6 +124,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const userOfficer = (
     <div data-cy="officer-menu-items">
+      <Tooltip title="Calls">
+        <ListItemButton component={NavLink} to="/Calls">
+          <ListItemIcon>
+            <CalendarToday />
+          </ListItemIcon>
+          <ListItemText primary="Calls" />
+        </ListItemButton>
+      </Tooltip>
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
@@ -152,22 +160,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
-      <Tooltip title="Calls">
-        <ListItemButton component={NavLink} to="/Calls">
-          <ListItemIcon>
-            <CalendarToday />
-          </ListItemIcon>
-          <ListItemText primary="Calls" />
-        </ListItemButton>
-      </Tooltip>
-      <StatusActionLogsMenuListItem />
-      {isUserManagementEnabled && (
-        <Tooltip title="People">
-          <ListItemButton component={NavLink} to="/People">
+      {isFapEnabled && (
+        <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
+          <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
-              <People />
+              <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary="People" />
+            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
           </ListItemButton>
         </Tooltip>
       )}
@@ -181,6 +180,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
+
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
@@ -199,24 +199,22 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
-      {isFapEnabled && (
-        <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
-          <ListItemButton component={NavLink} to="/Faps">
-            <ListItemIcon>
-              <GroupWorkIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
-          </ListItemButton>
-        </Tooltip>
-      )}
-      <Tooltip title="Pages">
-        <ListItemButton component={NavLink} to="/PageEditor">
+      <Tooltip title="Proposal workflows">
+        <ListItemButton
+          component={NavLink}
+          selected={
+            location.pathname.includes('/ProposalWorkflows') ||
+            location.pathname.includes('ProposalWorkflowEditor')
+          }
+          to={'/ProposalWorkflows'}
+        >
           <ListItemIcon>
-            <SettingsApplications />
+            <ProposalWorkflowIcon />
           </ListItemIcon>
-          <ListItemText primary="Pages" />
+          <ListItemText primary="Proposal workflows" />
         </ListItemButton>
       </Tooltip>
+
       {isUserManagementEnabled && (
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
@@ -228,6 +226,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
       )}
       <TemplateMenuListItem />
+      <StatusActionLogsMenuListItem />
+      {isUserManagementEnabled && (
+        <Tooltip title="People">
+          <ListItemButton component={NavLink} to="/People">
+            <ListItemIcon>
+              <People />
+            </ListItemIcon>
+            <ListItemText primary="People" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>

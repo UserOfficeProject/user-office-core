@@ -185,7 +185,7 @@ context('Invites tests', () => {
         .should('not.exist');
     });
 
-    it.only('Should not be able to invite the email of the current user', function () {
+    it('Should not be able to invite the email of the current user', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
