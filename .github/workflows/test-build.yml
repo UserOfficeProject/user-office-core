@@ -307,21 +307,24 @@ jobs:
             files: cypress/e2e/p[a-m]*.ts
           - id: p-nz
             order: 4
-            files: cypress/e2e/p[n-z]*.ts
-          - id: rs
+            files: cypress/e2e/p[n-z]!(oposals)*.ts
+          - id: proposals
             order: 5
+            files: cypress/e2e/proposals*.ts
+          - id: rs
+            order: 6
             files: cypress/e2e/[r-s]*.ts
           - id: t
-            order: 6
-            files: cypress/e2e/t!(emplateDeleteAndArchive).ts
-          - id: templateDelete
             order: 7
-            files: cypress/e2e/templateDeleteAndArchive*.ts
-          - id: uz
+            files: cypress/e2e/t!(emplatesBasic).ts
+          - id: templateDelete
             order: 8
+            files: cypress/e2e/templatesBasic*.ts
+          - id: uz
+            order: 9
             files: cypress/e2e/[u-z]*.ts
           - id: AZ
-            order: 9
+            order: 10
             files: cypress/e2e/[A-Z]*.ts
     runs-on: ${{  matrix.pattern.order < needs.count_self_hosted_runners.outputs.idle && 'self-hosted' || 'ubuntu-latest'  }}
  
