@@ -102,17 +102,18 @@ const AssignFapMemberToProposalModal = ({
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >
-          Update without rank
+          Assign without Rankings
         </Button>
         <Button
           type="button"
           onClick={() => {
             setRankSelectorOpen(true);
           }}
+          disabled={selectedParticipants.length === 0}
           color="primary"
           data-cy="assign-selected-users-with-rank"
         >
-          Assign Ranks
+          Assign with Rankings
         </Button>
         {rankSelectorOpen && (
           <MultiRankAssignmentDialog

@@ -12,6 +12,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { ChangeEvent } from 'react';
@@ -56,8 +57,17 @@ export const MultiRankAssignmentDialog = ({
       fullWidth
       data-cy="multi-rank-assignment-dialog"
     >
-      <DialogTitle>Assign Multiple Ranks</DialogTitle>
+      <DialogTitle>Mass Assignments with Ranking</DialogTitle>
       <DialogContent>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          gutterBottom
+          margin={2}
+        >
+          Please assign a unique rank to each user, Ranks must be whole numbers
+          and greater than 1.
+        </Typography>
         <TableContainer component={Paper}>
           <Table aria-label="rank-table">
             <TableHead>
@@ -90,22 +100,32 @@ export const MultiRankAssignmentDialog = ({
                   <TableCell align="right">
                     <TextField
                       type="number"
+                      variant="outlined"
                       data-cy={`rank-${row.lastname}`}
                       InputProps={{
-                        inputProps: { min: 1 },
+                        inputProps: { min: 1, step: 1 },
                       }}
-                      error={usersWithRank.some(
-                        (user) =>
-                          user.id !== row.id &&
-                          user.rank === row.rank &&
-                          row.rank !== null
-                      )}
+                      error={
+                        usersWithRank.some(
+                          (user) =>
+                            user.id !== row.id &&
+                            user.rank === row.rank &&
+                            row.rank !== null
+                        ) ||
+                        (row.rank !== null && row.rank < 1) ||
+                        (row.rank !== null && isNaN(row.rank))
+                      }
                       sx={{ width: 100 }}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        const rank = Number(e.target.value); // Non numeric values become 0
+
                         setUsersWithRank((prev) =>
                           prev.map((user) =>
                             user.id === row.id
-                              ? { ...user, rank: Number(e.target.value) }
+                              ? {
+                                  ...user,
+                                  rank: !Number.isInteger(rank) ? 0 : rank,
+                                } // If integer, set to 0 (invalid)
                               : user
                           )
                         );
@@ -132,12 +152,25 @@ export const MultiRankAssignmentDialog = ({
         </Button>
         <Button
           onClick={() => {
+            setOpen(false);
             assign(usersWithRank);
           }}
           color="primary"
           data-cy="save-ranks"
+          disabled={
+            usersWithRank.some((user) => user.rank === null) ||
+            usersWithRank.some((user) => user.rank !== null && user.rank < 1) ||
+            usersWithRank.some(
+              (user) => user.rank !== null && !Number.isInteger(user.rank)
+            ) ||
+            new Set(
+              usersWithRank
+                .filter((user) => user.rank !== null)
+                .map((user) => user.rank)
+            ).size !== usersWithRank.length
+          } // Disable if any rank is null, less than 1, NaN, or not unique
         >
-          Save Assignments
+          Submit Mass Assignments
         </Button>
       </DialogActions>
     </Dialog>
