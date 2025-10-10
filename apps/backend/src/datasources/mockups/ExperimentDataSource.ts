@@ -12,7 +12,6 @@ import { User } from '../../models/User';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   UserExperimentsFilter,
-  ExperimentsArgs,
   ExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
@@ -118,7 +117,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     this.init();
   }
 
-  async getAllExperiments(
+  async getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
@@ -318,11 +317,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     );
 
     return Promise.resolve(samples);
-  }
-
-  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
-    // For simplicity, ignoring filter and returning all experiments
-    return Promise.resolve(this.experiments);
   }
 
   updateExperimentSample(

@@ -15,7 +15,7 @@ import {
   Workflow as WorkflowOrigin,
   WorkflowType,
 } from '../../models/Workflow';
-import { WorkflowConnectionGroup } from './WorkflowConnection';
+import { WorkflowConnection } from './WorkflowConnection';
 
 @ObjectType()
 export class Workflow implements Partial<WorkflowOrigin> {
@@ -30,16 +30,19 @@ export class Workflow implements Partial<WorkflowOrigin> {
 
   @Field(() => WorkflowType)
   public entityType: WorkflowType;
+
+  @Field(() => String)
+  public connectionLineType: string;
 }
 
 @Resolver(() => Workflow)
 export class WorkflowResolver {
-  @FieldResolver(() => [WorkflowConnectionGroup])
-  async workflowConnectionGroups(
+  @FieldResolver(() => [WorkflowConnection])
+  async workflowConnections(
     @Root() workflow: Workflow,
     @Ctx() context: ResolverContext
-  ): Promise<WorkflowConnectionGroup[]> {
-    const connections = await context.queries.workflow.workflowConnectionGroups(
+  ): Promise<WorkflowConnection[]> {
+    const connections = await context.queries.workflow.getWorkflowConnections(
       context.user,
       workflow.id
     );

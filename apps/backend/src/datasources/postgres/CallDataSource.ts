@@ -587,7 +587,8 @@ export default class PostgresCallDataSource implements CallDataSource {
       proposalWorkflow.workflow_id,
       proposalWorkflow.name,
       proposalWorkflow.description,
-      proposalWorkflow.entity_type
+      proposalWorkflow.entity_type,
+      proposalWorkflow.connection_line_type
     );
   }
 
