@@ -101,8 +101,8 @@ context('Invites tests', () => {
         .should('be.enabled')
         .click();
 
-      cy.get('[data-cy="invites-chips"]').contains(email).should('not.exist');
       cy.get('[data-cy="co-proposers"]').contains(lastName);
+      cy.get('[data-cy="invites-chips"]').should('not.exist');
     });
 
     it('Should not be able to invite email already invited on proposal', function () {
