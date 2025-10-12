@@ -101,7 +101,7 @@ context('Invites tests', () => {
         .should('be.enabled')
         .click();
 
-      cy.get('.MuiChip-label').should('not.exist');
+      cy.get('[data-cy="invites-chips"]').contains(email).should('not.exist');
       cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
