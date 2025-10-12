@@ -218,13 +218,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: apps/backend/build
-          key: backend-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: backend-build-${{ github.sha }}-${{ github.run_id }}
 
       - name: Cache frontend build
         uses: actions/cache@v4
         with:
           path: apps/frontend/build
-          key: frontend-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: frontend-build-${{ github.sha }}-${{ github.run_id }}
 
   test_backend:
     runs-on: ubuntu-latest
@@ -349,13 +349,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: apps/backend/build
-          key: backend-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: backend-build-${{ github.sha }}-${{ github.run_id }}
 
       - name: Restore frontend build
         uses: actions/cache@v4
         with:
           path: apps/frontend/build
-          key: frontend-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: frontend-build-${{ github.sha }}-${{ github.run_id }}
 
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
