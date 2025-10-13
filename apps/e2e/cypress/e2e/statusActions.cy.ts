@@ -42,7 +42,7 @@ let emailTemplate2: EmailTemplate | null;
 
 context('Status actions tests', () => {
   beforeEach(function () {
-    cy.resetDB(true);
+    cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
     cy.updateFeature({
