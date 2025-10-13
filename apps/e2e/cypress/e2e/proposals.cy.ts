@@ -611,11 +611,6 @@ context('Proposal tests', () => {
     });
 
     it('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
-      cy.createCall({
-        ...newCall,
-        proposalWorkflowId: createdWorkflowId,
-      });
-
       // Create an ended call to test if it is not available for cloning.
       cy.createCall({
         ...newCall,
@@ -636,6 +631,16 @@ context('Proposal tests', () => {
           cy.assignProposalsToInstruments({
             instrumentIds: [result.createInstrument.id],
             proposalPks: [createdProposalPk],
+          });
+
+          cy.createCall({
+            ...newCall,
+            proposalWorkflowId: createdWorkflowId,
+          }).then((call) => {
+            cy.assignInstrumentToCall({
+              callId: call.createCall.id,
+              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            });
           });
         }
       });
