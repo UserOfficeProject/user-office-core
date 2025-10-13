@@ -4,7 +4,7 @@ const escapeLike = (s: string) =>
   s.replace(/\\/g, '\\\\').replace(/[%_]/g, '\\$&');
 
 function safeJsonPath(input: string): string {
-  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim();
+  return input.replace(/[.*+?^${}()|[\]\\"]/g, '\\$&').trim();
 }
 
 const addExtensions = () => {
