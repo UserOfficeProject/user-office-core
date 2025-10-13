@@ -840,6 +840,30 @@ export default class ProposalMutations {
         true
       );
 
+      // TODO: Check if we need to also clone the technical review when cloning the proposal.
+      clonedProposal = await this.proposalDataSource.update({
+        primaryKey: clonedProposal.primaryKey,
+        title: `Copy of ${clonedProposal.title}`,
+        abstract: clonedProposal.abstract,
+        proposerId: sourceProposal.proposerId,
+        statusId: 1,
+        created: new Date(),
+        updated: new Date(),
+        proposalId: clonedProposal.proposalId,
+        finalStatus: ProposalEndStatus.UNSET,
+        callId: callId,
+        questionaryId: clonedQuestionary.questionaryId,
+        commentForUser: '',
+        commentForManagement: '',
+        notified: false,
+        submitted: false,
+        referenceNumberSequence: 0,
+        managementDecisionSubmitted: false,
+        submittedDate: null,
+        experimentSequence: null,
+        fileId: null,
+      });
+
       const sourceProposalInstrumentId =
         await this.instrumentDataSource.getInstrumentsByProposalPk(
           sourceProposal.primaryKey
@@ -866,30 +890,6 @@ export default class ProposalMutations {
           );
         }
       }
-
-      // TODO: Check if we need to also clone the technical review when cloning the proposal.
-      clonedProposal = await this.proposalDataSource.update({
-        primaryKey: clonedProposal.primaryKey,
-        title: `Copy of ${clonedProposal.title}`,
-        abstract: clonedProposal.abstract,
-        proposerId: sourceProposal.proposerId,
-        statusId: 1,
-        created: new Date(),
-        updated: new Date(),
-        proposalId: clonedProposal.proposalId,
-        finalStatus: ProposalEndStatus.UNSET,
-        callId: callId,
-        questionaryId: clonedQuestionary.questionaryId,
-        commentForUser: '',
-        commentForManagement: '',
-        notified: false,
-        submitted: false,
-        referenceNumberSequence: 0,
-        managementDecisionSubmitted: false,
-        submittedDate: null,
-        experimentSequence: null,
-        fileId: null,
-      });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
         sourceProposal.primaryKey
