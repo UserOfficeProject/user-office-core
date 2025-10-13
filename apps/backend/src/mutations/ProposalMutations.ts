@@ -38,6 +38,7 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
+import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
@@ -381,13 +382,18 @@ export default class ProposalMutations {
   @Authorized([Roles.USER_OFFICER])
   async notify(
     user: UserWithRole | null,
-    { proposalPk }: { proposalPk: number }
+    notifyArgs: NotifyProposalArgs
   ): Promise<unknown> {
-    const proposal = await this.proposalDataSource.get(proposalPk);
+    const proposal = await this.proposalDataSource.get(notifyArgs.proposalPk);
 
-    if (!proposal || proposal.notified || !proposal.finalStatus) {
+    if (
+      !proposal ||
+      (proposal.notified && !notifyArgs.ignoreNotifiedFlag) ||
+      !proposal.finalStatus
+    ) {
       return rejection('Can not notify proposal', { proposal });
     }
+
     proposal.notified = true;
     const result = await this.proposalDataSource.update(proposal);
 
@@ -917,9 +923,17 @@ export default class ProposalMutations {
       const proposalUsers = await this.userDataSource.getProposalUsers(
         sourceProposal.primaryKey
       );
+      const proposalUserIds = proposalUsers.map((user) => user.id);
+
+      const hasWriteRightsOnClonedProposal =
+        await this.proposalAuth.hasWriteRights(agent, clonedProposal);
+      if (!hasWriteRightsOnClonedProposal) {
+        proposalUserIds.push(agent!.id);
+      }
+
       await this.proposalDataSource.setProposalUsers(
         clonedProposal.primaryKey,
-        proposalUsers.map((user) => user.id)
+        proposalUserIds
       );
 
       const proposalSamples = await this.sampleDataSource.getSamples({

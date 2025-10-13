@@ -3,7 +3,7 @@ import { intervalQuestionValidationSchema } from '@user-office-software/duo-vali
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType, IntervalConfig } from 'generated/sdk';
+import { DataType, IntervalConfig, NumberValueConstraint } from 'generated/sdk';
 
 import { IntervalAnswerRenderer } from './IntervalAnswerRenderer';
 import IntervalSearchCriteriaComponent from './IntervalSearchCriteriaComponent';
@@ -25,7 +25,8 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
     answerRenderer: IntervalAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: intervalQuestionValidationSchema,
+  createYupValidationSchema: (field) =>
+    intervalQuestionValidationSchema(field, NumberValueConstraint),
   getYupInitialValue: ({ answer }) =>
     answer.value || {
       min: '',
