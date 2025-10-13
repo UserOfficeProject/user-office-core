@@ -1,0 +1,56 @@
+import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { User } from '../types/User';
+@ArgsType()
+export class UpsertUserByOidcSubArgs {
+  @Field(() => String, { nullable: true })
+  public userTitle: string | null;
+
+  @Field(() => String)
+  public firstName: string;
+
+  @Field(() => String)
+  public lastName: string;
+
+  @Field(() => String, { nullable: true })
+  public username: string | null;
+
+  @Field(() => String, { nullable: true })
+  public preferredName: string | null;
+
+  @Field(() => String)
+  public oidcSub: string;
+
+  @Field(() => String, { nullable: true })
+  public gender: string | null;
+
+  @Field(() => String, { nullable: true })
+  public birthDate: string | null;
+
+  @Field(() => String)
+  public institutionRoRId: string;
+
+  @Field(() => String, { nullable: true })
+  public department: string | null;
+
+  @Field(() => String)
+  public position: string;
+
+  @Field(() => String)
+  public email: string;
+
+  @Field(() => String, { nullable: true })
+  public telephone: string | null;
+}
+
+@Resolver()
+export class UpsertUserByOidcSubMutation {
+  @Mutation(() => User)
+  upsertUserByOidcSub(
+    @Args() input: UpsertUserByOidcSubArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.user.upsertUserByOidcSub(context.user, input);
+  }
+}

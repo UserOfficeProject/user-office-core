@@ -68,7 +68,7 @@ export interface UserDataSource {
     oauth_issuer: string,
     gender: string,
     birthdate: Date,
-    institution: number,
+    institution: number | undefined,
     department: string,
     position: string,
     email: string,

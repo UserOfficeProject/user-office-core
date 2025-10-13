@@ -90,31 +90,40 @@ export default class PostgresUserDataSource implements UserDataSource {
       oidcSub,
       oauthRefreshToken,
       oauthIssuer,
+      username,
     } = user;
 
-    const [userRecord]: UserRecord[] = await database
-      .update({
-        firstname,
-        user_title,
-        lastname,
-        preferredname,
-        gender,
-        birthdate,
-        institution_id: institutionId,
-        department,
-        position,
-        email,
-        telephone,
-        placeholder,
-        oidc_sub: oidcSub,
-        oauth_refresh_token: oauthRefreshToken,
-        oauth_issuer: oauthIssuer,
-      })
-      .from('users')
-      .where('user_id', user.id)
-      .returning(['*']);
+    try {
+      const [userRecord]: UserRecord[] = await database
+        .update({
+          firstname,
+          user_title,
+          lastname,
+          preferredname,
+          gender,
+          birthdate,
+          institution_id: institutionId,
+          department,
+          position,
+          email,
+          telephone,
+          placeholder,
+          oidc_sub: oidcSub,
+          oauth_refresh_token: oauthRefreshToken,
+          oauth_issuer: oauthIssuer,
+          username,
+        })
+        .from('users')
+        .where('user_id', user.id)
+        .returning(['*']);
 
-    return createUserObject(userRecord);
+      return createUserObject(userRecord);
+    } catch (error) {
+      if (error instanceof Error && 'code' in error && error.code === '23505') {
+        throw new GraphQLError('User already exists');
+      }
+      throw new GraphQLError('Could not create user. Check your Inputs.');
+    }
   }
   async updateUserByOidcSub(
     args: UpdateUserByOidcSubArgs
@@ -135,34 +144,40 @@ export default class PostgresUserDataSource implements UserDataSource {
       oauthRefreshToken,
       oauthIssuer,
     } = args;
+    try {
+      const [userRecord]: UserRecord[] = await database
+        .update({
+          firstname,
+          user_title,
+          lastname,
+          preferredname,
+          gender,
+          birthdate,
+          institution_id: institutionId,
+          department,
+          position,
+          email,
+          telephone,
+          placeholder,
+          oauth_refresh_token: oauthRefreshToken,
+          oauth_issuer: oauthIssuer,
+          updated_at: new Date(),
+        })
+        .from('users')
+        .where('oidc_sub', args.oidcSub)
+        .returning(['*']);
 
-    const [userRecord]: UserRecord[] = await database
-      .update({
-        firstname,
-        user_title,
-        lastname,
-        preferredname,
-        gender,
-        birthdate,
-        institution_id: institutionId,
-        department,
-        position,
-        email,
-        telephone,
-        placeholder,
-        oauth_refresh_token: oauthRefreshToken,
-        oauth_issuer: oauthIssuer,
-        updated_at: new Date(),
-      })
-      .from('users')
-      .where('oidc_sub', args.oidcSub)
-      .returning(['*']);
+      if (!userRecord) {
+        return null;
+      }
 
-    if (!userRecord) {
-      return null;
+      return createUserObject(userRecord);
+    } catch (error) {
+      if (error instanceof Error && 'code' in error && error.code === '23505') {
+        throw new GraphQLError('User already exists');
+      }
+      throw new GraphQLError('Could not create user. Check your Inputs.');
     }
-
-    return createUserObject(userRecord);
   }
 
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
@@ -363,7 +378,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  // NOTE: This is used in the OAuthAuthorization only where we upsert users returned from Auth server.
   async create(
     user_title: string | undefined,
     firstname: string,
@@ -375,7 +389,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     oauth_issuer: string,
     gender: string,
     birthdate: Date,
-    institution_id: number,
+    institution_id: number | undefined,
     department: string,
     position: string,
     email: string,
@@ -407,6 +421,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
 
         return createUserObject(user[0]);
+      })
+      .catch((error) => {
+        if (error.code === '23505') {
+          throw new GraphQLError('User already exists');
+        }
+        throw new GraphQLError('Could not create user. Check your Inputs.');
       });
   }
 

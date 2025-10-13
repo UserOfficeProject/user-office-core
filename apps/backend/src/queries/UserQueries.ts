@@ -73,7 +73,8 @@ export default class UserQueries {
         user.placeholder,
         user.email,
         user.country,
-        user.title
+        user.title,
+        user.oidc_sub
       );
     } else {
       return null;
@@ -107,7 +108,8 @@ export default class UserQueries {
       user.placeholder,
       user.email,
       user.country,
-      user.title
+      user.title,
+      user.oidc_sub
     );
   }
 

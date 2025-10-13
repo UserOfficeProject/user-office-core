@@ -249,7 +249,7 @@ export interface UserRecord {
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
-  readonly oidc_sub: string | null;
+  readonly oidc_sub: string;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
@@ -996,7 +996,8 @@ export const createBasicUserObject = (
     user.placeholder,
     user.email,
     user.country,
-    user.user_title
+    user.user_title,
+    user.oidc_sub
   );
 };
 

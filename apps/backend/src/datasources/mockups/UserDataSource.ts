@@ -28,6 +28,7 @@ export const basicDummyUser = new BasicUserDetails(
   false,
   'test@email.com',
   '',
+  '',
   ''
 );
 
@@ -42,6 +43,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
   '',
   ''
 );
@@ -300,6 +302,7 @@ export class UserDataSourceMock implements UserDataSource {
       false,
       'test@email.com',
       '',
+      '',
       ''
     );
   }
@@ -483,8 +486,45 @@ export class UserDataSourceMock implements UserDataSource {
     return true;
   }
 
-  async create(firstname: string, lastname: string) {
-    return dummyUser;
+  async create(
+    user_title: string | undefined,
+    firstname: string,
+    lastname: string,
+    username: string,
+    preferredname: string | undefined,
+    oidc_sub: string,
+    oauth_refreshtoken: string,
+    oauth_issuer: string,
+    gender: string,
+    birthdate: Date,
+    institution: number | undefined,
+    department: string,
+    position: string,
+    email: string,
+    telephone: string
+  ) {
+    return new User(
+      10,
+      user_title || 'unspecified',
+      firstname,
+      lastname,
+      username,
+      preferredname || '',
+      oidc_sub,
+      oauth_refreshtoken,
+      oauth_issuer,
+      gender || 'unspecified',
+      birthdate,
+      institution || 1,
+      'Test institution',
+      department,
+      position,
+      email,
+      telephone,
+      false,
+      new Date().toISOString(),
+      new Date().toISOString()
+    );
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {

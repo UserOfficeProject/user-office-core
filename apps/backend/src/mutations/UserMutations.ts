@@ -8,11 +8,13 @@ import {
   updateUserValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
+import { DateTime } from 'luxon';
 import { inject, injectable } from 'tsyringe';
 import { Args } from 'type-graphql';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { RedeemCodesDataSource } from '../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -34,6 +36,7 @@ import {
   UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
+import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
@@ -42,6 +45,7 @@ export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource,
     @inject(Tokens.RedeemCodesDataSource)
     private redeemCodeDataSource: RedeemCodesDataSource
   ) {}
@@ -506,5 +510,85 @@ export default class UserMutations {
     id: number
   ): Promise<User | null> {
     return this.dataSource.setUserNotPlaceholder(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async upsertUserByOidcSub(
+    agent: UserWithRole | null,
+    args: UpsertUserByOidcSubArgs
+  ) {
+    const {
+      userTitle,
+      firstName,
+      lastName,
+      username,
+      preferredName,
+      oidcSub,
+      gender,
+      birthDate,
+      institutionRoRId,
+      department,
+      position,
+      email,
+      telephone,
+    } = args;
+
+    const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
+
+    let formattedBirthDate: DateTime | null = null;
+    formattedBirthDate = birthDate ? DateTime.fromISO(birthDate) : null;
+    if (formattedBirthDate && !formattedBirthDate.isValid) {
+      return rejection('Invalid birth date format', { birthDate, args });
+    }
+
+    // Fetch Institution ID from ROR ID
+    const institution =
+      await this.adminDataSource.getInstitutionByRorId(institutionRoRId);
+
+    if (userWithOAuthSubMatch) {
+      const updatedUser = await this.dataSource.update({
+        ...userWithOAuthSubMatch,
+        birthdate: formattedBirthDate?.toJSDate(),
+        department: department ?? undefined,
+        email,
+        firstname: firstName,
+        username: username ?? undefined,
+        gender: gender ?? undefined,
+        lastname: lastName,
+        oidcSub: oidcSub,
+        institutionId: institution?.id,
+        position: position,
+        preferredname: preferredName ?? undefined,
+        telephone: telephone ?? undefined,
+        user_title: userTitle ?? undefined,
+      });
+
+      return updatedUser;
+    } else {
+      const newUser = await this.dataSource.create(
+        userTitle ?? '',
+        firstName,
+        lastName,
+        username ?? '',
+        preferredName ?? '',
+        oidcSub,
+        '',
+        '',
+        gender ?? '',
+        formattedBirthDate?.toJSDate() ?? new Date(),
+        institution?.id ?? undefined,
+        department ?? '',
+        position,
+        email,
+        telephone ?? ''
+      );
+
+      await this.dataSource.addUserRole({
+        userID: newUser.id,
+        roleID: UserRole.USER,
+      });
+
+      return newUser;
+    }
   }
 }

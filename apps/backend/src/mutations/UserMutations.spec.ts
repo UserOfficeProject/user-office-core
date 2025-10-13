@@ -12,7 +12,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection, Rejection } from '../models/Rejection';
-import { AuthJwtPayload, UserRole } from '../models/User';
+import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
@@ -364,5 +364,56 @@ describe('updateUserByOidcSub', () => {
     expect((result as typeof dummyUser).lastname).toBe(dummyUser.lastname);
     expect((result as typeof dummyUser).email).toBe(dummyUser.email);
     expect((result as typeof dummyUser).department).toBe(dummyUser.department);
+  });
+});
+
+describe('upsertUserByOidcSub', () => {
+  test('A user can be created if OIDC sub does not exist', async () => {
+    const newOidcSub = 'new-unique-oidc-sub';
+    const result = await userMutations.upsertUserByOidcSub(
+      dummyUserOfficerWithRole,
+      {
+        oidcSub: newOidcSub,
+        firstName: 'New',
+        lastName: 'User',
+        email: 'new.user@example.com',
+        userTitle: null,
+        username: null,
+        preferredName: null,
+        gender: null,
+        birthDate: null,
+        institutionRoRId: '',
+        department: null,
+        position: '',
+        telephone: null,
+      }
+    );
+    // Check if the result has the oidcsub
+    expect(isRejection(result)).toBe(false);
+    expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
+  });
+  test('A user will be updated if OIDC sub exists', async () => {
+    const result = await userMutations.upsertUserByOidcSub(
+      dummyUserOfficerWithRole,
+      {
+        oidcSub: dummyUser.oidcSub as string,
+        firstName: 'UpsertedJane',
+        lastName: 'UpsertedDoe',
+        email: 'upserted.jane.doe@example.com',
+        userTitle: null,
+        username: null,
+        preferredName: null,
+        gender: null,
+        birthDate: null,
+        institutionRoRId: '',
+        department: null,
+        position: '',
+        telephone: null,
+      }
+    );
+
+    // Check if the result has the oidcsub
+    expect(isRejection(result)).toBe(false);
+    expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
   });
 });
