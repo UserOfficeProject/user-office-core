@@ -46,6 +46,7 @@ import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
+import FapMutations from './FapMutations';
 import InstrumentMutations from './InstrumentMutations';
 
 @injectable()
@@ -871,14 +872,18 @@ export default class ProposalMutations {
 
       if (sourceProposalInstrumentId.length > 0) {
         const instrumentMutations = container.resolve(InstrumentMutations);
+        const fapMutations = container.resolve(FapMutations);
 
         try {
-          instrumentMutations.assignProposalsToInstrumentsInternal(agent, {
-            instrumentIds: sourceProposalInstrumentId.map(
-              (instrument) => instrument.id
-            ),
-            proposalPks: [clonedProposal.primaryKey],
-          });
+          await instrumentMutations.assignProposalsToInstrumentsInternal(
+            agent,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
         } catch (error) {
           logger.logWarn(
             'Could not assign cloned proposals to the same instruments',
@@ -888,6 +893,24 @@ export default class ProposalMutations {
               sourceProposal,
             }
           );
+        }
+
+        try {
+          await fapMutations.assignProposalsToFapsUsingCallInstrumentsInternal(
+            null,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
+        } catch (error) {
+          logger.logWarn('Could not assign cloned proposals to faps', {
+            error,
+            clonedProposal,
+            sourceProposal,
+          });
         }
       }
 
