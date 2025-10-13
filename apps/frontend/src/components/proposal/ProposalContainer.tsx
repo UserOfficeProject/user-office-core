@@ -129,6 +129,14 @@ export default function ProposalContainer(props: ProposalContainerProps) {
         }
         draftState.isDirty = true;
         break;
+
+      case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
+        draftState.proposal = {
+          ...draftState.proposal,
+          ...action.itemWithQuestionary,
+        };
+
+        break;
     }
 
     return draftState;
