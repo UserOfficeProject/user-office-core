@@ -5,9 +5,9 @@ import baseContext from '../buildContext';
 
 const router = express.Router();
 
-router.get('/readiness', (req: Request, res: Response) => {
+router.get('/readiness', async (req: Request, res: Response) => {
   try {
-    baseContext.queries.system.connectivityCheck().then((success) => {
+    await baseContext.queries.system.connectivityCheck().then((success) => {
       const responseStatus = success ? 200 : 503;
       res.status(responseStatus).json({
         application: {
@@ -18,10 +18,9 @@ router.get('/readiness', (req: Request, res: Response) => {
           },
         },
       });
-
-      res.end();
     });
   } catch (e) {
+    logger.logException('Readiness check failed', e);
     res.status(500).json({
       application: {
         status: 'DOWN',
@@ -31,9 +30,6 @@ router.get('/readiness', (req: Request, res: Response) => {
         },
       },
     });
-
-    logger.logException('Readiness check failed', e);
-    res.end();
   }
 });
 
