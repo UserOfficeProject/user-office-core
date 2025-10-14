@@ -37,7 +37,7 @@ const addExtensions = () => {
     }
   );
   Knex.QueryBuilder.extend(
-    'orWhereJsonbPathLike',
+    'orWhereJsonFieldLikeEscaped',
     function (column: string, userInput: string) {
       const escapedInput = safeJsonPath(userInput);
       const jsonPath = `$[*].name ? (@ like_regex "${escapedInput}" flag "i")`;
