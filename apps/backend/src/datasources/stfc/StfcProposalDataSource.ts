@@ -129,7 +129,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
               .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
               .orWhere('principal_investigator', 'in', stfcUserIds)
-              .orWhereJsonbPathLike('instruments', `%${filter.text}%`);
+              .orWhereJsonFieldLike('instruments', 'name', `%${filter.text}%`);
           });
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
