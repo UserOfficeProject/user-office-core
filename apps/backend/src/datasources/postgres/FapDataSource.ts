@@ -340,6 +340,41 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    const fapProposals: FapProposalRecord[] = await database
+      .select(['fp.*'])
+      .from('fap_proposals as fp')
+      .modify((query) => {
+        query
+          .join('proposals as p', {
+            'p.proposal_pk': 'fp.proposal_pk',
+          })
+          .join('statuses as s', {
+            'p.status_id': 's.status_id',
+          })
+          .where(function () {
+            this.where('p.submitted', true);
+          });
+
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
+        }
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
+        }
+      })
+      .where('fp.fap_id', filter.fapId)
+      .distinctOn('fp.proposal_pk');
+
+    return fapProposals.map((fapProposal) =>
+      createFapProposalObject(fapProposal)
+    );
+  }
+
   async getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number

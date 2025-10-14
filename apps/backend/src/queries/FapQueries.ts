@@ -69,14 +69,22 @@ export default class FapQueries {
       fapId,
       callId,
       instrumentId,
-    }: { fapId: number; callId: number | null; instrumentId: number | null }
+      legacy,
+    }: {
+      fapId: number;
+      callId: number | null;
+      instrumentId: number | null;
+      legacy: boolean;
+    }
   ) {
     if (
       this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposals({ fapId, callId, instrumentId });
+      return legacy
+        ? this.dataSource.getLegacyFapProposals({ fapId, callId, instrumentId })
+        : this.dataSource.getFapProposals({ fapId, callId, instrumentId });
     } else {
       return null;
     }

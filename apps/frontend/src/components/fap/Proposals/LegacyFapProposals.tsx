@@ -6,26 +6,24 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { Fap } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { FapProposals } from 'hooks/fap/useFapProposalsData';
+import { useFapProposalsData } from 'hooks/fap/useFapProposalsData';
 import { useFapInstruments } from 'hooks/instrument/useFapInstruments';
 
-import FapProposalsAndAssignmentsTable from './FapProposalsAndAssignmentsTable';
+import FapLegacyProposalsTable from './FapLegacyProposalsTable';
 
-type FapProposalsAndAssignmentsProps = {
+type LegacyFapProposalsProps = {
   /** Id of the Fap we are assigning members to */
   data: Fap;
   onFapUpdate: (fap: Fap) => void;
-  fapProposals: FapProposals;
 };
 
-const FapProposalsAndAssignments = ({
+const LegacyFapProposals = ({
   data: fapData,
   onFapUpdate,
-  fapProposals,
-}: FapProposalsAndAssignmentsProps) => {
+}: LegacyFapProposalsProps) => {
   const { loadingCalls, calls } = useCallsData({
     fapIds: [fapData.id],
-    isFapReviewEnded: false,
+    isFapReviewEnded: true,
   });
   // NOTE: Default null means load all calls if nothing is selected
   const { loadingInstruments, instruments } = useFapInstruments(
@@ -33,9 +31,19 @@ const FapProposalsAndAssignments = ({
     null
   );
 
+  // Refech fap proposals too keep more the commenly used current fap proposals in memory
+
   const [searchParams] = useSearchParams();
   const call = searchParams.get('call');
   const instrument = searchParams.get('instrument');
+
+  const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
+    useFapProposalsData(
+      fapData.id,
+      call ? parseInt(call) : null,
+      instrument ? parseInt(instrument) : null,
+      true // legacy flag set to true
+    );
 
   return (
     <>
@@ -58,15 +66,19 @@ const FapProposalsAndAssignments = ({
           />
         </Grid>
       </Grid>
-      <FapProposalsAndAssignmentsTable
+      <FapLegacyProposalsTable
         data={fapData}
         onAssignmentsUpdate={onFapUpdate}
         selectedCallId={call ? +call : null}
         selectedInstrumentId={instrument ? +instrument : null}
-        fapProposals={fapProposals}
+        fapProposals={{
+          loadingFapProposals,
+          FapProposalsData,
+          setFapProposalsData,
+        }}
       />
     </>
   );
 };
 
-export default FapProposalsAndAssignments;
+export default LegacyFapProposals;
