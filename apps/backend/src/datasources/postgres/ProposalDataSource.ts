@@ -623,7 +623,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('users.email ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('users.firstname ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('users.lastname ILIKE ?', `%${filter.text}%`)
-              .orWhereJsonbPathLike('instruments', `%${filter.text}%`)
+              . orWhereJsonFieldLikeEscaped('instruments', 'name', `%${filter.text}%`)
+
           );
         }
         if (filter?.callId) {
