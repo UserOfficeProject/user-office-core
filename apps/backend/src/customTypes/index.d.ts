@@ -35,13 +35,15 @@ declare module 'knex' {
         userInput: string
       ): QueryBuilder;
 
-      whereJsonbPathLike(
+      whereJsonFieldLikeEscaped(
         column: string, 
+        field: string,
         userInput: string
       ) : QueryBuilder;
 
-      orWhereJsonbPathLike(
+      orWhereJsonFieldLikeEscaped(
         column: string, 
+        field: string,
         userInput: string
       ) : QueryBuilder;
     }
