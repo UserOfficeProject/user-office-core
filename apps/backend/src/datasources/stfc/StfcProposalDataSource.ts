@@ -132,7 +132,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `%${filter.text}%`
+                `${filter.text}`
               );
           });
         }

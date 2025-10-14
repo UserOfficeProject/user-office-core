@@ -449,7 +449,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `%${searchText}%`
+                `${searchText}`
               )
           );
         }
@@ -630,7 +630,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `%${filter.text}%`
+                `${filter.text}`
               )
           );
         }
