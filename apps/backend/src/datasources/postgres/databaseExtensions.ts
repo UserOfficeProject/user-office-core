@@ -31,7 +31,7 @@ const addExtensions = () => {
     'whereJsonFieldLikeEscaped',
     function (column: string, field: string, userInput: string) {
       const escapedInput = safeJsonPath(userInput);
-      const jsonPath = `$[*].name ? (@ like_regex "${escapedInput}" flag "i")`;
+      const jsonPath = `$[*].${field}? (@ like_regex "${escapedInput}" flag "i")`;
 
       return this.whereRaw('jsonb_path_exists(??, ?)', [column, jsonPath]);
     }
