@@ -272,6 +272,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
+      const { proposalPKey } = event;
 
       for (const invite of invites) {
         if (invite.isEmailSent) {
@@ -299,6 +300,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             ...event,
             type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT,
             invite,
+            proposalPKey,
           });
         });
       }
