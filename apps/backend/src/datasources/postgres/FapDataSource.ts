@@ -356,8 +356,12 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('statuses as s', {
             'p.status_id': 's.status_id',
           })
+          .join('call as c', {
+            'p.call_id': 'c.call_id',
+          })
           .where(function () {
             this.where('p.submitted', true);
+            this.andWhere('c.call_fap_review_ended', true);
           });
 
         if (filter.callId) {
