@@ -47,6 +47,7 @@ import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
+import FapMutations from './FapMutations';
 import InstrumentMutations from './InstrumentMutations';
 
 @injectable()
@@ -846,33 +847,6 @@ export default class ProposalMutations {
         true
       );
 
-      const sourceProposalInstrumentId =
-        await this.instrumentDataSource.getInstrumentsByProposalPk(
-          sourceProposal.primaryKey
-        );
-
-      if (sourceProposalInstrumentId.length > 0) {
-        const instrumentMutations = container.resolve(InstrumentMutations);
-
-        try {
-          instrumentMutations.assignProposalsToInstrumentsInternal(agent, {
-            instrumentIds: sourceProposalInstrumentId.map(
-              (instrument) => instrument.id
-            ),
-            proposalPks: [clonedProposal.primaryKey],
-          });
-        } catch (error) {
-          logger.logWarn(
-            'Could not assign cloned proposals to the same instruments',
-            {
-              error,
-              clonedProposal,
-              sourceProposal,
-            }
-          );
-        }
-      }
-
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
@@ -896,6 +870,55 @@ export default class ProposalMutations {
         experimentSequence: null,
         fileId: null,
       });
+
+      const sourceProposalInstrumentId =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(
+          sourceProposal.primaryKey
+        );
+
+      if (sourceProposalInstrumentId.length > 0) {
+        const instrumentMutations = container.resolve(InstrumentMutations);
+        const fapMutations = container.resolve(FapMutations);
+
+        try {
+          await instrumentMutations.assignProposalsToInstrumentsInternal(
+            agent,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
+        } catch (error) {
+          logger.logWarn(
+            'Could not assign cloned proposals to the same instruments',
+            {
+              error,
+              clonedProposal,
+              sourceProposal,
+            }
+          );
+        }
+
+        try {
+          await fapMutations.assignProposalsToFapsUsingCallInstrumentsInternal(
+            null,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
+        } catch (error) {
+          logger.logWarn('Could not assign cloned proposals to faps', {
+            error,
+            clonedProposal,
+            sourceProposal,
+          });
+        }
+      }
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
         sourceProposal.primaryKey
