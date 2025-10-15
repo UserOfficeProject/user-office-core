@@ -13,7 +13,7 @@ import { getFullUserNameWithInstitution } from 'utils/user';
 
 import ParticipantModal from './ParticipantModal';
 
-export default function ProposalParticipant(props: {
+export default function ProposalParticipantLegacy(props: {
   principalInvestigator: BasicUserData | null | undefined;
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
   sx?: SxProps<Theme>;
