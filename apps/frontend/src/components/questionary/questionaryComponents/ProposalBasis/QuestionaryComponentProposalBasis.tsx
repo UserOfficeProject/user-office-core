@@ -7,15 +7,17 @@ import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import ErrorMessage from 'components/common/ErrorMessage';
 import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
+import CoProposers from 'components/proposal/CoProposers';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import Participants from 'components/proposal/Participants';
+import PrincipalInvestigator from 'components/proposal/PrincipalInvestigator';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
-import ProposalParticipant from 'components/proposal/ProposalParticipant';
+import ProposalParticipantLegacy from 'components/proposal/ProposalParticipantLegacy';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
@@ -38,14 +40,17 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
-  const [textLen, setTextLen] = useState(
-    state?.proposal.abstract ? (state?.proposal.abstract as string).length : 0
-  );
+  const [textLen, setTextLen] = useState(state?.proposal.abstract ?? 0);
+  const { featuresMap } = useContext(FeatureContext);
+  const isLegacyInviteFlow = featuresMap.get(
+    FeatureId.EMAIL_INVITE_LEGACY
+  )?.isEnabled;
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposer, users, coProposerInvites } = state.proposal;
+  const { proposer, users } = state.proposal;
   const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
   const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
@@ -55,7 +60,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     }
   }, [userData]);
 
-  const coInvestigatorChanged = (users: BasicUserDetails[]) => {
+  const coProposersChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
       `${id}.users`,
       users.map((user) => user.id)
@@ -82,8 +87,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         proposer: user,
       },
     });
+
     setPIData(user);
-    coInvestigatorChanged(
+    // Remove the new PI from the co-proposers list (if present) and add the old PI (if present) to the co-proposers list
+    coProposersChanged(
       users
         .filter((coInvestigator) => coInvestigator.id !== user.id)
         .concat(proposer as BasicUserDetails)
@@ -166,25 +173,23 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       >
         {counter}
       </InputAdornment>
-      <ProposalParticipant
-        principalInvestigator={piData}
+      {isLegacyInviteFlow ? (
+        <ProposalParticipantLegacy
+          principalInvestigator={piData}
+          setPrincipalInvestigator={principalInvestigatorChanged}
+          sx={{ margin: theme.spacing(2, 0) }}
+          loadingPrincipalInvestigator={loading}
+        />
+      ) : (
+        <PrincipalInvestigator
+          setPrincipalInvestigator={principalInvestigatorChanged}
+        />
+      )}
+
+      <CoProposers
         setPrincipalInvestigator={principalInvestigatorChanged}
-        sx={{ margin: theme.spacing(2, 0) }}
-        loadingPrincipalInvestigator={loading}
-      />
-      <Participants
-        title="Co-Proposers"
-        sx={{ margin: theme.spacing(2, 0) }}
-        principalInvestigator={piData}
-        setPrincipalInvestigator={principalInvestigatorChanged}
-        setUsers={coInvestigatorChanged}
-        preserveSelf={true}
-        // QuickFix for material table changing immutable state
-        // https://github.com/mbrn/material-table/issues/666
-        users={JSON.parse(JSON.stringify(users))}
-        invites={coProposerInvites}
+        setUsers={coProposersChanged}
         setInvites={invitesChanged}
-        loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>
