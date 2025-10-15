@@ -34,6 +34,18 @@ declare module 'knex' {
         query: string,
         userInput: string
       ): QueryBuilder;
+
+      whereJsonFieldLikeEscaped(
+        column: string, 
+        field: string,
+        userInput: string
+      ) : QueryBuilder;
+
+      orWhereJsonFieldLikeEscaped(
+        column: string, 
+        field: string,
+        userInput: string
+      ) : QueryBuilder;
     }
   }
 }
