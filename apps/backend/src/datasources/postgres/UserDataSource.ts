@@ -20,7 +20,7 @@ import {
 } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
-import database from './database';
+import database, { isUniqueConstraintError } from './database';
 import {
   CountryRecord,
   InstitutionRecord,
@@ -119,10 +119,10 @@ export default class PostgresUserDataSource implements UserDataSource {
 
       return createUserObject(userRecord);
     } catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === '23505') {
+      if (isUniqueConstraintError(error)) {
         throw new GraphQLError('User already exists');
       }
-      throw new GraphQLError('Could not create user. Check your Inputs.');
+      throw new GraphQLError('Could not update user. Check your Inputs.');
     }
   }
   async updateUserByOidcSub(
@@ -173,7 +173,7 @@ export default class PostgresUserDataSource implements UserDataSource {
 
       return createUserObject(userRecord);
     } catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === '23505') {
+      if (isUniqueConstraintError(error)) {
         throw new GraphQLError('User already exists');
       }
       throw new GraphQLError('Could not create user. Check your Inputs.');
@@ -422,10 +422,10 @@ export default class PostgresUserDataSource implements UserDataSource {
         return createUserObject(user[0]);
       })
       .catch((error) => {
-        if (error.code === '23505') {
+        if (isUniqueConstraintError(error)) {
           throw new GraphQLError('User already exists');
         }
-        throw new GraphQLError('Could not create user. Check your Inputs.');
+        throw new GraphQLError('Could not update user. Check your Inputs.');
       });
   }
 
