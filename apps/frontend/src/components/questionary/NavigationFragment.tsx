@@ -19,6 +19,7 @@ const NavigationFragment = (props: {
       marginTop={3}
       spacing={1}
       alignItems="center"
+      data-cy="navigation-fragment"
     >
       {props.isLoading && <UOLoader size="2em" />}
       <>{props.children}</>
