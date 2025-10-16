@@ -102,8 +102,8 @@ export default class FapQueries {
           await this.proposalDataSource.getUserProposals(agent.id)
         ).map((p) => p.primaryKey);
 
-        return fapProposals.filter((fp) =>
-          usersProposals.includes(fp.proposalPk)
+        return fapProposals.filter(
+          (fp) => !usersProposals.includes(fp.proposalPk)
         );
       }
 

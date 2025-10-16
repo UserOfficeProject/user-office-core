@@ -45,7 +45,6 @@ type SimpleTabsProps = {
   tabPanelPadding?: number | string;
   orientation?: 'horizontal' | 'vertical';
   noItemsText?: string;
-  clearExtraSearchParams?: boolean;
 };
 
 const SimpleTabs = ({
@@ -55,7 +54,6 @@ const SimpleTabs = ({
   orientation = 'horizontal',
   tabPanelPadding = 3,
   noItemsText,
-  clearExtraSearchParams,
   ...other
 }: SimpleTabsProps) => {
   const theme = useTheme();
@@ -102,9 +100,7 @@ const SimpleTabs = ({
 
     if (isVerticalOrientation) {
       setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(
-          clearExtraSearchParams ? {} : searchParam
-        );
+        const searchParamCloned = new URLSearchParams(searchParam);
         searchParamCloned.delete('verticalTab');
         if (tabValue) searchParamCloned.append('verticalTab', String(tabValue));
 
@@ -112,9 +108,7 @@ const SimpleTabs = ({
       });
     } else if (isInsideModal) {
       setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(
-          clearExtraSearchParams ? {} : searchParam
-        );
+        const searchParamCloned = new URLSearchParams(searchParam);
         searchParamCloned.delete('modalTab');
         if (tabValue) searchParamCloned.append('modalTab', String(tabValue));
 
@@ -122,9 +116,7 @@ const SimpleTabs = ({
       });
     } else {
       setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(
-          clearExtraSearchParams ? {} : searchParam
-        );
+        const searchParamCloned = new URLSearchParams(searchParam);
         searchParamCloned.delete('tab');
         if (tabValue) searchParamCloned.append('tab', String(tabValue));
 

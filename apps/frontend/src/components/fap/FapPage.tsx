@@ -161,10 +161,7 @@ const FapPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <SimpleTabs
-          tabNames={tabs.map((tab) => tab.name)}
-          clearExtraSearchParams={true}
-        >
+        <SimpleTabs tabNames={tabs.map((tab) => tab.name)}>
           {tabs.map((tab, index) => (
             <React.Fragment key={index}>{tab.element}</React.Fragment>
           ))}
