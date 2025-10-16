@@ -269,37 +269,6 @@ function createWorkflowForESR() {
   });
 }
 
-// Helper function to approve proposal
-function approveProposal() {
-  cy.login('officer');
-  cy.visit('/');
-  cy.contains(TEST_CONSTANTS.UI_LABELS.PROPOSALS).click();
-  cy.get('[data-cy=view-proposal]').first().click();
-  cy.finishedLoading();
-  cy.get('[role="dialog"]').contains(TEST_CONSTANTS.UI_LABELS.ADMIN).click();
-  cy.get('[data-cy="proposal-final-status"]').should('exist');
-  cy.get('[role="dialog"]').contains(TEST_CONSTANTS.UI_LABELS.ADMIN).click();
-  cy.get('[data-cy="proposal-final-status"]').click();
-  cy.get('li[data-cy="proposal-final-status-options"]')
-    .contains(TEST_CONSTANTS.FORM_VALUES.PROPOSAL_STATUS)
-    .click();
-  cy.get(
-    `[data-cy="managementTimeAllocation-${initialDBData.instrument1.id}"] input`
-  )
-    .clear()
-    .type(TEST_CONSTANTS.FORM_VALUES.MANAGEMENT_TIME);
-  cy.get('[data-cy="is-management-decision-submitted"]').click();
-  cy.get('[data-cy="save-admin-decision"]').click();
-  cy.notification({ variant: 'success', text: 'Saved' });
-  cy.reload();
-  cy.get('[data-cy="is-management-decision-submitted"] input').should(
-    'have.value',
-    'true'
-  );
-  cy.closeModal();
-  cy.contains(TEST_CONSTANTS.FORM_VALUES.PROPOSAL_STATUS);
-}
-
 // Helper function to submit ESF by user
 function submitESFByUser() {
   cy.login('user1');
@@ -490,9 +459,6 @@ context('Experiment Safety Review tests', () => {
         templateGroupId: TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
         templateId: initialDBData.experimentSafetyReviewTemplate.id,
       });
-
-      // Approve proposal for all tests
-      approveProposal();
     });
 
     describe('User Experiment Safety Form Submission', () => {
@@ -679,13 +645,10 @@ context('Experiment Safety Review tests', () => {
         cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
         cy.contains(TEST_CONSTANTS.UI_LABELS.OK).click();
 
-        // Refresh the page to get the updated status after workflow processing
-        cy.reload();
-
-        // Download button should now be enabled (IS approval enables download in IS workflow)
-        cy.contains(TEST_CONSTANTS.UI_LABELS.DOWNLOAD_SAFETY_DOCUMENT).should(
-          'not.be.disabled'
-        );
+        // Wait for the workflow processing to complete by checking the download button state
+        cy.contains(TEST_CONSTANTS.UI_LABELS.DOWNLOAD_SAFETY_DOCUMENT, {
+          timeout: 6000,
+        }).should('not.be.disabled');
       });
 
       it('Should change experiment status to ESF APPROVED after Instrument Scientist approval (IS workflow)', () => {
@@ -744,9 +707,6 @@ context('Experiment Safety Review tests', () => {
         templateGroupId: TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
         templateId: initialDBData.experimentSafetyReviewTemplate.id,
       });
-
-      // Approve proposal for all tests
-      approveProposal();
     });
 
     describe('User Experiment Safety Form Submission', () => {
@@ -812,13 +772,10 @@ context('Experiment Safety Review tests', () => {
         cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
         cy.contains('OK').click();
 
-        // Refresh the page to get the updated status after workflow processing
-        cy.reload();
-
-        // Download button should now be enabled (ESR approval enables download in ESR workflow)
-        cy.contains('Download Safety Review Document').should(
-          'not.be.disabled'
-        );
+        // Wait for the workflow processing to complete by checking the download button state
+        cy.contains('Download Safety Review Document', {
+          timeout: 6000,
+        }).should('not.be.disabled');
       });
 
       it('Should change experiment status to ESF APPROVED after ESR approval (ESR workflow)', () => {
@@ -869,11 +826,10 @@ context('Experiment Safety Review tests', () => {
         cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
         cy.contains('OK').click();
 
-        // Refresh the page to get the updated status after workflow processing
-        cy.reload();
-
-        // Download button should remain disabled (IS approval doesn't enable download in ESR workflow)
-        cy.contains('Download Safety Review Document').should('be.disabled');
+        // Wait for the workflow processing to complete, then check that download button remains disabled
+        cy.contains('Download Safety Review Document', {
+          timeout: 6000,
+        }).should('be.disabled');
 
         // Status should remain the same (not changed to approved)
         cy.get('[data-cy="close-modal"]').click();
@@ -945,13 +901,10 @@ context('Experiment Safety Review tests', () => {
         cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
         cy.contains('OK').click();
 
-        // Refresh the page to get the updated status after workflow processing
-        cy.reload();
-
-        // Now download should be enabled and status should change
-        cy.contains('Download Safety Review Document').should(
-          'not.be.disabled'
-        );
+        // Wait for the workflow processing to complete by checking the download button state
+        cy.contains('Download Safety Review Document', {
+          timeout: 6000,
+        }).should('not.be.disabled');
         cy.get('[data-cy="close-modal"]').click();
         cy.visit('/Experiments');
         cy.finishedLoading();
