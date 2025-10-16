@@ -582,7 +582,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -719,7 +719,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="assign-selected-users-with-rank"]').click();
 
-      cy.contains('Assign Multiple Ranks');
+      cy.contains('Submit Mass Assignments');
 
       cy.get(`[data-cy="rank-${fapMembers.reviewer.lastName}"]`)
         .first()
@@ -782,7 +782,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -841,7 +841,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -898,7 +898,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1188,7 +1188,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1283,7 +1283,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1440,7 +1440,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1593,7 +1593,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
