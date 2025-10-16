@@ -57,7 +57,7 @@
     "dev:docker": "npm install && vite --no-open",
     "build": "vite build",
     "preview": "vite preview",
-    "preview:e2e": "vite preview --port 3000 --host 0.0.0.0",
+    "preview:e2e": "vite preview --port 3000",
     "lint": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint:fix:bash": "eslint --fix $(git diff --name-only --diff-filter=ACMRTUXB develop | grep  -E \"(.js$|.ts$|.tsx$)\")",
