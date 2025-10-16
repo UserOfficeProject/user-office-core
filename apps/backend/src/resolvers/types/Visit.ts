@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { Visit as VisitOrigin } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Invite } from './Invite';
 import { Proposal } from './Proposal';
 import { Sample } from './Sample';
 import { VisitRegistration } from './VisitRegistration';
@@ -51,6 +52,17 @@ export class VisitResolver {
     return context.queries.visit.getRegistrations(context.user, {
       visitId: visit.id,
     });
+  }
+
+  @FieldResolver(() => [Invite])
+  async registrationInvites(
+    @Root() visit: Visit,
+    @Ctx() context: ResolverContext
+  ): Promise<Invite[] | null> {
+    return context.queries.invite.getVisitRegistrationInvites(
+      context.user,
+      visit.id
+    );
   }
 
   @FieldResolver(() => BasicUserDetails)
