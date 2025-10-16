@@ -12,6 +12,7 @@ import { Sample } from '../models/Sample';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
@@ -224,13 +225,31 @@ interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
 }
 
 interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
-  type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT;
+  type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
   invite: Invite;
   proposalPKey: number;
 }
 
 interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED;
+  invite: Invite;
+  proposalPKey: number;
+}
+
+interface ProposalVisitRegistrationInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED;
+  array: Invite[];
+  proposalPKey: number;
+}
+
+interface ProposalVisitRegistrationInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT;
+  invite: Invite;
+  proposalPKey: number;
+}
+
+interface ProposalVisitRegistrationInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED;
   invite: Invite;
   proposalPKey: number;
 }
@@ -381,6 +400,10 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitCreatedEvent extends GeneralEvent {
+  type: Event.VISIT_CREATED;
+  visit: Visit;
+}
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -494,6 +517,9 @@ export type ApplicationEvent =
   | ProposalCoProposerInvitesUpdatedEvent
   | ProposalCoProposerInviteSentEvent
   | ProposalCoProposerInviteAcceptedEvent
+  | ProposalVisitRegistrationInvitesUpdatedEvent
+  | ProposalVisitRegistrationInviteSentEvent
+  | ProposalVisitRegistrationInviteAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
@@ -508,6 +534,7 @@ export type ApplicationEvent =
   | InternalReviewCreated
   | InternalReviewUpdated
   | InternalReviewDeleted
+  | VisitCreatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
   | UserDataAccessUpdatedEvent
