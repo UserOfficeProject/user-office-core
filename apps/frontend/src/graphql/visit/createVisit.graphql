@@ -2,11 +2,13 @@ mutation createVisit(
   $experimentPk: Int!
   $team: [Int!]!
   $teamLeadUserId: Int!
+  $inviteEmails: [String!]
 ) {
   createVisit(
     experimentPk: $experimentPk
     team: $team
     teamLeadUserId: $teamLeadUserId
+    inviteEmails: $inviteEmails
   ) {
     ...visit
 
@@ -20,6 +22,11 @@ mutation createVisit(
         ...basicUserDetails
       }
     }
+
+    registrationInvites {
+      ...invite
+    }
+
     proposal {
       ...proposal
       instruments {
