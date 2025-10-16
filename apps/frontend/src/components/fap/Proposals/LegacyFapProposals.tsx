@@ -45,7 +45,7 @@ const LegacyFapProposals = ({
         return searchParams;
       });
     }
-  }, [call, calls, searchParams, setSearchParams]);
+  }, [call, calls, loadingCalls, searchParams, setSearchParams]);
 
   // Refetch fap proposals too keep more the commenly used current fap proposals in memory
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
