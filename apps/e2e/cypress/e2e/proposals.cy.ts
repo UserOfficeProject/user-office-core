@@ -18,29 +18,30 @@ import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Proposal tests', () => {
+  faker.seed(0);
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
-  const time = faker.random.numeric();
+  const time = faker.number.int({ min: 1, max: 1 }).toString();
   const clonedProposalTitle = `Copy of ${newProposalTitle}`;
   const clonedProposalInternalTitle = `Copy of ${title}`;
   const proposer = initialDBData.users.user1;
   const proposalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
   };
   const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: initialDBData.users.user1.id,
   };
 
   const proposalInternalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
   };
 
   let createdWorkflowId: number;
@@ -48,7 +49,7 @@ context('Proposal tests', () => {
   let createdProposalId: string;
   let createdCallId: number;
   let createdTemplateId: number;
-  const textQuestion = faker.random.words(2);
+  const textQuestion = faker.lorem.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
   const yesterday = currentDayStart.plus({ days: -1 });
@@ -56,7 +57,7 @@ context('Proposal tests', () => {
   const tomorrow = currentDayStart.plus({ days: 1 });
 
   const newCall = {
-    shortCode: faker.random.alphaNumeric(15),
+    shortCode: faker.string.alphanumeric(15),
     startCall: faker.date.past().toISOString(),
     endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
