@@ -1043,6 +1043,7 @@ context('Status actions tests', () => {
         const proposal = result.createProposal;
         if (proposal) {
           cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
+            cy.wait(5000); // wait until status actions are executed
             cy.login('officer');
             cy.visit('/');
 
