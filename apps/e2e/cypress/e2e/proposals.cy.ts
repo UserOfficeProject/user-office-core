@@ -179,6 +179,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="save-data-access-users-modal"]').click();
       cy.logout();
       cy.login('user3', initialDBData.roles.user);
+      cy.visit('/');
       cy.get('[data-testid="VisibilityIcon"]').click();
       cy.get('[data-cy="questionary-details-view"]').contains(
         createdProposalId
