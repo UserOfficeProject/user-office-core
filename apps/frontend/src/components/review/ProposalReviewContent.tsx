@@ -26,13 +26,11 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
-import { TechnicalReviewWithQuestionary } from 'models/questionary/technicalReview/TechnicalReviewWithQuestionary';
 import { getFullUserName } from 'utils/user';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewContainer from './TechnicalReviewContainer';
-import TechnicalReviewInformation from './TechnicalReviewInformation';
 import TechnicalReviewQuestionaryReview from './TechnicalReviewQuestionaryReview';
 import InternalReviews from '../internalReview/InternalReviews';
 
@@ -191,11 +189,9 @@ const ProposalReviewContent = ({
             ></TechnicalReviewContainer>
           </Paper>
         </Fragment>
-      ) : !isUserOfficer && !isFapSec ? (
-        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
       ) : (
         <TechnicalReviewQuestionaryReview
-          data={technicalReview as TechnicalReviewWithQuestionary}
+          data={technicalReview as TechnicalReview}
         />
       );
     }
