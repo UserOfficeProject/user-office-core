@@ -17,6 +17,7 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+
 export enum EmailTemplateId {
   CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
   PROPOSAL_SUBMITTED = 'proposal-submitted',
@@ -270,6 +271,42 @@ export async function essEmailHandler(event: ApplicationEvent) {
       return;
     }
 
+    case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
+      const invites = event.array;
+
+      for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
+
+        if (!inviter) {
+          logger.logError('No inviter found when trying to send email', {
+            inviter,
+            event,
+          });
+
+          return;
+        }
+
+        await sendInviteEmail(
+          invite,
+          inviter,
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
+        ).then(async () => {
+          await eventBus.publish({
+            ...event,
+            type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+            description: 'Visit registration invite sent',
+            invite,
+          });
+        });
+      }
+      break;
+    }
+
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -297,7 +334,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         ).then(async () => {
           await eventBus.publish({
             ...event,
-            type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT,
+            type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
             invite,
           });
         });
