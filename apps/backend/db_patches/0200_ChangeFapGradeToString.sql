@@ -60,10 +60,10 @@ BEGIN
 
             UPDATE questions SET default_config = jsonb_set(default_config, '{maxGrade}', '10', true) WHERE question_id = 'fap_review_basis';
             UPDATE questions SET default_config = jsonb_set(default_config, '{minGrade}', '1', true) WHERE question_id = 'fap_review_basis';
-            UPDATE questions SET default_config = jsonb_set(default_config, '{decimalPoints}', '1', true) WHERE question_id = 'fap_review_basis';
+            UPDATE questions SET default_config = jsonb_set(default_config, '{decimalPoints}', '0', true) WHERE question_id = 'fap_review_basis';
             UPDATE templates_has_questions SET config = jsonb_set(config, '{maxGrade}', '10', true) WHERE question_id = 'fap_review_basis';
             UPDATE templates_has_questions SET config = jsonb_set(config, '{minGrade}', '1', true) WHERE question_id = 'fap_review_basis';
-            UPDATE templates_has_questions SET config = jsonb_set(config, '{decimalPoints}', '1', true) WHERE question_id = 'fap_review_basis';
+            UPDATE templates_has_questions SET config = jsonb_set(config, '{decimalPoints}', '0', true) WHERE question_id = 'fap_review_basis';
 
             DELETE FROM settings WHERE settings_id = 'GRADE_PRECISION';
         END;
