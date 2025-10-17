@@ -311,7 +311,11 @@ const FapProposalsAndAssignmentsTable = ({
       (assignment) => assignment.assignments
     );
 
-    const proposalAssignments: { memberId: number; proposalPk: number }[] = [];
+    const proposalAssignments: {
+      memberId: number;
+      proposalPk: number;
+      rank?: number | null;
+    }[] = [];
     const updatedMembers = new Set<FapAssignedMember>();
 
     for (const proposalPk of proposalPks) {
@@ -322,7 +326,11 @@ const FapProposalsAndAssignmentsTable = ({
             proposalPk === existingProposalAssignment.proposalPk
         );
         if (!isExistingAssignment) {
-          proposalAssignments.push({ memberId: assignedMember.id, proposalPk });
+          proposalAssignments.push({
+            memberId: assignedMember.id,
+            proposalPk,
+            rank: assignedMember.rank ?? null,
+          });
           updatedMembers.add(assignedMember);
         }
       }
@@ -406,7 +414,7 @@ const FapProposalsAndAssignmentsTable = ({
               dateAssigned: DateTime.now(),
               user,
               role,
-              rank: null,
+              rank: user.rank ?? null,
               review:
                 allProposalReviews.find(
                   (review) =>
