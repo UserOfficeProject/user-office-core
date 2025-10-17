@@ -41,7 +41,6 @@ const FapProposalsAndAssignments = ({
     const currentCall = call ? parseInt(call) : null;
 
     // If the selected call is not valid, remove it from the URL
-    console.log(calls);
     if (call && !loadingCalls && !calls.find((c) => c.id === currentCall)) {
       setSearchParams((searchParams) => {
         searchParams.delete('call');
