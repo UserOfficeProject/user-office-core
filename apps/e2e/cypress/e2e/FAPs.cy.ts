@@ -4061,20 +4061,20 @@ context(
     it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal using Instrument Picker', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
       cy.finishedLoading();
       cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=call-list]')
+        .contains(initialDBData.call.shortCode)
+        .click();
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
