@@ -192,6 +192,7 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
     const editor = getEditorById(win, tinyMceId);
     editor?.setContent(content);
   });
+  cy.get(`#${tinyMceId}_ifr`).first().focus().click(); // Also focus the iframe to trigger any onChange events
 };
 
 const setDatePickerValue = (selector: string, value: string) =>
