@@ -3738,7 +3738,7 @@ context('Fap meeting components tests', () => {
       cy.contains('Comment is required');
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy=save-and-continue-button]').focus().click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
@@ -3800,7 +3800,7 @@ context('Fap meeting components tests', () => {
       cy.get('#grade-proposal').clear().type('1.01');
 
       cy.get('[data-cy=save-and-continue-button]').click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
 });
