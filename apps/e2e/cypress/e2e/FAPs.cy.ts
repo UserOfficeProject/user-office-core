@@ -650,12 +650,17 @@ context('Fap reviews tests', () => {
 
       cy.contains('The rank -1 is invalid, please chose another.');
 
-      // For some reason we need to clear twice
-      cy.get('[data-cy="rank-input"]').clear().clear().type('3');
+      cy.get('[data-cy="rank-input"]')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('3');
 
       cy.contains('The rank 3 is invalid, please chose another.');
 
-      cy.get('[data-cy="rank-input"]').clear().clear().type('1');
+      cy.get('[data-cy="rank-input"]')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('1');
 
       cy.get('[data-cy="rank-submit"]').click();
 
@@ -672,7 +677,10 @@ context('Fap reviews tests', () => {
         'Warning! The rank 1 is already taken please chose another or update other ranks.'
       );
 
-      cy.get('[data-cy="rank-input"]').clear().clear().type('2');
+      cy.get('[data-cy="rank-input"]')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('2');
 
       cy.get('[data-cy="rank-submit"]').click();
 
@@ -2651,10 +2659,17 @@ context('Fap meeting components tests', () => {
       cy.get('@timeAllocation').type('-1').blur();
       cy.contains('Must be greater than or equal to');
 
-      cy.get('@timeAllocation').clear().type('987654321').blur();
+      cy.get('@timeAllocation')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('987654321')
+        .blur();
       cy.contains('Must be less than or equal to');
 
-      cy.get('@timeAllocation').clear().type('9999');
+      cy.get('@timeAllocation')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('9999');
       cy.get('[data-cy="save-time-allocation"]').click();
 
       cy.finishedLoading();
@@ -3763,7 +3778,8 @@ context('Fap meeting components tests', () => {
         .contains('GRADE_PRECISION')
         .parent()
         .find(`input[value="1"]`)
-        .clear()
+        .click()
+        .type('{selectall}{backspace}')
         .type('0.01');
 
       cy.get('[data-cy="settings-table"]')
@@ -3787,7 +3803,10 @@ context('Fap meeting components tests', () => {
 
       cy.contains('Lowest grade is 1');
 
-      cy.get('#grade-proposal').clear().type('1.001');
+      cy.get('#grade-proposal')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('1.001');
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
@@ -3797,7 +3816,10 @@ context('Fap meeting components tests', () => {
         );
       });
 
-      cy.get('#grade-proposal').clear().type('1.01');
+      cy.get('#grade-proposal')
+        .click()
+        .type('{selectall}{backspace}')
+        .type('1.01');
 
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.notification({ variant: 'success', text: 'Saved' });
