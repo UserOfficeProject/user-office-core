@@ -49,8 +49,8 @@ export class User implements Partial<UserOrigin> {
   @Field(() => Int)
   public id: number;
 
-  @Field(() => String)
-  public user_title: string;
+  @Field(() => String, { nullable: true })
+  public user_title?: string | null;
 
   @Field()
   public firstname: string;
@@ -58,11 +58,11 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public lastname: string;
 
-  @Field()
-  public username: string;
+  @Field(() => String, { nullable: true })
+  public username?: string | null;
 
   @Field(() => String, { nullable: true })
-  public preferredname: string | undefined;
+  public preferredname?: string | null;
 
   @Field(() => String, { nullable: true })
   public oidcSub: string | null;
@@ -76,8 +76,8 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public birthdate: Date;
 
-  @Field(() => Int)
-  public institutionId: number;
+  @Field(() => Int, { nullable: true })
+  public institutionId?: number | null;
 
   @Field()
   public department: string;
@@ -85,14 +85,14 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public position: string;
 
-  @Field()
-  public email: string;
+  @Field(() => String, { nullable: true })
+  public email?: string | null;
 
   @Field()
   public telephone: string;
 
-  @Field()
-  public placeholder: boolean;
+  @Field(() => Boolean, { nullable: true })
+  public placeholder?: boolean | null;
 
   @Field()
   public created: string;

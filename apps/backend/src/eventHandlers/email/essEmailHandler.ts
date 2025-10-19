@@ -93,9 +93,22 @@ export async function essEmailHandler(event: ApplicationEvent) {
         const principalInvestigator = await userDataSource.getUser(
           proposal.proposerId
         );
+
         if (!principalInvestigator) {
           logger.logError(
             'No principal investigator found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        if (!principalInvestigator.email) {
+          logger.logError(
+            'No principal investigator email found when trying to send invite accepted email',
             {
               claim,
               event,
@@ -155,7 +168,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         event.proposal.proposerId
       );
 
-      if (!principalInvestigator) {
+      if (!principalInvestigator || !principalInvestigator.email) {
         return;
       }
 
@@ -164,6 +177,21 @@ export async function essEmailHandler(event: ApplicationEvent) {
       );
 
       const call = await callDataSource.getCall(event.proposal.callId);
+
+      const recipients: (
+        | { address: string }
+        | { address: { email: string; header_to: string } }
+      )[] = [{ address: principalInvestigator.email }];
+      for (const partipant of participants) {
+        if (partipant.email) {
+          recipients.push({
+            address: {
+              email: partipant.email,
+              header_to: principalInvestigator.email,
+            },
+          });
+        }
+      }
 
       const options: EmailSettings = {
         content: {
@@ -179,17 +207,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           ),
           callShortCode: call?.shortCode,
         },
-        recipients: [
-          { address: principalInvestigator.email },
-          ...participants.map((partipant) => {
-            return {
-              address: {
-                email: partipant.email,
-                header_to: principalInvestigator.email,
-              },
-            };
-          }),
-        ],
+        recipients,
       };
 
       mailService
@@ -215,7 +233,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         event.proposal.proposerId
       );
       const call = await callDataSource.getCall(event.proposal.callId);
-      if (!principalInvestigator) {
+      if (!principalInvestigator || !principalInvestigator.email) {
         return;
       }
       const { finalStatus } = event.proposal;
@@ -347,7 +365,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const fapReviewer = await userDataSource.getUser(userID);
       const proposal = await proposalDataSource.get(proposalPk);
 
-      if (!fapReviewer || !proposal) {
+      if (!fapReviewer || !fapReviewer.email || !proposal) {
         return;
       }
 
@@ -408,7 +426,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
 
       const user = await userDataSource.getUser(visitRegistration.userId);
-      if (!user) {
+      if (!user || !user.email) {
         return;
       }
 

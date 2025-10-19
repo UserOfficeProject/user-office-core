@@ -17,13 +17,13 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public lastname: string;
 
   @Field(() => String, { nullable: true })
-  public preferredname: string | undefined;
+  public preferredname?: string | null;
 
-  @Field()
-  public institution: string;
+  @Field(() => String, { nullable: true })
+  public institution?: string | null;
 
-  @Field(() => Int)
-  public institutionId: number;
+  @Field(() => Int, { nullable: true })
+  public institutionId?: number | null;
 
   @Field()
   public position: string;
@@ -34,19 +34,19 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
     Roles.INTERNAL_REVIEWER,
   ])
   @Field({ nullable: true })
-  public email: string;
+  public email?: string | null;
 
   @Field(() => Boolean, { nullable: true })
-  public placeholder?: boolean;
+  public placeholder?: boolean | null;
 
-  @Field(() => Date, { nullable: true })
-  public created?: Date;
+  @Field(() => Date)
+  public created: Date;
 
   @Field({ nullable: true })
   public country: string;
 
   @Field(() => String, { nullable: true })
-  public oidc_sub: string | undefined;
+  public oidc_sub: string | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

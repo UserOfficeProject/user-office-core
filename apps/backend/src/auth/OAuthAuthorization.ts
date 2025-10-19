@@ -179,16 +179,26 @@ export class OAuthAuthorization extends UserAuthorization {
         ''
       );
 
-      const roleID = this.getUserRole(newUser);
-
-      await this.userDataSource.addUserRole({
-        userID: newUser.id,
-        roleID,
-      });
-
-      if (roleID === UserRole.USER_OFFICER) {
-        logger.logInfo('Initial User Officer created', {
+      if (newUser.email) {
+        const roleID = this.getUserRole({
+          id: newUser.id,
           email: newUser.email,
+        });
+
+        await this.userDataSource.addUserRole({
+          userID: newUser.id,
+          roleID,
+        });
+
+        if (roleID === UserRole.USER_OFFICER) {
+          logger.logInfo('Initial User Officer created', {
+            email: newUser.email,
+            userID: newUser.id,
+          });
+        }
+      } else {
+        logger.logInfo('User created without email, cannot assign role', {
+          userID: newUser.id,
         });
       }
 

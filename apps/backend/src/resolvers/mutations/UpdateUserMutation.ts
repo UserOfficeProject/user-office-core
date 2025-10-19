@@ -15,7 +15,7 @@ import { User } from '../types/User';
 @ArgsType()
 class UpdateUserArgs {
   @Field(() => String, { nullable: true })
-  public user_title?: string;
+  public user_title?: string | null;
 
   @Field(() => String, { nullable: true })
   public firstname?: string;
@@ -24,10 +24,10 @@ class UpdateUserArgs {
   public lastname?: string;
 
   @Field(() => String, { nullable: true })
-  public username?: string;
+  public username?: string | null;
 
   @Field(() => String, { nullable: true })
-  public preferredname?: string;
+  public preferredname?: string | null;
 
   @Field(() => String, { nullable: true })
   public gender?: string;
@@ -36,7 +36,7 @@ class UpdateUserArgs {
   public birthdate?: Date;
 
   @Field(() => Int, { nullable: true })
-  public institutionId?: number;
+  public institutionId?: number | null;
 
   @Field(() => String, { nullable: true })
   public department?: string;
@@ -45,13 +45,13 @@ class UpdateUserArgs {
   public position?: string;
 
   @Field(() => String, { nullable: true })
-  public email?: string;
+  public email?: string | null;
 
   @Field(() => String, { nullable: true })
   public telephone?: string;
 
   @Field(() => String, { nullable: true })
-  public placeholder?: boolean;
+  public placeholder?: boolean | null;
 
   @Field(() => [Int], { nullable: true })
   public roles?: number[];
