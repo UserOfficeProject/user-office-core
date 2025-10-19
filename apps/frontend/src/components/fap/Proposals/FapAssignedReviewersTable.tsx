@@ -2,7 +2,10 @@ import MaterialTable from '@material-table/core';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
+import { Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -32,33 +35,6 @@ type FapAssignedReviewersTableProps = {
   updateView: (proposalPk: number) => Promise<void>;
 };
 
-const assignmentColumns = [
-  {
-    title: 'First name',
-    field: 'user.firstname',
-  },
-  {
-    title: 'Last name',
-    field: 'user.lastname',
-  },
-  {
-    title: 'Date assigned',
-    field: 'dateAssignedFormatted',
-  },
-  {
-    title: 'Rank',
-    field: 'rank',
-    emptyValue: '-',
-    hidden: true,
-  },
-  { title: 'Review status', field: 'review.status' },
-  {
-    title: 'Grade',
-    field: 'review.grade',
-    emptyValue: '-',
-  },
-];
-
 const FapAssignedReviewersTable = ({
   fapProposal,
   fapSecs,
@@ -66,6 +42,7 @@ const FapAssignedReviewersTable = ({
   updateView,
 }: FapAssignedReviewersTableProps) => {
   const { api } = useDataApiWithFeedback();
+  const theme = useTheme();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewerModal = searchParams.get('reviewerModal');
@@ -93,10 +70,6 @@ const FapAssignedReviewersTable = ({
     PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
-
-  assignmentColumns[
-    assignmentColumns.findIndex((col) => col.field === 'rank')
-  ].hidden = !hasAccessRights;
 
   const fapAssignmentsStringified = JSON.stringify(fapProposal.assignments);
   const getFapAssignments = useCallback(
@@ -127,6 +100,60 @@ const FapAssignedReviewersTable = ({
   useEffect(() => {
     setFapAssignmentsWithIdAndFormattedDate(getFapAssignments());
   }, [getFapAssignments]);
+
+  const assignmentColumns = [
+    {
+      title: 'First name',
+      field: 'user.firstname',
+    },
+    {
+      title: 'Last name',
+      field: 'user.lastname',
+    },
+    {
+      title: 'Date assigned',
+      field: 'dateAssignedFormatted',
+    },
+    {
+      title: 'Rank',
+      field: 'rank',
+      emptyValue: '-',
+      hidden: !hasAccessRights,
+      render: (rowData: FapProposalAssignmentType) => {
+        if (
+          rowData.rank !== null &&
+          fapAssignmentsWithIdAndFormattedDate.some(
+            (fa) => fa.user?.id !== rowData.user?.id && fa.rank === rowData.rank
+          )
+        ) {
+          return (
+            <Tooltip title="This rank is already assigned to another reviewer">
+              <span
+                style={{
+                  color: theme.palette.error.main,
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                data-cy="duplicate-rank-warning"
+              >
+                <WarningRoundedIcon fontSize="small" />
+                {rowData.rank}
+              </span>
+            </Tooltip>
+          );
+        }
+
+        return <span>{rowData.rank}</span>;
+      },
+    },
+    { title: 'Review status', field: 'review.status' },
+    {
+      title: 'Grade',
+      field: 'review.grade',
+      emptyValue: '-',
+    },
+  ];
 
   const proposalReviewModalShouldOpen =
     !!reviewerModal && openProposalPk === fapProposal.proposalPk;

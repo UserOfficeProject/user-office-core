@@ -195,6 +195,7 @@ let createdCallId: number;
 let firstCreatedProposalPk: number;
 let firstCreatedProposalId: string;
 let secondCreatedProposalPk: number;
+let secondCreatedProposalId: string;
 let thirdCreatedProposalPk: number;
 let createdWorkflowId: number;
 let createdEsiTemplateId: number;
@@ -311,6 +312,7 @@ function initializationBeforeTests() {
             const createdProposal = result.createProposal;
             if (createdProposal) {
               secondCreatedProposalPk = createdProposal.primaryKey;
+              secondCreatedProposalId = createdProposal.proposalId;
 
               cy.updateProposal({
                 proposalPk: createdProposal.primaryKey,
@@ -580,7 +582,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -691,6 +693,77 @@ context('Fap reviews tests', () => {
       cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
     });
 
+    it('Officer should be able to assign ranks to reviewers during mass assignment', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.get('[type="checkbox"]').first().check();
+
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="assign-selected-users-with-rank"]').click();
+
+      cy.contains('Submit Mass Assignments');
+
+      cy.get(`[data-cy="rank-${fapMembers.reviewer.lastName}"]`)
+        .first()
+        .type('1');
+
+      cy.get(`[data-cy="rank-${fapMembers.reviewer2.lastName}"]`)
+        .first()
+        .type('2');
+
+      cy.get('[data-cy="save-ranks"]').click();
+
+      clickConfirmOk();
+
+      //Do second one first as the first chevron tooltip covers the second one
+      cy.contains(secondCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+
+      cy.contains(secondCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(firstCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+    });
+
     it('Should be able to assign Fap members to proposals in existing Fap', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -717,7 +790,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -776,7 +849,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -833,7 +906,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1123,7 +1196,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1218,7 +1291,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1375,7 +1448,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1528,7 +1601,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
