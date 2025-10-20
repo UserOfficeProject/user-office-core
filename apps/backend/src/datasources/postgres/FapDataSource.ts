@@ -903,6 +903,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       memberId: number;
       fapProposalId: number;
       questionaryId: number;
+      rank?: number;
     }[],
     fapId: number
   ) {
@@ -914,6 +915,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         fap_id: fapId,
         fap_proposal_id: assignment.fapProposalId,
         questionary_id: assignment.questionaryId,
+        rank: assignment.rank || null,
       }))
     );
 
