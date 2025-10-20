@@ -155,8 +155,8 @@ function ParticipantSelector({
         ];
 
         const { users } = await api().getUsers({
-          filter: query,
           subtractUsers: excludedUserIds,
+          searchText: query,
         });
 
         setOptions(users?.users || []);

@@ -40,9 +40,11 @@ export interface UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getPreviousCollaborators(
     user_id: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;

@@ -426,9 +426,13 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getPreviousCollaborators(
     user_id: number,
-    filter?: string,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string,
+    userRole?: UserRole,
+    subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return {
       totalCount: 2,

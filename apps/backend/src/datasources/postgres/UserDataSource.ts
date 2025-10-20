@@ -33,6 +33,14 @@ import {
   createUserObject,
 } from './records';
 
+const fieldMap: { [key: string]: string } = {
+  created_at: 'created_at',
+  firstname: 'firstname',
+  preferredname: 'preferredname',
+  lastname: 'lastname',
+  institution: 'i.institution',
+};
+
 export default class PostgresUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
     return database('users')
@@ -473,26 +481,25 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getUsers({
-    filter,
+    searchText,
     first,
     offset,
     userRole,
     subtractUsers,
-    orderBy,
-    orderDirection = 'desc',
+    sortField = 'created_at',
+    sortDirection = 'desc',
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
-      .orderBy('users.user_id', orderDirection)
       .modify((query) => {
-        if (filter) {
+        if (searchText) {
           query.andWhere((qb) => {
-            qb.whereILikeEscaped('institution', '%?%', filter)
-              .orWhereILikeEscaped('firstname', '%?%', filter)
-              .orWhereILikeEscaped('preferredname', '%?%', filter)
-              .orWhereILikeEscaped('lastname', '%?%', filter);
+            qb.whereILikeEscaped('institution', '%?%', searchText)
+              .orWhereILikeEscaped('firstname', '%?%', searchText)
+              .orWhereILikeEscaped('preferredname', '%?%', searchText)
+              .orWhereILikeEscaped('lastname', '%?%', searchText);
           });
         }
         if (first) {
@@ -509,8 +516,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         if (subtractUsers && subtractUsers.length > 0) {
           query.whereNotIn('users.user_id', subtractUsers);
         }
-        if (orderBy) {
-          query.orderBy(orderBy, orderDirection);
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderByRaw(`${sortField} ${sortDirection}`);
         }
       })
       .then(
@@ -529,14 +540,24 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async getPreviousCollaborators(
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     if (userId == -1) {
-      return this.getUsers({ filter, first, offset, userRole, subtractUsers });
+      return this.getUsers({
+        searchText,
+        first,
+        offset,
+        userRole,
+        subtractUsers,
+        sortField,
+        sortDirection,
+      });
     }
 
     const lastCollaborators = await this.getMostRecentCollaborators(userId);
@@ -553,14 +574,26 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
-        if (filter) {
+        if (searchText) {
           query.andWhere((qb) => {
-            qb.whereILikeEscaped('institution', '%?%', filter)
-              .orWhereILikeEscaped('firstname', '%?%', filter)
-              .orWhereILikeEscaped('preferredname', '%?%', filter)
-              .orWhereILikeEscaped('lastname', '%?%', filter);
+            qb.whereILikeEscaped('institution', '%?%', searchText)
+              .orWhereILikeEscaped('firstname', '%?%', searchText)
+              .orWhereILikeEscaped('preferredname', '%?%', searchText)
+              .orWhereILikeEscaped('lastname', '%?%', searchText);
           });
         }
+        logger.logInfo(
+          `Sort field: ${sortField}, direction: ${sortDirection}`,
+          {}
+        );
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderByRaw(`${sortField} ${sortDirection}`);
+        }
+
         if (first) {
           query.limit(first);
         }

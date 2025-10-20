@@ -138,17 +138,21 @@ export default class UserQueries {
   async getPreviousCollaborators(
     agent: UserWithRole | null,
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
     return this.dataSource.getPreviousCollaborators(
       userId,
-      filter,
       first,
       offset,
+      sortField,
+      sortDirection,
+      searchText,
       userRole,
       subtractUsers
     );

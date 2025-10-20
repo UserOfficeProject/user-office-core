@@ -15,6 +15,7 @@ import { Formik } from 'formik';
 import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -32,6 +33,7 @@ import {
   BasicUserDetailsFragment,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -204,6 +206,7 @@ const PeopleTable = ({
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
@@ -361,13 +364,13 @@ const PeopleTable = ({
         try {
           const [orderBy] = tableQuery.orderByCollection;
           const { users } = await api().getUsers({
-            filter: tableQuery.search,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
-            orderBy: orderBy?.orderByField,
-            orderDirection: orderBy?.orderDirection,
             subtractUsers: query.subtractUsers,
             userRole: query.userRole,
+            sortField: orderBy?.orderByField,
+            sortDirection: orderBy?.orderDirection,
+            searchText: tableQuery.search,
           });
 
           const filteredData = data
@@ -515,16 +518,73 @@ const PeopleTable = ({
               {title}
             </Typography>
           }
-          columns={columns ?? localColumns}
+          columns={setSortDirectionOnSortField(
+            columns ? columns : localColumns,
+            searchParams.get('sortField'),
+            searchParams.get('sortDirection')
+          )}
           onSelectionChange={handleColumnSelectionChange}
           data={fetchRemoteUsersData}
+          onPageChange={(page) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('page', page.toString());
+
+              return searchParams;
+            });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('pageSize', pageSize.toString());
+              searchParams.set('page', '0');
+
+              return searchParams;
+            });
+          }}
+          onSearchChange={(searchText) => {
+            setSearchParams((searchParams) => {
+              if (searchText) {
+                searchParams.set('search', searchText);
+                searchParams.set('page', '0');
+              } else {
+                searchParams.delete('search');
+              }
+
+              return searchParams;
+            });
+          }}
+          onOrderCollectionChange={(orderByCollection) => {
+            const [orderBy] = orderByCollection;
+
+            if (!orderBy) {
+              setSearchParams((searchParams) => {
+                searchParams.delete('sortField');
+                searchParams.delete('sortDirection');
+
+                return searchParams;
+              });
+            } else {
+              setSearchParams((searchParams) => {
+                searchParams.set('sortField', orderBy.orderByField);
+                searchParams.set('sortDirection', orderBy.orderDirection);
+
+                return searchParams;
+              });
+            }
+          }}
           options={{
             search: search,
+            searchText: searchParams.get('search') || undefined,
             debounceInterval: 400,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
+            pageSize: searchParams.get('pageSize')
+              ? +searchParams.get('pageSize')!
+              : undefined,
+            initialPage: searchParams.get('page')
+              ? +searchParams.get('page')!
+              : 0,
             ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {

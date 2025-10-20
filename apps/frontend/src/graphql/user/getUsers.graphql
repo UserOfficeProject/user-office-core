@@ -1,20 +1,20 @@
 query getUsers(
-  $filter: String
   $first: Int
   $offset: Int
   $userRole: UserRole
   $subtractUsers: [Int!]
-  $orderBy: String
-  $orderDirection: String
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
 ) {
   users(
-    filter: $filter
     first: $first
     offset: $offset
     userRole: $userRole
     subtractUsers: $subtractUsers
-    orderBy: $orderBy
-    orderDirection: $orderDirection
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
   ) {
     users {
       ...basicUserDetails
