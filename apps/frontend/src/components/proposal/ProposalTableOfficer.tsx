@@ -380,11 +380,17 @@ const ProposalTableOfficer = ({
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
   useEffect(() => {
     let isMounted = true;
 
-    if (isMounted) {
+    if (isMounted && !isFirstRender) {
       refreshTableData();
+    }
+
+    if (isFirstRender) {
+      setIsFirstRender(false);
     }
 
     return () => {
@@ -1120,10 +1126,24 @@ const ProposalTableOfficer = ({
             return searchParams;
           });
         }}
+        onRowsPerPageChange={(pageSize) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('pageSize', pageSize.toString());
+            searchParams.set('page', '0');
+
+            return searchParams;
+          });
+        }}
         onSearchChange={(searchText) => {
-          setSearchParams({
-            search: searchText ? searchText : '',
-            page: searchText ? '0' : page || '',
+          setSearchParams((searchParams) => {
+            if (searchText) {
+              searchParams.set('search', searchText);
+              searchParams.set('page', '0');
+            } else {
+              searchParams.delete('search');
+            }
+
+            return searchParams;
           });
         }}
         onSelectionChange={(selectedItems) => {
@@ -1162,7 +1182,7 @@ const ProposalTableOfficer = ({
             },
           }),
           pageSize: pageSize ? +pageSize : undefined,
-          initialPage: search ? 0 : page ? +page : 0,
+          initialPage: page ? +page : 0,
         }}
         actions={tableActions}
         onChangeColumnHidden={(columnChange) => {
@@ -1182,11 +1202,18 @@ const ProposalTableOfficer = ({
           const [orderBy] = orderByCollection;
 
           if (!orderBy) {
-            setSearchParams({});
+            setSearchParams((searchParams) => {
+              searchParams.delete('sortField');
+              searchParams.delete('sortDirection');
+
+              return searchParams;
+            });
           } else {
-            setSearchParams({
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
+            setSearchParams((searchParams) => {
+              searchParams.set('sortField', orderBy.orderByField);
+              searchParams.set('sortDirection', orderBy.orderDirection);
+
+              return searchParams;
             });
           }
         }}
