@@ -113,7 +113,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           Characters: {numberOfChars} / {6000}
         </FormHelperText>
         <ErrorMessage name={commentFieldId} />
-        <>localComment: {localComment}</>
         <TitledContainer label="Grade">
           {config.nonNumericOptions.length > 0 && (
             <ToggleButtonGroup

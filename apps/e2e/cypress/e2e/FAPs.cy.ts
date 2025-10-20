@@ -60,7 +60,8 @@ function readWriteReview(
     expect(content).to.have.string(commentContent)
   );
 
-  cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
+  cy.get('[data-cy="grade-proposal"]').click();
+  cy.get('[data-cy="grade-proposal-options"] [role="option"]').first().click();
 
   cy.get(`#comment_ifr`).first().focus().click();
 
@@ -1772,7 +1773,10 @@ context('Fap reviews tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      cy.get('[data-cy="grade-proposal"]').click().click().type('1');
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
@@ -3773,7 +3777,7 @@ context('Fap meeting components tests', () => {
       // NOTE: Testing native html required validation message.
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please fill out this field.'
+          'Please fill in this field.'
         );
       });
       cy.get('[data-cy="grade-proposal"]').click();
