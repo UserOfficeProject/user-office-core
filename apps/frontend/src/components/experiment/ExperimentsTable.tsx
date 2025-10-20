@@ -10,6 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { Experiment, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ExperimentReviewContent, {
@@ -58,7 +59,7 @@ export default function ExperimentsTable({
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   const selectedExperimentId = searchParams.get('experiment');
-
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
@@ -75,8 +76,12 @@ export default function ExperimentsTable({
   React.useEffect(() => {
     let isMounted = true;
 
-    if (isMounted) {
+    if (isMounted && !isFirstRender) {
       refreshTableData();
+    }
+
+    if (isFirstRender) {
+      setIsFirstRender(false);
     }
 
     return () => {
@@ -193,6 +198,12 @@ export default function ExperimentsTable({
     ];
   }
 
+  columns = setSortDirectionOnSortField(
+    columns,
+    searchParams.get('sortField'),
+    searchParams.get('sortDirection')
+  );
+
   const experimentReviewTabs = [
     EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
     EXPERIMENT_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -215,12 +226,21 @@ export default function ExperimentsTable({
         options={{
           searchText: search || undefined,
           pageSize: pageSize ? +pageSize : 10,
-          initialPage: search ? 0 : page ? +page : 0,
+          initialPage: page ? +page : 0,
+        }}
+        onRowsPerPageChange={(pageSize) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('pageSize', pageSize.toString());
+            searchParams.set('page', '0');
+
+            return searchParams;
+          });
         }}
         onSearchChange={(searchText) => {
           setSearchParams((searchParams) => {
             if (searchText) {
               searchParams.set('search', searchText);
+              searchParams.set('page', '0');
             } else {
               searchParams.delete('search');
             }
@@ -234,6 +254,25 @@ export default function ExperimentsTable({
 
             return searchParams;
           });
+        }}
+        onOrderCollectionChange={(orderByCollection) => {
+          const [orderBy] = orderByCollection;
+
+          if (!orderBy) {
+            setSearchParams((searchParams) => {
+              searchParams.delete('sortField');
+              searchParams.delete('sortDirection');
+
+              return searchParams;
+            });
+          } else {
+            setSearchParams((searchParams) => {
+              searchParams.set('sortField', orderBy.orderByField);
+              searchParams.set('sortDirection', orderBy.orderDirection);
+
+              return searchParams;
+            });
+          }
         }}
       />
 
