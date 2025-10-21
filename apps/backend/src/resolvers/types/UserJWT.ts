@@ -14,16 +14,16 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   public lastname: string;
 
   @Field(() => String, { nullable: true })
-  public preferredname?: string | null;
+  public preferredname: string | null;
 
   @Field(() => String, { nullable: true })
-  public email?: string | null;
+  public email: string | null;
 
   @Field(() => String, { nullable: true })
-  public oidcSub?: string | null;
+  public oidcSub: string | null;
 
   @Field(() => Boolean, { nullable: true })
-  public placeholder?: boolean | null;
+  public placeholder: boolean | null;
 
   @Field()
   public created: string;
@@ -32,5 +32,5 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   public position: string;
 
   @Field(() => Int, { nullable: true })
-  public institutionId?: number | null;
+  public institutionId: number | null;
 }

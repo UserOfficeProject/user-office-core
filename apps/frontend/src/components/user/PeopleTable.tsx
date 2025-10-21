@@ -137,7 +137,7 @@ const getUsersTableData = (
       query.search
         ? user.firstname.toLowerCase().includes(query.search.toLowerCase()) ||
           user.lastname.toLowerCase().includes(query.search.toLowerCase()) ||
-          user.institution.toLowerCase().includes(query.search.toLowerCase())
+          user.institution?.toLowerCase().includes(query.search.toLowerCase())
         : true
     );
 
@@ -380,7 +380,7 @@ const PeopleTable = ({
                       .toLowerCase()
                       .includes(tableQuery.search.toLowerCase()) ||
                     user.institution
-                      .toLowerCase()
+                      ?.toLowerCase()
                       .includes(tableQuery.search.toLowerCase())
                   : true
               )

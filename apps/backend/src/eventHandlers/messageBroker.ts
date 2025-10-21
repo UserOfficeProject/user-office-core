@@ -48,7 +48,7 @@ type Member = {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
+  email: string | null;
   oidcSub: string | null;
   oauthIssuer: string | null;
   institution: Institution;

@@ -33,7 +33,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
     Roles.INSTRUMENT_SCIENTIST,
     Roles.INTERNAL_REVIEWER,
   ])
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public email?: string | null;
 
   @Field(() => Boolean, { nullable: true })

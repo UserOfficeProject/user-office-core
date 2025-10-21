@@ -72,7 +72,7 @@ test('A user cannot invite another user by email if the user already has an acco
     userMutations.createUserByEmailInvite(dummyUserNotOnProposalWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyUser.email,
+      email: dummyUser.email as string,
       userRole: UserRole.USER,
     })
   ).rejects.toThrow('Can not create account because account already exists');
@@ -89,7 +89,7 @@ test('A user can reinvite another user by email if the user has not created an a
     userMutations.createUserByEmailInvite(dummyUserWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
+      email: dummyPlaceHolderUser.email as string,
       userRole: UserRole.USER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
@@ -106,7 +106,7 @@ test('A user officer can invite a reviewer by email', () => {
     userMutations.createUserByEmailInvite(dummyUserOfficerWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
+      email: dummyPlaceHolderUser.email as string,
       userRole: UserRole.FAP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
