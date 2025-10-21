@@ -3192,7 +3192,10 @@ context('Fap meeting components tests', () => {
       const commentContent = faker.lorem.words(3);
       cy.setTinyMceContent('comment', commentContent);
 
-      cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
