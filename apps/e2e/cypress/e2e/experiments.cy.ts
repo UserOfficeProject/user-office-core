@@ -7,6 +7,8 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Experiments tests', () => {
+  const instrumentScientist1 = initialDBData.users.instrumentScientist1;
+
   beforeEach(function () {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled().then(() => {
@@ -63,11 +65,11 @@ context('Experiments tests', () => {
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 2').click();
-      cy.contains('1-1 of 1');
+      cy.contains('1-2 of 2');
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains('Instrument 1').click();
-      cy.contains('1-3 of 3');
+      cy.contains('1-2 of 2');
     });
 
     it('Can filter by date', () => {
@@ -234,6 +236,61 @@ context('Experiments tests', () => {
             cy.reload();
           }
         });
+    });
+
+    it('Instrument Scientists should be able to see Experiments only associated with their instruments', () => {
+      cy.login(instrumentScientist1);
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // There should be a div with data-cy experiments-table, which will contain table inside it
+      cy.get('[data-cy=experiments-table]').should('exist');
+
+      // Wait for the table to load with data
+      cy.get('[data-cy=experiments-table] table tbody tr').should(
+        'have.length.at.least',
+        1
+      );
+
+      // Inside the table, there should be a column with title "Instrument"
+      cy.get('[data-cy=experiments-table] table thead th')
+        .contains('Instrument')
+        .should('exist');
+
+      // This column should only contains with value Instrument 1. Make sure you check only against that column and not others
+      // Make sure the table is fully loaded by checking that data exists
+      cy.get('[data-cy=experiments-table] table tbody tr td').should('exist');
+
+      // Get the header row and find the Instrument column index
+      cy.get('[data-cy=experiments-table] table thead tr th').then(
+        ($headers) => {
+          const headers = Array.from($headers).map((header) =>
+            Cypress.$(header).text().trim()
+          );
+          const instrumentColumnIndex = headers.findIndex(
+            (header) => header === 'Instrument'
+          );
+
+          cy.log(`Found headers: ${JSON.stringify(headers)}`);
+          cy.log(`Instrument column index: ${instrumentColumnIndex}`);
+
+          // Verify we found the column
+          expect(instrumentColumnIndex).to.be.greaterThan(-1);
+
+          // Now check all rows in the table body for this specific column
+          // Use a more robust approach that re-queries the DOM each time
+          cy.get('[data-cy=experiments-table] table tbody tr').then(($rows) => {
+            const rowCount = $rows.length;
+            for (let i = 0; i < rowCount; i++) {
+              cy.get('[data-cy=experiments-table] table tbody tr')
+                .eq(i)
+                .find('td')
+                .eq(instrumentColumnIndex)
+                .should('contain.text', 'Instrument 1');
+            }
+          });
+        }
+      );
     });
   });
 });

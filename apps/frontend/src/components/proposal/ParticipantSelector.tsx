@@ -31,8 +31,15 @@ import NoOptionsText from './NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 
-interface InviteUserProps {
+const keyOf = (u: UserOrEmail) =>
+  typeof u === 'string' ? `email:${u.toLowerCase()}` : `id:${String(u.id)}`;
+
+const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean =>
+  a.length === b.length && a.every((v, i) => keyOf(v) === keyOf(b[i]));
+
+interface ParticipantSelectorProps {
   modalOpen: boolean;
+  title?: string;
   onClose?: () => void;
   onAddParticipants?: (data: {
     users: BasicUserDetails[];
@@ -40,6 +47,9 @@ interface InviteUserProps {
   }) => void;
   excludeUserIds?: number[];
   excludeEmails?: string[];
+  preset?: UserOrEmail[];
+  multiple?: boolean;
+  allowInviteByEmail?: boolean;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -53,14 +63,19 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
 
 const MIN_SEARCH_LENGTH = 3;
 
-function InviteUser({
+function ParticipantSelector({
   modalOpen,
+  title,
   onClose,
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
+  allowInviteByEmail = false,
   confirm,
-}: InviteUserProps & WithConfirmProps) {
+  preset = [],
+  multiple = true,
+}: ParticipantSelectorProps & WithConfirmProps) {
+  // multiple selection enabled by default
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,7 +83,7 @@ function InviteUser({
   const [exactEmailMatch, setExactEmailMatch] = useState<
     BasicUserDetails | undefined
   >();
-  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
+  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>(preset);
   const isPendingSearch = useRef(false);
   const featureContext = useContext(FeatureContext);
   const isEmailSearchOnly = !!featureContext.featuresMap.get(
@@ -124,9 +139,7 @@ function InviteUser({
             .includes(basicUserDetailsByEmail.id);
 
         if (userAlreadyExists === false) {
-          setExactEmailMatch(
-            basicUserDetailsByEmail ? basicUserDetailsByEmail : undefined
-          );
+          setExactEmailMatch(basicUserDetailsByEmail || undefined);
         }
       } else {
         if (isEmailSearchOnly) {
@@ -166,7 +179,7 @@ function InviteUser({
   }, [query, fetchUserSearchResults]);
 
   const addToSelectedItems = (user: UserOrEmail) => {
-    setSelectedItems((prev) => [...prev, user]);
+    setSelectedItems((prev) => (multiple ? [...prev, user] : [user]));
 
     setExactEmailMatch(undefined);
     setOptions([]);
@@ -217,7 +230,7 @@ function InviteUser({
   };
 
   const handleClose = () => {
-    if (selectedItems.length > 0) {
+    if (isSameParticipants(selectedItems, preset || []) === false) {
       confirm(
         async () => {
           onClose?.();
@@ -227,7 +240,7 @@ function InviteUser({
         {
           title: 'Please confirm',
           description:
-            'User(s) have not yet been added to the proposal. Are you sure you want to close the dialog?',
+            'Are you sure you want to close the dialog? Your changes will be lost.',
         }
       )();
 
@@ -240,6 +253,13 @@ function InviteUser({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!multiple && selectedItems.length === 1) {
+      // Prevent further input when single selection is made
+      event.preventDefault();
+
+      return;
+    }
+
     if (event.key === 'Enter' || event.key === ' ' || event.key === ',') {
       event.preventDefault();
 
@@ -249,12 +269,11 @@ function InviteUser({
 
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
-      } else {
-        if (options.length === 1) {
-          addToSelectedItems(options[0]);
-        } else if (isValidEmail(query) && !isEmailSearchOnly) {
-          addValidEmailToSelection(query);
-        }
+        setExactEmailMatch(undefined);
+      } else if (options.length === 1) {
+        addToSelectedItems(options[0]);
+      } else if (isValidEmail(query) && !isEmailSearchOnly) {
+        addValidEmailToSelection(query);
       }
     }
   };
@@ -275,7 +294,7 @@ function InviteUser({
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title="Add co-proposers to proposal"
+      title={title || (multiple ? 'Add Participant(s)' : 'Select Participant')}
       tooltip={
         isEmailSearchOnly && (
           <Tooltip
@@ -299,13 +318,27 @@ function InviteUser({
         sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}
       >
         <Autocomplete
-          multiple
+          multiple={multiple}
           fullWidth
           options={options}
           loading={isLoading}
           getOptionLabel={getOptionLabel}
-          value={selectedItems}
-          onChange={(_, newValue) => setSelectedItems(newValue)}
+          value={
+            multiple
+              ? selectedItems
+              : selectedItems.length
+                ? selectedItems[0]
+                : undefined
+          }
+          onChange={(_, newValue) =>
+            setSelectedItems(
+              newValue
+                ? multiple
+                  ? (newValue as UserOrEmail[])
+                  : [newValue as UserOrEmail]
+                : []
+            )
+          }
           filterSelectedOptions
           onInputChange={(_, newValue) => setQuery(newValue)}
           onKeyDown={handleKeyDown}
@@ -342,10 +375,16 @@ function InviteUser({
             !isLoading ? (
               <NoOptionsText
                 query={query}
-                onAddEmail={(email) => addValidEmailToSelection(email)}
+                onAddEmail={(email) =>
+                  allowInviteByEmail
+                    ? addValidEmailToSelection(email)
+                    : undefined
+                }
                 exactEmailMatch={exactEmailMatch}
                 onAddUser={(user) => {
-                  addToSelectedItems(user);
+                  multiple
+                    ? addToSelectedItems(user)
+                    : setSelectedItems([user]);
                 }}
                 excludeEmails={
                   excludeEmails?.concat(
@@ -353,6 +392,7 @@ function InviteUser({
                   ) || []
                 }
                 isEmailSearchOnly={isEmailSearchOnly}
+                allowInviteByEmail={allowInviteByEmail}
               />
             ) : null
           }
@@ -363,14 +403,17 @@ function InviteUser({
           onClick={handleSubmit}
           sx={{ margin: '16px 0 8px 0' }}
           startIcon={<AddIcon />}
-          disabled={!selectedItems.length}
+          disabled={
+            !selectedItems.length ||
+            isSameParticipants(selectedItems, preset || [])
+          }
           data-cy="invite-user-submit-button"
         >
-          Add
+          {multiple ? 'Add' : 'Select'}
         </Button>
       </DialogContent>
     </StyledDialog>
   );
 }
 
-export default withConfirm(InviteUser);
+export default withConfirm(ParticipantSelector);

@@ -66,6 +66,7 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../../models/VisitRegistration';
+import { VisitRegistrationClaim } from '../../models/VisitRegistrationClaim';
 import { WorkflowType } from '../../models/Workflow';
 import {
   FapInstrument,
@@ -275,6 +276,11 @@ export interface VisitRegistrationRecord {
   status: string;
 }
 
+export interface VisitRegistrationClaimRecord {
+  readonly invite_id: number;
+  readonly visit_id: number;
+}
+
 export interface RoleRecord {
   readonly role_id: number;
   readonly short_code: string;
@@ -287,7 +293,7 @@ export interface ReviewRecord {
   readonly user_id: number;
   readonly proposal_pk: number;
   readonly comment: string;
-  readonly grade: number;
+  readonly grade: string;
   readonly status: number;
   readonly fap_id: number;
   readonly questionary_id: number;
@@ -591,6 +597,7 @@ export interface WorkflowRecord {
   readonly description: string;
   readonly full_count: number;
   readonly entity_type: WorkflowType;
+  readonly connection_line_type: string;
 }
 
 export interface WorkflowConnectionRecord {
@@ -600,8 +607,9 @@ export interface WorkflowConnectionRecord {
   readonly status_id: number;
   readonly next_status_id: number | null;
   readonly prev_status_id: number | null;
-  readonly droppable_group_id: string;
-  readonly parent_droppable_group_id: string;
+  readonly pos_x: number;
+  readonly pos_y: number;
+  readonly prev_connection_id: number | null;
 }
 
 export interface StatusChangingEventRecord {
@@ -1209,6 +1217,15 @@ export const createVisitObject = (visit: VisitRecord) => {
     visit.team_lead_user_id,
     visit.created_at,
     visit.experiment_pk
+  );
+};
+
+export const createVisitRegistrationClaimObject = (
+  visitRegistrationClaim: VisitRegistrationClaimRecord
+) => {
+  return new VisitRegistrationClaim(
+    visitRegistrationClaim.invite_id,
+    visitRegistrationClaim.visit_id
   );
 };
 

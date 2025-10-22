@@ -185,7 +185,7 @@ context('Invites tests', () => {
         .should('not.exist');
     });
 
-    it.only('Should not be able to invite the email of the current user', function () {
+    it('Should not be able to invite the email of the current user', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
@@ -243,7 +243,7 @@ context('Invites tests', () => {
       cy.getAndStoreFeaturesEnabled();
     });
 
-    it('Should be able to accept invite', function () {
+    it('Should be able to accept invite and then see that in log', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
@@ -256,13 +256,25 @@ context('Invites tests', () => {
         cy.get('[data-cy=join-proposal-btn]').click();
         cy.get('#code').type(response.setCoProposerInvites[0].code ?? '');
         cy.get('[data-cy="invitation-submit"]').click();
-        cy.get('[data-testid="VisibilityIcon"]').click();
+        cy.get('[data-testid="VisibilityIcon"]').first().click();
         cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
         cy.get('[data-cy=questionary-details-view]').should(
           'contain.text',
           initialDBData.users.user3.lastName
         );
+        cy.logout();
+
+        cy.login('officer', initialDBData.roles.userOfficer);
+        cy.visit('/');
       });
+      cy.get('[data-testid="VisibilityIcon"] > path').first().click();
+      cy.get('[data-cy="proposal-review-tabs"]').contains('Logs').click();
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_CO_PROPOSER_INVITE_SENT'
+      );
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED'
+      );
     });
   });
 

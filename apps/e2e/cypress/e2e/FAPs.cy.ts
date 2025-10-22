@@ -60,15 +60,8 @@ function readWriteReview(
     expect(content).to.have.string(commentContent)
   );
 
-  if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
-    cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
-
-    cy.get('[role="listbox"] > [role="option"]').first().click();
-
-    cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
-  } else {
-    cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
-  }
+  cy.get('[data-cy="grade-proposal"]').click();
+  cy.get('[data-cy="grade-proposal-options"] [role="option"]').first().click();
 
   cy.get(`#comment_ifr`).first().focus().click();
 
@@ -195,6 +188,7 @@ let createdCallId: number;
 let firstCreatedProposalPk: number;
 let firstCreatedProposalId: string;
 let secondCreatedProposalPk: number;
+let secondCreatedProposalId: string;
 let thirdCreatedProposalPk: number;
 let createdWorkflowId: number;
 let createdEsiTemplateId: number;
@@ -219,11 +213,13 @@ function createWorkflowAndEsiTemplate() {
         'FEASIBILITY'
       ) {
         cy.addWorkflowStatus({
-          droppableGroupId: 'proposalWorkflowConnections_0',
           statusId: initialDBData.proposalStatuses.feasibilityReview.id,
           workflowId: createdWorkflowId,
           sortOrder: 1,
           prevStatusId: 1,
+          posX: 0,
+          posY: 200,
+          prevConnectionId: 1,
         });
       }
 
@@ -309,6 +305,7 @@ function initializationBeforeTests() {
             const createdProposal = result.createProposal;
             if (createdProposal) {
               secondCreatedProposalPk = createdProposal.primaryKey;
+              secondCreatedProposalId = createdProposal.proposalId;
 
               cy.updateProposal({
                 proposalPk: createdProposal.primaryKey,
@@ -578,7 +575,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -681,6 +678,77 @@ context('Fap reviews tests', () => {
       cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
     });
 
+    it('Officer should be able to assign ranks to reviewers during mass assignment', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.get('[type="checkbox"]').first().check();
+
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="assign-selected-users-with-rank"]').click();
+
+      cy.contains('Submit Mass Assignments');
+
+      cy.get(`[data-cy="rank-${fapMembers.reviewer.lastName}"]`)
+        .first()
+        .type('1');
+
+      cy.get(`[data-cy="rank-${fapMembers.reviewer2.lastName}"]`)
+        .first()
+        .type('2');
+
+      cy.get('[data-cy="save-ranks"]').click();
+
+      clickConfirmOk();
+
+      //Do second one first as the first chevron tooltip covers the second one
+      cy.contains(secondCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+
+      cy.contains(secondCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(firstCreatedProposalId)
+        .closest('tr')
+        .find('[data-testid="ChevronRightIcon"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+    });
+
     it('Should be able to assign Fap members to proposals in existing Fap', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -707,7 +775,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -766,7 +834,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -823,7 +891,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').find('input[type="checkbox"]').first().click();
       cy.contains('2 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1113,7 +1181,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1208,7 +1276,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1365,7 +1433,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1518,7 +1586,7 @@ context('Fap reviews tests', () => {
         .find('input[type="checkbox"]')
         .click();
       cy.contains('1 user(s) selected');
-      cy.contains('Update').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
       clickConfirmOk();
 
@@ -1598,7 +1666,7 @@ context('Fap reviews tests', () => {
               cy.updateReview({
                 reviewID: proposalReviews[0].id,
                 comment: comment1,
-                grade: 2,
+                grade: '2',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: proposalReviews[0].questionaryID,
@@ -1705,16 +1773,10 @@ context('Fap reviews tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      if (
-        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
-      ) {
-        cy.get('[data-cy="grade-proposal"]').click();
-        cy.get('[data-cy="grade-proposal-options"] [role="option"]')
-          .first()
-          .click();
-      } else {
-        cy.get('[data-cy="grade-proposal"]').click().click().type('1');
-      }
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
@@ -1802,7 +1864,7 @@ context('Fap reviews tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[role="tablist"] [role="tab"]').should('have.length', 2);
+      cy.get('[role="tablist"] [role="tab"]').should('have.length', 3);
 
       cy.finishedLoading();
 
@@ -1837,6 +1899,76 @@ context('Fap reviews tests', () => {
       cy.contains('Technical reviews').click();
 
       cy.contains(comment1).should('not.exist');
+    });
+
+    it('Fap Reviewer should be see legacy FAP proposals page', () => {
+      cy.createCall({
+        ...updatedCall,
+        shortCode: 'legacy call',
+        esiTemplateId: createdEsiTemplateId,
+        proposalWorkflowId: createdWorkflowId,
+        faps: [createdFapId],
+      }).then((result) => {
+        createdCallId = result.createCall.id;
+
+        cy.assignInstrumentToCall({
+          callId: createdCallId,
+          instrumentFapIds: { instrumentId: newlyCreatedInstrumentId },
+        });
+
+        cy.createProposal({ callId: createdCallId }).then((result) => {
+          const createdProposal = result.createProposal;
+
+          if (createdProposal) {
+            secondCreatedProposalPk = createdProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: proposal2.title,
+              abstract: proposal2.abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+
+            cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.finished.id,
+              proposalPks: [secondCreatedProposalPk],
+            });
+
+            cy.assignProposalsToInstruments({
+              instrumentIds: [newlyCreatedInstrumentId],
+              proposalPks: [secondCreatedProposalPk],
+            });
+            cy.assignProposalsToFaps({
+              fapInstruments: [
+                { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+              ],
+              proposalPks: [createdProposal.primaryKey],
+            });
+          }
+
+          cy.updateCall({
+            id: createdCallId,
+            ...closedCall,
+            shortCode: 'legacy call',
+            proposalWorkflowId: createdWorkflowId,
+            esiTemplateId: createdEsiTemplateId,
+            faps: [createdFapId],
+            callFapReviewEnded: true,
+          });
+
+          cy.visit('/FapPage/' + createdFapId);
+
+          cy.contains(firstCreatedProposalId).should('exist');
+          cy.contains(createdProposal.proposalId).should('not.exist');
+
+          cy.contains('Legacy Proposals').click();
+
+          cy.contains(createdProposal.proposalId).should('exist');
+          cy.contains(firstCreatedProposalId).should('not.exist');
+        });
+      });
     });
   });
 });
@@ -2227,7 +2359,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2245,7 +2377,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2805,7 +2937,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2823,7 +2955,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3130,17 +3262,10 @@ context('Fap meeting components tests', () => {
       const commentContent = faker.lorem.words(3);
       cy.setTinyMceContent('comment', commentContent);
 
-      if (
-        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
-      ) {
-        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
-
-        cy.get('[role="listbox"] > [role="option"]').first().click();
-
-        cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
-      } else {
-        cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
-      }
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
@@ -3397,7 +3522,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3415,7 +3540,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3631,7 +3756,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3649,7 +3774,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3736,7 +3861,7 @@ context('Fap meeting components tests', () => {
       cy.contains('Comment is required');
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy=save-and-continue-button]').focus().click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
@@ -3744,31 +3869,16 @@ context('Fap meeting components tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
-      cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .get('input[aria-label="Search"]')
-        .type('GRADE_PRECISION');
+      cy.get('[aria-label="Edit"]').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find('button[aria-label="Edit"]')
-        .click();
+      cy.contains('fap_review_basis').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find(`input[value="1"]`)
-        .clear()
-        .type('0.01');
+      cy.get('[data-cy="decimal_points"]').clear().type('2');
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find('button[aria-label="Save"]')
-        .click();
+      cy.get('[data-cy="submit"]').click();
 
       cy.logout();
 
@@ -3789,16 +3899,53 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.get('[data-cy="grade-proposal"] input').then(($input) => {
-        expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Value must be less than or equal to 10.'
-        );
-      });
+      cy.contains('The grade must be a most 2 dp');
 
       cy.get('#grade-proposal').clear().type('1.01');
 
       cy.get('[data-cy=save-and-continue-button]').click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
+    });
+
+    it('Fap Reviewer should be able to give non numeric review', () => {
+      cy.login(initialDBData.users.officer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
+
+      cy.get('[aria-label="Edit"]').click();
+
+      cy.contains('fap_review_basis').click();
+
+      cy.get('[data-cy="add-item-button"]').click();
+
+      cy.get('[aria-label="Answer"]').type('A');
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.logout();
+
+      cy.login(fapMembers.reviewer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+
+      cy.contains('Classification').click();
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"]').last().click();
+
+      cy.get('[data-cy=save-and-continue-button]').click();
+
+      cy.contains('Comment is required').should('not.exist');
+      //TODO submiting review in tests is failing as the comment
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
 });
@@ -4337,7 +4484,7 @@ context('Fap meeting exports test', () => {
                 reviewID: review.id,
                 comment: comment1,
                 // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                grade: index ? 2 : 4,
+                grade: index ? '2' : '4',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: review.questionaryID,
@@ -4355,7 +4502,7 @@ context('Fap meeting exports test', () => {
                 reviewID: review.id,
                 comment: comment2,
                 // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                grade: index ? 1 : 5,
+                grade: index ? '1' : '5',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: review.questionaryID,

@@ -5,10 +5,14 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
-import { ProposalDataSourceMock } from '../../datasources/mockups/ProposalDataSource';
 import {
-  UserDataSourceMock,
+  ProposalDataSourceMock,
+  dummyProposal,
+} from '../../datasources/mockups/ProposalDataSource';
+import {
+  basicDummyUser,
   dummyUser,
+  UserDataSourceMock,
 } from '../../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -20,7 +24,7 @@ const mockMailService = {
   sendMail: jest.fn(),
 };
 
-describe('essEmailHandler', () => {
+describe('essEmailHandler co-proposer invites', () => {
   let proposalDataSourceMock: ProposalDataSourceMock;
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
   let userDataSourceMock: UserDataSourceMock;
@@ -91,6 +95,56 @@ describe('essEmailHandler', () => {
         claimerLastname: expect.any(String),
       },
       recipients: [{ address: expect.any(String) }],
+    });
+  });
+
+  test('mailService should be invoked when PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED event is sent', async () => {
+    const inviteEmail = faker.internet.email();
+    const inviterId = 1;
+    const inviteId = 123;
+    const redeemCode = faker.string.alphanumeric(10);
+
+    // Mock UserDataSource.getBasicUserInfo to return a dummy inviter
+    const userDataSourceMock = container.resolve<UserDataSourceMock>(
+      Tokens.UserDataSource
+    );
+    jest.spyOn(userDataSourceMock, 'getBasicUserInfo').mockResolvedValue({
+      id: inviterId,
+      firstname: 'Inviter',
+      lastname: 'User',
+      institution: 'TestOrg',
+      email: 'inviter@email.com',
+    } as any);
+
+    const mockEvent = {
+      type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+      array: [
+        {
+          id: inviteId,
+          email: inviteEmail,
+          code: redeemCode,
+          createdByUserId: inviterId,
+          isEmailSent: false,
+        },
+      ],
+      isRejection: false,
+    } as ApplicationEvent;
+
+    await essEmailHandler(mockEvent);
+
+    expect(mockMailService.sendMail).toHaveBeenCalledWith({
+      content: {
+        template_id:
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
+      },
+      substitution_data: {
+        email: inviteEmail,
+        inviterName: 'Inviter',
+        inviterLastname: 'User',
+        inviterOrg: 'TestOrg',
+        redeemCode: redeemCode,
+      },
+      recipients: [{ address: inviteEmail }],
     });
   });
 
@@ -221,5 +275,36 @@ describe('essEmailHandler', () => {
         }),
       })
     );
+  });
+
+  describe('handling PROPOSAL_SUBMITTED event', () => {
+    it('Should have PI and CoProposals in the payload', async () => {
+      const event: ApplicationEvent = {
+        type: Event.PROPOSAL_SUBMITTED,
+        proposal: dummyProposal,
+        key: 'proposal',
+        loggedInUserId: 1,
+        isRejection: false,
+      };
+
+      const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
+
+      await essEmailHandler(event);
+
+      expect(sendMailsSpy).toHaveBeenCalledTimes(1);
+      const arg = sendMailsSpy.mock.calls[0][0];
+      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
+
+      // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
+      expect(arg.recipients).toEqual([
+        { address: dummyUser.email },
+        {
+          address: {
+            email: basicDummyUser.email,
+            header_to: dummyUser.email,
+          },
+        },
+      ]);
+    });
   });
 });

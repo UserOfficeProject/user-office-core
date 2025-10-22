@@ -16,12 +16,14 @@ export type FapProposals = {
   loadingFapProposals: boolean;
   FapProposalsData: FapProposalType[];
   setFapProposalsData: Dispatch<SetStateAction<FapProposalType[]>>;
+  legacy?: boolean;
 };
 
 export function useFapProposalsData(
   fapId: number,
   callId: number | null,
-  instrumentId: number | null
+  instrumentId: number | null,
+  legacy: boolean = false
 ): FapProposals {
   const api = useDataApi();
   const [FapProposalsData, setFapProposalsData] = useState<FapProposalType[]>(
@@ -32,7 +34,7 @@ export function useFapProposalsData(
     let cancelled = false;
     setLoadingFapProposals(true);
     api()
-      .getFapProposals({ fapId, callId, instrumentId })
+      .getFapProposals({ fapId, callId, instrumentId, legacy })
       .then((data) => {
         if (cancelled) {
           return;

@@ -101,7 +101,7 @@ export default function ExperimentsTable({
           experimentStartDate,
           experimentEndDate,
         } = experimentsFilter;
-        const { allExperiments } = await api().getAllExperiments({
+        const { allExperiments } = await api().getExperiments({
           filter: {
             callId,
             instrumentId,
@@ -202,7 +202,7 @@ export default function ExperimentsTable({
   ];
 
   return (
-    <>
+    <div data-cy="experiments-table">
       <MaterialTable
         tableRef={tableRef}
         title={
@@ -256,6 +256,6 @@ export default function ExperimentsTable({
           />
         </ExperimentReviewModal>
       )}
-    </>
+    </div>
   );
 }

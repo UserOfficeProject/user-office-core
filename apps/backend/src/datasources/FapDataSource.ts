@@ -76,6 +76,11 @@ export interface FapDataSource {
     callId?: number | null;
     instrumentId?: number | null;
   }): Promise<FapProposal[]>;
+  getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]>;
   getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number
