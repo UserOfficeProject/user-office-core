@@ -239,6 +239,14 @@ export class FapDataSourceMock implements FapDataSource {
     );
   }
 
+  getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    throw new Error('Method not implemented.');
+  }
+
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,

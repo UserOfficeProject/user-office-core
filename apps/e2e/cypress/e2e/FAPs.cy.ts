@@ -1864,7 +1864,7 @@ context('Fap reviews tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[role="tablist"] [role="tab"]').should('have.length', 2);
+      cy.get('[role="tablist"] [role="tab"]').should('have.length', 3);
 
       cy.finishedLoading();
 
@@ -1899,6 +1899,76 @@ context('Fap reviews tests', () => {
       cy.contains('Technical reviews').click();
 
       cy.contains(comment1).should('not.exist');
+    });
+
+    it('Fap Reviewer should be see legacy FAP proposals page', () => {
+      cy.createCall({
+        ...updatedCall,
+        shortCode: 'legacy call',
+        esiTemplateId: createdEsiTemplateId,
+        proposalWorkflowId: createdWorkflowId,
+        faps: [createdFapId],
+      }).then((result) => {
+        createdCallId = result.createCall.id;
+
+        cy.assignInstrumentToCall({
+          callId: createdCallId,
+          instrumentFapIds: { instrumentId: newlyCreatedInstrumentId },
+        });
+
+        cy.createProposal({ callId: createdCallId }).then((result) => {
+          const createdProposal = result.createProposal;
+
+          if (createdProposal) {
+            secondCreatedProposalPk = createdProposal.primaryKey;
+
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: proposal2.title,
+              abstract: proposal2.abstract,
+              proposerId: initialDBData.users.user1.id,
+            });
+
+            cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.finished.id,
+              proposalPks: [secondCreatedProposalPk],
+            });
+
+            cy.assignProposalsToInstruments({
+              instrumentIds: [newlyCreatedInstrumentId],
+              proposalPks: [secondCreatedProposalPk],
+            });
+            cy.assignProposalsToFaps({
+              fapInstruments: [
+                { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+              ],
+              proposalPks: [createdProposal.primaryKey],
+            });
+          }
+
+          cy.updateCall({
+            id: createdCallId,
+            ...closedCall,
+            shortCode: 'legacy call',
+            proposalWorkflowId: createdWorkflowId,
+            esiTemplateId: createdEsiTemplateId,
+            faps: [createdFapId],
+            callFapReviewEnded: true,
+          });
+
+          cy.visit('/FapPage/' + createdFapId);
+
+          cy.contains(firstCreatedProposalId).should('exist');
+          cy.contains(createdProposal.proposalId).should('not.exist');
+
+          cy.contains('Legacy Proposals').click();
+
+          cy.contains(createdProposal.proposalId).should('exist');
+          cy.contains(firstCreatedProposalId).should('not.exist');
+        });
+      });
     });
   });
 });
