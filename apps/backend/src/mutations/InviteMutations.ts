@@ -3,14 +3,17 @@ import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
+import database from '../datasources/postgres/database';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { VisitRegistrationClaimDataSource } from '../datasources/VisitRegistrationClaimDataSource';
 import { Authorized } from '../decorators';
 import { ApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -35,10 +38,14 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.VisitRegistrationClaimDataSource)
+    private visitRegistrationClaimDataSource: VisitRegistrationClaimDataSource,
     @inject(Tokens.VisitDataSource)
     private visitDataSource: VisitDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.VisitAuthorization)
+    private visitAuthorization: VisitAuthorization,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
@@ -62,8 +69,9 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    await this.processRoleClaims(agent!.id, invite);
-    await this.processCoProposerClaims(agent!.id, invite);
+    await this.processAcceptedRoleClaims(agent!.id, invite);
+    await this.processAcceptedCoProposerClaims(agent!.id, invite);
+    await this.processAcceptedVisitRegistrationClaims(agent!.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
@@ -158,7 +166,85 @@ export default class InviteMutations {
     return invites;
   }
 
-  private async processRoleClaims(claimerUserId: number, invite: Invite) {
+  @Authorized()
+  public async setVisitRegistrationInvites(
+    agent: UserWithRole | null,
+    args: { visitId: number; emails: string[] }
+  ): Promise<Invite[] | Rejection> {
+    const { visitId, emails } = args;
+
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuthorization.hasWriteRights(agent, visitId));
+
+    if (!hasWriteRights) {
+      return rejection(
+        'User is not authorized to create invites for this visit'
+      );
+    }
+
+    const existingInvites =
+      await this.inviteDataSource.findVisitRegistrationInvites(visitId, false);
+
+    const existingEmails = existingInvites.map((invite) => invite.email);
+    const deletedEmails = existingEmails.filter(
+      (email) => !emails.includes(email)
+    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+
+    const expirationDate = await this.getInviteExpirationDate();
+
+    const newInvites = await Promise.all(
+      newEmails.map(async (email) =>
+        this.inviteDataSource.create({
+          createdByUserId: agent!.id,
+          code: await this.generateInviteCode(),
+          email: email,
+          expiresAt: expirationDate,
+        })
+      )
+    );
+    await Promise.all(
+      newInvites.map(async (newInvite) => {
+        await this.visitRegistrationClaimDataSource.create(
+          newInvite.id,
+          visitId
+        );
+      })
+    );
+
+    const invites = [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+
+    const { primaryKey: proposalPk } =
+      await this.proposalDataSource.getProposalByVisitId(visitId);
+
+    await this.eventBus.publish({
+      type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+      array: invites,
+      key: 'array',
+      loggedInUserId: agent?.id,
+      inputArgs: JSON.stringify(args),
+      impersonatingUserId: agent ? agent.impersonatingUserId : null,
+      proposalPKey: proposalPk,
+    } as ApplicationEvent);
+
+    return invites;
+  }
+  private async processAcceptedRoleClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
     const inviteId = invite.id;
     const roleClaims = await this.roleClaimDataSource.findByInviteId(inviteId);
 
@@ -179,7 +265,10 @@ export default class InviteMutations {
     }
   }
 
-  private async processCoProposerClaims(claimerUserId: number, invite: Invite) {
+  private async processAcceptedCoProposerClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
     const inviteId = invite.id;
     const coProposerClaim =
       await this.coProposerClaimDataSource.findByInviteId(inviteId);
@@ -207,6 +296,52 @@ export default class InviteMutations {
         invite: invite,
         description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
         proposalPKey: claim.proposalPk,
+      });
+    }
+  }
+  private async processAcceptedVisitRegistrationClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
+    const inviteId = invite.id;
+    const claims =
+      await this.visitRegistrationClaimDataSource.findByInviteId(inviteId);
+
+    for (const claim of claims) {
+      const existingRegistration = await this.visitDataSource.getRegistration(
+        claimerUserId,
+        claim.visitId
+      );
+
+      if (existingRegistration) {
+        return;
+      }
+
+      // Insert the user into the visits_has_users table to create a new visit registration
+      await database('visits_has_users')
+        .insert({
+          visit_id: claim.visitId,
+          user_id: claimerUserId,
+          registration_questionary_id: null,
+          starts_at: null,
+          ends_at: null,
+          // status will default to 'DRAFTED' as defined in the database schema
+        })
+        .onConflict(['user_id', 'visit_id'])
+        .ignore();
+
+      const proposal = await this.proposalDataSource.getProposalByVisitId(
+        claim.visitId
+      );
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted visit invite`,
+        proposalPKey: proposal.primaryKey,
       });
     }
   }

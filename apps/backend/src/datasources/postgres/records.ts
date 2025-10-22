@@ -66,6 +66,7 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../../models/VisitRegistration';
+import { VisitRegistrationClaim } from '../../models/VisitRegistrationClaim';
 import { WorkflowType } from '../../models/Workflow';
 import {
   FapInstrument,
@@ -273,6 +274,11 @@ export interface VisitRegistrationRecord {
   starts_at: Date | null;
   ends_at: Date | null;
   status: string;
+}
+
+export interface VisitRegistrationClaimRecord {
+  readonly invite_id: number;
+  readonly visit_id: number;
 }
 
 export interface RoleRecord {
@@ -1211,6 +1217,15 @@ export const createVisitObject = (visit: VisitRecord) => {
     visit.team_lead_user_id,
     visit.created_at,
     visit.experiment_pk
+  );
+};
+
+export const createVisitRegistrationClaimObject = (
+  visitRegistrationClaim: VisitRegistrationClaimRecord
+) => {
+  return new VisitRegistrationClaim(
+    visitRegistrationClaim.invite_id,
+    visitRegistrationClaim.visit_id
   );
 };
 
