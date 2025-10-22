@@ -7,17 +7,16 @@ const router = express.Router();
 
 router.get('/readiness', async (req: Request, res: Response) => {
   try {
-    await baseContext.queries.system.connectivityCheck().then((success) => {
-      const responseStatus = success ? 200 : 503;
-      res.status(responseStatus).json({
-        application: {
-          status: 'UP',
-          database: {
-            status: success ? 'UP' : 'DOWN',
-            message: success ? 'Connected' : 'Not connected',
-          },
+    const success = await baseContext.queries.system.connectivityCheck();
+    const responseStatus = success ? 200 : 503;
+    res.status(responseStatus).json({
+      application: {
+        status: 'UP',
+        database: {
+          status: success ? 'UP' : 'DOWN',
+          message: success ? 'Connected' : 'Not connected',
         },
-      });
+      },
     });
   } catch (e) {
     logger.logException('Readiness check failed', e);
