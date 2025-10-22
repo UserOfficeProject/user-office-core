@@ -99,10 +99,6 @@ async function enableDefaultEssFeatures() {
     settingsValue: 'FEASIBILITY_REVIEW',
   });
   await db.updateSettings({
-    settingsId: SettingsId.GRADE_PRECISION,
-    settingsValue: '1',
-  });
-  await db.updateSettings({
     settingsId: SettingsId.DISPLAY_FAQ_LINK,
     settingsValue: 'true',
   });
