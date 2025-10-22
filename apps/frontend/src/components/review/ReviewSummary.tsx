@@ -161,7 +161,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
                       toastSuccessMessage: 'Updated',
                     }).updateReview({
                       reviewID: state.fapReview.id,
-                      grade: state.fapReview.grade || 0,
+                      grade: state.fapReview.grade || '0',
                       comment: state.fapReview.comment || '',
                       status: state.fapReview.status,
                       fapID: state.fapReview.fapID,
@@ -196,7 +196,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
                             'Your review has been submitted successfully.',
                         }).updateReview({
                           reviewID: state.fapReview.id,
-                          grade: state.fapReview.grade || 0,
+                          grade: state.fapReview.grade || '0',
                           comment: state.fapReview.comment || '',
                           status: ReviewStatus.SUBMITTED,
                           fapID: state.fapReview.fapID,
