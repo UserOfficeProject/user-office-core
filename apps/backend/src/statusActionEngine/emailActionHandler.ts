@@ -139,7 +139,8 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         templateMessage,
-        loggedInUserId
+        loggedInUserId,
+        'CoProposer'
       );
 
       break;
@@ -424,7 +425,8 @@ const sendMail = async (
   successfulMessage: string,
   failMessage: string,
   templateMessage: string,
-  loggedInUserId?: number | null
+  loggedInUserId?: number | null,
+  messageType?: string
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const loggingHandler = container.resolve<
@@ -434,7 +436,7 @@ const sendMail = async (
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.EmailEventHandler);
 
-  if (!recipientsWithData.length) {
+  if (!recipientsWithData.length && messageType != 'CoProposer') {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
     });
