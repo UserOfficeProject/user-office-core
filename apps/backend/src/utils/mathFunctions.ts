@@ -14,7 +14,7 @@ export const average = (numbers: number[]) => {
 export const getGrades = (reviews: Review[] | null | undefined) =>
   reviews
     ?.filter((review) => review.status === ReviewStatus.SUBMITTED)
-    .map((review) => review.grade as number) ?? [];
+    .map((review) => parseFloat(review.grade)) ?? [];
 
 export const sortByRankOrder = (
   a: FapProposalWithReviewGradesAndRanking,
