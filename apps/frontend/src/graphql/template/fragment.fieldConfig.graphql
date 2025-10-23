@@ -167,6 +167,10 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     readPermissions
+    minGrade
+    maxGrade
+    decimalPoints
+    nonNumericOptions
   }
 
   ... on TechnicalReviewBasisConfig {

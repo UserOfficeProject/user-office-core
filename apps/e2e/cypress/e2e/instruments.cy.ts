@@ -1679,6 +1679,8 @@ context('Instrument tests', () => {
             instrumentId: createdInstrumentId,
             questionaryId: 3,
           });
+
+          cy.reload(); // we need to reload because client is unware of the changes made by cy.assignProposalsToInstruments, because it was not done with ui
         }
       });
       selectAllProposalsFilterStatus();
@@ -1800,8 +1802,11 @@ context('Instrument tests', () => {
               .wrap(result.addTechnicalReview.id.toString())
               .as('technicalReview2Id')
           );
+
+          cy.reload(); // we need to reload because client is unware of the changes made by cy.assignProposalsToInstruments, because it was not done with ui
         }
       });
+
       selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title)

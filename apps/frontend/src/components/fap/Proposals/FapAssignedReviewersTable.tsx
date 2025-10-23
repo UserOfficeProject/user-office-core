@@ -33,6 +33,7 @@ type FapAssignedReviewersTableProps = {
     proposalPk: number
   ) => Promise<void>;
   updateView: (proposalPk: number) => Promise<void>;
+  editable?: boolean;
 };
 
 const FapAssignedReviewersTable = ({
@@ -40,6 +41,7 @@ const FapAssignedReviewersTable = ({
   fapSecs,
   removeAssignedReviewer,
   updateView,
+  editable = true,
 }: FapAssignedReviewersTableProps) => {
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
@@ -169,15 +171,44 @@ const FapAssignedReviewersTable = ({
     setOpenProposalPk(null);
   };
 
-  const editableTableRow = hasAccessRights
-    ? {
-        deleteTooltip: () => 'Remove assignment',
-        onRowDelete: (
-          rowAssignmentsData: FapProposalAssignmentType
-        ): Promise<void> =>
-          removeAssignedReviewer(rowAssignmentsData, fapProposal.proposalPk),
-      }
-    : {};
+  const editableTableRow =
+    editable && hasAccessRights
+      ? {
+          deleteTooltip: () => 'Remove assignment',
+          onRowDelete: (
+            rowAssignmentsData: FapProposalAssignmentType
+          ): Promise<void> =>
+            removeAssignedReviewer(rowAssignmentsData, fapProposal.proposalPk),
+        }
+      : {};
+
+  const reviewProposals = (
+    review: {
+      id: number;
+      status: ReviewStatus | undefined;
+    } | null
+  ) => {
+    if (!review) {
+      return;
+    }
+
+    setSearchParams((searchParams) => {
+      if (review) searchParams.set('reviewerModal', review.id.toString());
+      searchParams.set(
+        'modalTab',
+        isDraftStatus(review?.status)
+          ? reviewProposalTabNames
+              .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
+              .toString()
+          : reviewProposalTabNames
+              .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+              .toString()
+      );
+
+      return searchParams;
+    });
+    setOpenProposalPk(fapProposal.proposalPk);
+  };
 
   return (
     <Box
@@ -252,53 +283,42 @@ const FapAssignedReviewersTable = ({
         title={'Assigned reviewers'}
         data={fapAssignmentsWithIdAndFormattedDate}
         editable={editableTableRow}
-        actions={[
-          (rowData) => ({
-            icon: isDraftStatus(rowData?.review?.status)
-              ? () => <RateReviewIcon data-cy="grade-proposal-icon" />
-              : () => <Visibility data-cy="view-proposal-details-icon" />,
-            onClick: () => {
-              if (!rowData.review) {
-                return;
-              }
-
-              setSearchParams((searchParams) => {
-                if (rowData.review)
-                  searchParams.set(
-                    'reviewerModal',
-                    rowData.review.id.toString()
-                  );
-                searchParams.set(
-                  'modalTab',
-                  isDraftStatus(rowData.review?.status)
-                    ? reviewProposalTabNames
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
-                        .toString()
-                    : reviewProposalTabNames
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
-                        .toString()
-                );
-
-                return searchParams;
-              });
-              setOpenProposalPk(fapProposal.proposalPk);
-            },
-            tooltip: isDraftStatus(rowData.review?.status)
-              ? 'Grade proposal'
-              : 'View review',
-          }),
-          (rowData) => ({
-            icon: () => <FormatListNumberedIcon data-cy="rank-reviewer" />,
-            onClick: () => {
-              setRankReviewer({
-                fapReviewId: rowData.review?.id as number,
-                reviewer: rowData.fapMemberUserId,
-                rank: rowData.rank,
-              });
-            },
-            tooltip: 'Rank Reviewer',
-          }),
-        ]}
+        actions={
+          editable
+            ? [
+                (rowData) => ({
+                  icon: isDraftStatus(rowData?.review?.status)
+                    ? () => <RateReviewIcon data-cy="grade-proposal-icon" />
+                    : () => <Visibility data-cy="view-proposal-details-icon" />,
+                  onClick: () => reviewProposals(rowData.review),
+                  tooltip: isDraftStatus(rowData.review?.status)
+                    ? 'Grade proposal'
+                    : 'View review',
+                }),
+                (rowData) => ({
+                  icon: () => (
+                    <FormatListNumberedIcon data-cy="rank-reviewer" />
+                  ),
+                  onClick: () => {
+                    setRankReviewer({
+                      fapReviewId: rowData.review?.id as number,
+                      reviewer: rowData.fapMemberUserId,
+                      rank: rowData.rank,
+                    });
+                  },
+                  tooltip: 'Rank Reviewer',
+                }),
+              ]
+            : [
+                (rowData) => ({
+                  icon: () => (
+                    <Visibility data-cy="view-proposal-details-icon" />
+                  ),
+                  onClick: () => reviewProposals(rowData.review),
+                  tooltip: 'View review',
+                }),
+              ]
+        }
         options={{
           search: false,
           paging: false,
