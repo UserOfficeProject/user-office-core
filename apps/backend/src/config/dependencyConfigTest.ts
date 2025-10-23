@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -39,6 +40,7 @@ import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSou
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { VisitRegistrationClaimDataSourceMock } from '../datasources/mockups/VisitRegistrationClaimDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
@@ -95,6 +97,11 @@ mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+mapClass(
+  Tokens.VisitRegistrationClaimDataSource,
+  VisitRegistrationClaimDataSourceMock
+);
+mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);

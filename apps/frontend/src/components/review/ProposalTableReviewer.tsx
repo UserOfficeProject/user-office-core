@@ -43,7 +43,7 @@ type UserWithReview = {
   proposalId: string;
   proposalPk: number;
   title: string;
-  grade: number | null;
+  grade: string | null;
   reviewId: number;
   comment: string | null;
   status: ReviewStatus;

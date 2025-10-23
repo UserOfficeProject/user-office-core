@@ -96,7 +96,7 @@ export const dummyFapReview = new Review(
   1,
   1,
   'Dummy Fap review',
-  7,
+  '7',
   0,
   1,
   1,
@@ -237,6 +237,14 @@ export class FapDataSourceMock implements FapDataSource {
         (fp) => fp.fapId === fapId && fp.proposalPk === proposalPk
       ) || null
     );
+  }
+
+  getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    throw new Error('Method not implemented.');
   }
 
   updateTimeAllocation(

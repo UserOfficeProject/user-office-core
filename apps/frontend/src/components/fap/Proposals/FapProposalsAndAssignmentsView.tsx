@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -23,16 +23,32 @@ const FapProposalsAndAssignments = ({
   onFapUpdate,
   fapProposals,
 }: FapProposalsAndAssignmentsProps) => {
-  const { loadingCalls, calls } = useCallsData({ fapIds: [fapData.id] });
+  const { loadingCalls, calls } = useCallsData({
+    fapIds: [fapData.id],
+    isFapReviewEnded: false,
+  });
   // NOTE: Default null means load all calls if nothing is selected
   const { loadingInstruments, instruments } = useFapInstruments(
     fapData.id,
     null
   );
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const call = searchParams.get('call');
   const instrument = searchParams.get('instrument');
+
+  useEffect(() => {
+    const currentCall = call ? parseInt(call) : null;
+
+    // If the selected call is not valid, remove it from the URL
+    if (call && !loadingCalls && !calls.find((c) => c.id === currentCall)) {
+      setSearchParams((searchParams) => {
+        searchParams.delete('call');
+
+        return searchParams;
+      });
+    }
+  }, [call, calls, loadingCalls, searchParams, setSearchParams]);
 
   return (
     <>

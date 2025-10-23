@@ -129,10 +129,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
               .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
               .orWhere('principal_investigator', 'in', stfcUserIds)
-              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-              .orWhereRaw(
-                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-                { searchText: filter.text }
+              .orWhereJsonFieldLikeEscaped(
+                'instruments',
+                'name',
+                `${filter.text}`
               );
           });
         }
