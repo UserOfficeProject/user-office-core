@@ -19,7 +19,6 @@ const spyLogInfo = jest
 const mockMailService = {
   sendMail: jest.fn(),
 };
-//we should have a test email inbocx to recieve all the email instead of skipping it, for e2e testing and for better pathways
 describe('stfcEmailHandler', () => {
   beforeAll(() => {
     container.registerInstance(Tokens.MailService, mockMailService);
@@ -30,7 +29,7 @@ describe('stfcEmailHandler', () => {
     jest.resetModules();
   });
 
-  describe('handling CALL_CREATED event', () => {
+  describe('These are the test for the handler function stfcEmailhandler', () => {
     it('When running Node process does not have env.FBS_EMAIL value', () => {
       process.env.FBS_EMAIL = '';
       const mockEvent = {
@@ -48,12 +47,9 @@ describe('stfcEmailHandler', () => {
         {}
       );
     });
-  });
 
-  describe('mailService.sendMail is sucessful', () => {
-    it('When all required settings are valid', async () => {
-      // here instead of using a rng email, we instead set a magic variable for readability
-      // This test us
+    it('mailService.sendMail is sucessful', async () => {
+      // When all required settings are valid
       const inviteEmail = faker.internet.email();
       process.env.FBS_EMAIL = inviteEmail;
       const mockEvent = {
@@ -90,10 +86,9 @@ describe('stfcEmailHandler', () => {
         event: mockEvent,
       });
     });
-  });
 
-  describe('mailService.sendMail is not sucessful', () => {
-    it('Then mailService.catch is evoked, logError(x) will be present', async () => {
+    it('mailService.sendMail is not sucessful', async () => {
+      // Then mailService.catch is evoked, logError(x) will be present
       const inviteEmail = faker.internet.email();
       process.env.FBS_EMAIL = inviteEmail;
       const mockEvent = {
