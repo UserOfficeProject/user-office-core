@@ -890,6 +890,7 @@ context('Calls tests', () => {
       //check order for users
       cy.logout();
       cy.login('user2', initialDBData.roles.user);
+      cy.visit('/');
       cy.contains('New Proposal').click();
 
       cy.get('[data-cy="call-list"]').find('li:first-child');
