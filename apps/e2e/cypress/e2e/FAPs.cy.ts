@@ -3895,7 +3895,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains('Lowest grade is 1');
 
-      cy.get('#grade-proposal').click().clear().clear().type('10.001');
+      cy.get('#grade-proposal').click().clear().clear().type('1.001');
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
