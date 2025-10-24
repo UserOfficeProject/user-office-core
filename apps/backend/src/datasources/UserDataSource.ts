@@ -28,8 +28,8 @@ export interface UserDataSource {
   getUsersByUserNumbers(id: readonly number[]): Promise<User[]>;
   getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;

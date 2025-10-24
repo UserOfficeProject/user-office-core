@@ -412,8 +412,8 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null> {
     return null;
   }

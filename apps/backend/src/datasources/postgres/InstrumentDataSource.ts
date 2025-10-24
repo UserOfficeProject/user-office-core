@@ -636,7 +636,7 @@ export default class PostgresInstrumentDataSource
       .join('instrument_has_scientists as ihs', {
         'u.user_id': 'ihs.user_id',
       })
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('ihs.instrument_id', instrumentId)
       .then(
         (

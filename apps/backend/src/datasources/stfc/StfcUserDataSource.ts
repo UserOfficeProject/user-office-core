@@ -529,8 +529,8 @@ export class StfcUserDataSource implements UserDataSource {
   }
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null> {
     return await postgresUserDataSource.getUserWithInstitution(id);
   }
