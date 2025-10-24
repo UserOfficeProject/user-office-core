@@ -765,6 +765,9 @@ context('Status actions tests', () => {
           );
         }
       });
+
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000); // wait until status actions are executed
     });
 
     it('User Officer should be able to view and replay email status actions', () => {
@@ -1059,6 +1062,9 @@ context('Status actions tests', () => {
         const proposal = result.createProposal;
         if (proposal) {
           cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+
             cy.login('officer');
             cy.visit('/');
 
