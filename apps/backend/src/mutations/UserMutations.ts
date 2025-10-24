@@ -576,7 +576,7 @@ export default class UserMutations {
         '',
         gender ?? '',
         formattedBirthDate?.toJSDate() ?? new Date(),
-        institution?.id ?? undefined,
+        institution?.id ?? null,
         department ?? '',
         position,
         email,

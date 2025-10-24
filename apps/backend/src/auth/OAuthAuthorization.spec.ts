@@ -204,7 +204,7 @@ describe('OAuthAuthorization', () => {
 
   describe('upsertUser->create: INITIAL_USER_OFFICER_EMAIL', () => {
     it('should assign USER_OFFICER role if the email is the INITIAL_USER_OFFICER_EMAIL', async () => {
-      process.env.INITIAL_USER_OFFICER_EMAIL = dummyUser.email as string;
+      process.env.INITIAL_USER_OFFICER_EMAIL = dummyUser.email!;
 
       jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
       jest.spyOn(mockUserDataSource, 'getByOIDCSub').mockResolvedValue(null);

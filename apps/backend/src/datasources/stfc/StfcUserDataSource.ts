@@ -529,8 +529,8 @@ export class StfcUserDataSource implements UserDataSource {
   }
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null> {
     return await postgresUserDataSource.getUserWithInstitution(id);
   }
@@ -686,20 +686,20 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async create(
-    user_title: string | undefined,
+    user_title: string | null,
     firstname: string,
     lastname: string,
-    username: string,
-    preferredname: string | undefined,
-    oidc_sub: string,
-    oauth_refresh_token: string,
-    oauth_issuer: string,
+    username: string | null,
+    preferredname: string | null,
+    oidc_sub: string | null,
+    oauth_refresh_token: string | null,
+    oauth_issuer: string | null,
     gender: string,
     birthdate: Date,
-    institution: number,
+    institution: number | null,
     department: string,
     position: string,
-    email: string,
+    email: string | null,
     telephone: string
   ): Promise<User> {
     throw new Error('Method not implemented.');

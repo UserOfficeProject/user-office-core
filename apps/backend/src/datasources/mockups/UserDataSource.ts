@@ -412,8 +412,8 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null> {
     return null;
   }
@@ -487,20 +487,20 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async create(
-    user_title: string | undefined,
+    user_title: string | null,
     firstname: string,
     lastname: string,
-    username: string,
-    preferredname: string | undefined,
-    oidc_sub: string,
-    oauth_refreshtoken: string,
-    oauth_issuer: string,
+    username: string | null,
+    preferredname: string | null,
+    oidc_sub: string | null,
+    oauth_refresh_token: string | null,
+    oauth_issuer: string | null,
     gender: string,
     birthdate: Date,
-    institution: number | undefined,
+    institution_id: number | null,
     department: string,
     position: string,
-    email: string,
+    email: string | null,
     telephone: string
   ) {
     return new User(
@@ -511,11 +511,11 @@ export class UserDataSourceMock implements UserDataSource {
       username,
       preferredname || '',
       oidc_sub,
-      oauth_refreshtoken,
+      oauth_refresh_token,
       oauth_issuer,
       gender || 'unspecified',
       birthdate,
-      institution || 1,
+      institution_id || 1,
       'Test institution',
       department,
       position,

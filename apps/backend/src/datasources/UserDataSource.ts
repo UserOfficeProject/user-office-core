@@ -28,8 +28,8 @@ export interface UserDataSource {
   getUsersByUserNumbers(id: readonly number[]): Promise<User[]>;
   getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution;
-    country: Country;
+    institution: Institution | null;
+    country: Country | null;
   } | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;
@@ -58,20 +58,20 @@ export interface UserDataSource {
   >;
   // Write
   create(
-    user_title: string | undefined,
+    user_title: string | null,
     firstname: string,
     lastname: string,
-    username: string,
-    preferredname: string | undefined,
-    oidc_sub: string,
-    oauth_refreshtoken: string,
-    oauth_issuer: string,
+    username: string | null,
+    preferredname: string | null,
+    oidc_sub: string | null,
+    oauth_refresh_token: string | null,
+    oauth_issuer: string | null,
     gender: string,
     birthdate: Date,
-    institution: number | undefined,
+    institution_id: number | null,
     department: string,
     position: string,
-    email: string,
+    email: string | null,
     telephone: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;

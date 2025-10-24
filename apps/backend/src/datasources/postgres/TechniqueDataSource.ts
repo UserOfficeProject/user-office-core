@@ -123,7 +123,7 @@ export default class PostgresTechniqueDataSource
       .join('technique_has_scientists as ths', {
         'u.user_id': 'ths.user_id',
       })
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('ths.technique_id', techniqueId)
       .then(
         (

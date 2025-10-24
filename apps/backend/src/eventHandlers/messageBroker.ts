@@ -51,8 +51,8 @@ type Member = {
   email: string | null;
   oidcSub: string | null;
   oauthIssuer: string | null;
-  institution: Institution;
-  country: Country;
+  institution: Institution | null;
+  country: Country | null;
 };
 
 type ProposalMessageData = {
