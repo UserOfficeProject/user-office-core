@@ -1,7 +1,8 @@
 import { MenuItem, Typography } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { BasicUserDetails } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId } from 'generated/sdk';
 import { isValidEmail } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
@@ -12,6 +13,9 @@ interface NoOptionsTextProps {
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
+  /* If true, if no user with email is found show invite option */
+  allowEmailInvites?: boolean;
+  /* If true, only allow searching users by entering their email */
   isEmailSearchOnly: boolean;
   allowInviteByEmail?: boolean;
 }
@@ -26,7 +30,14 @@ function NoOptionsText({
   isEmailSearchOnly,
   allowInviteByEmail = false,
 }: NoOptionsTextProps) {
-  const isEmailInviteEnabled = allowInviteByEmail;
+  const featureContext = useContext(FeatureContext);
+  const isEmailInviteFeatureEnabled = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
+  // email invite will be enabled if both the prop and the feature flag are true
+  const isEmailInviteEnabled =
+    allowInviteByEmail && isEmailInviteFeatureEnabled;
 
   if (exactEmailMatch) {
     return (

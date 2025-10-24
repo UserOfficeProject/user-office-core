@@ -8,6 +8,7 @@ import 'reflect-metadata';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -43,6 +44,7 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { createSkipLoggingHandler } from '../eventHandlers/logging';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -106,6 +108,11 @@ mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+mapClass(
+  Tokens.VisitRegistrationClaimDataSource,
+  PostgresVisitRegistrationClaimDataSource
+);
+mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.TechniqueDataSource, PostgresTechniqueDataSource);
 mapClass(
