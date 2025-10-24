@@ -17,6 +17,7 @@ import FapGeneralInfo from './General/FapGeneralInfo';
 import FapMeetingComponentsView from './MeetingComponents/FapMeetingComponentsView';
 import FapMembers from './Members/FapMembers';
 import FapProposalsAndAssignmentsView from './Proposals/FapProposalsAndAssignmentsView';
+import LegacyFapProposals from './Proposals/LegacyFapProposals';
 
 const FapPage = () => {
   const { id } = useParams();
@@ -76,6 +77,15 @@ const FapPage = () => {
       name: 'Documents',
       element: <FapFilesView data={fap} />,
     },
+    {
+      name: 'Legacy Proposals',
+      element: (
+        <LegacyFapProposals
+          data={fap}
+          onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+        />
+      ),
+    },
   ];
 
   if (isFapChairOrSecretary || isUserOfficer) {
@@ -119,6 +129,15 @@ const FapPage = () => {
       {
         name: 'Meeting Components',
         element: <FapMeetingComponentsView fapId={fap.id} code={fap.code} />,
+      },
+      {
+        name: 'Legacy Proposals',
+        element: (
+          <LegacyFapProposals
+            data={fap}
+            onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+          />
+        ),
       },
     ];
   }

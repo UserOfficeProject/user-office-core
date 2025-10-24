@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.2.0",
-    "exportDate": "2025-08-06T13:41:10.324Z"
+    "exportDate": "2025-10-17T11:23:20.021Z"
   },
   "data": {
     "template": {
@@ -249,121 +249,6 @@
           {
             "question": {
               "categoryId": 1,
-              "id": "dynamic_multiple_choice_question",
-              "naturalKey": "dynamic_multiple_choice_question",
-              "dataType": "DYNAMIC_MULTIPLE_CHOICE",
-              "question": "Dynamic multiple choice question from seeds",
-              "config": {
-                "required": false,
-                "small_label": "",
-                "tooltip": "",
-                "variant": "dropdown",
-                "url": "",
-                "jsonPath": "",
-                "isMultipleSelect": true,
-                "apiCallRequestHeaders": [],
-                "readPermissions": []
-              }
-            },
-            "topicId": 8,
-            "sortOrder": 6,
-            "config": {
-              "required": false,
-              "small_label": "",
-              "tooltip": "",
-              "variant": "dropdown",
-              "url": "",
-              "jsonPath": "",
-              "isMultipleSelect": true,
-              "apiCallRequestHeaders": [],
-              "readPermissions": []
-            },
-            "dependencies": [],
-            "dependenciesOperator": "AND"
-          },
-          {
-            "question": {
-              "categoryId": 1,
-              "id": "instrument_picker_question",
-              "naturalKey": "instrument_picker_question",
-              "dataType": "INSTRUMENT_PICKER",
-              "question": "Instrument Picker question from seeds",
-              "config": {
-                "small_label": "",
-                "required": false,
-                "tooltip": "",
-                "variant": "dropdown",
-                "instruments": [],
-                "isMultipleSelect": false,
-                "requestTime": false,
-                "readPermissions": [],
-                "options": [
-                  1,
-                  2
-                ]
-              }
-            },
-            "topicId": 8,
-            "sortOrder": 6,
-            "config": {
-              "small_label": "",
-              "required": false,
-              "tooltip": "",
-              "variant": "dropdown",
-              "instruments": [],
-              "isMultipleSelect": false,
-              "requestTime": false,
-              "readPermissions": [],
-              "options": [
-                1,
-                2
-              ]
-            },
-            "dependencies": [],
-            "dependenciesOperator": "AND"
-          },
-          {
-            "question": {
-              "categoryId": 1,
-              "id": "technique_picker_question",
-              "naturalKey": "technique_picker_question",
-              "dataType": "TECHNIQUE_PICKER",
-              "question": "Technique Picker question from seeds",
-              "config": {
-                "small_label": "",
-                "required": false,
-                "tooltip": "",
-                "variant": "dropdown",
-                "techniques": [],
-                "isMultipleSelect": false,
-                "readPermissions": [],
-                "options": [
-                  1,
-                  2
-                ]
-              }
-            },
-            "topicId": 8,
-            "sortOrder": 6,
-            "config": {
-              "small_label": "",
-              "required": false,
-              "tooltip": "",
-              "variant": "dropdown",
-              "techniques": [],
-              "isMultipleSelect": false,
-              "readPermissions": [],
-              "options": [
-                1,
-                2
-              ]
-            },
-            "dependencies": [],
-            "dependenciesOperator": "AND"
-          },
-          {
-            "question": {
-              "categoryId": 1,
               "id": "selection_from_options_question",
               "naturalKey": "selection_from_options_question",
               "dataType": "SELECTION_FROM_OPTIONS",
@@ -539,6 +424,121 @@
             },
             "dependencies": [],
             "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "dynamic_multiple_choice_question",
+              "naturalKey": "dynamic_multiple_choice_question",
+              "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+              "question": "Dynamic multiple choice question from seeds",
+              "config": {
+                "required": false,
+                "small_label": "",
+                "tooltip": "",
+                "variant": "dropdown",
+                "url": "",
+                "jsonPath": "",
+                "isMultipleSelect": true,
+                "apiCallRequestHeaders": [],
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 10,
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "variant": "dropdown",
+              "url": "",
+              "jsonPath": "",
+              "isMultipleSelect": true,
+              "apiCallRequestHeaders": [],
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "instrument_picker_question",
+              "naturalKey": "instrument_picker_question",
+              "dataType": "INSTRUMENT_PICKER",
+              "question": "Instrument Picker question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "instruments": [],
+                "isMultipleSelect": false,
+                "requestTime": false,
+                "readPermissions": [],
+                "options": [
+                  1,
+                  2
+                ]
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 11,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "instruments": [],
+              "isMultipleSelect": false,
+              "requestTime": false,
+              "readPermissions": [],
+              "options": [
+                1,
+                2
+              ]
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "technique_picker_question",
+              "naturalKey": "technique_picker_question",
+              "dataType": "TECHNIQUE_PICKER",
+              "question": "Technique Picker question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "techniques": [],
+                "isMultipleSelect": false,
+                "readPermissions": [],
+                "options": [
+                  1,
+                  2
+                ]
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 12,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "techniques": [],
+              "isMultipleSelect": false,
+              "readPermissions": [],
+              "options": [
+                1,
+                2
+              ]
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
           }
         ]
       }
@@ -656,65 +656,6 @@
       },
       {
         "categoryId": 1,
-        "id": "dynamic_multiple_choice_question",
-        "naturalKey": "dynamic_multiple_choice_question",
-        "dataType": "DYNAMIC_MULTIPLE_CHOICE",
-        "question": "Dynamic multiple choice question from seeds",
-        "config": {
-          "required": false,
-          "small_label": "",
-          "tooltip": "",
-          "variant": "dropdown",
-          "url": "",
-          "jsonPath": "",
-          "isMultipleSelect": true,
-          "apiCallRequestHeaders": [],
-          "readPermissions": []
-        }
-      },
-      {
-        "categoryId": 1,
-        "id": "instrument_picker_question",
-        "naturalKey": "instrument_picker_question",
-        "dataType": "INSTRUMENT_PICKER",
-        "question": "Instrument Picker question from seeds",
-        "config": {
-          "small_label": "",
-          "required": false,
-          "tooltip": "",
-          "variant": "dropdown",
-          "instruments": [],
-          "isMultipleSelect": false,
-          "requestTime": false,
-          "readPermissions": [],
-          "options": [
-            1,
-            2
-          ]
-        }
-      },
-      {
-        "categoryId": 1,
-        "id": "technique_picker_question",
-        "naturalKey": "technique_picker_question",
-        "dataType": "TECHNIQUE_PICKER",
-        "question": "Technique Picker question from seeds",
-        "config": {
-          "small_label": "",
-          "required": false,
-          "tooltip": "",
-          "variant": "dropdown",
-          "techniques": [],
-          "isMultipleSelect": false,
-          "readPermissions": [],
-          "options": [
-            1,
-            2
-          ]
-        }
-      },
-      {
-        "categoryId": 1,
         "id": "selection_from_options_question",
         "naturalKey": "selection_from_options_question",
         "dataType": "SELECTION_FROM_OPTIONS",
@@ -803,6 +744,65 @@
           "tooltip": "",
           "required": false,
           "small_label": ""
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "dynamic_multiple_choice_question",
+        "naturalKey": "dynamic_multiple_choice_question",
+        "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+        "question": "Dynamic multiple choice question from seeds",
+        "config": {
+          "required": false,
+          "small_label": "",
+          "tooltip": "",
+          "variant": "dropdown",
+          "url": "",
+          "jsonPath": "",
+          "isMultipleSelect": true,
+          "apiCallRequestHeaders": [],
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "instrument_picker_question",
+        "naturalKey": "instrument_picker_question",
+        "dataType": "INSTRUMENT_PICKER",
+        "question": "Instrument Picker question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "variant": "dropdown",
+          "instruments": [],
+          "isMultipleSelect": false,
+          "requestTime": false,
+          "readPermissions": [],
+          "options": [
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "technique_picker_question",
+        "naturalKey": "technique_picker_question",
+        "dataType": "TECHNIQUE_PICKER",
+        "question": "Technique Picker question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "variant": "dropdown",
+          "techniques": [],
+          "isMultipleSelect": false,
+          "readPermissions": [],
+          "options": [
+            1,
+            2
+          ]
         }
       }
     ],
