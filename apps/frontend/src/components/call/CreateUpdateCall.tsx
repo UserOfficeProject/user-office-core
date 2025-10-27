@@ -168,7 +168,6 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
-          console.log({ values });
           if (call) {
             const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',

@@ -37,12 +37,14 @@ export class FapQuery {
     @Arg('callId', () => Int, { nullable: true }) callId: number | null,
     @Arg('instrumentId', () => Int, { nullable: true })
     instrumentId: number | null,
+    @Arg('legacy', () => Boolean, { nullable: true }) legacy: boolean,
     @Ctx() context: ResolverContext
   ): Promise<FapProposal[] | null> {
     return context.queries.fap.getFapProposals(context.user, {
       fapId,
       callId,
       instrumentId,
+      legacy,
     });
   }
 
