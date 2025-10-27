@@ -60,15 +60,8 @@ function readWriteReview(
     expect(content).to.have.string(commentContent)
   );
 
-  if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
-    cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
-
-    cy.get('[role="listbox"] > [role="option"]').first().click();
-
-    cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
-  } else {
-    cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
-  }
+  cy.get('[data-cy="grade-proposal"]').click();
+  cy.get('[data-cy="grade-proposal-options"] [role="option"]').first().click();
 
   cy.get(`#comment_ifr`).first().focus().click();
 
@@ -1673,7 +1666,7 @@ context('Fap reviews tests', () => {
               cy.updateReview({
                 reviewID: proposalReviews[0].id,
                 comment: comment1,
-                grade: 2,
+                grade: '2',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: proposalReviews[0].questionaryID,
@@ -1780,16 +1773,10 @@ context('Fap reviews tests', () => {
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
-      if (
-        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
-      ) {
-        cy.get('[data-cy="grade-proposal"]').click();
-        cy.get('[data-cy="grade-proposal-options"] [role="option"]')
-          .first()
-          .click();
-      } else {
-        cy.get('[data-cy="grade-proposal"]').click().click().type('1');
-      }
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
@@ -2372,7 +2359,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2390,7 +2377,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2794,10 +2781,10 @@ context('Fap meeting components tests', () => {
       cy.get('@timeAllocation').type('-1').blur();
       cy.contains('Must be greater than or equal to');
 
-      cy.get('@timeAllocation').clear().type('987654321').blur();
+      cy.get('@timeAllocation').clear().clear().type('987654321').blur();
       cy.contains('Must be less than or equal to');
 
-      cy.get('@timeAllocation').clear().type('9999');
+      cy.get('@timeAllocation').clear().clear().type('9999');
       cy.get('[data-cy="save-time-allocation"]').click();
 
       cy.finishedLoading();
@@ -2950,7 +2937,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -2968,7 +2955,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3275,17 +3262,10 @@ context('Fap meeting components tests', () => {
       const commentContent = faker.lorem.words(3);
       cy.setTinyMceContent('comment', commentContent);
 
-      if (
-        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
-      ) {
-        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
-
-        cy.get('[role="listbox"] > [role="option"]').first().click();
-
-        cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
-      } else {
-        cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
-      }
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .first()
+        .click();
 
       cy.get(`#comment_ifr`).first().focus().click();
 
@@ -3542,7 +3522,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3560,7 +3540,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3776,7 +3756,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment1,
                   // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                  grade: index ? 2 : 4,
+                  grade: index ? '2' : '4',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3794,7 +3774,7 @@ context('Fap meeting components tests', () => {
                   reviewID: review.id,
                   comment: comment2,
                   // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                  grade: index ? 1 : 5,
+                  grade: index ? '1' : '5',
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
                   questionaryID: review.questionaryID,
@@ -3881,7 +3861,7 @@ context('Fap meeting components tests', () => {
       cy.contains('Comment is required');
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('[data-cy=save-and-continue-button]').focus().click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
@@ -3889,31 +3869,16 @@ context('Fap meeting components tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.get('[data-cy="officer-menu-items"]').contains('Settings').click();
-      cy.get('[data-cy="officer-menu-items"]').contains('App settings').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .get('input[aria-label="Search"]')
-        .type('GRADE_PRECISION');
+      cy.get('[aria-label="Edit"]').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find('button[aria-label="Edit"]')
-        .click();
+      cy.contains('fap_review_basis').click();
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find(`input[value="1"]`)
-        .clear()
-        .type('0.01');
+      cy.get('[data-cy="decimal_points"]').clear().type('2');
 
-      cy.get('[data-cy="settings-table"]')
-        .contains('GRADE_PRECISION')
-        .parent()
-        .find('button[aria-label="Save"]')
-        .click();
+      cy.get('[data-cy="submit"]').click();
 
       cy.logout();
 
@@ -3930,20 +3895,57 @@ context('Fap meeting components tests', () => {
 
       cy.contains('Lowest grade is 1');
 
-      cy.get('#grade-proposal').clear().type('1.001');
+      cy.get('#grade-proposal').click().clear().clear().type('1.001');
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.get('[data-cy="grade-proposal"] input').then(($input) => {
-        expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Value must be less than or equal to 10.'
-        );
-      });
+      cy.contains('The grade must be a most 2 dp');
 
-      cy.get('#grade-proposal').clear().type('1.01');
+      cy.get('#grade-proposal').click().clear().clear().type('1.01');
 
       cy.get('[data-cy=save-and-continue-button]').click();
-      //cy.notification({ variant: 'success', text: 'Updated' });
+      cy.notification({ variant: 'success', text: 'Saved' });
+    });
+
+    it('Fap Reviewer should be able to give non numeric review', () => {
+      cy.login(initialDBData.users.officer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
+
+      cy.get('[aria-label="Edit"]').click();
+
+      cy.contains('fap_review_basis').click();
+
+      cy.get('[data-cy="add-item-button"]').click();
+
+      cy.get('[aria-label="Answer"]').type('A');
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.logout();
+
+      cy.login(fapMembers.reviewer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+
+      cy.contains('Classification').click();
+      cy.get('[data-cy="grade-proposal"]').click();
+      cy.get('[data-cy="grade-proposal-options"]').last().click();
+
+      cy.get('[data-cy=save-and-continue-button]').click();
+
+      cy.contains('Comment is required').should('not.exist');
+      //TODO submiting review in tests is failing as the comment
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
 });
@@ -4204,20 +4206,20 @@ context(
     it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal using Instrument Picker', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
       cy.finishedLoading();
       cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=call-list]')
+        .contains(initialDBData.call.shortCode)
+        .click();
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
@@ -4482,7 +4484,7 @@ context('Fap meeting exports test', () => {
                 reviewID: review.id,
                 comment: comment1,
                 // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
-                grade: index ? 2 : 4,
+                grade: index ? '2' : '4',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: review.questionaryID,
@@ -4500,7 +4502,7 @@ context('Fap meeting exports test', () => {
                 reviewID: review.id,
                 comment: comment2,
                 // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
-                grade: index ? 1 : 5,
+                grade: index ? '1' : '5',
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
                 questionaryID: review.questionaryID,

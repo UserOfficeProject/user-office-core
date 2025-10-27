@@ -293,7 +293,7 @@ export interface ReviewRecord {
   readonly user_id: number;
   readonly proposal_pk: number;
   readonly comment: string;
-  readonly grade: number;
+  readonly grade: string;
   readonly status: number;
   readonly fap_id: number;
   readonly questionary_id: number;
