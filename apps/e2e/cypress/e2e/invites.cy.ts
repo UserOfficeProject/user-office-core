@@ -469,7 +469,7 @@ context('Invites tests', () => {
       cy.get('[role=presentation]').contains(lastName).click();
       cy.get('[data-cy="invite-user-submit-button"]')
         .should('be.enabled')
-        .click();
+        .click(1, 1);
 
       cy.get('[data-cy="add-participant-button"]').click();
 
