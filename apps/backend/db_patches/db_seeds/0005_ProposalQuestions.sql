@@ -389,7 +389,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    proposal_template_id_var, proposal_topic_id_var, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 10, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -456,7 +456,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    proposal_template_id_var, proposal_topic_id_var, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 11, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -491,7 +491,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    proposal_template_id_var, proposal_topic_id_var, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 12, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
