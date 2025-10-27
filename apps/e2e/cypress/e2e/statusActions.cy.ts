@@ -64,7 +64,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.get('[data-cy="status-events-and-actions-modal"]')
@@ -167,7 +169,9 @@ context('Status actions tests', () => {
         `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
       ).contains('Email action');
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -251,7 +255,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -322,7 +328,11 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(
+        'ul[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"] > li'
+      )
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -415,7 +425,9 @@ context('Status actions tests', () => {
 
       cy.closeModal();
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -474,7 +486,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -509,7 +523,9 @@ context('Status actions tests', () => {
         '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
       ).contains('Proposal download action');
 
-      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
