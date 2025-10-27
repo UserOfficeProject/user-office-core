@@ -370,7 +370,9 @@ context('Invites tests', () => {
         `${randomSearch}{enter}`
       );
 
-      cy.get('.MuiChip-label').should('not.be.visible');
+      cy.get('[data-cy="participant-selector"] .MuiChip-label').should(
+        'not.exist'
+      );
     });
   });
 
@@ -410,7 +412,9 @@ context('Invites tests', () => {
         .should('be.enabled')
         .click();
 
-      cy.get('.MuiChip-label').should('not.be.visible');
+      cy.get('[data-cy="participant-selector"] .MuiChip-label').should(
+        'not.exist'
+      );
       cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
@@ -435,7 +439,9 @@ context('Invites tests', () => {
       cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
       cy.get('[role=presentation]').contains(`No results found for "${email}"`);
       cy.get('[data-cy="invite-user-submit-button"]').should('be.disabled');
-      cy.get('.MuiChip-label').should('not.be.visible');
+      cy.get('[data-cy="participant-selector"] .MuiChip-label').should(
+        'not.exist'
+      );
     });
 
     it('Should not be able to add duplicate co-proposer in modal', () => {
