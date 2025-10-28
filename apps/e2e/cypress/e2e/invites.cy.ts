@@ -469,9 +469,9 @@ context('Invites tests', () => {
       cy.get('[role=presentation]').contains(lastName).click();
       cy.get('[data-cy="invite-user-submit-button"]')
         .should('be.enabled')
-        .click(1, 1);
+        .click();
 
-      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="add-participant-button"]').click(1, 1);
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
       cy.get('[role=presentation]')
