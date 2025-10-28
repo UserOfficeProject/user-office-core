@@ -290,7 +290,8 @@ export class StfcUserAuthorization extends UserAuthorization {
         return response.identifier !== undefined;
       })
       .catch((error) => {
-        logger.logError(
+        // Warn only as this could be a user trying to use an expired token
+        logger.logWarn(
           'An error occurred while validating the token using validateToken',
           error
         );

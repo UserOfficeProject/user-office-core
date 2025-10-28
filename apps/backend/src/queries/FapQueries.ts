@@ -69,14 +69,45 @@ export default class FapQueries {
       fapId,
       callId,
       instrumentId,
-    }: { fapId: number; callId: number | null; instrumentId: number | null }
+      legacy,
+    }: {
+      fapId: number;
+      callId: number | null;
+      instrumentId: number | null;
+      legacy: boolean;
+    }
   ) {
     if (
       this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposals({ fapId, callId, instrumentId });
+      const fapProposals = legacy
+        ? await this.dataSource.getLegacyFapProposals({
+            fapId,
+            callId,
+            instrumentId,
+          })
+        : await this.dataSource.getFapProposals({
+            fapId,
+            callId,
+            instrumentId,
+          });
+
+      // Remove users proposals from the list if the user is a FAP Reviewer
+      // This ensures that Reviewers cannot see reviews of there own proposals
+      // which might contain sensitive information
+      if (agent?.currentRole?.shortCode === Roles.FAP_REVIEWER) {
+        const usersProposals = (
+          await this.proposalDataSource.getUserProposals(agent.id)
+        ).map((p) => p.primaryKey);
+
+        return fapProposals.filter(
+          (fp) => !usersProposals.includes(fp.proposalPk)
+        );
+      }
+
+      return fapProposals;
     } else {
       return null;
     }
