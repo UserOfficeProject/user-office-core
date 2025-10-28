@@ -202,6 +202,7 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(1000);
   });
+  cy.get(`#${tinyMceId}_ifr`).first().focus().click(); // Also focus the iframe to trigger any onChange events
 };
 
 const setDatePickerValue = (selector: string, value: string) =>

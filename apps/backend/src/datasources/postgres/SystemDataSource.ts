@@ -7,7 +7,7 @@ export default class PostgresSystemDataSource implements SystemDataSource {
   async connectivityCheck(): Promise<boolean> {
     try {
       return database
-        .raw('select * FROM "settings" LIMIT 1')
+        .raw('SELECT 1')
         .then(() => {
           return true;
         })
