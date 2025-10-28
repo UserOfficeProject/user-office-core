@@ -508,6 +508,41 @@ context('Samples tests', () => {
       ).contains(sampleTitle);
     });
 
+    it('User officer should be able to add sample to submitted proposal', () => {
+      cy.createSample({
+        proposalPk: createdProposalPk,
+        templateId: createdSampleTemplateId,
+        questionId: createdSampleQuestionId,
+        title: sampleTitle,
+      });
+      cy.visit('/');
+
+      cy.contains('Proposals').click();
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+      /* ==== Generated with Cypress Studio ==== */
+      cy.get('[data-cy="toggle-edit-proposal"]').click();
+      cy.get(
+        ':nth-child(3) > .MuiButtonBase-root > .MuiStepLabel-root > .MuiStepLabel-labelContainer > .MuiStepLabel-label > span'
+      ).click();
+      cy.get('[data-cy="add-button"]').click();
+
+      const newSampleTitle = faker.lorem.words(3);
+      cy.get('#sample_basis-field').clear();
+      cy.get('#sample_basis-field').type(newSampleTitle);
+      cy.get(
+        '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+      ).click();
+      cy.get(
+        '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+      ).click();
+
+      cy.get('[data-cy="questionnaires-list-item"]').contains(newSampleTitle);
+    });
+
     it('User should not be able to submit proposal with unfinished sample', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');

@@ -4,7 +4,7 @@ export class Review {
     public proposalPk: number,
     public userID: number,
     public comment: string,
-    public grade: number,
+    public grade: string,
     public status: number,
     public fapID: number,
     public questionaryID: number,

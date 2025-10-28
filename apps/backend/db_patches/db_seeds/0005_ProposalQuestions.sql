@@ -1,10 +1,22 @@
 DO
 $DO$
+DECLARE
+  proposal_template_id_var INT;
+  proposal_topic_id_var INT;
+  proposal_category_id_var INT;
+  proposal_questionary_id_var INT;
 BEGIN
+-- Get Proposal Template category id
+SELECT template_category_id INTO proposal_category_id_var FROM template_categories WHERE name = 'Proposal' LIMIT 1;
 
+-- Get Proposal Template id
+SELECT template_id INTO proposal_template_id_var FROM templates WHERE name = 'default template' LIMIT 1;
 
+-- Get Proposal Template topic id
+SELECT topic_id INTO proposal_topic_id_var FROM topics WHERE template_id = proposal_template_id_var and topic_title = 'Topic title' LIMIT 1;
 
-
+-- Create a questionary for proposal
+SELECT questionary_id INTO proposal_questionary_id_var FROM questionaries WHERE template_id = proposal_template_id_var LIMIT 1;
 -- BOOLEAN
 INSERT INTO questions(
   question_id, data_type, question, 
@@ -22,7 +34,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'boolean_question', 1
+    'boolean_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -30,7 +42,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'boolean_question', 1, 8, 3, '{
+    'boolean_question', proposal_template_id_var, proposal_topic_id_var, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": "",
@@ -42,7 +54,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    2, 'boolean_question', '{"value": true }'
+    proposal_questionary_id_var, 'boolean_question', '{"value": true }'
   );
 -- Date
 INSERT INTO questions(
@@ -61,7 +73,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'date_question', 1
+    'date_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -69,14 +81,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'date_question', 1, 8, 5, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
+    'date_question', proposal_template_id_var, proposal_topic_id_var, 5, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'date_question', '{"value": "2030-01-01" }'
+    proposal_questionary_id_var, 'date_question', '{"value": "2030-01-01" }'
   );
 -- Embellishment
 INSERT INTO questions(
@@ -91,7 +103,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'embellishment_question', 1
+    'embellishment_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -99,7 +111,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'embellishment_question', 1, 8, 9, 
+    'embellishment_question', proposal_template_id_var, proposal_topic_id_var, 9, 
     '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
@@ -107,7 +119,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    2, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
+    proposal_questionary_id_var, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
   );
 -- File upload
 INSERT INTO questions(
@@ -122,7 +134,7 @@ VALUES
     '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'file_upload_question', 1
+    'file_upload_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -130,14 +142,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 8, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
+    'file_upload_question', proposal_template_id_var, proposal_topic_id_var, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'file_upload_question', '{
+    proposal_questionary_id_var, 'file_upload_question', '{
     "value": [{"id": "1c4b2ca8-f849-42db-b5d6-35aba2b26f8b"}]}'
   );
 -- INTERVAL
@@ -167,7 +179,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'interval_question', 1
+    'interval_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -175,7 +187,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'interval_question', 1, 8, 4, '{
+    'interval_question', proposal_template_id_var, proposal_topic_id_var, 4, '{
         "units": [
             {
                 "id": "meter",
@@ -196,7 +208,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    2, 'interval_question', '{
+    proposal_questionary_id_var, 'interval_question', '{
     "value": {
         "max": 100,
         "min": 1,
@@ -238,7 +250,7 @@ VALUES
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'number_question', 1
+    'number_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -246,7 +258,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'number_question', 1, 8, 2, '{
+    'number_question', proposal_template_id_var, proposal_topic_id_var, proposal_questionary_id_var, '{
         "units": [
             {
                 "id": "meter",
@@ -275,7 +287,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    2, 'number_question', '{
+    proposal_questionary_id_var, 'number_question', '{
     "value": {
         "unit": {
             "id": "centimeter",
@@ -302,7 +314,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'rich_text_input_question', 1
+    'rich_text_input_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -310,7 +322,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'rich_text_input_question', 1, 8, 
+    'rich_text_input_question', proposal_template_id_var, proposal_topic_id_var, 
     8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
@@ -318,7 +330,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    2, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
+    proposal_questionary_id_var, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
   );
 -- Selection from options
 INSERT INTO questions(
@@ -334,7 +346,7 @@ VALUES
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'selection_from_options_question', 
-    1
+    proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -343,14 +355,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'selection_from_options_question', 
-    1, 8, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'selection_from_options_question', 
+    proposal_questionary_id_var, 'selection_from_options_question', 
     '{"value": ["One"] }'
   );
 
@@ -368,7 +380,7 @@ VALUES
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'dynamic_multiple_choice_question', 
-    1
+    proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -377,14 +389,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 8, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 10, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'dynamic_multiple_choice_question', 
+    proposal_questionary_id_var, 'dynamic_multiple_choice_question', 
     '{"value": ["One"] }'
   );
 
@@ -401,7 +413,7 @@ VALUES
     '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
-    'text_input_question', 1
+    'text_input_question', proposal_category_id_var
   );
 INSERT INTO templates_has_questions(
   question_id, template_id, topic_id, 
@@ -409,14 +421,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'text_input_question', 1, 8, 7, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
+    'text_input_question', proposal_template_id_var, proposal_topic_id_var, 7, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'text_input_question', '{"value": "Text input answer from seeds" }'
+    proposal_questionary_id_var, 'text_input_question', '{"value": "Text input answer from seeds" }'
   );
 
 
@@ -434,7 +446,7 @@ VALUES
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'instrument_picker_question', 
-    1
+    proposal_category_id_var
   );
 
 INSERT INTO templates_has_questions(
@@ -444,14 +456,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    1, 8, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 11, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'instrument_picker_question', 
+    proposal_questionary_id_var, 'instrument_picker_question', 
     '{"value": 1 }'
   );
 
@@ -469,7 +481,7 @@ VALUES
     '2024-06-08 10:23:10.285415+00', 
     '2024-06-08 10:23:10.285415+00', 
     'technique_picker_question', 
-    1
+    proposal_category_id_var
   );
 
 INSERT INTO templates_has_questions(
@@ -479,14 +491,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    1, 8, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    proposal_template_id_var, proposal_topic_id_var, 12, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    2, 'technique_picker_question', 
+    proposal_questionary_id_var, 'technique_picker_question', 
     '{"value": 1 }'
   );
 

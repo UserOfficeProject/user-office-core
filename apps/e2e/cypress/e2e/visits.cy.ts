@@ -273,7 +273,11 @@ context('visits tests', () => {
       cy.finishedLoading();
       cy.get('[name=email]').type('david@teleworm.us{enter}');
       cy.finishedLoading();
-      cy.contains('Beckley').parent().find('[type=checkbox]').click();
+      cy.get('[data-cy=co-proposers]')
+        .contains('Beckley')
+        .parent()
+        .find('[type=checkbox]')
+        .click();
       cy.get('[data-cy=assign-selected-users]').click();
 
       // specify team lead
