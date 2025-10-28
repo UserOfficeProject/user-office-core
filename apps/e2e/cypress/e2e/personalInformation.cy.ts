@@ -55,7 +55,9 @@ context('Personal information tests', () => {
       cy.login('user1');
       cy.visit('/');
 
-      cy.get('[data-cy="active-user-profile"]').click();
+      cy.get('[data-cy="profile-page-btn"]').click();
+
+      cy.get('[data-cy="manage-account-button"]').click();
 
       cy.get("[name='firstname']").clear().type(newFirstName);
 
