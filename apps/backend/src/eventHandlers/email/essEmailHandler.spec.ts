@@ -25,7 +25,7 @@ const mockMailService = {
   sendMail: jest.fn(),
 };
 
-describe('essEmailHandler', () => {
+describe('essEmailHandler co-proposer invites', () => {
   let proposalDataSourceMock: ProposalDataSourceMock;
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
   let userDataSourceMock: UserDataSourceMock;
@@ -96,6 +96,56 @@ describe('essEmailHandler', () => {
         claimerLastname: expect.any(String),
       },
       recipients: [{ address: expect.any(String) }],
+    });
+  });
+
+  test('mailService should be invoked when PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED event is sent', async () => {
+    const inviteEmail = faker.internet.email();
+    const inviterId = 1;
+    const inviteId = 123;
+    const redeemCode = faker.string.alphanumeric(10);
+
+    // Mock UserDataSource.getBasicUserInfo to return a dummy inviter
+    const userDataSourceMock = container.resolve<UserDataSourceMock>(
+      Tokens.UserDataSource
+    );
+    jest.spyOn(userDataSourceMock, 'getBasicUserInfo').mockResolvedValue({
+      id: inviterId,
+      firstname: 'Inviter',
+      lastname: 'User',
+      institution: 'TestOrg',
+      email: 'inviter@email.com',
+    } as any);
+
+    const mockEvent = {
+      type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+      array: [
+        {
+          id: inviteId,
+          email: inviteEmail,
+          code: redeemCode,
+          createdByUserId: inviterId,
+          isEmailSent: false,
+        },
+      ],
+      isRejection: false,
+    } as ApplicationEvent;
+
+    await essEmailHandler(mockEvent);
+
+    expect(mockMailService.sendMail).toHaveBeenCalledWith({
+      content: {
+        template_id:
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
+      },
+      substitution_data: {
+        email: inviteEmail,
+        inviterName: 'Inviter',
+        inviterLastname: 'User',
+        inviterOrg: 'TestOrg',
+        redeemCode: redeemCode,
+      },
+      recipients: [{ address: inviteEmail }],
     });
   });
 

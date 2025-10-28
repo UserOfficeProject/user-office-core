@@ -214,6 +214,18 @@ jobs:
           JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
 
+      - name: Cache backend build
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/build
+          key: backend-build-${{ github.sha }}-${{ github.run_id }}
+
+      - name: Cache frontend build
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/build
+          key: frontend-build-${{ github.sha }}-${{ github.run_id }}
+
   test_backend:
     runs-on: ubuntu-latest
     needs: build
@@ -333,6 +345,18 @@ jobs:
             ${{ env.FRONTEND_SDK_KEY }}
             sdk-frontend-
 
+      - name: Restore backend build
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/build
+          key: backend-build-${{ github.sha }}-${{ github.run_id }}
+
+      - name: Restore frontend build
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/build
+          key: frontend-build-${{ github.sha }}-${{ github.run_id }}
+
       # TODO: See how to proceed with e2e caching because there is some error:
       # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
       # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
@@ -400,7 +424,7 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run e2e:after:dev:stfc
+          npm run e2e:after:start:stfc
 
       - name: Run e2e tests
         env:
@@ -439,7 +463,7 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run e2e:after:dev -- --dns-result-order=ipv4first
+          npm run e2e:after:start -- --dns-result-order=ipv4first
 
       - name: Upload cypres screenshots
         if: failure()

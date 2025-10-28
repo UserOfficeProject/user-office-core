@@ -340,6 +340,45 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    const fapProposals: FapProposalRecord[] = await database
+      .select(['fp.*'])
+      .from('fap_proposals as fp')
+      .modify((query) => {
+        query
+          .join('proposals as p', {
+            'p.proposal_pk': 'fp.proposal_pk',
+          })
+          .join('statuses as s', {
+            'p.status_id': 's.status_id',
+          })
+          .join('call as c', {
+            'p.call_id': 'c.call_id',
+          })
+          .where(function () {
+            this.where('p.submitted', true);
+            this.andWhere('c.call_fap_review_ended', true);
+          });
+
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
+        }
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
+        }
+      })
+      .where('fp.fap_id', filter.fapId)
+      .distinctOn('fp.proposal_pk');
+
+    return fapProposals.map((fapProposal) =>
+      createFapProposalObject(fapProposal)
+    );
+  }
+
   async getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number
@@ -864,6 +903,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       memberId: number;
       fapProposalId: number;
       questionaryId: number;
+      rank?: number;
     }[],
     fapId: number
   ) {
@@ -875,6 +915,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         fap_id: fapId,
         fap_proposal_id: assignment.fapProposalId,
         questionary_id: assignment.questionaryId,
+        rank: assignment.rank || null,
       }))
     );
 

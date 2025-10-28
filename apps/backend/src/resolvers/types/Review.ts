@@ -2,7 +2,6 @@ import {
   Ctx,
   Field,
   FieldResolver,
-  Float,
   Int,
   ObjectType,
   Resolver,
@@ -27,8 +26,8 @@ export class Review implements Partial<ReviewOrigin> {
   @Field({ nullable: true })
   public comment?: string;
 
-  @Field(() => Float, { nullable: true })
-  public grade?: number;
+  @Field(() => String, { nullable: true })
+  public grade?: string;
 
   @Field(() => ReviewStatus)
   public status: ReviewStatus;
