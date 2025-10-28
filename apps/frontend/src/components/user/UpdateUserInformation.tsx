@@ -179,7 +179,6 @@ export default function UpdateUserInformation(
                 type="email"
                 data-cy="email"
               />
-              {/* Remove telephone field */}
             </Grid>
           </Grid>
           <Stack
