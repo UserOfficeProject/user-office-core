@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import MenuIcon from '@mui/icons-material/Menu';
+import { Box } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import MuiLink from '@mui/material/Link';
 import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import PropTypes from 'prop-types';
-import React, { useContext, useMemo, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 
 import AccountActionButton from './AccountActionButton';
@@ -44,18 +42,6 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
     setLogo('/images/' + logoFilename);
   }, [logoFilename]);
 
-  const { user, roles, currentRole } = useContext(UserContext);
-  const settingsContext = useContext(SettingsContext);
-  const humanReadableActiveRole = useMemo(
-    () =>
-      roles.find(({ shortCode }) => shortCode.toUpperCase() === currentRole)
-        ?.title ?? 'Unknown',
-    [roles, currentRole]
-  );
-  const externalProfileLink = settingsContext.settingsMap.get(
-    SettingsId.PROFILE_PAGE_LINK
-  )?.settingsValue;
-
   return (
     <AppBar
       position="fixed"
@@ -80,75 +66,36 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
       }}
     >
       <Toolbar>
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="Open drawer"
-          onClick={handleDrawerOpen}
-          sx={{
-            marginRight: 15,
-            ...(open && { display: isTabletOrMobile ? 'inline-flex' : 'none' }),
-          }}
-          data-cy="open-drawer"
-        >
-          <MenuIcon />
-        </IconButton>
-        {(!isTabletOrMobile || !isPortraitMode) && logo && (
-          <Link className={'header-logo-container'} to="/">
-            <img src={logo} alt="Institution logo" className={'header-logo'} />
-          </Link>
-        )}
-        {(!isTabletOrMobile || !isPortraitMode) && (
-          <Typography
-            component="h1"
-            variant="h6"
+        <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center' }}>
+          <IconButton
+            edge="start"
             color="inherit"
-            noWrap
-            sx={{ flexGrow: 1 }}
+            aria-label="Open drawer"
+            onClick={handleDrawerOpen}
+            sx={{
+              ...(open && {
+                marginRight: '220px',
+                display: isTabletOrMobile ? 'inline-flex' : 'none',
+              }),
+            }}
+            data-cy="open-drawer"
           >
-            {location.pathname === '/' ? 'Dashboard' : header}
-          </Typography>
-        )}
-        <Box sx={{ marginLeft: 'auto', margin: theme.spacing(0, 0.5) }}>
-          Logged in as{' '}
-          {externalProfileLink ? (
-            <MuiLink
-              href={externalProfileLink}
-              target="_blank"
-              rel="noreferrer"
-              sx={{
-                color: theme.palette.common.white,
-                textDecoration: 'none',
-                borderBottom: '1px dashed',
-                borderBottomColor: theme.palette.common.white,
-                padding: '3px',
-                '&:hover': {
-                  textDecoration: 'none',
-                },
-              }}
-            >
-              {user.email}
-            </MuiLink>
-          ) : (
-            <MuiLink
-              data-cy="active-user-profile"
-              component={Link}
-              to={`/ProfilePage/${user.id}`}
-              sx={{
-                color: theme.palette.common.white,
-                textDecoration: 'none',
-                borderBottom: '1px dashed',
-                borderBottomColor: theme.palette.common.white,
-                padding: '3px',
-                '&:hover': {
-                  textDecoration: 'none',
-                },
-              }}
-            >
-              {user.email}
-            </MuiLink>
+            <MenuIcon />
+          </IconButton>
+          {(!isTabletOrMobile || !isPortraitMode) && logo && (
+            <Link className={'header-logo-container'} to="/">
+              <img
+                src={logo}
+                alt="Institution logo"
+                className={'header-logo'}
+              />
+            </Link>
           )}
-          {roles.length > 1 && ` (${humanReadableActiveRole})`}
+          {(!isTabletOrMobile || !isPortraitMode) && (
+            <Typography component="h1" variant="h6" color="inherit" noWrap>
+              {location.pathname === '/' ? 'Dashboard' : header}
+            </Typography>
+          )}
         </Box>
         <AccountActionButton />
       </Toolbar>
