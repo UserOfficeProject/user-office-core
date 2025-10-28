@@ -27,15 +27,16 @@
     "install:libs:validation": "cd libs/validation && npm install",
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
     "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 --timeout 300000 http://127.0.0.1:4000/readiness && npm run dev:frontend\"",
-    "dev:e2e": "concurrently \"npm run dev:backend:e2e\" \"npm run dev:frontend\"",
-    "dev:e2e:stfc": "concurrently \"npm run dev:backend:e2e:stfc\" \"npm run dev:frontend\"",
+    "start:e2e": "concurrently \"npm run start:backend:e2e\" \"npm run start:frontend:e2e\"",
+    "start:e2e:stfc": "concurrently \"npm run start:backend:e2e:stfc\" \"npm run start:frontend:e2e\"",
     "dev:backend": "cd apps/backend && node ../../copyIfNotExist.js example.development.env .env && npm run dev",
-    "dev:backend:e2e": "cd apps/backend && npm run dev:e2e",
-    "dev:backend:e2e:stfc": "cd apps/backend && npm run dev:e2e:stfc",
+    "start:backend:e2e": "cd apps/backend && npm run start:e2e",
+    "start:backend:e2e:stfc": "cd apps/backend && npm run start:e2e:stfc",
     "dev:frontend": "cd apps/frontend && node ../../copyIfNotExist.js example.development.env .env && npm run dev",
+    "start:frontend:e2e": "cd apps/frontend && npm run preview:e2e",
     "generate:shared:types": "cd apps/frontend && npm run generate:local",
-    "e2e:after:dev": "concurrently -k -s first \"wait-on --verbose --interval 5000 --timeout 300000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 --timeout 300000 tcp:3000 && cd apps/e2e && npm run cy:run:action\" \"npm run dev:e2e\"",
-    "e2e:after:dev:stfc": "concurrently -k -s first \"wait-on --verbose --interval 5000 --timeout 300000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 --timeout 300000 tcp:3000 && cd apps/e2e && npm run cy:run:action\" \"npm run dev:e2e:stfc\"",
+    "e2e:after:start": "concurrently -k -s first \"wait-on --verbose --interval 5000 --timeout 300000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 --timeout 300000 tcp:3000 && cd apps/e2e && npm run cy:run:action\" \"npm run start:e2e\"",
+    "e2e:after:start:stfc": "concurrently -k -s first \"wait-on --verbose --interval 5000 --timeout 300000 http://127.0.0.1:4000/readiness && wait-on --verbose --interval 5000 --timeout 300000 tcp:3000 && cd apps/e2e && npm run cy:run:action\" \"npm run start:e2e:stfc\"",
     "generate:sdk": "concurrently -k -s first \"npm run dev:backend\" \"wait-on --timeout 300000 http://127.0.0.1:4000/health && npm run generate:shared:types\"",
     "start": "npm run dev",
     "prepare": "husky",
@@ -49,7 +50,7 @@
   ],
   "dependencies": {
     "concurrently": "^9.0.1",
-    "wait-on": "^8.0.0"
+    "wait-on": "^9.0.1"
   },
   "devDependencies": {
     "husky": "^9.0.10",

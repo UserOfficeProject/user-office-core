@@ -30,6 +30,35 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
+  findVisitRegistrationInvites(
+    visitId: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]> {
+    return database
+      .select('invites.*')
+      .from('visit_registration_claims')
+      .where('visit_id', visitId)
+      .modify((query) => {
+        if (isClaimed !== undefined) {
+          if (isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+      })
+      .leftJoin(
+        'invites',
+        'visit_registration_claims.invite_id',
+        'invites.invite_id'
+      )
+      .catch((error: Error) => {
+        throw new Error(
+          `Could not find visit registration invites: ${error.message}`
+        );
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
   findByCode(code: string): Promise<Invite | null> {
     return database
       .select('*')
@@ -81,8 +110,9 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
+    templateId?: string | null;
   }): Promise<Invite> {
-    const { code, email, createdByUserId, expiresAt } = args;
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     return database
       .insert({
@@ -90,6 +120,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         email: email,
         created_by: createdByUserId,
         expires_at: expiresAt,
+        template_id: templateId,
       })
       .into('invites')
       .returning('*')
@@ -108,6 +139,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite> {
     return database
       .update({
@@ -118,6 +150,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_by: args.claimedByUserId,
         is_email_sent: args.isEmailSent,
         expires_at: args.expiresAt,
+        template_id: args.templateId,
       })
       .from('invites')
       .where('invite_id', args.id)

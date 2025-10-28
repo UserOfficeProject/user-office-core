@@ -25,6 +25,7 @@ export const basicDummyUser = new BasicUserDetails(
   1,
   new Date('2019-07-17 08:25:12.23043+00'),
   'test@email.com',
+  '',
   ''
 );
 
@@ -37,6 +38,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   1,
   new Date('2019-07-17 08:25:12.23043+00'),
   'test@email.com',
+  '',
   ''
 );
 
@@ -263,6 +265,7 @@ export class UserDataSourceMock implements UserDataSource {
       2,
       new Date('2019-07-17 08:25:12.23043+00'),
       'test@email.com',
+      '',
       ''
     );
   }
@@ -362,7 +365,7 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
-  async getUser(id: number) {
+  async getUser(id: number): Promise<User | null> {
     if (id === dummyPlaceHolderUser.id) {
       return dummyPlaceHolderUser;
     }

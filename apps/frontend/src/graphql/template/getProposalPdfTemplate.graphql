@@ -1,0 +1,11 @@
+query getProposalPdfTemplate($proposalPdfTemplateId: Int!) {
+  proposalPdfTemplate(proposalPdfTemplateId: $proposalPdfTemplateId) {
+    proposalPdfTemplateId
+    templateId
+    templateData
+    templateHeader
+    templateFooter
+    templateSampleDeclaration
+    dummyData
+  }
+}

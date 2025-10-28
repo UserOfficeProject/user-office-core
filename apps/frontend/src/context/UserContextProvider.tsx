@@ -68,8 +68,13 @@ const initUserData: UserContextData = {
   handleRole: (value) => value,
 };
 
-export const getCurrentUser = () =>
-  jwtDecode(localStorage.token) as DecodedTokenData | null;
+export const getCurrentUser = () => {
+  if (!localStorage.token) {
+    return null;
+  }
+
+  return jwtDecode(localStorage.token) as DecodedTokenData | null;
+};
 
 const checkLocalStorage = (
   dispatch: React.Dispatch<{

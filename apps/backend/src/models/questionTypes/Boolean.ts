@@ -21,6 +21,7 @@ export const booleanDefinition: Question<DataType.BOOLEAN> = {
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
+    config.readPermissions = [];
 
     return config;
   },

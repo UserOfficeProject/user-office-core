@@ -1,6 +1,7 @@
+/* eslint-disable import/order */
 import Autocomplete from '@mui/material/Autocomplete';
 import MUITextField from '@mui/material/TextField';
-import { Field } from 'formik';
+import { Field, getIn } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
@@ -9,11 +10,12 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import { IntervalConfig } from 'generated/sdk';
+import { IntervalConfig, NumberValueConstraint } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 
 export const QuestionTemplateRelationIntervalForm = (
   props: QuestionTemplateRelationFormProps
@@ -41,56 +43,91 @@ export const QuestionTemplateRelationIntervalForm = (
         }),
       })}
     >
-      {(formikProps) => (
-        <>
-          <QuestionExcerpt question={props.questionRel.question} />
-          <Field
-            name="config.small_label"
-            label="Small label"
-            id="small-label-input"
-            type="text"
-            component={TextField}
-            fullWidth
-            inputProps={{ 'data-cy': 'small-label' }}
-          />
-          <TitledContainer label="Constraints">
+      {(formikProps) => {
+        if (!getIn(formikProps.values, 'config.numberValueConstraint')) {
+          formikProps.setFieldValue(
+            'config.numberValueConstraint',
+            NumberValueConstraint.NONE
+          );
+        }
+
+        return (
+          <>
+            <QuestionExcerpt question={props.questionRel.question} />
             <Field
-              name="config.required"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Is required',
-              }}
-              InputProps={{ 'data-cy': 'required' }}
+              name="config.small_label"
+              label="Small label"
+              id="small-label-input"
+              type="text"
+              component={TextField}
+              fullWidth
+              inputProps={{ 'data-cy': 'small-label' }}
             />
+            <TitledContainer label="Constraints">
+              <Field
+                name="config.required"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is required',
+                }}
+                InputProps={{ 'data-cy': 'required' }}
+              />
 
-            <Autocomplete
-              id="config-units"
-              multiple
-              options={units}
-              getOptionLabel={({ unit, symbol, quantity }) =>
-                `${symbol} (${unit}) - ${quantity}`
-              }
-              renderInput={(params) => (
-                <MUITextField {...params} label="Units" margin="none" />
-              )}
-              onChange={(_event, newValue) => {
-                setSelectedUnits(newValue);
-                formikProps.setFieldValue('config.units', newValue);
-              }}
-              value={selectedUnits ?? undefined}
-              data-cy="units"
-            />
-          </TitledContainer>
+              <Autocomplete
+                id="config-units"
+                multiple
+                options={units}
+                getOptionLabel={({ unit, symbol, quantity }) =>
+                  `${symbol} (${unit}) - ${quantity}`
+                }
+                renderInput={(params) => (
+                  <MUITextField {...params} label="Units" margin="none" />
+                )}
+                onChange={(_event, newValue) => {
+                  setSelectedUnits(newValue);
+                  formikProps.setFieldValue('config.units', newValue);
+                }}
+                value={selectedUnits ?? undefined}
+                data-cy="units"
+              />
 
-          <TitledContainer label="Dependencies">
-            <QuestionDependencyList
-              form={formikProps}
-              template={props.template}
-            />
-          </TitledContainer>
-        </>
-      )}
+              <FormikUIAutocomplete
+                name="config.numberValueConstraint"
+                label="Value constraint"
+                InputProps={{
+                  'data-cy': 'numberValueConstraint',
+                }}
+                items={[
+                  { text: 'None', value: NumberValueConstraint.NONE },
+                  {
+                    text: 'Only positive numbers',
+                    value: NumberValueConstraint.ONLY_POSITIVE,
+                  },
+                  {
+                    text: 'Only negative numbers',
+                    value: NumberValueConstraint.ONLY_NEGATIVE,
+                  },
+                  {
+                    text: 'Only positive integers',
+                    value: NumberValueConstraint.ONLY_POSITIVE_INTEGER,
+                  },
+                  {
+                    text: 'Only negative integers',
+                    value: NumberValueConstraint.ONLY_NEGATIVE_INTEGER,
+                  },
+                ]}
+              />
+            </TitledContainer>
+            <TitledContainer label="Dependencies">
+              <QuestionDependencyList
+                form={formikProps}
+                template={props.template}
+              />
+            </TitledContainer>
+          </>
+        );
+      }}
     </QuestionTemplateRelationFormShell>
   );
 };

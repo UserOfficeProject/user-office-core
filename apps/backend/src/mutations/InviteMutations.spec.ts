@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
@@ -13,12 +14,19 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
 
 const inviteMutations = container.resolve(InviteMutations);
+const visitDataSource = container.resolve<VisitDataSource>(
+  Tokens.VisitDataSource
+);
 
 describe('Test Invite Mutations', () => {
   beforeEach(() => {
@@ -30,6 +38,11 @@ describe('Test Invite Mutations', () => {
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
+    container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('A user can accept valid invite code', () => {
@@ -220,15 +233,13 @@ describe('Test Invite Mutations', () => {
 
     expect(response).not.toBeInstanceOf(Rejection);
 
-    // wait 200ms for the email to be sent
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     expect(sendMailSpy).toHaveBeenCalledTimes(1);
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id: 'user-office-registration-invitation-co-proposer',
+          template_id:
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
         },
       })
     );
@@ -253,9 +264,115 @@ describe('Test Invite Mutations', () => {
     );
     expect(response).not.toBeInstanceOf(Rejection);
 
-    // wait 200ms for the email to be sent
+    expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
+    expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
+      dummyUserWithRole.id, // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_SENT), // eventType
+      expect.stringContaining(email), // rowData (JSON string containing the email)
+      expect.any(String), // changedObjectId (should be the invite ID)
+      expect.stringContaining(
+        `Co-proposer invite issued to ${email} by userId ${dummyUserWithRole.id}`
+      ), // description
+      undefined
+    );
+  });
+
+  test('A visitor should receive an invite email when visitor invite is created', async () => {
+    const email = faker.internet.email();
+
+    const mailService = container.resolve<MailService>(Tokens.MailService);
+    const sendMailSpy = jest.spyOn(mailService, 'sendMail');
+
+    const newVisit = await visitDataSource.createVisit(
+      {
+        teamLeadUserId: dummyUserWithRole.id,
+        experimentPk: 1,
+        team: [dummyUserWithRole.id],
+      },
+      dummyUserWithRole.id,
+      1
+    );
+    const response = await inviteMutations.setVisitRegistrationInvites(
+      dummyUserWithRole,
+      {
+        visitId: newVisit.id,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    // Wait for async handlers to complete
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    expect(setEventInDataSourceSpy).toHaveBeenCalled();
+    expect(sendMailSpy).toHaveBeenCalledTimes(1);
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipients: [{ address: email }],
+        content: {
+          template_id:
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
+        },
+      })
+    );
+  });
+
+  test('A log should be added when visitor invite is sent', async () => {
+    const email = faker.internet.email();
+    const visitId = 1;
+
+    // Get the exact same instance that the logging handler will use
+    const eventLogDataSource = container.resolve<EventLogsDataSource>(
+      Tokens.EventLogsDataSource
+    );
+    const setEventInDataSourceSpy = jest.spyOn(eventLogDataSource, 'set');
+
+    const response = await inviteMutations.setVisitRegistrationInvites(
+      dummyUserWithRole,
+      {
+        visitId: visitId,
+        emails: [email],
+      }
+    );
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
+    expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
+      dummyUserWithRole.id, // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT), // eventType
+      expect.stringContaining(email), // rowData (JSON string containing the email)
+      expect.any(String), // changedObjectId (should be the invite ID)
+      expect.stringContaining(
+        `Visit invite issued to ${email} by userId ${dummyUserWithRole.id}`
+      ), // description
+      undefined
+    );
+  });
+
+  test('Invite should have the templateId set', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const invite = (await container
+      .resolve<InviteDataSource>(Tokens.InviteDataSource)
+      .findById((response as Invite[])[0].id)) as Invite;
+
+    expect(invite.templateId).toBe(
+      'user-office-registration-invitation-co-proposer'
+    );
   });
 });

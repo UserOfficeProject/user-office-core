@@ -73,6 +73,7 @@ describe('Test FapQueries', () => {
         fapId: 1,
         callId: 1,
         instrumentId: 1,
+        legacy: false,
       })
     ).resolves.toStrictEqual([dummyFapProposal]);
   });

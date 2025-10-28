@@ -8,7 +8,7 @@ import {
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { Review, ReviewStatus } from '../models/Review';
-import { Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { BasicUserDetails } from '../models/User';
 import {
   UpdateMemberFapArgs,
@@ -49,7 +49,7 @@ export interface FapDataSource {
     role: Role,
     fapId?: number
   ): Promise<Fap[]>;
-  getUserFaps(id: number, role: Role): Promise<Fap[]>;
+  getUserFaps(id: number, roleShortCode: Roles): Promise<Fap[]>;
   getFapsByCallId(callId: number): Promise<Fap[]>;
   // TODO: This should be removed as we have getFapsByProposalPk and getFapsByProposalPks
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;
@@ -72,6 +72,11 @@ export interface FapDataSource {
     proposalPk: number
   ): Promise<boolean>;
   getFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]>;
+  getLegacyFapProposals(filter: {
     fapId: number;
     callId?: number | null;
     instrumentId?: number | null;

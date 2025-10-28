@@ -5,10 +5,12 @@ import {
   ChangeProposalsStatusMutationVariables,
   CloneProposalsMutation,
   CloneProposalsMutationVariables,
-  CreateOrGetExperimentSafetyMutation,
-  CreateOrGetExperimentSafetyMutationVariables,
+  CreateExperimentSafetyMutationVariables,
+  CreateExperimentSafetyMutation,
   CreateProposalMutation,
   CreateProposalMutationVariables,
+  GetProposalsQuery,
+  GetProposalsQueryVariables,
   SubmitExperimentSafetyMutation,
   SubmitExperimentSafetyMutationVariables,
   SubmitProposalMutation,
@@ -24,6 +26,15 @@ const createProposal = (
 ): Cypress.Chainable<CreateProposalMutation> => {
   const api = getE2EApi();
   const request = api.createProposal(createProposalInput);
+
+  return cy.wrap(request);
+};
+
+const getProposals = (
+  getProposalsInput: GetProposalsQueryVariables
+): Cypress.Chainable<GetProposalsQuery> => {
+  const api = getE2EApi();
+  const request = api.getProposals(getProposalsInput);
 
   return cy.wrap(request);
 };
@@ -73,13 +84,11 @@ const updateProposalManagementDecision = (
   return cy.wrap(request);
 };
 
-const createOrGetExperimentSafety = (
-  createOrGetExperimentSafetyInput: CreateOrGetExperimentSafetyMutationVariables
-): Cypress.Chainable<CreateOrGetExperimentSafetyMutation> => {
+const createExperimentSafety = (
+  createExperimentSafetyInput: CreateExperimentSafetyMutationVariables
+): Cypress.Chainable<CreateExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.createOrGetExperimentSafety(
-    createOrGetExperimentSafetyInput
-  );
+  const request = api.createExperimentSafety(createExperimentSafetyInput);
 
   return cy.wrap(request);
 };
@@ -103,8 +112,6 @@ Cypress.Commands.add(
   updateProposalManagementDecision
 );
 
-Cypress.Commands.add(
-  'createOrGetExperimentSafety',
-  createOrGetExperimentSafety
-);
+Cypress.Commands.add('createExperimentSafety', createExperimentSafety);
 Cypress.Commands.add('submitExperimentSafety', submitExperimentSafety);
+Cypress.Commands.add('getProposals', getProposals);

@@ -129,7 +129,7 @@ context('Event log tests', () => {
       cy.get('[data-cy="add-participant-button"]').click();
       cy.get('input[type="checkbox"]').eq(0).check();
       cy.get('[data-cy="assign-selected-users"]').click();
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-6').click();
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-7').click();
       cy.contains('userId:2 impersonating userId:1');
     });
   });

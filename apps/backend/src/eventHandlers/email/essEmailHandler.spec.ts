@@ -1,96 +1,310 @@
 import 'reflect-metadata';
+import { faker } from '@faker-js/faker';
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
-import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
-import { UserRole } from '../../models/User';
-import { getTemplateIdForInvite } from './essEmailHandler';
+import {
+  ProposalDataSourceMock,
+  dummyProposal,
+} from '../../datasources/mockups/ProposalDataSource';
+import {
+  basicDummyUser,
+  dummyUser,
+  UserDataSourceMock,
+} from '../../datasources/mockups/UserDataSource';
+import { ApplicationEvent } from '../../events/applicationEvents';
+import { Event } from '../../events/event.enum';
+import { Invite } from '../../models/Invite';
+import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
 
-describe('essEmailHandler', () => {
+// Mock MailService
+const mockMailService = {
+  sendMail: jest.fn(),
+};
+
+describe('essEmailHandler co-proposer invites', () => {
+  let proposalDataSourceMock: ProposalDataSourceMock;
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
-  let roleClaimDataSourceMock: RoleClaimDataSourceMock;
+  let userDataSourceMock: UserDataSourceMock;
+  let logErrorSpy: jest.SpyInstance;
+
+  beforeAll(() => {
+    container.registerInstance(Tokens.MailService, mockMailService);
+  });
 
   beforeEach(() => {
     // Initialize mocks
+    proposalDataSourceMock = container.resolve<ProposalDataSourceMock>(
+      Tokens.ProposalDataSource
+    );
+    userDataSourceMock = container.resolve<UserDataSourceMock>(
+      Tokens.UserDataSource
+    );
     coProposerDataSourceMock = container.resolve<CoProposerClaimDataSourceMock>(
       Tokens.CoProposerClaimDataSource
     );
-    roleClaimDataSourceMock = container.resolve<RoleClaimDataSourceMock>(
-      Tokens.RoleClaimDataSource
-    );
 
+    // Initialize mock data sources that have init method
+    proposalDataSourceMock.init();
     coProposerDataSourceMock.init();
-    roleClaimDataSourceMock.init();
+
+    // Set up spies on logger methods
+    logErrorSpy = jest.spyOn(logger, 'logError').mockImplementation(() => {});
+
+    mockMailService.sendMail.mockResolvedValue({ success: true });
   });
 
-  describe('getTemplateIdForInvite', () => {
-    test('should return co-proposer template when co-proposer claim exists', async () => {
-      const inviteId = 1;
-      const mockCoProposerClaim = {
-        inviteId,
-        proposalPk: 1,
-      };
+  afterEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+    // Restore all spies to their original implementations
+    jest.restoreAllMocks();
+  });
 
-      // Mock co-proposer claim exists
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockCoProposerClaim]);
+  test('mailService should be invoked when PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED event is sent', async () => {
+    const inviteEmail = faker.internet.email();
 
-      // Mock no role claims
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
+    const mockEvent = {
+      type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      invite: {
+        id: 1, // This will match the default mock data
+        email: inviteEmail,
+        code: faker.string.alphanumeric(10),
+        claimedByUserId: 2,
+        createdByUserId: 1,
+        isEmailSent: false,
+      },
+      isRejection: false,
+    } as ApplicationEvent;
 
-      const result = await getTemplateIdForInvite(inviteId);
+    await essEmailHandler(mockEvent);
 
-      expect(result).toBe('user-office-registration-invitation-co-proposer');
+    expect(mockMailService.sendMail).toHaveBeenCalledWith({
+      content: {
+        template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+      },
+      substitution_data: {
+        piPreferredname: expect.any(String),
+        piLastname: expect.any(String),
+        email: inviteEmail,
+        proposalTitle: expect.any(String),
+        proposalId: expect.any(String),
+        claimerPreferredname: expect.any(String),
+        claimerLastname: expect.any(String),
+      },
+      recipients: [{ address: expect.any(String) }],
     });
+  });
 
-    test('should return reviewer template when internal reviewer role claim exists', async () => {
-      const inviteId = 2;
-      const mockRoleClaim = {
-        roleClaimId: 1,
-        inviteId,
-        roleId: UserRole.INTERNAL_REVIEWER,
-      };
+  test('mailService should be invoked when PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED event is sent', async () => {
+    const inviteEmail = faker.internet.email();
+    const inviterId = 1;
+    const inviteId = 123;
+    const redeemCode = faker.string.alphanumeric(10);
 
-      // Mock no co-proposer claims
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
+    // Mock UserDataSource.getBasicUserInfo to return a dummy inviter
+    const userDataSourceMock = container.resolve<UserDataSourceMock>(
+      Tokens.UserDataSource
+    );
+    jest.spyOn(userDataSourceMock, 'getBasicUserInfo').mockResolvedValue({
+      id: inviterId,
+      firstname: 'Inviter',
+      lastname: 'User',
+      institution: 'TestOrg',
+      email: 'inviter@email.com',
+    } as any);
 
-      // Mock internal reviewer role claim
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockRoleClaim]);
+    const mockEvent = {
+      type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+      array: [
+        {
+          id: inviteId,
+          email: inviteEmail,
+          code: redeemCode,
+          createdByUserId: inviterId,
+          isEmailSent: false,
+        },
+      ],
+      isRejection: false,
+    } as ApplicationEvent;
 
-      const result = await getTemplateIdForInvite(inviteId);
+    await essEmailHandler(mockEvent);
 
-      expect(result).toBe('user-office-registration-invitation-reviewer');
+    expect(mockMailService.sendMail).toHaveBeenCalledWith({
+      content: {
+        template_id:
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
+      },
+      substitution_data: {
+        email: inviteEmail,
+        inviterName: 'Inviter',
+        inviterLastname: 'User',
+        inviterOrg: 'TestOrg',
+        redeemCode: redeemCode,
+      },
+      recipients: [{ address: inviteEmail }],
     });
+  });
 
-    test('should return user template when user role claim exists', async () => {
-      const inviteId = 3;
-      const mockRoleClaim = {
-        roleClaimId: 2,
-        inviteId,
-        roleId: UserRole.USER,
+  it('should log error when proposal is not found', async () => {
+    const mockInvite = new Invite(
+      1,
+      faker.string.alphanumeric(8),
+      dummyUser.email,
+      new Date(),
+      dummyUser.id,
+      new Date(),
+      dummyUser.id,
+      false,
+      null,
+      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+    );
+
+    // Mock proposalDataSource.get to return null
+    jest.spyOn(proposalDataSourceMock, 'get').mockResolvedValue(null);
+
+    const event: ApplicationEvent = {
+      type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      invite: mockInvite,
+      key: 'invite',
+      loggedInUserId: 3,
+      isRejection: false,
+      proposalPKey: 1,
+    };
+    const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
+
+    await essEmailHandler(event);
+
+    expect(sendMailsSpy).not.toHaveBeenCalled();
+    expect(logErrorSpy).toHaveBeenCalledWith(
+      'No proposal found when trying to send invite accepted email',
+      expect.objectContaining({
+        claim: expect.any(Object),
+        event: expect.objectContaining({
+          type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+        }),
+      })
+    );
+  });
+
+  it('should log error when principal investigator is not found', async () => {
+    const mockInvite = new Invite(
+      1,
+      faker.string.alphanumeric(8),
+      dummyUser.email,
+      new Date(),
+      dummyUser.id,
+      new Date(),
+      dummyUser.id,
+      false,
+      null,
+      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+    );
+
+    // Mock userDataSource.getUser to return null for the principal investigator (first call)
+    const getUserMock = jest.spyOn(userDataSourceMock, 'getUser');
+    getUserMock
+      .mockResolvedValueOnce(null) // First call for principal investigator
+      .mockResolvedValue(dummyUser); // Subsequent calls
+
+    const event: ApplicationEvent = {
+      type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      invite: mockInvite,
+      key: 'invite',
+      loggedInUserId: 3,
+      isRejection: false,
+      proposalPKey: 1,
+    };
+    const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
+
+    await essEmailHandler(event);
+
+    expect(sendMailsSpy).not.toHaveBeenCalled();
+    expect(logErrorSpy).toHaveBeenCalledWith(
+      'No principal investigator found when trying to send invite accepted email',
+      expect.objectContaining({
+        claim: expect.any(Object),
+        event: expect.objectContaining({
+          type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+        }),
+      })
+    );
+  });
+
+  it('should log error when claimer is not found', async () => {
+    const mockInvite = new Invite(
+      1,
+      faker.string.alphanumeric(8),
+      dummyUser.email,
+      new Date(),
+      dummyUser.id,
+      new Date(),
+      dummyUser.id,
+      false,
+      null,
+      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+    );
+
+    // Mock userDataSource.getUser to return dummyUser for principal investigator but null for claimer
+    const getUserMock = jest.spyOn(userDataSourceMock, 'getUser');
+    getUserMock
+      .mockResolvedValueOnce(dummyUser) // First call for principal investigator
+      .mockResolvedValueOnce(null); // Second call for claimer
+
+    const event: ApplicationEvent = {
+      type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      invite: mockInvite,
+      key: 'invite',
+      loggedInUserId: 3,
+      isRejection: false,
+      proposalPKey: 1,
+    };
+    const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
+
+    await essEmailHandler(event);
+
+    expect(sendMailsSpy).not.toHaveBeenCalled();
+    expect(logErrorSpy).toHaveBeenCalledWith(
+      'No claimer found when trying to send invite accepted email',
+      expect.objectContaining({
+        claim: expect.any(Object),
+        event: expect.objectContaining({
+          type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+        }),
+      })
+    );
+  });
+
+  describe('handling PROPOSAL_SUBMITTED event', () => {
+    it('Should have PI and CoProposals in the payload', async () => {
+      const event: ApplicationEvent = {
+        type: Event.PROPOSAL_SUBMITTED,
+        proposal: dummyProposal,
+        key: 'proposal',
+        loggedInUserId: 1,
+        isRejection: false,
       };
 
-      // Mock no co-proposer claims
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
+      const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
 
-      // Mock user role claim
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockRoleClaim]);
+      await essEmailHandler(event);
 
-      const result = await getTemplateIdForInvite(inviteId);
+      expect(sendMailsSpy).toHaveBeenCalledTimes(1);
+      const arg = sendMailsSpy.mock.calls[0][0];
+      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
 
-      expect(result).toBe('user-office-registration-invitation-user');
+      // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
+      expect(arg.recipients).toEqual([
+        { address: dummyUser.email },
+        {
+          address: {
+            email: basicDummyUser.email,
+            header_to: dummyUser.email,
+          },
+        },
+      ]);
     });
   });
 });

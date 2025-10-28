@@ -4,12 +4,13 @@ import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
-import { IntervalConfig } from 'generated/sdk';
+import { IntervalConfig, NumberValueConstraint } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -60,7 +61,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <Field
             name="config.small_label"
             label="Small label"
@@ -70,7 +70,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -97,6 +96,33 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
               }}
               value={selectedUnits ?? undefined}
               data-cy="units"
+            />
+
+            <FormikUIAutocomplete
+              name="config.numberValueConstraint"
+              label="Value constraint"
+              InputProps={{
+                'data-cy': 'numberValueConstraint',
+              }}
+              items={[
+                { text: 'None', value: NumberValueConstraint.NONE },
+                {
+                  text: 'Only positive numbers',
+                  value: NumberValueConstraint.ONLY_POSITIVE,
+                },
+                {
+                  text: 'Only negative numbers',
+                  value: NumberValueConstraint.ONLY_NEGATIVE,
+                },
+                {
+                  text: 'Only positive integers',
+                  value: NumberValueConstraint.ONLY_POSITIVE_INTEGER,
+                },
+                {
+                  text: 'Only negative integers',
+                  value: NumberValueConstraint.ONLY_NEGATIVE_INTEGER,
+                },
+              ]}
             />
           </TitledContainer>
         </>

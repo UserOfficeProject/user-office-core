@@ -1,6 +1,7 @@
 mutation updateCall(
   $id: Int!
   $shortCode: String
+  $sort_order: Int
   $startCall: DateTime
   $endCall: DateTime
   $endCallInternal: DateTime
@@ -18,9 +19,11 @@ mutation updateCall(
   $allocationTimeUnit: AllocationTimeUnits
   $referenceNumberFormat: String
   $proposalWorkflowId: Int
+  $experimentWorkflowId: Int
   $templateId: Int
   $esiTemplateId: Int
-  $pdfTemplateId: Int
+  $proposalPdfTemplateId: Int
+  $experimentSafetyPdfTemplateId: Int
   $fapReviewTemplateId: Int
   $technicalReviewTemplateId: Int
   $title: String
@@ -33,6 +36,7 @@ mutation updateCall(
     updateCallInput: {
       id: $id
       shortCode: $shortCode
+      sort_order: $sort_order
       startCall: $startCall
       endCall: $endCall
       endCallInternal: $endCallInternal
@@ -50,9 +54,11 @@ mutation updateCall(
       allocationTimeUnit: $allocationTimeUnit
       referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
+      experimentWorkflowId: $experimentWorkflowId
       templateId: $templateId
       esiTemplateId: $esiTemplateId
-      pdfTemplateId: $pdfTemplateId
+      proposalPdfTemplateId: $proposalPdfTemplateId
+      experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
       fapReviewTemplateId: $fapReviewTemplateId
       technicalReviewTemplateId: $technicalReviewTemplateId
       title: $title

@@ -25,12 +25,18 @@ export class ConfigBase {
 
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class SampleBasisConfig {
   @Field(() => String)
   titlePlaceholder: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -40,13 +46,31 @@ export class GenericTemplateBasisConfig {
 
   @Field(() => String)
   questionLabel: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class FapReviewBasisConfig extends ConfigBase {}
+export class ExperimentSafetyReviewBasisConfig extends ConfigBase {}
+
+@ObjectType()
+export class FapReviewBasisConfig extends ConfigBase {
+  @Field(() => [String])
+  nonNumericOptions: string[];
+
+  @Field(() => Int)
+  minGrade: number;
+
+  @Field(() => Int)
+  maxGrade: number;
+
+  @Field(() => Int)
+  decimalPoints: number;
+}
 
 @ObjectType()
 export class TechnicalReviewBasisConfig extends ConfigBase {}
@@ -79,6 +103,9 @@ export class EmbellishmentConfig {
 
   @Field(() => String)
   plain: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -206,7 +233,10 @@ export class TextInputConfig extends ConfigBase {
 export class ShipmentBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class FeedbackBasisConfig extends ConfigBase {}
+export class FeedbackBasisConfig extends ConfigBase {
+  @Field(() => [String])
+  readPermissions: string[];
+}
 
 @ObjectType()
 export class SubTemplateBaseConfig {
@@ -230,6 +260,9 @@ export class SubTemplateBaseConfig {
 
   @Field(() => Boolean)
   required: boolean;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -256,6 +289,9 @@ export class SampleDeclarationConfig extends SubTemplateBaseConfig {
 export class IntervalConfig extends ConfigBase {
   @Field(() => [Unit])
   units: Unit[];
+
+  @Field(() => NumberValueConstraint, { nullable: true })
+  numberValueConstraint: NumberValueConstraint | null;
 }
 
 export enum NumberValueConstraint {
@@ -279,18 +315,27 @@ export class NumberInputConfig extends ConfigBase {
 export class ProposalBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class ProposalEsiBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class SampleEsiBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -348,6 +393,7 @@ export const FieldConfigType = createUnionType({
     TechnicalReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    ExperimentSafetyReviewBasisConfig,
     InstrumentPickerConfig,
     TechniquePickerConfig,
   ], // function that returns array of object types classes

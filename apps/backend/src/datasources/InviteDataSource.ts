@@ -13,12 +13,17 @@ export interface InviteDataSource {
     code: string;
     email: string;
     expiresAt: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   findByCode(code: string): Promise<Invite | null>;
   findById(id: number): Promise<Invite | null>;
   findCoProposerInvites(
     proposalPk: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]>;
+  findVisitRegistrationInvites(
+    visitId: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
   getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
@@ -32,6 +37,7 @@ export interface InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   delete(id: number): Promise<void>;

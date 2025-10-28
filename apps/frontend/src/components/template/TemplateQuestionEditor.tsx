@@ -59,7 +59,7 @@ export default function TemplateQuestionEditor(props: {
       ? '&&'
       : '||';
   const dependencyJsx = dependencies.length ? (
-    <div>
+    <>
       <LockIcon sx={{ fontSize: '17px' }} />
       <ul data-cy="dependency-list">
         {dependencies.map((dependency, i) => {
@@ -99,9 +99,8 @@ export default function TemplateQuestionEditor(props: {
           );
         })}
       </ul>
-    </div>
+    </>
   ) : null;
-
   const questionDefinition = getQuestionaryComponentDefinition(
     props.data.dataType
   );
@@ -139,6 +138,7 @@ export default function TemplateQuestionEditor(props: {
               fontSize: '12px',
               fontWeight: 'bold',
               color: theme.palette.grey[800],
+              wordBreak: 'break-word',
             }}
             data-cy="proposal-question-id"
           >
@@ -149,9 +149,9 @@ export default function TemplateQuestionEditor(props: {
             xs={2}
             sx={{
               color: theme.palette.grey[400],
-              justifyItems: 'flex-end',
-              justifyContent: 'flex-end',
               display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
             }}
           >
             {getTemplateFieldIcon(props.data.dataType)}
@@ -160,7 +160,7 @@ export default function TemplateQuestionEditor(props: {
           <Grid
             item
             xs={10}
-            sx={{ color: '#000', fontSize: '15px', padding: '6px 0' }}
+            sx={{ color: '#000', fontSize: '13px', padding: '6px 0' }}
           >
             {questionDefinition.renderers
               ? questionDefinition.renderers.questionRenderer(props.data)

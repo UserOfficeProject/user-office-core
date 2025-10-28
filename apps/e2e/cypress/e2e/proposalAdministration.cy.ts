@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  FeatureUpdateAction,
   SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
@@ -187,8 +188,6 @@ context('Proposal administration tests', () => {
 
         return false;
       });
-
-      cy.contains('Proposal information').click();
 
       cy.get('[data-cy="is-management-decision-submitted"]').click();
 
@@ -411,7 +410,7 @@ context('Proposal administration tests', () => {
               cy.updateQuestion({
                 id: createdQuestion.id,
                 question: initialDBData.questions.fileUpload.text,
-                config: `{"file_type":[".pdf",".docx","image/*"]}`,
+                config: `{"file_type":[".pdf",".docx","image/*"],"readPermissions":[]}`,
               });
               cy.createQuestionTemplateRelation({
                 templateId: initialDBData.template.id,
@@ -1249,6 +1248,11 @@ context('Proposal administration tests', () => {
             proposalPk: createdProposalPk,
           });
         }
+      });
+
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
       });
 
       cy.login('officer');

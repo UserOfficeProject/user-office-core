@@ -81,7 +81,8 @@ export class BasicUserDetails {
     public institutionId: number,
     public created: Date,
     public email: string,
-    public country: string
+    public country: string,
+    public title: string
   ) {}
 }
 

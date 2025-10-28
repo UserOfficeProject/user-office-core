@@ -1,0 +1,9 @@
+mutation assignCallsToTag(
+  $callIds: [Int!]!
+  $tagId: Int!
+) {
+  assignCallsToTag(
+    callIds: $callIds
+    tagId: $tagId
+  )
+}
