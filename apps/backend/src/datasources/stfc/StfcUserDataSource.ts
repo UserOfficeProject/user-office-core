@@ -587,7 +587,7 @@ export class StfcUserDataSource implements UserDataSource {
         offset: offset,
         userRole: undefined,
         subtractUsers: subtractUsers,
-        orderDirection: 'asc',
+        sortDirection: 'asc',
       });
 
       if (users[0]) {
@@ -609,18 +609,22 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getPreviousCollaborators(
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     const dbUsers: BasicUserDetails[] = (
       await postgresUserDataSource.getPreviousCollaborators(
         userId,
-        filter,
         first,
         offset,
+        sortField,
+        sortDirection,
+        searchText,
         undefined,
         subtractUsers
       )

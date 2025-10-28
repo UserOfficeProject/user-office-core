@@ -75,7 +75,6 @@ function ParticipantSelector({
   preset = [],
   multiple = true,
 }: ParticipantSelectorProps & WithConfirmProps) {
-  // multiple selection enabled by default
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -312,6 +311,7 @@ function ParticipantSelector({
           </Tooltip>
         )
       }
+      data-cy="participant-selector"
     >
       <DialogContent
         dividers
