@@ -48,11 +48,11 @@ type Member = {
   id: string;
   firstName: string;
   lastName: string;
-  email: string | null;
+  email: string;
   oidcSub: string | null;
   oauthIssuer: string | null;
-  institution: Institution | null;
-  country: Country | null;
+  institution: Institution;
+  country: Country;
 };
 
 type ProposalMessageData = {

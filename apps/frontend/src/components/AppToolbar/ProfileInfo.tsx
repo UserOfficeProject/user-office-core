@@ -31,17 +31,15 @@ const ProfileInfo = () => {
         >
           {getFullUserName(user)}
         </Typography>
-        {user.email && (
-          <Typography
-            sx={{
-              color: 'dimgray',
-              fontSize: '14px',
-              lineHeight: 1.3,
-            }}
-          >
-            {user.email.toLocaleLowerCase()}
-          </Typography>
-        )}
+        <Typography
+          sx={{
+            color: 'dimgray',
+            fontSize: '14px',
+            lineHeight: 1.3,
+          }}
+        >
+          {user?.email.toLocaleLowerCase()}
+        </Typography>
       </Box>
     </Box>
   );

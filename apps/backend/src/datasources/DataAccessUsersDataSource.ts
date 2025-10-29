@@ -5,8 +5,8 @@ import { BasicUserDetails, User } from '../models/User';
 
 export type UserWithInstitution = {
   user: User;
-  institution: Institution | null;
-  country: Country | null;
+  institution: Institution;
+  country: Country;
 };
 
 export interface DataAccessUsersDataSource {

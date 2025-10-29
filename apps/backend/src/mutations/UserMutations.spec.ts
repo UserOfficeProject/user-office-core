@@ -72,7 +72,7 @@ test('A user cannot invite another user by email if the user already has an acco
     userMutations.createUserByEmailInvite(dummyUserNotOnProposalWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyUser.email!,
+      email: dummyUser.email,
       userRole: UserRole.USER,
     })
   ).rejects.toThrow('Can not create account because account already exists');
@@ -89,7 +89,7 @@ test('A user can reinvite another user by email if the user has not created an a
     userMutations.createUserByEmailInvite(dummyUserWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyPlaceHolderUser.email!,
+      email: dummyPlaceHolderUser.email,
       userRole: UserRole.USER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
@@ -106,7 +106,7 @@ test('A user officer can invite a reviewer by email', () => {
     userMutations.createUserByEmailInvite(dummyUserOfficerWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: dummyPlaceHolderUser.email!,
+      email: dummyPlaceHolderUser.email,
       userRole: UserRole.FAP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
@@ -386,11 +386,13 @@ describe('upsertUserByOidcSub', () => {
         department: null,
         position: '',
         telephone: null,
+        institutionName: '',
+        institutionCountry: '',
       }
     );
     // Check if the result has the oidcsub
     expect(isRejection(result)).toBe(false);
-    expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
+    expect((result as User).oidcSub).toBe(newOidcSub);
   });
   test('A user will be updated if OIDC sub exists', async () => {
     const result = await userMutations.upsertUserByOidcSub(
@@ -409,11 +411,86 @@ describe('upsertUserByOidcSub', () => {
         department: null,
         position: '',
         telephone: null,
+        institutionName: '',
+        institutionCountry: '',
       }
     );
 
     // Check if the result has the oidcsub
     expect(isRejection(result)).toBe(false);
     expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
+  });
+
+  test('A new user can be created where the institution will be fetched from institutionRoRId', async () => {
+    const newOidcSub = 'user-with-existing-institution-ror';
+    const existingRorId = 'https://ror.org/dummy001'; // Dummy Research Institute from our mock
+
+    const result = await userMutations.upsertUserByOidcSub(
+      dummyUserOfficerWithRole,
+      {
+        oidcSub: newOidcSub,
+        firstName: 'John',
+        lastName: 'Scientist',
+        email: 'john.scientist@dummy-research.org',
+        userTitle: 'Dr.',
+        username: 'jscientist',
+        preferredName: 'Johnny',
+        gender: 'male',
+        birthDate: '1985-05-15',
+        institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
+        institutionName: 'CERN', // This should match the existing institution
+        institutionCountry: 'Switzerland',
+        department: 'Physics Department',
+        position: 'Senior Researcher',
+        telephone: '+41-22-767-6111',
+      }
+    );
+
+    expect(isRejection(result)).toBe(false);
+    const createdUser = result as User;
+
+    // Should use existing institution (Dummy Research Institute has ID 3 in our mock)
+    expect(createdUser.institutionId).toBe(3);
+    expect(createdUser.firstname).toBe('John');
+    expect(createdUser.lastname).toBe('Scientist');
+    expect(createdUser.email).toBe('john.scientist@dummy-research.org');
+    expect(createdUser.oidcSub).toBe(newOidcSub);
+  });
+
+  test('A new user can be created where the institution will be created newly for the new institutionRoRId', async () => {
+    const newOidcSub = 'user-with-new-institution-ror';
+    const newRorId = 'https://ror.org/05a28rw58'; // New ROR ID not in our mock
+
+    const result = await userMutations.upsertUserByOidcSub(
+      dummyUserOfficerWithRole,
+      {
+        oidcSub: newOidcSub,
+        firstName: 'Maria',
+        lastName: 'Researcher',
+        email: 'maria.researcher@newinstitute.edu',
+        userTitle: 'Prof.',
+        username: 'mresearcher',
+        preferredName: 'Maria',
+        gender: 'female',
+        birthDate: '1980-03-22',
+        institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
+        institutionName: 'New Research Institute',
+        institutionCountry: 'Germany',
+        department: 'Materials Science',
+        position: 'Principal Investigator',
+        telephone: '+49-30-12345678',
+      }
+    );
+
+    expect(isRejection(result)).toBe(false);
+    const createdUser = result as User;
+
+    // Should create new institution and assign it
+    // The new institution should have ID 6 (next available in our mock)
+    expect(createdUser.institutionId).toBe(6);
+    expect(createdUser.firstname).toBe('Maria');
+    expect(createdUser.lastname).toBe('Researcher');
+    expect(createdUser.email).toBe('maria.researcher@newinstitute.edu');
+    expect(createdUser.oidcSub).toBe(newOidcSub);
   });
 });

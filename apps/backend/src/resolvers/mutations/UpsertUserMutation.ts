@@ -31,6 +31,12 @@ export class UpsertUserByOidcSubArgs {
   @Field(() => String)
   public institutionRoRId: string;
 
+  @Field(() => String)
+  public institutionName: string;
+
+  @Field(() => String)
+  public institutionCountry: string;
+
   @Field(() => String, { nullable: true })
   public department: string | null;
 

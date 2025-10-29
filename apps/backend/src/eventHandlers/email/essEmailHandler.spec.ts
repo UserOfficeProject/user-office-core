@@ -152,7 +152,7 @@ describe('essEmailHandler co-proposer invites', () => {
     const mockInvite = new Invite(
       1,
       faker.string.alphanumeric(8),
-      dummyUser.email!,
+      dummyUser.email,
       new Date(),
       dummyUser.id,
       new Date(),
@@ -193,7 +193,7 @@ describe('essEmailHandler co-proposer invites', () => {
     const mockInvite = new Invite(
       1,
       faker.string.alphanumeric(8),
-      dummyUser.email!,
+      dummyUser.email,
       new Date(),
       dummyUser.id,
       new Date(),
@@ -237,7 +237,7 @@ describe('essEmailHandler co-proposer invites', () => {
     const mockInvite = new Invite(
       1,
       faker.string.alphanumeric(8),
-      dummyUser.email!,
+      dummyUser.email,
       new Date(),
       dummyUser.id,
       new Date(),

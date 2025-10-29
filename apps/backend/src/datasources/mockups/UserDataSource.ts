@@ -261,8 +261,21 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
+  // Mock user storage for testing upsertUserByOidcSub
+  private mockUsers: User[] = [
+    dummyUser,
+    dummyUserNotOnProposal,
+    dummyUserOfficer,
+    dummyPlaceHolderUser,
+  ];
+
   async getByOIDCSub(oidcSub: string): Promise<User | null> {
-    return dummyUser;
+    // Check if user exists with this OIDC sub
+    const existingUser = this.mockUsers.find(
+      (user) => user.oidcSub === oidcSub
+    );
+
+    return existingUser || null;
   }
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
@@ -412,8 +425,8 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution | null;
-    country: Country | null;
+    institution: Institution;
+    country: Country;
   } | null> {
     return null;
   }
@@ -487,24 +500,27 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async create(
-    user_title: string | null,
+    user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string | null,
-    preferredname: string | null,
-    oidc_sub: string | null,
-    oauth_refresh_token: string | null,
-    oauth_issuer: string | null,
+    username: string,
+    preferredname: string | undefined,
+    oidc_sub: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
     gender: string,
     birthdate: Date,
-    institution_id: number | null,
+    institution_id: number,
     department: string,
     position: string,
-    email: string | null,
+    email: string,
     telephone: string
   ) {
-    return new User(
-      10,
+    // Generate a new user ID
+    const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;
+
+    const newUser = new User(
+      newId,
       user_title || 'unspecified',
       firstname,
       lastname,
@@ -525,6 +541,11 @@ export class UserDataSourceMock implements UserDataSource {
       new Date().toISOString(),
       new Date().toISOString()
     );
+
+    // Add to mock users collection
+    this.mockUsers.push(newUser);
+
+    return newUser;
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {

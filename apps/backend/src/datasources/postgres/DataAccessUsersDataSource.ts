@@ -22,8 +22,8 @@ export default class PostgresDataAccessUsersDataSource
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .join('countries as c', { 'i.country_id': 'c.country_id' })
       .join('data_access_user_has_proposal as dauhp', {
         'u.user_id': 'dauhp.user_id',
       })

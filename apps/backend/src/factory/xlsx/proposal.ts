@@ -149,7 +149,7 @@ export const collectTechniqueProposalXLSXData = async (
     proposal.proposalId,
     proposal.title,
     `${proposer.firstname} ${proposer.lastname}`,
-    proposer.email ?? '',
+    proposer.email,
     submittedDate,
     techniques.length
       ? techniques.map((technique) => technique.name ?? '').join(', ')

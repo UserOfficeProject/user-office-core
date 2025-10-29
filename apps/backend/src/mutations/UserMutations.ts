@@ -527,6 +527,8 @@ export default class UserMutations {
       gender,
       birthDate,
       institutionRoRId,
+      institutionName,
+      institutionCountry,
       department,
       position,
       email,
@@ -541,9 +543,18 @@ export default class UserMutations {
       return rejection('Invalid birth date format', { birthDate, args });
     }
 
-    // Fetch Institution ID from ROR ID
-    const institution =
-      await this.adminDataSource.getInstitutionByRorId(institutionRoRId);
+    const institution = await this.userAuth.getOrCreateUserInstitution({
+      institution_ror_id: institutionRoRId,
+      institution_name: institutionName,
+      institution_country: institutionCountry,
+    });
+
+    if (!institution) {
+      return rejection('Invalid Input for the Institution', {
+        institutionRoRId,
+        args,
+      });
+    }
 
     if (userWithOAuthSubMatch) {
       const updatedUser = await this.dataSource.update({
@@ -556,7 +567,7 @@ export default class UserMutations {
         gender: gender ?? undefined,
         lastname: lastName,
         oidcSub: oidcSub,
-        institutionId: institution?.id,
+        institutionId: institution.id,
         position: position,
         preferredname: preferredName ?? undefined,
         telephone: telephone ?? undefined,
@@ -576,7 +587,7 @@ export default class UserMutations {
         '',
         gender ?? '',
         formattedBirthDate?.toJSDate() ?? new Date(),
-        institution?.id ?? null,
+        institution.id,
         department ?? '',
         position,
         email,

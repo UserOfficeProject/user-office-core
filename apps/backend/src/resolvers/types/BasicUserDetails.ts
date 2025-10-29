@@ -17,13 +17,13 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public lastname: string;
 
   @Field(() => String, { nullable: true })
-  public preferredname?: string | null;
+  public preferredname: string | undefined;
 
-  @Field(() => String, { nullable: true })
-  public institution?: string | null;
+  @Field()
+  public institution: string;
 
-  @Field(() => Int, { nullable: true })
-  public institutionId?: number | null;
+  @Field(() => Int)
+  public institutionId: number;
 
   @Field()
   public position: string;
@@ -33,14 +33,14 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
     Roles.INSTRUMENT_SCIENTIST,
     Roles.INTERNAL_REVIEWER,
   ])
-  @Field(() => String, { nullable: true })
-  public email?: string | null;
+  @Field({ nullable: true })
+  public email: string;
 
   @Field(() => Boolean, { nullable: true })
-  public placeholder?: boolean | null;
+  public placeholder?: boolean;
 
-  @Field(() => Date)
-  public created: Date;
+  @Field(() => Date, { nullable: true })
+  public created?: Date;
 
   @Field({ nullable: true })
   public country: string;

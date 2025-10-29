@@ -272,7 +272,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord) => {
@@ -282,14 +282,14 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async getUserWithInstitution(id: number): Promise<{
     user: User;
-    institution: Institution | null;
-    country: Country | null;
+    institution: Institution;
+    country: Country;
   } | null> {
     return database
       .select('i.*', 'c.*', 'u.*')
       .from('users as u')
-      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .join('countries as c', { 'c.country_id': 'i.country_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) => {
@@ -297,10 +297,8 @@ export default class PostgresUserDataSource implements UserDataSource {
           ? null
           : {
               user: createUserObject(user),
-              institution: user.institution_id
-                ? createInstitutionObject(user)
-                : null,
-              country: user.country_id ? createCountryObject(user) : null,
+              institution: createInstitutionObject(user),
+              country: createCountryObject(user),
             };
       });
   }
@@ -309,13 +307,11 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', {
-        'u.institution_id': 'i.institution_id',
-      })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
-        user ? createBasicUserObject(user) : null
+        createBasicUserObject(user)
       );
   }
 
@@ -323,7 +319,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .whereIn('u.user_id', ids)
       .then(
         (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
@@ -338,9 +334,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', {
-        'u.institution_id': 'i.institution_id',
-      })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .whereILikeEscaped('email', '?', email)
       .modify((query) => {
         if (role) {
@@ -387,20 +381,20 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async create(
-    user_title: string | null,
+    user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string | null,
-    preferredname: string | null,
-    oidc_sub: string | null,
-    oauth_refresh_token: string | null,
-    oauth_issuer: string | null,
+    username: string,
+    preferredname: string | undefined,
+    oidc_sub: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
     gender: string,
     birthdate: Date,
-    institution_id: number | null,
+    institution_id: number,
     department: string,
     position: string,
-    email: string | null,
+    email: string,
     telephone: string
   ): Promise<User> {
     return database
@@ -511,9 +505,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .leftJoin('institutions as i', {
-        'users.institution_id': 'i.institution_id',
-      })
+      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
@@ -579,9 +571,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .leftJoin('institutions as i', {
-        'users.institution_id': 'i.institution_id',
-      })
+      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
         if (filter) {
@@ -741,7 +731,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', id)

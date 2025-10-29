@@ -245,11 +245,11 @@ export interface TemplateRecord {
 
 export interface UserRecord {
   readonly user_id: number;
-  readonly user_title: string | null;
+  readonly user_title: string;
   readonly firstname: string;
   readonly lastname: string;
-  readonly username: string | null;
-  readonly preferredname: string | null;
+  readonly username: string;
+  readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
@@ -257,14 +257,14 @@ export interface UserRecord {
   readonly birthdate: Date;
   readonly department: string;
   readonly position: string;
-  readonly email: string | null;
+  readonly email: string;
   readonly telephone: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
-  readonly institution_id: number | null;
-  readonly institution: string | null;
-  readonly placeholder: boolean | null;
+  readonly institution_id: number;
+  readonly institution: string;
+  readonly placeholder: boolean;
 }
 
 export interface VisitRegistrationRecord {

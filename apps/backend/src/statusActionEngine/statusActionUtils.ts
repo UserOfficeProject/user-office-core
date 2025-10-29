@@ -211,22 +211,20 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
             }
           }
         }
-        if (recipient.email) {
-          emailReadyUsersWithProposals.push({
-            id: recipientsWithEmailTemplate.recipient.name,
-            proposals: [proposal],
-            template: recipientsWithEmailTemplate.emailTemplate.id,
-            email: recipient.email,
-            firstName: recipient.firstname,
-            lastName: recipient.lastname,
-            preferredName: recipient.preferredname ?? undefined,
-            pi: pi,
-            coProposers: coProposers,
-            techniques: techniques,
-            samples: sampleAnswers,
-            hazards: hazardAnswers,
-          });
-        }
+        emailReadyUsersWithProposals.push({
+          id: recipientsWithEmailTemplate.recipient.name,
+          proposals: [proposal],
+          template: recipientsWithEmailTemplate.emailTemplate.id,
+          email: recipient.email,
+          firstName: recipient.firstname,
+          lastName: recipient.lastname,
+          preferredName: recipient.preferredname,
+          pi: pi,
+          coProposers: coProposers,
+          techniques: techniques,
+          samples: sampleAnswers,
+          hazards: hazardAnswers,
+        });
       }
     })
   );

@@ -56,7 +56,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         event.emailinviteresponse.inviterId
       );
 
-      if (!user || !user.email || !inviter) {
+      if (!user || !inviter) {
         logger.logError('Failed email invite', { user, inviter, event });
 
         return;
@@ -146,7 +146,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      if (!principalInvestigator || !principalInvestigator.email || !call) {
+      if (!principalInvestigator || !call) {
         return;
       }
 
@@ -189,23 +189,8 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const participants = await userDataSource.getProposalUsersFull(
         event.proposal.primaryKey
       );
-      if (!principalInvestigator || !principalInvestigator.email) {
+      if (!principalInvestigator) {
         return;
-      }
-
-      const recipients: (
-        | { address: string }
-        | { address: { email: string; header_to: string } }
-      )[] = [{ address: principalInvestigator.email }];
-      for (const partipant of participants) {
-        if (partipant.email) {
-          recipients.push({
-            address: {
-              email: partipant.email,
-              header_to: principalInvestigator.email,
-            },
-          });
-        }
       }
 
       const options: EmailSettings = {
@@ -222,7 +207,17 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           ),
           call: '',
         },
-        recipients,
+        recipients: [
+          { address: principalInvestigator.email },
+          ...participants.map((partipant) => {
+            return {
+              address: {
+                email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
+            };
+          }),
+        ],
       };
 
       mailService
@@ -247,7 +242,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
       );
-      if (!principalInvestigator || !principalInvestigator.email) {
+      if (!principalInvestigator) {
         return;
       }
       const { finalStatus } = event.proposal;
@@ -298,7 +293,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const fapReviewer = await userDataSource.getUser(userID);
       const proposal = await proposalDataSource.get(proposalPk);
 
-      if (!fapReviewer || !fapReviewer.email || !proposal) {
+      if (!fapReviewer || !proposal) {
         return;
       }
 
@@ -353,7 +348,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           event.internalreview.technicalReviewId
         );
 
-      if (!assignedBy || !reviewer || !reviewer.email || !technicalReview) {
+      if (!assignedBy || !reviewer || !technicalReview) {
         logger.logError('Failed email invite', { event });
 
         return;
