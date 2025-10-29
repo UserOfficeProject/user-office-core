@@ -127,21 +127,22 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-      await sendMail(
-        CPs,
-        statusActionLogger({
-          connectionId: statusAction.connectionId,
-          actionId: statusAction.actionId,
-          statusActionsLogId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
-          proposalPks,
-        }),
-        successfulMessage,
-        failMessage,
-        templateMessage,
-        loggedInUserId,
-        'CoProposer'
-      );
+      CPs.length &&
+        (await sendMail(
+          CPs,
+          statusActionLogger({
+            connectionId: statusAction.connectionId,
+            actionId: statusAction.actionId,
+            statusActionsLogId,
+            emailStatusActionRecipient:
+              EmailStatusActionRecipients.CO_PROPOSERS,
+            proposalPks,
+          }),
+          successfulMessage,
+          failMessage,
+          templateMessage,
+          loggedInUserId
+        ));
 
       break;
     }
@@ -425,8 +426,7 @@ const sendMail = async (
   successfulMessage: string,
   failMessage: string,
   templateMessage: string,
-  loggedInUserId?: number | null,
-  messageType?: string
+  loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const loggingHandler = container.resolve<
@@ -436,7 +436,7 @@ const sendMail = async (
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.EmailEventHandler);
 
-  if (!recipientsWithData.length && messageType != 'CoProposer') {
+  if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
     });
