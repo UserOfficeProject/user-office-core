@@ -336,7 +336,7 @@ const ProposalsPeopleTable = ({
           }
 
           if (selectedUsers?.includes(userDetails.id)) {
-            setFieldError('email', 'User is already on the proposal');
+            setFieldError('email', 'User is already assigned');
 
             return;
           }

@@ -1,8 +1,9 @@
-import { ExitToApp } from '@mui/icons-material';
+import { ExitToApp, ManageAccounts } from '@mui/icons-material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
+import { Chip, Divider } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -12,26 +13,37 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useContext, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
+import { SettingsId } from 'generated/sdk';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 
+import ProfileInfo from './ProfileInfo';
 import RoleSelection from './RoleSelection';
 
 const AccountActionButton = () => {
+  const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
-  const { roles, handleLogout, impersonatingUserId } = useContext(UserContext);
+  const { user } = useContext(UserContext);
+  const settingsContext = useContext(SettingsContext);
+  const { roles, currentRole, handleLogout, impersonatingUserId } =
+    useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
   const [searchParams, setSearchParams] = useSearchParams();
-
   const hasMultipleRoles = getUniqueArrayBy(roles, 'id').length > 1;
+  const humanReadableActiveRole = useMemo(
+    () =>
+      roles.find(({ shortCode }) => shortCode.toUpperCase() === currentRole)
+        ?.title ?? 'Unknown',
+    [roles, currentRole]
+  );
 
   useEffect(() => {
     if (searchParams.get('selectRoles')) {
@@ -45,6 +57,10 @@ const AccountActionButton = () => {
   }, [hasMultipleRoles, searchParams, setSearchParams]);
 
   const isUserImpersonated = typeof impersonatingUserId === 'number';
+
+  const externalProfileLink = settingsContext.settingsMap.get(
+    SettingsId.PROFILE_PAGE_LINK
+  )?.settingsValue;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -61,6 +77,15 @@ const AccountActionButton = () => {
     handleLogout().finally(() => {
       setIsLoggingOut(false);
     });
+  };
+
+  const handleManageAccountClick = () => {
+    handleClose();
+    if (externalProfileLink) {
+      window.open(externalProfileLink, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(`/ProfilePage/${user.id}`);
+    }
   };
 
   return (
@@ -121,6 +146,18 @@ const AccountActionButton = () => {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
+          <ProfileInfo />
+          <Divider style={{ marginBottom: '7px' }} />
+          <MenuItem
+            onClick={handleManageAccountClick}
+            disabled={isLoggingOut}
+            data-cy="manage-account-button"
+          >
+            <Box paddingRight={1} paddingTop={1}>
+              <ManageAccounts />
+            </Box>
+            Manage account
+          </MenuItem>
           {hasMultipleRoles && (
             <MenuItem
               onClick={() => {
@@ -132,7 +169,26 @@ const AccountActionButton = () => {
               <Box paddingRight={1} paddingTop={1}>
                 <SupervisedUserCircleIcon />
               </Box>
-              Roles
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flex: 1,
+                }}
+              >
+                <Box>Roles</Box>
+                <Chip
+                  label={humanReadableActiveRole}
+                  color="primary"
+                  size="small"
+                  sx={{
+                    fontSize: '10px',
+                    height: 'inherit',
+                    lineHeight: 2,
+                  }}
+                />
+              </Box>
             </MenuItem>
           )}
           {isUserImpersonated && (
