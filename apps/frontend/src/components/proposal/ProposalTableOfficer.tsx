@@ -26,7 +26,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -380,22 +380,16 @@ const ProposalTableOfficer = ({
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 
-  const [isFirstRender, setIsFirstRender] = useState(true);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    let isMounted = true;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
 
-    if (isMounted && !isFirstRender) {
-      refreshTableData();
+      return;
     }
 
-    if (isFirstRender) {
-      setIsFirstRender(false);
-    }
-
-    return () => {
-      isMounted = false;
-    };
+    refreshTableData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(proposalFilter)]);
 
