@@ -15,10 +15,6 @@ context('Invites tests', () => {
   describe('Creating invites', () => {
     beforeEach(() => {
       cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
 
       cy.login('user1', initialDBData.roles.user);
@@ -236,10 +232,6 @@ context('Invites tests', () => {
   describe('Accepting invites', () => {
     beforeEach(() => {
       cy.resetDB(true);
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
     });
 
@@ -283,10 +275,6 @@ context('Invites tests', () => {
 
     beforeEach(() => {
       cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
 
       const email = initialDBData.users.user2.email;
@@ -379,10 +367,6 @@ context('Invites tests', () => {
   describe('Invites disabled with email search enabled', () => {
     beforeEach(() => {
       cy.resetDB(true);
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.updateFeature({
         action: FeatureUpdateAction.DISABLE,
         featureIds: [FeatureId.EMAIL_INVITE],

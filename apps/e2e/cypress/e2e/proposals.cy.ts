@@ -1071,27 +1071,6 @@ context('Proposal tests', () => {
       cy.getAndStoreFeaturesEnabled();
     });
 
-    it('Should be able to redeem proposal invite user information', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
-        this.skip();
-      }
-      cy.login('user2');
-      cy.visit('/');
-      cy.finishedLoading();
-      cy.get('[data-cy="proposal-table"]').should(
-        'not.contain.text',
-        initialDBData.proposal.shortCode
-      );
-      cy.get('[data-cy="join-proposal-btn"]').click();
-      cy.get('#code').clear();
-      cy.get('#code').type(initialDBData.redeemCodes.validRedeemCode.code);
-      cy.get('[data-cy="invitation-submit"]').click();
-      cy.get('[data-cy="proposal-table"]').should(
-        'contain.text',
-        initialDBData.proposal.shortCode
-      );
-    });
-
     it('User officer should reopen proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');

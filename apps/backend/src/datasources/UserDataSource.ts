@@ -3,7 +3,6 @@ import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
@@ -13,7 +12,6 @@ import { UsersArgs } from '../resolvers/queries/UsersQuery';
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
-  createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(

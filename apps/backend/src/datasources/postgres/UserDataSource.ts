@@ -13,7 +13,6 @@ import {
   UserRoleShortCodeMap,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserByIdArgs,
   UpdateUserByOidcSubArgs,
@@ -139,26 +138,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     }
 
     return createUserObject(userRecord);
-  }
-
-  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
-    const { firstname, lastname, email } = args;
-
-    return database
-      .insert({
-        user_title: '',
-        firstname,
-        lastname,
-        preferredname: firstname,
-        oidc_sub: '',
-        oauth_refresh_token: '',
-        oauth_issuer: '',
-        institution_id: 1,
-        email,
-      })
-      .returning(['*'])
-      .into('users')
-      .then((user: UserRecord[]) => user[0].user_id);
   }
 
   async getRoles(): Promise<Role[]> {

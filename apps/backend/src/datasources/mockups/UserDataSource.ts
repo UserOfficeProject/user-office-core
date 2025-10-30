@@ -8,7 +8,6 @@ import {
   UserWithRole,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserByIdArgs,
   UpdateUserByOidcSubArgs,
@@ -229,9 +228,6 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async getByOIDCSub(oidcSub: string): Promise<User | null> {
     return dummyUser;
-  }
-  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
-    return 5;
   }
   async createInstitution(name: string, countryId?: number): Promise<number> {
     return 1;

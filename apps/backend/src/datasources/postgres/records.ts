@@ -35,7 +35,6 @@ import {
   getTransformedConfigData,
   QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
-import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { RoleClaim } from '../../models/RoleClaim';
@@ -736,15 +735,6 @@ export interface QuantityRecord {
   readonly quantity_id: string;
 }
 
-export interface RedeemCodeRecord {
-  readonly code: string;
-  readonly placeholder_user_id: number;
-  readonly created_by: number;
-  readonly created_at: Date;
-  readonly claimed_by: number | null;
-  readonly claimed_at: Date | null;
-}
-
 export interface StatusActionRecord {
   readonly status_action_id: number;
   readonly name: string;
@@ -1302,15 +1292,6 @@ export const createExperimentSafetyPdfTemplateObject = (
   );
 };
 
-export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
-  new RedeemCode(
-    invite.code,
-    invite.placeholder_user_id,
-    invite.created_by,
-    invite.created_at,
-    invite.claimed_by,
-    invite.claimed_at
-  );
 export const createStatusActionsLogObject = (
   statusActionLog: StatusActionsLogRecord
 ) => {

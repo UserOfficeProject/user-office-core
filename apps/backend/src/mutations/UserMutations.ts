@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import {
   addUserRoleValidationSchema,
-  createUserByEmailInviteValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
@@ -13,22 +12,13 @@ import { Args } from 'type-graphql';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { RedeemCodesDataSource } from '../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import {
-  AuthJwtPayload,
-  User,
-  UserRole,
-  UserRoleShortCodeMap,
-  UserWithRole,
-} from '../models/User';
+import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserRolesArgs,
   UpdateUserByOidcSubArgs,
@@ -41,9 +31,7 @@ import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.RedeemCodesDataSource)
-    private redeemCodeDataSource: RedeemCodesDataSource
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
   ) {}
 
   createHash(password: string): string {
@@ -74,93 +62,6 @@ export default class UserMutations {
     }
 
     return user;
-  }
-
-  createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
-    return new EmailInviteResponse(userId, agentId, role);
-  }
-
-  @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
-  @Authorized()
-  @EventBus(Event.EMAIL_INVITE_LEGACY)
-  async createUserByEmailInvite(
-    agent: UserWithRole | null,
-    args: CreateUserByEmailInviteArgs
-  ): Promise<EmailInviteResponse> {
-    let userId: number | null = null;
-    let role: UserRole = args.userRole;
-
-    if (!agent) {
-      throw rejection('Agent is not defined', {
-        agent,
-        args,
-        code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
-      });
-    }
-    // Check if email exist in database and if user has been invited before
-    const user = await this.dataSource.getByEmail(args.email);
-    if (user) {
-      userId = user.id;
-
-      return this.createEmailInviteResponse(userId, agent.id, role);
-    } else if (user) {
-      throw rejection('Can not create account because account already exists', {
-        args,
-        code: ApolloServerErrorCodeExtended.BAD_REQUEST,
-      });
-    }
-
-    if (
-      args.userRole === UserRole.FAP_REVIEWER &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-
-      const newUserRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[role]
-      );
-
-      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.FAP_REVIEWER;
-    } else if (args.userRole === UserRole.USER) {
-      userId = await this.dataSource.createInviteUser(args);
-
-      const newUserRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[role]
-      );
-
-      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.USER;
-    } else if (
-      args.userRole === UserRole.FAP_CHAIR &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_CHAIR;
-    } else if (
-      args.userRole === UserRole.FAP_SECRETARY &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_SECRETARY;
-    } else if (
-      args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.INSTRUMENT_SCIENTIST;
-    }
-
-    if (!userId) {
-      throw rejection('Can not create user for this role', {
-        args,
-      });
-    } else {
-      await this.redeemCodeDataSource.createRedeemCode(userId, agent.id);
-
-      return this.createEmailInviteResponse(userId, agent.id, role);
-    }
   }
 
   @ValidateArgs(updateUserValidationBackendSchema)

@@ -8,7 +8,6 @@ import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User, UserRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserByIdArgs,
   UpdateUserByOidcSubArgs,
@@ -333,10 +332,6 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   getByOIDCSub(oidcSub: string): Promise<User | null> {
-    throw new Error('Method not implemented.');
-  }
-
-  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     throw new Error('Method not implemented.');
   }
 
