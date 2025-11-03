@@ -26,7 +26,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -380,16 +380,16 @@ const ProposalTableOfficer = ({
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 
-  useEffect(() => {
-    let isMounted = true;
+  const isFirstRender = useRef(true);
 
-    if (isMounted) {
-      refreshTableData();
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      return;
     }
 
-    return () => {
-      isMounted = false;
-    };
+    refreshTableData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(proposalFilter)]);
 
@@ -1120,10 +1120,24 @@ const ProposalTableOfficer = ({
             return searchParams;
           });
         }}
+        onRowsPerPageChange={(pageSize) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('pageSize', pageSize.toString());
+            searchParams.set('page', '0');
+
+            return searchParams;
+          });
+        }}
         onSearchChange={(searchText) => {
-          setSearchParams({
-            search: searchText ? searchText : '',
-            page: searchText ? '0' : page || '',
+          setSearchParams((searchParams) => {
+            if (searchText) {
+              searchParams.set('search', searchText);
+              searchParams.set('page', '0');
+            } else {
+              searchParams.delete('search');
+            }
+
+            return searchParams;
           });
         }}
         onSelectionChange={(selectedItems) => {
@@ -1162,7 +1176,7 @@ const ProposalTableOfficer = ({
             },
           }),
           pageSize: pageSize ? +pageSize : undefined,
-          initialPage: search ? 0 : page ? +page : 0,
+          initialPage: page ? +page : 0,
         }}
         actions={tableActions}
         onChangeColumnHidden={(columnChange) => {
@@ -1182,11 +1196,18 @@ const ProposalTableOfficer = ({
           const [orderBy] = orderByCollection;
 
           if (!orderBy) {
-            setSearchParams({});
+            setSearchParams((searchParams) => {
+              searchParams.delete('sortField');
+              searchParams.delete('sortDirection');
+
+              return searchParams;
+            });
           } else {
-            setSearchParams({
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
+            setSearchParams((searchParams) => {
+              searchParams.set('sortField', orderBy.orderByField);
+              searchParams.set('sortDirection', orderBy.orderDirection);
+
+              return searchParams;
             });
           }
         }}
