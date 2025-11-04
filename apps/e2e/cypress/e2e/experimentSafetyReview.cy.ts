@@ -16,19 +16,23 @@ const TEST_CONSTANTS = {
     IS_REVIEW: 18,
     ESR_REVIEW: 19,
     APPROVED: 21,
+    REJECTED: 20,
   },
 
   // Sort Orders
   SORT_ORDER: {
     FIRST: 1,
     SECOND: 2,
+    THIRD: 3,
   },
 
   // Events
   EVENTS: {
     ESF_SUBMITTED: 'EXPERIMENT_ESF_SUBMITTED',
     ESF_APPROVED_BY_IS: 'EXPERIMENT_ESF_APPROVED_BY_IS',
+    ESF_REJECTED_BY_IS: 'EXPERIMENT_ESF_REJECTED_BY_IS',
     ESF_APPROVED_BY_ESR: 'EXPERIMENT_ESF_APPROVED_BY_ESR',
+    ESF_REJECTED_BY_ESR: 'EXPERIMENT_ESF_REJECTED_BY_ESR',
   },
 
   // Status Labels
@@ -36,6 +40,7 @@ const TEST_CONSTANTS = {
     ESF_IS_REVIEW: 'ESF IS REVIEW',
     ESF_ESR_REVIEW: 'ESF ESR REVIEW',
     ESF_APPROVED: 'ESF APPROVED',
+    ESF_REJECTED: 'ESF REJECTED',
   },
 
   // Form Values - can be configured for different test scenarios
@@ -51,6 +56,7 @@ const TEST_CONSTANTS = {
     SELECTION_OPTION: 'One',
     PROPOSAL_STATUS: 'Accepted',
     DECISION_ACCEPTED: 'ACCEPTED',
+    DECISION_REJECTED: 'REJECTED',
 
     // Randomized versions available via getters for tests that don't need validation
     get RANDOM_DATE() {
@@ -115,8 +121,14 @@ const TEST_CONSTANTS = {
     get IS_APPROVAL() {
       return `Approved by Instrument Scientist - ${faker.lorem.sentence()}`;
     },
+    get IS_REJECTION() {
+      return `Rejected by Instrument Scientist - ${faker.lorem.sentence()}`;
+    },
     get ESR_APPROVAL() {
       return `Approved by Experiment Safety Reviewer - ${faker.lorem.sentence()}`;
+    },
+    get ESR_REJECTION() {
+      return `Rejected by Experiment Safety Reviewer - ${faker.lorem.sentence()}`;
     },
     get IS_WORKFLOW() {
       return `IS approval for status change test - ${faker.lorem.sentence()}`;
@@ -156,8 +168,9 @@ function createWorkflowForInstrumentScientist() {
           workflowId: workflowData.id,
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
-          posX: 0,
-          posY: 200,
+          posX: -9,
+          posY: 75,
+          prevConnectionId: 2, // Connect to initial status
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -173,8 +186,9 @@ function createWorkflowForInstrumentScientist() {
                     workflowId: workflowData.id,
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
-                    posX: 0,
-                    posY: 200,
+                    posX: 228,
+                    posY: 213,
+                    prevConnectionId: result.addWorkflowStatus.id,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
@@ -187,7 +201,34 @@ function createWorkflowForInstrumentScientist() {
                           ],
                         })
                         .then(() => {
-                          return cy.wrap(workflowData.id);
+                          return cy
+                            .addWorkflowStatus({
+                              statusId: TEST_CONSTANTS.WORKFLOW_STATUS.REJECTED,
+                              workflowId: workflowData.id,
+                              sortOrder: TEST_CONSTANTS.SORT_ORDER.THIRD,
+                              prevStatusId:
+                                TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
+                              posX: -221,
+                              posY: 218,
+                              prevConnectionId: result.addWorkflowStatus.id,
+                            })
+                            .then((thirdResult) => {
+                              if (thirdResult.addWorkflowStatus) {
+                                return cy
+                                  .addStatusChangingEventsToConnection({
+                                    workflowConnectionId:
+                                      thirdResult.addWorkflowStatus.id,
+                                    statusChangingEvents: [
+                                      TEST_CONSTANTS.EVENTS.ESF_REJECTED_BY_IS,
+                                    ],
+                                  })
+                                  .then(() => {
+                                    return cy.wrap(workflowData.id);
+                                  });
+                              }
+
+                              return cy.wrap(workflowData.id);
+                            });
                         });
                     }
 
@@ -221,8 +262,9 @@ function createWorkflowForESR() {
           workflowId: workflowData.id,
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
-          posX: 0,
-          posY: 200,
+          posX: 1,
+          posY: 111,
+          prevConnectionId: 2,
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -238,8 +280,9 @@ function createWorkflowForESR() {
                     workflowId: workflowData.id,
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
-                    posX: 0,
-                    posY: 200,
+                    posX: -211,
+                    posY: 282,
+                    prevConnectionId: result.addWorkflowStatus.id,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
@@ -252,7 +295,34 @@ function createWorkflowForESR() {
                           ],
                         })
                         .then(() => {
-                          return cy.wrap(workflowData.id);
+                          return cy
+                            .addWorkflowStatus({
+                              statusId: TEST_CONSTANTS.WORKFLOW_STATUS.REJECTED,
+                              workflowId: workflowData.id,
+                              sortOrder: TEST_CONSTANTS.SORT_ORDER.THIRD,
+                              prevStatusId:
+                                TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
+                              posX: 195,
+                              posY: 287,
+                              prevConnectionId: result.addWorkflowStatus.id,
+                            })
+                            .then((thirdResult) => {
+                              if (thirdResult.addWorkflowStatus) {
+                                return cy
+                                  .addStatusChangingEventsToConnection({
+                                    workflowConnectionId:
+                                      thirdResult.addWorkflowStatus.id,
+                                    statusChangingEvents: [
+                                      TEST_CONSTANTS.EVENTS.ESF_REJECTED_BY_ESR,
+                                    ],
+                                  })
+                                  .then(() => {
+                                    return cy.wrap(workflowData.id);
+                                  });
+                              }
+
+                              return cy.wrap(workflowData.id);
+                            });
                         });
                     }
 
@@ -651,6 +721,32 @@ context('Experiment Safety Review tests', () => {
         }).should('not.be.disabled');
       });
 
+      it('Should not enable download button when Instrument Scientist rejects (IS workflow)', () => {
+        // Initially download button should be disabled
+        cy.contains(TEST_CONSTANTS.UI_LABELS.DOWNLOAD_SAFETY_DOCUMENT).should(
+          'be.disabled'
+        );
+
+        // Accept the review as Instrument Scientist
+        cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
+        cy.get(
+          `li[data-value="${TEST_CONSTANTS.FORM_VALUES.DECISION_REJECTED}"]`
+        ).click();
+        cy.get('[data-cy="experiment-safety-review-comment"]').type(
+          TEST_CONSTANTS.COMMENTS.IS_REJECTION
+        );
+        cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
+        cy.contains(TEST_CONSTANTS.UI_LABELS.OK).click();
+
+        // Refresh the page to get the updated status after workflow processing
+        cy.reload();
+
+        // Download button should now be enabled (IS approval enables download in IS workflow)
+        cy.contains(TEST_CONSTANTS.UI_LABELS.DOWNLOAD_SAFETY_DOCUMENT).should(
+          'be.disabled'
+        );
+      });
+
       it('Should change experiment status to ESF APPROVED after Instrument Scientist approval (IS workflow)', () => {
         // Accept the review as Instrument Scientist
         cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
@@ -658,7 +754,7 @@ context('Experiment Safety Review tests', () => {
           `li[data-value="${TEST_CONSTANTS.FORM_VALUES.DECISION_ACCEPTED}"]`
         ).click();
         cy.get('[data-cy="experiment-safety-review-comment"]').type(
-          TEST_CONSTANTS.COMMENTS.IS_WORKFLOW
+          TEST_CONSTANTS.COMMENTS.IS_APPROVAL
         );
         cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
         cy.contains(TEST_CONSTANTS.UI_LABELS.OK).click();
@@ -674,6 +770,31 @@ context('Experiment Safety Review tests', () => {
           .find('td')
           .eq(6)
           .should('contain', TEST_CONSTANTS.STATUS_LABELS.ESF_APPROVED);
+      });
+
+      it('Should change experiment status to ESF REJECTED after Instrument Scientist approval (IS workflow)', () => {
+        // Accept the review as Instrument Scientist
+        cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
+        cy.get(
+          `li[data-value="${TEST_CONSTANTS.FORM_VALUES.DECISION_REJECTED}"]`
+        ).click();
+        cy.get('[data-cy="experiment-safety-review-comment"]').type(
+          TEST_CONSTANTS.COMMENTS.IS_REJECTION
+        );
+        cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
+        cy.contains(TEST_CONSTANTS.UI_LABELS.OK).click();
+
+        // Close modal and verify status
+        cy.get('[data-cy="close-modal"]').click();
+        cy.visit('/Experiments');
+        cy.finishedLoading();
+
+        cy.get('table tbody tr')
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
+          .find('td')
+          .eq(6)
+          .should('contain', TEST_CONSTANTS.STATUS_LABELS.ESF_REJECTED);
       });
     });
   });
@@ -778,6 +899,26 @@ context('Experiment Safety Review tests', () => {
         }).should('not.be.disabled');
       });
 
+      it('Should not enable download button when Experiment Safety Reviewer rejects (ESR workflow)', () => {
+        // Initially download button should be disabled
+        cy.contains('Download Safety Review Document').should('be.disabled');
+
+        // Reject the review as ESR
+        cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
+        cy.get('li[data-value="REJECTED"]').click();
+        cy.get('[data-cy="experiment-safety-review-comment"]').type(
+          'Rejected by Experiment Safety Reviewer in ESR workflow.'
+        );
+        cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
+        cy.contains('OK').click();
+
+        // Refresh the page to get the updated status after workflow processing
+        cy.reload();
+
+        // Download button should now be enabled (ESR approval enables download in ESR workflow)
+        cy.contains('Download Safety Review Document').should('be.disabled');
+      });
+
       it('Should change experiment status to ESF APPROVED after ESR approval (ESR workflow)', () => {
         // Accept the review as ESR
         cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
@@ -799,6 +940,29 @@ context('Experiment Safety Review tests', () => {
           .find('td')
           .eq(6)
           .should('contain', 'ESF APPROVED');
+      });
+
+      it('Should change experiment status to ESF REJECTED after ESR rejection (ESR workflow)', () => {
+        // Reject the review as ESR
+        cy.get('[data-cy="experiment-safety-review-make-decision"]').click();
+        cy.get('li[data-value="REJECTED"]').click();
+        cy.get('[data-cy="experiment-safety-review-comment"]').type(
+          'ESR rejection for status change test.'
+        );
+        cy.get('[data-cy="button-submit-experiment-safety-review"]').click();
+        cy.contains('OK').click();
+
+        // Close modal and verify status
+        cy.get('[data-cy="close-modal"]').click();
+        cy.visit('/Experiments');
+        cy.finishedLoading();
+
+        cy.get('table tbody tr')
+          .contains('td', TEST_CONSTANTS.EXPERIMENT.ID)
+          .parent()
+          .find('td')
+          .eq(6)
+          .should('contain', 'ESF REJECTED');
       });
 
       it('Should keep download disabled when Instrument Scientist approves in ESR workflow', () => {

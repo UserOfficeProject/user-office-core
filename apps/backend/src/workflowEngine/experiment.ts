@@ -22,7 +22,7 @@ const getExperimentWorkflowByCallId = (callId: number) => {
 
 export const getWorkflowConnectionByStatusId = (
   workflowId: number,
-  statusId: number,
+  statusId?: number,
   prevStatusId?: number
 ) => {
   const workflowDataSource = container.resolve<WorkflowDataSource>(
@@ -45,7 +45,6 @@ const shouldMoveToNextStatus = (
         experimentSafetyEventsKey as keyof ExperimentSafetyEventsRecord
       ]
   );
-
   const allNextStatusRulesFulfilled = !statusChangingEvents.some(
     (statusChangingEvent) =>
       allExperimentIncompleteEvents.indexOf(
@@ -203,78 +202,78 @@ export const workflowEngine = async (
          * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
          * We go through each record and based on the currentEvent we move the proposal into the right direction
          */
-        return Promise.all(
+        const response = await Promise.all(
           currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            if (!currentWorkflowConnection.nextStatusId) {
-              return;
-            }
-
-            if (!experimentSafetyWithEvents.experimentSafetyEvents) {
-              return;
-            }
-
             const nextWorkflowConnections =
               await getWorkflowConnectionByStatusId(
                 experimentWorkflow.id,
-                currentWorkflowConnection.nextStatusId,
+                undefined,
                 currentWorkflowConnection.statusId
               );
-            if (!nextWorkflowConnections?.length) {
-              return;
-            }
 
-            const workflowDataSource = container.resolve<WorkflowDataSource>(
-              Tokens.WorkflowDataSource
+            return Promise.all(
+              nextWorkflowConnections.map(async (nextWorkflowConnection) => {
+                if (!experimentSafetyWithEvents.experimentSafetyEvents) {
+                  return;
+                }
+                const workflowDataSource =
+                  container.resolve<WorkflowDataSource>(
+                    Tokens.WorkflowDataSource
+                  );
+
+                const statusChangingEvents =
+                  await workflowDataSource.getStatusChangingEventsByConnectionIds(
+                    [nextWorkflowConnection.id]
+                  );
+                if (!statusChangingEvents) {
+                  return;
+                }
+
+                const eventThatTriggeredStatusChangeIsStatusChangingEvent =
+                  statusChangingEvents.find(
+                    (statusChangingEvent) =>
+                      experimentSafetyWithEvents.currentEvent ===
+                      statusChangingEvent.statusChangingEvent
+                  );
+
+                if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
+                  return;
+                }
+
+                if (
+                  shouldMoveToNextStatus(
+                    statusChangingEvents,
+                    experimentSafetyWithEvents.experimentSafetyEvents
+                  )
+                ) {
+                  const updatedExperimentSafety =
+                    await experimentDataSource.updateExperimentSafetyStatus(
+                      experimentSafety.experimentSafetyPk,
+                      nextWorkflowConnection.statusId
+                    );
+
+                  if (updatedExperimentSafety) {
+                    await checkIfConditionsForNextStatusAreMet({
+                      nextWorkflowConnections,
+                      experimentWorkflow,
+                      workflowDataSource,
+                      experimentSafetyWithEvents,
+                    });
+
+                    return {
+                      ...updatedExperimentSafety,
+                      workflowId: experimentWorkflow.id,
+                      prevStatusId: currentWorkflowConnection.statusId,
+                      callShortCode: call.shortCode,
+                    };
+                  }
+                }
+              })
             );
-
-            const statusChangingEvents =
-              await workflowDataSource.getStatusChangingEventsByConnectionIds(
-                nextWorkflowConnections.map((connection) => connection.id)
-              );
-            if (!statusChangingEvents) {
-              return;
-            }
-
-            const eventThatTriggeredStatusChangeIsStatusChangingEvent =
-              statusChangingEvents.find(
-                (statusChangingEvent) =>
-                  experimentSafetyWithEvents.currentEvent ===
-                  statusChangingEvent.statusChangingEvent
-              );
-            if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
-              return;
-            }
-
-            if (
-              shouldMoveToNextStatus(
-                statusChangingEvents,
-                experimentSafetyWithEvents.experimentSafetyEvents
-              )
-            ) {
-              const updatedExperimentSafety =
-                await experimentDataSource.updateExperimentSafetyStatus(
-                  experimentSafety.experimentSafetyPk,
-                  currentWorkflowConnection.nextStatusId
-                );
-
-              if (updatedExperimentSafety) {
-                await checkIfConditionsForNextStatusAreMet({
-                  nextWorkflowConnections,
-                  experimentWorkflow,
-                  workflowDataSource,
-                  experimentSafetyWithEvents,
-                });
-
-                return {
-                  ...updatedExperimentSafety,
-                  workflowId: experimentWorkflow.id,
-                  prevStatusId: currentWorkflowConnection.statusId,
-                  callShortCode: call.shortCode,
-                };
-              }
-            }
           })
-        );
+        ).then((results) => results.flat());
+
+        return response;
       })
     )
   ).flat();

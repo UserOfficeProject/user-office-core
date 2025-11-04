@@ -235,7 +235,6 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
               <ActionDiv>
                 {sendEmailButton}
                 {cancelButton}
-                {editButton}
               </ActionDiv>
             );
           case VisitRegistrationStatus.SUBMITTED:
