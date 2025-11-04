@@ -390,11 +390,10 @@ export async function createPostToRabbitMQHandler() {
           jsonMessage
         );
 
-        const proposalJsonMessage = await getProposalMessageData(proposal!);
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           Event.PROPOSAL_UPDATED,
-          proposalJsonMessage
+          proposalPayload
         );
         break;
       }

@@ -840,7 +840,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     }[]
   > {
     return database
-      .select('i.*', 'c.*', 'u.*')
+      .distinct('i.*', 'c.*', 'u.*')
       .from('users as u')
       .join('visits_has_users as vu', { 'u.user_id': 'vu.user_id' })
       .join('visits as v', { 'v.visit_id': 'vu.visit_id' })
