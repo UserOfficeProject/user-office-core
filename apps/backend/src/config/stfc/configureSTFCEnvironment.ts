@@ -86,6 +86,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.USER_SEARCH_FILTER,
       FeatureId.TAGS,
       FeatureId.TECHNIQUE_PROPOSALS,
+      FeatureId.PREGENERATED_PROPOSAL_PDF,
     ],
     true
   );
@@ -112,10 +113,6 @@ async function enableDefaultStfcFeatures() {
   await db.updateSettings({
     settingsId: SettingsId.IDLE_TIMEOUT,
     settingsValue: '1200000',
-  });
-  await db.updateSettings({
-    settingsId: SettingsId.GRADE_PRECISION,
-    settingsValue: '0.01',
   });
   await db.updateSettings({
     settingsId: SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS,

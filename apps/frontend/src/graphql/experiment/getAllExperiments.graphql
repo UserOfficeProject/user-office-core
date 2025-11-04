@@ -1,0 +1,44 @@
+query getExperiments(
+  $filter: ExperimentsFilter
+  $first: Int
+  $offset: Int
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
+) {
+  allExperiments(
+    filter: $filter
+    first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+  ) {
+    experiments {
+      ...experiment
+      proposal {
+        ...proposal
+        proposer {
+          ...basicUserDetails
+        }
+      }
+      experimentSafety {
+        ...experimentSafety
+      }
+      visit {
+        registrations {
+          ...visitRegistration
+          startsAt
+          endsAt
+          user {
+            ...basicUserDetails
+          }
+        }
+        teamLead {
+          ...basicUserDetails
+        }
+      }
+    }
+    totalCount
+  }
+}

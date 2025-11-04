@@ -55,7 +55,22 @@ export class GenericTemplateBasisConfig {
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class FapReviewBasisConfig extends ConfigBase {}
+export class ExperimentSafetyReviewBasisConfig extends ConfigBase {}
+
+@ObjectType()
+export class FapReviewBasisConfig extends ConfigBase {
+  @Field(() => [String])
+  nonNumericOptions: string[];
+
+  @Field(() => Int)
+  minGrade: number;
+
+  @Field(() => Int)
+  maxGrade: number;
+
+  @Field(() => Int)
+  decimalPoints: number;
+}
 
 @ObjectType()
 export class TechnicalReviewBasisConfig extends ConfigBase {}
@@ -274,6 +289,9 @@ export class SampleDeclarationConfig extends SubTemplateBaseConfig {
 export class IntervalConfig extends ConfigBase {
   @Field(() => [Unit])
   units: Unit[];
+
+  @Field(() => NumberValueConstraint, { nullable: true })
+  numberValueConstraint: NumberValueConstraint | null;
 }
 
 export enum NumberValueConstraint {
@@ -375,6 +393,7 @@ export const FieldConfigType = createUnionType({
     TechnicalReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    ExperimentSafetyReviewBasisConfig,
     InstrumentPickerConfig,
     TechniquePickerConfig,
   ], // function that returns array of object types classes

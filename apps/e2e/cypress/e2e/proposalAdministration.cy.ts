@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  FeatureUpdateAction,
   SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
@@ -187,8 +188,6 @@ context('Proposal administration tests', () => {
 
         return false;
       });
-
-      cy.contains('Proposal information').click();
 
       cy.get('[data-cy="is-management-decision-submitted"]').click();
 
@@ -1249,6 +1248,11 @@ context('Proposal administration tests', () => {
             proposalPk: createdProposalPk,
           });
         }
+      });
+
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
       });
 
       cy.login('officer');

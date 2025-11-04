@@ -4,41 +4,56 @@ import fetch from 'cross-fetch';
 import pdf from 'pdf-parse';
 import * as xlsx from 'xlsx';
 
-export function downloadFile(args: {
+export type DownloadFileResult = { success: boolean; message: string };
+
+export async function downloadFile(args: {
   url: string;
   token: string;
   filename: string;
   downloadsFolder: string;
-}) {
-  return fetch(args.url, {
-    headers: {
-      authorization: `Bearer ${args.token}`,
-    },
-  })
-    .then((response: Response) => {
-      if (!response) {
-        throw new Error('No response');
-      }
-
-      if (response.status !== 200) {
-        throw new Error('Bad status code: ' + response.status);
-      }
-
-      return response.arrayBuffer();
-    })
-    .then(function (arrayBuffer: ArrayBuffer) {
-      // NOTE: Create the downloads folder if it doesn't exists
-      if (args.downloadsFolder && !fs.existsSync(args.downloadsFolder)) {
-        fs.mkdirSync(args.downloadsFolder);
-      }
-
-      const fullFilePathWithName = `${args.downloadsFolder}/${args.filename}`;
-
-      const myBuffer = new Uint8Array(arrayBuffer);
-      fs.writeFileSync(fullFilePathWithName, myBuffer);
-
-      return 'downloadFile ' + args.filename + ' downloaded';
+}): Promise<DownloadFileResult> {
+  try {
+    const response = await fetch(args.url, {
+      headers: {
+        authorization: `Bearer ${args.token}`,
+      },
     });
+
+    if (!response) {
+      return { success: false, message: 'No response received from server' };
+    }
+
+    if (response.status !== 200) {
+      return {
+        success: false,
+        message: `Bad status code: ${response.status}`,
+      };
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    if (!fs.existsSync(args.downloadsFolder)) {
+      fs.mkdirSync(args.downloadsFolder, { recursive: true });
+    }
+
+    const fullPath = `${args.downloadsFolder}/${args.filename}`;
+    fs.writeFileSync(fullPath, Buffer.from(arrayBuffer));
+
+    return {
+      success: true,
+      message: `downloadFile ${args.filename} downloaded`,
+    };
+  } catch (err: unknown) {
+    let message = 'Unknown error';
+
+    if (err instanceof Error) {
+      message = err.message;
+    } else if (typeof err === 'string') {
+      message = err;
+    }
+
+    return { success: false, message: message };
+  }
 }
 
 export const readPdf = (pathToPdf: string) => {

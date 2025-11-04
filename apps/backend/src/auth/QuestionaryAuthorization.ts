@@ -2,10 +2,10 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
 import { UserJWT } from '../models/User';
+import { ExperimentSafetyReviewQuestionaryAuthorizer } from './questionary/ExperimentSafetyReviewQuestionaryAuthorizer';
 import { FapReviewQuestionaryAuthorizer } from './questionary/FapReviewQuestionaryAuthorizer';
 import { FeedbackQuestionaryAuthorizer } from './questionary/FeedbackQuestionaryAuthorizer';
 import { GenericTemplateQuestionaryAuthorizer } from './questionary/GenericTemplateQuestionaryAuthorizer';
@@ -33,8 +33,7 @@ export class QuestionaryAuthorization {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource,
-    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
+    private templateDataSource: TemplateDataSource
   ) {
     this.authorizers.set(
       TemplateGroupId.PROPOSAL,
@@ -75,6 +74,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateGroupId.TECHNICAL_REVIEW,
       container.resolve(TechnicalReviewQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
+      container.resolve(ExperimentSafetyReviewQuestionaryAuthorizer)
     );
   }
 

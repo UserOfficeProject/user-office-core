@@ -55,7 +55,9 @@ context('Personal information tests', () => {
       cy.login('user1');
       cy.visit('/');
 
-      cy.get('[data-cy="active-user-profile"]').click();
+      cy.get('[data-cy="profile-page-btn"]').click();
+
+      cy.get('[data-cy="manage-account-button"]').click();
 
       cy.get("[name='firstname']").clear().type(newFirstName);
 
@@ -159,7 +161,7 @@ context('Personal information tests', () => {
         .should('have.length', 2);
     });
 
-    it('Should be able to change role even in the view where next role is not allowed to be', () => {
+    it('Should allow role switching from restricted page to role without access to that page', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: initialDBData.users.officer.id,
@@ -184,7 +186,7 @@ context('Personal information tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      cy.get('[data-cy^="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy="connection_DRAFT"]').should('contain.text', 'DRAFT');
 
       cy.get("[data-cy='profile-page-btn']").click();
 

@@ -1,30 +1,29 @@
-query getWorkflow($workflowId: Int!) {
-  workflow(workflowId: $workflowId) {
+query getWorkflow($workflowId: Int!, $entityType: WorkflowType!) {
+  workflow(workflowId: $workflowId, entityType: $entityType) {
     id
     name
     description
-    workflowConnectionGroups {
-      groupId
-      parentGroupId
-      connections {
-        id
-        sortOrder
-        workflowId
-        statusId
-        status {
-          ...status
-        }
-        nextStatusId
-        prevStatusId
-        droppableGroupId
-        statusChangingEvents {
-          statusChangingEventId
-          workflowConnectionId
-          statusChangingEvent
-        }
-        statusActions {
-          ...connectionStatusAction
-        }
+    connectionLineType
+    workflowConnections {
+      id
+      sortOrder
+      workflowId
+      statusId
+      status {
+        ...status
+      }
+      nextStatusId
+      prevStatusId
+      prevConnectionId
+      posX
+      posY
+      statusChangingEvents {
+        statusChangingEventId
+        workflowConnectionId
+        statusChangingEvent
+      }
+      statusActions {
+        ...connectionStatusAction
       }
     }
   }

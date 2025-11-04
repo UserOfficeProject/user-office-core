@@ -35,6 +35,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isUser = useCheckAccess([UserRole.USER]);
   const { isInternalUser } = useContext(UserContext);
   const callHasEnded = isCallEnded(
     state.proposal.call?.startCall,
@@ -94,7 +95,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       const { call } = await api().getCallSubmissionDetails({
         callId: proposal.callId,
       });
-      const connections = call?.workflow?.workflowConnectionGroups;
+      const connections = call?.proposalWorkflow?.workflowConnections;
 
       const currentStatusId = proposal.status?.id;
 
@@ -105,14 +106,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
         ];
         const hasUpcomingEditableStatus =
           connections &&
-          connections.some((group) =>
-            group.connections.find(
-              (conn) =>
-                conn.prevStatusId &&
-                currentStatusId &&
-                conn.prevStatusId === currentStatusId &&
-                editableStatusesShortCodes?.includes(conn.status.shortCode)
-            )
+          connections.some(
+            (conn) =>
+              conn.prevStatusId &&
+              currentStatusId &&
+              conn.prevStatusId === currentStatusId &&
+              editableStatusesShortCodes?.includes(conn.status.shortCode)
           );
 
         if (proposal.status != null && hasUpcomingEditableStatus) {
@@ -165,13 +164,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                     proposalPk: state.proposal.primaryKey,
                   });
 
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: submitProposal,
-                  });
+                  const { proposal } = await api().getProposal({
+                    primaryKey: submitProposal.primaryKey,
+                  }); // refetching proposal after event handling is done in backend
+
                   dispatch({
                     type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: submitProposal,
+                    itemWithQuestionary: proposal!,
                   });
                 } finally {
                   setSubmitDisabled(true);
@@ -194,7 +193,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
-          disabled={!allStepsComplete || isSubmitting}
+          disabled={
+            !allStepsComplete || isSubmitting || (!proposal.submitted && isUser)
+          }
           color="secondary"
         >
           Download PDF

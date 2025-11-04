@@ -14,7 +14,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import {
   EmailReadyType,
   getCoProposersAndFormatOutputForEmailSending,
@@ -127,20 +127,22 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-      await sendMail(
-        CPs,
-        statusActionLogger({
-          connectionId: statusAction.connectionId,
-          actionId: statusAction.actionId,
-          statusActionsLogId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
-          proposalPks,
-        }),
-        successfulMessage,
-        failMessage,
-        templateMessage,
-        loggedInUserId
-      );
+      CPs.length &&
+        (await sendMail(
+          CPs,
+          statusActionLogger({
+            connectionId: statusAction.connectionId,
+            actionId: statusAction.actionId,
+            statusActionsLogId,
+            emailStatusActionRecipient:
+              EmailStatusActionRecipients.CO_PROPOSERS,
+            proposalPks,
+          }),
+          successfulMessage,
+          failMessage,
+          templateMessage,
+          loggedInUserId
+        ));
 
       break;
     }

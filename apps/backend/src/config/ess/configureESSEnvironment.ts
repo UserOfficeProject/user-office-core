@@ -85,6 +85,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.OAUTH,
       FeatureId.CONFLICT_OF_INTEREST_WARNING,
       FeatureId.EXPERIMENT_SAFETY_REVIEW,
+      FeatureId.DATA_ACCESS_USERS,
     ],
     true
   );
@@ -96,10 +97,6 @@ async function enableDefaultEssFeatures() {
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
     settingsValue: 'FEASIBILITY_REVIEW',
-  });
-  await db.updateSettings({
-    settingsId: SettingsId.GRADE_PRECISION,
-    settingsValue: '1',
   });
   await db.updateSettings({
     settingsId: SettingsId.DISPLAY_FAQ_LINK,

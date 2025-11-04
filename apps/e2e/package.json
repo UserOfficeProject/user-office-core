@@ -6,8 +6,8 @@
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "adm-zip": "^0.4.13",
-    "cypress": "^13.2.0",
-    "cypress-real-events": "^1.12.0",
+    "cypress": "^15.4.0",
+    "cypress-real-events": "^1.15.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "graphql-tag": "^2.12.6",
@@ -25,6 +25,7 @@
     "@types/pdf-parse": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "cypress-wait-until": "^3.0.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^2.15.2",
@@ -37,7 +38,7 @@
   },
   "engines": {
     "npm": ">=10.9.2",
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",

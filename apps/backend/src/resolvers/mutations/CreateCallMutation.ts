@@ -17,6 +17,9 @@ export class CreateCallInput {
   @Field()
   public shortCode: string;
 
+  @Field(() => Int, { nullable: true })
+  public sort_order?: number;
+
   @Field()
   public startCall: Date;
 
@@ -71,6 +74,9 @@ export class CreateCallInput {
   @Field(() => Int)
   public proposalWorkflowId: number;
 
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId?: number;
+
   @Field(() => Int)
   public templateId: number;
 
@@ -87,7 +93,10 @@ export class CreateCallInput {
   public faps?: number[];
 
   @Field(() => Int, { nullable: true })
-  public pdfTemplateId?: number;
+  public proposalPdfTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public experimentSafetyPdfTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;

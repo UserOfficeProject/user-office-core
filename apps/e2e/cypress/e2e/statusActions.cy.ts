@@ -4,6 +4,8 @@ import {
   EmailStatusActionRecipients,
   StatusActionType,
   AllocationTimeUnits,
+  FeatureUpdateAction,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -39,22 +41,32 @@ context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.updateFeature({
+      action: FeatureUpdateAction.ENABLE,
+      featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
+    });
   });
+
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.get('[data-cy="status-events-and-actions-modal"]')
@@ -104,16 +116,11 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Email action');
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
-
-      cy.get('[role="tooltip"]')
-        .should('contain', 'Status actions')
-        .and('contain', 'Email action')
-        .and('contain', 'Proposal download action');
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Proposal download action');
     });
 
     it('User Officer should be able to update a status action added to the workflow connection', () => {
@@ -131,12 +138,15 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
+        cy.reload();
         cy.addConnectionStatusActions({
           actions: [
             {
@@ -156,15 +166,12 @@ context('Status actions tests', () => {
       cy.finishedLoading();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
-      cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Email action');
 
-      cy.get('[role="tooltip"]').contains('Status actions: Email action');
-
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -221,11 +228,13 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -246,7 +255,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -271,7 +282,7 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+        '[data-cy="edge-label-events-list-DRAFT-FEASIBILITY_REVIEW"]'
       ).should('not.exist');
     });
 
@@ -291,11 +302,13 @@ context('Status actions tests', () => {
       const validEmail = faker.internet.email();
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -315,7 +328,11 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(
+        'ul[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"] > li'
+      )
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -408,7 +425,9 @@ context('Status actions tests', () => {
 
       cy.closeModal();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -440,11 +459,13 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 150,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -465,7 +486,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -491,19 +514,18 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('Email action');
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('RabbitMQ action');
+      cy.get(
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('Proposal download action');
 
-      cy.get('[role="tooltip"]')
-        .should('contain', 'Status actions')
-        .and('contain', 'Email action')
-        .and('contain', 'RabbitMQ action')
-        .and('contain', 'Proposal download action');
-
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -562,11 +584,13 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -682,11 +706,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
       }).then((result) => {
         const connection = result.addWorkflowStatus;
         if (connection) {
@@ -740,6 +765,9 @@ context('Status actions tests', () => {
           );
         }
       });
+
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000); // wait until status actions are executed
     });
 
     it('User Officer should be able to view and replay email status actions', () => {
@@ -1034,6 +1062,9 @@ context('Status actions tests', () => {
         const proposal = result.createProposal;
         if (proposal) {
           cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+
             cy.login('officer');
             cy.visit('/');
 

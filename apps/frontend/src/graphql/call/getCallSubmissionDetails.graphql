@@ -2,13 +2,11 @@ query getCallSubmissionDetails($callId: Int!) {
   call(callId: $callId) {
     proposalWorkflowId
     submissionMessage
-    workflow {
-      workflowConnectionGroups {
-        connections {
-          prevStatusId
-          status {
-            shortCode
-          }
+    proposalWorkflow {
+      workflowConnections {
+        prevStatusId
+        status {
+          shortCode
         }
       }
     }
