@@ -69,15 +69,15 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    await this.processAcceptedRoleClaims(agent!.id, invite);
-    await this.processAcceptedCoProposerClaims(agent!.id, invite);
-    await this.processAcceptedVisitRegistrationClaims(agent!.id, invite);
-
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
+
+    await this.processAcceptedRoleClaims(agent!.id, updatedInvite);
+    await this.processAcceptedCoProposerClaims(agent!.id, updatedInvite);
+    await this.processAcceptedVisitRegistrationClaims(agent!.id, updatedInvite);
 
     return updatedInvite;
   }
@@ -282,7 +282,6 @@ export default class InviteMutations {
       if (proposalHasUser) {
         return;
       }
-
       await this.proposalDataSource.addProposalUser(
         claim.proposalPk,
         claimerUserId
