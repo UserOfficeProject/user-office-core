@@ -340,7 +340,7 @@ function ParticipantSelector({
             )
           }
           filterSelectedOptions
-          onInputChange={(_, newValue) => setQuery(newValue)}
+          onInputChange={(_, newValue) => setQuery(newValue.trim())}
           onKeyDown={handleKeyDown}
           data-cy="invite-user-autocomplete"
           renderInput={(params) => (
