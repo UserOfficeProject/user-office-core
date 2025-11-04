@@ -15,7 +15,7 @@ import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ExperimentSafetyContextType } from './ExperimentSafetyContainer';
-import ProposalEsiDetails from './ExperimentSafetyDetails';
+import ExperimentSafetyDetails from './ExperimentSafetyDetails';
 
 type ExperimentSafetyReviewProps = {
   onComplete?: FunctionType<void>;
@@ -62,7 +62,9 @@ function ExperimentSafetyReview({ confirm }: ExperimentSafetyReviewProps) {
 
   return (
     <>
-      <ProposalEsiDetails esiId={state.experimentSafety.experimentSafetyPk} />
+      <ExperimentSafetyDetails
+        experimentSafetyPk={state.experimentSafety.experimentSafetyPk}
+      />
       <NavigationFragment isLoading={isExecutingCall}>
         <NavigButton
           onClick={() =>
