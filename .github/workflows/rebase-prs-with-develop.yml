@@ -15,6 +15,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Rebase all open non-Dependabots PRs with develop branch as base
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
