@@ -243,11 +243,24 @@ export default class QuestionaryMutations {
           );
         }
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
-        if (!(await isMatchingConstraints(questionTemplateRelation, value))) {
+        if (
+          !isPartialSave &&
+          !(await isMatchingConstraints(questionTemplateRelation, value))
+        ) {
           return rejection(
             'The input to "' +
               questionTemplateRelation.question.question +
               '" is not satisfying a constraint. Please enter a valid input.',
+            { answer, questionTemplateRelation }
+          );
+        }
+        if (
+          questionTemplateRelation.question.dataType == DataType.FILE_UPLOAD &&
+          isPartialSave &&
+          !(await isMatchingConstraints(questionTemplateRelation, value))
+        ) {
+          return rejection(
+            'Cannot Save file that does not satisfy the given constraists.  Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }
