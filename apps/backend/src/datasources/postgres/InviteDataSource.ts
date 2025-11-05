@@ -107,6 +107,43 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
 
+  getProposalInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('invites')
+      .join(
+        'co_proposer_claims',
+        'invites.invite_id',
+        'co_proposer_claims.invite_id'
+      )
+      .modify((query) => {
+        if (filter.createdBefore) {
+          query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (filter.isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+
+        if (filter.isExpired) {
+          query.where('expires_at', '<', new Date());
+        }
+
+        if (filter.email) {
+          query.where('email', filter.email);
+        }
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
+
   async create(args: {
     code: string;
     email: string;

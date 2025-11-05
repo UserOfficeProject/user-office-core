@@ -107,8 +107,8 @@ export class InvitedProposal implements Partial<InvitedProposalOrigin> {
   @Field(() => String)
   public proposalId: string;
 
-  @Field(() => Int)
-  public proposerId: number;
+  @Field(() => String)
+  public proposerName: string;
 
   @Field(() => String)
   public title: string;

@@ -1,6 +1,6 @@
 fragment invitedProposal on InvitedProposal {
   abstract
   proposalId
-  proposerId
+  proposerName
   title
 }
