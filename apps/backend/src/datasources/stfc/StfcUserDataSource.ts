@@ -107,7 +107,8 @@ export function toEssBasicUserDetails(
     false,
     stfcUser.email ?? '',
     stfcUser.country ?? '',
-    stfcUser.title ?? ''
+    stfcUser.title ?? '',
+    ''
   );
 }
 
