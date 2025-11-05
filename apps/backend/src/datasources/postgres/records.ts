@@ -1002,7 +1002,8 @@ export const createBasicUserObject = (
     user.placeholder,
     user.email,
     user.country,
-    user.user_title
+    user.user_title,
+    user.oidc_sub
   );
 };
 

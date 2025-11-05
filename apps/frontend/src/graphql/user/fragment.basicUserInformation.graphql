@@ -10,4 +10,5 @@ fragment basicUserDetails on BasicUserDetails {
   placeholder
   email
   country
+  oidc_sub
 }
