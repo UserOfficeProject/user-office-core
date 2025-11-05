@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
-import { useProposalInvites } from 'hooks/proposal/useProposalInvites';
+import { useProposalInvites } from 'hooks/invite/useProposalInvites';
 
 interface ProposalInviteNotificationProps {
   // We'll fetch the invites directly rather than passing count
@@ -20,7 +20,7 @@ const ProposalInviteNotification: React.FC<
   const [processingInviteId, setProcessingInviteId] = useState<number | null>(
     null
   );
-  const { invites, loading, acceptInvite, declineInvite } =
+  const { proposalInvites, loading, acceptInvite, declineInvite } =
     useProposalInvites();
 
   const handleViewInvites = () => {
@@ -32,30 +32,30 @@ const ProposalInviteNotification: React.FC<
   };
 
   const handleAcceptInvite = async (inviteId: number) => {
-    setProcessingInviteId(inviteId);
-    const success = await acceptInvite(inviteId);
-    setProcessingInviteId(null);
-    if (success && invites.length === 1) {
-      // If this was the last invite, close the dialog
-      setIsDialogOpen(false);
-    }
+    // setProcessingInviteId(inviteId);
+    // const success = await acceptInvite(inviteId);
+    // setProcessingInviteId(null);
+    // if (success && userProposalInvites.length === 1) {
+    //   // If this was the last invite, close the dialog
+    //   setIsDialogOpen(false);
+    // }
   };
 
   const handleDeclineInvite = async (inviteId: number) => {
-    setProcessingInviteId(inviteId);
-    const success = await declineInvite(inviteId);
-    setProcessingInviteId(null);
-    if (success && invites.length === 1) {
-      // If this was the last invite, close the dialog
-      setIsDialogOpen(false);
-    }
+    // setProcessingInviteId(inviteId);
+    // const success = await declineInvite(inviteId);
+    // setProcessingInviteId(null);
+    // if (success && userProposalInvites.length === 1) {
+    //   // If this was the last invite, close the dialog
+    //   setIsDialogOpen(false);
+    // }
   };
 
-  if (invites.length === 0) {
+  if (proposalInvites.length === 0) {
     return null;
   }
 
-  const inviteCount = invites.length;
+  const inviteCount = proposalInvites.length;
 
   return (
     <>
@@ -97,12 +97,12 @@ const ProposalInviteNotification: React.FC<
           <Typography variant="h6">Proposal Invitations</Typography>
         </DialogTitle>
         <DialogContent>
-          {invites.length === 0 ? (
+          {proposalInvites.length === 0 ? (
             <Typography variant="body1" color="textSecondary">
               No pending invitations found.
             </Typography>
           ) : (
-            invites.map((invite) => (
+            proposalInvites.map((invite) => (
               <Alert
                 key={invite.id}
                 severity="info"
@@ -141,10 +141,10 @@ const ProposalInviteNotification: React.FC<
               >
                 <div>
                   <Typography variant="subtitle2" fontWeight="bold">
-                    {invite.proposalTitle}
+                    {invite.proposal?.title || 'No Title'}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Principal Investigator: {invite.principalInvestigatorName}
+                    Principal Investigator: asd
                   </Typography>
                   <Typography variant="caption" color="textSecondary">
                     Invited on:{' '}

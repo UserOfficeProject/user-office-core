@@ -28,6 +28,7 @@ export interface InviteDataSource {
     isClaimed?: boolean
   ): Promise<Invite[]>;
   getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
+  getProposalInvites(filter: GetInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;

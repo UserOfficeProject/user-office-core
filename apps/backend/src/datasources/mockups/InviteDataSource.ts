@@ -177,4 +177,7 @@ export class InviteDataSourceMock implements InviteDataSource {
 
     return invite;
   }
+  getProposalInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    throw new Error('Method not implemented.');
+  }
 }

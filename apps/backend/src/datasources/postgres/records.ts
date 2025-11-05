@@ -179,7 +179,7 @@ export interface ProposalViewRecord {
 
 export interface InvitedProposalRecord {
   readonly proposal_id: string;
-  readonly proposer_id: number;
+  readonly proposer_name: string;
   readonly title: string;
   readonly abstract: string;
 }
@@ -915,7 +915,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
 export const createInvitedProposalObject = (record: InvitedProposalRecord) => {
   return new InvitedProposal(
     record.proposal_id,
-    record.proposer_id,
+    record.proposer_name,
     record.title,
     record.abstract
   );

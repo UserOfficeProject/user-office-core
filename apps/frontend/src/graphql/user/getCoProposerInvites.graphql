@@ -1,7 +1,6 @@
-query getUserInvites {
+query getProposalInvites {
   me {
-    email
-    invites {
+    proposalInvites {
       id
       code
       email

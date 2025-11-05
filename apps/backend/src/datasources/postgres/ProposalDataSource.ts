@@ -1316,13 +1316,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     const proposals: InvitedProposalRecord[] | undefined = await database
       .select(
         'proposals.proposal_id',
-        'proposals.title',
+        'proposer.firstname as proposer_name',
         'proposals.abstract',
-        'proposals.proposer_id'
+        'proposals.title'
       )
       .from('co_proposer_claims')
       .join('proposals', {
         'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
+      })
+      .join('users as proposer', {
+        'proposals.proposer_id': 'proposer.user_id',
       })
       .where('invite_id', inviteId);
 

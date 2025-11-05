@@ -59,12 +59,12 @@ export default class InviteQueries {
   }
 
   @Authorized()
-  async getUserInvites(agent: UserWithRole | null) {
+  async getProposalInvites(agent: UserWithRole | null) {
     if (!agent) {
       return [];
     }
 
-    const invites = await this.dataSource.getInvites({
+    const invites = await this.dataSource.getProposalInvites({
       email: agent.email,
       isClaimed: false,
       isExpired: false,
