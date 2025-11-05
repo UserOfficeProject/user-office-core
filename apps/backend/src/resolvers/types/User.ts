@@ -21,6 +21,7 @@ import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
 import { Fap } from './Fap';
 import { Instrument } from './Instrument';
+import { Invite } from './Invite';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
@@ -160,6 +161,11 @@ export class UserResolver {
       user.id,
       filter
     );
+  }
+
+  @FieldResolver(() => [Invite])
+  async invites(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.invite.getUserInvites(context.user);
   }
 
   @FieldResolver(() => [Experiment])

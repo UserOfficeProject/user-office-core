@@ -24,7 +24,11 @@ import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+} from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
 import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { ProposalView } from '../../models/ProposalView';
@@ -171,6 +175,13 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
+}
+
+export interface InvitedProposalRecord {
+  readonly proposal_id: string;
+  readonly proposer_id: number;
+  readonly title: string;
+  readonly abstract: string;
 }
 
 export interface TopicRecord {
@@ -898,6 +909,15 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_workflow_id,
     proposal.submitted_date,
     proposal.techniques
+  );
+};
+
+export const createInvitedProposalObject = (record: InvitedProposalRecord) => {
+  return new InvitedProposal(
+    record.proposal_id,
+    record.proposer_id,
+    record.title,
+    record.abstract
   );
 };
 

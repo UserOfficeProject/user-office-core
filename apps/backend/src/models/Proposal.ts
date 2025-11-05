@@ -52,6 +52,15 @@ export class Proposal {
   ) {}
 }
 
+export class InvitedProposal {
+  constructor(
+    public proposalId: string,
+    public proposerId: number,
+    public title: string,
+    public abstract: string
+  ) {}
+}
+
 export class ProposalPks {
   constructor(public proposalPks: number[]) {}
 }

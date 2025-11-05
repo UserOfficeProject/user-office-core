@@ -2,7 +2,12 @@ import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
-import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+  Proposals,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import {
   TechnicalReview,
@@ -421,5 +426,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     searchText?: string
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
+  }
+
+  getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
+    throw new Error('Method not implemented.');
   }
 }

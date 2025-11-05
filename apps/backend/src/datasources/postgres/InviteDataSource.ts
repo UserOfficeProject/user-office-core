@@ -4,7 +4,6 @@ import { Invite } from '../../models/Invite';
 import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
-
 export default class PostgresInviteDataSource implements InviteDataSource {
   findCoProposerInvites(
     proposalPk: number,
@@ -99,6 +98,10 @@ export default class PostgresInviteDataSource implements InviteDataSource {
 
         if (filter.isExpired) {
           query.where('expires_at', '<', new Date());
+        }
+
+        if (filter.email) {
+          query.where('email', filter.email);
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));

@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
+  InvitedProposal as InvitedProposalOrigin,
   ProposalEndStatus,
   ProposalPublicStatus,
 } from '../../models/Proposal';
@@ -99,6 +100,21 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => String, { nullable: true })
   public fileId?: string | null;
+}
+
+@ObjectType()
+export class InvitedProposal implements Partial<InvitedProposalOrigin> {
+  @Field(() => String)
+  public proposalId: string;
+
+  @Field(() => Int)
+  public proposerId: number;
+
+  @Field(() => String)
+  public title: string;
+
+  @Field(() => String)
+  public abstract: string;
 }
 
 @Resolver(() => Proposal)

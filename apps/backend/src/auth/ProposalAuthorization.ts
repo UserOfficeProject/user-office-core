@@ -242,6 +242,10 @@ export class ProposalAuthorization {
     return isInternalReviewerOnSomeTechnicalReview;
   }
 
+  // async isInvitee(agent: UserWithRole, proposalPk: number) {
+  //   return this.inviteDataSource.isInvitee(agent.id, proposalPk);
+  // }
+
   async hasReadRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
