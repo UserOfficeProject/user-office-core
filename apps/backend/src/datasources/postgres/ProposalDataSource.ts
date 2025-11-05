@@ -7,7 +7,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal, Proposals } from '../../models/Proposal';
+import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
@@ -40,6 +40,8 @@ import {
   TechnicalReviewRecord,
   TechniqueRecord,
   createProposalViewObjectWithTechniques,
+  InvitedProposalRecord,
+  createInvitedProposalObject,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
@@ -1308,5 +1310,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning('*');
 
     return proposal ? createProposalObject(proposal[0]) : null;
+  }
+
+  async getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
+    const proposals: InvitedProposalRecord[] | undefined = await database
+      .select(
+        'proposals.proposal_id',
+        'proposals.title',
+        'proposals.abstract',
+        'proposals.proposer_id'
+      )
+      .from('co_proposer_claims')
+      .join('proposals', {
+        'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
+      })
+      .where('invite_id', inviteId);
+
+    return proposals ? createInvitedProposalObject(proposals[0]) : null;
   }
 }

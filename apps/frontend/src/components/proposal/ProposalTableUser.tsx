@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
+import ProposalInviteNotification from 'components/notification/ProposalInviteNotification';
 import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -83,12 +84,15 @@ const ProposalTableUser = () => {
   }, [api]);
 
   return (
-    <ProposalTable
-      title="My proposals"
-      search={false}
-      searchQuery={sendUserProposalRequest}
-      isLoading={loading}
-    />
+    <>
+      <ProposalInviteNotification />
+      <ProposalTable
+        title="My proposals"
+        search={false}
+        searchQuery={sendUserProposalRequest}
+        isLoading={loading}
+      />
+    </>
   );
 };
 

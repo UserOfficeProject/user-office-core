@@ -5,6 +5,7 @@ export interface GetInvitesFilter {
   createdAfter?: Date;
   isClaimed?: boolean;
   isExpired?: boolean;
+  email?: string;
 }
 
 export interface InviteDataSource {

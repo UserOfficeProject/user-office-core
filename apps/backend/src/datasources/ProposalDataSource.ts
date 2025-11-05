@@ -1,6 +1,6 @@
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, Proposals } from '../models/Proposal';
+import { InvitedProposal, Proposal, Proposals } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
@@ -92,4 +92,5 @@ export interface ProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
+  getInvitedProposal(inviteId: number): Promise<InvitedProposal | null>;
 }
