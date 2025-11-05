@@ -853,4 +853,29 @@ export default class PostgresUserDataSource implements UserDataSource {
         });
       });
   }
+
+  async getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return database
+      .distinct('i.*', 'c.*', 'u.*')
+      .from('users as u')
+      .join('visits_has_users as vu', { 'u.user_id': 'vu.user_id' })
+      .join('visits as v', { 'v.visit_id': 'vu.visit_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
+      .where('v.proposal_pk', proposalPk)
+      .andWhere('vu.status', 'APPROVED')
+      .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
+        return users.map((user) => ({
+          user: createUserObject(user),
+          institution: createInstitutionObject(user),
+          country: createCountryObject(user),
+        }));
+      });
+  }
 }

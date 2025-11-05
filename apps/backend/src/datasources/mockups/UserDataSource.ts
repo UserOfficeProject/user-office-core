@@ -620,4 +620,14 @@ export class UserDataSourceMock implements UserDataSource {
       },
     ];
   }
+
+  async getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return [];
+  }
 }
