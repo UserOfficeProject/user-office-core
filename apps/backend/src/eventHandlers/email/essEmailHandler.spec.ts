@@ -278,6 +278,42 @@ describe('essEmailHandler co-proposer invites', () => {
     );
   });
 
+  it('should send mail when co-proposer invite is accepted', async () => {
+    const mockInvite = new Invite(
+      1,
+      faker.string.alphanumeric(8),
+      dummyUser.email,
+      new Date(),
+      dummyUser.id,
+      new Date(),
+      dummyUser.id,
+      false,
+      null,
+      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+    );
+
+    // Mock userDataSource.getUser to return dummyUser for principal investigator but null for claimer
+    const getUserMock = jest.spyOn(userDataSourceMock, 'getUser');
+    getUserMock
+      .mockResolvedValueOnce(dummyUser) // First call for principal investigator
+      .mockResolvedValueOnce(dummyUser); // Second call for claimer
+
+    const event: ApplicationEvent = {
+      type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      invite: mockInvite,
+      key: 'invite',
+      loggedInUserId: 3,
+      isRejection: false,
+      proposalPKey: 1,
+    };
+
+    const sendMailsSpy = jest.spyOn(mockMailService, 'sendMail');
+
+    await essEmailHandler(event);
+
+    expect(sendMailsSpy).toHaveBeenCalled();
+  });
+
   describe('handling PROPOSAL_SUBMITTED event', () => {
     it('Should have PI and CoProposals in the payload', async () => {
       const event: ApplicationEvent = {

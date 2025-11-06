@@ -32,10 +32,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
     Tokens.CoProposerClaimDataSource
   );
 
-  const inviteDataSource = container.resolve<InviteDataSource>(
-    Tokens.InviteDataSource
-  );
-
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );

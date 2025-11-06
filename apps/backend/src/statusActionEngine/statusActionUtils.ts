@@ -465,6 +465,7 @@ export const getOtherAndFormatOutputForEmailSending = async (
       true,
       otherEmail,
       '',
+      '',
       ''
     );
 

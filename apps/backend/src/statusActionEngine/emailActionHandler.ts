@@ -130,21 +130,23 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-      await sendMail(
-        CPs,
-        statusActionLogger({
-          connectionId: statusAction.connectionId,
-          actionId: statusAction.actionId,
-          statusActionsLogId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
-          proposalPks,
-        }),
-        successfulMessage,
-        failMessage,
-        templateMessage,
-        templateMessageId,
-        loggedInUserId
-      );
+      CPs.length &&
+        (await sendMail(
+          CPs,
+          statusActionLogger({
+            connectionId: statusAction.connectionId,
+            actionId: statusAction.actionId,
+            statusActionsLogId,
+            emailStatusActionRecipient:
+              EmailStatusActionRecipients.CO_PROPOSERS,
+            proposalPks,
+          }),
+          successfulMessage,
+          failMessage,
+          templateMessage,
+          templateMessageId,
+          loggedInUserId
+        ));
 
       break;
     }
