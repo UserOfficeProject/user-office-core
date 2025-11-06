@@ -111,8 +111,10 @@ export default defineConfig(
       //TS already handles undef variables
       'no-undef': 'off',
       'no-unused-vars': 'off',
+      'no-unused-expressions': 'off',
+      //We use these 2 rules in some places intentionally
       'no-prototype-builtins': 'off',
-
+      'no-case-declarations': 'off'
     },
   },
 );
