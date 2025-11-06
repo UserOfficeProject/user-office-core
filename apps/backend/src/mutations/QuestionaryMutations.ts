@@ -255,12 +255,12 @@ export default class QuestionaryMutations {
           );
         }
         if (
-          questionTemplateRelation.question.dataType == DataType.FILE_UPLOAD &&
+          questionTemplateRelation.question.dataType === DataType.FILE_UPLOAD &&
           isPartialSave &&
           !(await isMatchingConstraints(questionTemplateRelation, value))
         ) {
           return rejection(
-            'Cannot Save file that does not satisfy the given constraists.  Please enter a valid input.',
+            'Cannot Save file that does not satisfy the given constraints.  Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }
