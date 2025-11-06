@@ -243,7 +243,10 @@ export default class QuestionaryMutations {
           );
         }
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
-        if (!(await isMatchingConstraints(questionTemplateRelation, value))) {
+        if (
+          !isPartialSave &&
+          !(await isMatchingConstraints(questionTemplateRelation, value))
+        ) {
           return rejection(
             'The input to "' +
               questionTemplateRelation.question.question +
