@@ -8,13 +8,8 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default defineConfig(
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
+export default defineConfig([
   {
-    files: ['**/*.{ts,js}'],
     ignores: [
       'build/*',
       'coverage/*',
@@ -25,6 +20,13 @@ export default defineConfig(
       'generated/',
       // node_modules is ignored by default
     ],
+  },
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  {
+    files: ['**/*.{ts,js}'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -33,11 +35,6 @@ export default defineConfig(
       },
       globals: { ...globals.node },
     },
-    // settings: {
-    //   node: {
-    //     extensions: ['.js', '.ts'],
-    //   }
-    // },
     plugins: {
       'unused-imports': unusedImports,
       prettier,
@@ -118,4 +115,5 @@ export default defineConfig(
       '@typescript-eslint/no-unused-expressions': [ 'error', { allowShortCircuit: true, allowTernary: true } ],
     },
   },
+]
 );
