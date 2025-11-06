@@ -114,7 +114,8 @@ export default defineConfig(
       'no-unused-expressions': 'off',
       //We use these 2 rules in some places intentionally
       'no-prototype-builtins': 'off',
-      'no-case-declarations': 'off'
+      'no-case-declarations': 'off',
+      '@typescript-eslint/no-unused-expressions': [ 'error', { allowShortCircuit: true, allowTernary: true } ],
     },
   },
 );

@@ -640,16 +640,10 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     let shortCode: Roles;
 
-    if (
-      fapChairs.find((chair) => {
-        chair.user_id === userId;
-      })
-    ) {
+    if (fapChairs.find((chair) => chair.user_id === userId)) {
       shortCode = Roles.FAP_CHAIR;
     } else if (
-      fapSecretaries.find((secretary) => {
-        secretary.user_id === userId;
-      })
+      fapSecretaries.find((secretary) => secretary.user_id === userId)
     ) {
       shortCode = Roles.FAP_SECRETARY;
     } else {
