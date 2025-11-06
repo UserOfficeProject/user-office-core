@@ -9,11 +9,11 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusActionsLog';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Proposal } from './Proposal';
 import { EmailStatusActionRecipients } from './StatusActionConfig';
+import { ResolverContext } from '../../context';
+import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusActionsLog';
 
 @ObjectType()
 @Directive('@key(fields: "statusActionsLogId")')

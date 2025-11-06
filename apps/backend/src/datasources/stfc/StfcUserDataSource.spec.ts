@@ -1,6 +1,6 @@
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');

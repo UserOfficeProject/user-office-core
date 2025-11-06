@@ -1,12 +1,12 @@
 import { container } from 'tsyringe';
 
+import { DataAccessUsersAuthorization } from './DataAccessUsersAuthorization';
 import {
   dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { DataAccessUsersAuthorization } from './DataAccessUsersAuthorization';
 
 const dataAccessUsersAuth = container.resolve(DataAccessUsersAuthorization);
 

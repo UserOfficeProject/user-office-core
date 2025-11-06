@@ -8,9 +8,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { User } from './User';
 import { ResolverContext } from '../../context';
 import { EventLog as EventLogOrigin } from '../../models/EventLog';
-import { User } from './User';
 
 @ObjectType()
 export class EventLog {

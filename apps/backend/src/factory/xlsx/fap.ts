@@ -2,13 +2,13 @@ import { groupBy } from 'lodash';
 import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
+import { collectCallFapXLSXData } from './callFaps';
+import { getDataRow } from './FapDataRow';
 import baseContext from '../../buildContext';
+import { getStfcDataRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { UserWithRole } from '../../models/User';
-import { collectCallFapXLSXData } from './callFaps';
-import { getDataRow } from './FapDataRow';
-import { getStfcDataRow } from './stfc/StfcFapDataRow';
 
 type FapXLSXData = Array<{
   sheetName: string;

@@ -8,11 +8,11 @@ import {
 } from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
+import { ExperimentSafetyEventsRecord } from './postgres/records';
 import {
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
-import { ExperimentSafetyEventsRecord } from './postgres/records';
 
 export interface ExperimentDataSource {
   create(

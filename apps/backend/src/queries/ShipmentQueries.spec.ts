@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ShipmentQueries from './ShipmentQueries';
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import {
@@ -8,7 +9,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import ShipmentQueries from './ShipmentQueries';
 
 const shipmentQueries = container.resolve(ShipmentQueries);
 

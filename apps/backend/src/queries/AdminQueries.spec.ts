@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import context from '../buildContext';
+import AdminQueries from './AdminQueries';
 import { Tokens } from '../config/Tokens';
 import {
   AdminDataSourceMock,
@@ -12,7 +13,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import AdminQueries from './AdminQueries';
 
 const adminQueries = container.resolve(AdminQueries);
 

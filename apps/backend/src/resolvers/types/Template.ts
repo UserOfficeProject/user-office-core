@@ -9,17 +9,17 @@ import {
   Root,
 } from 'type-graphql';
 
+import { ExperimentSafetyPdfTemplate } from './ExperimentSafetyPdfTemplate';
+import { ProposalPdfTemplate } from './ProposalPdfTemplate';
+import { Question } from './Question';
+import { TemplateGroup } from './TemplateGroup';
+import { TemplateStep } from './TemplateStep';
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import {
   Template as TemplateOrigin,
   TemplateGroupId,
 } from '../../models/Template';
-import { ExperimentSafetyPdfTemplate } from './ExperimentSafetyPdfTemplate';
-import { ProposalPdfTemplate } from './ProposalPdfTemplate';
-import { Question } from './Question';
-import { TemplateGroup } from './TemplateGroup';
-import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
 export class Template implements Partial<TemplateOrigin> {

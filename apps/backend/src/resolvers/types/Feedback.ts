@@ -8,10 +8,10 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Questionary } from './Questionary';
 import { ResolverContext } from '../../context';
 import { Feedback as FeedbackOrigin } from '../../models/Feedback';
 import { FeedbackStatus } from '../../models/Feedback';
-import { Questionary } from './Questionary';
 
 @ObjectType()
 export class Feedback implements Partial<FeedbackOrigin> {

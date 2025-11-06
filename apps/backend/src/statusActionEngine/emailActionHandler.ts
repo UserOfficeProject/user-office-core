@@ -1,6 +1,18 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import {
+  EmailReadyType,
+  getCoProposersAndFormatOutputForEmailSending,
+  getInstrumentScientistsAndFormatOutputForEmailSending,
+  getPIAndFormatOutputForEmailSending,
+  getFapReviewersAndFormatOutputForEmailSending,
+  getFapChairSecretariesAndFormatOutputForEmailSending,
+  statusActionLogger,
+  getOtherAndFormatOutputForEmailSending,
+  getTechniqueScientistsAndFormatOutputForEmailSending,
+  constructProposalStatusChangeEvent,
+} from './statusActionUtils';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -15,18 +27,6 @@ import {
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
-import {
-  EmailReadyType,
-  getCoProposersAndFormatOutputForEmailSending,
-  getInstrumentScientistsAndFormatOutputForEmailSending,
-  getPIAndFormatOutputForEmailSending,
-  getFapReviewersAndFormatOutputForEmailSending,
-  getFapChairSecretariesAndFormatOutputForEmailSending,
-  statusActionLogger,
-  getOtherAndFormatOutputForEmailSending,
-  getTechniqueScientistsAndFormatOutputForEmailSending,
-  constructProposalStatusChangeEvent,
-} from './statusActionUtils';
 
 export const emailActionHandler = async (
   statusAction: ConnectionHasStatusAction,
@@ -91,10 +91,10 @@ export const emailStatusActionRecipient = async (
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
   const templateMessage = recipientWithTemplate.emailTemplate.id;
-  const successfulMessage = !!statusActionsLogId
+  const successfulMessage = statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
-  const failMessage = !!statusActionsLogId
+  const failMessage = statusActionsLogId
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
   switch (recipientWithTemplate.recipient.name) {

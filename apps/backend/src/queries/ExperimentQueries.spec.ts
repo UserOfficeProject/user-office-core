@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ExperimentQueries from './ExperimentQueries';
 import { Tokens } from '../config/Tokens';
 import {
   DummyExperimentSample1,
@@ -9,7 +10,6 @@ import {
 } from '../datasources/mockups/ExperimentDataSource';
 import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import { ExperimentSafety } from '../models/Experiment';
-import ExperimentQueries from './ExperimentQueries';
 
 describe('ExperimentQueries', () => {
   let queries: ExperimentQueries;

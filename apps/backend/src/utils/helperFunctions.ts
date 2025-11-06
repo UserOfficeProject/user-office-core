@@ -3,8 +3,8 @@ import { randomBytes } from 'crypto';
 import * as Yup from 'yup';
 
 import { BasicResolverContext } from '../context';
-import { Review, ReviewStatus } from '../models/Review';
 import { OmitType } from './utilTypes';
+import { Review, ReviewStatus } from '../models/Review';
 
 export const omit: OmitType = (obj, ...keys) => {
   const ret = {} as {

@@ -12,18 +12,18 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ProposalEndStatus } from '../../models/Proposal';
-import { ReviewerFilter, ReviewStatus } from '../../models/Review';
-import { Roles } from '../../models/Role';
-import { User as UserOrigin } from '../../models/User';
-import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
 import { Fap } from './Fap';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
+import { ResolverContext } from '../../context';
+import { ProposalEndStatus } from '../../models/Proposal';
+import { ReviewerFilter, ReviewStatus } from '../../models/Review';
+import { Roles } from '../../models/Role';
+import { User as UserOrigin } from '../../models/User';
+import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 
 @InputType()
 export class UserProposalsFilter {

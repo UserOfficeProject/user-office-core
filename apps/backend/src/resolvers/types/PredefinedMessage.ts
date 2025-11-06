@@ -8,9 +8,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
 import { ResolverContext } from '../../context';
 import { PredefinedMessage as PredefinedMessageOrigin } from '../../models/PredefinedMessage';
-import { BasicUserDetails } from './BasicUserDetails';
 
 /**
  * NOTE: Predefined messages are used as a way to reuse some messages that are repeatable throughout the app.

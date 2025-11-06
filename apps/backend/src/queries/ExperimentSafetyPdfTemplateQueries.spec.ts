@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ExperimentSafetyPdfTemplateQueries from './ExperimentSafetyPdfTemplateQueries';
 import { Tokens } from '../config/Tokens';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -8,7 +9,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ExperimentSafetyPdfTemplate } from '../models/ExperimentSafetyPdfTemplate';
-import ExperimentSafetyPdfTemplateQueries from './ExperimentSafetyPdfTemplateQueries';
 
 const experimentSafetyPdfTemplateQueries = container.resolve(
   ExperimentSafetyPdfTemplateQueries

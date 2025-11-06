@@ -1,11 +1,11 @@
 import { ObjectType, Field } from 'type-graphql';
 
+import { Question } from './Question';
 import {
   ConflictResolutionStrategy,
   QuestionComparison as QuestionComparisonOrigin,
   ComparisonStatus,
 } from '../../models/Template';
-import { Question } from './Question';
 
 @ObjectType()
 export class QuestionComparison implements Partial<QuestionComparisonOrigin> {

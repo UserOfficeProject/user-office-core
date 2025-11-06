@@ -10,9 +10,9 @@ import {
   Resolver,
 } from 'type-graphql';
 
+import { ProposalsFilter } from './ProposalsQuery';
 import { ResolverContext } from '../../context';
 import { ProposalScientistComment, ProposalView } from '../types/ProposalView';
-import { ProposalsFilter } from './ProposalsQuery';
 
 @ArgsType()
 class ProposalsViewArgs {

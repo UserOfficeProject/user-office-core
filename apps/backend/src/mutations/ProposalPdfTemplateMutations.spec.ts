@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import ProposalPdfTemplateMutations from './ProposalPdfTemplateMutations';
 import { Tokens } from '../config/Tokens';
 import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
@@ -11,7 +12,6 @@ import { ProposalPdfTemplate } from '../models/ProposalPdfTemplate';
 import { isRejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { Template } from '../models/Template';
-import ProposalPdfTemplateMutations from './ProposalPdfTemplateMutations';
 
 const proposalPdfTemplateMutations = container.resolve(
   ProposalPdfTemplateMutations

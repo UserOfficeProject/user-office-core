@@ -2,9 +2,9 @@
 import { CronJob } from 'cron';
 import { container } from 'tsyringe';
 
+import ALL_ASYNC_JOBS from './allAsyncJobs';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import ALL_ASYNC_JOBS from './allAsyncJobs';
 
 const callDataSource = container.resolve<CallDataSource>(Tokens.CallDataSource);
 

@@ -4,6 +4,10 @@ import { ReadableStream } from 'stream/web';
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import {
+  constructProposalStatusChangeEvent,
+  statusActionLogger,
+} from './statusActionUtils';
 import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/FileDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -11,10 +15,6 @@ import type { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
-import {
-  constructProposalStatusChangeEvent,
-  statusActionLogger,
-} from './statusActionUtils';
 
 const FACTORY_ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
@@ -34,10 +34,10 @@ export const proposalDownloadActionHandler = async (
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.LoggingHandler);
 
-  const successMessage = !!options?.statusActionsLogId
+  const successMessage = options?.statusActionsLogId
     ? 'Proposal successfully downloaded on status action replay'
     : 'Proposal successfully downloaded';
-  const failMessage = !!options?.statusActionsLogId
+  const failMessage = options?.statusActionsLogId
     ? 'Proposal failed to download on status action replay'
     : 'Proposal failed to download';
 

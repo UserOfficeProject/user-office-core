@@ -9,6 +9,8 @@ import {
   InputType,
 } from 'type-graphql';
 
+import { ProposalInternalComment } from './ProposalInternalComment';
+import { User } from './User';
 import { ResolverContext } from '../../context';
 import { AllocationTimeUnits } from '../../models/Call';
 import {
@@ -16,8 +18,6 @@ import {
   ProposalEndStatus,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { ProposalInternalComment } from './ProposalInternalComment';
-import { User } from './User';
 
 @InputType('FapInstrumentInput')
 @ObjectType()

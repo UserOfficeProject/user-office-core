@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import SampleQueries from './SampleQueries';
 import { Tokens } from '../config/Tokens';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import {
@@ -8,7 +9,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import SampleQueries from './SampleQueries';
 
 const sampleQueries = container.resolve(SampleQueries);
 

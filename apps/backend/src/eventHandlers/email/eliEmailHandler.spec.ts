@@ -2,12 +2,12 @@ import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
+import { eliEmailHandler } from './eliEmailHandler';
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { eliEmailHandler } from './eliEmailHandler';
 
 // Mock MailService
 const mockMailService = {

@@ -8,9 +8,9 @@ import {
   Resolver,
 } from 'type-graphql';
 
+import { CreateTagArgs } from './CreateTagMutation';
 import { ResolverContext } from '../../context';
 import { Tag } from '../types/Tag';
-import { CreateTagArgs } from './CreateTagMutation';
 
 @ArgsType()
 export class UpdateTagArgs extends CreateTagArgs {

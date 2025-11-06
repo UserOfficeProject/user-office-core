@@ -9,12 +9,12 @@ import { GraphQLError } from 'graphql';
 import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
-import { UserAuthorization } from './UserAuthorization';
 
 interface UserinfoResponseWithInssitution extends UserinfoResponse {
   institution_ror_id?: string;

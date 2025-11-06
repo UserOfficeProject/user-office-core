@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import TemplateMutations from './TemplateMutations';
 import { Tokens } from '../config/Tokens';
 import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
@@ -17,7 +18,6 @@ import {
   Question,
   TemplateGroupId,
 } from '../models/Template';
-import TemplateMutations from './TemplateMutations';
 
 const QUESTION_ID = 'links_to_field';
 const NON_EXISTING_QUESTION_ID = 'non_existing_question_id';

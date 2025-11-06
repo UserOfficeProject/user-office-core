@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { handleWorkflowEngineChange } from './proposalWorkflow';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -18,7 +19,6 @@ import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
-import { handleWorkflowEngineChange } from './proposalWorkflow';
 
 export default function createCustomHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(

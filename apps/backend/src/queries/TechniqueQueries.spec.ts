@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import TechniqueQueries from './TechniqueQueries';
 import { dummyInstruments } from '../datasources/mockups/InstrumentDataSource';
 import {
   dummyTechnique1,
@@ -10,7 +11,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import TechniqueQueries from './TechniqueQueries';
 
 const techniqueQueries = container.resolve(TechniqueQueries);
 

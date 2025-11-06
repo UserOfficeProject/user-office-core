@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import InternalReviewMutations from './InternalReviewMutations';
 import { dummyReview } from '../datasources/mockups/InternalReviewDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import InternalReviewMutations from './InternalReviewMutations';
 
 const internalReviewMutations = container.resolve(InternalReviewMutations);
 

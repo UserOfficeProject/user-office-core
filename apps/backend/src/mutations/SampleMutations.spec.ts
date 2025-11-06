@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ReviewMutations from './ReviewMutations';
+import SampleMutations from './SampleMutations';
 import { Tokens } from '../config/Tokens';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import {
@@ -11,8 +13,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Sample, SampleStatus } from '../models/Sample';
-import ReviewMutations from './ReviewMutations';
-import SampleMutations from './SampleMutations';
 
 const sampleMutations = container.resolve(SampleMutations);
 const reviewMutations = container.resolve(ReviewMutations);

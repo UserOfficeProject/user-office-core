@@ -3,13 +3,13 @@ import { faker } from '@faker-js/faker';
 import sinon from 'sinon';
 import { container } from 'tsyringe';
 
+import checkInviteReminderJob from './checkInviteReminderJob';
 import { Tokens } from '../../config/Tokens';
 import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Invite } from '../../models/Invite';
 import { RoleClaim } from '../../models/RoleClaim';
 import { SettingsId } from '../../models/Settings';
 import { User, UserRole } from '../../models/User';
-import checkInviteReminderJob from './checkInviteReminderJob';
 
 const mockUserDataSource = {
   getBasicUserInfo: sinon.stub(),

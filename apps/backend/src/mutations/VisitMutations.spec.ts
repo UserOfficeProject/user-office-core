@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import VisitMutations from './VisitMutations';
 import { Tokens } from '../config/Tokens';
 import {
   dummyUserNotOnProposalWithRole,
@@ -14,7 +15,6 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import VisitMutations from './VisitMutations';
 
 const mutations = container.resolve(VisitMutations);
 const visitDataSource = container.resolve<VisitDataSourceMock>(

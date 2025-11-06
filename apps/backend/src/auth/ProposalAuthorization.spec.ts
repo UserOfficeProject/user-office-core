@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
 import {
   dummyFapChairWithRole,
   dummyFapReviewerWithRole,
@@ -13,7 +14,6 @@ import {
   dummyUserWithRole,
   dummyVisitorWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalAuthorization } from './ProposalAuthorization';
 
 const proposalAuthorization = container.resolve(ProposalAuthorization);
 

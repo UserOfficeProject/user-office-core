@@ -1,6 +1,7 @@
 import jsonwebtoken from 'jsonwebtoken';
 import { container } from 'tsyringe';
 
+import UserMutations from './UserMutations';
 import {
   dummyPlaceHolderUser,
   dummyUser,
@@ -14,7 +15,6 @@ import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection, Rejection } from '../models/Rejection';
 import { AuthJwtPayload, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
-import UserMutations from './UserMutations';
 
 const secret = process.env.JWT_SECRET as string;
 

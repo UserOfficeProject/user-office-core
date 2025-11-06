@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import EventLogQueries from './EventLogQueries';
 import {
   dummyEventLogUserUpdated,
   dummyEventLogs,
@@ -10,7 +11,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import EventLogQueries from './EventLogQueries';
 
 const eventLogQueries = container.resolve(EventLogQueries);
 

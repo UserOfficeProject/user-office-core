@@ -10,6 +10,10 @@ import {
   Root,
 } from 'type-graphql';
 
+import { ExperimentHasSample } from './ExperimentHasSample';
+import { Proposal } from './Proposal';
+import { Questionary } from './Questionary';
+import { Status } from './Status';
 import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
@@ -19,10 +23,6 @@ import {
   InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
 import { TemplateCategoryId } from '../../models/Template';
-import { ExperimentHasSample } from './ExperimentHasSample';
-import { Proposal } from './Proposal';
-import { Questionary } from './Questionary';
-import { Status } from './Status';
 
 @ObjectType()
 @Directive('@key(fields: "experimentSafetyPk")')

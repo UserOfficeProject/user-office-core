@@ -556,7 +556,7 @@ export const statusActionLogger = (args: {
       statusActionsMessage,
     };
 
-    if (!!statusActionsLogsArgs.statusActionsLogId) {
+    if (statusActionsLogsArgs.statusActionsLogId) {
       await statusActionsLogsDataSource.update(statusActionsLogsArgs);
 
       return;

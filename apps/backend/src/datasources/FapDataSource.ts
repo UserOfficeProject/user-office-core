@@ -11,6 +11,10 @@ import { Review, ReviewStatus } from '../models/Review';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails } from '../models/User';
 import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from './postgres/records';
+import {
   UpdateMemberFapArgs,
   AssignReviewersToFapArgs,
   AssignChairOrSecretaryToFapInput,
@@ -18,10 +22,6 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
-import {
-  FapReviewsRecord,
-  AssignProposalsToFapsInput,
-} from './postgres/records';
 
 export interface FapDataSource {
   create(

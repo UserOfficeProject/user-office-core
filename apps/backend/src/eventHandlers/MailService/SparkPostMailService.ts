@@ -1,9 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { isProduction, isStaging } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService } from './MailService';
 import { SparkPost } from './SparkPost';
+import { isProduction, isStaging } from '../../utils/helperFunctions';
 
 export class SparkPostMailService extends MailService {
   private client: SparkPost;
