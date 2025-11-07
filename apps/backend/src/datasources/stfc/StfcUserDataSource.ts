@@ -752,4 +752,10 @@ export class StfcUserDataSource implements UserDataSource {
       this.roleAssignmentMap.get(roleId) ?? ''
     );
   }
+
+  async getApprovedProposalVisitorsWithInstitution(
+    proposalPk: number
+  ): Promise<{ user: User; institution: Institution; country: Country }[]> {
+    throw new Error('Method not implemented.');
+  }
 }
