@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId, UserRole } from '@user-office-software-libs/shared-types';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -173,16 +173,6 @@ context('PageTable component tests', () => {
     });
 
     it('should preserve the selected users after pagination', () => {
-      // NOTE: Create 5 users
-      new Array(5).fill(0).map((elem, index) => {
-        cy.createUserByEmailInvite({
-          firstname: faker.name.firstName(),
-          lastname: faker.name.lastName(),
-          email: emails[index],
-          userRole: UserRole.USER,
-        });
-      });
-
       cy.login('user1');
       cy.visit('/');
 
@@ -344,15 +334,6 @@ context('PageTable component tests', () => {
     });
 
     it('Should preserve the selected users after pagination', () => {
-      // NOTE: Create 10 users
-      new Array(10).fill(0).map((elem, index) => {
-        cy.createUserByEmailInvite({
-          firstname: faker.name.firstName(),
-          lastname: faker.name.lastName(),
-          email: emails[index],
-          userRole: UserRole.USER,
-        });
-      });
       cy.login('officer');
       cy.visit('/');
 
@@ -408,15 +389,6 @@ context('PageTable component tests', () => {
 
   describe('PeopleTable sort', () => {
     it('PeopleTable should sort all people when using column sort', () => {
-      // NOTE: Create 5 users
-      new Array(5).fill(0).map((elem, index) => {
-        cy.createUserByEmailInvite({
-          firstname: faker.name.firstName(),
-          lastname: faker.name.lastName(),
-          email: emails[index],
-          userRole: UserRole.USER,
-        });
-      });
       let firstTableRowTextBeforeSorting: string;
       let firstTableRowTextAfterSorting: string;
       cy.login('officer');
