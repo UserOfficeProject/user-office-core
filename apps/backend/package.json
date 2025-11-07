@@ -108,6 +108,7 @@
     "@types/simple-oauth2": "^4.1.1",
     "@types/sinon": "^9.0.11",
     "@types/yup": "^0.29.13",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.2",
     "@user-office-software/uows_client_generator": "^3.1.0",
     "eslint": "^9.0.0",
@@ -126,7 +127,6 @@
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.46.3"
   },
-  "type": "module",
   "engines": {
     "npm": ">=10.9.2",
     "node": ">=22.0.0"

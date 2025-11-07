@@ -1,3 +1,5 @@
+// For some reason ESLint's own types are not resolved correctly :)
+/* eslint-disable import/no-unresolved */
 import eslint from '@eslint/js';
 import tsParser from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
@@ -15,7 +17,7 @@ export default defineConfig([
       'coverage/*',
       '**/*.d.ts', // data definition files
       'src/public/', //3rd party libs
-      'src/types/', 
+      'src/types/',
       'openapi.yaml', //# auto-generated REST client for the STFC UserOfficeWebService
       'generated/',
       // node_modules is ignored by default
@@ -38,7 +40,7 @@ export default defineConfig([
     plugins: {
       'unused-imports': unusedImports,
       prettier,
-      jest
+      jest,
     },
     rules: {
       semi: ['error', 'always'],
@@ -112,8 +114,10 @@ export default defineConfig([
       //We use these 2 rules in some places intentionally
       'no-prototype-builtins': 'off',
       'no-case-declarations': 'off',
-      '@typescript-eslint/no-unused-expressions': [ 'error', { allowShortCircuit: true, allowTernary: true } ],
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        { allowShortCircuit: true, allowTernary: true },
+      ],
     },
   },
-]
-);
+]);
