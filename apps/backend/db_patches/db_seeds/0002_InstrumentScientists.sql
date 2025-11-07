@@ -20,9 +20,8 @@ BEGIN
 
   -- user account with experiment safety reviewer
   INSERT INTO users(
-    user_id, user_title, firstname, lastname, username, preferredname, oidc_sub, oauth_refresh_token, gender, birthdate, department, "position", email, 
-    telephone, created_at, updated_at, institution_id, placeholder)
-    VALUES (103, '', 'Experiment', 'Safety', 'experiment.safety', '-', 'experiment.safety.oauthsub', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'experiment.safety@local.host', '', NOW(), NOW(), 1, false);
+    user_id, user_title, firstname, lastname, preferredname, oidc_sub, oauth_refresh_token, email, created_at, updated_at, institution_id)
+    VALUES (103, '', 'Experiment', 'Safety', 'experiment.safety', 'experiment.safety.oauthsub', 'dummy-refresh-token', 'experiment.safety@local.host', NOW(), NOW(), 1);
 
   INSERT INTO role_user(
     role_id, user_id)
