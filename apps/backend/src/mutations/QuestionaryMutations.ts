@@ -226,7 +226,7 @@ export default class QuestionaryMutations {
     );
 
     const updatedAnswers: AnswerBasic[] = [];
-    for (const answer of answersToUpdate) {
+    for (const answer of answers) {
       if (answer.value !== undefined) {
         const questionTemplateRelation =
           await this.templateDataSource.getQuestionTemplateRelation(
@@ -251,16 +251,6 @@ export default class QuestionaryMutations {
             'The input to "' +
               questionTemplateRelation.question.question +
               '" is not satisfying a constraint. Please enter a valid input.',
-            { answer, questionTemplateRelation }
-          );
-        }
-        if (
-          questionTemplateRelation.question.dataType === DataType.FILE_UPLOAD &&
-          isPartialSave &&
-          !(await isMatchingConstraints(questionTemplateRelation, value))
-        ) {
-          return rejection(
-            'Cannot Save file that does not satisfy the given constraints.  Please enter a valid input.',
             { answer, questionTemplateRelation }
           );
         }
