@@ -82,7 +82,8 @@ export class BasicUserDetails {
     public created: Date,
     public email: string,
     public country: string,
-    public title: string
+    public user_title: string,
+    public oidc_sub: string | null
   ) {}
 }
 

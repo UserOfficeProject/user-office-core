@@ -32,6 +32,7 @@ function createRegistrationStub(
       institutionId: 1,
       email: '',
       country: '',
+      oidc_sub: '',
     },
     questionary: {
       isCompleted: false,

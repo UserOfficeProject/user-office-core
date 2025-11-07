@@ -17,13 +17,14 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import { AuthJwtPayload, User, UserWithRole } from '../models/User';
+import { AuthJwtPayload, User, UserRole, UserWithRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import {
   UpdateUserRolesArgs,
   UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
+import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
@@ -405,5 +406,73 @@ export default class UserMutations {
     id: number
   ): Promise<User | null> {
     return this.dataSource.setUserNotPlaceholder(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async upsertUserByOidcSub(
+    agent: UserWithRole | null,
+    args: UpsertUserByOidcSubArgs
+  ) {
+    const {
+      userTitle,
+      firstName,
+      lastName,
+      preferredName,
+      oidcSub,
+      institutionRoRId,
+      institutionName,
+      institutionCountry,
+      position,
+      email,
+    } = args;
+
+    const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
+
+    const institution = await this.userAuth.getOrCreateUserInstitution({
+      institution_ror_id: institutionRoRId,
+      institution_name: institutionName,
+      institution_country: institutionCountry,
+    });
+
+    if (!institution) {
+      return rejection('Invalid Input for the Institution', {
+        institutionRoRId,
+        args,
+      });
+    }
+
+    if (userWithOAuthSubMatch) {
+      const updatedUser = await this.dataSource.update({
+        ...userWithOAuthSubMatch,
+        email,
+        firstname: firstName,
+        lastname: lastName,
+        oidcSub: oidcSub,
+        institutionId: institution.id,
+        preferredname: preferredName ?? undefined,
+        user_title: userTitle ?? undefined,
+      });
+
+      return updatedUser;
+    } else {
+      const newUser = await this.dataSource.create(
+        userTitle ?? '',
+        firstName,
+        lastName,
+        preferredName ?? '',
+        oidcSub,
+        '',
+        '',
+        institution.id,
+        email
+      );
+
+      await this.dataSource.addUserRole({
+        userID: newUser.id,
+        roleID: UserRole.USER,
+      });
+
+      return newUser;
+    }
   }
 }

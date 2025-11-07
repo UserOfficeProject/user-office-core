@@ -71,7 +71,8 @@ export default class UserQueries {
         user.created,
         user.email,
         user.country,
-        user.title
+        user.user_title,
+        user.oidc_sub
       );
     } else {
       return null;
@@ -103,7 +104,8 @@ export default class UserQueries {
       user.created,
       user.email,
       user.country,
-      user.title
+      user.user_title,
+      user.oidc_sub
     );
   }
 

@@ -19,7 +19,7 @@ import {
 } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
-import database from './database';
+import database, { isUniqueConstraintError } from './database';
 import {
   CountryRecord,
   InstitutionRecord,
@@ -103,6 +103,13 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     return createUserObject(userRecord);
   }
+  catch(error: any) {
+    if (isUniqueConstraintError(error)) {
+      throw new GraphQLError('User already exists');
+    }
+    throw new GraphQLError('Could not update user. Check your Inputs.');
+  }
+
   async updateUserByOidcSub(
     args: UpdateUserByOidcSubArgs
   ): Promise<User | null> {
@@ -116,28 +123,30 @@ export default class PostgresUserDataSource implements UserDataSource {
       oauthRefreshToken,
       oauthIssuer,
     } = args;
+    try {
+      const [userRecord]: UserRecord[] = await database
+        .update({
+          firstname,
+          user_title,
+          lastname,
+          preferredname,
+          institution_id: institutionId,
+          email,
+          oauth_refresh_token: oauthRefreshToken,
+          oauth_issuer: oauthIssuer,
+          updated_at: new Date(),
+        })
+        .from('users')
+        .where('oidc_sub', args.oidcSub)
+        .returning(['*']);
 
-    const [userRecord]: UserRecord[] = await database
-      .update({
-        firstname,
-        user_title,
-        lastname,
-        preferredname,
-        institution_id: institutionId,
-        email,
-        oauth_refresh_token: oauthRefreshToken,
-        oauth_issuer: oauthIssuer,
-        updated_at: new Date(),
-      })
-      .from('users')
-      .where('oidc_sub', args.oidcSub)
-      .returning(['*']);
-
-    if (!userRecord) {
-      return null;
+      return createUserObject(userRecord);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new GraphQLError('User already exists');
+      }
+      throw new GraphQLError('Could not create user. Check your Inputs.');
     }
-
-    return createUserObject(userRecord);
   }
 
   async getRoles(): Promise<Role[]> {
@@ -208,7 +217,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
-      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
+      .then((user: UserRecord) => {
+        return !user ? null : createUserObject(user);
+      });
   }
 
   async getUserWithInstitution(id: number): Promise<{
@@ -311,7 +322,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  // NOTE: This is used in the OAuthAuthorization only where we upsert users returned from Auth server.
   async create(
     user_title: string | undefined,
     firstname: string,
@@ -343,6 +353,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
 
         return createUserObject(user[0]);
+      })
+      .catch((error) => {
+        if (isUniqueConstraintError(error)) {
+          throw new GraphQLError('User already exists');
+        }
+        throw new GraphQLError('Could not update user. Check your Inputs.');
       });
   }
 
@@ -395,7 +411,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       firstname: '',
       lastname: '',
       preferredname: '',
-      oidc_sub: '',
       oauth_refresh_token: '',
       institution_id: 1,
       email: userId.toString(),
@@ -648,6 +663,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         users.map((user) => createBasicUserObject(user))
       );
   }
+
   async createInstitution(
     name: string,
     countryId: number | null = null,

@@ -16,7 +16,7 @@ import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
-interface UserinfoResponseWithInssitution extends UserinfoResponse {
+interface UserinfoResponseWithInstitution extends UserinfoResponse {
   institution_ror_id?: string;
   institution_name?: string;
   institution_country?: string;
@@ -85,11 +85,11 @@ export class OAuthAuthorization extends UserAuthorization {
     });
   }
 
-  private async getUserInstitutionId(
-    userInfo: UserinfoResponseWithInssitution
+  public async getOrCreateUserInstitution(
+    userInfo: UserinfoResponseWithInstitution
   ) {
     if (!userInfo.institution_name || !userInfo.institution_country) {
-      return undefined;
+      return null;
     }
 
     let institution = userInfo.institution_ror_id
@@ -119,7 +119,7 @@ export class OAuthAuthorization extends UserAuthorization {
         await this.adminDataSource.createInstitution(newInstitution);
     }
 
-    return institution?.id;
+    return institution;
   }
 
   private async upsertUser(
@@ -127,7 +127,7 @@ export class OAuthAuthorization extends UserAuthorization {
     tokenSet: ValidTokenSet
   ): Promise<User> {
     const client = await OpenIdClient.getInstance();
-    const institutionId = await this.getUserInstitutionId(userInfo);
+    const institution = await this.getOrCreateUserInstitution(userInfo);
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );
@@ -147,7 +147,7 @@ export class OAuthAuthorization extends UserAuthorization {
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        institutionId: institutionId ?? user.institutionId,
+        institutionId: institution?.id ?? user.institutionId,
         preferredname: userInfo.preferred_username,
         user_title: userInfo.title as string,
       });
@@ -162,7 +162,7 @@ export class OAuthAuthorization extends UserAuthorization {
         userInfo.sub,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
-        institutionId ?? 1,
+        institution?.id ?? 1,
         userInfo.email
       );
 

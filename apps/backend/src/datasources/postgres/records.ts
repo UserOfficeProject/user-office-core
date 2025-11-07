@@ -976,7 +976,8 @@ export const createBasicUserObject = (
     user.created_at,
     user.email,
     user.country,
-    user.user_title
+    user.user_title,
+    user.oidc_sub
   );
 };
 

@@ -8,4 +8,5 @@ fragment basicUserDetails on BasicUserDetails {
   created
   email
   country
+  oidc_sub
 }

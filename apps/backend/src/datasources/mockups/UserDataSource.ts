@@ -25,6 +25,7 @@ export const basicDummyUser = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   'test@email.com',
   '',
+  '',
   ''
 );
 
@@ -37,6 +38,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   1,
   new Date('2019-07-17 08:25:12.23043+00'),
   'test@email.com',
+  '',
   '',
   ''
 );
@@ -226,8 +228,21 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
+  // Mock user storage for testing upsertUserByOidcSub
+  private mockUsers: User[] = [
+    dummyUser,
+    dummyUserNotOnProposal,
+    dummyUserOfficer,
+    dummyPlaceHolderUser,
+  ];
+
   async getByOIDCSub(oidcSub: string): Promise<User | null> {
-    return dummyUser;
+    // Check if user exists with this OIDC sub
+    const existingUser = this.mockUsers.find(
+      (user) => user.oidcSub === oidcSub
+    );
+
+    return existingUser || null;
   }
   async createInstitution(name: string, countryId?: number): Promise<number> {
     return 1;
@@ -261,6 +276,7 @@ export class UserDataSourceMock implements UserDataSource {
       2,
       new Date('2019-07-17 08:25:12.23043+00'),
       'test@email.com',
+      '',
       '',
       ''
     );
@@ -445,8 +461,40 @@ export class UserDataSourceMock implements UserDataSource {
     return true;
   }
 
-  async create(firstname: string, lastname: string) {
-    return dummyUser;
+  async create(
+    user_title: string | undefined,
+    firstname: string,
+    lastname: string,
+    preferredname: string | undefined,
+    oidc_sub: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
+    institution_id: number,
+    email: string
+  ) {
+    // Generate a new user ID
+    const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;
+
+    const newUser = new User(
+      newId,
+      user_title || 'unspecified',
+      firstname,
+      lastname,
+      preferredname || '',
+      oidc_sub,
+      oauth_refresh_token,
+      oauth_issuer,
+      institution_id || 1,
+      'Test institution',
+      email,
+      new Date().toISOString(),
+      new Date().toISOString()
+    );
+
+    // Add to mock users collection
+    this.mockUsers.push(newUser);
+
+    return newUser;
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
