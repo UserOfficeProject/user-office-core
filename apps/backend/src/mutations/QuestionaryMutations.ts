@@ -226,7 +226,7 @@ export default class QuestionaryMutations {
     );
 
     const updatedAnswers: AnswerBasic[] = [];
-    for (const answer of answersToUpdate) {
+    for (const answer of answers) {
       if (answer.value !== undefined) {
         const questionTemplateRelation =
           await this.templateDataSource.getQuestionTemplateRelation(
