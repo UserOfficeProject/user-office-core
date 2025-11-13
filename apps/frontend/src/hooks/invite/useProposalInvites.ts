@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 
-import { GetProposalInvitesQuery } from 'generated/sdk';
+import { GetCoProposerInvitesQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalInvites() {
   const [proposalInvites, setProposalInvites] = useState<
-    NonNullable<GetProposalInvitesQuery['me']>['proposalInvites']
+    NonNullable<GetCoProposerInvitesQuery['me']>['coProposerInvites']
   >([]);
   const [loading, setLoading] = useState(true);
+  const [processingInviteId, setProcessingInviteId] = useState<number | null>(
+    null
+  );
 
   const api = useDataApi();
 
@@ -16,12 +19,12 @@ export function useProposalInvites() {
 
     setLoading(true);
     api()
-      .getProposalInvites()
+      .getCoProposerInvites()
       .then((data) => {
         if (unmounted) {
           return;
         }
-        if (data.me) setProposalInvites(data.me.proposalInvites);
+        if (data.me) setProposalInvites(data.me.coProposerInvites);
         setLoading(false);
       });
 
@@ -30,14 +33,32 @@ export function useProposalInvites() {
     };
   }, [api]);
 
-  const acceptInvite = () => {};
-  const declineInvite = () => {};
+  const acceptCoProposerInvite = (inviteId: number) => {
+    const proposalId = proposalInvites.find((invite) => invite.id === inviteId)
+      ?.proposal?.proposalId;
+    if (!proposalId) {
+      throw new Error('Failed to accept the invitation.');
+    }
+    setProcessingInviteId(inviteId);
+    api()
+      .acceptCoProposerInvite({ proposalId })
+      .then(({ acceptCoProposerInvite }) => {
+        setProposalInvites((invites) =>
+          invites.filter((invite) => invite.id !== acceptCoProposerInvite.id)
+        );
+      })
+      .catch(() => {
+        throw new Error('Failed to accept the invitation.');
+      })
+      .finally(() => {
+        setProcessingInviteId(null);
+      });
+  };
 
   return {
     loading,
     proposalInvites,
-    setProposalInvites,
-    acceptInvite,
-    declineInvite,
+    acceptCoProposerInvite,
+    processingInviteId,
   };
 }
