@@ -2781,10 +2781,10 @@ context('Fap meeting components tests', () => {
       cy.get('@timeAllocation').type('-1').blur();
       cy.contains('Must be greater than or equal to');
 
-      cy.get('@timeAllocation').clear().type('987654321').blur();
+      cy.get('@timeAllocation').clear().clear().type('987654321').blur();
       cy.contains('Must be less than or equal to');
 
-      cy.get('@timeAllocation').clear().type('9999');
+      cy.get('@timeAllocation').clear().clear().type('9999');
       cy.get('[data-cy="save-time-allocation"]').click();
 
       cy.finishedLoading();
@@ -3895,13 +3895,13 @@ context('Fap meeting components tests', () => {
 
       cy.contains('Lowest grade is 1');
 
-      cy.get('#grade-proposal').clear().type('1.001');
+      cy.get('#grade-proposal').click().clear().clear().type('1.001');
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('The grade must be a most 2 dp');
 
-      cy.get('#grade-proposal').clear().type('1.01');
+      cy.get('#grade-proposal').click().clear().clear().type('1.01');
 
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.notification({ variant: 'success', text: 'Saved' });
@@ -4206,20 +4206,20 @@ context(
     it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal using Instrument Picker', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
       cy.finishedLoading();
       cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=call-list]')
+        .contains(initialDBData.call.shortCode)
+        .click();
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();

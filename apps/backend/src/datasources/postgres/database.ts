@@ -38,4 +38,8 @@ if (process.env.DATABASE_LOG_QUERIES === '1') {
   });
 }
 
+export function isUniqueConstraintError(error: any) {
+  return 'code' in error && error.code === '23505';
+}
+
 export default db;

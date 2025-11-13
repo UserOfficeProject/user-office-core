@@ -61,6 +61,7 @@ type ProposalMessageData = {
   instruments?: { id: number; shortCode: string; allocatedTime: number }[];
   members: Member[];
   dataAccessUsers: Member[];
+  visitors: Member[];
   newStatus?: string;
   proposalPk: number;
   proposer?: Member;
@@ -133,6 +134,12 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     await dataAccessUsersDataSource.getDataAccessUsersWithInstitution(
       proposal.primaryKey
     );
+
+  const visitorsWithInstitution =
+    await userDataSource.getApprovedProposalVisitorsWithInstitution(
+      proposal.primaryKey
+    );
+
   const maybeInstruments =
     await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
@@ -177,9 +184,11 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     dataAccessUsers: dataAccessUsersWithInstitution.map(
       mapUserWithInstitutionToMember
     ),
+    visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
     newStatus: proposalStatus?.shortCode,
     submitted: proposal.submitted,
   };
+
   const proposerWithInstitution = await userDataSource.getUserWithInstitution(
     proposal.proposerId
   );
@@ -242,7 +251,6 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_DELETED:
       case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
-
         await rabbitMQ.sendMessageToExchange(
           event.exchange || EXCHANGE_NAME,
           event.type,
@@ -378,6 +386,25 @@ export async function createPostToRabbitMQHandler() {
           event.type === Event.VISIT_REGISTRATION_APPROVED
             ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
             : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          jsonMessage
+        );
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
+          proposalPayload
+        );
+        break;
+      }
+      case Event.DATA_ACCESS_USERS_UPDATED: {
+        const { proposalPKey } = event;
+
+        const proposal = await proposalDataSource.get(proposalPKey);
+
+        const jsonMessage = await getProposalMessageData(proposal!);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
           jsonMessage
         );
         break;
