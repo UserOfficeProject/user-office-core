@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Invite } from '../../models/Invite';
-import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
+import {
+  GetCoProposerInvitesFilter,
+  GetInvitesFilter,
+  InviteDataSource,
+} from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 export default class PostgresInviteDataSource implements InviteDataSource {
@@ -101,13 +105,13 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         }
 
         if (filter.email) {
-          query.where('email', filter.email);
+          query.whereRaw('lower(email) = ?', filter.email.toLowerCase());
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
 
-  getProposalInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]> {
     return database
       .select('*')
       .from('invites')
@@ -138,7 +142,11 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         }
 
         if (filter.email) {
-          query.where('email', filter.email);
+          query.whereRaw('lower(email) = ?', filter.email.toLowerCase());
+        }
+
+        if (filter.proposalPk) {
+          query.where('co_proposer_claims.proposal_pk', filter.proposalPk);
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));

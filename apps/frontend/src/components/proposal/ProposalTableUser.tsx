@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import ProposalInviteNotification from 'components/notification/ProposalInviteNotification';
+import ProposalInviteNotification from 'components/proposal/ProposalInviteNotification';
 import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -41,7 +41,7 @@ export type UserProposalDataType = {
 const ProposalTableUser = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [refreshTableKey, setRefreshTableKey] = useState(0);
   const sendUserProposalRequest = useCallback(async () => {
     setLoading(true);
 
@@ -85,12 +85,15 @@ const ProposalTableUser = () => {
 
   return (
     <>
-      <ProposalInviteNotification />
+      <ProposalInviteNotification
+        onAccept={() => setRefreshTableKey((prev) => prev + 1)}
+      />
       <ProposalTable
         title="My proposals"
         search={false}
         searchQuery={sendUserProposalRequest}
         isLoading={loading}
+        key={refreshTableKey}
       />
     </>
   );

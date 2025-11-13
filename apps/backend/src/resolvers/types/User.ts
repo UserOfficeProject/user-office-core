@@ -164,8 +164,8 @@ export class UserResolver {
   }
 
   @FieldResolver(() => [Invite])
-  async proposalInvites(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.invite.getProposalInvites(context.user);
+  async coProposerInvites(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.invite.getPendingCoProposerInvites(context.user);
   }
 
   @FieldResolver(() => [Experiment])
