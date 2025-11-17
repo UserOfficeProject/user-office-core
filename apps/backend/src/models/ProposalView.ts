@@ -1,3 +1,4 @@
+import { AllocationTimeUnits } from './Call';
 import {
   FapInstrument,
   ProposalViewFap,
@@ -5,7 +6,6 @@ import {
   ProposalViewTechnicalReview,
   ProposalViewTechnique,
 } from '../resolvers/types/ProposalView';
-import { AllocationTimeUnits } from './Call';
 export class ProposalView {
   constructor(
     public primaryKey: number,

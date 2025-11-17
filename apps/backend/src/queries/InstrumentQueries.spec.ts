@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import InstrumentQueries from './InstrumentQueries';
 import { dummyInstrument } from '../datasources/mockups/InstrumentDataSource';
 import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import InstrumentQueries from './InstrumentQueries';
 
 const InstrumentQueriesInstance = container.resolve(InstrumentQueries);
 

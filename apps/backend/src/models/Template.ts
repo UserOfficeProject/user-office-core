@@ -1,9 +1,9 @@
-import { Dependency } from '../datasources/postgres/records';
-import { FieldConfigType } from '../resolvers/types/FieldConfig';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from './ConditionEvaluator';
+import { Dependency } from '../datasources/postgres/records';
+import { FieldConfigType } from '../resolvers/types/FieldConfig';
 
 export class FieldDependency {
   constructor(

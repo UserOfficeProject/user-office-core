@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
+import InviteMutations from './InviteMutations';
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
@@ -21,7 +22,6 @@ import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
-import InviteMutations from './InviteMutations';
 
 const inviteMutations = container.resolve(InviteMutations);
 const visitDataSource = container.resolve<VisitDataSource>(

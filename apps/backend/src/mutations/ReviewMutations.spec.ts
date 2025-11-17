@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ReviewMutations from './ReviewMutations';
 import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyFapChairWithRole,
@@ -10,7 +11,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Review, ReviewStatus } from '../models/Review';
-import ReviewMutations from './ReviewMutations';
 
 const reviewMutations = container.resolve(ReviewMutations);
 

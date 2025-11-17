@@ -7,8 +7,8 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
 import { Template } from './Template';
+import { ResolverContext } from '../../context';
 
 @ObjectType()
 export class TechnicalReviewTemplate extends Template {}

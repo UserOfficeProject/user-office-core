@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import express from 'express';
 import { container } from 'tsyringe';
 
+import FactoryServices, { DownloadTypeServices } from './factoryServices';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import {
@@ -18,7 +19,6 @@ import { getCurrentTimestamp } from '../../factory/util';
 import { ProposalAttachmentData } from '../../factory/zip/attachment';
 import { FeatureId } from '../../models/Feature';
 import { UserWithRole } from '../../models/User';
-import FactoryServices, { DownloadTypeServices } from './factoryServices';
 
 const router = express.Router();
 

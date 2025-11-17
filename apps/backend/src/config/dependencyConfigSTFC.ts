@@ -5,6 +5,10 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
+import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
+import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -57,10 +61,6 @@ import {
 } from '../factory/xlsx/stfc/StfcFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
-import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
-import { Tokens } from './Tokens';
-import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);

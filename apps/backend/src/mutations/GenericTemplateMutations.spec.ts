@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import GenericTemplateMutations from './GenericTemplateMutations';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
 import {
@@ -10,7 +11,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { GenericTemplate } from '../models/GenericTemplate';
 import { isRejection, Rejection } from '../models/Rejection';
-import GenericTemplateMutations from './GenericTemplateMutations';
 
 const genericTemplateMutations = container.resolve(GenericTemplateMutations);
 

@@ -8,6 +8,7 @@ import {
   Ctx,
 } from 'type-graphql';
 
+import { WorkflowConnection } from './WorkflowConnection';
 import { ResolverContext } from '../../context';
 import { Event } from '../../events/event.enum';
 import { isRejection } from '../../models/Rejection';
@@ -15,7 +16,6 @@ import {
   Workflow as WorkflowOrigin,
   WorkflowType,
 } from '../../models/Workflow';
-import { WorkflowConnection } from './WorkflowConnection';
 
 @ObjectType()
 export class Workflow implements Partial<WorkflowOrigin> {

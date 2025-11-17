@@ -1,9 +1,9 @@
 import { OpenIdClient } from '@user-office-software/openid';
 import { container } from 'tsyringe';
 
+import { Tokens } from './Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { SettingsId } from '../models/Settings';
-import { Tokens } from './Tokens';
 
 export async function updateOIDCSettings() {
   if (OpenIdClient.hasConfig() === false) {

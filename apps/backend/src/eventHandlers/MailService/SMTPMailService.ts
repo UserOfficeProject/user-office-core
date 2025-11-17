@@ -8,13 +8,13 @@ import SMTPPool from 'nodemailer/lib/smtp-pool';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { container } from 'tsyringe';
 
+import EmailSettings from './EmailSettings';
+import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
+import { ResultsPromise } from './SparkPost';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
-import EmailSettings from './EmailSettings';
-import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
-import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
   private emailTemplates: EmailTemplates<any>;

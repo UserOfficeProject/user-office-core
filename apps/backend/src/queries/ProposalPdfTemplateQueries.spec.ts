@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ProposalPdfTemplateQueries from './ProposalPdfTemplateQueries';
 import { Tokens } from '../config/Tokens';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -8,7 +9,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalPdfTemplate } from '../models/ProposalPdfTemplate';
-import ProposalPdfTemplateQueries from './ProposalPdfTemplateQueries';
 
 const proposalPdfTemplateQueries = container.resolve(
   ProposalPdfTemplateQueries

@@ -8,9 +8,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { QuestionaryStep } from './QuestionaryStep';
 import { ResolverContext } from '../../context';
 import { Questionary as QuestionaryOrigin } from '../../models/Questionary';
-import { QuestionaryStep } from './QuestionaryStep';
 
 @ObjectType()
 export class Questionary implements Partial<QuestionaryOrigin> {

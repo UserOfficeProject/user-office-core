@@ -9,10 +9,10 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
+import { ResolverContext } from '../../context';
+import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
 
 @ObjectType()
 export class Sample implements Partial<SampleOrigin> {

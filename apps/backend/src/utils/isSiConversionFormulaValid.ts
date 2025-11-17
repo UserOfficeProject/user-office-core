@@ -8,5 +8,6 @@ export function isSiConversionFormulaValid(expression?: string): boolean {
     return true;
   }
 
+  // eslint-disable-next-line no-useless-escape
   return expression.match(/[^0-9\+\-\*\/\(\)\s\.x]/g) === null;
 }

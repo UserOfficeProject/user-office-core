@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import ExperimentSafetyPdfTemplateMutations from './ExperimentSafetyPdfTemplateMutations';
 import { Tokens } from '../config/Tokens';
 import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
@@ -11,7 +12,6 @@ import { ExperimentSafetyPdfTemplate } from '../models/ExperimentSafetyPdfTempla
 import { isRejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { Template } from '../models/Template';
-import ExperimentSafetyPdfTemplateMutations from './ExperimentSafetyPdfTemplateMutations';
 
 const experimentSafetyPdfTemplateMutations = container.resolve(
   ExperimentSafetyPdfTemplateMutations

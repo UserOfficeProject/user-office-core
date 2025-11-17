@@ -8,11 +8,11 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Proposal } from './Proposal';
+import { Questionary } from './Questionary';
 import { ResolverContext } from '../../context';
 import { GenericTemplate as GenericTemplateOrigin } from '../../models/GenericTemplate';
 import { TemplateCategoryId } from '../../models/Template';
-import { Proposal } from './Proposal';
-import { Questionary } from './Questionary';
 
 @ObjectType()
 export class GenericTemplate implements Partial<GenericTemplateOrigin> {

@@ -37,9 +37,9 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
     }
   } catch (error) {
     logger.logException('Checking and ending calls failed: ', error);
-  } finally {
-    return updatedCalls;
   }
+
+  return updatedCalls;
 };
 const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
   const eventBus = resolveApplicationEventBus();
@@ -74,9 +74,9 @@ const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
     }
   } catch (error) {
     logger.logException('Checking and ending calls internal failed: ', error);
-  } finally {
-    return updatedCalls;
   }
+
+  return updatedCalls;
 };
 
 const checkAllCallsEnded = async (dataSource: CallDataSource) => {

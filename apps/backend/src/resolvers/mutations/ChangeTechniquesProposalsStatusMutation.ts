@@ -1,8 +1,8 @@
 import { Ctx, Mutation, Resolver, Arg } from 'type-graphql';
 
+import { ChangeProposalsStatusInput } from './ChangeProposalsStatusMutation';
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { ChangeProposalsStatusInput } from './ChangeProposalsStatusMutation';
 
 @Resolver()
 export class ChangeTechniqueProposalsStatusMutation {

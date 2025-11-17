@@ -1,8 +1,8 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { TemplateStep as TemplateStepOrigin } from '../../models/Template';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Topic } from './Topic';
+import { TemplateStep as TemplateStepOrigin } from '../../models/Template';
 
 @ObjectType()
 export class TemplateStep implements Partial<TemplateStepOrigin> {

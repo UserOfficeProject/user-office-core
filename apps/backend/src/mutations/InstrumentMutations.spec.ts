@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import InstrumentMutations from './InstrumentMutations';
 import { Tokens } from '../config/Tokens';
 import {
   dummyInstrument,
@@ -14,7 +15,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { WorkflowType } from '../models/Workflow';
-import InstrumentMutations from './InstrumentMutations';
 
 let statusDataSource: StatusDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;

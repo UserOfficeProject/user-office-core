@@ -3,12 +3,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Call } from '../../models/Call';
-import { Proposal } from '../../models/Proposal';
-import { WorkflowType } from '../../models/Workflow';
 import database from './database';
 import ProposalDataSource from './ProposalDataSource';
 import { createCallObject, createProposalObject } from './records';
+import { Call } from '../../models/Call';
+import { Proposal } from '../../models/Proposal';
+import { WorkflowType } from '../../models/Workflow';
 
 const proposalDataSource = container.resolve(ProposalDataSource);
 

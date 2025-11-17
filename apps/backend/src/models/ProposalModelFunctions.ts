@@ -1,4 +1,3 @@
-import { FileUploadConfig } from '../resolvers/types/FieldConfig';
 import {
   ConditionEvaluator,
   DependenciesLogicOperator,
@@ -11,6 +10,7 @@ import {
   TemplateStep,
   DataType,
 } from './Template';
+import { FileUploadConfig } from '../resolvers/types/FieldConfig';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 

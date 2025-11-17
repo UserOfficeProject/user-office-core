@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ShipmentMutations from './ShipmentMutations';
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import {
@@ -9,7 +10,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { isRejection } from '../models/Rejection';
 import { Shipment } from '../models/Shipment';
-import ShipmentMutations from './ShipmentMutations';
 
 const mutations = container.resolve(ShipmentMutations);
 

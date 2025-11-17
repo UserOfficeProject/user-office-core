@@ -3,6 +3,7 @@ jest.mock('axios');
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import TemplateQueries from './TemplateQueries';
 import { Tokens } from '../config/Tokens';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -10,7 +11,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Template, TemplateStep } from '../models/Template';
-import TemplateQueries from './TemplateQueries';
 
 const templateQueries = container.resolve(TemplateQueries);
 beforeEach(() => {

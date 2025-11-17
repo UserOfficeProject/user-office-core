@@ -1,13 +1,13 @@
 import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { UserWithRole } from '../models/User';
 import { Visit } from '../models/Visit';
-import { ProposalAuthorization } from './ProposalAuthorization';
-import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class VisitAuthorization {

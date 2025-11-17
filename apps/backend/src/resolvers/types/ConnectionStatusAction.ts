@@ -8,10 +8,10 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ConnectionHasStatusAction } from '../../models/StatusAction';
 import { StatusAction } from './StatusAction';
 import { StatusActionConfig } from './StatusActionConfig';
+import { ResolverContext } from '../../context';
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
 
 @ObjectType()
 export class ConnectionStatusAction

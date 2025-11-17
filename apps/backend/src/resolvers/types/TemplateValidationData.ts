@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { TemplateValidationData as TemplateValidationDataOrigin } from '../../models/Template';
 import { QuestionComparison } from './QuestionComparison';
+import { TemplateValidationData as TemplateValidationDataOrigin } from '../../models/Template';
 
 @ObjectType()
 export class TemplateValidationData

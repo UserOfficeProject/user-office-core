@@ -9,11 +9,11 @@ import {
   Directive,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
+import { Instrument } from './Instrument';
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { Technique as TechniqueOrigin } from '../../models/Technique';
-import { BasicUserDetails } from './BasicUserDetails';
-import { Instrument } from './Instrument';
 
 @ObjectType()
 @Directive('@key(fields: "id")')

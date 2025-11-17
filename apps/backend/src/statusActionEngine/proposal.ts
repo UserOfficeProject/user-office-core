@@ -1,14 +1,14 @@
 import { container } from 'tsyringe';
 
+import { emailActionHandler } from './emailActionHandler';
+import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
+import { rabbitMQActionHandler } from './rabbitMQHandler';
+import { groupProposalsByProperties } from './statusActionUtils';
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { StatusActionType } from '../models/StatusAction';
 import { getWorkflowConnectionByStatusId } from '../workflowEngine/experiment';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
-import { emailActionHandler } from './emailActionHandler';
-import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
-import { rabbitMQActionHandler } from './rabbitMQHandler';
-import { groupProposalsByProperties } from './statusActionUtils';
 
 export const proposalStatusActionEngine = async (
   proposals: WorkflowEngineProposalType[]

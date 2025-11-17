@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Tokens } from '../../config/Tokens';
 import { Fap } from '../../models/Fap';
 import { UserRole, UserRoleShortCodeMap } from '../../models/User';
@@ -13,7 +14,6 @@ import {
 import { FapDataSource } from '../FapDataSource';
 import CallDataSource from '../postgres/CallDataSource';
 import PostgresFapDataSource from '../postgres/FapDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 enum STFCRolesMap {
   FAP_CHAIR = 50,

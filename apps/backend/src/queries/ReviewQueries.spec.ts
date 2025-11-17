@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ReviewQueries from './ReviewQueries';
 import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import ReviewQueries from './ReviewQueries';
 
 const reviewQueries = container.resolve(ReviewQueries);
 

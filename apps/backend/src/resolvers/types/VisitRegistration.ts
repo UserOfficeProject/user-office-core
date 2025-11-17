@@ -8,14 +8,14 @@ import {
   Root,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/Template';
 import {
   VisitRegistration as VisitRegistrationOrig,
   VisitRegistrationStatus,
 } from '../../models/VisitRegistration';
-import { BasicUserDetails } from './BasicUserDetails';
-import { Questionary } from './Questionary';
 
 @ObjectType()
 export class VisitRegistration implements Partial<VisitRegistrationOrig> {

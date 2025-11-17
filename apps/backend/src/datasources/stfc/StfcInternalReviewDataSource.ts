@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Tokens } from '../../config/Tokens';
 import { InternalReview } from '../../models/InternalReview';
 import { Roles } from '../../models/Role';
@@ -9,7 +10,6 @@ import { CreateInternalReviewInput } from '../../resolvers/mutations/internalRev
 import { DeleteInternalReviewInput } from '../../resolvers/mutations/internalReview/DeleteInternalReviewMutation';
 import { InternalReviewDataSource } from '../InternalReviewDataSource';
 import PostgresInternalReviewDataSource from '../postgres/InternalReviewDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 const InternalReviewRoleNumber = 53; // STFC Internal Reviewer role ID
 

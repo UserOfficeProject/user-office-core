@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ReviewStatus } from '../models/Review';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
-import { ProposalAuthorization } from './ProposalAuthorization';
-import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ReviewAuthorization {

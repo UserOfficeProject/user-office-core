@@ -1,11 +1,14 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { Tokens } from './Tokens';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
+import { mapClass, mapValue } from './utils';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -58,9 +61,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
-import { Tokens } from './Tokens';
-import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);

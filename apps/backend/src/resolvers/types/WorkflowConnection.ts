@@ -8,12 +8,12 @@ import {
   Ctx,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
-import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/WorkflowConnections';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Status } from './Status';
 import { StatusChangingEvent } from './StatusChangingEvent';
+import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
+import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/WorkflowConnections';
 
 @ObjectType()
 export class WorkflowConnection
