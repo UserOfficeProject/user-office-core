@@ -17,6 +17,7 @@ import {
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
+import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -346,5 +347,13 @@ export class StfcUserAuthorization extends UserAuthorization {
 
   async canBeAssignedToFap(userId: number): Promise<boolean> {
     return true;
+  }
+
+  getOrCreateUserInstitution(userInfo: {
+    institution_ror_id?: string;
+    institution_name?: string;
+    institution_country?: string;
+  }): Promise<Institution | null> {
+    throw new Error('Method not implemented.');
   }
 }
