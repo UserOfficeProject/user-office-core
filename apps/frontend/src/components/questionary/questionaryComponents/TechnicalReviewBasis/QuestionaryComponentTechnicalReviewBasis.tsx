@@ -20,6 +20,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { TechnicalReviewSubmissionState } from 'models/questionary/technicalReview/TechnicalReviewSubmissionState';
 import { Option } from 'utils/utilTypes';
+import { useTranslation } from 'react-i18next';
 
 function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   const {
@@ -28,7 +29,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
     },
     formikProps,
   } = props;
-
+  const { t } = useTranslation();
   const theme = useTheme();
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -156,8 +157,13 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
               isInstrumentScientist ||
               fapSecOrChairCanEdit) && (
               <Grid item xs={12}>
-                <InputLabel htmlFor="comment" shrink margin="dense">
-                  Internal comment
+                <InputLabel
+                  htmlFor="comment"
+                  margin="dense"
+                  sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                >
+                  Internal comment - To only be seen by other technical
+                  reviewers
                 </InputLabel>
                 {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
                     This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
@@ -209,8 +215,13 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
               isInstrumentScientist ||
               fapSecOrChairCanEdit) && (
               <Grid item xs={12}>
-                <InputLabel htmlFor="comment" shrink margin="dense">
-                  Internal documents
+                <InputLabel
+                  htmlFor="comment"
+                  margin="dense"
+                  sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                >
+                  Internal documents - To only be seen by other technical
+                  reviewers
                 </InputLabel>
                 <FileUploadComponent
                   maxFiles={5}
@@ -241,8 +252,12 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
               </Grid>
             )}
             <Grid item xs={12}>
-              <InputLabel htmlFor="publicComment" shrink margin="dense">
-                Comments for the review panel
+              <InputLabel
+                htmlFor="publicComment"
+                margin="dense"
+                sx={{ fontWeight: 'bold', color: 'text.primary' }}
+              >
+                {`Comments be seen by the ${t('FAP')} panels`}
               </InputLabel>
               <Editor
                 id="publicComment"
