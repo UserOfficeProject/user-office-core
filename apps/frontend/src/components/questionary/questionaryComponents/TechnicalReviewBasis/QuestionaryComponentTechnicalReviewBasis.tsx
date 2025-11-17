@@ -1,6 +1,7 @@
 import { Box, CssBaseline, Grid, InputLabel, useTheme } from '@mui/material';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   FileUploadComponent,
@@ -20,7 +21,6 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { TechnicalReviewSubmissionState } from 'models/questionary/technicalReview/TechnicalReviewSubmissionState';
 import { Option } from 'utils/utilTypes';
-import { useTranslation } from 'react-i18next';
 
 function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   const {
