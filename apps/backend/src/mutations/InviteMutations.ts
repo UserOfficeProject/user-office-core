@@ -57,6 +57,9 @@ export default class InviteMutations {
     agent: UserWithRole | null,
     code: string
   ): Promise<Invite | Rejection> {
+    if (!agent) {
+      return rejection('User not found', { invite: code });
+    }
     const invite = await this.inviteDataSource.findByCode(code);
     if (invite === null) {
       return rejection('Invite code not found', { invite: code });
@@ -69,28 +72,30 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
+    await this.processAcceptedRoleClaims(agent.id, invite);
+    await this.processAcceptedCoProposerClaims(agent.id, invite);
+    await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
+
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
 
-    await this.processAcceptedRoleClaims(agent!.id, updatedInvite);
-    await this.processAcceptedCoProposerClaims(agent!.id, updatedInvite);
-    await this.processAcceptedVisitRegistrationClaims(agent!.id, updatedInvite);
-
     return updatedInvite;
   }
 
   @Authorized([Roles.USER])
   async acceptCoProposerInvite(agent: UserWithRole | null, proposalId: string) {
+    if (!agent) {
+      return rejection('User not found', { proposalId });
+    }
+
     const proposal = await this.proposalDataSource.getProposalById(proposalId);
     if (!proposal) {
       return rejection('Proposal not found', { proposalId });
     }
-    if (!agent) {
-      return rejection('User not found', { proposalId });
-    }
+
     const [invite] = await this.inviteDataSource.getCoProposerInvites({
       proposalPk: proposal.primaryKey,
       email: agent.email,
@@ -101,14 +106,14 @@ export default class InviteMutations {
       return rejection('Invite not found', { proposalId });
     }
 
+    await this.processAcceptedRoleClaims(agent.id, invite);
+    await this.processAcceptedCoProposerClaims(agent.id, invite);
+
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent.id,
     });
-
-    await this.processAcceptedRoleClaims(agent.id, updatedInvite);
-    await this.processAcceptedCoProposerClaims(agent.id, updatedInvite);
 
     return updatedInvite;
   }
