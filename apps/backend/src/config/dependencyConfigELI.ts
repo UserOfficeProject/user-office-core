@@ -118,6 +118,7 @@ mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
@@ -148,5 +149,3 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-
-mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);

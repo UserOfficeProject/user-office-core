@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react';
 import {
   defineConfig,
-  loadEnv,
   splitVendorChunkPlugin,
+  loadEnv,
   UserConfig,
 } from 'vite';
 

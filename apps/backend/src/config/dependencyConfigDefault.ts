@@ -125,6 +125,7 @@ mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
@@ -150,5 +151,3 @@ mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
-
-mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);

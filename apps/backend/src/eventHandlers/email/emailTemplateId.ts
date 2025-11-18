@@ -15,4 +15,6 @@ export enum EmailTemplateId {
   INTERNAL_REVIEW_CREATED = 'internal-review-created',
   INTERNAL_REVIEW_UPDATED = 'internal-review-updated',
   INTERNAL_REVIEW_DELETED = 'internal-review-deleted',
+  CALL_CREATED_EMAIL = 'call-created-email',
+  FEEDBACK_REQUEST = 'feedback-request',
 }

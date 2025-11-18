@@ -9,11 +9,11 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ExperimentStatus } from '../models/Experiment';
 import { Feedback, FeedbackStatus } from '../models/Feedback';
-import { rejection } from '../models/Rejection';
-import { Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SettingsId } from '../models/Settings';
 import { TemplateGroupId } from '../models/Template';
@@ -327,7 +327,7 @@ export default class FeedbackMutations {
     try {
       const { results } = await this.mailService.sendMail({
         content: {
-          template_id: 'feedback-request',
+          template: EmailTemplateId.FEEDBACK_REQUEST,
         },
         substitution_data: {
           teamleadPreferredname: teamLead.preferredname,

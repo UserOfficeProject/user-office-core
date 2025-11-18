@@ -39,7 +39,7 @@ export default class PostgresEmailTemplateDataSource
     const query = database('email_templates').select(['*']);
 
     if (filter?.filter) {
-      query.where('name', 'ilike', `%${filter.filter}%`);
+      query.whereILikeEscaped('name', '%?%', filter.filter);
     }
 
     if (filter?.emailTemplateIds) {
@@ -84,9 +84,13 @@ export default class PostgresEmailTemplateDataSource
         ['*']
       )
       .from('email_templates')
-      .then((resultSet: EmailTemplateRecord[]) =>
-        createEmailTemplateObject(resultSet[0])
-      );
+      .then((emailTemplates: EmailTemplateRecord[]) => {
+        if (emailTemplates?.length === 0) {
+          throw new GraphQLError(`Failed to create email template '${name}'`);
+        }
+
+        return createEmailTemplateObject(emailTemplates[0]);
+      });
   }
 
   async update(
@@ -108,8 +112,14 @@ export default class PostgresEmailTemplateDataSource
       )
       .from('email_templates')
       .where('email_templates.email_template_id', emailTemplateId)
-      .then((resultSet: EmailTemplateRecord[]) => {
-        return createEmailTemplateObject(resultSet[0]);
+      .then((emailTemplates: EmailTemplateRecord[]) => {
+        if (emailTemplates === undefined || emailTemplates.length !== 1) {
+          throw new GraphQLError(
+            `Failed to update email template with id '${emailTemplateId}'`
+          );
+        }
+
+        return createEmailTemplateObject(emailTemplates[0]);
       });
   }
 
@@ -119,14 +129,14 @@ export default class PostgresEmailTemplateDataSource
       .del()
       .from('email_templates')
       .returning('*')
-      .then((emailTemplate: EmailTemplateRecord[]) => {
-        if (emailTemplate === undefined || emailTemplate.length !== 1) {
+      .then((emailTemplates: EmailTemplateRecord[]) => {
+        if (emailTemplates === undefined || emailTemplates.length !== 1) {
           throw new GraphQLError(
             `Could not delete emailTemplate with id:${id}`
           );
         }
 
-        return createEmailTemplateObject(emailTemplate[0]);
+        return createEmailTemplateObject(emailTemplates[0]);
       });
   }
 }

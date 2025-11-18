@@ -104,7 +104,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         mailService
           .sendMail({
             content: {
-              template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+              template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
@@ -148,7 +148,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const options: EmailSettings = {
         content: {
-          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
+          template: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -216,7 +216,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             piPreferredname: principalInvestigator.preferredname,
@@ -337,7 +337,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: EmailTemplateId.REVIEW_REMINDER,
+            template: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -418,7 +418,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             preferredname: user.preferredname,
@@ -474,7 +474,7 @@ async function sendInviteEmail(
   return mailService
     .sendMail({
       content: {
-        template_id: templateId,
+        template: templateId,
       },
       substitution_data: {
         email: invite.email,

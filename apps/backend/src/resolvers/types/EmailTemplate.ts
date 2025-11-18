@@ -3,7 +3,7 @@ import { Field, Int, ObjectType } from 'type-graphql';
 import { EmailTemplate as EmailTemplateOrigin } from '../../models/EmailTemplate';
 
 @ObjectType()
-export class EmailTemplate implements Partial<EmailTemplateOrigin> {
+export class EmailTemplate implements EmailTemplateOrigin {
   @Field(() => Int)
   public id: number;
 

@@ -1,7 +1,7 @@
 mutation createEmailTemplate(
   $createdByUserId: Int!
   $name: String!
-  $description: String
+  $description: String!
   $subject: String!
   $body: String!
 ) {

@@ -124,7 +124,7 @@ const checkInviteReminder = async () => {
       try {
         await mailService.sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             email: invite.email,

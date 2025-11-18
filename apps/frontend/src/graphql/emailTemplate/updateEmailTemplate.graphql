@@ -2,7 +2,7 @@ mutation updateEmailTemplate(
   $id: Int!
   $createdByUserId: Int!
   $name: String!
-  $description: String
+  $description: String!
   $subject: String!
   $body: String!
 ) {

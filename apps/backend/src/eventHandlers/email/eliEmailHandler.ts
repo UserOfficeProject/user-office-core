@@ -102,8 +102,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
-            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+            template: emailTemplate?.name || templateId || '',
           },
           substitution_data: {
             firstname: user.preferredname,
@@ -179,8 +178,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
       const options: EmailSettings = {
         content: {
-          template_id: templateId,
-          db_template_id: emailTemplate ? emailTemplate.id : undefined,
+          template: emailTemplate?.name || templateId || '',
         },
         substitution_data: {
           preferredName: principalInvestigator.preferredname,
@@ -237,8 +235,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
-            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+            template: emailTemplate?.name || templateId || '',
           },
           substitution_data: {
             preferredName: principalInvestigator.preferredname,
@@ -279,8 +276,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
-            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+            template: emailTemplate?.name || templateId || '',
           },
           substitution_data: {
             preferredName: fapReviewer.preferredname,
@@ -368,8 +364,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
-            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+            template: emailTemplate?.name || templateId || '',
           },
           substitution_data: {
             assignedByPreferredName: assignedBy.preferredname,
@@ -429,8 +424,7 @@ async function sendInviteEmail(
   return mailService
     .sendMail({
       content: {
-        template_id: templateId,
-        db_template_id: emailTemplate?.id,
+        template: emailTemplate?.name || templateId || '',
       },
       substitution_data: {
         email: invite.email,

@@ -107,6 +107,7 @@ mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 mapClass(Tokens.TagDataSource, TagDataSourceMock);
+mapClass(Tokens.EmailTemplateDataSource, EmailTemplateDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
@@ -129,5 +130,3 @@ mapValue(Tokens.ConfigureLogger, () =>
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
-
-mapClass(Tokens.EmailTemplateDataSource, EmailTemplateDataSourceMock);

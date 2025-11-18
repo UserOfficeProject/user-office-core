@@ -16,16 +16,16 @@ export class CreateEmailTemplateInput {
   @Field(() => Int)
   public createdByUserId: number;
 
-  @Field()
+  @Field(() => String)
   public name: string;
 
-  @Field({ nullable: true })
+  @Field(() => String)
   public description: string;
 
-  @Field()
+  @Field(() => String)
   public subject: string;
 
-  @Field()
+  @Field(() => String)
   public body: string;
 }
 
