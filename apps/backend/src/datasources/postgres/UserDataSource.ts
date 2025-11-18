@@ -506,7 +506,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
-      .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
