@@ -422,7 +422,6 @@ export default class UserMutations {
       institutionRoRId,
       institutionName,
       institutionCountry,
-      position,
       email,
     } = args;
 

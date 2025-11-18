@@ -285,14 +285,9 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'User',
         email: 'new.user@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
         department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -310,14 +305,9 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'UpsertedDoe',
         email: 'upserted.jane.doe@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
         department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -340,16 +330,11 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Scientist',
         email: 'john.scientist@dummy-research.org',
         userTitle: 'Dr.',
-        username: 'jscientist',
         preferredName: 'Johnny',
-        gender: 'male',
-        birthDate: '1985-05-15',
         institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
         institutionName: 'CERN', // This should match the existing institution
         institutionCountry: 'Switzerland',
         department: 'Physics Department',
-        position: 'Senior Researcher',
-        telephone: '+41-22-767-6111',
       }
     );
 
@@ -376,16 +361,11 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Researcher',
         email: 'maria.researcher@newinstitute.edu',
         userTitle: 'Prof.',
-        username: 'mresearcher',
         preferredName: 'Maria',
-        gender: 'female',
-        birthDate: '1980-03-22',
         institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
         institutionName: 'New Research Institute',
         institutionCountry: 'Germany',
         department: 'Materials Science',
-        position: 'Principal Investigator',
-        telephone: '+49-30-12345678',
       }
     );
 
