@@ -7,7 +7,6 @@ mutation upsertUserByOidcSub(
   $institutionRoRId: String!
   $institutionName: String!
   $institutionCountry: String!
-  $department: String
   $email: String!
 ) {
   upsertUserByOidcSub(
@@ -19,7 +18,6 @@ mutation upsertUserByOidcSub(
     institutionRoRId: $institutionRoRId
     institutionName: $institutionName
     institutionCountry: $institutionCountry
-    department: $department
     email: $email
   ) {
     id

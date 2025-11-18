@@ -287,7 +287,6 @@ describe('upsertUserByOidcSub', () => {
         userTitle: null,
         preferredName: null,
         institutionRoRId: '',
-        department: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -307,7 +306,6 @@ describe('upsertUserByOidcSub', () => {
         userTitle: null,
         preferredName: null,
         institutionRoRId: '',
-        department: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -334,7 +332,6 @@ describe('upsertUserByOidcSub', () => {
         institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
         institutionName: 'CERN', // This should match the existing institution
         institutionCountry: 'Switzerland',
-        department: 'Physics Department',
       }
     );
 
@@ -365,7 +362,6 @@ describe('upsertUserByOidcSub', () => {
         institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
         institutionName: 'New Research Institute',
         institutionCountry: 'Germany',
-        department: 'Materials Science',
       }
     );
 
