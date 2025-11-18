@@ -11,6 +11,7 @@ import { ExperimentsFilter } from '../resolvers/queries/ExperimentsQuery';
 import { Experiment } from '../resolvers/types/Experiment';
 import { ExperimentHasSample } from '../resolvers/types/ExperimentHasSample';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class ExperimentQueries {
@@ -97,7 +98,7 @@ export default class ExperimentQueries {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
     let instrumentScientistUserId: number | undefined;

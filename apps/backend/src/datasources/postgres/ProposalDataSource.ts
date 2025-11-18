@@ -19,6 +19,7 @@ import { UserWithRole } from '../../models/User';
 import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
@@ -382,7 +383,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     principleInvestigator?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
@@ -459,7 +460,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
+          query.orderBy(sortField, sortDirection);
         }
 
         if (filter?.referenceNumbers) {
@@ -1067,7 +1068,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     /*

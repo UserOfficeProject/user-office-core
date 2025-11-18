@@ -12,6 +12,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @ObjectType()
@@ -43,8 +44,8 @@ export class UsersArgs {
   @Field({ nullable: true })
   public sortField?: string;
 
-  @Field({ nullable: true })
-  public sortDirection?: string;
+  @Field(() => PaginationSortDirection, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
 
   @Field({ nullable: true })
   public searchText?: string;

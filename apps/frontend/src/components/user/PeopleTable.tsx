@@ -31,6 +31,7 @@ import {
   Maybe,
   getSdk,
   BasicUserDetailsFragment,
+  PaginationSortDirection,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
@@ -210,6 +211,7 @@ const PeopleTable = ({
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
+  const sortDirection = searchParams.get('sortDirection');
   useEffect(() => {
     if (!data) {
       return;
@@ -369,7 +371,12 @@ const PeopleTable = ({
             subtractUsers: query.subtractUsers,
             userRole: query.userRole,
             sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             searchText: tableQuery.search,
           });
 
@@ -521,7 +528,11 @@ const PeopleTable = ({
           columns={setSortDirectionOnSortField(
             columns ? columns : localColumns,
             searchParams.get('sortField'),
-            searchParams.get('sortDirection')
+            sortDirection === PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : sortDirection === PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined
           )}
           onSelectionChange={handleColumnSelectionChange}
           data={fetchRemoteUsersData}

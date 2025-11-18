@@ -9,6 +9,7 @@ import {
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
@@ -43,7 +44,7 @@ export interface UserDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]

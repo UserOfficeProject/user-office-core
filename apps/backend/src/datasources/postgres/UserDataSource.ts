@@ -19,6 +19,7 @@ import {
   UpdateUserByOidcSubArgs,
 } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
 import database, { isUniqueConstraintError } from './database';
 import {
@@ -508,7 +509,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     userRole,
     subtractUsers,
     sortField = 'created_at',
-    sortDirection = 'desc',
+    sortDirection,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
@@ -542,7 +543,7 @@ export default class PostgresUserDataSource implements UserDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
+          query.orderBy(sortField, sortDirection);
         }
       })
       .then(
@@ -564,7 +565,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
@@ -603,16 +604,12 @@ export default class PostgresUserDataSource implements UserDataSource {
               .orWhereILikeEscaped('lastname', '%?%', searchText);
           });
         }
-        logger.logInfo(
-          `Sort field: ${sortField}, direction: ${sortDirection}`,
-          {}
-        );
         if (sortField && sortDirection) {
           if (!fieldMap.hasOwnProperty(sortField)) {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
+          query.orderBy(sortField, sortDirection);
         }
 
         if (first) {
@@ -705,7 +702,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('pu')
       .whereIn('pu.proposal_pk', proposals)
       .groupBy('pu.user_id')
-      .orderByRaw('count(pu.user_id) DESC')
+      .orderBy('pu.user_id', 'desc')
       .limit(10)
       .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }

@@ -16,6 +16,7 @@ import {
 } from '../models/User';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { verifyToken } from '../utils/jwt';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class UserQueries {
@@ -143,7 +144,7 @@ export default class UserQueries {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]

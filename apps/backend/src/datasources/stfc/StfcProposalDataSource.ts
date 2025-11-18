@@ -9,6 +9,7 @@ import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
 import database from '../postgres/database';
@@ -224,7 +225,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     const stfcUserIds: number[] = searchText
@@ -279,7 +280,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return postgresProposalDataSource.getTechniqueScientistProposals(

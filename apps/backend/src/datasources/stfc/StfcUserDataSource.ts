@@ -15,6 +15,7 @@ import {
 } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
+import { PaginationSortDirection } from '../../utils/pagination';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import { createUOWSClient } from './UOWSClient';
@@ -588,7 +589,7 @@ export class StfcUserDataSource implements UserDataSource {
         offset: offset,
         userRole: undefined,
         subtractUsers: subtractUsers,
-        sortDirection: 'asc',
+        sortDirection: PaginationSortDirection.asc,
       });
 
       if (users[0]) {
@@ -613,7 +614,7 @@ export class StfcUserDataSource implements UserDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]

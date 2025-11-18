@@ -14,6 +14,7 @@ import {
   UpdateUserByOidcSubArgs,
 } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -445,7 +446,7 @@ export class UserDataSourceMock implements UserDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]

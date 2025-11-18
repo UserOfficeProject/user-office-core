@@ -17,6 +17,7 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { UserContext } from 'context/UserContextProvider';
 import {
+  PaginationSortDirection,
   ReviewerFilter,
   ReviewStatus,
   UserRole,
@@ -176,7 +177,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const sortedColumns = setSortDirectionOnSortField(
     columns(t),
     sortField,
-    sortDirection
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
   );
 
   /**

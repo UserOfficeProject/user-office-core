@@ -6,6 +6,7 @@ import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../resolvers/types/User';
+import { PaginationSortDirection } from '../utils/pagination';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -15,7 +16,7 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }>;
   // Read
@@ -89,7 +90,7 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
 }
