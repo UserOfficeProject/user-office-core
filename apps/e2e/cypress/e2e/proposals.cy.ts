@@ -173,9 +173,16 @@ context('Proposal tests', () => {
       cy.visit('/');
       cy.get('[data-testid="PeopleIcon"]').click();
       cy.get('[data-cy="add-participant-button"]').click();
-      cy.get('#Email-input').type(initialDBData.users.user3.email);
-      cy.get('[data-cy="findUser"]').click();
-      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user3.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user3.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
       cy.get('[data-cy="save-data-access-users-modal"]').click();
       cy.logout();
       cy.login('user3', initialDBData.roles.user);
@@ -233,14 +240,19 @@ context('Proposal tests', () => {
       cy.get('[data-cy=edit-proposer-button]').click();
 
       cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[data-cy="invite-user-autocomplete"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .find('.MuiAutocomplete-clearIndicator')
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user2.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user2.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
