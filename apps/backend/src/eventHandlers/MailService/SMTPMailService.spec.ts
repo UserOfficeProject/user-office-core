@@ -21,7 +21,7 @@ test('Return result should indicate all emails were successfully sent', async ()
 
   const options: EmailSettings = {
     content: {
-      template_id: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
+      template: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
     },
     substitution_data: {
       piPreferredname: 'John',
@@ -75,7 +75,7 @@ test('All emails with bcc were successfully sent', async () => {
 
   const options: EmailSettings = {
     content: {
-      template_id: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
+      template: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
     },
     substitution_data: substitutionData,
     recipients: [
