@@ -96,11 +96,6 @@ const instrumentDataSource = container.resolve(
   Tokens.InstrumentDataSource
 ) as InstrumentDataSource;
 
-const mockRemoveScientistFromInstruments = jest.spyOn(
-  instrumentDataSource,
-  'removeScientistFromInstruments'
-);
-
 const mockAssignScientistToInstruments = jest.spyOn(
   instrumentDataSource,
   'assignScientistToInstruments'
@@ -132,7 +127,6 @@ beforeAll(() => {
 
 beforeEach(() => {
   mockAssignScientistToInstruments.mockClear();
-  mockRemoveScientistFromInstruments.mockClear();
   mockGetRequiredInstrumentForRole.mockClear();
 });
 
@@ -230,108 +224,23 @@ test('When a user requests multiple instruments, only new existing ones are adde
   expect(result).toEqual([lsfInstrument.id]);
 });
 
-// getInstrumentsToRemove
-test('When a user has an instrument they have not requested, the instrument is removed', async () => {
-  const requiredInstruments: string[] = [];
-  const currentInstruments = [isisInstrument];
-
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([isisInstrument.id]);
-});
-
-test('When a user has an instrument they have requested, no instrument is removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments = [isisInstrument];
-
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([]);
-});
-
-test('When a user does not have an instrument they requested, no instrument is removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments: Instrument[] = [];
-
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([]);
-});
-
-test('When a user requests a nonexisting instrument, all other instruments are removed', async () => {
-  const requiredInstruments = [nonExistingInstrumentName];
-  const currentInstruments = [isisInstrument, lsfInstrument];
-
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([isisInstrument.id, lsfInstrument.id]);
-});
-
-test('When a user requests multiple instrument, only non requested ones are removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments: Instrument[] = [isisInstrument, lsfInstrument];
-
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([lsfInstrument.id]);
-});
-
 //autoAssignRemoveInstruments
-test('When a user requires an instrument but does not have it, the instrument is assigned and no instrument are removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
-    0,
-    [isisInstrument.name],
-    [],
-    true
-  );
+test('When a user requires an instrument but does not have it, the instrument is assigned', async () => {
+  await userAuthorization.autoAssignInstruments(0, [isisInstrument.name], []);
 
   expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
     isisInstrument.id,
   ]);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledTimes(0);
 });
 
-test('When a user does not require an instrument but has it, no instrument is assigned and the instrument is removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
-    0,
-    [],
-    [isisInstrument],
-    true
-  );
-
-  expect(mockAssignScientistToInstruments).toHaveBeenCalledTimes(0);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
-    isisInstrument.id,
-  ]);
-});
-
-test('When a user requires an instrument but has a different one, the requested instrument is assigned and the current instrument is removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
+test('When a user requires an instrument but has a different one, the requested instrument is assigned and the current instrument stays the same', async () => {
+  await userAuthorization.autoAssignInstruments(
     0,
     [isisInstrument.name],
-    [lsfInstrument],
-    true
+    [lsfInstrument]
   );
 
   expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
     isisInstrument.id,
-  ]);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
-    lsfInstrument.id,
   ]);
 });

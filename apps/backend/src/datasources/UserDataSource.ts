@@ -99,4 +99,11 @@ export interface UserDataSource {
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
+  getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  >;
 }
