@@ -1,0 +1,6 @@
+query getReviewerCalls {
+  callsOfReviewer {
+    id
+    shortCode
+  }
+}

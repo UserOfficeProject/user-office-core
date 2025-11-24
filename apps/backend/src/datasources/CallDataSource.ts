@@ -34,4 +34,5 @@ export interface CallDataSource {
   getCallByAnswerIdProposal(answerId: number): Promise<Call>;
   getProposalWorkflowByCall(callId: number): Promise<Workflow | null>;
   getExperimentWorkflowByCall(callId: number): Promise<Workflow | null>;
+  getCallsOfFaps(fapIds: number[]): Promise<Call[]>;
 }
