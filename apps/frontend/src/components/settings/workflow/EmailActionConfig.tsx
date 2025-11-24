@@ -15,15 +15,15 @@ import * as Yup from 'yup';
 
 import {
   EmailActionConfig as EmailActionConfigType,
+  EmailStatusActionEmailTemplate,
   EmailStatusActionRecipient,
   EmailStatusActionRecipients,
-  EmailTemplate,
 } from 'generated/sdk';
 
 type EmailActionConfigProps = {
   emailStatusActionConfig: EmailActionConfigType;
   recipients: EmailStatusActionRecipient[];
-  emailTemplates: EmailTemplate[];
+  emailTemplates: EmailStatusActionEmailTemplate[];
   isRecipientRequired?: boolean;
   isEmailTemplateRequired?: boolean;
 };
@@ -177,9 +177,9 @@ const EmailActionConfig = ({
       return (
         emailTemplates.find(
           (template) =>
-            template.id ===
+            template.name ===
             recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
-              ?.emailTemplate?.id
+              ?.emailTemplate?.name
         ) || null
       );
     } else {
@@ -254,7 +254,7 @@ const EmailActionConfig = ({
                         options={emailTemplates || []}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) =>
-                          option.id === value.id
+                          option.name === value.name
                         }
                         renderInput={(params) => (
                           <TextField

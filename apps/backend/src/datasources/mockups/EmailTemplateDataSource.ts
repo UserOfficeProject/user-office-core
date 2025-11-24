@@ -1,3 +1,4 @@
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
@@ -28,6 +29,70 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.PROPOSAL_CREATED,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.ACCEPTED_PROPOSAL,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.REJECTED_PROPOSAL,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.RESERVED_PROPOSAL,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.REVIEW_REMINDER,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.INTERNAL_REVIEW_CREATED,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.INTERNAL_REVIEW_DELETED,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+      new EmailTemplate(
+        1,
+        2,
+        EmailTemplateId.INTERNAL_REVIEW_UPDATED,
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
     ];
   }
 
@@ -41,11 +106,13 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
   }
 
   async getEmailTemplate(id: number): Promise<EmailTemplate> {
-    return dummyEmailTemplate;
+    return this.emailTemplates.find((e) => e.id == id) || dummyEmailTemplate;
   }
 
   async getEmailTemplateByName(name: string): Promise<EmailTemplate> {
-    return dummyEmailTemplate;
+    return (
+      this.emailTemplates.find((e) => e.name == name) || dummyEmailTemplate
+    );
   }
 
   async create(

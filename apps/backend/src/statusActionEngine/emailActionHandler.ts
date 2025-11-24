@@ -91,7 +91,7 @@ export const emailStatusActionRecipient = async (
   loggedInUserId?: number | null
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
-  const templateMessageId = recipientWithTemplate.emailTemplate.id;
+  const emailTemplateName = recipientWithTemplate.emailTemplate.name;
   const successfulMessage = !!statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
@@ -116,7 +116,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -141,7 +141,7 @@ export const emailStatusActionRecipient = async (
           }),
           successfulMessage,
           failMessage,
-          templateMessageId,
+          emailTemplateName,
           loggedInUserId
         ));
 
@@ -165,7 +165,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -189,7 +189,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -214,7 +214,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -252,7 +252,6 @@ export const emailStatusActionRecipient = async (
             email: userOfficeEmail,
             proposals: proposals,
             template: recipientWithTemplate.emailTemplate.name,
-            templateId: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -291,7 +290,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -316,7 +315,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -352,7 +351,6 @@ export const emailStatusActionRecipient = async (
             email: experimentSafetyEmail,
             proposals: proposals,
             template: recipientWithTemplate.emailTemplate.name,
-            templateId: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -376,7 +374,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        templateMessageId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -409,7 +407,7 @@ export const emailStatusActionRecipient = async (
           }),
           successfulMessage,
           failMessage,
-          templateMessageId,
+          emailTemplateName,
           loggedInUserId
         );
       }
@@ -429,7 +427,7 @@ const sendMail = async (
   ) => Promise<void>,
   successfulMessage: string,
   failMessage: string,
-  templateMessageId: number,
+  emailTemplateName: string,
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -452,17 +450,17 @@ const sendMail = async (
   }
 
   const emailTemplate =
-    await emailTemplateDataSource.getEmailTemplate(templateMessageId);
+    await emailTemplateDataSource.getEmailTemplateByName(emailTemplateName);
 
   if (!emailTemplate) {
     logger.logInfo(
-      `Could not send email(s) because the email template with id ${templateMessageId} does not exist.`,
+      `Could not send email(s) because the email template with id ${emailTemplateName} does not exist.`,
       { recipientsWithData }
     );
   }
 
   logger.logInfo(
-    `Preparing to send email(s) using template: ${emailTemplate?.name} (${templateMessageId}) to ${recipientsWithData.length} recipient(s).`,
+    `Preparing to send email(s) using template: ${emailTemplate?.name} (${emailTemplateName}) to ${recipientsWithData.length} recipient(s).`,
     { recipientsWithData }
   );
 

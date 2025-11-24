@@ -238,7 +238,7 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id:
+          template:
             EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
         },
       })
@@ -310,7 +310,7 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id:
+          template:
             EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
         },
       })

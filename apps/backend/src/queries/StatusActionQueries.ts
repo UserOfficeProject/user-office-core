@@ -63,11 +63,14 @@ export default class StatusActionQueries {
         }));
 
         const emailTemplatesResult =
-          await this.emailTemplateDataSource.getEmailTemplates();
+          await this.emailService.getEmailTemplates();
 
         return new EmailActionDefaultConfig(
           allEmailRecipients,
-          emailTemplatesResult.emailTemplates
+          emailTemplatesResult.results.map((e) => ({
+            id: e.name,
+            name: e.name,
+          }))
         );
 
       case StatusActionType.RABBITMQ:

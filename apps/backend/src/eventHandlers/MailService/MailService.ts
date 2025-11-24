@@ -28,7 +28,7 @@ export type STFCEmailTemplate = {
 };
 
 export type ELIEmailTemplate = {
-  id: string;
+  id: number;
   name: string;
 };
 

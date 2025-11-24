@@ -6,8 +6,8 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import {
-  ProposalDataSourceMock,
   dummyProposal,
+  ProposalDataSourceMock,
 } from '../../datasources/mockups/ProposalDataSource';
 import {
   basicDummyUser,
@@ -84,7 +84,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+        template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
       },
       substitution_data: {
         piPreferredname: expect.any(String),
@@ -135,7 +135,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id:
+        template:
           EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
       },
       substitution_data: {
@@ -330,7 +330,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
       expect(sendMailsSpy).toHaveBeenCalledTimes(1);
       const arg = sendMailsSpy.mock.calls[0][0];
-      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
+      expect(arg.content.template).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
 
       // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
       expect(arg.recipients).toEqual([

@@ -16,16 +16,21 @@ import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSour
 import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
-import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
+import { ELIEmailTemplate, MailService, SendMailResults } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
   private emailTemplate: EmailTemplates<any>;
+  private emailTemplateDataSource: EmailTemplateDataSource;
 
   constructor() {
     super();
 
     logger.logInfo('Initializing SMTPMailService', {});
+
+    this.emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+      Tokens.EmailTemplateDataSource
+    );
 
     const attachments = [];
 
@@ -107,19 +112,16 @@ export class SMTPMailService extends MailService {
     body: string;
   } | null> {
     if (process.env.NODE_ENV === 'test') {
-      return { subject: '= `test subject`', body: 'test body' };
+      return { subject: '= ``', body: '' };
     }
 
     let templateBody = '';
     let templateSubject = '';
 
-    const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
-      Tokens.EmailTemplateDataSource
-    );
-
-    const emailTemplate = await emailTemplateDataSource.getEmailTemplateByName(
-      options.content.template
-    );
+    const emailTemplate =
+      await this.emailTemplateDataSource.getEmailTemplateByName(
+        options.content.template
+      );
 
     if (emailTemplate) {
       templateBody = emailTemplate.body;
@@ -252,9 +254,15 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async getEmailTemplates(): ResultsPromise<STFCEmailTemplate[]> {
+  async getEmailTemplates(): ResultsPromise<ELIEmailTemplate[]> {
+    const emailTemplates =
+      await this.emailTemplateDataSource.getEmailTemplates();
+
     return {
-      results: [],
+      results: emailTemplates.emailTemplates.map((template) => ({
+        id: template.id,
+        name: template.name || '',
+      })),
     };
   }
 }

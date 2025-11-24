@@ -62,8 +62,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.PROPOSAL_CREATED,
+            template: EmailTemplateId.PROPOSAL_CREATED,
           },
         })
       );
@@ -92,8 +91,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.ACCEPTED_PROPOSAL,
+            template: EmailTemplateId.ACCEPTED_PROPOSAL,
           },
         })
       );
@@ -122,8 +120,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.REJECTED_PROPOSAL,
+            template: EmailTemplateId.REJECTED_PROPOSAL,
           },
         })
       );
@@ -152,8 +149,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.RESERVED_PROPOSAL,
+            template: EmailTemplateId.RESERVED_PROPOSAL,
           },
         })
       );
@@ -178,8 +174,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.REVIEW_REMINDER,
+            template: EmailTemplateId.REVIEW_REMINDER,
           },
         })
       );
@@ -212,8 +207,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.INTERNAL_REVIEW_CREATED,
+            template: EmailTemplateId.INTERNAL_REVIEW_CREATED,
           },
         })
       );
@@ -246,8 +240,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.INTERNAL_REVIEW_UPDATED,
+            template: EmailTemplateId.INTERNAL_REVIEW_UPDATED,
           },
         })
       );
@@ -280,8 +273,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            db_template_id: 1,
-            template_id: EmailTemplateId.INTERNAL_REVIEW_DELETED,
+            template: EmailTemplateId.INTERNAL_REVIEW_DELETED,
           },
         })
       );
