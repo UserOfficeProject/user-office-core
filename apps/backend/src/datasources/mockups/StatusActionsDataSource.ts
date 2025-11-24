@@ -48,7 +48,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
   }
 
   async hasEmailTemplateIdConnectionStatusAction(
-    emailTemplateId: number
+    emailTemplateName: string
   ): Promise<boolean> {
     return false;
   }

@@ -75,9 +75,16 @@ export default class EmailTemplateMutations {
     agent: UserWithRole | null,
     { emailTemplateId }: { emailTemplateId: number }
   ): Promise<EmailTemplate | Rejection> {
+    const emailTemplate =
+      await this.dataSource.getEmailTemplate(emailTemplateId);
+
+    if (!emailTemplate) {
+      return rejection('Email template not found', { emailTemplateId });
+    }
+
     const has =
       await this.statusActionsDataSource.hasEmailTemplateIdConnectionStatusAction(
-        emailTemplateId
+        emailTemplate.name
       );
 
     if (has) {
@@ -85,13 +92,6 @@ export default class EmailTemplateMutations {
         'Could not delete email template (used in status actions)',
         { emailTemplateId }
       );
-    }
-
-    const emailTemplate =
-      await this.dataSource.getEmailTemplate(emailTemplateId);
-
-    if (!emailTemplate) {
-      return rejection('Email template not found', { emailTemplateId });
     }
 
     try {
