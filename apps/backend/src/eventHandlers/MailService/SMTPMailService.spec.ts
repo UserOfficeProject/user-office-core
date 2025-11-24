@@ -93,6 +93,7 @@ test('All emails with bcc were successfully sent', async () => {
     message: {
       to: process.env.SINK_EMAIL,
       bcc: bccEmail,
+      subject: '= ``',
     },
     locals: substitutionData,
   });
