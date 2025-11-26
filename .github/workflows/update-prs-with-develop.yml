@@ -1,4 +1,4 @@
-name: Rebase PRs with develop
+name: Update PRs with develop
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Rebase all open non-Dependabots PRs with develop branch as base
+      - name: Merge develop into all open non-Dependabot PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -32,14 +32,14 @@ jobs:
             gh pr checkout $pr
             git fetch origin develop
 
-            # Attempt rebase
-            if git rebase origin/develop; then
-              echo "PR #$pr rebased successfully. Pushing changes..."
-              git push --force-with-lease
+            # Attempt merge
+            if git merge --no-edit origin/develop; then
+              echo "PR #$pr merged successfully. Pushing changes..."
+              git push
             else
-              echo "Conflict in PR #$pr. Rebase aborted."
-              git rebase --abort
+              echo "Conflict in PR #$pr. Merge aborted."
+              git merge --abort
               # Optional: Notify author
-              gh pr comment $pr --body "⚠️ Automatic rebase failed due to conflicts. Please rebase manually."
+              gh pr comment $pr --body "⚠️ Automatic merge of \`develop\` into this PR failed due to conflicts. Please resolve the conflicts and update your branch."
             fi
           done
