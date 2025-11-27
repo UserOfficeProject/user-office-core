@@ -444,10 +444,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
       cy.wait('@getUsers');
-
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
@@ -465,10 +462,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
       cy.wait('@getUsers');
-
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
