@@ -7,6 +7,8 @@ on:
 
 jobs:
   sync-prs:
+    # Disabled until we can push with a PAT that has workflow scope; otherwise CI stays in "Waiting".
+    if: ${{ false }}
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +23,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Merge develop into all open non-Dependabot PRs
+        # TODO: Re-enable once we replace the default GITHUB_TOKEN with a PAT that has repo+workflow scopes
+        # so that downstream PR checks trigger automatically after the bot pushes merge commits.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
