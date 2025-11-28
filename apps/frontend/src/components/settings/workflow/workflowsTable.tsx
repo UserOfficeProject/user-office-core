@@ -63,7 +63,7 @@ const WorkflowsTable = ({
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

@@ -95,7 +95,7 @@ class App extends React.Component {
         errorInfo: errorInfo.componentStack?.toString(),
         user: this.state.errorUserInformation,
       });
-    } catch (e) {
+    } catch {
       errorMessage = 'Exception while preparing error message';
     } finally {
       getUnauthorizedApi().addClientLog({ error: errorMessage });

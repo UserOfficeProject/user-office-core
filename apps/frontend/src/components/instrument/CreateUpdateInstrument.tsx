@@ -96,7 +96,7 @@ const CreateUpdateInstrument = ({
             setUsersData(data.users?.users || []);
           }
         });
-    } catch (error) {
+    } catch {
       close(null);
     }
   };
@@ -176,7 +176,7 @@ const CreateUpdateInstrument = ({
               });
 
               close(updateInstrument);
-            } catch (error) {
+            } catch {
               close(null);
             }
           },
@@ -203,7 +203,7 @@ const CreateUpdateInstrument = ({
           });
 
           close(updateInstrument);
-        } catch (error) {
+        } catch {
           close(null);
         }
       }
@@ -218,7 +218,7 @@ const CreateUpdateInstrument = ({
         }).createInstrument(values);
 
         close(createInstrument);
-      } catch (error) {
+      } catch {
         close(null);
       }
     }

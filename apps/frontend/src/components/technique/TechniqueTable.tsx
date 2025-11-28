@@ -73,7 +73,7 @@ const TechniqueTable = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -81,7 +81,6 @@ const TechniqueTable = () => {
   const AssignmentInstrumentIcon = (): JSX.Element => <ScienceIcon />;
   const AssignmentScientistIcon = (): JSX.Element => <AssignmentInd />;
 
-   
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
     setSelectedTechnique(technique);
     setOpenTechniqueAssignment(true);

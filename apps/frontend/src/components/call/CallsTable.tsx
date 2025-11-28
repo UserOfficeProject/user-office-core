@@ -251,7 +251,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       setCalls(newObjectsArray);
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

@@ -125,7 +125,7 @@ const AssignInstrumentsToCall = ({
       });
 
       assignInstrumentsToCall(response.assignInstrumentsToCall.instruments);
-    } catch (error) {
+    } catch {
       return;
     }
   };

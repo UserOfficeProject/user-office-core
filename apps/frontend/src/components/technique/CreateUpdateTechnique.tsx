@@ -48,7 +48,7 @@ const CreateUpdateTechnique = ({
             });
 
             close(updateTechnique);
-          } catch (error) {
+          } catch {
             close(null);
           }
         } else {
@@ -58,7 +58,7 @@ const CreateUpdateTechnique = ({
             }).createTechnique(values);
 
             close(createTechnique);
-          } catch (error) {
+          } catch {
             close(null);
           }
         }

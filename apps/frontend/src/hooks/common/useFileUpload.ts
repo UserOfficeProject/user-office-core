@@ -63,7 +63,7 @@ export function useFileUpload() {
           } else {
             setState(UPLOAD_STATE.ERROR);
           }
-        } catch (e) {
+        } catch {
           setState(UPLOAD_STATE.ERROR);
         }
       },
