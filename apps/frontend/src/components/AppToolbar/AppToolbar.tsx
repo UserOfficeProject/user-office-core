@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box } from '@mui/material';
 import AppBar from '@mui/material/AppBar';

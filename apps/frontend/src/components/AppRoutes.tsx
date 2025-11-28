@@ -1,7 +1,8 @@
-import i18n from 'i18n';
 import React, { lazy, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';

@@ -24,12 +24,13 @@ import {
   ResourceId,
   getTranslation,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';

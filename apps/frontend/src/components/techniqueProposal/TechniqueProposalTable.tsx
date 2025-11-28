@@ -18,10 +18,11 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {

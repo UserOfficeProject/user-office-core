@@ -5,9 +5,10 @@ import {
   updateTechniqueValidationSchema,
 } from '@user-office-software/duo-validation/lib/Technique';
 import { Field, Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';

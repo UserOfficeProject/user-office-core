@@ -8,8 +8,7 @@ import {
   GetUserQuery,
   GetUserQueryVariables,
   ReviewerFilter,
-} from 'generated/sdk';
-import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
+ UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUserData({

@@ -4,7 +4,7 @@ const grapqlImportUrl = process.env.GRAPHQL_IMPORT_URL;
 const exportToken = process.env.EXPORT_TOKEN;
 const importToken = process.env.IMPORT_TOKEN;
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const axiosDev = require('axios').create({
   headers: {
     common: {
@@ -12,7 +12,6 @@ const axiosDev = require('axios').create({
     },
   },
 });
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const axiosProd = require('axios').create({
   headers: {
     common: {

@@ -1,10 +1,11 @@
 import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete, Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
