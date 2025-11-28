@@ -23,7 +23,6 @@ export default defineConfig([
     ],
   },
   // Base configs
-  // js.configs.recommended,
   eslint.configs.recommended,
   tseslint.configs.recommended,
   react.configs.flat.recommended,
@@ -127,6 +126,7 @@ export default defineConfig([
       'no-extra-boolean-cast': 'off',
       'no-case-declarations': 'off',
       'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/static-components': 'off',
     },
   }]
 );
