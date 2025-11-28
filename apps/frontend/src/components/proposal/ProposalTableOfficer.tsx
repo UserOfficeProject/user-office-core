@@ -653,7 +653,7 @@ const ProposalTableOfficer = ({
   ];
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
-    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+    new Promise<QueryResult<ProposalViewData>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
         const {
@@ -665,62 +665,69 @@ const ProposalTableOfficer = ({
           questionFilter,
           referenceNumbers,
         } = proposalFilter;
-        const { proposalsView } = await api().getProposalsCore({
-          filter: {
-            callId: callId,
-            instrumentFilter: instrumentFilter,
-            proposalStatusId: proposalStatusId,
-            questionaryIds: questionaryIds,
-            referenceNumbers: referenceNumbers,
-            questionFilter: questionFilter && {
-              ...questionFilter,
-              value:
-                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
-            }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
-            text: text,
-          },
-          sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-          searchText: tableQuery.search,
-        });
+        api()
+          .getProposalsCore({
+            filter: {
+              callId: callId,
+              instrumentFilter: instrumentFilter,
+              proposalStatusId: proposalStatusId,
+              questionaryIds: questionaryIds,
+              referenceNumbers: referenceNumbers,
+              questionFilter: questionFilter && {
+                ...questionFilter,
+                value:
+                  JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+              }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+              text: text,
+            },
+            sortField: orderBy?.orderByField,
+            sortDirection: orderBy?.orderDirection,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            searchText: tableQuery.search,
+          })
+          .then(({ proposalsView }) => {
+            const tableData =
+              proposalsView?.proposalViews.map((proposal) => {
+                const selection = new Set(searchParams.getAll('selection'));
+                const proposalData = {
+                  ...proposal,
+                  status: proposal.submitted ? 'Submitted' : 'Open',
+                  technicalReviews: proposal.technicalReviews?.map(
+                    (technicalReview) => ({
+                      ...technicalReview,
+                      status: getTranslation(
+                        technicalReview.status as ResourceId
+                      ),
+                    })
+                  ),
+                  finalStatus: getTranslation(
+                    proposal.finalStatus as ResourceId
+                  ),
+                } as ProposalViewData;
 
-        const tableData =
-          proposalsView?.proposalViews.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
-            const proposalData = {
-              ...proposal,
-              status: proposal.submitted ? 'Submitted' : 'Open',
-              technicalReviews: proposal.technicalReviews?.map(
-                (technicalReview) => ({
-                  ...technicalReview,
-                  status: getTranslation(technicalReview.status as ResourceId),
-                })
-              ),
-              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-            } as ProposalViewData;
+                if (searchParams.getAll('selection').length > 0) {
+                  return {
+                    ...proposalData,
+                    tableData: {
+                      checked: selection.has(proposal.primaryKey.toString()),
+                    },
+                  };
+                } else {
+                  return proposalData;
+                }
+              }) || [];
 
-            if (searchParams.getAll('selection').length > 0) {
-              return {
-                ...proposalData,
-                tableData: {
-                  checked: selection.has(proposal.primaryKey.toString()),
-                },
-              };
-            } else {
-              return proposalData;
-            }
-          }) || [];
+            setTableData(tableData);
+            setTotalCount(proposalsView?.totalCount || 0);
 
-        setTableData(tableData);
-        setTotalCount(proposalsView?.totalCount || 0);
-
-        resolve({
-          data: tableData,
-          page: tableQuery.page,
-          totalCount: proposalsView?.totalCount || 0,
-        });
+            resolve({
+              data: tableData,
+              page: tableQuery.page,
+              totalCount: proposalsView?.totalCount || 0,
+            });
+          })
+          .catch((error) => reject(error));
       } catch (error) {
         reject(error);
       }

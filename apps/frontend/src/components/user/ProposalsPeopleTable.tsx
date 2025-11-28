@@ -277,38 +277,43 @@ const ProposalsPeopleTable = ({
           };
         }
       >
-    >(async (resolve, reject) => {
+    >((resolve, reject) => {
       try {
         const userId = getCurrentUser()?.user.id as number;
 
-        const { previousCollaborators } = await api().getPreviousCollaborators({
-          userId: userId,
-          filter: tableQuery.search,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-          subtractUsers: query.subtractUsers,
-          userRole: query.userRole,
-        });
+        api()
+          .getPreviousCollaborators({
+            userId: userId,
+            filter: tableQuery.search,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            subtractUsers: query.subtractUsers,
+            userRole: query.userRole,
+          })
+          .then(({ previousCollaborators }) => {
+            const usersTableData = getUsersTableData(
+              previousCollaborators?.users || [],
+              selectedParticipants || [],
+              invitedUsers,
+              tableQuery
+            );
 
-        const usersTableData = getUsersTableData(
-          previousCollaborators?.users || [],
-          selectedParticipants || [],
-          invitedUsers,
-          tableQuery
-        );
+            const currentPage = [
+              ...invitedUsers,
+              ...usersTableData.users,
+            ].slice(tableQuery.page, tableQuery.page + tableQuery.pageSize);
 
-        const currentPage = [...invitedUsers, ...usersTableData.users].slice(
-          tableQuery.page,
-          tableQuery.page + tableQuery.pageSize
-        );
+            setCurrentPageIds(currentPage.map(({ id }) => id));
 
-        setCurrentPageIds(currentPage.map(({ id }) => id));
-
-        resolve({
-          data: usersTableData.users,
-          page: tableQuery.page,
-          totalCount: usersTableData.totalCount,
-        });
+            resolve({
+              data: usersTableData.users,
+              page: tableQuery.page,
+              totalCount: usersTableData.totalCount,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }
