@@ -61,6 +61,7 @@ import { configureELIDevelopmentEnvironment } from './eli/configureELIEnvironmen
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -147,3 +148,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
+mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);

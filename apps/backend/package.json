@@ -33,6 +33,7 @@
   "dependencies": {
     "@apollo/server": "^4.10.0",
     "@apollo/subgraph": "^2.7.1",
+    "@casl/ability": "^6.7.3",
     "@graphql-tools/utils": "^10.1.0",
     "@isaacs/ttlcache": "^1.4.1",
     "@opentelemetry/exporter-trace-otlp-http": "^0.200.0",

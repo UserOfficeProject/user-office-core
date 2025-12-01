@@ -8,6 +8,7 @@
   },
   "private": true,
   "dependencies": {
+    "@casl/react": "^5.0.0",
     "@codemirror/lang-html": "^6.4.5",
     "@graphql-codegen/cli": "^4.0.0",
     "@graphql-codegen/typescript": "^4.0.0",

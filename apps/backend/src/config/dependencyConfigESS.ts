@@ -63,6 +63,7 @@ import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironmen
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -147,3 +148,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
+mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);

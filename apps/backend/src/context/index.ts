@@ -65,6 +65,7 @@ import UnitQueries from '../queries/UnitQueries';
 import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
 import WorkflowQueries from '../queries/WorkflowQueries';
+import AccessQueries from '../queries/AccessQueries';
 
 interface ResolverContextQueries {
   admin: AdminQueries;
@@ -100,6 +101,7 @@ interface ResolverContextQueries {
   statusAction: StatusActionQueries;
   tag: TagQueries;
   experiment: ExperimentQueries;
+  access: AccessQueries;
 }
 
 interface ResolverContextMutations {

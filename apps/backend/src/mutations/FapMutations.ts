@@ -49,6 +49,8 @@ import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
+import { AccessDataSource } from '../datasources/AccessDataSource';
+import { error } from 'console';
 
 @injectable()
 export default class FapMutations {
@@ -67,7 +69,9 @@ export default class FapMutations {
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.AccessDataSource)
+    private accessDataSource: AccessDataSource
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
@@ -102,24 +106,30 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: UpdateFapArgs
   ): Promise<Fap | Rejection> {
-    return this.dataSource
-      .update(
-        args.id,
-        args.code,
-        args.description,
-        args.numberRatingsRequired,
-        args.gradeGuide,
-        args.customGradeGuide,
-        args.active,
-        args.files
-      )
-      .catch((err) => {
+    try {
+      if(agent != null && !this.accessDataSource.canAccess(agent?.id, 'manage')) {
+        throw error('user does not have sufficient permissions');
+      }
+
+      return this.dataSource
+        .update(
+          args.id,
+          args.code,
+          args.description,
+          args.numberRatingsRequired,
+          args.gradeGuide,
+          args.customGradeGuide,
+          args.active,
+          args.files
+        )
+    }
+      catch(err) {
         return rejection(
           'Could not update facility access panel',
           { agent },
           err
         );
-      });
+      };
   }
 
   @ValidateArgs(assignFapChairOrSecretaryValidationSchema(UserRole))

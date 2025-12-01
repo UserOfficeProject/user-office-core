@@ -61,6 +61,7 @@ import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetReg
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -140,3 +141,4 @@ mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);

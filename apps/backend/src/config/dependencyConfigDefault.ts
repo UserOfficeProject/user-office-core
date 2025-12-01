@@ -65,6 +65,7 @@ import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetReg
 import { configureBaseEnvironment } from './base/configureBaseEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
 
 async function skipEmailHandler(event: ApplicationEvent) {
   logger.logInfo('Skip email sending', { event });
@@ -149,3 +150,4 @@ mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);
