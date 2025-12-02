@@ -31,7 +31,7 @@ import AnswerCountDetails from './AnswerCountDetails';
 import QuestionsTableFilter from './QuestionsTableFilter';
 import TemplateCountDetails from './TemplateCountDetails';
 
-let columns: Column<QuestionWithUsage>[] = [
+const columns: Column<QuestionWithUsage>[] = [
   { title: 'Question', field: 'question' },
   { title: 'Key', field: 'naturalKey' },
   { title: 'Category', field: 'categoryId' },
@@ -90,30 +90,35 @@ function QuestionsPage() {
   const { api } = useDataApiWithFeedback();
 
   const fetchQuestionsData = (tableQuery: Query<QuestionWithUsage>) =>
-    new Promise<QueryResult<QuestionWithUsage>>(async (resolve, reject) => {
+    new Promise<QueryResult<QuestionWithUsage>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
 
-        const results = await api().getAllQuestions({
-          filter,
-          searchText: tableQuery.search,
-          sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-        });
-
-        resolve({
-          data: results.allQuestions?.questions,
-          page: tableQuery.page,
-          totalCount: results.allQuestions?.totalCount || 0,
-        });
+        api()
+          .getAllQuestions({
+            filter,
+            searchText: tableQuery.search,
+            sortField: orderBy?.orderByField,
+            sortDirection: orderBy?.orderDirection,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+          })
+          .then((results) => {
+            resolve({
+              data: results.allQuestions?.questions,
+              page: tableQuery.page,
+              totalCount: results.allQuestions?.totalCount || 0,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }
     });
 
-  columns = setSortDirectionOnSortField(
+  const sortedColumns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
     searchParams.get('sortDirection')
@@ -132,21 +137,25 @@ function QuestionsPage() {
           <DialogContent>
             {selectedQuestion && (
               <>
-                {createQuestionForm({
-                  question: selectedQuestion,
-                  rolesData,
-                  onUpdated: () => {
-                    setIsEditQuestionModalOpen(false);
-                    tableRef.current && tableRef.current.onQueryChange({});
-                  },
-                  onDeleted: () => {
-                    setIsEditQuestionModalOpen(false);
-                    tableRef.current && tableRef.current.onQueryChange({});
-                  },
-                  closeMe: () => {
-                    setIsEditQuestionModalOpen(false);
-                  },
-                })}
+                {
+                  // refs should not be used in rendering but these are used in event handlers only but eslint cannot detect that
+                  // eslint-disable-next-line react-hooks/refs
+                  createQuestionForm({
+                    question: selectedQuestion,
+                    rolesData,
+                    onUpdated: () => {
+                      setIsEditQuestionModalOpen(false);
+                      tableRef.current && tableRef.current.onQueryChange({});
+                    },
+                    onDeleted: () => {
+                      setIsEditQuestionModalOpen(false);
+                      tableRef.current && tableRef.current.onQueryChange({});
+                    },
+                    closeMe: () => {
+                      setIsEditQuestionModalOpen(false);
+                    },
+                  })
+                }
               </>
             )}
           </DialogContent>
@@ -192,7 +201,7 @@ function QuestionsPage() {
                 },
               },
             ]}
-            columns={columns}
+            columns={sortedColumns}
             data={fetchQuestionsData}
             onSearchChange={(searchText) => {
               setSearchParam((searchParam) => {
