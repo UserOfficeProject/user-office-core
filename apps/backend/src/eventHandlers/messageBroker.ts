@@ -130,7 +130,6 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
-
   const dataAccessUsersWithInstitution =
     await dataAccessUsersDataSource.getDataAccessUsersWithInstitution(
       proposal.primaryKey
@@ -394,6 +393,19 @@ export async function createPostToRabbitMQHandler() {
           EXCHANGE_NAME,
           Event.PROPOSAL_UPDATED,
           proposalPayload
+        );
+        break;
+      }
+      case Event.DATA_ACCESS_USERS_UPDATED: {
+        const { proposalPKey } = event;
+
+        const proposal = await proposalDataSource.get(proposalPKey);
+
+        const jsonMessage = await getProposalMessageData(proposal!);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
+          jsonMessage
         );
         break;
       }
