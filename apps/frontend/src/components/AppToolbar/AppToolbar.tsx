@@ -32,7 +32,10 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   const [logo, setLogo] = useState('');
   const theme = useTheme();
 
-  if (location.pathname === '/') document.title = 'User Office Dashboard';
+  useEffect(() => {
+    if (location.pathname === '/') document.title = 'User Office Dashboard';
+  }, [location.pathname]);
+
   const logoFilename = settingsMap.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;

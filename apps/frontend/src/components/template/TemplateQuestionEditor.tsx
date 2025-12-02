@@ -54,7 +54,7 @@ export default function TemplateQuestionEditor(props: {
   });
 
   const dependencies = props.data.dependencies;
-  let dependencyComparator =
+  const dependencyComparator =
     props.data.dependenciesOperator === DependenciesLogicOperator.AND
       ? '&&'
       : '||';
@@ -63,7 +63,7 @@ export default function TemplateQuestionEditor(props: {
       <LockIcon sx={{ fontSize: '17px' }} />
       <ul data-cy="dependency-list">
         {dependencies.map((dependency, i) => {
-          dependencyComparator =
+          const finalDependencyComparator =
             i < dependencies.length - 1 ? dependencyComparator : '';
 
           const dependenciesAreVisible = !!dependency.dependencyNaturalKey;
@@ -93,7 +93,7 @@ export default function TemplateQuestionEditor(props: {
                 }}
               >
                 {`${dependency.dependencyNaturalKey} `}
-                <strong>{`${dependencyComparator}`}</strong>
+                <strong>{`${finalDependencyComparator}`}</strong>
               </li>
             )
           );

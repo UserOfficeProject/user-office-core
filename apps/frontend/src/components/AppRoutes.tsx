@@ -127,7 +127,7 @@ const PrivateOutlet = () => (
         const redirectPath = queryParams.size
           ? `${pathName}?${queryParams.toString()}`
           : pathName;
-        localStorage.redirectPath = redirectPath;
+        localStorage.setItem('redirectPath', redirectPath);
 
         return <Navigate to="/external-auth" />;
       }

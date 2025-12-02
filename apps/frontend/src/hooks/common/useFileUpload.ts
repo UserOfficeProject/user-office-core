@@ -28,9 +28,9 @@ export function useFileUpload() {
   const abort = () => {
     try {
       xhr.abort();
-    } catch {}
-
-    reset();
+    } finally {
+      reset();
+    }
   };
 
   const uploadFile = (
