@@ -15,6 +15,7 @@ import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
+import { Tag } from './Tag';
 import { Template } from './Template';
 import { Workflow } from './Workflow';
 
@@ -88,7 +89,10 @@ export class Call implements Partial<CallOrigin> {
   public esiTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
-  public pdfTemplateId?: number;
+  public proposalPdfTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public experimentSafetyPdfTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;
@@ -104,6 +108,12 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Boolean)
   public isActive: boolean;
+
+  @Field(() => Int)
+  public sort_order: number;
+
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId?: number;
 }
 
 @Resolver(() => Call)
@@ -121,9 +131,23 @@ export class CallInstrumentsResolver {
   }
 
   @FieldResolver(() => Workflow, { nullable: true })
-  async workflow(@Root() call: Call, @Ctx() context: ResolverContext) {
+  async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.workflow.dataSource.getWorkflow(
       call.proposalWorkflowId
+    );
+  }
+
+  @FieldResolver(() => Workflow, { nullable: true })
+  async experimentWorkflow(
+    @Root() call: Call,
+    @Ctx() context: ResolverContext
+  ) {
+    if (!call.experimentWorkflowId) {
+      return null;
+    }
+
+    return context.queries.workflow.dataSource.getWorkflow(
+      call.experimentWorkflowId
     );
   }
 
@@ -146,6 +170,11 @@ export class CallInstrumentsResolver {
     const endCallInternal = new Date(call.endCallInternal);
 
     return startCall <= now && endCallInternal >= now;
+  }
+
+  @FieldResolver(() => Tag)
+  async tags(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getCallsTags(call.id);
   }
 }
 

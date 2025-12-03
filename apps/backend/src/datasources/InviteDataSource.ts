@@ -1,11 +1,19 @@
 import { Invite } from '../models/Invite';
 
+export interface GetInvitesFilter {
+  createdBefore?: Date;
+  createdAfter?: Date;
+  isClaimed?: boolean;
+  isExpired?: boolean;
+}
+
 export interface InviteDataSource {
   create(args: {
     createdByUserId: number;
     code: string;
     email: string;
     expiresAt: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   findByCode(code: string): Promise<Invite | null>;
@@ -14,6 +22,11 @@ export interface InviteDataSource {
     proposalPk: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
+  findVisitRegistrationInvites(
+    visitId: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]>;
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;
@@ -24,6 +37,7 @@ export interface InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   delete(id: number): Promise<void>;

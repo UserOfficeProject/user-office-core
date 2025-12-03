@@ -3,30 +3,70 @@ import {
   Event as PROPOSAL_EVENTS,
   EmailStatusActionRecipients,
   StatusActionType,
+  AllocationTimeUnits,
+  FeatureUpdateAction,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
 
 import initialDBData from '../support/initialDBData';
+
+const currentDayStart = DateTime.now().startOf('day');
+
+const newCall = {
+  shortCode: faker.string.alphanumeric(15),
+  startCall: faker.date.past().toISOString(),
+  endCall: faker.date.future().toISOString(),
+  startReview: currentDayStart,
+  endReview: currentDayStart,
+  startFapReview: currentDayStart,
+  endFapReview: currentDayStart,
+  startNotify: currentDayStart,
+  endNotify: currentDayStart,
+  startCycle: currentDayStart,
+  endCycle: currentDayStart,
+  templateName: initialDBData.template.name,
+  templateId: initialDBData.template.id,
+  fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+  technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
+  allocationTimeUnit: AllocationTimeUnits.DAY,
+  cycleComment: faker.lorem.word(10),
+  surveyComment: faker.lorem.word(10),
+};
+
+let proposal1Id: string;
+let proposal2Id: string;
 
 context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.updateFeature({
+      action: FeatureUpdateAction.ENABLE,
+      featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
+    });
   });
+
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.get('[data-cy="status-events-and-actions-modal"]')
@@ -35,6 +75,7 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('[data-cy="PROPOSALDOWNLOAD-status-action"] input').click();
       cy.get('[data-cy="EMAIL-status-action"] input').click();
       cy.get('[data-cy="submit"]').contains('Add status actions').click();
 
@@ -75,13 +116,11 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Email action');
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
-
-      cy.get('[role="tooltip"]').contains('Status actions: Email action');
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Proposal download action');
     });
 
     it('User Officer should be able to update a status action added to the workflow connection', () => {
@@ -99,12 +138,15 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
+        cy.reload();
         cy.addConnectionStatusActions({
           actions: [
             {
@@ -124,15 +166,12 @@ context('Status actions tests', () => {
       cy.finishedLoading();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
-      cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
+        `[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]`
+      ).contains('Email action');
 
-      cy.get('[role="tooltip"]').contains('Status actions: Email action');
-
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -189,11 +228,13 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -202,6 +243,7 @@ context('Status actions tests', () => {
               actionType: StatusActionType.EMAIL,
               config: JSON.stringify(statusActionConfig),
             },
+            { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
           connectionId: result.addWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
@@ -213,7 +255,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -223,7 +267,13 @@ context('Status actions tests', () => {
 
       cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
 
+      cy.get('[data-cy="PROPOSALDOWNLOAD-status-action"] input')
+        .scrollIntoView()
+        .should('be.checked');
+
       cy.get('[data-cy="EMAIL-status-action"] input').uncheck();
+
+      cy.get('[data-cy="PROPOSALDOWNLOAD-status-action"] input').uncheck();
 
       cy.get('[data-cy="submit"]').contains('Add status actions').click();
 
@@ -232,7 +282,7 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
+        '[data-cy="edge-label-events-list-DRAFT-FEASIBILITY_REVIEW"]'
       ).should('not.exist');
     });
 
@@ -252,11 +302,13 @@ context('Status actions tests', () => {
       const validEmail = faker.internet.email();
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -276,7 +328,11 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(
+        'ul[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"] > li'
+      )
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -369,7 +425,9 @@ context('Status actions tests', () => {
 
       cy.closeModal();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -386,7 +444,7 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to add multiple actions per status', () => {
-      const statusActionConfig = {
+      const emailStatusActionConfig = {
         recipientsWithEmailTemplate: [
           {
             recipient: {
@@ -401,19 +459,22 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 150,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
             {
               actionId: 1,
               actionType: StatusActionType.EMAIL,
-              config: JSON.stringify(statusActionConfig),
+              config: JSON.stringify(emailStatusActionConfig),
             },
+            { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
           connectionId: result.addWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
@@ -425,7 +486,9 @@ context('Status actions tests', () => {
 
       cy.finishedLoading();
 
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -434,6 +497,10 @@ context('Status actions tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
+
+      cy.get('[data-cy="PROPOSALDOWNLOAD-status-action"] input')
+        .scrollIntoView()
+        .should('be.checked');
 
       cy.get('[data-cy="RABBITMQ-status-action"] input').should(
         'not.be.checked'
@@ -447,17 +514,18 @@ context('Status actions tests', () => {
       cy.closeModal();
 
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).should('exist');
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('Email action');
       cy.get(
-        `[data-cy^="connection_FEASIBILITY_REVIEW"] [data-testid="PendingActionsIcon"]`
-      ).realHover();
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('RabbitMQ action');
+      cy.get(
+        '[data-cy="edge-label-actions-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains('Proposal download action');
 
-      cy.get('[role="tooltip"]').contains(
-        'Status actions: Email action,RabbitMQ action'
-      );
-
-      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]`)
+        .should('exist')
+        .click({ force: true });
 
       cy.get('[data-cy="status-events-and-actions-modal"]')
         .contains('Status actions')
@@ -467,7 +535,13 @@ context('Status actions tests', () => {
 
       cy.get('[data-cy="EMAIL-status-action"] input').should('be.checked');
 
-      cy.get('[data-cy="RABBITMQ-status-action"] input').should('be.checked');
+      cy.get('[data-cy="PROPOSALDOWNLOAD-status-action"] input')
+        .scrollIntoView()
+        .should('be.checked');
+
+      cy.get('[data-cy="RABBITMQ-status-action"] input')
+        .scrollIntoView()
+        .should('be.checked');
     });
 
     it('User Officer should be able to see logs after status actions successful run', () => {
@@ -510,11 +584,13 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -528,6 +604,7 @@ context('Status actions tests', () => {
               actionType: StatusActionType.RABBITMQ,
               config: JSON.stringify(rabbitMQStatusActionConfig),
             },
+            { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
           connectionId: result.addWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
@@ -588,7 +665,7 @@ context('Status actions tests', () => {
         .invoke('text')
         .then((tableText) => {
           expect(tableText).to.contain(
-            `${statusActionEvent}Email successfully sent to: ${statusActionEmail}`
+            `${statusActionEvent}Email successfully sent`
           );
 
           expect(tableText).to.contain(
@@ -629,11 +706,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
       }).then((result) => {
         const connection = result.addWorkflowStatus;
         if (connection) {
@@ -653,49 +731,262 @@ context('Status actions tests', () => {
                 actionType: StatusActionType.RABBITMQ,
                 config: JSON.stringify(rabbitMQStatusActionConfig),
               },
+              { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
             ],
             connectionId: connection.id,
             workflowId: initialDBData.workflows.defaultWorkflow.id,
           });
         }
       });
-    });
 
-    it('User Officer should be able to view and replay status actions', () => {
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      }).then((result) => {
+        cy.createProposal({ callId: result.createCall.id }).then((result) => {
+          const proposal = result.createProposal;
+          if (proposal) {
+            cy.submitProposal({ proposalPk: proposal.primaryKey }).then(
+              (result) => {
+                proposal1Id = result.submitProposal.proposalId;
+              }
+            );
+          }
+        });
+      });
+
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(
+            (result) => {
+              proposal2Id = result.submitProposal.proposalId;
+            }
+          );
         }
       });
+
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000); // wait until status actions are executed
+    });
+
+    it('User Officer should be able to view and replay email status actions', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.contains('Status Actions Logs').click();
+      cy.navigateToStatusActionLogsSubmenu('Email');
 
       cy.get('[data-cy="replay_status_action_icon"]')
         .first()
         .click({ force: true });
 
+      cy.contains('duplicate emails').should('exist');
+
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Status action replay successfully send',
+        text: 'Status action replay successfully sent.',
       });
     });
-    it('User Officer should be able to view and filter status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
+
+    it('User Officer should be able to view and replay proposal download status actions', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+      cy.get('[data-cy="replay_status_action_icon"]')
+        .first()
+        .click({ force: true });
+
+      cy.contains('unexpected behaviour').should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Status action replay successfully sent.',
       });
+    });
+
+    it('User Officer should be able to replay all email status actions in a call', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Email');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]')
+        .should('exist')
+        .first()
+        .click({ force: true });
+
+      cy.contains(
+        `all failed status actions in call '${initialDBData.call.shortCode}'`
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
+    it('User Officer should be able to replay all proposal download status actions in a call', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]')
+        .should('exist')
+        .first()
+        .click({ force: true });
+
+      cy.contains(
+        `all failed status actions in call '${initialDBData.call.shortCode}'`
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
+    it('User Officer should be able to view and filter email status actions logs', () => {
+      const assertProposalPresentInTable = (proposalId: string) => {
+        return cy
+          .get('[data-cy="status-actions-logs-table"]')
+          .find('tbody td')
+          .contains(proposalId)
+          .parents('tr')
+          .should('contain', 'SUCCESSFUL');
+      };
+
+      const assertProposalAbsentInTable = (proposalId: string) => {
+        cy.get('[data-cy="status-actions-logs-table"]').should(
+          'not.contain',
+          proposalId
+        );
+      };
 
       cy.login('officer');
       cy.visit('/');
 
-      cy.contains('Status Actions Logs').click();
+      cy.navigateToStatusActionLogsSubmenu('Email');
+
+      cy.contains('Email Status Actions Logs').should('exist');
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Successful').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 4);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Failed').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .first()
+        .then((element) => {
+          expect(element.text()).to.be.equal('No records to display');
+        });
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 4);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 2);
+
+      assertProposalAbsentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(newCall.shortCode).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalAbsentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 4);
+    });
+
+    it('User Officer should be able to view and filter proposal download status actions logs', () => {
+      const assertProposalPresentInTable = (proposalId: string) => {
+        return cy
+          .get('[data-cy="status-actions-logs-table"]')
+          .find('tbody td')
+          .contains(proposalId)
+          .parents('tr')
+          .should('contain', 'SUCCESSFUL');
+      };
+
+      const assertProposalAbsentInTable = (proposalId: string) => {
+        cy.get('[data-cy="status-actions-logs-table"]').should(
+          'not.contain',
+          proposalId
+        );
+      };
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+      cy.contains('Proposal Download Status Actions Logs').should('exist');
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Successful').click();
@@ -706,6 +997,11 @@ context('Status actions tests', () => {
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.log('after');
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Failed').click();
@@ -728,15 +1024,24 @@ context('Status actions tests', () => {
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
 
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="status-actions-logs-table"]')
-        .find('tbody td')
-        .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 2);
+      assertProposalAbsentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(newCall.shortCode).click();
+
+      cy.finishedLoading();
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalAbsentInTable(String(proposal2Id));
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains('All').click();
@@ -747,6 +1052,9 @@ context('Status actions tests', () => {
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
     });
 
     it('User Officer should be able to access the proposal from the link in status actions logs', () => {
@@ -754,10 +1062,25 @@ context('Status actions tests', () => {
         const proposal = result.createProposal;
         if (proposal) {
           cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+
             cy.login('officer');
             cy.visit('/');
 
-            cy.contains('Status Actions Logs').click();
+            cy.finishedLoading();
+
+            cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+            cy.contains(proposal.proposalId).click();
+
+            cy.get('h1')
+              .should('contain.text', 'View proposal')
+              .should('contain.text', proposal.proposalId);
+
+            cy.visit('/');
+
+            cy.navigateToStatusActionLogsSubmenu('Email');
 
             cy.contains(proposal.proposalId).click();
 

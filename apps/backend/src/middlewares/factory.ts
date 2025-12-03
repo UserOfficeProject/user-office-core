@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
 import { Tokens } from '../config/Tokens';
-import { DownloadType } from '../factory/DownloadService';
+import { DownloadType } from '../factory/service';
 import { AuthJwtPayload, UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf/download';
 import pdfPreview from './factory/pdf/preview';
@@ -31,9 +31,7 @@ const getUserWithRoleFromExpressUser = async ({
     currentRole: currentRole || (roles ? roles[0] : null),
     externalToken: externalToken,
     externalTokenValid:
-      externalToken !== undefined
-        ? await userAuthorization.isExternalTokenValid(externalToken)
-        : false,
+      await userAuthorization.isExternalTokenValid(externalToken),
     isInternalUser: isInternalUser,
     impersonatingUserId: impersonatingUserId,
   } as UserWithRole;

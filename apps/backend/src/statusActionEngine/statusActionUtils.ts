@@ -23,7 +23,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 
 interface GroupedObjectType {
   [key: string]: WorkflowEngineProposalType[];
@@ -88,12 +88,9 @@ async function stepAnswers(
             Tokens.GenericTemplateDataSource
           );
         const genericTemplates =
-          await genericTemplateDataSource.getGenericTemplates(
-            {
-              filter: { proposalPk: answerProposalPk },
-            },
-            null
-          );
+          await genericTemplateDataSource.getGenericTemplates({
+            filter: { proposalPk: answerProposalPk },
+          });
         const subGenericTemplates = genericTemplates
           .filter(
             (genericTemplate) =>
@@ -465,6 +462,8 @@ export const getOtherAndFormatOutputForEmailSending = async (
       new Date(),
       true,
       otherEmail,
+      '',
+      '',
       ''
     );
 
@@ -537,7 +536,7 @@ export const publishMessageToTheEventBus = async (
 export const statusActionLogger = (args: {
   connectionId: number;
   actionId: number;
-  emailStatusActionRecipient: EmailStatusActionRecipients;
+  emailStatusActionRecipient?: EmailStatusActionRecipients;
   proposalPks: number[];
   statusActionsLogId?: number | null;
 }) => {
@@ -552,6 +551,7 @@ export const statusActionLogger = (args: {
   ) {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
+      emailStatusActionRecipient: args?.emailStatusActionRecipient,
       statusActionsLogId: args?.statusActionsLogId || null,
       statusActionsSuccessful,
       statusActionsMessage,

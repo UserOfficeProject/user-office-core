@@ -17,6 +17,7 @@ import {
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
+import { Institution } from '../models/Institution';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -102,26 +103,10 @@ export class StfcUserAuthorization extends UserAuthorization {
     return instrumentsToAssign.map((instrument) => instrument.id);
   }
 
-  async getInstrumentsToRemove(
-    requiredInstrumentNames: string[],
-    currentInstruments: Instrument[]
-  ) {
-    // Remove instrument scientist from any instruments they are assigned to,
-    // but shouldn't be.
-    // We don't need to check if the instruments exist here,
-    // because we fetch the list of currently assigned instruments from the DB
-    return currentInstruments
-      .filter(
-        (instrument) => !requiredInstrumentNames.includes(instrument.name)
-      )
-      .map((instrument) => instrument.id);
-  }
-
-  async autoAssignRemoveInstruments(
+  async autoAssignInstruments(
     userId: number,
     requiredInstrumentNames: string[],
-    currentInstruments: Instrument[],
-    removeInstruments: boolean
+    currentInstruments: Instrument[]
   ) {
     // Assign any instruments which aren't currently assigned
     const instrumentsToAdd = await this.getInstrumentsToAdd(
@@ -141,28 +126,6 @@ export class StfcUserAuthorization extends UserAuthorization {
         userId,
         instrumentsToAdd
       );
-    }
-
-    if (removeInstruments) {
-      // Remove any instruments which are currently assigned, but not required
-      const instrumentsToRemove = await this.getInstrumentsToRemove(
-        requiredInstrumentNames,
-        currentInstruments
-      );
-
-      if (instrumentsToRemove.length > 0) {
-        logger.logInfo(
-          'Auto-removing STFC instrument scientist from instruments',
-          {
-            instruments: instrumentsToRemove,
-          }
-        );
-
-        this.instrumentDataSource.removeScientistFromInstruments(
-          userId,
-          instrumentsToRemove
-        );
-      }
     }
   }
 
@@ -250,15 +213,10 @@ export class StfcUserAuthorization extends UserAuthorization {
         await this.instrumentDataSource.getUserInstruments(userNumber);
 
       // Don't remove instruments from ISIS Staff and User officers as these will be manually assigned
-      this.autoAssignRemoveInstruments(
+      this.autoAssignInstruments(
         userNumber,
         requiredInstruments,
-        currentUserInstruments,
-        !uniqueRoles.find(
-          (role) =>
-            role.name === 'ISIS Instrument Scientist' ||
-            role.name === 'User Officer'
-        )
+        currentUserInstruments
       );
     }
 
@@ -309,7 +267,11 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async isExternalTokenValid(token: string): Promise<boolean> {
+  async isExternalTokenValid(token: string | undefined): Promise<boolean> {
+    if (token === undefined) {
+      return false;
+    }
+
     const cachedValidity = await this.uowsTokenCache.get(token);
     if (cachedValidity !== undefined) {
       if (!cachedValidity) {
@@ -329,7 +291,8 @@ export class StfcUserAuthorization extends UserAuthorization {
         return response.identifier !== undefined;
       })
       .catch((error) => {
-        logger.logError(
+        // Warn only as this could be a user trying to use an expired token
+        logger.logWarn(
           'An error occurred while validating the token using validateToken',
           error
         );
@@ -380,5 +343,17 @@ export class StfcUserAuthorization extends UserAuthorization {
       readableUsers.includes(id) ||
       (await this.userDataSource.isSearchableUser(id))
     );
+  }
+
+  async canBeAssignedToFap(userId: number): Promise<boolean> {
+    return true;
+  }
+
+  getOrCreateUserInstitution(userInfo: {
+    institution_ror_id?: string;
+    institution_name?: string;
+    institution_country?: string;
+  }): Promise<Institution | null> {
+    throw new Error('Method not implemented.');
   }
 }

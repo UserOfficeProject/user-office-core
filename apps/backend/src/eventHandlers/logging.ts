@@ -61,23 +61,63 @@ export default function createLoggingHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.EMAIL_INVITE:
-        case Event.EMAIL_INVITES:
-          let invites;
-          if ('invite' in event) {
-            invites = [event.invite];
-          } else {
-            invites = event.array;
-          }
-          for (const invite of invites) {
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              invite.id.toString()
-            );
-          }
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
+          const { invite, proposalPKey } = event;
+
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer invite issued to ${invite.email} accepted by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
           break;
+        }
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
+          const { invite, proposalPKey } = event;
+
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer invite issued to ${invite.email} by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
+          const { invite, proposalPKey: proposalPk } = event;
+
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPk.toString(),
+            `Visit invite issued to ${invite.email} by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED: {
+          const { invite, proposalPKey } = event;
+
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Visit invite sent to ${invite.email} accepted by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
+
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
@@ -96,7 +136,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -117,7 +158,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 proposalPk.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -138,7 +180,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 fapProposal.proposalPk.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -158,7 +201,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 proposal.primaryKey.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -184,7 +228,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -206,7 +251,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -254,7 +300,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].techniqueId,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -280,7 +327,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].techniqueId,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -303,7 +351,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].proposalPk,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -318,7 +367,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 event.visitregistration.visitId.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -332,9 +382,23 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 event.visitregistration.visitId.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             }
+          }
+          break;
+        case Event.DATA_ACCESS_USERS_UPDATED:
+          {
+            const description = 'Data access users updated';
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              event.proposalPKey.toString(),
+              description,
+              event.impersonatingUserId
+            );
           }
           break;
         default: {
@@ -343,8 +407,16 @@ export default function createLoggingHandler() {
             changedObjectId = (event as any)[event.key].primaryKey;
           } else if (typeof (event as any)[event.key].proposalPk === 'number') {
             changedObjectId = (event as any)[event.key].proposalPk;
+          } else if (
+            typeof (event as any)[event.key].experimentPk === 'number'
+          ) {
+            changedObjectId = (event as any)[event.key].experimentPk;
           } else {
             changedObjectId = (event as any)[event.key].id;
+          }
+
+          if (!changedObjectId) {
+            return;
           }
           const description = event.description || '';
 
@@ -353,7 +425,8 @@ export default function createLoggingHandler() {
             event.type,
             json,
             changedObjectId.toString(),
-            description
+            description,
+            event.impersonatingUserId
           );
           break;
         }

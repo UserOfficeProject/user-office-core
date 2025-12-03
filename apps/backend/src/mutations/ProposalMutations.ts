@@ -38,14 +38,17 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
+import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { statusActionEngine } from '../statusActionEngine';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
+import FapMutations from './FapMutations';
+import InstrumentMutations from './InstrumentMutations';
 
 @injectable()
 export default class ProposalMutations {
@@ -379,13 +382,18 @@ export default class ProposalMutations {
   @Authorized([Roles.USER_OFFICER])
   async notify(
     user: UserWithRole | null,
-    { proposalPk }: { proposalPk: number }
+    notifyArgs: NotifyProposalArgs
   ): Promise<unknown> {
-    const proposal = await this.proposalDataSource.get(proposalPk);
+    const proposal = await this.proposalDataSource.get(notifyArgs.proposalPk);
 
-    if (!proposal || proposal.notified || !proposal.finalStatus) {
+    if (
+      !proposal ||
+      (proposal.notified && !notifyArgs.ignoreNotifiedFlag) ||
+      !proposal.finalStatus
+    ) {
       return rejection('Can not notify proposal', { proposal });
     }
+
     proposal.notified = true;
     const result = await this.proposalDataSource.update(proposal);
 
@@ -593,7 +601,7 @@ export default class ProposalMutations {
       );
 
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      statusActionEngine(statusEngineReadyProposals);
+      proposalStatusActionEngine(statusEngineReadyProposals);
     } else {
       rejection('Could not change statuses to all of the selected proposals', {
         result,
@@ -859,14 +867,73 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
+        experimentSequence: null,
+        fileId: null,
       });
+
+      const sourceProposalInstrumentId =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(
+          sourceProposal.primaryKey
+        );
+
+      if (sourceProposalInstrumentId.length > 0) {
+        const instrumentMutations = container.resolve(InstrumentMutations);
+        const fapMutations = container.resolve(FapMutations);
+
+        try {
+          await instrumentMutations.assignProposalsToInstrumentsInternal(
+            agent,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
+        } catch (error) {
+          logger.logWarn(
+            'Could not assign cloned proposals to the same instruments',
+            {
+              error,
+              clonedProposal,
+              sourceProposal,
+            }
+          );
+        }
+
+        try {
+          await fapMutations.assignProposalsToFapsUsingCallInstrumentsInternal(
+            null,
+            {
+              instrumentIds: sourceProposalInstrumentId.map(
+                (instrument) => instrument.id
+              ),
+              proposalPks: [clonedProposal.primaryKey],
+            }
+          );
+        } catch (error) {
+          logger.logWarn('Could not assign cloned proposals to faps', {
+            error,
+            clonedProposal,
+            sourceProposal,
+          });
+        }
+      }
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
         sourceProposal.primaryKey
       );
+      const proposalUserIds = proposalUsers.map((user) => user.id);
+
+      const hasWriteRightsOnClonedProposal =
+        await this.proposalAuth.hasWriteRights(agent, clonedProposal);
+      if (!hasWriteRightsOnClonedProposal) {
+        proposalUserIds.push(agent!.id);
+      }
+
       await this.proposalDataSource.setProposalUsers(
         clonedProposal.primaryKey,
-        proposalUsers.map((user) => user.id)
+        proposalUserIds
       );
 
       const proposalSamples = await this.sampleDataSource.getSamples({
@@ -881,12 +948,9 @@ export default class ProposalMutations {
       }
 
       const proposalGenericTemplates =
-        await this.genericTemplateDataSource.getGenericTemplates(
-          {
-            filter: { proposalPk: sourceProposal.primaryKey },
-          },
-          agent
-        );
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
 
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =

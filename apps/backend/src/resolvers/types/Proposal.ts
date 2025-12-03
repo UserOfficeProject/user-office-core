@@ -93,6 +93,12 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Date, { nullable: true })
   public submittedDate?: Date | null;
+
+  @Field(() => Int, { nullable: true })
+  public experimentSequence?: number | null;
+
+  @Field(() => String, { nullable: true })
+  public fileId?: string | null;
 }
 
 @Resolver(() => Proposal)

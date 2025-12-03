@@ -24,6 +24,12 @@ export class CreateInstrumentArgs {
 
   @Field(() => Int)
   public managerUserId: number;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: true })
+  public selectable?: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  public multipleTechReviewsEnabled?: boolean;
 }
 
 @Resolver()

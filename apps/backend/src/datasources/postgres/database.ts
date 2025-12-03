@@ -1,6 +1,10 @@
 import { logger } from '@user-office-software/duo-logger';
 import Knex from 'knex';
 
+import addExtensions from './databaseExtensions';
+
+addExtensions();
+
 const db = Knex({
   client: 'postgresql',
   connection: process.env.DATABASE_URL,
@@ -32,6 +36,10 @@ if (process.env.DATABASE_LOG_QUERIES === '1') {
     // TODO: add timestamp to logger (maybe only ConsoleLogger needs it)
     logger.logDebug(`${new Date().toISOString()} - QUERY`, sql);
   });
+}
+
+export function isUniqueConstraintError(error: any) {
+  return 'code' in error && error.code === '23505';
 }
 
 export default db;

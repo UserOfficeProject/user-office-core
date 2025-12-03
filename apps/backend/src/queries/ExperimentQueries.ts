@@ -1,12 +1,13 @@
 import { inject, injectable } from 'tsyringe';
-import { Authorized } from 'type-graphql';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ExperimentSampleArgs } from '../resolvers/queries/ExperimentSampleQuery';
-import { ExperimentsArgs } from '../resolvers/queries/ExperimentsQuery';
+import { ExperimentsFilter } from '../resolvers/queries/ExperimentsQuery';
 import { Experiment } from '../resolvers/types/Experiment';
 import { ExperimentHasSample } from '../resolvers/types/ExperimentHasSample';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
@@ -14,12 +15,19 @@ import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 @injectable()
 export default class ExperimentQueries {
   constructor(
-    @inject(Tokens.ExperimentDataSource) public dataSource: ExperimentDataSource
+    @inject(Tokens.ExperimentDataSource)
+    public dataSource: ExperimentDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  @Authorized(Roles.USER_OFFICER, Roles.USER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSafetyByExperimentPk(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentSafety | null> {
     const experimentSafety =
@@ -28,9 +36,14 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized(Roles.USER_OFFICER, Roles.USER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSafety(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     experimentSafetyPk: number
   ): Promise<ExperimentSafety | null> {
     const experimentSafety =
@@ -39,9 +52,14 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized(Roles.USER_OFFICER, Roles.USER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSample(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: ExperimentSampleArgs
   ): Promise<ExperimentHasSample | null> {
     const experimentSample = await this.dataSource.getExperimentSample(
@@ -52,9 +70,14 @@ export default class ExperimentQueries {
     return experimentSample;
   }
 
-  @Authorized(Roles.USER_OFFICER, Roles.USER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.USER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperimentSamples(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentHasSample[]> {
     const experimentSamples =
@@ -63,17 +86,45 @@ export default class ExperimentQueries {
     return experimentSamples;
   }
 
-  @Authorized(Roles.USER_OFFICER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+  ])
   async getExperiments(
-    user: UserWithRole | null,
-    args: ExperimentsArgs
-  ): Promise<Experiment[]> {
-    return this.dataSource.getExperiments(args);
+    agent: UserWithRole | null,
+    filter: ExperimentsFilter = {},
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ) {
+    let instrumentScientistUserId: number | undefined;
+    if (this.userAuth.isInstrumentScientist(agent)) {
+      instrumentScientistUserId = agent!.id;
+    }
+
+    filter['instrumentScientistUserId'] = instrumentScientistUserId;
+
+    return this.dataSource.getExperiments(
+      filter,
+      first,
+      offset,
+      sortField,
+      sortDirection,
+      searchText
+    );
   }
 
-  @Authorized(Roles.USER_OFFICER)
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+    Roles.USER,
+  ])
   async getExperiment(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     experimentPk: number
   ): Promise<Experiment | null> {
     return this.dataSource.getExperiment(experimentPk);

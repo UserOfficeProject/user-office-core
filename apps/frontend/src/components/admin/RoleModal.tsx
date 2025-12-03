@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
-import { useQueriesMutationsAndServicesData } from 'hooks/admin/useQueriesMutationsAndServicesData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -44,8 +43,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
   const [dataAccess, setDataAccess] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
   const { api } = useDataApiWithFeedback();
-  const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =
-    useQueriesMutationsAndServicesData();
   const { instruments, loadingInstruments } = useInstrumentsData();
 
   useEffect(() => {
@@ -104,80 +101,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
     }
   };
 
-  const renderPermissions = () => {
-    if (loadingQueriesMutationsAndServices) {
-      return <Typography>Loading permissions...</Typography>;
-    }
-
-    return (
-      <FormControl component="fieldset" variant="standard" fullWidth>
-        <FormLabel component="legend">Permissions</FormLabel>
-        <FormGroup>
-          <Typography variant="subtitle1" gutterBottom>
-            Queries
-          </Typography>
-          <Grid container spacing={1}>
-            {queriesMutationsAndServices.queries.map((group, groupIndex) =>
-              group.items.map((query, index) => (
-                <Grid item md={6} xs={12} key={`${groupIndex}-${index}`}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={permissions.includes(query)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setPermissions([...permissions, query]);
-                          } else {
-                            setPermissions(
-                              permissions.filter((perm) => perm !== query)
-                            );
-                          }
-                        }}
-                      />
-                    }
-                    label={query}
-                  />
-                </Grid>
-              ))
-            )}
-          </Grid>
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            style={{ marginTop: '20px' }}
-          >
-            Mutations
-          </Typography>
-          <Grid container spacing={1}>
-            {queriesMutationsAndServices.mutations.map((group, groupIndex) =>
-              group.items.map((mutation, index) => (
-                <Grid item md={6} xs={12} key={`${groupIndex}-${index}`}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={permissions.includes(mutation)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setPermissions([...permissions, mutation]);
-                          } else {
-                            setPermissions(
-                              permissions.filter((perm) => perm !== mutation)
-                            );
-                          }
-                        }}
-                      />
-                    }
-                    label={mutation}
-                  />
-                </Grid>
-              ))
-            )}
-          </Grid>
-        </FormGroup>
-      </FormControl>
-    );
-  };
-
   const renderDataAccess = () => {
     if (loadingInstruments) {
       return <Typography>Loading data access options...</Typography>;
@@ -185,7 +108,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
 
     return (
       <FormControl component="fieldset" variant="standard" fullWidth>
-        <FormLabel component="legend">Data Access</FormLabel>
+        <FormLabel component="legend">Instruments</FormLabel>
         <FormGroup>
           <Grid container spacing={1}>
             {instruments.map((instrument, index) => (
@@ -251,11 +174,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
           fullWidth
           margin="normal"
         />
-        {/* Permissions Section */}
-        <div>
-          <Typography variant="h6">Permissions</Typography>
-          {renderPermissions()}
-        </div>
         {/* Data Access Section */}
         <div>
           <Typography variant="h6">Data Access</Typography>

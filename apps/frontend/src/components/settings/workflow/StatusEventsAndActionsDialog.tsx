@@ -69,7 +69,11 @@ const StatusEventsAndActionsDialog = ({
         }}
       >
         <SimpleTabs
-          tabNames={['Next status events', 'Status actions']}
+          tabNames={
+            entityType === WorkflowType.PROPOSAL
+              ? ['Next status events', 'Status actions']
+              : ['Next status events']
+          }
           tabPanelPadding={theme.spacing(0, 3)}
         >
           <AddStatusChangingEventsToConnection
@@ -90,23 +94,34 @@ const StatusEventsAndActionsDialog = ({
                 },
               })
             }
+            deleteWorkflowConnection={() =>
+              dispatch({
+                type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED,
+                payload: {
+                  connectionId: workflowConnection?.id,
+                },
+              })
+            }
+            onClose={close}
             isLoading={isLoading}
             entityType={entityType}
           />
-          <AddStatusActionsToConnection
-            addStatusActionsToConnection={(statusActions) => {
-              dispatch({
-                type: EventType.ADD_STATUS_ACTION_REQUESTED,
-                payload: {
-                  statusActions,
-                  workflowConnection,
-                },
-              });
-            }}
-            connectionStatusActions={workflowConnection?.statusActions}
-            statusName={workflowConnection?.status.name}
-            isLoading={isLoading}
-          />
+          {entityType == WorkflowType.PROPOSAL && (
+            <AddStatusActionsToConnection
+              addStatusActionsToConnection={(statusActions) => {
+                dispatch({
+                  type: EventType.ADD_STATUS_ACTION_REQUESTED,
+                  payload: {
+                    statusActions,
+                    workflowConnection,
+                  },
+                });
+              }}
+              connectionStatusActions={workflowConnection?.statusActions}
+              statusName={workflowConnection?.status.name}
+              isLoading={isLoading}
+            />
+          )}
         </SimpleTabs>
       </DialogContent>
     </Dialog>

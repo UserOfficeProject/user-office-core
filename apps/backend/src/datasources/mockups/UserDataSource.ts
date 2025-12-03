@@ -10,7 +10,10 @@ import {
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -25,6 +28,8 @@ export const basicDummyUser = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
+  '',
   ''
 );
 
@@ -39,6 +44,8 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
+  '',
   ''
 );
 
@@ -46,7 +53,6 @@ export const dummyUserOfficer = new User(
   4,
   'Mr.',
   'John',
-  'Smith',
   'Doe',
   'JoDo',
   'Hailey',
@@ -54,7 +60,6 @@ export const dummyUserOfficer = new User(
   '683142616',
   'issuer',
   'male',
-  12,
   new Date('1990-01-25'),
   3,
   'Other',
@@ -62,7 +67,6 @@ export const dummyUserOfficer = new User(
   'Producer',
   'Dorris83@gmail.com',
   '+46700568256',
-  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -78,13 +82,13 @@ export const dummyUserOfficerWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyUser = new User(
   2,
   'Dr.',
   'Jane',
-  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -92,7 +96,6 @@ export const dummyUser = new User(
   '568567353',
   'issuer',
   'male',
-  2,
   new Date('1981-05-04'),
   3,
   'Other',
@@ -100,7 +103,6 @@ export const dummyUser = new User(
   'Architect',
   'Cleve30@yahoo.com',
   '+38978414058',
-  '+46700568256',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -117,6 +119,7 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyUserWithRole: UserWithRole = {
@@ -129,6 +132,7 @@ export const dummyUserWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyFapChairWithRole: UserWithRole = {
@@ -141,6 +145,7 @@ export const dummyFapChairWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyFapSecretaryWithRole: UserWithRole = {
@@ -153,6 +158,7 @@ export const dummyFapSecretaryWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyFapReviewerWithRole: UserWithRole = {
@@ -165,6 +171,7 @@ export const dummyFapReviewerWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -177,6 +184,7 @@ export const dummySampleReviewer: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyInternalReviewer: UserWithRole = {
@@ -202,6 +210,7 @@ export const dummyInstrumentScientist: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyVisitorWithRole: UserWithRole = {
@@ -215,13 +224,13 @@ export const dummyVisitorWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export const dummyPlaceHolderUser = new User(
   5,
   'Dr.',
   'Jane',
-  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -229,7 +238,6 @@ export const dummyPlaceHolderUser = new User(
   '568567353',
   'issuer',
   'male',
-  2,
   new Date('1981-05-04'),
   3,
   'Other',
@@ -237,7 +245,6 @@ export const dummyPlaceHolderUser = new User(
   'Architect',
   'placeholder@ess.se',
   '+46700568256',
-  '',
   true,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -247,7 +254,6 @@ export const dummyUserNotOnProposal = new User(
   3,
   'Dr.',
   'Noel',
-  '',
   'Doe',
   'NoDO',
   'Damion',
@@ -255,7 +261,6 @@ export const dummyUserNotOnProposal = new User(
   'Apricot',
   'issuer',
   'female',
-  3,
   new Date('1991-11-08'),
   5,
   'Other',
@@ -263,7 +268,6 @@ export const dummyUserNotOnProposal = new User(
   'Facilitator',
   'Tyrique41@hotmail.com',
   '+46700568256',
-  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -279,6 +283,7 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
     permissions: [],
     dataAccess: [],
   },
+  externalTokenValid: true,
 };
 
 export class UserDataSourceMock implements UserDataSource {
@@ -298,8 +303,21 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
+  // Mock user storage for testing upsertUserByOidcSub
+  private mockUsers: User[] = [
+    dummyUser,
+    dummyUserNotOnProposal,
+    dummyUserOfficer,
+    dummyPlaceHolderUser,
+  ];
+
   async getByOIDCSub(oidcSub: string): Promise<User | null> {
-    return dummyUser;
+    // Check if user exists with this OIDC sub
+    const existingUser = this.mockUsers.find(
+      (user) => user.oidcSub === oidcSub
+    );
+
+    return existingUser || null;
   }
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
@@ -310,10 +328,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
-  async getBasicUserInfo(
-    id: number
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
-    throw new Error('Method not implemented.');
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    if (id === dummyUser.id) {
+      return basicDummyUser;
+    } else if (id === dummyUserNotOnProposal.id) {
+      return basicDummyUserNotOnProposal;
+    }
+
+    return null;
   }
   async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
@@ -322,7 +344,7 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
+  ): Promise<BasicUserDetails> {
     return new BasicUserDetails(
       1,
       'John',
@@ -334,6 +356,8 @@ export class UserDataSourceMock implements UserDataSource {
       new Date('2019-07-17 08:25:12.23043+00'),
       false,
       'test@email.com',
+      '',
+      '',
       ''
     );
   }
@@ -445,15 +469,26 @@ export class UserDataSourceMock implements UserDataSource {
     ];
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     return dummyUser;
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    if (dummyUser.oidcSub === args.oidcSub) {
+      return { ...dummyUser, ...args };
+    }
+
+    // User not found
+    return null;
   }
 
   async me(id: number) {
     return dummyUser;
   }
 
-  async getUser(id: number) {
+  async getUser(id: number): Promise<User | null> {
     if (id === dummyPlaceHolderUser.id) {
       return dummyPlaceHolderUser;
     }
@@ -537,8 +572,53 @@ export class UserDataSourceMock implements UserDataSource {
     return true;
   }
 
-  async create(firstname: string, lastname: string) {
-    return dummyUser;
+  async create(
+    user_title: string | undefined,
+    firstname: string,
+    lastname: string,
+    username: string,
+    preferredname: string | undefined,
+    oidc_sub: string,
+    oauth_refresh_token: string,
+    oauth_issuer: string,
+    gender: string,
+    birthdate: Date,
+    institution_id: number,
+    department: string,
+    position: string,
+    email: string,
+    telephone: string
+  ) {
+    // Generate a new user ID
+    const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;
+
+    const newUser = new User(
+      newId,
+      user_title || 'unspecified',
+      firstname,
+      lastname,
+      username,
+      preferredname || '',
+      oidc_sub,
+      oauth_refresh_token,
+      oauth_issuer,
+      gender || 'unspecified',
+      birthdate,
+      institution_id || 1,
+      'Test institution',
+      department,
+      position,
+      email,
+      telephone,
+      false,
+      new Date().toISOString(),
+      new Date().toISOString()
+    );
+
+    // Add to mock users collection
+    this.mockUsers.push(newUser);
+
+    return newUser;
   }
 
   async ensureDummyUserExists(userId: number): Promise<User> {
@@ -614,5 +694,15 @@ export class UserDataSourceMock implements UserDataSource {
         name: 'User',
       },
     ];
+  }
+
+  async getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return [];
   }
 }

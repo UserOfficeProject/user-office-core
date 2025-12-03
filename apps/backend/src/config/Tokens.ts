@@ -6,6 +6,8 @@ export const Tokens = {
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
+  DataAccessUsersDataSource: Symbol('DataAccessUsersDataSource'),
+  DataAccessUsersAuthorization: Symbol('DataAccessUsersAuthorization'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
@@ -18,7 +20,10 @@ export const Tokens = {
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),
-  PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
+  ProposalPdfTemplateDataSource: Symbol('ProposalPdfTemplateDataSource'),
+  ExperimentSafetyPdfTemplateDataSource: Symbol(
+    'ExperimentSafetyPdfTemplateDataSource'
+  ),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
@@ -37,16 +42,17 @@ export const Tokens = {
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
+  VisitAuthorization: Symbol('VisitAuthorization'),
   VisitRegistrationAuthorization: Symbol('VisitRegistrationAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
+  VisitRegistrationClaimDataSource: Symbol('VisitRegistrationClaimDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
   FapDataColumns: Symbol('FapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
   PopulateCallRow: Symbol('PopulateCallRow'),
-  DownloadService: Symbol('DownloadService'),
   StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
@@ -55,4 +61,5 @@ export const Tokens = {
   StatusDataSource: Symbol('StatusDataSource'),
   ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
+  TagDataSource: Symbol('TagDataSource'),
 };

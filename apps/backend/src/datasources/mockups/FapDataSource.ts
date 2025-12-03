@@ -96,7 +96,7 @@ export const dummyFapReview = new Review(
   1,
   1,
   'Dummy Fap review',
-  7,
+  '7',
   0,
   1,
   1,
@@ -239,6 +239,14 @@ export class FapDataSourceMock implements FapDataSource {
     );
   }
 
+  getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    throw new Error('Method not implemented.');
+  }
+
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
@@ -358,7 +366,7 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
-  async getCurrentFapReviewerProposalCount(reviewerId: number) {
+  async getCurrentFapReviewerProposalCount(reviewerId: number, fapId: number) {
     return dummyFapProposals.length;
   }
 

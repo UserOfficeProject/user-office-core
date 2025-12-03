@@ -7,6 +7,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
@@ -18,6 +19,7 @@ export interface CallDataSource {
   ): Promise<CallHasInstrument[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
+  orderCalls(args: CallOrderInput): Promise<boolean>;
   delete(id: number): Promise<Call>;
   assignInstrumentsToCall(args: AssignInstrumentsToCallInput): Promise<Call>;
   updateFapToCallInstrument(
@@ -31,4 +33,5 @@ export interface CallDataSource {
   isCallEnded(callId: number): Promise<boolean>;
   getCallByAnswerIdProposal(answerId: number): Promise<Call>;
   getProposalWorkflowByCall(callId: number): Promise<Workflow | null>;
+  getExperimentWorkflowByCall(callId: number): Promise<Workflow | null>;
 }

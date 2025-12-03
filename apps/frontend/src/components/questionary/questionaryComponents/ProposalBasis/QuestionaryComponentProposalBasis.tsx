@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
 import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
@@ -6,15 +7,17 @@ import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import ErrorMessage from 'components/common/ErrorMessage';
 import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
+import CoProposers from 'components/proposal/CoProposers';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import PrincipalInvestigator from 'components/proposal/PrincipalInvestigator';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
-import ProposalParticipant from 'components/proposal/ProposalParticipant';
-import Participants from 'components/proposal/ProposalParticipants';
+import ProposalParticipantLegacy from 'components/proposal/ProposalParticipantLegacy';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
@@ -36,12 +39,18 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
+  const [hasInvalidChars, setHasInvalidChars] = useState(false);
+  const [textLen, setTextLen] = useState(state?.proposal.abstract ?? 0);
+  const { featuresMap } = useContext(FeatureContext);
+  const isLegacyInviteFlow = featuresMap.get(
+    FeatureId.EMAIL_INVITE_LEGACY
+  )?.isEnabled;
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposer, users, coProposerInvites } = state.proposal;
+  const { proposer, users } = state.proposal;
   const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
   const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
@@ -51,7 +60,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     }
   }, [userData]);
 
-  const coInvestigatorChanged = (users: BasicUserDetails[]) => {
+  const coProposersChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
       `${id}.users`,
       users.map((user) => user.id)
@@ -78,20 +87,23 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         proposer: user,
       },
     });
+
     setPIData(user);
-    coInvestigatorChanged(
+    // Remove the new PI from the co-proposers list (if present) and add the old PI (if present) to the co-proposers list
+    coProposersChanged(
       users
         .filter((coInvestigator) => coInvestigator.id !== user.id)
         .concat(proposer as BasicUserDetails)
     );
   };
+  const counter = `Characters: ${textLen}/1500`;
 
   return (
     <div>
       <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
-          label="Title"
+          label="Proposal Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
               setLocalTitle(event.target.value),
@@ -114,10 +126,17 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
         <Field
           name={`${id}.abstract`}
-          label="Abstract"
+          label="Proposal Abstract"
           inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) =>
-              setLocalAbstract(event.target.value),
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+              const value = event.target.value;
+              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+              const hasInvalid = nonPrintableRegex.test(value);
+              const cleanedValue = value.replace(nonPrintableRegex, ' ');
+              setTextLen(event.target.value.length);
+              setHasInvalidChars(hasInvalid);
+              setLocalAbstract(cleanedValue);
+            },
             onBlur: () => {
               dispatch({
                 type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -137,27 +156,40 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           InputLabelProps={{
             shrink: true,
           }}
+          helperText={
+            hasInvalidChars
+              ? 'Non-printable characters have been removed from your input.'
+              : 'Only printable ASCII characters are allowed.'
+          }
         />
       </Box>
-      <ProposalParticipant
-        principalInvestigator={piData}
+      <InputAdornment
+        position="end"
+        sx={(theme) => ({
+          display: 'flex',
+          justifyContent: 'right',
+          marginBottom: -theme.spacing(50),
+        })}
+      >
+        {counter}
+      </InputAdornment>
+      {isLegacyInviteFlow ? (
+        <ProposalParticipantLegacy
+          principalInvestigator={piData}
+          setPrincipalInvestigator={principalInvestigatorChanged}
+          sx={{ margin: theme.spacing(2, 0) }}
+          loadingPrincipalInvestigator={loading}
+        />
+      ) : (
+        <PrincipalInvestigator
+          setPrincipalInvestigator={principalInvestigatorChanged}
+        />
+      )}
+
+      <CoProposers
         setPrincipalInvestigator={principalInvestigatorChanged}
-        sx={{ margin: theme.spacing(2, 0) }}
-        loadingPrincipalInvestigator={loading}
-      />
-      <Participants
-        title="Co-Proposers"
-        sx={{ margin: theme.spacing(2, 0) }}
-        principalInvestigator={piData}
-        setPrincipalInvestigator={principalInvestigatorChanged}
-        setUsers={coInvestigatorChanged}
-        preserveSelf={true}
-        // QuickFix for material table changing immutable state
-        // https://github.com/mbrn/material-table/issues/666
-        users={JSON.parse(JSON.stringify(users))}
-        invites={coProposerInvites}
+        setUsers={coProposersChanged}
         setInvites={invitesChanged}
-        loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>
@@ -165,7 +197,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 }
 
 const proposalBasisPreSubmit =
-  () =>
+  (isInvitesEnabled: boolean) =>
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const proposal = (state as ProposalSubmissionState).proposal;
     const { primaryKey, title, abstract, users, proposer, callId } = proposal;
@@ -181,19 +213,24 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
-      const invites = await api.setCoProposerInvites({
-        input: {
-          proposalPk: result.updateProposal.primaryKey,
-          emails: proposal.coProposerInvites.map((invite) => invite.email),
-        },
-      });
+      let invites;
+      if (isInvitesEnabled) {
+        invites = await api.setCoProposerInvites({
+          input: {
+            proposalPk: result.updateProposal.primaryKey,
+            emails: proposal.coProposerInvites.map((invite) => invite.email),
+          },
+        });
+      }
+
+      const coProposerInvites = invites?.setCoProposerInvites ?? [];
 
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_LOADED',
         itemWithQuestionary: {
           ...proposal,
           ...result.updateProposal,
-          ...{ coProposerInvites: invites.setCoProposerInvites },
+          ...(isInvitesEnabled ? { coProposerInvites } : {}),
         },
       });
     } else {
@@ -208,19 +245,25 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
-      const invites = await api.setCoProposerInvites({
-        input: {
-          proposalPk: updateProposal.primaryKey,
-          emails: proposal.coProposerInvites.map((invite) => invite.email),
-        },
-      });
+      let invites;
+      if (isInvitesEnabled) {
+        invites = await api.setCoProposerInvites({
+          input: {
+            proposalPk: updateProposal.primaryKey,
+            emails: proposal.coProposerInvites.map((invite) => invite.email),
+          },
+        });
+      }
+
+      const coProposerInvites = invites?.setCoProposerInvites ?? [];
+
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
         itemWithQuestionary: {
           ...proposal,
           ...createProposal,
           ...updateProposal,
-          ...{ coProposerInvites: invites.setCoProposerInvites },
+          ...(isInvitesEnabled ? { coProposerInvites } : {}),
         },
       });
       returnValue = createProposal.questionaryId;

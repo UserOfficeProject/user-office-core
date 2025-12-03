@@ -16,10 +16,13 @@ import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
-import database from './database';
+import database, { isUniqueConstraintError } from './database';
 import {
   CountryRecord,
   InstitutionRecord,
@@ -66,61 +69,120 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users')
-      .where('email', 'ilike', email)
+      .whereILikeEscaped('email', '?', email)
       .andWhere('placeholder', false)
       .first()
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     const {
       firstname,
       user_title,
-      middlename,
       lastname,
       preferredname,
       gender,
-      nationality,
       birthdate,
       institutionId,
       department,
       position,
       email,
       telephone,
-      telephone_alt,
       placeholder,
       oidcSub,
       oauthRefreshToken,
       oauthIssuer,
+      username,
     } = user;
 
-    const [userRecord]: UserRecord[] = await database
-      .update({
-        firstname,
-        user_title,
-        middlename,
-        lastname,
-        preferredname,
-        gender,
-        nationality,
-        birthdate,
-        institution_id: institutionId,
-        department,
-        position,
-        email,
-        telephone,
-        telephone_alt,
-        placeholder,
-        oidc_sub: oidcSub,
-        oauth_refresh_token: oauthRefreshToken,
-        oauth_issuer: oauthIssuer,
-      })
-      .from('users')
-      .where('user_id', user.id)
-      .returning(['*']);
+    try {
+      const [userRecord]: UserRecord[] = await database
+        .update({
+          firstname,
+          user_title,
+          lastname,
+          preferredname,
+          gender,
+          birthdate,
+          institution_id: institutionId,
+          department,
+          position,
+          email,
+          telephone,
+          placeholder,
+          oidc_sub: oidcSub,
+          oauth_refresh_token: oauthRefreshToken,
+          oauth_issuer: oauthIssuer,
+          username,
+        })
+        .from('users')
+        .where('user_id', user.id)
+        .returning(['*']);
 
-    return createUserObject(userRecord);
+      return createUserObject(userRecord);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new GraphQLError('User already exists');
+      }
+      throw new GraphQLError('Could not update user. Check your Inputs.');
+    }
   }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    const {
+      firstname,
+      user_title,
+      lastname,
+      preferredname,
+      gender,
+      birthdate,
+      institutionId,
+      department,
+      position,
+      email,
+      telephone,
+      placeholder,
+      oauthRefreshToken,
+      oauthIssuer,
+    } = args;
+    try {
+      const [userRecord]: UserRecord[] = await database
+        .update({
+          firstname,
+          user_title,
+          lastname,
+          preferredname,
+          gender,
+          birthdate,
+          institution_id: institutionId,
+          department,
+          position,
+          email,
+          telephone,
+          placeholder,
+          oauth_refresh_token: oauthRefreshToken,
+          oauth_issuer: oauthIssuer,
+          updated_at: new Date(),
+        })
+        .from('users')
+        .where('oidc_sub', args.oidcSub)
+        .returning(['*']);
+
+      if (!userRecord) {
+        return null;
+      }
+
+      return createUserObject(userRecord);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new GraphQLError('User already exists');
+      }
+      throw new GraphQLError('Could not create user. Check your Inputs.');
+    }
+  }
+
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     const { firstname, lastname, email } = args;
 
@@ -128,22 +190,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       .insert({
         user_title: '',
         firstname,
-        middlename: '',
         lastname,
         username: email,
         preferredname: firstname,
-        oidc_sub: '',
         oauth_refresh_token: '',
         oauth_issuer: '',
         gender: '',
-        nationality: null,
         birthdate: '2000-01-01',
         institution_id: 1,
         department: '',
         position: '',
         email,
         telephone: '',
-        telephone_alt: '',
         placeholder: true,
       })
       .returning(['*'])
@@ -223,7 +281,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
-      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
+      .then((user: UserRecord) => {
+        return !user ? null : createUserObject(user);
+      });
   }
 
   async getUserWithInstitution(id: number): Promise<{
@@ -281,7 +341,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .where('email', 'ilike', email)
+      .whereILikeEscaped('email', '?', email)
       .modify((query) => {
         if (role) {
           query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
@@ -321,16 +381,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users')
-      .where('email', 'ilike', email)
+      .whereILikeEscaped('email', '?', email)
       .first()
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  // NOTE: This is used in the OAuthAuthorization only where we upsert users returned from Auth server.
   async create(
     user_title: string | undefined,
     firstname: string,
-    middlename: string | undefined,
     lastname: string,
     username: string,
     preferredname: string | undefined,
@@ -338,20 +396,17 @@ export default class PostgresUserDataSource implements UserDataSource {
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
-    nationality: number,
     birthdate: Date,
     institution_id: number,
     department: string,
     position: string,
     email: string,
-    telephone: string,
-    telephone_alt: string | undefined
+    telephone: string
   ): Promise<User> {
     return database
       .insert({
         user_title,
         firstname,
-        middlename,
         lastname,
         username,
         preferredname,
@@ -359,14 +414,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         oauth_refresh_token,
         oauth_issuer,
         gender,
-        nationality,
         birthdate,
         institution_id,
         department,
         position,
         email,
         telephone,
-        telephone_alt,
       })
       .returning(['*'])
       .into('users')
@@ -376,6 +429,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
 
         return createUserObject(user[0]);
+      })
+      .catch((error) => {
+        if (isUniqueConstraintError(error)) {
+          throw new GraphQLError('User already exists');
+        }
+        throw new GraphQLError('Could not update user. Check your Inputs.');
       });
   }
 
@@ -426,21 +485,17 @@ export default class PostgresUserDataSource implements UserDataSource {
       user_id: userId,
       user_title: '',
       firstname: '',
-      middlename: '',
       lastname: '',
       username: userId.toString(),
       preferredname: '',
-      oidc_sub: '',
       oauth_refresh_token: '',
       gender: '',
-      nationality: 1,
       birthdate: '2000-01-01',
       institution_id: 1,
       department: '',
       position: '',
       email: userId.toString(),
       telephone: '',
-      telephone_alt: '',
     };
   }
 
@@ -457,14 +512,13 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
-      .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
-            qb.where('institution', 'ilike', `%${filter}%`)
-              .orWhere('firstname', 'ilike', `%${filter}%`)
-              .orWhere('preferredname', 'ilike', `%${filter}%`)
-              .orWhere('lastname', 'ilike', `%${filter}%`);
+            qb.whereILikeEscaped('institution', '%?%', filter)
+              .orWhereILikeEscaped('firstname', '%?%', filter)
+              .orWhereILikeEscaped('preferredname', '%?%', filter)
+              .orWhereILikeEscaped('lastname', '%?%', filter);
           });
         }
         if (first) {
@@ -527,10 +581,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
-            qb.where('institution', 'ilike', `%${filter}%`)
-              .orWhere('firstname', 'ilike', `%${filter}%`)
-              .orWhere('preferredname', 'ilike', `%${filter}%`)
-              .orWhere('lastname', 'ilike', `%${filter}%`);
+            qb.whereILikeEscaped('institution', '%?%', filter)
+              .orWhereILikeEscaped('firstname', '%?%', filter)
+              .orWhereILikeEscaped('preferredname', '%?%', filter)
+              .orWhereILikeEscaped('lastname', '%?%', filter);
           });
         }
         if (first) {
@@ -690,6 +744,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         users.map((user) => createBasicUserObject(user))
       );
   }
+
   async createInstitution(
     name: string,
     countryId: number | null = null,
@@ -898,5 +953,30 @@ export default class PostgresUserDataSource implements UserDataSource {
       deletedRole.permissions,
       deletedRole.data_access
     );
+  }
+
+  async getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  > {
+    return database
+      .distinct('i.*', 'c.*', 'u.*')
+      .from('users as u')
+      .join('visits_has_users as vu', { 'u.user_id': 'vu.user_id' })
+      .join('visits as v', { 'v.visit_id': 'vu.visit_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
+      .where('v.proposal_pk', proposalPk)
+      .andWhere('vu.status', 'APPROVED')
+      .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
+        return users.map((user) => ({
+          user: createUserObject(user),
+          institution: createInstitutionObject(user),
+          country: createCountryObject(user),
+        }));
+      });
   }
 }

@@ -19,6 +19,7 @@ context('visits tests', () => {
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
   const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
+  let createdVisitId: number;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -74,6 +75,8 @@ context('visits tests', () => {
         teamLeadUserId: visitor.id,
         experimentPk: existingExperimentPk,
       }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        createdVisitId = visit.id;
+
         cy.createVisitRegistration({
           visitId: visit.id,
           userId: visitor.id,
@@ -86,16 +89,93 @@ context('visits tests', () => {
       });
     });
 
-    it('User officer should be able to cancel visit registration', () => {
+    it('User officer should be able request changes', () => {
       cy.login('officer');
-      cy.visit('/ExperimentPage');
+      cy.visit('/Experiments');
+      cy.finishedLoading();
+
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
+      cy.get('[data-cy="request-visit-registration-changes-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="request-visit-registration-changes-button"]').should(
+        'not.be.exist'
+      );
+
+      cy.logout();
+      cy.login(visitor);
+      cy.visit('/');
 
       cy.finishedLoading();
-      cy.get('[data-cy=preset-date-selector]').contains('All').click();
 
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagRegisterVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      const startDateObj = faker.date.future();
+      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
+
+      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+
+      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="submit-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
+    });
+
+    it('User should be able to cancel visit registration', () => {
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').click();
+      cy.get('[data-cy="cancel-visit-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
       cy.get(
-        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
-      ).click();
+        '[aria-label="Define your visit (This action is disabled because your registration for visit is cancelled)"]'
+      ).should('exist');
+    });
+
+    it('User should not be able to cancel visit registration after visit is approved', () => {
+      cy.approveVisitRegistration({
+        visitRegistration: {
+          userId: visitor.id,
+          visitId: createdVisitId,
+        },
+      });
+
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').should('not.exist');
+    });
+
+    it('User officer should be able to cancel visit registration', () => {
+      cy.login('officer');
+      cy.visit('/Experiments');
+      cy.finishedLoading();
+
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
       cy.get('[data-cy="cancel-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -107,14 +187,13 @@ context('visits tests', () => {
 
     it('User officer should be able to approve visit registration', () => {
       cy.login('officer');
-      cy.visit('/ExperimentPage');
-
+      cy.visit('/Experiments');
       cy.finishedLoading();
-      cy.get('[data-cy=preset-date-selector]').contains('All').click();
 
-      cy.get(
-        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
-      ).click();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
       cy.get('[data-cy="approve-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -194,7 +273,11 @@ context('visits tests', () => {
       cy.finishedLoading();
       cy.get('[name=email]').type('david@teleworm.us{enter}');
       cy.finishedLoading();
-      cy.contains('Beckley').parent().find('[type=checkbox]').click();
+      cy.get('[data-cy=co-proposers]')
+        .contains('Beckley')
+        .parent()
+        .find('[type=checkbox]')
+        .click();
       cy.get('[data-cy=assign-selected-users]').click();
 
       // specify team lead
@@ -292,7 +375,7 @@ context('visits tests', () => {
 
       cy.reload();
 
-      cy.testActionButton(cyTagRegisterVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
     });
 
     it('User should not see register for visit or training button if he is not a visitor', () => {

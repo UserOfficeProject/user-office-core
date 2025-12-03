@@ -8,6 +8,7 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
@@ -20,6 +21,7 @@ import { omit } from '../utils/helperFunctions';
 export default class ProposalQueries {
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.UserDataSource) public userDataSource: UserDataSource,
     @inject(Tokens.ExperimentDataSource)
     public experimentDataSource: ExperimentDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
@@ -79,7 +81,11 @@ export default class ProposalQueries {
     return this.proposalAuth.hasReadRights(agent, proposal);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.DYNAMIC_PROPOSAL_READER,
+  ])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -89,7 +95,7 @@ export default class ProposalQueries {
     return this.dataSource.getProposals(filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.DYNAMIC_PROPOSAL_READER])
   async getAllView(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -99,6 +105,11 @@ export default class ProposalQueries {
     sortDirection?: string,
     searchText?: string
   ) {
+    let instrumentFilters: string[] = [];
+    if (agent && this.userAuth.isDynamicProposalReader(agent)) {
+      instrumentFilters = agent.currentRole?.dataAccess || [];
+    }
+
     try {
       // leave await here because getProposalsFromView might thrown an exception
       // and we want to handle it here
@@ -109,7 +120,9 @@ export default class ProposalQueries {
         offset,
         sortField,
         sortDirection,
-        searchText
+        searchText,
+        undefined,
+        instrumentFilters
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });

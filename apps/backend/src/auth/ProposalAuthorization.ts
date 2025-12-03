@@ -2,12 +2,12 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
-import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Role, Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
@@ -34,10 +34,10 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.StatusDataSource)
     private statusDataSource: StatusDataSource,
-    @inject(Tokens.TechniqueDataSource)
-    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
+    @inject(Tokens.DataAccessUsersDataSource)
+    private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -56,22 +56,29 @@ export class ProposalAuthorization {
   }
 
   isPrincipalInvestigatorOfProposal(
-    agent: UserJWT | null,
+    agentOrUserId: UserJWT | number | null,
     proposal: Proposal | null
   ) {
-    if (agent == null || proposal == null) {
+    if (agentOrUserId == null || proposal == null) {
       return false;
     }
-    if (agent.id === proposal.proposerId) {
+    let userId: number;
+    if (typeof agentOrUserId === 'number') {
+      userId = agentOrUserId;
+    } else {
+      userId = agentOrUserId.id;
+    }
+
+    if (userId === proposal.proposerId) {
       return true;
     }
   }
 
   async isMemberOfProposal(
-    agent: UserJWT | null,
+    agentOrUserId: UserJWT | number | null,
     proposalOrPk: Proposal | number | null
   ) {
-    if (agent == null || proposalOrPk == null) {
+    if (agentOrUserId == null || proposalOrPk == null) {
       return false;
     }
 
@@ -86,14 +93,21 @@ export class ProposalAuthorization {
       proposal = proposalOrPk;
     }
 
-    if (this.isPrincipalInvestigatorOfProposal(agent, proposal)) {
+    let userId: number;
+    if (typeof agentOrUserId === 'number') {
+      userId = agentOrUserId;
+    } else {
+      userId = agentOrUserId.id;
+    }
+
+    if (this.isPrincipalInvestigatorOfProposal(userId, proposal)) {
       return true;
     }
 
     return this.userDataSource
       .getProposalUsers(proposal.primaryKey)
       .then((users) => {
-        return users.some((user) => user.id === agent.id);
+        return users.some((user) => user.id === userId);
       });
   }
 
@@ -181,6 +195,13 @@ export class ProposalAuthorization {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
+  async isDataAccessUserOfProposal(agent: UserWithRole, proposalPk: number) {
+    return this.dataAccessUsersDataSource.isDataAccessUserOfProposal(
+      agent.id,
+      proposalPk
+    );
+  }
+
   async isChairOrSecretaryOfProposal(
     agent: UserJWT | null,
     proposalPk: number
@@ -263,7 +284,9 @@ export class ProposalAuthorization {
       agent.currentRole?.shortCode &&
         userRoles[agent.currentRole.shortCode]?.dataAccess.some(
           (dataAccess) => {
-            if (dataAccess === instrument.shortCode) {
+            if (
+              dataAccess.toLowerCase() === instrument.shortCode.toLowerCase()
+            ) {
               hasAccess = true;
 
               return true;
@@ -279,7 +302,8 @@ export class ProposalAuthorization {
       case Roles.USER:
         hasAccess =
           (await this.isMemberOfProposal(agent, proposal)) ||
-          (await this.isVisitorOfProposal(agent, proposal.primaryKey));
+          (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
+          (await this.isDataAccessUserOfProposal(agent, proposal.primaryKey));
         break;
       case Roles.INSTRUMENT_SCIENTIST:
         hasAccess =
@@ -310,6 +334,7 @@ export class ProposalAuthorization {
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
+
       default:
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }

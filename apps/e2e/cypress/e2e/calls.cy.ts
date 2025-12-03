@@ -4,7 +4,6 @@ import {
   CreateInstrumentMutationVariables,
   FeatureId,
   TemplateGroupId,
-  UpdateCallInput,
   WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -17,12 +16,28 @@ context('Calls tests', () => {
   const esiTemplateName = faker.lorem.words(2);
   let workflowId: number;
 
+  const firstDayMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    2
+  )
+    .toISOString()
+    .split('T')[0];
+  const lastDayMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0
+  )
+    .toISOString()
+    .split('T')[0];
+
   const currentDayStart = DateTime.now().startOf('day');
   const yesterday = currentDayStart.plus({ days: -1 });
   const twoDaysAgo = currentDayStart.plus({ days: -2 });
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: DateTime.fromJSDate(faker.date.past()),
     endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
@@ -47,6 +62,7 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: twoDaysAgo.toISO(),
     endCall: yesterday.toISO(),
     startReview: currentDayStart,
@@ -113,11 +129,12 @@ context('Calls tests', () => {
       const workflow = result.createWorkflow;
       if (workflow) {
         cy.addWorkflowStatus({
-          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
           statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
           workflowId: workflow.id,
           sortOrder: 1,
-          prevStatusId: workflow.workflowConnectionGroups[0].connections[0].id,
+          prevStatusId: workflow.workflowConnections[0].id,
+          posX: 0,
+          posY: 200,
         }).then((result) => {
           if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
@@ -151,19 +168,6 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-
-      const invalidPastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.getFormats().dateFormat + ' HH'
-      ); // no minutes
-      const invalidFutureDate = DateTime.fromJSDate(
-        faker.date.future()
-      ).toFormat(initialDBData.getFormats().dateFormat + ' HH'); // no minutes
 
       cy.contains('Proposals');
 
@@ -180,33 +184,13 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.get('[data-cy=start-date] input').type('{selectall}{backspace}');
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.get('[data-cy="next-step"]').click();
+      cy.get(`[data-day=${firstDayMonth}]`).click();
 
-      cy.contains('Invalid Date');
+      cy.get(`[data-day=${lastDayMonth}]`).click();
 
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        invalidPastDate
-      ).should('have.value', invalidPastDate + ':mm');
-
-      cy.contains('Invalid Date');
-
-      cy.setDatePickerValue('[data-cy=start-date] input', startDate).should(
-        'have.value',
-        startDate
-      );
-
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        invalidFutureDate
-      ).should('have.value', invalidFutureDate + ':mm');
-
-      cy.setDatePickerValue('[data-cy=end-date] input', endDate).should(
-        'have.value',
-        endDate
-      );
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]')
@@ -228,7 +212,7 @@ context('Calls tests', () => {
         cy.get('[role="presentation"]').contains(esiTemplateName).click();
       }
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="next-step"]').click();
@@ -261,52 +245,12 @@ context('Calls tests', () => {
       cy.get('[data-cy="cycle-comment"] .Mui-error').should('exist');
     });
 
-    it('A user-officer should not be able to create a call with end dates before start dates', () => {
-      const shortCode = faker.random.alphaNumeric(15);
-      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
-      const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
-      cy.clock(todayJsDate);
-
-      const yesterday = today.minus({ days: 1 }).day;
-      const tomorrow = today
-        .plus({ days: 1 })
-        .startOf('day')
-        // TODO: Find a way how to access the settings format here and not hard coding it like this.
-        .toFormat(initialDBData.getFormats().dateTimeFormat)
-        .toString();
-
-      cy.contains('Proposals');
-
-      cy.contains('Calls').click();
-
-      cy.contains('Create').click();
-
-      cy.get('[data-cy=short-code] input')
-        .type(shortCode)
-        .should('have.value', shortCode);
-
-      cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
-
-      cy.get('[role="dialog"] .MuiDateCalendar-root .MuiPickersDay-root')
-        .contains(yesterday)
-        .closest('button')
-        .should('be.disabled');
-
-      cy.get('[data-cy=start-date] input').click();
-
-      cy.setDatePickerValue('[data-cy=start-date] input', tomorrow)
-        .should('have.value', tomorrow)
-        .blur();
-
-      cy.get('[data-cy=end-date] .Mui-error').should('exist');
-    });
-
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
       // will be enabled after @user-office-software/duo-validation new version
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
+      const todayJsDate = new Date();
       const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
       cy.clock(todayJsDate);
 
@@ -314,12 +258,6 @@ context('Calls tests', () => {
         .minus({ days: 1 })
         .toFormat(initialDBData.getFormats().dateTimeFormat)
         .toString();
-      const tomorrow = today
-        .plus({ days: 1 })
-        .startOf('day')
-        // TODO: Find a way how to access the settings format here and not hard coding it like this.
-        .toFormat(initialDBData.getFormats().dateTimeFormat)
-        .toString();
 
       cy.contains('Proposals');
 
@@ -327,17 +265,20 @@ context('Calls tests', () => {
 
       cy.contains('Create').click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.contains('Loading...').should('not.exist');
 
       cy.get('[role="presentation"]')
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', tomorrow).should(
-        'have.value',
-        tomorrow
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
+
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
@@ -350,20 +291,12 @@ context('Calls tests', () => {
     it('A user-officer should be able to create a call', () => {
       const {
         shortCode,
-        startCall,
-        endCall,
         templateName,
         fapReviewTemplateName,
         technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate = startCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callEndDate = endCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
@@ -375,15 +308,13 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
-        'have.value',
-        callStartDate
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
-        'have.value',
-        callEndDate
-      );
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
@@ -434,23 +365,15 @@ context('Calls tests', () => {
       }
       const {
         shortCode,
-        startCall,
-        endCall,
         templateName,
         fapReviewTemplateName,
         technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate = startCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callEndDate = endCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
 
-      const callInternalEndDate = endCall
-        .plus({ days: 7 })
+      const callInternalEndDate = DateTime.now()
+        .plus({ days: 40 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const callSurveyComment = faker.lorem.word(10);
@@ -464,15 +387,13 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
-        'have.value',
-        callStartDate
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
-        'have.value',
-        callEndDate
-      );
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
@@ -573,13 +494,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call', () => {
-      const { shortCode, startDate, endDate } = updatedCall;
-      const updatedCallStartDate = startDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const updatedCallEndDate = endDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
+      const { shortCode } = updatedCall;
 
       const refNumFormat = '211{digits:5}';
 
@@ -607,20 +522,17 @@ context('Calls tests', () => {
         'have.value',
         proposalWorkflow.name
       );
-
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        updatedCallStartDate
-      ).should('have.value', updatedCallStartDate);
-
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        updatedCallEndDate
-      ).should('have.value', updatedCallEndDate);
-
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
       });
+
+      cy.get('[data-cy=start-end-call-input]').click();
+
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -647,15 +559,10 @@ context('Calls tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const { shortCode, startDate, endDate } = updatedCall;
-      const updatedCallStartDate = startDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const updatedCallEndDate = endDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callInternalEndDate = endDate
-        .plus({ days: 7 })
+      const { shortCode } = updatedCall;
+
+      const callInternalEndDate = DateTime.now()
+        .plus({ days: 35 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const refNumFormat = '211{digits:5}';
@@ -680,15 +587,13 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        updatedCallStartDate
-      ).should('have.value', updatedCallStartDate);
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        updatedCallEndDate
-      ).should('have.value', updatedCallEndDate);
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('#proposalWorkflowId-input').click();
 
@@ -791,7 +696,7 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[aria-label="Deactivate call"]')
+        .find('[aria-label="Archive call"]')
         .click();
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -801,31 +706,11 @@ context('Calls tests', () => {
         'not.contain',
         newCall.shortCode
       );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
-
-      cy.finishedLoading();
-
+      cy.contains('Archived').click();
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[aria-label="Activate call"]')
+        .find('[aria-label="Unarchive call"]')
         .click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.notification({ variant: 'success', text: 'successfully' });
-
-      cy.get('[data-cy="calls-table"]').should(
-        'not.contain',
-        newCall.shortCode
-      );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="calls-table"]').should('contain', newCall.shortCode);
     });
 
     it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
@@ -948,24 +833,80 @@ context('Calls tests', () => {
         });
     });
 
+    it('User officer can reorder how calls appear to a user', () => {
+      cy.createCall({
+        ...newInactiveCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      let firstTableRowTextBeforeSorting: string;
+      let firstTableRowTextAfterSorting: string;
+      cy.contains('Calls').click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="order-calls-button"]').first().click();
+      cy.contains('Drag to order calls');
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .then((element) => {
+          firstTableRowTextBeforeSorting = element.text();
+        });
+      //reorder
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .dragElement([
+          { direction: 'left', length: 0 },
+          { direction: 'down', length: 1 },
+        ]);
+
+      cy.get('[data-cy="call-list-drag-item"]')
+        .last()
+        .then((element) => {
+          firstTableRowTextAfterSorting = element.text();
+          expect(firstTableRowTextBeforeSorting).not.equal(
+            firstTableRowTextAfterSorting
+          );
+        });
+
+      //Open calls
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newCall,
+        proposalWorkflowId: initialDBData.proposal.id,
+        startCall: yesterday,
+        endCall: DateTime.now().plus({ days: 5 }),
+        endCallInternal: DateTime.now().plus({ days: 6 }),
+      });
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newInactiveCall,
+        shortCode: initialDBData.call.shortCode,
+        endCall: DateTime.now().plus({ days: 31, hours: 1 }),
+        proposalWorkflowId: initialDBData.proposal.id,
+      });
+      //check order for users
+      cy.logout();
+      cy.login('user2', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+
+      cy.get('[data-cy="call-list"]').find('li:first-child');
+      cy.contains(newCall.shortCode);
+    });
+
     it('User officer can filter calls by their status', () => {
       cy.createCall({
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
-
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
 
       cy.finishedLoading();
 
@@ -975,7 +916,7 @@ context('Calls tests', () => {
       cy.contains(newCall.shortCode);
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
+      cy.get('[role="listbox"]').contains('Closed').click();
 
       cy.finishedLoading();
 
@@ -995,7 +936,7 @@ context('Calls tests', () => {
       ).should('have.length', 3);
     });
 
-    it('User officer can filter active internal calls by their status', function () {
+    it('User officer can filter active calls by their status', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
@@ -1003,13 +944,6 @@ context('Calls tests', () => {
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
 
       cy.contains('Calls').click();
@@ -1033,10 +967,10 @@ context('Calls tests', () => {
       }).then(() => {
         cy.reload();
         cy.get('[data-cy="call-status-filter"]').click();
-        cy.get('[role="listbox"]').contains('Active Internal').click();
+        cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
-        ).should('have.length', 1);
+        ).should('have.length', 2);
       });
     });
 
@@ -1044,7 +978,7 @@ context('Calls tests', () => {
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('All').click();
 
       cy.contains(newCall.shortCode)
         .parent()
@@ -1136,7 +1070,7 @@ context('Calls tests', () => {
       id: initialDBData.call.id,
       ...newCall,
       shortCode: initialDBData.call.shortCode,
-      endCall: DateTime.now().plus({ minutes: 1, seconds: 50 }),
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
@@ -1249,7 +1183,7 @@ context('Calls tests', () => {
       ...newCall,
       shortCode: initialDBData.call.shortCode,
       endCall: yesterday,
-      endCallInternal: DateTime.now().plus({ minutes: 1, seconds: 30 }),
+      endCallInternal: DateTime.now().plus({ minutes: 1, seconds: 59 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();

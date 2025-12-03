@@ -3,12 +3,11 @@ import { container } from 'tsyringe';
 
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
-import {
+import callFactoryService, {
   XLSXType,
   XLSXMetaBase,
   DownloadType,
-  DownloadService,
-} from '../../factory/DownloadService';
+} from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
   CallExtraFapDataColumns,
@@ -25,10 +24,6 @@ const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
 
 const router = express.Router();
 
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
-
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
     if (!req.user) {
@@ -36,8 +31,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const proposalPks: number[] = req.params.proposal_pks
@@ -71,7 +65,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },
@@ -91,8 +85,7 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const fapId = parseInt(req.params.fap_id);
@@ -117,7 +110,7 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.FAP,
       { data, meta, userRole },
@@ -137,8 +130,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const callId = parseInt(req.params.call_id);
@@ -159,7 +151,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.CALL_FAP,
       { data, meta, userRole },
@@ -190,8 +182,7 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const proposalPks: number[] = req.params.proposal_pks
@@ -228,7 +219,7 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },

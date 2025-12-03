@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import {
@@ -26,6 +26,7 @@ import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
+import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
   FapRecord,
@@ -55,6 +56,10 @@ import {
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
+  protected userDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as UserDataSource;
+
   constructor(
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
   ) {}
@@ -186,22 +191,22 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getUserFaps(userId: number, role: Role): Promise<Fap[]> {
+  async getUserFaps(userId: number, role: Roles): Promise<Fap[]> {
     const qb = database<FapRecord>('faps').select<FapRecord[]>('faps.*');
 
-    if (role.shortCode === Roles.FAP_CHAIR) {
+    if (role === Roles.FAP_CHAIR) {
       qb.join('fap_chairs', 'fap_chairs.fap_id', '=', 'faps.fap_id').where(
         'fap_chairs.user_id',
         userId
       );
-    } else if (role.shortCode === Roles.FAP_SECRETARY) {
+    } else if (role === Roles.FAP_SECRETARY) {
       qb.join(
         'fap_secretaries',
         'fap_secretaries.fap_id',
         '=',
         'faps.fap_id'
       ).where('fap_secretaries.user_id', userId);
-    } else if (role.shortCode === Roles.FAP_REVIEWER) {
+    } else if (role === Roles.FAP_REVIEWER) {
       qb.join(
         'fap_reviewers',
         'fap_reviewers.fap_id',
@@ -335,6 +340,45 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getLegacyFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
+    const fapProposals: FapProposalRecord[] = await database
+      .select(['fp.*'])
+      .from('fap_proposals as fp')
+      .modify((query) => {
+        query
+          .join('proposals as p', {
+            'p.proposal_pk': 'fp.proposal_pk',
+          })
+          .join('statuses as s', {
+            'p.status_id': 's.status_id',
+          })
+          .join('call as c', {
+            'p.call_id': 'c.call_id',
+          })
+          .where(function () {
+            this.where('p.submitted', true);
+            this.andWhere('c.call_fap_review_ended', true);
+          });
+
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
+        }
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
+        }
+      })
+      .where('fp.fap_id', filter.fapId)
+      .distinctOn('fp.proposal_pk');
+
+    return fapProposals.map((fapProposal) =>
+      createFapProposalObject(fapProposal)
+    );
+  }
+
   async getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number
@@ -406,7 +450,8 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getCurrentFapReviewerProposalCount(
-    reviewerId: number
+    reviewerId: number,
+    fapId: number
   ): Promise<number> {
     const callFilter = {
       isFapReviewEnded: false,
@@ -424,6 +469,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       })
       .whereIn('fp.call_id', callIds)
       .andWhere('fr.user_id', reviewerId)
+      .andWhere('fr.fap_id', fapId)
       .groupBy('fr.user_id')
       .first()
       .then((result: { count?: string | undefined } | undefined) => {
@@ -857,6 +903,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       memberId: number;
       fapProposalId: number;
       questionaryId: number;
+      rank?: number;
     }[],
     fapId: number
   ) {
@@ -868,6 +915,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         fap_id: fapId,
         fap_proposal_id: assignment.fapProposalId,
         questionary_id: assignment.questionaryId,
+        rank: assignment.rank || null,
       }))
     );
 

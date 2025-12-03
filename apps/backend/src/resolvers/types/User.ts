@@ -15,6 +15,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { User as UserOrigin } from '../../models/User';
 import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
@@ -54,9 +55,6 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public firstname: string;
 
-  @Field(() => String, { nullable: true })
-  public middlename: string | undefined;
-
   @Field()
   public lastname: string;
 
@@ -75,9 +73,6 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public gender: string;
 
-  @Field(() => Int, { nullable: true })
-  public nationality: number;
-
   @Field()
   public birthdate: Date;
 
@@ -95,9 +90,6 @@ export class User implements Partial<UserOrigin> {
 
   @Field()
   public telephone: string;
-
-  @Field(() => String, { nullable: true })
-  public telephone_alt: string | undefined;
 
   @Field()
   public placeholder: boolean;
@@ -191,7 +183,7 @@ export class UserResolver {
 
     return context.queries.fap.dataSource.getUserFaps(
       user.id,
-      context.user.currentRole
+      context.user.currentRole.shortCode as Roles
     );
   }
 

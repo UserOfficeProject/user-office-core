@@ -54,7 +54,7 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 7,
+      id: 8,
       title: 'Topic title',
     },
   },
@@ -73,6 +73,10 @@ export default {
       id: 6,
       title: 'Topic title',
     },
+  },
+  experimentSafetyReviewTemplate: {
+    id: 4,
+    name: 'default experiment safety review template',
   },
   questions: {
     boolean: {
@@ -288,57 +292,118 @@ export default {
       email: 'unverified-user@example.com',
       password: '',
     },
+    instrumentScientist1: {
+      id: 100,
+      firstName: 'Instrument',
+      lastName: 'Scientist1',
+      email: 'instr.sci1@local.host',
+      password: 'Test1234!',
+    },
+    instrumentScientist2: {
+      id: 101,
+      firstName: 'Instrument',
+      lastName: 'Scientist2',
+      email: 'instr.sci2@local.host',
+      password: 'Test1234!',
+    },
+    experimentSafetyReviewer1: {
+      id: 103,
+      firstName: 'Experiment',
+      lastName: 'Safety',
+      email: 'experiment.safety@local.host',
+      password: 'Test1234!',
+    },
   },
   proposalStatuses: {
     draft: {
       id: 1,
       name: 'DRAFT',
+      shortCode: 'DRAFT',
     },
     feasibilityReview: {
       id: 2,
       name: 'FEASIBILITY_REVIEW',
+      shortCode: 'FEASIBILITY_REVIEW',
     },
-    notFeasible: { id: 3 },
-    fapSelection: { id: 4 },
+    notFeasible: {
+      id: 3,
+      name: 'NOT_FEASIBLE',
+      shortCode: 'NOT_FEASIBLE',
+    },
+    fapSelection: {
+      id: 4,
+      name: 'FAP_SELECTION',
+      shortCode: 'FAP_SELECTION',
+    },
     fapReview: {
       id: 5,
       name: 'FAP_REVIEW',
+      shortCode: 'FAP_REVIEW',
     },
     expired: {
       id: 9,
       name: 'EXPIRED',
+      shortCode: 'EXPIRED',
     },
     fapMeeting: {
       id: 12,
       name: 'FAP Meeting',
+      shortCode: 'FAP_MEETING',
     },
     editableSubmitted: {
       id: 14,
       name: 'EDITABLE_SUBMITTED',
+      shortCode: 'EDITABLE_SUBMITTED',
     },
     editableSubmittedInternal: {
       id: 15,
       name: 'EDITABLE_SUBMITTED_INTERNAL',
+      shortCode: 'EDITABLE_SUBMITTED_INTERNAL',
+    },
+    awaitingEsf: {
+      id: 17,
+      name: 'AWAITING ESF',
+      shortCode: 'AWAITING_ESF',
+    },
+    esfIsReview: {
+      id: 18,
+      name: 'ESF_IS_REVIEW',
+      shortCode: 'ESF_IS_REVIEW',
+    },
+    esfEsrReview: {
+      id: 19,
+      name: 'ESF ESR REVIEW',
+      shortCode: 'ESF_ESR_REVIEW',
+    },
+    esfRejected: {
+      id: 20,
+      name: 'ESF REJECTED',
+      shortCode: 'ESF_REJECTED',
     },
     quickReview: {
       id: 22,
       name: 'QUICK_REVIEW',
+      shortCode: 'QUICK_REVIEW',
     },
     underReview: {
       id: 23,
       name: 'UNDER_REVIEW',
+      shortCode: 'UNDER_REVIEW',
     },
     approved: {
       id: 24,
       name: 'APPROVED',
+      shortCode: 'APPROVED',
     },
     unsuccessful: {
       id: 25,
       name: 'UNSUCCESSFUL',
+      shortCode: 'UNSUCCESSFUL',
     },
     finished: {
       id: 26,
       name: 'FINISHED',
+      shortCode: 'FINISHED',
     },
   },
   experiments: {
@@ -386,5 +451,12 @@ export default {
       id: 1,
     },
     defaultDroppableGroup: 'proposalWorkflowConnections_0',
+  },
+  sample1: {
+    sampleId: 1,
+    title: 'My sample title',
+    questionaryId: 4,
+    proposalPk: 1,
+    questionId: 'sample_declaration_question',
   },
 };

@@ -1,670 +1,1128 @@
 {
-    "metadata": {
-        "version": "1.2.0",
-        "exportDate": "2024-08-08T11:27:53.039Z"
+  "metadata": {
+    "version": "1.2.0",
+    "exportDate": "2025-10-17T11:23:20.021Z"
+  },
+  "data": {
+    "template": {
+      "templateId": 1,
+      "groupId": "PROPOSAL",
+      "name": "default template",
+      "description": "original template",
+      "isArchived": false
     },
-    "data": {
+    "templateSteps": [
+      {
+        "topic": {
+          "id": 1,
+          "title": "New proposal",
+          "templateId": 1,
+          "sortOrder": 0,
+          "isEnabled": true
+        },
+        "fields": [
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "proposal_basis",
+              "naturalKey": "proposal_basis",
+              "dataType": "PROPOSAL_BASIS",
+              "question": "Proposal basic information",
+              "config": {
+                "tooltip": "",
+                "required": false,
+                "small_label": "",
+                "readPermissions": []
+              }
+            },
+            "topicId": 1,
+            "sortOrder": 0,
+            "config": {
+              "tooltip": "",
+              "required": false,
+              "small_label": "",
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          }
+        ]
+      },
+      {
+        "topic": {
+          "id": 8,
+          "title": "Topic title",
+          "templateId": 1,
+          "sortOrder": 1,
+          "isEnabled": true
+        },
+        "fields": [
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "sample_declaration_question",
+              "naturalKey": "sample_declaration_question",
+              "dataType": "SAMPLE_DECLARATION",
+              "question": "Add samples",
+              "config": {
+                "addEntryButtonLabel": "Add",
+                "templateCategory": "SAMPLE_DECLARATION",
+                "templateId": 7,
+                "esiTemplateId": 6,
+                "small_label": "",
+                "required": false,
+                "readPermissions": [],
+                "maxEntries": null,
+                "minEntries": null
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 0,
+            "config": {
+              "addEntryButtonLabel": "Add",
+              "templateCategory": "SAMPLE_DECLARATION",
+              "templateId": 7,
+              "esiTemplateId": 6,
+              "small_label": "",
+              "required": false,
+              "readPermissions": [],
+              "maxEntries": null,
+              "minEntries": null
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "number_question",
+              "naturalKey": "number_question",
+              "dataType": "NUMBER_INPUT",
+              "question": "Number question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "units": [
+                  {
+                    "id": "meter",
+                    "unit": "meter",
+                    "symbol": "m",
+                    "quantity": "length",
+                    "siConversionFormula": "x"
+                  },
+                  {
+                    "id": "centimeter",
+                    "unit": "centimeter",
+                    "symbol": "cm",
+                    "quantity": "length",
+                    "siConversionFormula": "x / 100"
+                  }
+                ],
+                "readPermissions": [],
+                "numberValueConstraint": null
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 2,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "units": [
+                {
+                  "id": "meter",
+                  "unit": "meter",
+                  "symbol": "m",
+                  "quantity": "length",
+                  "siConversionFormula": "x"
+                },
+                {
+                  "id": "centimeter",
+                  "unit": "centimeter",
+                  "symbol": "cm",
+                  "quantity": "length",
+                  "siConversionFormula": "x / 100"
+                }
+              ],
+              "readPermissions": [],
+              "numberValueConstraint": null
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "boolean_question",
+              "naturalKey": "boolean_question",
+              "dataType": "BOOLEAN",
+              "question": "Boolean question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 3,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "interval_question",
+              "naturalKey": "interval_question",
+              "dataType": "INTERVAL",
+              "question": "Interval question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "units": [
+                  {
+                    "id": "meter",
+                    "unit": "meter",
+                    "symbol": "m",
+                    "quantity": "length",
+                    "siConversionFormula": "x"
+                  }
+                ],
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 4,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "units": [
+                {
+                  "id": "meter",
+                  "unit": "meter",
+                  "symbol": "m",
+                  "quantity": "length",
+                  "siConversionFormula": "x"
+                }
+              ],
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "date_question",
+              "naturalKey": "date_question",
+              "dataType": "DATE",
+              "question": "Date question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "includeTime": false,
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 5,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "includeTime": false,
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "selection_from_options_question",
+              "naturalKey": "selection_from_options_question",
+              "dataType": "SELECTION_FROM_OPTIONS",
+              "question": "Selection from options question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "options": [
+                  "One",
+                  "Two",
+                  "Three"
+                ],
+                "isMultipleSelect": true,
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 6,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "options": [
+                "One",
+                "Two",
+                "Three"
+              ],
+              "isMultipleSelect": true,
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "text_input_question",
+              "naturalKey": "text_input_question",
+              "dataType": "TEXT_INPUT",
+              "question": "Text input question from seeds",
+              "config": {
+                "required": false,
+                "small_label": "",
+                "tooltip": "",
+                "htmlQuestion": "",
+                "isHtmlQuestion": false,
+                "min": null,
+                "max": null,
+                "multiline": false,
+                "placeholder": "",
+                "isCounterHidden": false,
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 7,
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "htmlQuestion": "",
+              "isHtmlQuestion": false,
+              "min": null,
+              "max": null,
+              "multiline": false,
+              "placeholder": "",
+              "isCounterHidden": false,
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "rich_text_input_question",
+              "naturalKey": "rich_text_input_question",
+              "dataType": "RICH_TEXT_INPUT",
+              "question": "Rich text input question from seeds",
+              "config": {
+                "required": false,
+                "small_label": "",
+                "tooltip": "",
+                "max": null,
+                "allowImages": false,
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 8,
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "max": null,
+              "allowImages": false,
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "file_upload_question",
+              "naturalKey": "file_upload_question",
+              "dataType": "FILE_UPLOAD",
+              "question": "File upload question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "file_type": [
+                  ".pdf",
+                  ".doc",
+                  ".docx"
+                ],
+                "pdf_page_limit": 0,
+                "max_files": 0,
+                "omitFromPdf": false,
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 8,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "file_type": [
+                ".pdf",
+                ".doc",
+                ".docx"
+              ],
+              "pdf_page_limit": 0,
+              "max_files": 0,
+              "omitFromPdf": false,
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "embellishment_question",
+              "naturalKey": "embellishment_question",
+              "dataType": "EMBELLISHMENT",
+              "question": "Embellishment question from seeds",
+              "config": {
+                "html": "",
+                "plain": "",
+                "omitFromPdf": false,
+                "readPermissions": [],
+                "tooltip": "",
+                "required": false,
+                "small_label": ""
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 9,
+            "config": {
+              "html": "",
+              "plain": "",
+              "omitFromPdf": false,
+              "readPermissions": [],
+              "tooltip": "",
+              "required": false,
+              "small_label": ""
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "dynamic_multiple_choice_question",
+              "naturalKey": "dynamic_multiple_choice_question",
+              "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+              "question": "Dynamic multiple choice question from seeds",
+              "config": {
+                "required": false,
+                "small_label": "",
+                "tooltip": "",
+                "variant": "dropdown",
+                "url": "",
+                "jsonPath": "",
+                "isMultipleSelect": true,
+                "apiCallRequestHeaders": [],
+                "readPermissions": []
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 10,
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "variant": "dropdown",
+              "url": "",
+              "jsonPath": "",
+              "isMultipleSelect": true,
+              "apiCallRequestHeaders": [],
+              "readPermissions": []
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "instrument_picker_question",
+              "naturalKey": "instrument_picker_question",
+              "dataType": "INSTRUMENT_PICKER",
+              "question": "Instrument Picker question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "instruments": [],
+                "isMultipleSelect": false,
+                "requestTime": false,
+                "readPermissions": [],
+                "options": [
+                  1,
+                  2
+                ]
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 11,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "instruments": [],
+              "isMultipleSelect": false,
+              "requestTime": false,
+              "readPermissions": [],
+              "options": [
+                1,
+                2
+              ]
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          },
+          {
+            "question": {
+              "categoryId": 1,
+              "id": "technique_picker_question",
+              "naturalKey": "technique_picker_question",
+              "dataType": "TECHNIQUE_PICKER",
+              "question": "Technique Picker question from seeds",
+              "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "techniques": [],
+                "isMultipleSelect": false,
+                "readPermissions": [],
+                "options": [
+                  1,
+                  2
+                ]
+              }
+            },
+            "topicId": 8,
+            "sortOrder": 12,
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "techniques": [],
+              "isMultipleSelect": false,
+              "readPermissions": [],
+              "options": [
+                1,
+                2
+              ]
+            },
+            "dependencies": [],
+            "dependenciesOperator": "AND"
+          }
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "categoryId": 1,
+        "id": "proposal_basis",
+        "naturalKey": "proposal_basis",
+        "dataType": "PROPOSAL_BASIS",
+        "question": "Proposal basic information",
+        "config": {
+          "tooltip": "",
+          "required": false,
+          "small_label": "",
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "sample_declaration_question",
+        "naturalKey": "sample_declaration_question",
+        "dataType": "SAMPLE_DECLARATION",
+        "question": "Add samples",
+        "config": {
+          "addEntryButtonLabel": "Add",
+          "templateCategory": "SAMPLE_DECLARATION",
+          "templateId": 7,
+          "esiTemplateId": 6,
+          "small_label": "",
+          "required": false,
+          "readPermissions": [],
+          "maxEntries": null,
+          "minEntries": null
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "number_question",
+        "naturalKey": "number_question",
+        "dataType": "NUMBER_INPUT",
+        "question": "Number question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "units": [
+            {
+              "id": "meter",
+              "unit": "meter",
+              "symbol": "m",
+              "quantity": "length",
+              "siConversionFormula": "x"
+            },
+            {
+              "id": "centimeter",
+              "unit": "centimeter",
+              "symbol": "cm",
+              "quantity": "length",
+              "siConversionFormula": "x / 100"
+            }
+          ],
+          "readPermissions": [],
+          "numberValueConstraint": null
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "boolean_question",
+        "naturalKey": "boolean_question",
+        "dataType": "BOOLEAN",
+        "question": "Boolean question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "interval_question",
+        "naturalKey": "interval_question",
+        "dataType": "INTERVAL",
+        "question": "Interval question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "units": [
+            {
+              "id": "meter",
+              "unit": "meter",
+              "symbol": "m",
+              "quantity": "length",
+              "siConversionFormula": "x"
+            }
+          ],
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "date_question",
+        "naturalKey": "date_question",
+        "dataType": "DATE",
+        "question": "Date question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "includeTime": false,
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "selection_from_options_question",
+        "naturalKey": "selection_from_options_question",
+        "dataType": "SELECTION_FROM_OPTIONS",
+        "question": "Selection from options question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "variant": "dropdown",
+          "options": [
+            "One",
+            "Two",
+            "Three"
+          ],
+          "isMultipleSelect": true,
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "text_input_question",
+        "naturalKey": "text_input_question",
+        "dataType": "TEXT_INPUT",
+        "question": "Text input question from seeds",
+        "config": {
+          "required": false,
+          "small_label": "",
+          "tooltip": "",
+          "htmlQuestion": "",
+          "isHtmlQuestion": false,
+          "min": null,
+          "max": null,
+          "multiline": false,
+          "placeholder": "",
+          "isCounterHidden": false,
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "rich_text_input_question",
+        "naturalKey": "rich_text_input_question",
+        "dataType": "RICH_TEXT_INPUT",
+        "question": "Rich text input question from seeds",
+        "config": {
+          "required": false,
+          "small_label": "",
+          "tooltip": "",
+          "max": null,
+          "allowImages": false,
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "file_upload_question",
+        "naturalKey": "file_upload_question",
+        "dataType": "FILE_UPLOAD",
+        "question": "File upload question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "file_type": [
+            ".pdf",
+            ".doc",
+            ".docx"
+          ],
+          "pdf_page_limit": 0,
+          "max_files": 0,
+          "omitFromPdf": false,
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "embellishment_question",
+        "naturalKey": "embellishment_question",
+        "dataType": "EMBELLISHMENT",
+        "question": "Embellishment question from seeds",
+        "config": {
+          "html": "",
+          "plain": "",
+          "omitFromPdf": false,
+          "readPermissions": [],
+          "tooltip": "",
+          "required": false,
+          "small_label": ""
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "dynamic_multiple_choice_question",
+        "naturalKey": "dynamic_multiple_choice_question",
+        "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+        "question": "Dynamic multiple choice question from seeds",
+        "config": {
+          "required": false,
+          "small_label": "",
+          "tooltip": "",
+          "variant": "dropdown",
+          "url": "",
+          "jsonPath": "",
+          "isMultipleSelect": true,
+          "apiCallRequestHeaders": [],
+          "readPermissions": []
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "instrument_picker_question",
+        "naturalKey": "instrument_picker_question",
+        "dataType": "INSTRUMENT_PICKER",
+        "question": "Instrument Picker question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "variant": "dropdown",
+          "instruments": [],
+          "isMultipleSelect": false,
+          "requestTime": false,
+          "readPermissions": [],
+          "options": [
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "categoryId": 1,
+        "id": "technique_picker_question",
+        "naturalKey": "technique_picker_question",
+        "dataType": "TECHNIQUE_PICKER",
+        "question": "Technique Picker question from seeds",
+        "config": {
+          "small_label": "",
+          "required": false,
+          "tooltip": "",
+          "variant": "dropdown",
+          "techniques": [],
+          "isMultipleSelect": false,
+          "readPermissions": [],
+          "options": [
+            1,
+            2
+          ]
+        }
+      }
+    ],
+    "subTemplates": [
+      {
         "template": {
-            "templateId": 1,
-            "groupId": "PROPOSAL",
-            "name": "default template",
-            "description": "original template",
-            "isArchived": false
+          "templateId": 7,
+          "groupId": "SAMPLE",
+          "name": "default sample declaration template",
+          "description": "default sample declaration template",
+          "isArchived": false
         },
         "templateSteps": [
-            {
-                "topic": {
-                    "id": 1,
-                    "title": "New proposal",
-                    "templateId": 1,
-                    "sortOrder": 0,
-                    "isEnabled": true
-                },
-                "fields": [
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "proposal_basis",
-                            "naturalKey": "proposal_basis",
-                            "dataType": "PROPOSAL_BASIS",
-                            "question": "Proposal basic information",
-                            "config": {
-                                "tooltip": "",
-                                "required": false,
-                                "small_label": ""
-                            }
-                        },
-                        "topicId": 1,
-                        "sortOrder": 0,
-                        "config": {
-                            "tooltip": "",
-                            "required": false,
-                            "small_label": ""
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    }
-                ]
+          {
+            "topic": {
+              "id": 7,
+              "title": "New sample",
+              "templateId": 7,
+              "sortOrder": 0,
+              "isEnabled": true
             },
-            {
-                "topic": {
-                    "id": 7,
-                    "title": "Topic title",
-                    "templateId": 1,
-                    "sortOrder": 1,
-                    "isEnabled": true
-                },
-                "fields": [
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "sample_declaration_question",
-                            "naturalKey": "sample_declaration_question",
-                            "dataType": "SAMPLE_DECLARATION",
-                            "question": "Add samples",
-                            "config": {
-                                "addEntryButtonLabel": "Add",
-                                "templateCategory": "SAMPLE_DECLARATION",
-                                "templateId": 6,
-                                "esiTemplateId": 5,
-                                "small_label": "",
-                                "required": false,
-                                "maxEntries": null,
-                                "minEntries": null
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 0,
-                        "config": {
-                            "addEntryButtonLabel": "Add",
-                            "templateCategory": "SAMPLE_DECLARATION",
-                            "templateId": 6,
-                            "esiTemplateId": 5,
-                            "small_label": "",
-                            "required": false,
-                            "maxEntries": null,
-                            "minEntries": null
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "number_question",
-                            "naturalKey": "number_question",
-                            "dataType": "NUMBER_INPUT",
-                            "question": "Number question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "units": [
-                                    {
-                                        "id": "meter",
-                                        "unit": "meter",
-                                        "symbol": "m",
-                                        "quantity": "length",
-                                        "siConversionFormula": "x"
-                                    },
-                                    {
-                                        "id": "centimeter",
-                                        "unit": "centimeter",
-                                        "symbol": "cm",
-                                        "quantity": "length",
-                                        "siConversionFormula": "x / 100"
-                                    }
-                                ],
-                                "numberValueConstraint": null
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 2,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "units": [
-                                {
-                                    "id": "meter",
-                                    "unit": "meter",
-                                    "symbol": "m",
-                                    "quantity": "length",
-                                    "siConversionFormula": "x"
-                                },
-                                {
-                                    "id": "centimeter",
-                                    "unit": "centimeter",
-                                    "symbol": "cm",
-                                    "quantity": "length",
-                                    "siConversionFormula": "x / 100"
-                                }
-                            ],
-                            "numberValueConstraint": null
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "boolean_question",
-                            "naturalKey": "boolean_question",
-                            "dataType": "BOOLEAN",
-                            "question": "Boolean question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": ""
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 3,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": ""
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "interval_question",
-                            "naturalKey": "interval_question",
-                            "dataType": "INTERVAL",
-                            "question": "Interval question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "units": [
-                                    {
-                                        "id": "meter",
-                                        "unit": "meter",
-                                        "symbol": "m",
-                                        "quantity": "length",
-                                        "siConversionFormula": "x"
-                                    }
-                                ]
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 4,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "units": [
-                                {
-                                    "id": "meter",
-                                    "unit": "meter",
-                                    "symbol": "m",
-                                    "quantity": "length",
-                                    "siConversionFormula": "x"
-                                }
-                            ]
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "date_question",
-                            "naturalKey": "date_question",
-                            "dataType": "DATE",
-                            "question": "Date question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "includeTime": false
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 5,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "includeTime": false
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "technique_picker_question",
-                            "naturalKey": "technique_picker_question",
-                            "dataType": "TECHNIQUE_PICKER",
-                            "question": "Technique Picker question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "variant": "dropdown",
-                                "techniques": [],
-                                "isMultipleSelect": false,
-                                "options": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 6,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "variant": "dropdown",
-                            "techniques": [],
-                            "isMultipleSelect": false,
-                            "options": [
-                                1,
-                                2
-                            ]
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "selection_from_options_question",
-                            "naturalKey": "selection_from_options_question",
-                            "dataType": "SELECTION_FROM_OPTIONS",
-                            "question": "Selection from options question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "variant": "dropdown",
-                                "options": [
-                                    "One",
-                                    "Two",
-                                    "Three"
-                                ],
-                                "isMultipleSelect": true
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 6,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "variant": "dropdown",
-                            "options": [
-                                "One",
-                                "Two",
-                                "Three"
-                            ],
-                            "isMultipleSelect": true
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "dynamic_multiple_choice_question",
-                            "naturalKey": "dynamic_multiple_choice_question",
-                            "dataType": "DYNAMIC_MULTIPLE_CHOICE",
-                            "question": "Dynamic multiple choice question from seeds",
-                            "config": {
-                                "required": false,
-                                "small_label": "",
-                                "tooltip": "",
-                                "variant": "dropdown",
-                                "url": "",
-                                "jsonPath": "",
-                                "isMultipleSelect": true,
-                                "apiCallRequestHeaders": []
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 6,
-                        "config": {
-                            "required": false,
-                            "small_label": "",
-                            "tooltip": "",
-                            "variant": "dropdown",
-                            "url": "",
-                            "jsonPath": "",
-                            "isMultipleSelect": true,
-                            "apiCallRequestHeaders": []
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "instrument_picker_question",
-                            "naturalKey": "instrument_picker_question",
-                            "dataType": "INSTRUMENT_PICKER",
-                            "question": "Instrument Picker question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "variant": "dropdown",
-                                "instruments": [],
-                                "isMultipleSelect": false,
-                                "requestTime": false,
-                                "options": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 6,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "variant": "dropdown",
-                            "instruments": [],
-                            "isMultipleSelect": false,
-                            "requestTime": false,
-                            "options": [
-                                1,
-                                2
-                            ]
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "text_input_question",
-                            "naturalKey": "text_input_question",
-                            "dataType": "TEXT_INPUT",
-                            "question": "Text input question from seeds",
-                            "config": {
-                                "required": false,
-                                "small_label": "",
-                                "tooltip": "",
-                                "htmlQuestion": "",
-                                "isHtmlQuestion": false,
-                                "min": null,
-                                "max": null,
-                                "multiline": false,
-                                "placeholder": "",
-                                "isCounterHidden": false
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 7,
-                        "config": {
-                            "required": false,
-                            "small_label": "",
-                            "tooltip": "",
-                            "htmlQuestion": "",
-                            "isHtmlQuestion": false,
-                            "min": null,
-                            "max": null,
-                            "multiline": false,
-                            "placeholder": "",
-                            "isCounterHidden": false
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "file_upload_question",
-                            "naturalKey": "file_upload_question",
-                            "dataType": "FILE_UPLOAD",
-                            "question": "File upload question from seeds",
-                            "config": {
-                                "small_label": "",
-                                "required": false,
-                                "tooltip": "",
-                                "file_type": [
-                                    ".pdf",
-                                    ".doc",
-                                    ".docx"
-                                ],
-                                "pdf_page_limit": 0,
-                                "max_files": 0,
-                                "omitFromPdf": false
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 8,
-                        "config": {
-                            "small_label": "",
-                            "required": false,
-                            "tooltip": "",
-                            "file_type": [
-                                ".pdf",
-                                ".doc",
-                                ".docx"
-                            ],
-                            "pdf_page_limit": 0,
-                            "max_files": 0,
-                            "omitFromPdf": false
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "rich_text_input_question",
-                            "naturalKey": "rich_text_input_question",
-                            "dataType": "RICH_TEXT_INPUT",
-                            "question": "Rich text input question from seeds",
-                            "config": {
-                                "required": false,
-                                "small_label": "",
-                                "tooltip": "",
-                                "max": null,
-                                "allowImages": false
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 8,
-                        "config": {
-                            "required": false,
-                            "small_label": "",
-                            "tooltip": "",
-                            "max": null,
-                            "allowImages": false
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    },
-                    {
-                        "question": {
-                            "categoryId": 1,
-                            "id": "embellishment_question",
-                            "naturalKey": "embellishment_question",
-                            "dataType": "EMBELLISHMENT",
-                            "question": "Embellishment question from seeds",
-                            "config": {
-                                "html": "",
-                                "plain": "",
-                                "omitFromPdf": false,
-                                "tooltip": "",
-                                "required": false,
-                                "small_label": ""
-                            }
-                        },
-                        "topicId": 7,
-                        "sortOrder": 9,
-                        "config": {
-                            "html": "",
-                            "plain": "",
-                            "omitFromPdf": false,
-                            "tooltip": "",
-                            "required": false,
-                            "small_label": ""
-                        },
-                        "dependencies": [],
-                        "dependenciesOperator": "AND"
-                    }
-                ]
-            }
-        ],
-        "questions": [
-            {
-                "categoryId": 1,
-                "id": "proposal_basis",
-                "naturalKey": "proposal_basis",
-                "dataType": "PROPOSAL_BASIS",
-                "question": "Proposal basic information",
-                "config": {
+            "fields": [
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_basis",
+                  "naturalKey": "sample_basis",
+                  "dataType": "SAMPLE_BASIS",
+                  "question": "Sample basic information",
+                  "config": {
+                    "titlePlaceholder": "Title",
                     "tooltip": "",
                     "required": false,
-                    "small_label": ""
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "sample_declaration_question",
-                "naturalKey": "sample_declaration_question",
-                "dataType": "SAMPLE_DECLARATION",
-                "question": "Add samples",
+                    "small_label": "",
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 0,
                 "config": {
-                    "addEntryButtonLabel": "Add",
-                    "templateCategory": "SAMPLE_DECLARATION",
-                    "templateId": 6,
-                    "esiTemplateId": 5,
+                  "titlePlaceholder": "Title",
+                  "tooltip": "",
+                  "required": false,
+                  "small_label": "",
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_boolean_question",
+                  "naturalKey": "sample_boolean_question",
+                  "dataType": "BOOLEAN",
+                  "question": "Sample Boolean question from seeds",
+                  "config": {
                     "small_label": "",
                     "required": false,
-                    "maxEntries": null,
-                    "minEntries": null
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "number_question",
-                "naturalKey": "number_question",
-                "dataType": "NUMBER_INPUT",
-                "question": "Number question from seeds",
+                    "tooltip": "",
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 3,
                 "config": {
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_date_question",
+                  "naturalKey": "sample_date_question",
+                  "dataType": "DATE",
+                  "question": "Sample Date question from seeds",
+                  "config": {
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "includeTime": false,
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 4,
+                "config": {
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "includeTime": false,
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_file_upload_question",
+                  "naturalKey": "sample_file_upload_question",
+                  "dataType": "FILE_UPLOAD",
+                  "question": "Sample file upload question from seeds",
+                  "config": {
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "file_type": [
+                      ".pdf",
+                      ".doc",
+                      ".docx"
+                    ],
+                    "pdf_page_limit": 0,
+                    "max_files": 0,
+                    "omitFromPdf": false,
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 5,
+                "config": {
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "file_type": [
+                    ".pdf",
+                    ".doc",
+                    ".docx"
+                  ],
+                  "pdf_page_limit": 0,
+                  "max_files": 0,
+                  "omitFromPdf": false,
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_interval_question",
+                  "naturalKey": "sample_interval_question",
+                  "dataType": "INTERVAL",
+                  "question": "Sample Interval question from seeds",
+                  "config": {
                     "small_label": "",
                     "required": false,
                     "tooltip": "",
                     "units": [
-                        {
-                            "id": "meter",
-                            "unit": "meter",
-                            "symbol": "m",
-                            "quantity": "length",
-                            "siConversionFormula": "x"
-                        },
-                        {
-                            "id": "centimeter",
-                            "unit": "centimeter",
-                            "symbol": "cm",
-                            "quantity": "length",
-                            "siConversionFormula": "x / 100"
-                        }
+                      {
+                        "id": "meter",
+                        "unit": "meter",
+                        "symbol": "m",
+                        "quantity": "length",
+                        "siConversionFormula": "x"
+                      }
                     ],
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 6,
+                "config": {
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "units": [
+                    {
+                      "id": "meter",
+                      "unit": "meter",
+                      "symbol": "m",
+                      "quantity": "length",
+                      "siConversionFormula": "x"
+                    }
+                  ],
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_number_question",
+                  "naturalKey": "sample_number_question",
+                  "dataType": "NUMBER_INPUT",
+                  "question": "Sample Number question from seeds",
+                  "config": {
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [
+                      {
+                        "id": "meter",
+                        "unit": "meter",
+                        "symbol": "m",
+                        "quantity": "length",
+                        "siConversionFormula": "x"
+                      },
+                      {
+                        "id": "centimeter",
+                        "unit": "centimeter",
+                        "symbol": "cm",
+                        "quantity": "length",
+                        "siConversionFormula": "x / 100"
+                      }
+                    ],
+                    "readPermissions": [],
                     "numberValueConstraint": null
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "boolean_question",
-                "naturalKey": "boolean_question",
-                "dataType": "BOOLEAN",
-                "question": "Boolean question from seeds",
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 7,
                 "config": {
-                    "small_label": "",
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "units": [
+                    {
+                      "id": "meter",
+                      "unit": "meter",
+                      "symbol": "m",
+                      "quantity": "length",
+                      "siConversionFormula": "x"
+                    },
+                    {
+                      "id": "centimeter",
+                      "unit": "centimeter",
+                      "symbol": "cm",
+                      "quantity": "length",
+                      "siConversionFormula": "x / 100"
+                    }
+                  ],
+                  "readPermissions": [],
+                  "numberValueConstraint": null
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_rich_text_input_question",
+                  "naturalKey": "sample_rich_text_input_question",
+                  "dataType": "RICH_TEXT_INPUT",
+                  "question": "Sample Rich text input question from seeds",
+                  "config": {
                     "required": false,
-                    "tooltip": ""
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "interval_question",
-                "naturalKey": "interval_question",
-                "dataType": "INTERVAL",
-                "question": "Interval question from seeds",
-                "config": {
                     "small_label": "",
-                    "required": false,
                     "tooltip": "",
-                    "units": [
-                        {
-                            "id": "meter",
-                            "unit": "meter",
-                            "symbol": "m",
-                            "quantity": "length",
-                            "siConversionFormula": "x"
-                        }
-                    ]
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "date_question",
-                "naturalKey": "date_question",
-                "dataType": "DATE",
-                "question": "Date question from seeds",
+                    "max": null,
+                    "allowImages": false,
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 8,
                 "config": {
-                    "small_label": "",
-                    "required": false,
-                    "tooltip": "",
-                    "includeTime": false
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "technique_picker_question",
-                "naturalKey": "technique_picker_question",
-                "dataType": "TECHNIQUE_PICKER",
-                "question": "Technique Picker question from seeds",
-                "config": {
-                    "small_label": "",
-                    "required": false,
-                    "tooltip": "",
-                    "variant": "dropdown",
-                    "techniques": [],
-                    "isMultipleSelect": false,
-                    "options": [
-                        1,
-                        2
-                    ]
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "selection_from_options_question",
-                "naturalKey": "selection_from_options_question",
-                "dataType": "SELECTION_FROM_OPTIONS",
-                "question": "Selection from options question from seeds",
-                "config": {
+                  "required": false,
+                  "small_label": "",
+                  "tooltip": "",
+                  "max": null,
+                  "allowImages": false,
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_selection_from_options_question",
+                  "naturalKey": "sample_selection_from_options_question",
+                  "dataType": "SELECTION_FROM_OPTIONS",
+                  "question": "Sample Selection from options question from seeds",
+                  "config": {
                     "small_label": "",
                     "required": false,
                     "tooltip": "",
                     "variant": "dropdown",
                     "options": [
-                        "One",
-                        "Two",
-                        "Three"
+                      "One",
+                      "Two",
+                      "Three"
                     ],
-                    "isMultipleSelect": true
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "dynamic_multiple_choice_question",
-                "naturalKey": "dynamic_multiple_choice_question",
-                "dataType": "DYNAMIC_MULTIPLE_CHOICE",
-                "question": "Dynamic multiple choice question from seeds",
+                    "isMultipleSelect": true,
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 9,
                 "config": {
+                  "small_label": "",
+                  "required": false,
+                  "tooltip": "",
+                  "variant": "dropdown",
+                  "options": [
+                    "One",
+                    "Two",
+                    "Three"
+                  ],
+                  "isMultipleSelect": true,
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_dynamic_multiple_choice_question",
+                  "naturalKey": "sample_dynamic_multiple_choice_question",
+                  "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+                  "question": "Sample Dynamic multiple choice question from seeds",
+                  "config": {
                     "required": false,
                     "small_label": "",
                     "tooltip": "",
@@ -672,36 +1130,34 @@
                     "url": "",
                     "jsonPath": "",
                     "isMultipleSelect": true,
-                    "apiCallRequestHeaders": []
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "instrument_picker_question",
-                "naturalKey": "instrument_picker_question",
-                "dataType": "INSTRUMENT_PICKER",
-                "question": "Instrument Picker question from seeds",
+                    "apiCallRequestHeaders": [],
+                    "readPermissions": []
+                  }
+                },
+                "topicId": 7,
+                "sortOrder": 10,
                 "config": {
-                    "small_label": "",
-                    "required": false,
-                    "tooltip": "",
-                    "variant": "dropdown",
-                    "instruments": [],
-                    "isMultipleSelect": false,
-                    "requestTime": false,
-                    "options": [
-                        1,
-                        2
-                    ]
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "text_input_question",
-                "naturalKey": "text_input_question",
-                "dataType": "TEXT_INPUT",
-                "question": "Text input question from seeds",
-                "config": {
+                  "required": false,
+                  "small_label": "",
+                  "tooltip": "",
+                  "variant": "dropdown",
+                  "url": "",
+                  "jsonPath": "",
+                  "isMultipleSelect": true,
+                  "apiCallRequestHeaders": [],
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              },
+              {
+                "question": {
+                  "categoryId": 2,
+                  "id": "sample_text_input_question",
+                  "naturalKey": "sample_text_input_question",
+                  "dataType": "TEXT_INPUT",
+                  "question": "Sample Text input question from seeds",
+                  "config": {
                     "required": false,
                     "small_label": "",
                     "tooltip": "",
@@ -711,123 +1167,222 @@
                     "max": null,
                     "multiline": false,
                     "placeholder": "",
-                    "isCounterHidden": false
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "file_upload_question",
-                "naturalKey": "file_upload_question",
-                "dataType": "FILE_UPLOAD",
-                "question": "File upload question from seeds",
-                "config": {
-                    "small_label": "",
-                    "required": false,
-                    "tooltip": "",
-                    "file_type": [
-                        ".pdf",
-                        ".doc",
-                        ".docx"
-                    ],
-                    "pdf_page_limit": 0,
-                    "max_files": 0,
-                    "omitFromPdf": false
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "rich_text_input_question",
-                "naturalKey": "rich_text_input_question",
-                "dataType": "RICH_TEXT_INPUT",
-                "question": "Rich text input question from seeds",
-                "config": {
-                    "required": false,
-                    "small_label": "",
-                    "tooltip": "",
-                    "max": null,
-                    "allowImages": false
-                }
-            },
-            {
-                "categoryId": 1,
-                "id": "embellishment_question",
-                "naturalKey": "embellishment_question",
-                "dataType": "EMBELLISHMENT",
-                "question": "Embellishment question from seeds",
-                "config": {
-                    "html": "",
-                    "plain": "",
-                    "omitFromPdf": false,
-                    "tooltip": "",
-                    "required": false,
-                    "small_label": ""
-                }
-            }
-        ],
-        "subTemplates": [
-            {
-                "template": {
-                    "templateId": 6,
-                    "groupId": "SAMPLE",
-                    "name": "default sample template",
-                    "description": "default sample template",
-                    "isArchived": false
+                    "isCounterHidden": false,
+                    "readPermissions": []
+                  }
                 },
-                "templateSteps": [
-                    {
-                        "topic": {
-                            "id": 6,
-                            "title": "New sample",
-                            "templateId": 6,
-                            "sortOrder": 0,
-                            "isEnabled": true
-                        },
-                        "fields": [
-                            {
-                                "question": {
-                                    "categoryId": 2,
-                                    "id": "sample_basis",
-                                    "naturalKey": "sample_basis",
-                                    "dataType": "SAMPLE_BASIS",
-                                    "question": "Sample basic information",
-                                    "config": {
-                                        "titlePlaceholder": "Title",
-                                        "tooltip": "",
-                                        "required": false,
-                                        "small_label": ""
-                                    }
-                                },
-                                "topicId": 6,
-                                "sortOrder": 0,
-                                "config": {
-                                    "titlePlaceholder": "Title",
-                                    "tooltip": "",
-                                    "required": false,
-                                    "small_label": ""
-                                },
-                                "dependencies": [],
-                                "dependenciesOperator": "AND"
-                            }
-                        ]
-                    }
-                ],
-                "questions": [
-                    {
-                        "categoryId": 2,
-                        "id": "sample_basis",
-                        "naturalKey": "sample_basis",
-                        "dataType": "SAMPLE_BASIS",
-                        "question": "Sample basic information",
-                        "config": {
-                            "titlePlaceholder": "Title",
-                            "tooltip": "",
-                            "required": false,
-                            "small_label": ""
-                        }
-                    }
-                ],
-                "subTemplates": []
+                "topicId": 7,
+                "sortOrder": 11,
+                "config": {
+                  "required": false,
+                  "small_label": "",
+                  "tooltip": "",
+                  "htmlQuestion": "",
+                  "isHtmlQuestion": false,
+                  "min": null,
+                  "max": null,
+                  "multiline": false,
+                  "placeholder": "",
+                  "isCounterHidden": false,
+                  "readPermissions": []
+                },
+                "dependencies": [],
+                "dependenciesOperator": "AND"
+              }
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "categoryId": 2,
+            "id": "sample_basis",
+            "naturalKey": "sample_basis",
+            "dataType": "SAMPLE_BASIS",
+            "question": "Sample basic information",
+            "config": {
+              "titlePlaceholder": "Title",
+              "tooltip": "",
+              "required": false,
+              "small_label": "",
+              "readPermissions": []
             }
-        ]
-    }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_boolean_question",
+            "naturalKey": "sample_boolean_question",
+            "dataType": "BOOLEAN",
+            "question": "Sample Boolean question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_date_question",
+            "naturalKey": "sample_date_question",
+            "dataType": "DATE",
+            "question": "Sample Date question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "includeTime": false,
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_file_upload_question",
+            "naturalKey": "sample_file_upload_question",
+            "dataType": "FILE_UPLOAD",
+            "question": "Sample file upload question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "file_type": [
+                ".pdf",
+                ".doc",
+                ".docx"
+              ],
+              "pdf_page_limit": 0,
+              "max_files": 0,
+              "omitFromPdf": false,
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_interval_question",
+            "naturalKey": "sample_interval_question",
+            "dataType": "INTERVAL",
+            "question": "Sample Interval question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "units": [
+                {
+                  "id": "meter",
+                  "unit": "meter",
+                  "symbol": "m",
+                  "quantity": "length",
+                  "siConversionFormula": "x"
+                }
+              ],
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_number_question",
+            "naturalKey": "sample_number_question",
+            "dataType": "NUMBER_INPUT",
+            "question": "Sample Number question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "units": [
+                {
+                  "id": "meter",
+                  "unit": "meter",
+                  "symbol": "m",
+                  "quantity": "length",
+                  "siConversionFormula": "x"
+                },
+                {
+                  "id": "centimeter",
+                  "unit": "centimeter",
+                  "symbol": "cm",
+                  "quantity": "length",
+                  "siConversionFormula": "x / 100"
+                }
+              ],
+              "readPermissions": [],
+              "numberValueConstraint": null
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_rich_text_input_question",
+            "naturalKey": "sample_rich_text_input_question",
+            "dataType": "RICH_TEXT_INPUT",
+            "question": "Sample Rich text input question from seeds",
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "max": null,
+              "allowImages": false,
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_selection_from_options_question",
+            "naturalKey": "sample_selection_from_options_question",
+            "dataType": "SELECTION_FROM_OPTIONS",
+            "question": "Sample Selection from options question from seeds",
+            "config": {
+              "small_label": "",
+              "required": false,
+              "tooltip": "",
+              "variant": "dropdown",
+              "options": [
+                "One",
+                "Two",
+                "Three"
+              ],
+              "isMultipleSelect": true,
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_dynamic_multiple_choice_question",
+            "naturalKey": "sample_dynamic_multiple_choice_question",
+            "dataType": "DYNAMIC_MULTIPLE_CHOICE",
+            "question": "Sample Dynamic multiple choice question from seeds",
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "variant": "dropdown",
+              "url": "",
+              "jsonPath": "",
+              "isMultipleSelect": true,
+              "apiCallRequestHeaders": [],
+              "readPermissions": []
+            }
+          },
+          {
+            "categoryId": 2,
+            "id": "sample_text_input_question",
+            "naturalKey": "sample_text_input_question",
+            "dataType": "TEXT_INPUT",
+            "question": "Sample Text input question from seeds",
+            "config": {
+              "required": false,
+              "small_label": "",
+              "tooltip": "",
+              "htmlQuestion": "",
+              "isHtmlQuestion": false,
+              "min": null,
+              "max": null,
+              "multiline": false,
+              "placeholder": "",
+              "isCounterHidden": false,
+              "readPermissions": []
+            }
+          }
+        ],
+        "subTemplates": []
+      }
+    ]
+  }
 }

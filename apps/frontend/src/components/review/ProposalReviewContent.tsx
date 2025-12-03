@@ -18,6 +18,7 @@ import {
   CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
   Review,
+  TechnicalReview,
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -25,7 +26,6 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
-import { TechnicalReviewWithQuestionary } from 'models/questionary/technicalReview/TechnicalReviewWithQuestionary';
 import { getFullUserName } from 'utils/user';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
@@ -94,6 +94,7 @@ const ProposalReviewContent = ({
           call: proposalData.call,
         })
       }
+      canEditProposal={true}
     />
   );
 
@@ -113,7 +114,11 @@ const ProposalReviewContent = ({
 
       const canEditAsInstrumentSci =
         isInstrumentScientist &&
-        technicalReview?.technicalReviewAssigneeId === user.id;
+        (technicalReview?.technicalReviewAssigneeId === user.id ||
+          (technicalReviewInstrument?.scientists.some(
+            (scientist) => scientist.id === user.id
+          ) &&
+            technicalReviewInstrument.multipleTechReviewsEnabled));
 
       return isUserOfficer ||
         isFapSec ||
@@ -186,11 +191,7 @@ const ProposalReviewContent = ({
         </Fragment>
       ) : (
         <TechnicalReviewQuestionaryReview
-          data={
-            (!isUserOfficer && !isFapSec
-              ? { ...technicalReview, comment: null }
-              : technicalReview) as TechnicalReviewWithQuestionary
-          }
+          data={technicalReview as TechnicalReview}
         />
       );
     }
@@ -288,6 +289,7 @@ const ProposalReviewContent = ({
         <SimpleTabs
           tabNames={tabNames.map((name) => t(name))}
           isInsideModal={isInsideModal}
+          data-cy="proposal-review-tabs"
         >
           {tabsContent}
         </SimpleTabs>

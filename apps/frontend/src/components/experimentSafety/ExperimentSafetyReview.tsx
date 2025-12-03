@@ -6,12 +6,16 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
+import {
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ExperimentSafetyContextType } from './ExperimentSafetyContainer';
-import ProposalEsiDetails from './ExperimentSafetyDetails';
+import ExperimentSafetyDetails from './ExperimentSafetyDetails';
 
 type ExperimentSafetyReviewProps = {
   onComplete?: FunctionType<void>;
@@ -30,9 +34,37 @@ function ExperimentSafetyReview({ confirm }: ExperimentSafetyReviewProps) {
 
   const isSubmitted = state.experimentSafety.esiQuestionarySubmittedAt !== null;
 
+  // Check if any decision has been made (not null, not undefined, not UNSET)
+  const hasInstrumentScientistDecision =
+    state.experimentSafety.instrumentScientistDecision !== null &&
+    state.experimentSafety.instrumentScientistDecision !== undefined &&
+    state.experimentSafety.instrumentScientistDecision !==
+      InstrumentScientistDecisionEnum.UNSET;
+
+  const hasExperimentSafetyReviewerDecision =
+    state.experimentSafety.experimentSafetyReviewerDecision !== null &&
+    state.experimentSafety.experimentSafetyReviewerDecision !== undefined &&
+    state.experimentSafety.experimentSafetyReviewerDecision !==
+      ExperimentSafetyReviewerDecisionEnum.UNSET;
+
+  const hasDecision =
+    hasInstrumentScientistDecision || hasExperimentSafetyReviewerDecision;
+
+  const isDisabled = isSubmitted || hasDecision;
+
+  // Create appropriate button label
+  let buttonLabel = 'Submit';
+  if (isSubmitted) {
+    buttonLabel = '✔ Submitted';
+  } else if (hasDecision) {
+    buttonLabel = '✔ Decision Made';
+  }
+
   return (
     <>
-      <ProposalEsiDetails esiId={state.experimentSafety.experimentSafetyPk} />
+      <ExperimentSafetyDetails
+        experimentSafetyPk={state.experimentSafety.experimentSafetyPk}
+      />
       <NavigationFragment isLoading={isExecutingCall}>
         <NavigButton
           onClick={() =>
@@ -60,10 +92,10 @@ function ExperimentSafetyReview({ confirm }: ExperimentSafetyReviewProps) {
               }
             )()
           }
-          disabled={isSubmitted}
+          disabled={isDisabled}
           data-cy="submit-proposal-esi-button"
         >
-          {isSubmitted ? '✔ Submitted' : 'Submit'}
+          {buttonLabel}
         </NavigButton>
       </NavigationFragment>
     </>

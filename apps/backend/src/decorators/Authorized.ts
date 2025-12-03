@@ -36,7 +36,9 @@ const Authorized = (roles: Roles[] = []) => {
         return isMutation ? rejection('NOT_LOGGED_IN') : null;
       }
 
-      if (agent.externalToken && !agent.externalTokenValid) {
+      // Note: For OAuth the agent.externalTokenValid is always TRUE
+
+      if (!agent.externalTokenValid) {
         logger.logWarn('External token invalid/Expired', {
           externalToken: agent.externalToken,
         });

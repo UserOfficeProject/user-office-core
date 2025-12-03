@@ -48,7 +48,7 @@ const CreateUpdateInstrument = ({
   const [usersData, setUsersData] = useState(
     instrument?.instrumentContact ? [instrument?.instrumentContact] : []
   );
-  const [isChecked, setIsChecked] = useState(false);
+  const [isReviewerUpdateChecked, setIsReviewerUpdateChecked] = useState(false);
 
   const initialValues = instrument
     ? { ...instrument, surname: '' }
@@ -58,6 +58,8 @@ const CreateUpdateInstrument = ({
         description: '',
         managerUserId: null,
         surname: '',
+        selectable: true,
+        multipleTechReviewsEnabled: false,
       };
 
   useEffect(() => {
@@ -136,7 +138,10 @@ const CreateUpdateInstrument = ({
         return;
       }
 
-      if (values.managerUserId !== instrument.managerUserId && isChecked) {
+      if (
+        values.managerUserId !== instrument.managerUserId &&
+        isReviewerUpdateChecked
+      ) {
         confirm(
           async () => {
             try {
@@ -164,6 +169,9 @@ const CreateUpdateInstrument = ({
                 description: updatedValues.description,
                 managerUserId: updatedValues.managerUserId,
                 updateTechReview: true,
+                selectable: updatedValues.selectable,
+                multipleTechReviewsEnabled:
+                  updatedValues.multipleTechReviewsEnabled,
               });
 
               close(updateInstrument);
@@ -188,6 +196,9 @@ const CreateUpdateInstrument = ({
             description: updatedValues.description,
             managerUserId: updatedValues.managerUserId,
             updateTechReview: false,
+            selectable: updatedValues.selectable,
+            multipleTechReviewsEnabled:
+              updatedValues.multipleTechReviewsEnabled,
           });
 
           close(updateInstrument);
@@ -262,6 +273,35 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={formikProps.values.selectable ?? true}
+                onChange={(event) =>
+                  formikProps.setFieldValue('selectable', event.target.checked)
+                }
+              />
+            }
+            label="Allow this instrument to be selectable in proposal submission"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={formikProps.values.multipleTechReviewsEnabled ?? false}
+                onChange={(event) =>
+                  formikProps.setFieldValue(
+                    'multipleTechReviewsEnabled',
+                    event.target.checked
+                  )
+                }
+              />
+            }
+            label="Allow multiple reviews for a technical review for this instrument"
+          />
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
@@ -287,8 +327,10 @@ const CreateUpdateInstrument = ({
                   <Checkbox
                     icon={<CheckBoxOutlineBlankIcon />}
                     checkedIcon={<CheckBoxIcon />}
-                    checked={isChecked}
-                    onChange={(event) => setIsChecked(event.target.checked)}
+                    checked={isReviewerUpdateChecked}
+                    onChange={(event) =>
+                      setIsReviewerUpdateChecked(event.target.checked)
+                    }
                   />
                 }
                 label="Update all un-assigned technical reviews to new contact"

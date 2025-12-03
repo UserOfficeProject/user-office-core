@@ -5,6 +5,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import People from '@mui/icons-material/People';
 import Settings from '@mui/icons-material/Settings';
+import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
 import { ListItemButton } from '@mui/material';
@@ -19,12 +20,10 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 
 import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
-import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 
 const menuMap = {
   Units: '/Units',
   ProposalStatuses: '/ProposalStatuses',
-  ProposalWorkflows: '/ProposalWorkflows',
   ExperimentWorkflows: '/ExperimentWorkflows',
   ApiAccessTokens: '/ApiAccessTokens',
   Features: '/Features',
@@ -53,7 +52,7 @@ const SettingsMenuListItem = () => {
 
   return (
     <>
-      <Tooltip title="Settings">
+      <Tooltip title="Configuration Settings">
         <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
             {isExpanded ? (
@@ -68,7 +67,7 @@ const SettingsMenuListItem = () => {
               </>
             )}
           </ListItemIcon>
-          <ListItemText primary="Settings" />
+          <ListItemText primary="Configuration Settings" />
         </ListItemButton>
       </Tooltip>
 
@@ -79,6 +78,14 @@ const SettingsMenuListItem = () => {
               <FunctionsIcon />
             </ListItemIcon>
             <ListItemText primary="Units" />
+          </ListItemButton>
+        </Tooltip>
+        <Tooltip title="Pages">
+          <ListItemButton component={NavLink} to="/PageEditor">
+            <ListItemIcon>
+              <SettingsApplications />
+            </ListItemIcon>
+            <ListItemText primary="Pages" />
           </ListItemButton>
         </Tooltip>
 
@@ -92,22 +99,6 @@ const SettingsMenuListItem = () => {
               <ProposalSettingsIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal statuses" />
-          </ListItemButton>
-        </Tooltip>
-
-        <Tooltip title="Proposal workflows">
-          <ListItemButton
-            component={NavLink}
-            selected={
-              location.pathname.includes('/ProposalWorkflows') ||
-              location.pathname.includes('ProposalWorkflowEditor')
-            }
-            to={menuMap['ProposalWorkflows']}
-          >
-            <ListItemIcon>
-              <ProposalWorkflowIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal workflows" />
           </ListItemButton>
         </Tooltip>
 

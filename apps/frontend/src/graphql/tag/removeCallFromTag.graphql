@@ -1,0 +1,9 @@
+mutation removeCallFromTag(
+  $callId: Int!
+  $tagId: Int!
+) {
+  removeCallFromTag(
+    callId: $callId
+    tagId: $tagId
+  )
+}

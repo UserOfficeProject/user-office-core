@@ -16,7 +16,7 @@ import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
-interface UserinfoResponseWithInssitution extends UserinfoResponse {
+interface UserinfoResponseWithInstitution extends UserinfoResponse {
   institution_ror_id?: string;
   institution_name?: string;
   institution_country?: string;
@@ -85,11 +85,11 @@ export class OAuthAuthorization extends UserAuthorization {
     });
   }
 
-  private async getUserInstitutionId(
-    userInfo: UserinfoResponseWithInssitution
+  public async getOrCreateUserInstitution(
+    userInfo: UserinfoResponseWithInstitution
   ) {
     if (!userInfo.institution_name || !userInfo.institution_country) {
-      return undefined;
+      return null;
     }
 
     let institution = userInfo.institution_ror_id
@@ -119,7 +119,7 @@ export class OAuthAuthorization extends UserAuthorization {
         await this.adminDataSource.createInstitution(newInstitution);
     }
 
-    return institution?.id;
+    return institution;
   }
 
   private async upsertUser(
@@ -127,7 +127,7 @@ export class OAuthAuthorization extends UserAuthorization {
     tokenSet: ValidTokenSet
   ): Promise<User> {
     const client = await OpenIdClient.getInstance();
-    const institutionId = await this.getUserInstitutionId(userInfo);
+    const institution = await this.getOrCreateUserInstitution(userInfo);
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );
@@ -152,7 +152,7 @@ export class OAuthAuthorization extends UserAuthorization {
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
         oidcSub: userInfo.sub,
-        institutionId: institutionId ?? user.institutionId,
+        institutionId: institution?.id ?? user.institutionId,
         position: userInfo.position as string,
         preferredname: userInfo.preferred_username,
         telephone: userInfo.phone_number,
@@ -164,7 +164,6 @@ export class OAuthAuthorization extends UserAuthorization {
       const newUser = await this.userDataSource.create(
         (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,
-        undefined,
         userInfo.family_name,
         userInfo.email,
         userInfo.preferred_username ?? '',
@@ -172,14 +171,12 @@ export class OAuthAuthorization extends UserAuthorization {
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
         userInfo.gender ?? 'unspecified',
-        1,
         new Date(),
-        institutionId ?? 1,
+        institution?.id ?? 1,
         '',
         (userInfo.position as string) ?? '',
         userInfo.email,
-        '',
-        undefined
+        ''
       );
 
       const roleID = this.getUserRole(newUser);

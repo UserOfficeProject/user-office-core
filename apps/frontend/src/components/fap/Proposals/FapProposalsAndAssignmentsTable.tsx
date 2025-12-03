@@ -51,7 +51,7 @@ type ProposalReview = {
   id: number;
   userID: number;
   comment: string | null;
-  grade: number | null;
+  grade: string | null;
   status: ReviewStatus;
   fapID: number;
   proposalPk?: number;
@@ -311,7 +311,11 @@ const FapProposalsAndAssignmentsTable = ({
       (assignment) => assignment.assignments
     );
 
-    const proposalAssignments: { memberId: number; proposalPk: number }[] = [];
+    const proposalAssignments: {
+      memberId: number;
+      proposalPk: number;
+      rank?: number | null;
+    }[] = [];
     const updatedMembers = new Set<FapAssignedMember>();
 
     for (const proposalPk of proposalPks) {
@@ -322,7 +326,11 @@ const FapProposalsAndAssignmentsTable = ({
             proposalPk === existingProposalAssignment.proposalPk
         );
         if (!isExistingAssignment) {
-          proposalAssignments.push({ memberId: assignedMember.id, proposalPk });
+          proposalAssignments.push({
+            memberId: assignedMember.id,
+            proposalPk,
+            rank: assignedMember.rank ?? null,
+          });
           updatedMembers.add(assignedMember);
         }
       }
@@ -406,7 +414,7 @@ const FapProposalsAndAssignmentsTable = ({
               dateAssigned: DateTime.now(),
               user,
               role,
-              rank: null,
+              rank: user.rank ?? null,
               review:
                 allProposalReviews.find(
                   (review) =>
@@ -603,13 +611,12 @@ const FapProposalsAndAssignmentsTable = ({
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
-  hasRightToAssignReviewers &&
-    tableActions.push({
-      icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
-      tooltip: 'Download proposals',
-      onClick: handleBulkDownloadClick,
-      position: 'toolbarOnSelect',
-    });
+  tableActions.push({
+    icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
+    tooltip: 'Download proposals',
+    onClick: handleBulkDownloadClick,
+    position: 'toolbarOnSelect',
+  });
   hasRightToRemoveAssignedProposal &&
     tableActions.push({
       icon: () => <DeleteOutline data-cy="remove-assigned-fap-proposal" />,

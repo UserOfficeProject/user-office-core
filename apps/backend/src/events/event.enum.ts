@@ -38,14 +38,11 @@ export enum Event {
   CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_FAP_REVIEW_ENDED = 'CALL_FAP_REVIEW_ENDED',
-  INVITE_ACCEPTED = 'INVITE_ACCEPTED',
   USER_UPDATED = 'USER_UPDATED',
   USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
   EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
-  EMAIL_INVITE = 'EMAIL_INVITE',
-  EMAIL_INVITES = 'EMAIL_INVITES',
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -66,6 +63,12 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
+  PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
+  PROPOSAL_CO_PROPOSER_INVITE_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_SENT',
+  PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
+  PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED = 'PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_SENT = 'PROPOSAL_VISIT_REGISTRATION_INVITE_SENT',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -89,6 +92,12 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  DATA_ACCESS_USERS_UPDATED = 'DATA_ACCESS_USERS_UPDATED',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW',
+  VISIT_CREATED = 'VISIT_CREATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -234,11 +243,6 @@ export const EventLabel = new Map<Event, string>([
     Event.EMAIL_INVITE_LEGACY,
     '[Deprecated] Event occurs when user is created using email invite',
   ],
-  [Event.EMAIL_INVITE, 'Event occurs when user is invited by email'],
-  [
-    Event.EMAIL_INVITES,
-    'Event occurs when multiple users are invited by email',
-  ],
   [Event.FAP_CREATED, 'Event occurs when FAP is created'],
   [Event.FAP_UPDATED, 'Event occurs when FAP is updated'],
   [Event.FAP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a FAP'],
@@ -267,6 +271,30 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_STATUS_ACTION_EXECUTED,
     'Event occurs when the proposal status action is being executed in the status engine',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+    'Event occurs when co-proposer invites are updated for a proposal',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+    'Event occurs when co-proposer invite is sent to a user',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+    'Event occurs when user accepts the co-proposer claim for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+    'Event occurs when visit registration invites are updated for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+    'Event occurs when visit registration invite is sent to a user',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
+    'Event occurs when user accepts the visit registration claim for a proposal',
   ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
@@ -344,6 +372,7 @@ export const EventLabel = new Map<Event, string>([
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
     'Event occurs when a proposal is assigned to techniques',
   ],
+  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
   [
     Event.VISIT_REGISTRATION_APPROVED,
     'Event occurs when visit registration is approved',
@@ -371,5 +400,25 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
     'Event occurs when experiment ESF is rejected by ESR',
+  ],
+  [
+    Event.DATA_ACCESS_USERS_UPDATED,
+    'Event occurs when data access users are updated',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS,
+    'Event occurs when experiment safety management decision is submitted by IS',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR,
+    'Event occurs when experiment safety management decision is submitted by ESR',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER,
+    'Event occurs when experiment safety status is changed by user',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
+    'Event occurs when experiment safety status is changed by workflow',
   ],
 ]);

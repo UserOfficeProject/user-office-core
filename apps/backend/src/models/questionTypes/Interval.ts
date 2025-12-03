@@ -4,7 +4,10 @@ import { logger } from '@user-office-software/duo-logger';
 import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
 import { GraphQLError } from 'graphql';
 
-import { IntervalConfig } from '../../resolvers/types/FieldConfig';
+import {
+  IntervalConfig,
+  NumberValueConstraint,
+} from '../../resolvers/types/FieldConfig';
 import { isSiConversionFormulaValid } from '../../utils/isSiConversionFormulaValid';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -28,7 +31,10 @@ export const intervalDefinition: Question<DataType.INTERVAL> = {
       throw new GraphQLError('DataType should be INTERVAL');
     }
 
-    return intervalQuestionValidationSchema(field).isValid(value);
+    return intervalQuestionValidationSchema(
+      field,
+      NumberValueConstraint
+    ).isValid(value);
   },
   createBlankConfig: (): IntervalConfig => {
     const config = new IntervalConfig();
@@ -36,6 +42,7 @@ export const intervalDefinition: Question<DataType.INTERVAL> = {
     config.required = false;
     config.tooltip = '';
     config.units = [];
+    config.readPermissions = [];
 
     return config;
   },

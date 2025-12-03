@@ -1,4 +1,4 @@
-import { Science, Topic, History } from '@mui/icons-material';
+import { Science, Topic, Apartment } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -8,50 +8,29 @@ import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import Help from '@mui/icons-material/Help';
 import NoteAdd from '@mui/icons-material/NoteAdd';
 import People from '@mui/icons-material/People';
-import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
-import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
-import {
-  DEFAULT_DATE_FORMAT,
-  getRelativeDatesFromToday,
-} from 'components/experiment/DateFilter';
-import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
-import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { FeatureId, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
-import { useMeData } from 'hooks/user/useMeData';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
+import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
-import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
+import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
-};
-
-const ExperimentSafetyReviewMenuListItem = () => {
-  return (
-    <Tooltip title="Experiment Safety Review">
-      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
-        <ListItemIcon>
-          <BoxIcon />
-        </ListItemIcon>
-        <ListItemText primary="Experiment Safety" />
-      </ListItemButton>
-    </Tooltip>
-  );
 };
 
 const ProposalsMenuListItem = () => {
@@ -69,11 +48,7 @@ const ProposalsMenuListItem = () => {
 
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
-  const { meData } = useMeData();
   const { t } = useTranslation();
-  const { format } = useFormattedDateTime({
-    settingsFormatToUse: SettingsId.DATE_FORMAT,
-  });
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -85,14 +60,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
-    FeatureId.EXPERIMENT_SAFETY_REVIEW
-  )?.isEnabled;
 
   const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
+
+  const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
   const calls = useCallsData(
     {
@@ -101,62 +75,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     CallsDataQuantity.MINIMAL
   ).calls;
 
-  let currentRoleInfo = null;
-
-  if (meData) {
-    currentRoleInfo = meData.roles.find((role) => {
-      if (
-        role.shortCode.toLocaleLowerCase() === currentRole?.toLocaleLowerCase()
-      ) {
-        return true;
-      }
-    });
-  }
-  const permissions = currentRoleInfo?.permissions;
-  let dynamicMenuItems: React.ReactNode = null;
   const openCall = calls?.find((call) => call.isActive);
-  if (permissions) {
-    dynamicMenuItems = (
-      <div data-cy="user-menu-items">
-        {permissions.some(
-          (permission) => permission === 'ProposalQueries.getAll'
-        ) && (
-          <Tooltip title="Proposals">
-            <ListItemButton component={NavLink} to="/Proposals">
-              <ListItemIcon>
-                <FolderOpen />
-              </ListItemIcon>
-              <ListItemText primary="Proposals" />
-            </ListItemButton>
-          </Tooltip>
-        )}
-        {permissions.some(
-          (permission) => permission === 'InstrumentQueries.getAll'
-        ) && (
-          <Tooltip title={i18n.format(t('instrument'), 'plural')}>
-            <ListItemButton component={NavLink} to="/Instruments">
-              <ListItemIcon>
-                <ScienceIcon />
-              </ListItemIcon>
-              <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
-            </ListItemButton>
-          </Tooltip>
-        )}
-      </div>
-    );
-  }
 
   const techniqueProposalUrl =
     openCall && openCall.id
       ? `/TechniqueProposals?call=${openCall?.id}`
       : '/TechniqueProposals';
-
-  const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
-
-  const formattedDate = (value?: Date) =>
-    value
-      ? DateTime.fromJSDate(value).toFormat(format || DEFAULT_DATE_FORMAT)
-      : undefined;
 
   const user = (
     <div data-cy="user-menu-items">
@@ -200,6 +124,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const userOfficer = (
     <div data-cy="officer-menu-items">
+      <Tooltip title="Calls">
+        <ListItemButton component={NavLink} to="/Calls">
+          <ListItemIcon>
+            <CalendarToday />
+          </ListItemIcon>
+          <ListItemText primary="Calls" />
+        </ListItemButton>
+      </Tooltip>
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
@@ -220,10 +152,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItemButton
-            component={NavLink}
-            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
-          >
+          <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
@@ -231,29 +160,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
-      <Tooltip title="Calls">
-        <ListItemButton component={NavLink} to="/Calls">
-          <ListItemIcon>
-            <CalendarToday />
-          </ListItemIcon>
-          <ListItemText primary="Calls" />
-        </ListItemButton>
-      </Tooltip>
-      <Tooltip title="Status Actions Logs">
-        <ListItemButton component={NavLink} to="/StatusActionsLogs">
-          <ListItemIcon>
-            <History />
-          </ListItemIcon>
-          <ListItemText primary="Status Actions Logs" />
-        </ListItemButton>
-      </Tooltip>
-      {isUserManagementEnabled && (
-        <Tooltip title="People">
-          <ListItemButton component={NavLink} to="/People">
+      {isFapEnabled && (
+        <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
+          <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
-              <People />
+              <GroupWorkIcon />
             </ListItemIcon>
-            <ListItemText primary="People" />
+            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
           </ListItemButton>
         </Tooltip>
       )}
@@ -267,6 +180,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
+
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
@@ -275,24 +189,32 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
-      {isFapEnabled && (
-        <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
-          <ListItemButton component={NavLink} to="/Faps">
+      {isTagsEnabled && (
+        <Tooltip title="Tag">
+          <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
-              <GroupWorkIcon />
+              <Apartment />
             </ListItemIcon>
-            <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
+            <ListItemText primary={'Tag'} />
           </ListItemButton>
         </Tooltip>
       )}
-      <Tooltip title="Pages">
-        <ListItemButton component={NavLink} to="/PageEditor">
+      <Tooltip title="Proposal workflows">
+        <ListItemButton
+          component={NavLink}
+          selected={
+            location.pathname.includes('/ProposalWorkflows') ||
+            location.pathname.includes('ProposalWorkflowEditor')
+          }
+          to={'/ProposalWorkflows'}
+        >
           <ListItemIcon>
-            <SettingsApplications />
+            <ProposalWorkflowIcon />
           </ListItemIcon>
-          <ListItemText primary="Pages" />
+          <ListItemText primary="Proposal workflows" />
         </ListItemButton>
       </Tooltip>
+
       {isUserManagementEnabled && (
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
@@ -304,6 +226,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
       )}
       <TemplateMenuListItem />
+      <StatusActionLogsMenuListItem />
+      {isUserManagementEnabled && (
+        <Tooltip title="People">
+          <ListItemButton component={NavLink} to="/People">
+            <ListItemIcon>
+              <People />
+            </ListItemIcon>
+            <ListItemText primary="People" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
@@ -312,9 +245,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
-      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -354,6 +284,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={t('Technique Proposals')} />
         </ListItemButton>
       )}
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItemButton component={NavLink} to={`/Experiments`}>
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
@@ -362,16 +302,20 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
       )}
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
-      )}
     </div>
   );
 
   const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItemButton component={NavLink} to={`/Experiments`}>
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItemButton>
+        </Tooltip>
       )}
     </div>
   );
@@ -379,6 +323,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const internalReviewer = (
     <div data-cy="internal-reviewer-menu-items">
       <ProposalsMenuListItem />
+    </div>
+  );
+
+  const dynamicReadUser = (
+    <div data-cy="instrument-scientist-menu-items">
+      <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Proposals" />
+      </ListItemButton>
     </div>
   );
 
@@ -398,7 +353,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:
-      return dynamicMenuItems;
+      return dynamicReadUser;
   }
 };
 

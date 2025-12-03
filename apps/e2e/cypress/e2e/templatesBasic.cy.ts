@@ -25,6 +25,8 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
+const scientist1 = initialDBData.users.user1;
+
 context('Template Basic tests', () => {
   beforeEach(() => {
     cy.resetDB(true);
@@ -502,7 +504,7 @@ context('Template Basic tests', () => {
                     cy.get(
                       `[data-cy=proposals-count-${initialDBData.template.id}]`
                     )
-                      .contains('1')
+                      .contains('2')
                       .click();
 
                     cy.get('[data-cy=proposals-modal]').contains(
@@ -755,6 +757,107 @@ context('Template Basic tests', () => {
       /* Test good inputs */
       for (const question of questions) {
         cy.get(`[data-natural-key="${question.id}"] input`)
+          .clear()
+          .type(question.goodInput);
+      }
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage).should('not.exist');
+      }
+    });
+
+    it('should render the Interval question field accepting only positive, negative numbers if set', () => {
+      const generateId = () =>
+        `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
+
+      const questions = [
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive numbers',
+          fieldName: 'numberField2',
+          badInput: '1{leftarrow}-',
+          goodInput: '1',
+          failureMessage: 'Value must be a positive number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative numbers',
+          fieldName: 'numberField3',
+          badInput: '1',
+          goodInput: '1{leftarrow}-',
+          failureMessage: 'Value must be a negative number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only negative integers',
+          fieldName: 'numberField4',
+          badInput: '1.1{leftarrow}{leftarrow}{leftarrow}-',
+          goodInput: '-1',
+          failureMessage: 'Value must be negative whole number',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          valueConstraint: 'Only positive integers',
+          fieldName: 'numberField5',
+          badInput: '1.1',
+          goodInput: '1',
+          failureMessage: 'Value must be positive whole number',
+        },
+      ];
+
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
+
+      /* Create questions */
+      for (const question of questions) {
+        cy.createIntervalQuestion(question.title, {
+          key: question.id,
+          units: ['kelvin'],
+          valueConstraint: question.valueConstraint,
+          firstTopic: true,
+        });
+      }
+
+      cy.logout();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      /* Test questions exist */
+      for (const question of questions) {
+        cy.contains(question.title);
+      }
+
+      /* Test bad inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}-Min"] input`).type(
+          question.badInput
+        );
+        cy.get(`[data-natural-key="${question.id}-Max"] input`).type(
+          question.badInput
+        );
+      }
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      for (const question of questions) {
+        cy.contains(question.failureMessage);
+      }
+
+      /* Test good inputs */
+      for (const question of questions) {
+        cy.get(`[data-natural-key="${question.id}-Min"] input`)
+          .clear()
+          .type(question.goodInput);
+        cy.get(`[data-natural-key="${question.id}-Max"] input`)
           .clear()
           .type(question.goodInput);
       }
@@ -1085,6 +1188,71 @@ context('Template Basic tests', () => {
       addDependency(field1, [field2, field3], field2);
       addDependency(field2, [field3], field3);
       addDependency(field3, []);
+    });
+
+    it('Should be able to add read permissions to a template', () => {
+      createTopicWithQuestionsAndRelations();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: scientist1.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
+
+      cy.assignScientistsToInstrument({
+        scientistIds: [scientist1.id],
+        instrumentId: 1,
+      });
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: 1,
+        userId: scientist1.id,
+        instrumentId: 1,
+      });
+
+      cy.changeProposalsStatus({ proposalPks: [1], statusId: 2 });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.visit('/ProposalTemplates');
+      cy.get('[data-testid="EditIcon"]').first().click();
+
+      cy.createBooleanQuestion(booleanQuestion);
+
+      cy.contains(booleanQuestion)
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
+      cy.contains(booleanQuestion).click();
+
+      cy.get('[data-cy="read-permissions"]').click();
+
+      cy.contains('user_officer').click();
+      // Only way i found to close the menu in the test
+      // you cannot just press escape you must select a element and then press escape
+      // and the only elements that can be selected are the ones in the menu
+      // plese fix this if you can
+      cy.contains('fap_reviewer').click().type('{esc}');
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.visit('/Proposals');
+
+      cy.get('[data-cy="view-proposal"]').first().click();
+
+      cy.contains(booleanQuestion).should('exist');
+
+      cy.login(scientist1, initialDBData.roles.instrumentScientist);
+
+      cy.visit('/');
+
+      cy.get('[data-cy="edit-technical-review').click();
+
+      cy.contains('Proposal information').click();
+
+      cy.contains(booleanQuestion).should('not.exist');
     });
 
     it('User officer should be able to search questions', function () {

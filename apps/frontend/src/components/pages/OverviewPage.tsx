@@ -2,6 +2,7 @@ import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
+import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
@@ -24,7 +25,6 @@ const Paper = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function OverviewPage(props: { userRole: UserRole }) {
-  console.log('OverviewPage', props.userRole);
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
@@ -56,10 +56,25 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
-    default:
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+    case UserRole.FAP_CHAIR:
+    case UserRole.FAP_REVIEWER:
+    case UserRole.FAP_SECRETARY:
       roleBasedOverView = (
         <Paper>
           <ProposalTableReviewer />
+        </Paper>
+      );
+      break;
+    default:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableOfficer
+            proposalFilter={{}}
+            setProposalFilter={function (): void {
+              throw new Error('Function not implemented.');
+            }}
+          />
         </Paper>
       );
       break;
@@ -67,15 +82,16 @@ export default function OverviewPage(props: { userRole: UserRole }) {
 
   return (
     <StyledContainer maxWidth={false}>
-      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
-        <Paper>
-          {loadingContent ? (
-            <div>Loading...</div>
-          ) : (
-            parse(pageContent as string)
-          )}
-        </Paper>
-      )}
+      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+        Object.values(UserRole).includes(props.userRole) && (
+          <Paper>
+            {loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              parse(pageContent as string)
+            )}
+          </Paper>
+        )}
       {roleBasedOverView}
     </StyledContainer>
   );
