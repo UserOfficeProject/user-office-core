@@ -107,7 +107,7 @@ export default class FapMutations {
     args: UpdateFapArgs
   ): Promise<Fap | Rejection> {
     try {
-      if(agent != null && !this.accessDataSource.canAccess(agent?.id, 'manage')) {
+      if(agent != null && !this.accessDataSource.canAccess(agent.id, 'update')) {
         throw error('user does not have sufficient permissions');
       }
 

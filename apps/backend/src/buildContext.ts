@@ -66,6 +66,7 @@ import UnitQueries from './queries/UnitQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
 import WorkflowQueries from './queries/WorkflowQueries';
+import AccessQueries from './queries/AccessQueries';
 
 const context: BasicResolverContext = {
   queries: {
@@ -104,6 +105,7 @@ const context: BasicResolverContext = {
     settings: container.resolve(SettingsQueries),
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
+    access: container.resolve(AccessQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),

@@ -14,6 +14,7 @@ import { Fap, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { useAccess } from 'hooks/access/useAccess';
 
 type FapPageProps = {
   /** Fap data to be shown */
@@ -26,6 +27,8 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const fap = { ...data };
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+  const  { access }= useAccess('update');
+  //const access = false;
   const { t } = useTranslation();
 
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
@@ -84,7 +87,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 data-cy="code"
                 error={touched.code && errors.code !== undefined}
                 helperText={touched.code && errors.code && errors.code}
-                disabled={!hasAccessRights || isExecutingCall}
+                disabled={!access || isExecutingCall}
               />
               <Field
                 id="numberRatingsRequired"
@@ -105,7 +108,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   errors.numberRatingsRequired &&
                   errors.numberRatingsRequired
                 }
-                disabled={!hasAccessRights || isExecutingCall}
+                disabled={!access || isExecutingCall}
               />
               {customGradeGuideChecked && (
                 <FapGradeGuide
@@ -133,7 +136,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   label: 'Custom Grade Guide',
                 }}
                 data-cy="custom-grade-guide"
-                disabled={!hasAccessRights || isExecutingCall}
+                disabled={!access || isExecutingCall}
               />
             </Grid>
             <Grid item sm={6} xs={12}>
@@ -156,7 +159,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   errors.description &&
                   errors.description
                 }
-                disabled={!hasAccessRights || isExecutingCall}
+                disabled={!access || isExecutingCall}
               />
               <Field
                 id="active"
@@ -167,11 +170,11 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   label: 'Active',
                 }}
                 data-cy="fapActive"
-                disabled={!hasAccessRights || isExecutingCall}
+                disabled={!access || isExecutingCall}
               />
             </Grid>
           </Grid>
-          {hasAccessRights && (
+          {access && (
             <StyledButtonContainer>
               <Button
                 disabled={isExecutingCall}

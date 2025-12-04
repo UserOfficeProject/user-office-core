@@ -1,5 +1,4 @@
 import { Query, Arg, Ctx, Resolver, Int, InputType, Field } from 'type-graphql';
-import { Action, Subject } from '../../datasources/postgres/AccessDataSource';
 import { ResolverContext } from '../../context';
 
 @InputType()
@@ -18,6 +17,6 @@ export class AccessQuery {
     @Ctx() context: ResolverContext,
     @Arg('filter', () => AccessFilter) filter: AccessFilter
   ) {
-    context.queries.access.get(context.user, filter)
+    return context.queries.access.get(context.user, filter)
   }
 }
