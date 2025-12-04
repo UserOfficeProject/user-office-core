@@ -46,7 +46,7 @@ export default defineConfig([
       semi: ['error', 'always'],
       quotes: ['error', 'single'],
       'no-console': 'error', // prefer `duo-logger` over console
-
+      'prettier/prettier': 'error',
       'import/order': [
         'error',
         {

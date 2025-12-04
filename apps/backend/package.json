@@ -22,8 +22,8 @@
     "start:e2e:stfc": "docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && node ./build/index.js",
     "dev:docker": "npm install && ts-node-dev --inspect=0.0.0.0:9229 --respawn -T ./index.ts",
     "prod": "tsc && node ./build/index.js",
-    "lint": "npm run generate:uows && tsc --noEmit && eslint . --ext .js,.ts --quiet",
-    "lint:fix": "npm run generate:uows && tsc --noEmit && eslint . --ext .js,.ts --fix --quiet",
+    "lint": "npm run generate:uows && tsc --noEmit && eslint . --quiet",
+    "lint:fix": "npm run generate:uows && tsc --noEmit && eslint . --fix --quiet",
     "start": "npm run dev",
     "debug": "ts-node-dev --inspect --respawn -T ./index.ts",
     "generate:uows": "openapi --output ./generated --name UOWS --input ./openapi.yaml"
