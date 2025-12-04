@@ -1,25 +1,25 @@
 import eslint from '@eslint/js';
 import tsParser from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
-import importPlugin from "eslint-plugin-import";
-import prettier from "eslint-plugin-prettier";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import unusedImports from "eslint-plugin-unused-imports";
-import tseslint from "typescript-eslint";
+import importPlugin from 'eslint-plugin-import';
+import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import unusedImports from 'eslint-plugin-unused-imports';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
     ignores: [
-     "node_modules",
-     ".next",
-     "build",
-     "dist",
-     "public",
-     "src/serviceWorker.js",
-     "src/setupProxy.js",
-     "src/generated/sdk.ts",
-     "server.js",
+      'node_modules',
+      '.next',
+      'build',
+      'dist',
+      'public',
+      'src/serviceWorker.js',
+      'src/setupProxy.js',
+      'src/generated/sdk.ts',
+      'server.js',
     ],
   },
   // Base configs
@@ -32,11 +32,11 @@ export default defineConfig([
 
   // Custom project configuration
   {
-    files: ["**/*.{ts,tsx,js,jsx}"],
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2018,
-      sourceType: "module",
+      sourceType: 'module',
       globals: {
         browser: true,
         commonjs: true,
@@ -46,73 +46,74 @@ export default defineConfig([
     },
     settings: {
       react: {
-        version: "detect",
+        version: '18.3.1',
       },
-      "import/resolver": {
+      'import/resolver': {
         typescript: {
-          project: "./tsconfig.json", 
+          project: './tsconfig.json',
         },
-      }
+      },
     },
     plugins: {
-      "unused-imports": unusedImports,
+      'unused-imports': unusedImports,
       prettier,
     },
     rules: {
       // Import order
-      "import/order": [
-        "error",
+      'import/order': [
+        'error',
         {
           groups: [
-            "builtin",
-            "external",
-            "internal",
-            ["parent", "sibling"],
-            "index",
+            'builtin',
+            'external',
+            'internal',
+            ['parent', 'sibling'],
+            'index',
           ],
           pathGroups: [
             {
               pattern:
-                "+(components|context|generated|graphql|hooks|images|models|styles|utils)/**",
-              group: "internal",
-              position: "after",
+                '+(components|context|generated|graphql|hooks|images|models|styles|utils)/**',
+              group: 'internal',
+              position: 'after',
             },
           ],
-          pathGroupsExcludedImportTypes: ["builtin"],
-          "newlines-between": "always",
-          alphabetize: { order: "asc", caseInsensitive: true },
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "@typescript-eslint/no-use-before-define": ["error"],
-      "@typescript-eslint/no-empty-function": [
-        "error",
-        { allow: ["arrowFunctions"] },
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-use-before-define': ['error'],
+      '@typescript-eslint/no-empty-function': [
+        'error',
+        { allow: ['arrowFunctions'] },
       ],
-      "@typescript-eslint/naming-convention": [
-        "error",
+      '@typescript-eslint/naming-convention': [
+        'error',
         {
-          selector: "variable",
-          format: ["camelCase", "PascalCase", "UPPER_CASE"],
-          leadingUnderscore: "allow",
-          trailingUnderscore: "allow",
+          selector: 'variable',
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+          leadingUnderscore: 'allow',
+          trailingUnderscore: 'allow',
         },
         {
-          selector: "function",
-          format: ["PascalCase", "camelCase"],
+          selector: 'function',
+          format: ['PascalCase', 'camelCase'],
         },
       ],
-      "@typescript-eslint/ban-ts-comment": "warn",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "react/display-name": "warn",
-      "react/prop-types": "off",
-      "padding-line-between-statements": [
-        "error",
-        { blankLine: "always", prev: "*", next: "return" },
+      '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      'react/display-name': 'warn',
+      'react/prop-types': 'off',
+      'prettier/prettier': 'error',
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: '*', next: 'return' },
       ],
-      "unused-imports/no-unused-imports": "error",
+      'unused-imports/no-unused-imports': 'error',
       '@typescript-eslint/no-unused-expressions': [
         'error',
         { allowShortCircuit: true, allowTernary: true },
@@ -128,5 +129,5 @@ export default defineConfig([
       'react-hooks/set-state-in-effect': 'off',
       'react-hooks/static-components': 'off',
     },
-  }]
-);
+  },
+]);

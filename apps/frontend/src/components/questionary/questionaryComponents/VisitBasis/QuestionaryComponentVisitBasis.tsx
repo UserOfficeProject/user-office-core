@@ -5,7 +5,6 @@ import { Field } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 
-
 import DatePicker from 'components/common/FormikUIDatePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
