@@ -107,7 +107,8 @@ export function toEssBasicUserDetails(
     false,
     stfcUser.email ?? '',
     stfcUser.country ?? '',
-    stfcUser.title ?? ''
+    stfcUser.title ?? '',
+    ''
   );
 }
 
@@ -773,5 +774,11 @@ export class StfcUserDataSource implements UserDataSource {
       userId,
       this.roleAssignmentMap.get(roleId) ?? ''
     );
+  }
+
+  async getApprovedProposalVisitorsWithInstitution(
+    proposalPk: number
+  ): Promise<{ user: User; institution: Institution; country: Country }[]> {
+    throw new Error('Method not implemented.');
   }
 }

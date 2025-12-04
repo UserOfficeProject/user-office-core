@@ -7,6 +7,7 @@ import { InternalReviewDataSource } from '../datasources/InternalReviewDataSourc
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { Institution } from '../models/Institution';
 import { Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
@@ -190,6 +191,12 @@ export abstract class UserAuthorization {
     redirectUri: string,
     iss: string | null
   ): Promise<User | null>;
+
+  abstract getOrCreateUserInstitution(userInfo: {
+    institution_ror_id?: string;
+    institution_name?: string;
+    institution_country?: string;
+  }): Promise<Institution | null>;
 
   abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
 
