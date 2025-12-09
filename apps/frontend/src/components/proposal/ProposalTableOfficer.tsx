@@ -14,6 +14,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
+import Warning from '@mui/icons-material/Warning';
 import { IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -462,6 +463,29 @@ const ProposalTableOfficer = ({
       searchParams.getAll('selection').includes(item.primaryKey.toString())
     );
 
+  const runWithMultiSelectConfirm = (action: () => void) => {
+    const selectedCount = getSelectedProposalPks().length;
+
+    if (selectedCount > 1) {
+      confirm(action, {
+        title: 'Are you sure? Multiple proposals selected!',
+        description: (
+          <Box display="flex" alignItems="center">
+            <Warning color="warning" sx={{ marginRight: 1 }} />
+            <span>
+              <b>{selectedCount}</b> proposals are selected. This action will
+              affect all selected proposals. Are you sure you want to proceed?
+            </span>
+          </Box>
+        ),
+        confirmationText: 'Yes, proceed',
+        cancellationText: 'Cancel',
+      })();
+    } else {
+      action();
+    }
+  };
+
   const handleClose = (selectedOption: string) => {
     const firstSelectedProposalTitle = getSelectedProposalsData()[0].title;
     if (selectedOption === PdfDownloadMenuOption.PDF) {
@@ -780,16 +804,18 @@ const ProposalTableOfficer = ({
     {
       icon: FileCopy,
       tooltip: 'Clone proposals to call',
-      onClick: () => {
-        setOpenCallSelection(true);
-      },
+      onClick: () =>
+        runWithMultiSelectConfirm(() => {
+          setOpenCallSelection(true);
+        }),
       position: 'toolbarOnSelect',
     },
     {
       icon: GetAppIconComponent,
       tooltip: 'Download proposals',
       onClick: (event): void => {
-        handleDownloadActionClick(event);
+        runWithMultiSelectConfirm(() => handleDownloadActionClick(event))
+
       },
       position: 'toolbarOnSelect',
     },
@@ -797,13 +823,15 @@ const ProposalTableOfficer = ({
       icon: ExportIcon,
       tooltip: 'Export proposals in Excel',
       onClick: (): void => {
-        downloadXLSXProposal(
-          searchParams
-            .getAll('selection')
-            .filter((item): item is string => !!item)
-            .map((item) => +item),
-          selectedProposalsData?.[0].title
-        );
+        runWithMultiSelectConfirm(() => {
+          downloadXLSXProposal(
+            searchParams
+              .getAll('selection')
+              .filter((item): item is string => !!item)
+              .map((item) => +item),
+            selectedProposalsData?.[0].title
+          );
+        });
       },
       position: 'toolbarOnSelect',
     },
@@ -817,8 +845,7 @@ const ProposalTableOfficer = ({
           },
           {
             title: 'Delete proposals',
-            description:
-              'This action will delete proposals and all data associated with them.',
+            description: `This action will delete ${selectedProposalsData.length} proposal(s) and all data associated with them.`,
           }
         )();
       },
@@ -828,7 +855,9 @@ const ProposalTableOfficer = ({
       icon: ChangeProposalStatusIcon,
       tooltip: 'Change proposal status',
       onClick: () => {
-        setOpenChangeProposalStatus(true);
+        runWithMultiSelectConfirm(() => {
+          setOpenChangeProposalStatus(true);
+        });
       },
       position: 'toolbarOnSelect',
     },
@@ -911,7 +940,9 @@ const ProposalTableOfficer = ({
     tableActions.push({
       icon: ReduceCapacityIconComponent,
       tooltip: 'Reassign selected Techniqual Reviews',
-      onClick: handleBulkTechnicalReviewsReassign,
+      onClick: () => {
+        runWithMultiSelectConfirm(handleBulkTechnicalReviewsReassign);
+      },
       position: 'toolbarOnSelect',
     });
 
@@ -920,7 +951,9 @@ const ProposalTableOfficer = ({
       icon: GroupWorkIcon,
       tooltip: 'Assign proposals to FAP',
       onClick: () => {
-        setOpenAssignment(true);
+        runWithMultiSelectConfirm(() => {
+          setOpenAssignment(true);
+        });
       },
       position: 'toolbarOnSelect',
     });
