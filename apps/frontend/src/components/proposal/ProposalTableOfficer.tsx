@@ -474,7 +474,8 @@ const ProposalTableOfficer = ({
             <Warning color="warning" sx={{ marginRight: 1 }} />
             <span>
               <b>{selectedCount}</b> proposals are selected. This action will
-              affect all selected proposals. Are you sure you want to proceed?
+              run on all of the selected proposals. Are you sure you want to
+              proceed?
             </span>
           </Box>
         ),
@@ -814,8 +815,7 @@ const ProposalTableOfficer = ({
       icon: GetAppIconComponent,
       tooltip: 'Download proposals',
       onClick: (event): void => {
-        runWithMultiSelectConfirm(() => handleDownloadActionClick(event))
-
+        handleDownloadActionClick(event);
       },
       position: 'toolbarOnSelect',
     },
@@ -823,15 +823,13 @@ const ProposalTableOfficer = ({
       icon: ExportIcon,
       tooltip: 'Export proposals in Excel',
       onClick: (): void => {
-        runWithMultiSelectConfirm(() => {
-          downloadXLSXProposal(
-            searchParams
-              .getAll('selection')
-              .filter((item): item is string => !!item)
-              .map((item) => +item),
-            selectedProposalsData?.[0].title
-          );
-        });
+        downloadXLSXProposal(
+          searchParams
+            .getAll('selection')
+            .filter((item): item is string => !!item)
+            .map((item) => +item),
+          selectedProposalsData?.[0].title
+        );
       },
       position: 'toolbarOnSelect',
     },
@@ -855,9 +853,7 @@ const ProposalTableOfficer = ({
       icon: ChangeProposalStatusIcon,
       tooltip: 'Change proposal status',
       onClick: () => {
-        runWithMultiSelectConfirm(() => {
-          setOpenChangeProposalStatus(true);
-        });
+        setOpenChangeProposalStatus(true);
       },
       position: 'toolbarOnSelect',
     },
