@@ -3,7 +3,6 @@ import { Authorized } from '../decorators';
 import { UserWithRole } from '../models/User';
 import { Tokens } from '../config/Tokens';
 import { AccessDataSource } from '../datasources/AccessDataSource';
-import { Action, Subject } from '../datasources/postgres/AccessDataSource';
 import { AccessFilter } from '../resolvers/queries/AccessQuery';
 
 @injectable()
@@ -13,8 +12,8 @@ export default class AccessQueries {
 
   @Authorized()
     async get(agent: UserWithRole | null, filter: AccessFilter) {
-      const {userId, action} = filter;
+      const {userId, action, subject} = filter;
 
-      return this.dataSource.canAccess(userId, action as Action);
+      return this.dataSource.canAccess(userId, action, subject);
     }
 }

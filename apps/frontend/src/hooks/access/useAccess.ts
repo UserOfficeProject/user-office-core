@@ -3,7 +3,7 @@ import { SetStateAction, useContext, useEffect, useState } from 'react';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { UserContext } from 'context/UserContextProvider';
 
-export function useAccess(action: string) {
+export function useAccess(action: string, subject: string) {
   const [access, setAccess] = useState<boolean>(false);
   const [loadingAccess, setLoadingAccess] = useState(true);
 
@@ -22,7 +22,7 @@ export function useAccess(action: string) {
     setLoadingAccess(true);
 
     api()
-      .getAccess({filter: {userId: user.id, action: action}})
+      .getAccess({filter: {userId: user.id, action: action, subject: subject}})
       .then((data) => {
         if (unmounted) {
           return;

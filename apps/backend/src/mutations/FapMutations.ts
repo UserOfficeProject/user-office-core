@@ -51,6 +51,7 @@ import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
 import { AccessDataSource } from '../datasources/AccessDataSource';
 import { error } from 'console';
+import { Subject } from '@casl/ability';
 
 @injectable()
 export default class FapMutations {
@@ -107,7 +108,7 @@ export default class FapMutations {
     args: UpdateFapArgs
   ): Promise<Fap | Rejection> {
     try {
-      if(agent != null && !this.accessDataSource.canAccess(agent.id, 'update')) {
+      if(agent != null && !(await this.accessDataSource.canAccess(agent.id, 'update', 'Fap'))) {
         throw error('user does not have sufficient permissions');
       }
 

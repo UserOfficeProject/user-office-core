@@ -8,6 +8,9 @@ export class AccessFilter {
 
   @Field(() => String)
   public action: string;
+
+  @Field(() => String)
+  public subject: string
 }
 
 @Resolver()

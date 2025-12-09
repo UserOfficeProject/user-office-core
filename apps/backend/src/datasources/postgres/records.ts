@@ -76,6 +76,7 @@ import {
   ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
 import { FeedbackStatus } from './../../models/Feedback';
+import { actions, subjects } from './AccessDataSource';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
 declare module 'knex/types/tables' {
@@ -1548,4 +1549,11 @@ export interface ExperimentSafetyEventsRecord {
   readonly experiment_esf_rejected_by_is: boolean;
   readonly experiment_esf_approved_by_esr: boolean;
   readonly experiment_esf_rejected_by_esr: boolean;
+}
+
+export interface AccessRecord {
+  readonly permission_id: number;
+  readonly action: typeof actions[number];
+  readonly subject: typeof subjects[number];
+  readonly conditions: string;
 }
