@@ -506,7 +506,6 @@ describe('upsertUserByOidcSub', () => {
 
     // Should create new institution and assign it
     // The new institution should have ID 6 (next available in our mock)
-    console.log('Created User Institution ID:', createdUser.institutionId);
     expect(createdUser.institutionId).toBe(6);
     expect(createdUser.firstname).toBe('Maria');
     expect(createdUser.lastname).toBe('Researcher');
