@@ -947,9 +947,7 @@ const ProposalTableOfficer = ({
       icon: GroupWorkIcon,
       tooltip: 'Assign proposals to FAP',
       onClick: () => {
-        runWithMultiSelectConfirm(() => {
-          setOpenAssignment(true);
-        });
+        setOpenAssignment(true);
       },
       position: 'toolbarOnSelect',
     });
