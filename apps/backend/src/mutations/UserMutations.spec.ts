@@ -412,6 +412,7 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: '',
           manual: null,
+          institutionId: null,
         },
         department: null,
         position: '',
@@ -443,6 +444,7 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: existingRorId, // This should find Dummy Research Institute in our mock
           manual: null,
+          institutionId: null,
         },
         department: 'Physics Department',
         position: 'Senior Researcher',
@@ -480,6 +482,7 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: newRorId, // This ROR ID doesn't exist in mock
           manual: null,
+          institutionId: null,
         },
         department: 'Materials Science',
         position: 'Principal Investigator',

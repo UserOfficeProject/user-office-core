@@ -150,12 +150,17 @@ export class OAuthAuthorization extends UserAuthorization {
     tokenSet: ValidTokenSet
   ): Promise<User> {
     const client = await OpenIdClient.getInstance();
-    const institution = await this.getOrCreateUserInstitution(
-      (userInfo.institution_ror_id as string) ?? {
+    let institutionInput: GetOrCreateInstitutionInput = null;
+    if (userInfo.institution_ror_id) {
+      institutionInput = userInfo.institution_ror_id as string;
+    } else if (userInfo.institution_name && userInfo.institution_country) {
+      institutionInput = {
         country: userInfo.institution_country as string,
         name: userInfo.institution_name as string,
-      }
-    );
+      };
+    }
+
+    const institution = await this.getOrCreateUserInstitution(institutionInput);
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );
