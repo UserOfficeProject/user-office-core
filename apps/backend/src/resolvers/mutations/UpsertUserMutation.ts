@@ -5,6 +5,7 @@ import {
   Directive,
   Field,
   InputType,
+  Int,
   Mutation,
   Resolver,
 } from 'type-graphql';
@@ -30,7 +31,7 @@ export class InstitutionInput {
   @Field(() => InstitutionManualInput, { nullable: true })
   public manual: InstitutionManualInput | null;
 
-  @Field(() => Number, { nullable: true })
+  @Field(() => Int, { nullable: true })
   public institutionId: number | null;
 }
 

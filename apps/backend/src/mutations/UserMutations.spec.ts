@@ -37,7 +37,11 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const userMutations = container.resolve(UserMutations);
+let userMutations: UserMutations;
+
+beforeEach(() => {
+  userMutations = container.resolve(UserMutations);
+});
 
 test('A user can invite another user by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
