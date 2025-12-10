@@ -642,6 +642,8 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="bulk-reassign-reviews"]').click();
 
+      cy.get('[data-cy="confirm-ok"]').click(); 
+
       cy.get('@createdProposal2Id').then((proposalId) => {
         cy.get('[data-cy="multi-instrument-alert"]').contains(`${proposalId}`);
       });
