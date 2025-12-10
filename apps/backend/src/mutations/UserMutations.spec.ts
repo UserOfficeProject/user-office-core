@@ -1,14 +1,16 @@
 import jsonwebtoken from 'jsonwebtoken';
-import { container } from 'tsyringe';
+import { container, Lifecycle } from 'tsyringe';
 
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
+import { Tokens } from '../config/Tokens';
 import {
   dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
-  dummyUserOfficer,
-  dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
+  dummyUserOfficer,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection, Rejection } from '../models/Rejection';
@@ -40,6 +42,11 @@ const badToken = jsonwebtoken.sign(
 let userMutations: UserMutations;
 
 beforeEach(() => {
+  container.register(
+    Tokens.UserAuthorization,
+    { useClass: UserAuthorizationMock },
+    { lifecycle: Lifecycle.Singleton }
+  );
   userMutations = container.resolve(UserMutations);
 });
 
@@ -499,6 +506,7 @@ describe('upsertUserByOidcSub', () => {
 
     // Should create new institution and assign it
     // The new institution should have ID 6 (next available in our mock)
+    console.log('Created User Institution ID:', createdUser.institutionId);
     expect(createdUser.institutionId).toBe(6);
     expect(createdUser.firstname).toBe('Maria');
     expect(createdUser.lastname).toBe('Researcher');
