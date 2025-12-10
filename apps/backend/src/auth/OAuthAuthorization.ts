@@ -86,8 +86,8 @@ export class OAuthAuthorization extends UserAuthorization {
     let institution = await this.adminDataSource.getInstitutionByRorId(rorId);
     if (!institution) {
       institution = await this.adminDataSource.createInstitution({
-        name: 'New Institution',
-        country: 1,
+        name: 'Unknown institution',
+        country: null,
         rorId: rorId,
       });
     }
