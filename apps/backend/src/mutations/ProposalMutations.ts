@@ -928,9 +928,9 @@ export default class ProposalMutations {
       );
 
       const isUserRole = this.userAuth.isUser(agent);
-      const isAlreadyOnProposal = proposalUsers.some(
-        (user) => user.id === agent?.id
-      );
+      const isAlreadyOnProposal =
+        proposalUsers.some((user) => user.id === agent?.id) ||
+        clonedProposal.proposerId === agent!.id;
       if (isUserRole && !isAlreadyOnProposal) {
         await this.proposalDataSource.addProposalUser(
           clonedProposal.primaryKey,
