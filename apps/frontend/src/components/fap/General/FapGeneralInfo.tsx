@@ -27,7 +27,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const fap = { ...data };
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
-  const  { access }= useAccess('update', 'fap');
+  const  { access }= useAccess('update', 'Fap', fap.id);
   //const access = false;
   const { t } = useTranslation();
 

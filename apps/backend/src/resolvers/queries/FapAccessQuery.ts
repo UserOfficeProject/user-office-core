@@ -2,7 +2,7 @@ import { Query, Arg, Ctx, Resolver, Int, InputType, Field } from 'type-graphql';
 import { ResolverContext } from '../../context';
 
 @InputType()
-export class AccessFilter {
+export class FapAccessFilter {
   @Field(() => Int)
   public userId: number;
 
@@ -13,16 +13,19 @@ export class AccessFilter {
   public action: string;
 
   @Field(() => String)
-  public subject: string
+  public subject: string;
+
+  @Field(() => Int)
+  public fapId: number;
 }
 
 @Resolver()
-export class AccessQuery {
+export class FapAccessQuery {
   @Query(() => Boolean)
-  canAccess(
+  canAccessFap(
     @Ctx() context: ResolverContext,
-    @Arg('filter', () => AccessFilter) filter: AccessFilter
+    @Arg('filter', () => FapAccessFilter) filter: FapAccessFilter
   ) {
-    return context.queries.access.get(context.user, filter)
+    return context.queries.fap.getAccess(context.user, filter);
   }
 }

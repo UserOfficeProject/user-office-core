@@ -18,12 +18,14 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { actions, subjects } from './postgres/AccessDataSource';
 import {
   FapReviewsRecord,
   AssignProposalsToFapsInput,
 } from './postgres/records';
 
 export interface FapDataSource {
+  canAccess(id: number, role: Roles, action: typeof actions[number], subject: typeof subjects[number], fapId: number): Promise<boolean>;
   create(
     code: string,
     description: string,

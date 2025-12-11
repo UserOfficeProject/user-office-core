@@ -53,6 +53,9 @@ import {
   CountryRecord,
   FapReviewsRecord,
 } from './records';
+import { AccessDataSource } from '../AccessDataSource';
+import { actions, subjects } from './AccessDataSource';
+import { subject as subjectType } from '@casl/ability';
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
@@ -61,8 +64,20 @@ export default class PostgresFapDataSource implements FapDataSource {
   ) as UserDataSource;
 
   constructor(
-    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
+    @inject(Tokens.AccessDataSource) private accessDataSource: AccessDataSource
   ) {}
+
+  async canAccess(id: number, role: Roles, action: typeof actions[number], subject: typeof subjects[number], fapId: number) {
+    let can = false;
+    const fap = await this.getFap(fapId);
+    const rule = await this.accessDataSource.getRule(id, role, action, subject);
+    if(fap && rule) {
+      can = rule.can(action, subjectType('Fap', fap))
+    }
+
+    return can;
+  }
 
   async delete(id: number): Promise<Fap> {
     return database

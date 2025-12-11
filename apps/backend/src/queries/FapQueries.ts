@@ -8,6 +8,8 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { actions, subjects } from '../datasources/postgres/AccessDataSource';
+import { FapAccessFilter } from '../resolvers/queries/FapAccessQuery';
 
 @injectable()
 export default class FapQueries {
@@ -17,6 +19,13 @@ export default class FapQueries {
     public proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
+
+  @Authorized()
+      async getAccess(agent: UserWithRole | null, filter: FapAccessFilter) {
+        const {userId, role, action, subject, fapId} = filter;
+  
+        return this.dataSource.canAccess(userId, role as Roles, action as typeof actions[number], subject as typeof subjects[number], fapId);
+      }
 
   @Authorized([
     Roles.USER_OFFICER,

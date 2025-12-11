@@ -1,0 +1,3 @@
+query getFapAccess($filter: FapAccessFilter!) {
+  canAccessFap(filter: $filter)
+}

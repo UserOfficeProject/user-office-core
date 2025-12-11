@@ -3,11 +3,11 @@ import { SetStateAction, useContext, useEffect, useState } from 'react';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { UserContext } from 'context/UserContextProvider';
 
-export function useAccess(action: string, subject: string) {
+export function useAccess(action: string, subject: string, fapId: number) {
   const [access, setAccess] = useState<boolean>(false);
   const [loadingAccess, setLoadingAccess] = useState(true);
 
-  const { user } = useContext(UserContext);
+  const { user, currentRole } = useContext(UserContext);
   const api = useDataApi();
 
   const setAccessWithLoading = (data: SetStateAction<boolean>) => {
@@ -22,12 +22,12 @@ export function useAccess(action: string, subject: string) {
     setLoadingAccess(true);
 
     api()
-      .getAccess({filter: {userId: user.id, action: action, subject: subject}})
+      .getFapAccess({filter: {userId: user.id, role: currentRole!, action, subject, fapId}})
       .then((data) => {
         if (unmounted) {
           return;
         }
-          setAccess(data.canAccess);
+          setAccess(data.canAccessFap);
         setLoadingAccess(false);
       });
 

@@ -14,6 +14,7 @@ import { FapDataSource } from '../FapDataSource';
 import CallDataSource from '../postgres/CallDataSource';
 import PostgresFapDataSource from '../postgres/FapDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
+import AccessDataSource from '../postgres/AccessDataSource';
 
 enum STFCRolesMap {
   FAP_CHAIR = 50,
@@ -30,7 +31,7 @@ export default class StfcFapDataSource
   ) as StfcUserDataSource;
 
   constructor() {
-    super(new CallDataSource());
+    super(new CallDataSource(), new AccessDataSource());
   }
 
   async assignChairOrSecretaryToFap(
