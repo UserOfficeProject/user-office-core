@@ -541,7 +541,6 @@ export default class UserMutations {
       return rejection('Invalid birth date format', { birthDate, args });
     }
 
-    // due to Graphql @oneOf directive institutionInput can be of mutually exclusive three types: rorId (string), manual (InstitutionManualInput), institutionId (number)
     const institution = await this.userAuth.getOrCreateUserInstitution(
       institutionInput.institutionId ??
         institutionInput.manual ??
