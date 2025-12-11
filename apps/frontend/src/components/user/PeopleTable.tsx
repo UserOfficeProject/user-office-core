@@ -241,6 +241,7 @@ const PeopleTable = ({
           ...(selectedItems.map((selectedItem) => ({
             id: selectedItem.id,
             firstname: selectedItem.firstname,
+            preferredname: selectedItem.preferredname,
             lastname: selectedItem.lastname,
             institution: selectedItem.institution,
             institutionId: selectedItem.institutionId,
@@ -262,6 +263,7 @@ const PeopleTable = ({
             {
               id: selectedItem.id,
               firstname: selectedItem.firstname,
+              preferredname: selectedItem.preferredname,
               lastname: selectedItem.lastname,
               institution: selectedItem.institution,
               institutionId: selectedItem.institutionId,

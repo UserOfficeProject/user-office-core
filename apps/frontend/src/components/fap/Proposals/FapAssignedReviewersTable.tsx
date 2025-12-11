@@ -106,7 +106,12 @@ const FapAssignedReviewersTable = ({
   const assignmentColumns = [
     {
       title: 'First name',
-      field: 'user.firstname',
+      render: (rowData: FapProposalAssignmentType) =>
+        rowData.user
+          ? rowData.user.preferredname
+            ? rowData.user.preferredname
+            : rowData.user.firstname
+          : '-',
     },
     {
       title: 'Last name',

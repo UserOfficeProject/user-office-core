@@ -9,6 +9,6 @@ export class AddClientLogMutation {
     @Arg('error', () => String) error: string,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.admin.addClientLog(error);
+    return context.mutations.admin.addClientLog(context.user, error);
   }
 }
