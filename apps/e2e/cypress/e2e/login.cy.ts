@@ -4,18 +4,12 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('User login tests', () => {
-  const userOne = 'user1';
-  const userTwo = 'user2';
-  const userOneInstitutionInfo = {
-    institution_ror_id: 'Test_ror_id_1',
-    institution_country: 'China',
-    institution_name: 'Test Institution',
-  };
+  const userThree = 'user3';
 
-  const userTwoInstitutionInfo = {
-    institution_ror_id: 'Test_ror_id_2',
+  const userThreeInstitutionInfo = {
+    institution_ror_id: null,
     institution_country: 'TestCountry',
-    institution_name: 'Test Institution2',
+    institution_name: 'Test Institution3',
   };
 
   beforeEach(() => {
@@ -31,7 +25,7 @@ context('User login tests', () => {
         this.skip();
       }
 
-      cy.login(userOne, initialDBData.roles.user);
+      cy.login(userThree, initialDBData.roles.user);
       cy.visit('/');
       cy.logout();
 
@@ -42,18 +36,18 @@ context('User login tests', () => {
 
       cy.get('input[aria-label="Search"]')
         .focus()
-        .type(userOneInstitutionInfo.institution_name);
+        .type(userThreeInstitutionInfo.institution_name);
 
       cy.get('[data-cy="institutions-table"]').as('institutionsTable');
       cy.get('@institutionsTable')
-        .contains(userOneInstitutionInfo.institution_name)
+        .contains(userThreeInstitutionInfo.institution_name)
         .parents('tr')
         .within(() => {
           cy.get('td:nth-child(4)')
             .invoke('text')
             .then((text) => {
               expect(text.trim()).to.eq(
-                userOneInstitutionInfo.institution_ror_id
+                userThreeInstitutionInfo.institution_ror_id ?? '-'
               );
             });
         });
@@ -64,7 +58,7 @@ context('User login tests', () => {
         this.skip();
       }
 
-      cy.login(userTwo, initialDBData.roles.user);
+      cy.login(userThree, initialDBData.roles.user);
       cy.visit('/');
       cy.logout();
 
@@ -75,18 +69,18 @@ context('User login tests', () => {
 
       cy.get('input[aria-label="Search"]')
         .focus()
-        .type(userOneInstitutionInfo.institution_name);
+        .type(userThreeInstitutionInfo.institution_name);
 
       cy.get('[data-cy="institutions-table"]').as('institutionsTable');
       cy.get('@institutionsTable')
-        .contains(userTwoInstitutionInfo.institution_name)
+        .contains(userThreeInstitutionInfo.institution_name)
         .parents('tr')
         .within(() => {
           cy.get('td:nth-child(3)')
             .invoke('text')
             .then((text) => {
               expect(text.trim()).to.eq(
-                userTwoInstitutionInfo.institution_country
+                userThreeInstitutionInfo.institution_country
               );
             });
         });
