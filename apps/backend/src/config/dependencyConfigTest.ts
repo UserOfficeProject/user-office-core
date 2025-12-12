@@ -2,12 +2,15 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
@@ -37,6 +40,7 @@ import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSou
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { VisitRegistrationClaimDataSourceMock } from '../datasources/mockups/VisitRegistrationClaimDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
@@ -54,6 +58,7 @@ import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
+mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
@@ -92,6 +97,11 @@ mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+mapClass(
+  Tokens.VisitRegistrationClaimDataSource,
+  VisitRegistrationClaimDataSourceMock
+);
+mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
@@ -99,6 +109,7 @@ mapClass(Tokens.TagDataSource, TagDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

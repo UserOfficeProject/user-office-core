@@ -377,11 +377,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return query;
   }
 
-  safeEscapeRegexExpression(expression: string): string {
-    const escaped = expression.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    return escaped;
-  }
   async getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -442,10 +437,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
-          const regexLiteral = this.safeEscapeRegexExpression(searchText);
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-          const jsonPathPattern = `$[*] ? (@.name.type() == "string" && @.name like_regex "${regexLiteral}" flag "i")`;
-
           query.andWhere((qb) =>
             qb
               .orWhereRaw('proposal_id ILIKE ?', [`%${searchText}%`])
@@ -455,9 +446,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhere('users.firstname', 'ilike', `%${searchText}%`)
               .orWhere('users.lastname', 'ilike', `%${searchText}%`)
               .orWhere('principal_investigator', 'in', principalInvestigator)
-              .orWhereRaw('jsonb_path_exists(instruments, ?)', [
-                jsonPathPattern,
-              ])
+              .orWhereJsonFieldLikeEscaped(
+                'instruments',
+                'name',
+                `${searchText}`
+              )
           );
         }
 
@@ -631,13 +624,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('title ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_id ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_status_name ILIKE ?', `%${filter.text}%`)
-              .orWhereRaw('users.email ILIKE', `%${filter.text}%`)
-              .orWhereRaw('users.firstname ILIKE', `%${filter.text}%`)
-              .orWhereRaw('users.lastname ILIKE', `%${filter.text}%`)
-              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-              .orWhereRaw(
-                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-                { searchText: filter.text }
+              .orWhereRaw('users.email ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.firstname ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.lastname ILIKE ?', `%${filter.text}%`)
+              .orWhereJsonFieldLikeEscaped(
+                'instruments',
+                'name',
+                `${filter.text}`
               )
           );
         }
@@ -653,7 +646,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             ).orWhereRaw(
               // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
               // eslint-disable-next-line prettier/prettier
-              'jsonb_path_exists(instruments, \'$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)\')',
+              "jsonb_path_exists(instruments, '$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)')",
               { userId: user.id }
             );
           });
@@ -716,48 +709,56 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter
   ): Promise<Proposal[]> {
-    return database
-      .select('p.*')
-      .from('proposals as p')
-      .where('p.proposer_id', id) // Principal investigator
-      .orWhereIn('p.proposal_pk', function () {
-        // co-proposer
-        this.select('proposal_pk').from('proposal_user').where('user_id', id);
-      })
-      .orWhereIn('p.proposal_pk', function () {
-        // visitor
-        this.select('proposal_pk')
-          .from('visits')
-          .leftJoin(
-            'visits_has_users',
-            'visits.visit_id',
-            'visits_has_users.visit_id'
-          )
-          .where('visits_has_users.user_id', id);
-      })
-      .modify((qb) => {
-        if (filter?.instrumentId) {
-          qb.innerJoin('instrument_has_proposals as ihp', {
-            'p.proposal_pk': 'ihp.proposal_pk',
-          });
-          qb.where('ihp.instrument_id', filter.instrumentId);
-        }
+    return (
+      database
+        .select('p.*')
+        .from('proposals as p')
+        .where('p.proposer_id', id) // Principal investigator
+        .orWhereIn('p.proposal_pk', function () {
+          // co-proposer
+          this.select('proposal_pk').from('proposal_user').where('user_id', id);
+        })
+        // data access
+        .orWhereIn('p.proposal_pk', function () {
+          this.select('proposal_pk')
+            .from('data_access_user_has_proposal')
+            .where('user_id', id);
+        })
+        .orWhereIn('p.proposal_pk', function () {
+          // visitor
+          this.select('proposal_pk')
+            .from('visits')
+            .leftJoin(
+              'visits_has_users',
+              'visits.visit_id',
+              'visits_has_users.visit_id'
+            )
+            .where('visits_has_users.user_id', id);
+        })
+        .modify((qb) => {
+          if (filter?.instrumentId) {
+            qb.innerJoin('instrument_has_proposals as ihp', {
+              'p.proposal_pk': 'ihp.proposal_pk',
+            });
+            qb.where('ihp.instrument_id', filter.instrumentId);
+          }
 
-        if (filter?.managementDecisionSubmitted) {
-          qb.where(
-            'p.management_decision_submitted',
-            filter.managementDecisionSubmitted
-          );
-        }
+          if (filter?.managementDecisionSubmitted) {
+            qb.where(
+              'p.management_decision_submitted',
+              filter.managementDecisionSubmitted
+            );
+          }
 
-        if (filter?.finalStatus) {
-          qb.where('p.final_status', filter.finalStatus);
-        }
-      })
-      .groupBy('p.proposal_pk')
-      .then((proposals: ProposalRecord[]) =>
-        proposals.map((proposal) => createProposalObject(proposal))
-      );
+          if (filter?.finalStatus) {
+            qb.where('p.final_status', filter.finalStatus);
+          }
+        })
+        .groupBy('p.proposal_pk')
+        .then((proposals: ProposalRecord[]) =>
+          proposals.map((proposal) => createProposalObject(proposal))
+        )
+    );
   }
 
   async getProposalsByPks(proposalPks: number[]): Promise<Proposal[]> {

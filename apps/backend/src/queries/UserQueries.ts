@@ -73,7 +73,8 @@ export default class UserQueries {
         user.placeholder,
         user.email,
         user.country,
-        user.title
+        user.user_title,
+        user.oidc_sub
       );
     } else {
       return null;
@@ -86,7 +87,11 @@ export default class UserQueries {
     email: string,
     role?: UserRole
   ) {
-    const user = await this.dataSource.getBasicUserDetailsByEmail(email, role);
+    const user = await this.dataSource.getBasicUserDetailsByEmail(
+      email,
+      role,
+      agent?.currentRole?.id
+    );
     if (!user) {
       return null;
     }
@@ -103,7 +108,8 @@ export default class UserQueries {
       user.placeholder,
       user.email,
       user.country,
-      user.title
+      user.user_title,
+      user.oidc_sub
     );
   }
 

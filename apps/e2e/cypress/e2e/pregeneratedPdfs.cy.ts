@@ -110,11 +110,12 @@ context('Pregenerated PDF tests', () => {
     });
 
     cy.addWorkflowStatus({
-      droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
       statusId: initialDBData.proposalStatuses.editableSubmitted.id,
       workflowId: initialDBData.workflows.defaultWorkflow.id,
       sortOrder: 1,
       prevStatusId: initialDBData.proposalStatuses.draft.id,
+      posX: 0,
+      posY: 200,
     }).then((result) => {
       const connection = result.addWorkflowStatus;
       if (connection) {
@@ -516,7 +517,7 @@ context('Pregenerated PDF tests', () => {
   });
 
   it('User officer can download pregenerated and generated PDFs in a zip', () => {
-    cy.login('user1', initialDBData.roles.user).then(() => {
+    cy.login('officer', initialDBData.roles.userOfficer).then(() => {
       const token = window.localStorage.getItem('token');
 
       if (!token) {

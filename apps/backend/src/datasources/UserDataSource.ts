@@ -18,7 +18,8 @@ export interface UserDataSource {
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
     email: string,
-    role?: UserRole
+    role?: UserRole,
+    currentRole?: UserRole
   ): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
   // Read
@@ -98,4 +99,11 @@ export interface UserDataSource {
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
+  getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
+    {
+      user: User;
+      institution: Institution;
+      country: Country;
+    }[]
+  >;
 }

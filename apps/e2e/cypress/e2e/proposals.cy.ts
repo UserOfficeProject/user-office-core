@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   DataType,
   FeatureId,
+  ProposalEndStatus,
   SettingsId,
   TemplateCategoryId,
   TemplateGroupId,
@@ -17,29 +18,30 @@ import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Proposal tests', () => {
+  faker.seed(0);
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
-  const time = faker.random.numeric();
+  const time = faker.number.int({ min: 1, max: 1 }).toString();
   const clonedProposalTitle = `Copy of ${newProposalTitle}`;
   const clonedProposalInternalTitle = `Copy of ${title}`;
   const proposer = initialDBData.users.user1;
   const proposalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
   };
   const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: initialDBData.users.user1.id,
   };
 
   const proposalInternalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
   };
 
   let createdWorkflowId: number;
@@ -47,7 +49,7 @@ context('Proposal tests', () => {
   let createdProposalId: string;
   let createdCallId: number;
   let createdTemplateId: number;
-  const textQuestion = faker.random.words(2);
+  const textQuestion = faker.lorem.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
   const yesterday = currentDayStart.plus({ days: -1 });
@@ -55,7 +57,7 @@ context('Proposal tests', () => {
   const tomorrow = currentDayStart.plus({ days: 1 });
 
   const newCall = {
-    shortCode: faker.random.alphaNumeric(15),
+    shortCode: faker.string.alphanumeric(15),
     startCall: faker.date.past().toISOString(),
     endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
@@ -128,11 +130,12 @@ context('Proposal tests', () => {
       }).then((result) => {
         if (result.createWorkflow) {
           cy.addWorkflowStatus({
-            droppableGroupId: 'proposalWorkflowConnections_0',
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
             sortOrder: 1,
             prevStatusId: 1,
+            posX: 0,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -149,6 +152,39 @@ context('Proposal tests', () => {
           });
         }
       });
+    });
+
+    it('Should be able add user to proposal though data access feature', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.DATA_ACCESS_USERS)) {
+        this.skip();
+      }
+      cy.submitProposal({ proposalPk: createdProposalPk });
+
+      cy.updateProposalManagementDecision({
+        proposalPk: createdProposalPk,
+        finalStatus: ProposalEndStatus.ACCEPTED,
+        managementTimeAllocations: [
+          { instrumentId: initialDBData.instrument1.id, value: 5 },
+        ],
+        managementDecisionSubmitted: true,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.get('[data-testid="PeopleIcon"]').click();
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('#Email-input').type(initialDBData.users.user3.email);
+      cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="save-data-access-users-modal"]').click();
+      cy.logout();
+      cy.login('user3', initialDBData.roles.user);
+      cy.visit('/');
+      cy.get('[data-testid="VisibilityIcon"]').click();
+      cy.get('[data-cy="questionary-details-view"]').contains(
+        createdProposalId
+      );
+      cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
     });
 
     it('Copy to clipboard should work for Proposal ID', () => {
@@ -282,6 +318,11 @@ context('Proposal tests', () => {
       cy.contains('Submit').click();
 
       cy.contains('OK').click();
+
+      cy.get('[data-cy="questionary-stepper"').contains('New proposal').click();
+
+      cy.get('#title-input').should('have.value', title);
+      cy.get('#abstract-input').should('have.value', modifiedAbstract);
 
       cy.contains('Dashboard').click();
       cy.contains(title);
@@ -611,11 +652,6 @@ context('Proposal tests', () => {
     });
 
     it('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
-      cy.createCall({
-        ...newCall,
-        proposalWorkflowId: createdWorkflowId,
-      });
-
       // Create an ended call to test if it is not available for cloning.
       cy.createCall({
         ...newCall,
@@ -636,6 +672,16 @@ context('Proposal tests', () => {
           cy.assignProposalsToInstruments({
             instrumentIds: [result.createInstrument.id],
             proposalPks: [createdProposalPk],
+          });
+
+          cy.createCall({
+            ...newCall,
+            proposalWorkflowId: createdWorkflowId,
+          }).then((call) => {
+            cy.assignInstrumentToCall({
+              callId: call.createCall.id,
+              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            });
           });
         }
       });
@@ -1049,7 +1095,7 @@ context('Proposal tests', () => {
     it('User officer should reopen proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.get('[aria-label="View proposal"]').click();
+      cy.get('[aria-label="View proposal"]').first().click();
       cy.get('[role="tablist"]').contains('Proposal').click();
       cy.get('[data-cy=button-submit-proposal]').should('be.disabled');
 

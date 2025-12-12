@@ -6,7 +6,7 @@ import { RoleDTO } from '../../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
-import { BasicUserDetails, User } from '../../models/User';
+import { BasicUserDetails, User, UserRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
@@ -107,7 +107,8 @@ export function toEssBasicUserDetails(
     false,
     stfcUser.email ?? '',
     stfcUser.country ?? '',
-    stfcUser.title ?? ''
+    stfcUser.title ?? '',
+    ''
   );
 }
 
@@ -380,9 +381,13 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getBasicUserDetailsByEmail(
-    email: string
+    email: string,
+    role?: UserRole,
+    currentRole?: UserRole | undefined
   ): Promise<BasicUserDetails | null> {
-    return this.getStfcBasicPersonByEmail(email, true).then((stfcUser) =>
+    const searchable = currentRole !== UserRole.USER_OFFICER;
+
+    return this.getStfcBasicPersonByEmail(email, searchable).then((stfcUser) =>
       stfcUser ? toEssBasicUserDetails(stfcUser) : null
     );
   }
@@ -571,6 +576,11 @@ export class StfcUserDataSource implements UserDataSource {
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)
       );
+
+      if (subtractUsers && subtractUsers.length > 0) {
+        const usersToRemove = new Set(subtractUsers);
+        userDetails = userDetails.filter((user) => !usersToRemove.has(user.id));
+      }
     } else {
       const { users } = await postgresUserDataSource.getUsers({
         filter: undefined,
@@ -763,6 +773,14 @@ export class StfcUserDataSource implements UserDataSource {
     return UOWSClient.groupMemberships.removePersonFromFapGroup(
       userId,
       this.roleAssignmentMap.get(roleId) ?? ''
+    );
+  }
+
+  async getApprovedProposalVisitorsWithInstitution(
+    proposalPk: number
+  ): Promise<{ user: User; institution: Institution; country: Country }[]> {
+    return await postgresUserDataSource.getApprovedProposalVisitorsWithInstitution(
+      proposalPk
     );
   }
 }

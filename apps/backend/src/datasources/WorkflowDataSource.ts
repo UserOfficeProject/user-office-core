@@ -6,29 +6,38 @@ import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
 } from '../models/WorkflowConnections';
+import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
+import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 
 export interface WorkflowDataSource {
-  createWorkflow(newWorkflowInput: Omit<Workflow, 'id'>): Promise<Workflow>;
+  createWorkflow(newWorkflowInput: CreateWorkflowInput): Promise<Workflow>;
   getWorkflow(workflowId: number): Promise<Workflow | null>;
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
-  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
+  updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
+  deleteWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnection | null>;
   getWorkflowConnections(
-    workflowId: WorkflowConnection['workflowId'],
-    droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: boolean | undefined
+    workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]>;
+  getWorkflowConnection(
+    connectionId: WorkflowConnection['id']
+  ): Promise<WorkflowConnectionWithStatus | null>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'],
+    statusId: Status['id'] | undefined,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]>;
   addWorkflowStatus(
-    newWorkflowStatusInput: Omit<WorkflowConnection, 'id' | 'entityType'>
+    newWorkflowStatusInput: Omit<
+      WorkflowConnection,
+      'id' | 'entityType' | 'prevConnectionId'
+    >
   ): Promise<WorkflowConnectionWithStatus>;
-  updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]>;
+  updateWorkflowStatus(
+    workflowStatuses: WorkflowConnection
+  ): Promise<WorkflowConnectionWithStatus>;
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,

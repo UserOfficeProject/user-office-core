@@ -36,6 +36,7 @@ fragment fieldConfig on FieldConfig {
     units {
       ...unit
     }
+    numberValueConstraint
     small_label
     required
     tooltip
@@ -166,6 +167,10 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     readPermissions
+    minGrade
+    maxGrade
+    decimalPoints
+    nonNumericOptions
   }
 
   ... on TechnicalReviewBasisConfig {

@@ -189,9 +189,20 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.wait(1000);
 
   cy.window().then((win) => {
+    // setContent does not trigger change and blur event so we need to do it manually
+    // However, blur event needs to be triggered after a timeout as the onChange function
+    // may not have finished before the blur event is triggered.
     const editor = getEditorById(win, tinyMceId);
     editor?.setContent(content);
+    editor?.fire('change');
+    // Since editor is a cypress object we cannot just use a cy.wait here
+    setTimeout(() => {
+      editor?.fire('blur');
+    }, 1000);
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000);
   });
+  cy.get(`#${tinyMceId}_ifr`).first().focus().click(); // Also focus the iframe to trigger any onChange events
 };
 
 const setDatePickerValue = (selector: string, value: string) =>

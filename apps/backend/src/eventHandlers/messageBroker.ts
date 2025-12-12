@@ -8,6 +8,10 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import {
+  DataAccessUsersDataSource,
+  UserWithInstitution,
+} from '../datasources/DataAccessUsersDataSource';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -56,6 +60,8 @@ type ProposalMessageData = {
   callId: number;
   instruments?: { id: number; shortCode: string; allocatedTime: number }[];
   members: Member[];
+  dataAccessUsers: Member[];
+  visitors: Member[];
   newStatus?: string;
   proposalPk: number;
   proposer?: Member;
@@ -104,6 +110,11 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.UserDataSource
   );
 
+  const dataAccessUsersDataSource =
+    container.resolve<DataAccessUsersDataSource>(
+      Tokens.DataAccessUsersDataSource
+    );
+
   const statusDataSource = container.resolve<StatusDataSource>(
     Tokens.StatusDataSource
   );
@@ -119,6 +130,16 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
+  const dataAccessUsersWithInstitution =
+    await dataAccessUsersDataSource.getDataAccessUsersWithInstitution(
+      proposal.primaryKey
+    );
+
+  const visitorsWithInstitution =
+    await userDataSource.getApprovedProposalVisitorsWithInstitution(
+      proposal.primaryKey
+    );
+
   const maybeInstruments =
     await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
@@ -138,6 +159,20 @@ export const getProposalMessageData = async (proposal: Proposal) => {
       }))
     : undefined;
 
+  // Helper function to map user with institution to Member
+  const mapUserWithInstitutionToMember = (
+    userWithInstitution: UserWithInstitution
+  ): Member => ({
+    firstName: userWithInstitution.user.firstname,
+    lastName: userWithInstitution.user.lastname,
+    email: userWithInstitution.user.email,
+    id: userWithInstitution.user.id.toString(),
+    oidcSub: userWithInstitution.user.oidcSub,
+    oauthIssuer: userWithInstitution.user.oauthIssuer,
+    institution: userWithInstitution.institution,
+    country: userWithInstitution.country,
+  });
+
   const messageData: ProposalMessageData = {
     proposalPk: proposal.primaryKey,
     shortCode: proposal.proposalId,
@@ -145,35 +180,22 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     title: proposal.title,
     abstract: proposal.abstract,
     callId: call.id,
-    members: proposalUsersWithInstitution.map(
-      (proposalUserWithInstitution) => ({
-        firstName: proposalUserWithInstitution.user.firstname,
-        lastName: proposalUserWithInstitution.user.lastname,
-        email: proposalUserWithInstitution.user.email,
-        id: proposalUserWithInstitution.user.id.toString(),
-        oidcSub: proposalUserWithInstitution.user.oidcSub,
-        oauthIssuer: proposalUserWithInstitution.user.oauthIssuer,
-        institution: proposalUserWithInstitution.institution,
-        country: proposalUserWithInstitution.country,
-      })
+    members: proposalUsersWithInstitution.map(mapUserWithInstitutionToMember),
+    dataAccessUsers: dataAccessUsersWithInstitution.map(
+      mapUserWithInstitutionToMember
     ),
+    visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
     newStatus: proposalStatus?.shortCode,
     submitted: proposal.submitted,
   };
+
   const proposerWithInstitution = await userDataSource.getUserWithInstitution(
     proposal.proposerId
   );
   if (proposerWithInstitution) {
-    messageData.proposer = {
-      firstName: proposerWithInstitution.user.firstname,
-      lastName: proposerWithInstitution.user.lastname,
-      email: proposerWithInstitution.user.email,
-      id: proposerWithInstitution.user.id.toString(),
-      oidcSub: proposerWithInstitution.user.oidcSub,
-      oauthIssuer: proposerWithInstitution.user.oauthIssuer,
-      institution: proposerWithInstitution.institution,
-      country: proposerWithInstitution.country,
-    };
+    messageData.proposer = mapUserWithInstitutionToMember(
+      proposerWithInstitution
+    );
   }
 
   return JSON.stringify(messageData);
@@ -229,7 +251,6 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_DELETED:
       case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
-
         await rabbitMQ.sendMessageToExchange(
           event.exchange || EXCHANGE_NAME,
           event.type,
@@ -237,8 +258,8 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.INVITE_ACCEPTED: {
-        const invite = event.invite;
+      case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
+        const { invite } = event;
 
         const claims = await coProposerClaimDataSource.findByInviteId(
           invite.id
@@ -365,6 +386,25 @@ export async function createPostToRabbitMQHandler() {
           event.type === Event.VISIT_REGISTRATION_APPROVED
             ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
             : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          jsonMessage
+        );
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
+          proposalPayload
+        );
+        break;
+      }
+      case Event.DATA_ACCESS_USERS_UPDATED: {
+        const { proposalPKey } = event;
+
+        const proposal = await proposalDataSource.get(proposalPKey);
+
+        const jsonMessage = await getProposalMessageData(proposal!);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
           jsonMessage
         );
         break;

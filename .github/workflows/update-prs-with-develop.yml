@@ -1,0 +1,49 @@
+name: Update PRs with develop
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  sync-prs:
+    # Disabled until we can push with a PAT that has workflow scope; otherwise CI stays in "Waiting".
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge develop into all open non-Dependabot PRs
+        # TODO: Re-enable once we replace the default GITHUB_TOKEN with a PAT that has repo+workflow scopes
+        # so that downstream PR checks trigger automatically after the bot pushes merge commits.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all open PRs targeting develop, excluding Dependabot
+          prs=$(gh pr list --state open --base develop --limit 100 --json number,author --jq '.[] | select(.author.is_bot != true) | .number')
+
+          for pr in $prs; do
+            echo "Processing PR #$pr"
+            gh pr checkout $pr
+            git fetch origin develop
+
+            # Attempt merge
+            if git merge --no-edit origin/develop; then
+              echo "PR #$pr merged successfully. Pushing changes..."
+              git push
+            else
+              echo "Conflict in PR #$pr. Merge aborted."
+              git merge --abort
+              # Optional: Notify author
+              gh pr comment $pr --body "⚠️ Automatic merge of \`develop\` into this PR failed due to conflicts. Please resolve the conflicts and update your branch."
+            fi
+          done

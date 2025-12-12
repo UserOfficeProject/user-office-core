@@ -9,8 +9,11 @@ import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 
+import { MultiRankAssignmentDialog } from './MultiRankAssignmentDialog';
+
 export type FapAssignedMember = BasicUserDetails & {
   role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
+  rank?: number | null;
 };
 
 type AssignFapMemberToProposalModalProps = {
@@ -24,7 +27,11 @@ type AssignFapMemberToProposalModalProps = {
 const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 
 const columns = [
-  { title: 'Name', field: 'firstname' },
+  {
+    title: 'Name',
+    render: (rowData: FapAssignedMember) =>
+      rowData.preferredname ? rowData.preferredname : rowData.firstname,
+  },
   { title: 'Surname', field: 'lastname' },
   { title: 'Proposal Count', field: 'proposalsCountByCall' },
   {
@@ -44,6 +51,7 @@ const AssignFapMemberToProposalModal = ({
     BasicUserDetails[]
   >([]);
   const { loadingMembers, FapMembersData } = useFapMembersData(fapId, false);
+  const [rankSelectorOpen, setRankSelectorOpen] = useState(false);
 
   useEffect(() => {
     if (proposalPks.length === 0) {
@@ -98,8 +106,27 @@ const AssignFapMemberToProposalModal = ({
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >
-          Update
+          Assign without Rankings
         </Button>
+        <Button
+          type="button"
+          onClick={() => {
+            setRankSelectorOpen(true);
+          }}
+          disabled={selectedParticipants.length === 0}
+          color="primary"
+          data-cy="assign-selected-users-with-rank"
+        >
+          Assign with Rankings
+        </Button>
+        {rankSelectorOpen && (
+          <MultiRankAssignmentDialog
+            users={selectedParticipants ? selectedParticipants : []}
+            open={rankSelectorOpen}
+            setOpen={setRankSelectorOpen}
+            assign={assignMembersToFapProposals}
+          />
+        )}
       </DialogActions>
     </Dialog>
   );

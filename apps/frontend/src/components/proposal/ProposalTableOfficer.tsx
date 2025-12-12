@@ -26,7 +26,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -48,12 +48,12 @@ import TechnicalBulkReassignModal, {
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
-  ProposalsFilter,
-  InstrumentMinimalFragment,
-  FeatureId,
-  FapInstrumentInput,
   FapInstrument,
+  FapInstrumentInput,
+  FeatureId,
+  InstrumentMinimalFragment,
   ProposalViewInstrument,
+  ProposalsFilter,
   Status,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -75,6 +75,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
+import NotifyProposal from './NotifyProposal';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
@@ -332,6 +333,7 @@ const ProposalTableOfficer = ({
     useState(false);
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
+  const [openNotifiyProposal, setOpenNotifyProposal] = useState(false);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [openCallSelection, setOpenCallSelection] = useState(false);
@@ -378,16 +380,16 @@ const ProposalTableOfficer = ({
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 
-  useEffect(() => {
-    let isMounted = true;
+  const isFirstRender = useRef(true);
 
-    if (isMounted) {
-      refreshTableData();
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      return;
     }
 
-    return () => {
-      isMounted = false;
-    };
+    refreshTableData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(proposalFilter)]);
 
@@ -477,12 +479,13 @@ const ProposalTableOfficer = ({
   };
 
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
-  const emailProposals = (): void => {
+  const emailProposals = (ignoreNotifiedFlag: boolean): void => {
     getSelectedProposalPks().forEach(async (proposalPk) => {
       await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
         proposalPk,
+        ignoreNotifiedFlag,
       });
 
       refreshTableData();
@@ -833,16 +836,7 @@ const ProposalTableOfficer = ({
       icon: EmailIcon,
       tooltip: 'Notify users final result',
       onClick: () => {
-        confirm(
-          () => {
-            emailProposals();
-          },
-          {
-            title: 'Notify results',
-            description:
-              'This action will trigger emails to be sent to principal investigators.',
-          }
-        )();
+        setOpenNotifyProposal(true);
       },
       position: 'toolbarOnSelect',
     },
@@ -972,6 +966,21 @@ const ProposalTableOfficer = ({
                 )
               )
               .flat()}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openNotifiyProposal}
+        maxWidth="sm"
+        onClose={(): void => setOpenNotifyProposal(false)}
+        fullWidth
+      >
+        <DialogContent>
+          <NotifyProposal
+            close={(): void => setOpenNotifyProposal(false)}
+            ignoreNotifiedFlag={emailProposals}
           />
         </DialogContent>
       </Dialog>
@@ -1111,10 +1120,24 @@ const ProposalTableOfficer = ({
             return searchParams;
           });
         }}
+        onRowsPerPageChange={(pageSize) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('pageSize', pageSize.toString());
+            searchParams.set('page', '0');
+
+            return searchParams;
+          });
+        }}
         onSearchChange={(searchText) => {
-          setSearchParams({
-            search: searchText ? searchText : '',
-            page: searchText ? '0' : page || '',
+          setSearchParams((searchParams) => {
+            if (searchText) {
+              searchParams.set('search', searchText);
+              searchParams.set('page', '0');
+            } else {
+              searchParams.delete('search');
+            }
+
+            return searchParams;
           });
         }}
         onSelectionChange={(selectedItems) => {
@@ -1153,7 +1176,7 @@ const ProposalTableOfficer = ({
             },
           }),
           pageSize: pageSize ? +pageSize : undefined,
-          initialPage: search ? 0 : page ? +page : 0,
+          initialPage: page ? +page : 0,
         }}
         actions={tableActions}
         onChangeColumnHidden={(columnChange) => {
@@ -1173,11 +1196,18 @@ const ProposalTableOfficer = ({
           const [orderBy] = orderByCollection;
 
           if (!orderBy) {
-            setSearchParams({});
+            setSearchParams((searchParams) => {
+              searchParams.delete('sortField');
+              searchParams.delete('sortDirection');
+
+              return searchParams;
+            });
           } else {
-            setSearchParams({
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
+            setSearchParams((searchParams) => {
+              searchParams.set('sortField', orderBy.orderByField);
+              searchParams.set('sortDirection', orderBy.orderDirection);
+
+              return searchParams;
             });
           }
         }}

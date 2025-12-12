@@ -43,7 +43,7 @@ type UserWithReview = {
   proposalId: string;
   proposalPk: number;
   title: string;
-  grade: number | null;
+  grade: string | null;
   reviewId: number;
   comment: string | null;
   status: ReviewStatus;
@@ -116,6 +116,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       instrumentId: selectedInstrumentId,
       status: getFilterStatus(reviewStatus),
       reviewer: getFilterReviewer(reviewer),
+      active: true,
     });
 
   useEffect(() => {
