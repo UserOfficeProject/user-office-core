@@ -4,44 +4,56 @@ ________________________________________________________________________________
 
 ## What is the Scheduler?
 
-The Scheduler section of the User Office Application allows instrument scientists to plan and manage time slots for the use of equipment and instruments. This feature is accessible via the calendar interface, where users can view, organize, and modify beam time slots. The module also allows filtering of time slots based on various criteria for efficient scheduling.  
+The Scheduler helps instrument scientists plan and manage experiment time on instruments and equipment.
+
+With the calendar interface, they can:
+
+- Create, view, organize, and adjust scheduled time slots (also called experiments)
+- Filter by instrument, equipment, or local contact for efficient planning
+
+This ensures clear visibility of upcoming work and streamlined allocation of beam time.
 
 _________________________________________________________________________________________________________
 
 ## Accessing the Scheduler Interface
 
-The scheduling module is not accessible by default within the core part of the User Office Application. Instead, scheduling is managed through a separate interface. Since it is a dedicated Application, the User Office Scheduler comes with its own URL, which is usually different from that of User Office Core. However, It depends on how the Infrastructure is built.
+The scheduling service is not available by default within the core part of the User Office Application. Instead, scheduling is running as a separate microservice. Since it is a dedicated Application, the User Office Scheduler comes with its own URL, which is usually different from that of User Office Core. However, the exact URL depends on how the Infrastructure is set up.
 
 _________________________________________________________________________________________________________
 
 ## Prerequisites
 
 ### System Requirements
-- A supported web browser (Chrome, Firefox, Safari, etc.).
+- Docker-enabled environment
 
 ### Essential Configuration
-- The scheduling module must be deployed and activated to allow access.
+- The scheduling service must be deployed and activated to allow access.
 - Users must have appropriate permissions as Instrument Scientists or administrators (User Officer) to access and modify scheduling data.
 
-### Linking Proposals
+### Scheduling Proposals
 - This part should be done by the User Officer in the User Office Core application.
-- Scheduling is tied to Calls for each Proposal which must be correctly associated with planned time slots.
-- Proposals in **SCHEDULING** status will appear in the calendar, and administrators can assign time slots accordingly. Note there are 2 ways to set a proposal to **SCHEDULING** status:
+- Not all proposals show up in the Scheduler. It is only when Proposal enters particular state will it be eligible for scheduling. You can define the state as an ENV variable for the scheduler via **UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES** parameter. 
+Example:
+```
+UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES="SCHEDULING, ALLOCATED"
+
+```
+In the example above, proposals in **SCHEDULING** status will appear in the calendar, and administrators can assign time slots (experiments) accordingly. Note there are 2 ways to set a proposal to **SCHEDULING** status:
   1. **Through Workflow**: Configure the workflow to automatically transition proposals to **SCHEDULING** status based on predefined criteria. For more details on configuring the **SCHEDULING** status, refer to the [Creating Workflow guide](../user-guide/user-officer/creating_workflow.md).
   2. **Manual Status Change**: The User Officer can manually change the status of a proposal to **SCHEDULING** within the User Office Core application.
 - Proposals need to be **Accepted** by the User Officer in order to be scheduled.
 - It is necessary to check the **RabbitMQ** box in the **SCHEDULING** status of the Call Workflow to allow the proposal to be processed in the scheduler. To enable this:
-  1. Click on the **SCHEDULING** status in your workflow tree.
-
+  1. Open your workflow.
     ![scheduler_wf](../assets/images/scheduler_wf.png)
 
-  2. Click on **Status Actions**.
+  2. Click on the path that leads to **SCHEDULING** status workflow tree.
 
     ![scheduler_wf_status](../assets/images/scheduler_wf_status.png)
 
-  3. Check the **RabbitMQ** box.
+  3. Click on **Status Actions** and check the **RabbitMQ** box.
 
     ![scheduler_wf_rabbit](../assets/images/scheduler_wf_rabbit.png)
+
 
 You can now put your proposal in **SCHEDULING** status and allocate time slots, so it will appear in the scheduler.
 
@@ -103,7 +115,14 @@ A **NEW EVENT** button is available to create new events, such as:
 ![scheduler_plan_down](../assets/images/scheduler_plan_down.png)
 
 ### Time Slots to Plan
-Time slots are associated with proposals. For example, a proposal in **SCHEDULING** status may appear in the calendar, as shown with proposal **2025000**. This proposal is currently being scheduled for a duration of **2 days and 17 hours**. This process is essential for managing periods of instrument and equipment usage.
+Time slots link directly to proposals. When a proposal reaches the SCHEDULING status, it appears on the calendar and can be assigned time.
+
+Example:
+
+- Proposal 2025000 is in SCHEDULING
+- Currently scheduled for 2 days and 17 hours
+
+This section provides a clear overview of planning and managing beam time for instruments and equipment.
 
 ![scheduler_plan_drag](../assets/images/scheduler_plan_drag.png)
 
