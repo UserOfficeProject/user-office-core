@@ -349,7 +349,11 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       result.source.index,
       result.destination.index
     );
-    setCalls(callsWithUpdatedOrder);
+    setCalls(
+      callsWithUpdatedOrder.sort((a, b) =>
+        a.sort_order > b.sort_order ? -1 : 1
+      )
+    );
     const callOrderList = callsWithUpdatedOrder.map((item, index) => ({
       callId: item.id,
       sort_order: index,
@@ -397,7 +401,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
           <Paper>
             <CallReorder
               items={calls.sort((a, b) =>
-                a.sort_order > b.sort_order ? 1 : -1
+                a.sort_order > b.sort_order ? -1 : 1
               )}
               onDragEnd={onDragEnd}
             />
