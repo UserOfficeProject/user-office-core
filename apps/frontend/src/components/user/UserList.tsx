@@ -8,6 +8,7 @@ import UserListItem from './UserListItem';
 interface UserListProps {
   users: BasicUserDetails[];
   initVisibleItems?: number;
+  'data-cy'?: string;
 }
 
 const StyledList = styled(List)(() => ({
@@ -20,7 +21,11 @@ const StyledList = styled(List)(() => ({
   },
 }));
 
-const UserList: React.FC<UserListProps> = ({ users, initVisibleItems = 4 }) => {
+const UserList: React.FC<UserListProps> = ({
+  users,
+  initVisibleItems = 4,
+  'data-cy': dataCy = 'user-list',
+}) => {
   const [showAll, setShowAll] = useState(false);
 
   if (!users || users.length === 0) {
@@ -32,7 +37,7 @@ const UserList: React.FC<UserListProps> = ({ users, initVisibleItems = 4 }) => {
   const hasMore = users.length > initVisibleItems;
 
   return (
-    <div data-cy="user-list">
+    <div data-cy={dataCy}>
       <StyledList>
         {initialUsers.map((user) => (
           <ListItem key={user.id} disableGutters>

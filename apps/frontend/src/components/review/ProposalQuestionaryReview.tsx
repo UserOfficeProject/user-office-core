@@ -50,7 +50,12 @@ export default function ProposalQuestionaryReview(
       ? [
           {
             label: 'Data Access Users',
-            value: <UserList users={data.dataAccessUsers} />,
+            value: (
+              <UserList
+                users={data.dataAccessUsers}
+                data-cy="data-access-users-list"
+              />
+            ),
           },
         ]
       : []),
