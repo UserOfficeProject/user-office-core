@@ -138,15 +138,18 @@ Time slots are directly linked to proposals. When a proposal reaches the **SCHED
 
 Example:
 
-- Proposal 2025000 is in SCHEDULING
-- Currently scheduled for 2 days and 17 hours
+- Proposal is in SCHEDULING
+- Currently scheduled for 2 days and 3 hours
 
 This section provides a clear overview of planning and managing beam time for instruments and equipment.
 
+Drag proposal onto the calendar to specify desired start date
 ![scheduler_plan_drag](../assets/images/scheduler_plan_drag.png)
 
+Edit the experiment details (e.g duration and Local Contanct) and activate the Experiment time
 ![scheduler_plan](../assets/images/scheduler_plan.png)
 
+You should now see the experiment time in the callendar
 ![scheduler_planned](../assets/images/scheduler_planned.png)
 
 ---

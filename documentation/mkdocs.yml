@@ -10,6 +10,8 @@ theme:
   palette:
     primary: indigo
     accent: light blue
+extra_css:
+  - stylesheets/extra.css
 extra:
   generator: false
   version:
