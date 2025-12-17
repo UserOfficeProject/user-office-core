@@ -4,7 +4,7 @@
 
 ## What is the Scheduler?
 
-The Scheduler helps instrument scientists plan and manage experiment time on instruments and equipment.
+The Scheduler helps Instrument Scientists plan and manage experiment time on instruments and equipment.
 
 With the calendar interface, they can:
 
@@ -49,7 +49,7 @@ UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES="SCHEDULING, ALLOCATED"
 
 ```
 
-In the example above, proposals in **SCHEDULING** status will appear in the calendar, and administrators can assign time slots (experiments) accordingly. There are two ways to set a proposal to the **SCHEDULING** status:
+In the example above, proposals in **SCHEDULING** status will appear in the planning sidebar, and administrators can assign time slots (experiments) accordingly. There are two ways to set a proposal to the **SCHEDULING** status:
 
 1. **Through Workflow**: Configure the workflow to automatically transition proposals to **SCHEDULING** status based on predefined criteria. For more details on configuring the **SCHEDULING** status, refer to the [Creating Workflow guide](../user-guide/user-officer/creating_workflow.md).
 2. **Manual Status Change**: The User Officer can manually change the status of a proposal to **SCHEDULING** within the User Office Core application.
@@ -68,7 +68,7 @@ In the example above, proposals in **SCHEDULING** status will appear in the cale
 
   ![scheduler_wf_rabbit](../assets/images/scheduler_wf_rabbit.png)
 
-Ensure the proposal is **Accepted** and its status is **SCHEDULING**. Once these two conditions are met, you can allocate time slots, and they will appear in the scheduler.
+Ensure the proposal is **Accepted** and its status matches the configured trigger status (e.g. **SCHEDULING**). Once these two conditions are met, you can allocate time slots, and they will appear in the scheduler.
 
 ![scheduler_pre_status](../assets/images/scheduler_pre_status.png)
 
@@ -80,7 +80,7 @@ Ensure the proposal is **Accepted** and its status is **SCHEDULING**. Once these
 
 ### Left Panel
 
-The left panel displays the menus available in the User Office Application. The default page is **Calendar**, where all planned time slots are visualized. Additional menus, such as **Equipment List** and **Equipment Request**, will be added to manage equipment and related requests.
+The left panel displays the menus available in the Scheduler interface. The default page is **Calendar**, where all planned time slots are visualized. Additional menus, such as **Equipment List** and **Equipment Request**, will be added to manage equipment and related requests.
 
 ![scheduler_menu](../assets/images/scheduler_menu.png)
 
@@ -134,7 +134,7 @@ A **NEW EVENT** button is available to create new events, such as:
 
 ### Time Slots to Plan
 
-Time slots are directly linked to proposals. When a proposal reaches the **SCHEDULING** status, it appears on the calendar and can be assigned time.
+Time slots are directly linked to proposals. When a proposal reaches the **SCHEDULING** status (or other configured status), it appears in the planning sidebar and can be assigned time.
 
 Example:
 
