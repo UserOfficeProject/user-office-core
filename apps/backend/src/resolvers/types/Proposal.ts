@@ -296,9 +296,20 @@ export class ProposalResolver {
   }
 
   @FieldResolver(() => ProposalAttachments, { nullable: true })
-  attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+  async attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
     return ctx.queries.questionary.getProposalAttachments(
       ctx.user,
+      proposal.primaryKey
+    );
+  }
+
+  @FieldResolver(() => [BasicUserDetails], { nullable: true })
+  async dataAccessUsers(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails[]> {
+    return await context.queries.dataAccessUsers.findByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }
