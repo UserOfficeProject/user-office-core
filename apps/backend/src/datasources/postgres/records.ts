@@ -753,7 +753,7 @@ export interface RedeemCodeRecord {
 }
 
 export interface StatusActionRecord {
-  readonly status_action_id: number;
+  readonly workflow_status_action_id: number;
   readonly name: string;
   readonly description: string;
   readonly type: StatusActionType;

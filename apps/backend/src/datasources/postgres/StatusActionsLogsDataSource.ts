@@ -133,10 +133,10 @@ export default class PostgresStatusActionsLogsDataSource
         }
         if (args.filter?.statusActionType) {
           query
-            .join('status_actions as sa', {
-              'sa.status_action_id': 'sal.action_id',
+            .join('workflow_status_actions as wsa', {
+              'wsa.workflow_status_action_id': 'sal.action_id',
             })
-            .where('sa.type', args.filter.statusActionType);
+            .where('wsa.type', args.filter.statusActionType);
         }
         if (args.filter?.statusActionsMessage) {
           query.where(
