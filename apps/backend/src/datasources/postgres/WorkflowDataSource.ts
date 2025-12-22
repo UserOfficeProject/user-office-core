@@ -439,10 +439,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       if (existingEvent) {
         eventId = existingEvent.status_changing_event_id;
       } else {
-        const [newEvent] = await database('workflow_status_changing_events')
-          .insert({ name: eventName })
-          .returning('*');
-        eventId = newEvent.status_changing_event_id;
+        throw new GraphQLError(
+          `Status changing event with name ${eventName} not found`
+        );
       }
 
       await database(
