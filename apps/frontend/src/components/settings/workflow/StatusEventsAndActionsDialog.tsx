@@ -14,7 +14,7 @@ import {
 } from 'generated/sdk';
 
 import AddStatusActionsToConnection from './AddStatusActionsToConnection';
-import AddStatusChangingEventsToConnection from './AddStatusChangingEventsToConnection';
+import SetStatusChangingEventsOnConnection from './SetStatusChangingEventsOnConnection';
 import { EventType, Event } from './WorkflowEditorModel';
 
 type StatusEventsAndActionsDialogProps = {
@@ -76,18 +76,18 @@ const StatusEventsAndActionsDialog = ({
           }
           tabPanelPadding={theme.spacing(0, 3)}
         >
-          <AddStatusChangingEventsToConnection
+          <SetStatusChangingEventsOnConnection
             statusChangingEvents={
               workflowConnection?.statusChangingEvents?.map(
                 (statusChangingEvent) => statusChangingEvent.statusChangingEvent
               ) as WorkflowEvent[]
             }
             statusName={workflowConnection?.status.name}
-            addStatusChangingEventsToConnection={(
+            setStatusChangingEventsOnConnection={(
               statusChangingEvents: string[]
             ) =>
               dispatch({
-                type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED,
+                type: EventType.SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED,
                 payload: {
                   statusChangingEvents,
                   workflowConnection,

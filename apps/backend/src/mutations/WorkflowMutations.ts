@@ -22,10 +22,10 @@ import { UserWithRole } from '../models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
-import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
 import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkflowStatusMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
+import { SetStatusChangingEventsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusChangingEventsOnConnectionMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
@@ -140,12 +140,12 @@ export default class WorkflowMutations {
 
   // @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addStatusChangingEventsToConnection(
+  async setStatusChangingEventsOnConnection(
     agent: UserWithRole | null,
-    args: AddStatusChangingEventsToConnectionInput
+    args: SetStatusChangingEventsOnConnectionInput
   ): Promise<StatusChangingEvent[] | Rejection> {
     return this.dataSource
-      .addStatusChangingEventsToConnection(
+      .setStatusChangingEventsOnConnection(
         args.workflowConnectionId,
         args.statusChangingEvents
       )

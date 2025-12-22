@@ -3,8 +3,8 @@ import {
   AddConnectionStatusActionsMutationVariables,
   AddWorkflowStatusMutation,
   AddWorkflowStatusMutationVariables,
-  AddStatusChangingEventsToConnectionMutation,
-  AddStatusChangingEventsToConnectionMutationVariables,
+  SetStatusChangingEventsOnConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutationVariables,
   CreateStatusMutation,
   CreateStatusMutationVariables,
   CreateWorkflowMutation,
@@ -42,12 +42,12 @@ const addWorkflowStatus = (
   return cy.wrap(request);
 };
 
-const addStatusChangingEventsToConnection = (
-  addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
-): Cypress.Chainable<AddStatusChangingEventsToConnectionMutation> => {
+const setStatusChangingEventsOnConnection = (
+  setStatusChangingEventsOnConnectionInput: SetStatusChangingEventsOnConnectionMutationVariables
+): Cypress.Chainable<SetStatusChangingEventsOnConnectionMutation> => {
   const api = getE2EApi();
-  const request = api.addStatusChangingEventsToConnection(
-    addStatusChangingEventsToConnectionInput
+  const request = api.setStatusChangingEventsOnConnection(
+    setStatusChangingEventsOnConnectionInput
   );
 
   return cy.wrap(request);
@@ -163,8 +163,8 @@ Cypress.Commands.add('createWorkflow', createWorkflow);
 Cypress.Commands.add('createStatus', createStatus);
 Cypress.Commands.add('addWorkflowStatus', addWorkflowStatus);
 Cypress.Commands.add(
-  'addStatusChangingEventsToConnection',
-  addStatusChangingEventsToConnection
+  'setStatusChangingEventsOnConnection',
+  setStatusChangingEventsOnConnection
 );
 Cypress.Commands.add('addConnectionStatusActions', addConnectionStatusActions);
 Cypress.Commands.add(

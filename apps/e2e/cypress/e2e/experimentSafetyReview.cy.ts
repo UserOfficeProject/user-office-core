@@ -175,7 +175,7 @@ function createWorkflowForInstrumentScientist() {
         .then((result) => {
           if (result.addWorkflowStatus) {
             return cy
-              .addStatusChangingEventsToConnection({
+              .setStatusChangingEventsOnConnection({
                 workflowConnectionId: result.addWorkflowStatus.id,
                 statusChangingEvents: [TEST_CONSTANTS.EVENTS.ESF_SUBMITTED],
               })
@@ -193,7 +193,7 @@ function createWorkflowForInstrumentScientist() {
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
                       return cy
-                        .addStatusChangingEventsToConnection({
+                        .setStatusChangingEventsOnConnection({
                           workflowConnectionId:
                             secondResult.addWorkflowStatus.id,
                           statusChangingEvents: [
@@ -215,7 +215,7 @@ function createWorkflowForInstrumentScientist() {
                             .then((thirdResult) => {
                               if (thirdResult.addWorkflowStatus) {
                                 return cy
-                                  .addStatusChangingEventsToConnection({
+                                  .setStatusChangingEventsOnConnection({
                                     workflowConnectionId:
                                       thirdResult.addWorkflowStatus.id,
                                     statusChangingEvents: [
@@ -269,7 +269,7 @@ function createWorkflowForESR() {
         .then((result) => {
           if (result.addWorkflowStatus) {
             return cy
-              .addStatusChangingEventsToConnection({
+              .setStatusChangingEventsOnConnection({
                 workflowConnectionId: result.addWorkflowStatus.id,
                 statusChangingEvents: [TEST_CONSTANTS.EVENTS.ESF_SUBMITTED],
               })
@@ -287,7 +287,7 @@ function createWorkflowForESR() {
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
                       return cy
-                        .addStatusChangingEventsToConnection({
+                        .setStatusChangingEventsOnConnection({
                           workflowConnectionId:
                             secondResult.addWorkflowStatus.id,
                           statusChangingEvents: [
@@ -309,7 +309,7 @@ function createWorkflowForESR() {
                             .then((thirdResult) => {
                               if (thirdResult.addWorkflowStatus) {
                                 return cy
-                                  .addStatusChangingEventsToConnection({
+                                  .setStatusChangingEventsOnConnection({
                                     workflowConnectionId:
                                       thirdResult.addWorkflowStatus.id,
                                     statusChangingEvents: [

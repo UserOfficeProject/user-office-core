@@ -191,7 +191,7 @@ context('Settings tests', () => {
       }).then((result) => {
         const connection = result.addWorkflowStatus;
         if (connection) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -206,7 +206,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [
               Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
@@ -224,7 +224,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.fapSelection.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
           });
@@ -239,7 +239,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.fapReview.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
           });
@@ -258,7 +258,7 @@ context('Settings tests', () => {
       }).then((result) => {
         const connection = result.addWorkflowStatus;
         if (connection) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -273,7 +273,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
           });
@@ -288,7 +288,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [
               Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
@@ -345,7 +345,7 @@ context('Settings tests', () => {
         prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -431,7 +431,7 @@ context('Settings tests', () => {
         prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -525,7 +525,7 @@ context('Settings tests', () => {
         prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -611,7 +611,7 @@ context('Settings tests', () => {
         prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
@@ -626,7 +626,7 @@ context('Settings tests', () => {
         prevStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.CALL_ENDED],
           });
@@ -1541,7 +1541,7 @@ context('Settings tests', () => {
         prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });

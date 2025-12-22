@@ -119,7 +119,7 @@ context('Pregenerated PDF tests', () => {
     }).then((result) => {
       const connection = result.addWorkflowStatus;
       if (connection) {
-        cy.addStatusChangingEventsToConnection({
+        cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: connection.id,
           statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
         });

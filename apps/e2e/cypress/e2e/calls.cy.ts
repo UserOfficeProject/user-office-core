@@ -137,7 +137,7 @@ context('Calls tests', () => {
           posY: 200,
         }).then((result) => {
           if (result.addWorkflowStatus) {
-            cy.addStatusChangingEventsToConnection({
+            cy.setStatusChangingEventsOnConnection({
               workflowConnectionId: result.addWorkflowStatus.id,
               statusChangingEvents: ['CALL_ENDED'],
             });

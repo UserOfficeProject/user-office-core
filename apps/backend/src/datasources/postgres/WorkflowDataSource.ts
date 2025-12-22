@@ -400,7 +400,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
-  async addStatusChangingEventsToConnection(
+  async setStatusChangingEventsOnConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]> {
@@ -421,38 +421,81 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       );
     }
 
-    const eventsToInsert = statusChangingEvents.map((statusChangingEvent) => ({
-      workflow_connection_id: workflowConnectionId,
-      status_changing_event: statusChangingEvent,
-    }));
-
-    await database('status_changing_events')
-      .where('workflow_connection_id', workflowConnectionId)
+    await database(
+      'workflow_status_connection_has_workflow_status_changing_events'
+    )
+      .where('workflow_status_connection_id', workflowConnectionId)
       .del();
 
-    const statusChangingEventsResult: StatusChangingEventRecord[] =
-      await database('status_changing_events')
-        .insert(eventsToInsert)
-        .returning(['*']);
+    const eventsToReturn: StatusChangingEvent[] = [];
 
-    return (
-      statusChangingEventsResult?.map((statusChangingEventResult) =>
-        this.createStatusChangingEventObject(statusChangingEventResult)
-      ) || []
-    );
+    for (const eventName of statusChangingEvents) {
+      let eventId: number;
+      const existingEvent = await database('workflow_status_changing_events')
+        .select('status_changing_event_id')
+        .where('name', eventName)
+        .first();
+
+      if (existingEvent) {
+        eventId = existingEvent.status_changing_event_id;
+      } else {
+        const [newEvent] = await database('workflow_status_changing_events')
+          .insert({ name: eventName })
+          .returning('*');
+        eventId = newEvent.status_changing_event_id;
+      }
+
+      await database(
+        'workflow_status_connection_has_workflow_status_changing_events'
+      ).insert({
+        workflow_status_connection_id: workflowConnectionId,
+        status_changing_event_id: eventId,
+      });
+
+      eventsToReturn.push(
+        new StatusChangingEvent(eventId, workflowConnectionId, eventName)
+      );
+    }
+
+    return eventsToReturn;
   }
 
   async getStatusChangingEventsByConnectionIds(
     workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return database
-      .select('*')
-      .from('status_changing_events')
-      .whereIn('workflow_connection_id', workflowConnectionIds)
-      .then((statusChangingEvents: StatusChangingEventRecord[]) => {
-        return statusChangingEvents.map((statusChangingEvent) =>
-          this.createStatusChangingEventObject(statusChangingEvent)
-        );
-      });
+      .select(
+        'wsche.workflow_status_connection_id',
+        'wsce.status_changing_event_id',
+        'wsce.name'
+      )
+      .from(
+        'workflow_status_connection_has_workflow_status_changing_events as wsche'
+      )
+      .join(
+        'workflow_status_changing_events as wsce',
+        'wsche.status_changing_event_id',
+        'wsce.status_changing_event_id'
+      )
+      .whereIn('wsche.workflow_status_connection_id', workflowConnectionIds)
+      .then(
+        (
+          statusChangingEvents: {
+            workflow_status_connection_id: number;
+            status_changing_event_id: number;
+            name: string;
+          }[]
+        ) => {
+          return statusChangingEvents.map((statusChangingEvent) =>
+            this.createStatusChangingEventObject({
+              status_changing_event_id:
+                statusChangingEvent.status_changing_event_id,
+              workflow_connection_id:
+                statusChangingEvent.workflow_status_connection_id,
+              status_changing_event: statusChangingEvent.name,
+            })
+          );
+        }
+      );
   }
 }

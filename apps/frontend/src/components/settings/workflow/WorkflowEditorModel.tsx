@@ -21,8 +21,8 @@ export enum EventType {
   WORKFLOW_STATUS_DELETED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
-  NEXT_STATUS_EVENTS_ADDED,
-  ADD_NEXT_STATUS_EVENTS_REQUESTED,
+  STATUS_CHANGING_EVENTS_ON_CONNECTION_SET,
+  SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED,
   ADD_STATUS_ACTION_REQUESTED,
   STATUS_ACTION_ADDED,
   DELETE_WORKFLOW_CONNECTION_REQUESTED,
@@ -112,7 +112,7 @@ const WorkflowEditorModel = (
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
         }
-        case EventType.NEXT_STATUS_EVENTS_ADDED: {
+        case EventType.STATUS_CHANGING_EVENTS_ON_CONNECTION_SET: {
           const { workflowConnection, statusChangingEvents } = action.payload;
           const connectionIndex = draft.workflowConnections.findIndex(
             (conn) => conn.id === workflowConnection.id

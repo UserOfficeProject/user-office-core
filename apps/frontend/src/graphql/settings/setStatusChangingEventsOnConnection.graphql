@@ -1,0 +1,15 @@
+mutation setStatusChangingEventsOnConnection(
+  $workflowConnectionId: Int!
+  $statusChangingEvents: [String!]!
+) {
+  setStatusChangingEventsOnConnection(
+    setStatusChangingEventsOnConnectionInput: {
+      workflowConnectionId: $workflowConnectionId
+      statusChangingEvents: $statusChangingEvents
+    }
+  ) {
+    statusChangingEventId
+    workflowConnectionId
+    statusChangingEvent
+  }
+}

@@ -161,7 +161,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return null;
   }
 
-  async addStatusChangingEventsToConnection(
+  async setStatusChangingEventsOnConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]> {

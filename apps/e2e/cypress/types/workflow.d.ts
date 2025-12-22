@@ -1,6 +1,6 @@
 import {
-  AddStatusChangingEventsToConnectionMutationVariables,
-  AddStatusChangingEventsToConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutationVariables,
+  SetStatusChangingEventsOnConnectionMutation,
   CreateWorkflowMutationVariables,
   CreateWorkflowMutation,
   CreateStatusMutationVariables,
@@ -42,14 +42,14 @@ declare global {
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.
        *
-       * @returns {typeof addStatusChangingEventsToConnection}
+       * @returns {typeof setStatusChangingEventsOnConnection}
        * @memberof Chainable
        * @example
-       *    cy.addStatusChangingEventsToConnection('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
+       *    cy.setStatusChangingEventsOnConnection('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
        */
-      addStatusChangingEventsToConnection: (
-        addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
-      ) => Cypress.Chainable<AddStatusChangingEventsToConnectionMutation>;
+      setStatusChangingEventsOnConnection: (
+        setStatusChangingEventsOnConnectionInput: SetStatusChangingEventsOnConnectionMutationVariables
+      ) => Cypress.Chainable<SetStatusChangingEventsOnConnectionMutation>;
 
       /**
        * Add proposal status to workflow.

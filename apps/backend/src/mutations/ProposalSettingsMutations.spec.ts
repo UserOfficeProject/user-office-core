@@ -174,7 +174,7 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can add next status event/s to workflow connection', () => {
     return expect(
-      workflowMutationsInstance.addStatusChangingEventsToConnection(
+      workflowMutationsInstance.setStatusChangingEventsOnConnection(
         dummyUserOfficerWithRole,
         {
           statusChangingEvents: ['PROPOSAL_SUBMITTED'],

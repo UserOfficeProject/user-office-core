@@ -43,7 +43,7 @@ export interface WorkflowDataSource {
     workflowId: number,
     sortOrder: number
   ): Promise<WorkflowConnection>;
-  addStatusChangingEventsToConnection(
+  setStatusChangingEventsOnConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]>;
