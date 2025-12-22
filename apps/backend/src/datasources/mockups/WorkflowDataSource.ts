@@ -6,7 +6,7 @@ import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
 } from '../../models/WorkflowConnections';
-import { AddWorkflowStatusInput } from '../../resolvers/mutations/settings/AddWorkflowStatusMutation';
+import { AddStatusToWorkflowInput } from '../../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { WorkflowDataSource } from '../WorkflowDataSource';
@@ -128,8 +128,8 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return [dummyWorkflowConnection];
   }
 
-  async addWorkflowStatus(
-    newWorkflowStatusInput: AddWorkflowStatusInput
+  async addStatusToWorkflow(
+    newWorkflowStatusInput: AddStatusToWorkflowInput
   ): Promise<WorkflowConnectionWithStatus> {
     return dummyWorkflowConnection;
   }

@@ -1,0 +1,17 @@
+mutation addStatusToWorkflow(
+  $workflowId: Int!
+  $statusId: Int!
+  $posX: Int!
+  $posY: Int!
+) {
+  addStatusToWorkflow(
+    newWorkflowStatusInput: {
+      workflowId: $workflowId
+      statusId: $statusId
+      posX: $posX
+      posY: $posY
+    }
+  ) {
+    id
+  }
+}

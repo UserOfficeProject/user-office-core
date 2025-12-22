@@ -165,7 +165,7 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can create new proposal workflow connection', () => {
     return expect(
-      workflowMutationsInstance.addWorkflowStatus(
+      workflowMutationsInstance.addStatusToWorkflow(
         dummyUserOfficerWithRole,
         dummyWorkflowConnection
       )

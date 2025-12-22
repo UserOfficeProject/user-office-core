@@ -29,12 +29,12 @@ export interface WorkflowDataSource {
     statusId: Status['id'] | undefined,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]>;
-  addWorkflowStatus(
-    newWorkflowStatusInput: Omit<
-      WorkflowConnection,
-      'id' | 'entityType' | 'prevConnectionId'
-    >
-  ): Promise<WorkflowConnectionWithStatus>;
+  addStatusToWorkflow(newWorkflowStatusInput: {
+    workflowId: number;
+    statusId: number;
+    posX: number;
+    posY: number;
+  }): Promise<WorkflowConnectionWithStatus>;
   updateWorkflowStatus(
     workflowStatuses: WorkflowConnection
   ): Promise<WorkflowConnectionWithStatus>;

@@ -22,7 +22,7 @@ import { UserWithRole } from '../models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
-import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkflowStatusMutation';
+import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
 import { SetStatusChangingEventsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusChangingEventsOnConnectionMutation';
@@ -74,27 +74,12 @@ export default class WorkflowMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async addWorkflowStatus(
+  async addStatusToWorkflow(
     agent: UserWithRole | null,
-    args: AddWorkflowStatusInput
+    args: AddStatusToWorkflowInput
   ): Promise<WorkflowConnection | Rejection> {
     try {
-      if (args.prevStatusId) {
-        const previousWorkflowConnection =
-          await this.dataSource.getWorkflowConnectionsById(
-            args.workflowId,
-            args.prevStatusId,
-            {}
-          );
-        if (previousWorkflowConnection.length > 0) {
-          // If there is a previous connection, we need to update its nextStatusId
-          const updatedConnection = previousWorkflowConnection[0];
-          updatedConnection.nextStatusId = args.statusId;
-          await this.dataSource.updateWorkflowStatus(updatedConnection);
-        }
-      }
-
-      return await this.dataSource.addWorkflowStatus(args);
+      return await this.dataSource.addStatusToWorkflow(args);
     } catch (error) {
       return rejection('Could not add workflow status', { agent, args }, error);
     }

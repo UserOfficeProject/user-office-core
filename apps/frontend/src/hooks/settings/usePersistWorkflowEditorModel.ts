@@ -55,24 +55,18 @@ export function usePersistWorkflowEditorModel() {
 
     const insertNewStatusInWorkflow = async (
       workflowId: number,
-      sortOrder: number,
       statusId: number,
-      nextStatusId: number,
-      prevStatusId: number,
       posX: number,
       posY: number
     ) => {
       return api({ toastSuccessMessage: 'Workflow status added successfully' })
-        .addWorkflowStatus({
+        .addStatusToWorkflow({
           workflowId,
-          sortOrder,
           statusId,
-          nextStatusId,
-          prevStatusId,
           posY,
           posX,
         })
-        .then((data) => data.addWorkflowStatus);
+        .then((data) => data.addStatusToWorkflow);
     };
 
     const setStatusChangingEventsOnConnection = async (
@@ -206,15 +200,7 @@ export function usePersistWorkflowEditorModel() {
           break;
         }
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
-          const {
-            workflowId,
-            sortOrder,
-            statusId,
-            nextStatusId,
-            prevStatusId,
-            posX,
-            posY,
-          } = action.payload;
+          const { workflowId, statusId, posX, posY } = action.payload;
 
           // Immediately add to state so it shows up in the UI
           dispatch({
@@ -228,10 +214,7 @@ export function usePersistWorkflowEditorModel() {
             try {
               const result = await insertNewStatusInWorkflow(
                 workflowId,
-                sortOrder,
                 statusId,
-                nextStatusId,
-                prevStatusId,
                 posX,
                 posY
               );

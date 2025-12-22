@@ -12,41 +12,29 @@ import { ResolverContext } from '../../../context';
 import { WorkflowConnection } from '../../types/WorkflowConnection';
 
 @InputType()
-export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
+export class AddStatusToWorkflowInput implements Partial<WorkflowConnection> {
   @Field(() => Int)
   public workflowId: number;
 
   @Field(() => Int)
-  public sortOrder: number;
-
-  @Field(() => Int)
   public statusId: number;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId: number | null;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId: number | null;
 
   @Field(() => Int)
   public posX: number;
 
   @Field(() => Int)
   public posY: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevConnectionId: number | null;
 }
 
 @Resolver()
-export class AddWorkflowStatusMutation {
+export class AddStatusToWorkflowMutation {
   @Mutation(() => WorkflowConnection)
-  async addWorkflowStatus(
+  async addStatusToWorkflow(
     @Ctx() context: ResolverContext,
     @Arg('newWorkflowStatusInput')
-    newWorkflowStatusInput: AddWorkflowStatusInput
+    newWorkflowStatusInput: AddStatusToWorkflowInput
   ) {
-    return context.mutations.workflow.addWorkflowStatus(
+    return context.mutations.workflow.addStatusToWorkflow(
       context.user,
       newWorkflowStatusInput
     );
