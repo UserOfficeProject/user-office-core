@@ -39,7 +39,6 @@ export function usePersistWorkflowEditorModel() {
   type MonitorableServiceCall = () => Promise<unknown>;
 
   const persistModel = ({
-    getState,
     dispatch,
   }: MiddlewareInputParams<Workflow, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
@@ -51,6 +50,22 @@ export function usePersistWorkflowEditorModel() {
         .catch(() => {
           setIsLoading(false);
         });
+    };
+
+    const addConnectionToWorkflow = async (
+      sourceWorkflowStatusId: number,
+      targetWorkflowStatusId: number
+    ) => {
+      return api({
+        toastSuccessMessage: 'Workflow connection added successfully!',
+      })
+        .addConnectionToWorkflow({
+          newWorkflowConnectionInput: {
+            prevWorkflowStatusId: sourceWorkflowStatusId,
+            nextWorkflowStatusId: targetWorkflowStatusId,
+          },
+        })
+        .then((data) => data.addConnectionToWorkflow);
     };
 
     const insertNewStatusInWorkflow = async (
@@ -93,6 +108,16 @@ export function usePersistWorkflowEditorModel() {
         .then((data) => data.deleteWorkflowConnection);
     };
 
+    const deleteWorkflowStatus = async (workflowStatusId: number) => {
+      return api({
+        toastSuccessMessage: 'Workflow status removed successfully',
+      })
+        .deleteWorkflowStatus({
+          workflowStatusId,
+        })
+        .then((data) => data.deleteWorkflowStatus);
+    };
+
     const addStatusActionToConnection = async (
       statusActions: ConnectionHasActionsInput[],
       workflowConnection: WorkflowConnection
@@ -112,7 +137,6 @@ export function usePersistWorkflowEditorModel() {
 
     return (next: FunctionType) => (action: Event) => {
       next(action);
-      const state = getState();
 
       switch (action.type) {
         case EventType.UPDATE_WORKFLOW_METADATA_REQUESTED: {
@@ -138,35 +162,23 @@ export function usePersistWorkflowEditorModel() {
         }
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
           // Find the workflow connection to remove based on connectionId
-          const workflowConnectionToRemove = state.workflowConnections.find(
-            (connection) => connection.id === action.payload.connectionId
-          );
 
-          if (workflowConnectionToRemove) {
-            return executeAndMonitorCall(async () => {
-              const result = await deleteWorkflowConnection(
-                workflowConnectionToRemove.id
-              );
+          return executeAndMonitorCall(async () => {
+            const result = await deleteWorkflowStatus(
+              action.payload.workflowStatusId
+            );
 
-              dispatch({
-                type: EventType.WORKFLOW_STATUS_DELETED,
-                payload: action.payload,
-              });
-
-              return result;
+            dispatch({
+              type: EventType.WORKFLOW_STATUS_DELETED,
+              payload: action.payload,
             });
-          }
+
+            return result;
+          });
 
           break;
         case EventType.WORKFLOW_STATUS_UPDATE_REQUESTED: {
-          const {
-            connectionId,
-            posX,
-            posY,
-            prevStatusId,
-            nextStatusId,
-            prevConnectionId,
-          } = action.payload;
+          const { id, posX, posY } = action.payload;
 
           return executeAndMonitorCall(async () => {
             try {
@@ -174,12 +186,9 @@ export function usePersistWorkflowEditorModel() {
                 toastErrorMessage: 'Failed to update workflow status',
               })
                 .updateWorkflowStatus({
-                  id: connectionId,
+                  workflowStatusId: id,
                   posX,
                   posY,
-                  prevStatusId,
-                  nextStatusId,
-                  prevConnectionId,
                 })
                 .then((data) => data.updateWorkflowStatus);
 
@@ -267,11 +276,29 @@ export function usePersistWorkflowEditorModel() {
             );
 
             dispatch({
-              type: EventType.STATUS_ACTION_ADDED,
+              type: EventType.STATUS_ACTIONS_UPDATED,
               payload: {
                 workflowConnection: workflowConnection,
                 statusActions: result,
               },
+            });
+
+            return result;
+          });
+        }
+        case EventType.ADD_WORKFLOW_CONNECTION_REQUESTED: {
+          const { sourceWorkflowStatusId, targetWorkflowStatusId } =
+            action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await addConnectionToWorkflow(
+              sourceWorkflowStatusId,
+              targetWorkflowStatusId
+            );
+
+            dispatch({
+              type: EventType.WORKFLOW_CONNECTION_ADDED,
+              payload: result,
             });
 
             return result;

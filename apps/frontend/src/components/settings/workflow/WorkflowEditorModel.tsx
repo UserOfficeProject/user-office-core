@@ -4,7 +4,7 @@ import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ConnectionLineType } from 'reactflow';
 
-import { Workflow, WorkflowType } from 'generated/sdk';
+import { Workflow, WorkflowStatus, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
   useReducerWithMiddleWares,
@@ -24,7 +24,9 @@ export enum EventType {
   STATUS_CHANGING_EVENTS_ON_CONNECTION_SET,
   SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED,
   ADD_STATUS_ACTION_REQUESTED,
-  STATUS_ACTION_ADDED,
+  STATUS_ACTIONS_UPDATED,
+  ADD_WORKFLOW_CONNECTION_REQUESTED,
+  WORKFLOW_CONNECTION_ADDED,
   DELETE_WORKFLOW_CONNECTION_REQUESTED,
   WORKFLOW_CONNECTION_DELETED,
 }
@@ -43,7 +45,8 @@ const WorkflowEditorModel = (
     id: 0,
     name: '',
     description: '',
-    workflowConnections: [],
+    connections: [],
+    statuses: [],
     connectionLineType: ConnectionLineType.Bezier,
     entityType: entityType,
   };
@@ -54,44 +57,38 @@ const WorkflowEditorModel = (
         case EventType.READY:
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED: {
-          // Add the new workflow connection to the state
+          // Add the new workflow status to the state
           if (
             action.payload &&
             action.payload.statusId &&
             action.payload.status
           ) {
-            const newConnection = {
+            const newWorkflowStatus: WorkflowStatus = {
               id: action.payload.id || 0, // Will be updated when API response comes back
               workflowId: action.payload.workflowId,
               statusId: action.payload.statusId,
               status: action.payload.status,
-              sortOrder: action.payload.sortOrder,
-              prevStatusId: action.payload.prevStatusId,
-              nextStatusId: action.payload.nextStatusId,
               posX: action.payload.posX,
               posY: action.payload.posY,
-              prevConnectionId: action.payload.prevConnectionId || null,
-              statusChangingEvents: [],
-              statusActions: [],
             };
-            draft.workflowConnections.push(newConnection);
+            draft.statuses.push(newWorkflowStatus);
           }
 
           return draft;
         }
         case EventType.WORKFLOW_STATUS_UPDATED: {
-          // If payload contains an updated connection (from middleware response), update state
+          // If payload contains an updated status (from middleware response), update state
           if (action.payload && action.payload.id) {
-            const updatedConnection = action.payload;
-            const connectionIndex = draft.workflowConnections.findIndex(
-              (conn) =>
-                conn.id === updatedConnection.id ||
-                (conn.id === 0 && conn.statusId === updatedConnection.statusId)
+            const updatedStatus = action.payload;
+            const statusIndex = draft.statuses.findIndex(
+              (status) =>
+                status.id === updatedStatus.id ||
+                (status.id === 0 && status.statusId === updatedStatus.statusId)
             );
-            if (connectionIndex !== -1) {
-              draft.workflowConnections[connectionIndex] = {
-                ...draft.workflowConnections[connectionIndex],
-                ...updatedConnection,
+            if (statusIndex !== -1) {
+              draft.statuses[statusIndex] = {
+                ...draft.statuses[statusIndex],
+                ...updatedStatus,
               };
             }
           }
@@ -100,10 +97,10 @@ const WorkflowEditorModel = (
           return draft;
         }
         case EventType.WORKFLOW_STATUS_DELETED: {
-          // Remove the workflow connection by connectionId
-          if (action.payload.connectionId) {
-            draft.workflowConnections = draft.workflowConnections.filter(
-              (conn) => conn.id !== action.payload.connectionId
+          // Remove the workflow status by statusId
+          if (action.payload.workflowStatusId) {
+            draft.statuses = draft.statuses.filter(
+              (status) => status.id !== action.payload.workflowStatusId
             );
           }
 
@@ -114,32 +111,58 @@ const WorkflowEditorModel = (
         }
         case EventType.STATUS_CHANGING_EVENTS_ON_CONNECTION_SET: {
           const { workflowConnection, statusChangingEvents } = action.payload;
-          const connectionIndex = draft.workflowConnections.findIndex(
+          const connectionIndex = draft.connections.findIndex(
             (conn) => conn.id === workflowConnection.id
           );
           if (connectionIndex !== -1) {
-            draft.workflowConnections[connectionIndex].statusChangingEvents =
+            draft.connections[connectionIndex].statusChangingEvents =
               statusChangingEvents;
           }
 
           return draft;
         }
-        case EventType.STATUS_ACTION_ADDED: {
+        case EventType.STATUS_ACTIONS_UPDATED: {
           const { workflowConnection, statusActions } = action.payload;
-          const connectionIndex = draft.workflowConnections.findIndex(
+          const connectionIndex = draft.connections.findIndex(
             (conn) => conn.id === workflowConnection.id
           );
           if (connectionIndex !== -1) {
-            draft.workflowConnections[connectionIndex].statusActions =
-              statusActions;
+            draft.connections[connectionIndex].statusActions = statusActions;
           }
 
+          return draft;
+        }
+        case EventType.ADD_WORKFLOW_CONNECTION_REQUESTED: {
+          const { sourceWorkflowStatusId, targetWorkflowStatusId } =
+            action.payload;
+
+          const prevStatus = draft.statuses.find(
+            (status) => status.id === sourceWorkflowStatusId
+          )!;
+          const nextStatus = draft.statuses.find(
+            (status) => status.id === targetWorkflowStatusId
+          )!;
+
+          draft.connections.push({
+            id: 0, // Temporary ID, will be updated when API response comes back
+            workflowId: draft.id,
+            prevWorkflowStatusId: sourceWorkflowStatusId,
+            nextWorkflowStatusId: targetWorkflowStatusId,
+            prevStatus,
+            nextStatus,
+            statusChangingEvents: [],
+            statusActions: [],
+          });
+
+          return draft;
+        }
+        case EventType.WORKFLOW_CONNECTION_ADDED: {
           return draft;
         }
         case EventType.WORKFLOW_CONNECTION_DELETED: {
           // Remove the workflow connection by connectionId
           if (action.payload && action.payload.connectionId) {
-            draft.workflowConnections = draft.workflowConnections.filter(
+            draft.connections = draft.connections.filter(
               (conn) => conn.id !== action.payload.connectionId
             );
           }

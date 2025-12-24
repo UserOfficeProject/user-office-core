@@ -14,19 +14,8 @@ mutation createWorkflow(
     name
     description
     connectionLineType
-    workflowConnections {
-      id
-      sortOrder
-      workflowId
-      statusId
-      status {
-        ...status
-      }
-      nextStatusId
-      prevStatusId
-      prevConnectionId
-      posX
-      posY
+    connections {
+      ...workflowConnection
       statusChangingEvents {
         statusChangingEventId
         workflowConnectionId
@@ -34,6 +23,12 @@ mutation createWorkflow(
       }
       statusActions {
         ...connectionStatusAction
+      }
+    }
+    statuses {
+      ...workflowStatus
+      status {
+        shortCode
       }
     }
   }

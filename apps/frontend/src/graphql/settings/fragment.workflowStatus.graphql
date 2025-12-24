@@ -1,0 +1,7 @@
+fragment workflowStatus on WorkflowStatus {
+  id
+  workflowId
+  statusId
+  posX
+  posY
+}

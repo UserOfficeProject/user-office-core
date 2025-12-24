@@ -10,7 +10,7 @@ import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { Workflow } from '../models/Workflow';
-import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
+import { WorkflowConnection } from '../models/WorkflowConnections';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
 
 const getProposalWorkflowByCallId = (callId: number) => {
@@ -21,7 +21,7 @@ const getProposalWorkflowByCallId = (callId: number) => {
   return callDataSource.getProposalWorkflowByCall(callId);
 };
 
-export const getProposalWorkflowConnectionByStatusId = (
+export const getProposalWorkflowConnectionByStatusId = async (
   workflowId: number,
   statusId?: number,
   prevStatusId?: number
@@ -30,9 +30,18 @@ export const getProposalWorkflowConnectionByStatusId = (
     Tokens.WorkflowDataSource
   );
 
-  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
-    prevStatusId,
-  });
+  const statuses = await workflowDataSource.getWorkflowStatuses(workflowId);
+  const connections =
+    await workflowDataSource.getWorkflowConnections(workflowId);
+
+  const matchingWorkflowStatuses = statuses.filter(
+    (ws) => ws.statusId === statusId
+  );
+  const matchingWorkflowStatusIds = matchingWorkflowStatuses.map((ws) => ws.id);
+
+  return connections.filter((conn) =>
+    matchingWorkflowStatusIds.includes(conn.prevWorkflowStatusId)
+  );
 };
 
 const shouldMoveToNextStatus = (
@@ -61,7 +70,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
   workflowDataSource,
   proposalWithEvents,
 }: {
-  nextWorkflowConnections: WorkflowConnectionWithStatus[];
+  nextWorkflowConnections: WorkflowConnection[];
   proposalWorkflow: Workflow;
   workflowDataSource: WorkflowDataSource;
   proposalWithEvents: {
@@ -70,15 +79,23 @@ const checkIfConditionsForNextStatusAreMet = async ({
     currentEvent: Event;
   };
 }) => {
+  const statuses = await workflowDataSource.getWorkflowStatuses(
+    proposalWorkflow.id
+  );
+
   for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextStatusId) {
+    const nextStatusId = statuses.find(
+      (ws) => ws.id === nextWorkflowConnection.nextWorkflowStatusId
+    )?.statusId;
+
+    if (!nextStatusId) {
       continue;
     }
 
     const nextNextWorkflowConnections =
       await getProposalWorkflowConnectionByStatusId(
         proposalWorkflow.id,
-        nextWorkflowConnection.nextStatusId
+        nextStatusId
       );
     const newStatusChangingEvents =
       await workflowDataSource.getStatusChangingEventsByConnectionIds(
@@ -188,7 +205,8 @@ export const workflowEngine = async (
               await getProposalWorkflowConnectionByStatusId(
                 proposalWorkflow.id,
                 undefined,
-                currentWorkflowConnection.statusId
+                0 // TODO fix this when new WF is implemented
+                // currentWorkflowConnection.statusId
               );
 
             return Promise.all(
@@ -230,7 +248,8 @@ export const workflowEngine = async (
                   const updatedProposal =
                     await proposalDataSource.updateProposalStatus(
                       proposalWithEvents.proposalPk,
-                      nextWorkflowConnection.statusId
+                      0 // TODO fix this when new WF is implemented
+                      // nextWorkflowConnection.statusId
                     );
 
                   if (updatedProposal) {
@@ -244,7 +263,8 @@ export const workflowEngine = async (
                     return {
                       ...updatedProposal,
                       workflowId: proposalWorkflow.id,
-                      prevStatusId: currentWorkflowConnection.statusId,
+                      prevStatusId: 0, // TODO fix this when new WF is implemented
+                      // prevStatusId: currentWorkflowConnection.statusId,
                       callShortCode: call.shortCode,
                     };
                   }

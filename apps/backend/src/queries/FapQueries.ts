@@ -177,26 +177,31 @@ export default class FapQueries {
       proposalPk: number;
     }
   ) {
-    let reviewerId = null;
+    const reviewerId = null;
 
-    const proposalEvents =
-      await this.proposalDataSource.getProposalEvents(proposalPk);
-
-    // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
-    if (
-      agent &&
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
-      !proposalEvents?.proposal_all_fap_reviews_submitted
-    ) {
-      reviewerId = agent.id;
-    }
-
-    return this.dataSource.getFapProposalAssignments(
-      fapId,
-      proposalPk,
-      reviewerId
+    throw new Error(
+      'getProposalEvents does not exist any more, please inspect tables if all fap reviews are submitted instead or relying on events system.'
     );
+    // TODO implement new logic here and get all fap reviews are submitted instead or relying on events system
+
+    // const proposalEvents =
+    //   await this.proposalDataSource.getProposalEvents(proposalPk);
+
+    // // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
+    // if (
+    //   agent &&
+    //   !this.userAuth.isUserOfficer(agent) &&
+    //   !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
+    //   !proposalEvents?.proposal_all_fap_reviews_submitted
+    // ) {
+    //   reviewerId = agent.id;
+    // }
+
+    // return this.dataSource.getFapProposalAssignments(
+    //   fapId,
+    //   proposalPk,
+    //   reviewerId
+    // );
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])

@@ -16,7 +16,6 @@ import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import { UserWithRole } from '../../models/User';
-import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { AdminDataSource } from '../AdminDataSource';
@@ -28,15 +27,12 @@ import {
 } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
-  CallRecord,
   createProposalObject,
   createProposalViewObject,
   createTechnicalReviewObject,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  WorkflowConnectionRecord,
-  StatusChangingEventRecord,
   TechnicalReviewRecord,
   TechniqueRecord,
   createProposalViewObjectWithTechniques,
@@ -803,22 +799,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
-  async getProposalEvents(
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    const result = await database
-      .select()
-      .from('proposal_events')
-      .where('proposal_pk', proposalPk)
-      .first();
-
-    if (!result) {
-      return null;
-    }
-
-    return result;
-  }
-
   async getCount(callId: number): Promise<number> {
     return database('proposals')
       .count('call_id')
@@ -867,93 +847,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).rows;
 
     return createProposalObject(newProposal);
-  }
-
-  async resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean> {
-    return database.transaction(async (trx) => {
-      try {
-        const proposalCall: CallRecord = await database('call')
-          .select('*')
-          .where('call_id', callId)
-          .first()
-          .transacting(trx);
-
-        if (!proposalCall) {
-          logger.logError(
-            'Could not reset proposal events because proposal call does not exist',
-            { callId }
-          );
-
-          throw new GraphQLError('Could not reset proposal events');
-        }
-
-        const proposalWorkflowId = proposalCall.proposal_workflow_id;
-
-        const proposalEventsToReset: (StatusChangingEventRecord &
-          WorkflowConnectionRecord)[] = (
-          await database
-            .raw(
-              `
-        SELECT *
-        FROM workflow_connections AS wc
-        JOIN status_changing_events sce
-        ON sce.workflow_connection_id = wc.workflow_connection_id
-        WHERE wc.workflow_connection_id >= (
-          SELECT workflow_connection_id
-          FROM workflow_connections
-          WHERE workflow_id = ${proposalWorkflowId}
-          AND status_id = ${statusId}
-        )
-        AND wc.workflow_id = ${proposalWorkflowId};
-      `
-            )
-            .transacting(trx)
-        ).rows;
-
-        if (proposalEventsToReset?.length) {
-          const dataToUpdate: Record<string, boolean> = {};
-
-          proposalEventsToReset.forEach((event) => {
-            const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
-              event.status_changing_event.toLocaleLowerCase()
-            );
-            // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
-            if (!dataToUpdateHasProperty) {
-              dataToUpdate[event.status_changing_event.toLocaleLowerCase()] =
-                false;
-            }
-          });
-
-          const [updatedProposalEvents] = await database
-            .update(dataToUpdate)
-            .from('proposal_events')
-            .where('proposal_pk', proposalPk)
-            .returning<ProposalEventsRecord[]>('*')
-            .transacting(trx);
-
-          if (!updatedProposalEvents) {
-            logger.logError('Could not reset proposal events', {
-              dataToUpdate,
-            });
-
-            throw new GraphQLError('Could not reset proposal events');
-          }
-        }
-
-        return true;
-      } catch (error) {
-        logger.logException(
-          `Failed to reset proposal events proposalPk: ${proposalPk}`,
-          error
-        );
-
-        return false;
-      }
-    });
   }
 
   async changeProposalsStatus(
@@ -1044,12 +937,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: WorkflowConnectionWithStatus[] =
-      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
+    const result = await database('workflow_has_statuses')
+      .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')
+      .where('workflow_has_statuses.workflow_id', proposalWorkflowId)
+      .andWhere('statuses.short_code', workflowStatus)
+      .first();
 
-    return !!proposalStatus.find((status) =>
-      status.status.shortCode.match(workflowStatus)
-    );
+    return !!result;
   }
 
   createTechniqueObject(technique: TechniqueRecord): Technique {

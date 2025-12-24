@@ -10,7 +10,7 @@ import { Event } from '../events/event.enum';
 import { ExperimentSafety } from '../models/Experiment';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { Workflow } from '../models/Workflow';
-import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
+import { WorkflowConnection } from '../models/WorkflowConnections';
 
 const getExperimentWorkflowByCallId = (callId: number) => {
   const callDataSource = container.resolve<CallDataSource>(
@@ -20,7 +20,7 @@ const getExperimentWorkflowByCallId = (callId: number) => {
   return callDataSource.getExperimentWorkflowByCall(callId);
 };
 
-export const getWorkflowConnectionByStatusId = (
+export const getWorkflowConnectionByStatusId = async (
   workflowId: number,
   statusId?: number,
   prevStatusId?: number
@@ -29,9 +29,18 @@ export const getWorkflowConnectionByStatusId = (
     Tokens.WorkflowDataSource
   );
 
-  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
-    prevStatusId,
-  });
+  const statuses = await workflowDataSource.getWorkflowStatuses(workflowId);
+  const connections =
+    await workflowDataSource.getWorkflowConnections(workflowId);
+
+  const matchingWorkflowStatuses = statuses.filter(
+    (ws) => ws.statusId === statusId
+  );
+  const matchingWorkflowStatusIds = matchingWorkflowStatuses.map((ws) => ws.id);
+
+  return connections.filter((conn) =>
+    matchingWorkflowStatusIds.includes(conn.prevWorkflowStatusId)
+  );
 };
 
 const shouldMoveToNextStatus = (
@@ -61,7 +70,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
   workflowDataSource,
   experimentSafetyWithEvents,
 }: {
-  nextWorkflowConnections: WorkflowConnectionWithStatus[];
+  nextWorkflowConnections: WorkflowConnection[];
   experimentWorkflow: Workflow;
   workflowDataSource: WorkflowDataSource;
   experimentSafetyWithEvents: {
@@ -70,14 +79,22 @@ const checkIfConditionsForNextStatusAreMet = async ({
     currentEvent: Event;
   };
 }) => {
+  const statuses = await workflowDataSource.getWorkflowStatuses(
+    experimentWorkflow.id
+  );
+
   for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextStatusId) {
+    const nextStatusId = statuses.find(
+      (ws) => ws.id === nextWorkflowConnection.nextWorkflowStatusId
+    )?.statusId;
+
+    if (!nextStatusId) {
       continue;
     }
 
     const nextNextWorkflowConnections = await getWorkflowConnectionByStatusId(
       experimentWorkflow.id,
-      nextWorkflowConnection.nextStatusId
+      nextStatusId
     );
     const newStatusChangingEvents =
       await workflowDataSource.getStatusChangingEventsByConnectionIds(
@@ -208,7 +225,8 @@ export const workflowEngine = async (
               await getWorkflowConnectionByStatusId(
                 experimentWorkflow.id,
                 undefined,
-                currentWorkflowConnection.statusId
+                0 // TODO fix this when new WF is implemented
+                // currentWorkflowConnection.statusId
               );
 
             return Promise.all(
@@ -249,7 +267,8 @@ export const workflowEngine = async (
                   const updatedExperimentSafety =
                     await experimentDataSource.updateExperimentSafetyStatus(
                       experimentSafety.experimentSafetyPk,
-                      nextWorkflowConnection.statusId
+                      0 // TODO fix this when new WF is implemented
+                      // nextWorkflowConnection.statusId
                     );
 
                   if (updatedExperimentSafety) {
@@ -263,7 +282,8 @@ export const workflowEngine = async (
                     return {
                       ...updatedExperimentSafety,
                       workflowId: experimentWorkflow.id,
-                      prevStatusId: currentWorkflowConnection.statusId,
+                      prevStatusId: 0, // TODO fix this when new WF is implemented
+                      // prevStatusId: currentWorkflowConnection.statusId,
                       callShortCode: call.shortCode,
                     };
                   }

@@ -82,7 +82,7 @@ const StatusEventsAndActionsDialog = ({
                 (statusChangingEvent) => statusChangingEvent.statusChangingEvent
               ) as WorkflowEvent[]
             }
-            statusName={workflowConnection?.status.name}
+            statusName={workflowConnection?.nextStatus.status.name}
             setStatusChangingEventsOnConnection={(
               statusChangingEvents: string[]
             ) =>
@@ -118,7 +118,7 @@ const StatusEventsAndActionsDialog = ({
                 });
               }}
               connectionStatusActions={workflowConnection?.statusActions}
-              statusName={workflowConnection?.status.name}
+              statusName={workflowConnection?.nextStatus.status.name}
               isLoading={isLoading}
             />
           )}

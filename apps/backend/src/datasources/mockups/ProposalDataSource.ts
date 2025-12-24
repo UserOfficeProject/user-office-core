@@ -366,26 +366,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return [dummyProposalEvents];
   }
 
-  async getProposalEvents(
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    return dummyProposalEvents;
-  }
-
   async getCount(callId: number): Promise<number> {
     return 1;
   }
 
   async cloneProposal(proposal: Proposal, call: Call): Promise<Proposal> {
     return dummyProposal;
-  }
-
-  async resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean> {
-    return true;
   }
 
   async changeProposalsStatus(

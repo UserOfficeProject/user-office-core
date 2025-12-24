@@ -70,12 +70,6 @@ export interface ProposalDataSource {
   ): Promise<ProposalEventsRecord[] | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
-  resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean>;
-  getProposalEvents(proposalPk: number): Promise<ProposalEventsRecord | null>;
   changeProposalsStatus(
     statusId: number,
     proposalPks: number[]

@@ -1,26 +1,35 @@
-mutation updateWorkflow($id: Int!, $name: String!, $description: String!, $connectionLineType: String) {
+mutation updateWorkflow(
+  $id: Int!
+  $name: String!
+  $description: String!
+  $connectionLineType: String
+) {
   updateWorkflow(
-    updatedWorkflowInput: { id: $id, name: $name, description: $description, connectionLineType: $connectionLineType }
+    updatedWorkflowInput: {
+      id: $id
+      name: $name
+      description: $description
+      connectionLineType: $connectionLineType
+    }
   ) {
     id
     name
     description
     connectionLineType
-    workflowConnections {
-      id
-      sortOrder
-      workflowId
-      statusId
-      status {
-        id
-        name
-        description
+    connections {
+      ...workflowConnection
+      prevStatus {
+        ...workflowStatus
+        status {
+          shortCode
+        }
       }
-      nextStatusId
-      prevStatusId
-      prevConnectionId
-      posX
-      posY
+      nextStatus {
+        ...workflowStatus
+        status {
+          shortCode
+        }
+      }
       statusChangingEvents {
         statusChangingEventId
         workflowConnectionId

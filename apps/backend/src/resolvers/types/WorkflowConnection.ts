@@ -10,44 +10,24 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/WorkflowConnections';
+import { WorkflowConnection as WorkflowConnectionOrigin } from '../../models/WorkflowConnections';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
-import { Status } from './Status';
 import { StatusChangingEvent } from './StatusChangingEvent';
+import { WorkflowStatus } from './WorkflowStatus';
 
 @ObjectType()
-export class WorkflowConnection
-  implements Partial<WorkflowConnectionWithStatusOrigin>
-{
+export class WorkflowConnection implements Partial<WorkflowConnectionOrigin> {
   @Field(() => Int)
   public id: number;
-
-  @Field(() => Int)
-  public sortOrder: number;
 
   @Field(() => Int)
   public workflowId: number;
 
   @Field(() => Int)
-  public statusId: number;
-
-  @Field(() => Status)
-  public status: Status;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId: number | null;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId: number | null;
+  public prevWorkflowStatusId: number;
 
   @Field(() => Int)
-  public posX: number;
-
-  @Field(() => Int)
-  public posY: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevConnectionId: number | null;
+  public nextWorkflowStatusId: number;
 }
 
 @Resolver(() => WorkflowConnection)
@@ -81,5 +61,43 @@ export class WorkflowConnectionResolver {
       );
 
     return isRejection(statusActions) ? [] : statusActions;
+  }
+
+  @FieldResolver(() => WorkflowStatus)
+  async prevStatus(
+    @Root() workflowConnection: WorkflowConnection,
+    @Ctx() context: ResolverContext
+  ): Promise<WorkflowStatus> {
+    const status = await context.queries.workflow.getWorkflowStatus(
+      context.user,
+      workflowConnection.prevWorkflowStatusId
+    );
+
+    if (status === null) {
+      throw new Error(
+        `Workflow status with id ${workflowConnection.prevWorkflowStatusId} not found`
+      );
+    }
+
+    return status;
+  }
+
+  @FieldResolver(() => WorkflowStatus)
+  async nextStatus(
+    @Root() workflowConnection: WorkflowConnection,
+    @Ctx() context: ResolverContext
+  ): Promise<WorkflowStatus> {
+    const status = await context.queries.workflow.getWorkflowStatus(
+      context.user,
+      workflowConnection.nextWorkflowStatusId
+    );
+
+    if (status === null) {
+      throw new Error(
+        `Workflow status with id ${workflowConnection.nextWorkflowStatusId} not found`
+      );
+    }
+
+    return status;
   }
 }

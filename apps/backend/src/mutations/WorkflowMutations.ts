@@ -21,7 +21,9 @@ import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
+import { WorkflowStatus } from '../models/WorkflowStatus';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { AddConnectionToWorkflowInput } from '../resolvers/mutations/settings/AddConnectionToWorkflow';
 import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
@@ -77,7 +79,7 @@ export default class WorkflowMutations {
   async addStatusToWorkflow(
     agent: UserWithRole | null,
     args: AddStatusToWorkflowInput
-  ): Promise<WorkflowConnection | Rejection> {
+  ): Promise<WorkflowStatus | Rejection> {
     try {
       return await this.dataSource.addStatusToWorkflow(args);
     } catch (error) {
@@ -86,34 +88,28 @@ export default class WorkflowMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  async addConnectionToWorkflow(
+    agent: UserWithRole | null,
+    args: AddConnectionToWorkflowInput
+  ): Promise<WorkflowConnection | Rejection> {
+    try {
+      return await this.dataSource.addConnectionToWorkflow(args);
+    } catch (error) {
+      return rejection(
+        'Could not add workflow connection',
+        { agent, args },
+        error
+      );
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async updateWorkflowStatus(
     agent: UserWithRole | null,
     args: UpdateWorkflowStatusInput
-  ): Promise<WorkflowConnection | Rejection> {
+  ): Promise<WorkflowStatus | Rejection> {
     try {
-      const connection = await this.dataSource.getWorkflowConnection(args.id);
-
-      if (!connection) {
-        return rejection(
-          'Workflow connection not found',
-          { agent, args },
-          new Error('Connection not found')
-        );
-      }
-
-      const updatedConnection = new WorkflowConnection(
-        connection.id,
-        connection.sortOrder,
-        connection.workflowId,
-        connection.statusId,
-        args.nextStatusId ?? connection.nextStatusId,
-        args.prevStatusId ?? connection.prevStatusId,
-        args.posX ?? connection.posX,
-        args.posY ?? connection.posY,
-        args.prevConnectionId ?? connection.prevConnectionId
-      );
-
-      return await this.dataSource.updateWorkflowStatus(updatedConnection);
+      return await this.dataSource.updateWorkflowStatus(args);
     } catch (error) {
       return rejection(
         'Could not update workflow status',
@@ -150,11 +146,7 @@ export default class WorkflowMutations {
     args: DeleteWorkflowStatusInput
   ): Promise<boolean | Rejection> {
     try {
-      await this.dataSource.deleteWorkflowStatus(
-        args.statusId,
-        args.workflowId,
-        args.sortOrder
-      );
+      await this.dataSource.deleteWorkflowStatus(args.workflowStatusId);
 
       return true;
     } catch (error) {

@@ -40,8 +40,23 @@ export default class WorkflowQueries {
   }
 
   @Authorized()
-  async getWorkflowConnections(agent: UserWithRole | null, workflowId: number) {
+  async getConnections(agent: UserWithRole | null, workflowId: number) {
     return this.dataSource.getWorkflowConnections(workflowId);
+  }
+
+  @Authorized()
+  async getStatuses(agent: UserWithRole | null, workflowId: number) {
+    return this.dataSource.getWorkflowStatuses(workflowId);
+  }
+
+  @Authorized()
+  async getWorkflowStatus(
+    agent: UserWithRole | null,
+    workflowStatusId: number
+  ) {
+    const status = await this.dataSource.getWorkflowStatus(workflowStatusId);
+
+    return status;
   }
 
   @Authorized([Roles.USER_OFFICER])

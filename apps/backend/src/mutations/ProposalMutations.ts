@@ -568,12 +568,6 @@ export default class ProposalMutations {
             return null;
           }
 
-          await this.proposalDataSource.resetProposalEvents(
-            proposalPk,
-            fullProposal.callId,
-            statusId
-          );
-
           const proposalWorkflow =
             await this.callDataSource.getProposalWorkflowByCall(
               fullProposal.callId
