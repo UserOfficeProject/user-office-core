@@ -245,14 +245,14 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       }
 
       // Find source and target status names for the edge data
-      const sourceStatus = statuses.find(
-        (s) => s.id.toString() === connection.source
+      const sourceWfStatus = state.statuses.find(
+        (s) => s.workflowStatusId.toString() === connection.source
       );
-      const targetStatus = statuses.find(
-        (s) => s.id.toString() === connection.target
+      const targetWfStatus = state.statuses.find(
+        (s) => s.workflowStatusId.toString() === connection.target
       );
 
-      if (!sourceStatus || !targetStatus) {
+      if (!sourceWfStatus || !targetWfStatus) {
         return;
       }
 
@@ -264,8 +264,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
-          sourceStatusShortCode: sourceStatus.shortCode,
-          targetStatusShortCode: targetStatus.shortCode,
+          sourceStatusShortCode: sourceWfStatus.status.shortCode,
+          targetStatusShortCode: targetWfStatus.status.shortCode,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
         },
@@ -280,8 +280,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       dispatch({
         type: EventType.ADD_WORKFLOW_CONNECTION_REQUESTED,
         payload: {
-          sourceWorkflowStatusId: sourceStatus.id, // Use connection ID for persistence
-          targetWorkflowStatusId: targetStatus.id,
+          sourceWorkflowStatusId: sourceWfStatus.workflowStatusId, // Use connection ID for persistence
+          targetWorkflowStatusId: targetWfStatus.workflowStatusId,
         },
       });
 
