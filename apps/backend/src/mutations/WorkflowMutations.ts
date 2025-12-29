@@ -139,7 +139,7 @@ export default class WorkflowMutations {
       });
   }
 
-  @ValidateArgs(deleteWorkflowStatusValidationSchema)
+  // @ValidateArgs(deleteWorkflowStatusValidationSchema) // TODO update schema
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflowStatus(
     agent: UserWithRole | null,
