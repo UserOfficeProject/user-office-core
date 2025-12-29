@@ -2,7 +2,7 @@ import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { WorkflowStatus } from '../models/WorkflowStatus';
-import { AddConnectionToWorkflowInput } from '../resolvers/mutations/settings/AddConnectionToWorkflow';
+import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
@@ -30,8 +30,8 @@ export interface WorkflowDataSource {
     posX: number;
     posY: number;
   }): Promise<WorkflowStatus>;
-  addConnectionToWorkflow(
-    newWorkflowConnectionInput: AddConnectionToWorkflowInput
+  createWorkflowConnection(
+    newWorkflowConnectionInput: CreateWorkflowConnectionInput
   ): Promise<WorkflowConnection>;
   updateWorkflowStatus(
     workflowStatus: UpdateWorkflowStatusInput

@@ -1,7 +1,6 @@
 import {
   addStatusActionsToConnectionValidationSchema,
   createWorkflowValidationSchema,
-  deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
   updateWorkflowValidationSchema,
 } from '@user-office-software/duo-validation';
@@ -23,8 +22,8 @@ import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { WorkflowStatus } from '../models/WorkflowStatus';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
-import { AddConnectionToWorkflowInput } from '../resolvers/mutations/settings/AddConnectionToWorkflow';
 import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
+import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
 import { SetStatusChangingEventsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusChangingEventsOnConnectionMutation';
@@ -88,12 +87,12 @@ export default class WorkflowMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async addConnectionToWorkflow(
+  async createWorkflowConnection(
     agent: UserWithRole | null,
-    args: AddConnectionToWorkflowInput
+    args: CreateWorkflowConnectionInput
   ): Promise<WorkflowConnection | Rejection> {
     try {
-      return await this.dataSource.addConnectionToWorkflow(args);
+      return await this.dataSource.createWorkflowConnection(args);
     } catch (error) {
       return rejection(
         'Could not add workflow connection',

@@ -12,7 +12,7 @@ import { ResolverContext } from '../../../context';
 import { WorkflowConnection } from '../../types/WorkflowConnection';
 
 @InputType()
-export class AddConnectionToWorkflowInput {
+export class CreateWorkflowConnectionInput {
   @Field(() => Int)
   public prevWorkflowStatusId: number;
 
@@ -21,14 +21,14 @@ export class AddConnectionToWorkflowInput {
 }
 
 @Resolver()
-export class AddConnectionToWorkflowMutation {
+export class CreateWorkflowConnectionMutation {
   @Mutation(() => WorkflowConnection)
-  async addConnectionToWorkflow(
+  async createWorkflowConnection(
     @Ctx() context: ResolverContext,
     @Arg('newWorkflowConnectionInput')
-    newWorkflowConnectionInput: AddConnectionToWorkflowInput
+    newWorkflowConnectionInput: CreateWorkflowConnectionInput
   ) {
-    return context.mutations.workflow.addConnectionToWorkflow(
+    return context.mutations.workflow.createWorkflowConnection(
       context.user,
       newWorkflowConnectionInput
     );

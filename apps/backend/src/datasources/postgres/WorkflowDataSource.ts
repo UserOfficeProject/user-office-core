@@ -6,7 +6,7 @@ import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { Workflow } from '../../models/Workflow';
 import { WorkflowConnection } from '../../models/WorkflowConnections';
 import { WorkflowStatus } from '../../models/WorkflowStatus';
-import { AddConnectionToWorkflowInput } from '../../resolvers/mutations/settings/AddConnectionToWorkflow';
+import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
@@ -25,12 +25,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   constructor(
     @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
   ) {}
-
-  addConnectionToWorkflow(
-    newWorkflowConnectionInput: AddConnectionToWorkflowInput
-  ): Promise<WorkflowConnection> {
-    throw new Error('Method not implemented.');
-  }
 
   private createWorkflowObject(workflow: WorkflowRecord) {
     return new Workflow(
@@ -244,6 +238,54 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     }
 
     return this.createWorkflowStatusObject(updatedStatus);
+  }
+
+  async createWorkflowConnection(
+    newWorkflowConnectionInput: CreateWorkflowConnectionInput
+  ): Promise<WorkflowConnection> {
+    const prevStatus = await this.getWorkflowStatus(
+      newWorkflowConnectionInput.prevWorkflowStatusId
+    );
+
+    if (!prevStatus) {
+      throw new GraphQLError(
+        `Could not find workflow status with id: ${newWorkflowConnectionInput.prevWorkflowStatusId}`
+      );
+    }
+
+    const nextStatus = await this.getWorkflowStatus(
+      newWorkflowConnectionInput.nextWorkflowStatusId
+    );
+
+    if (!nextStatus) {
+      throw new GraphQLError(
+        `Could not find workflow status with id: ${newWorkflowConnectionInput.nextWorkflowStatusId}`
+      );
+    }
+
+    if (prevStatus.workflowId !== nextStatus.workflowId) {
+      throw new GraphQLError(
+        'Cannot connect statuses from different workflows'
+      );
+    }
+
+    const [createdConnection]: WorkflowConnectionRecord[] = await database(
+      'workflow_status_connections'
+    )
+      .insert({
+        workflow_id: prevStatus.workflowId,
+        prev_workflow_status_id:
+          newWorkflowConnectionInput.prevWorkflowStatusId,
+        next_workflow_status_id:
+          newWorkflowConnectionInput.nextWorkflowStatusId,
+      })
+      .returning('*');
+
+    if (!createdConnection) {
+      throw new GraphQLError('Could not create workflow connection');
+    }
+
+    return this.createWorkflowConnectionObject(createdConnection);
   }
 
   async deleteWorkflowConnection(

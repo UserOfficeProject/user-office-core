@@ -53,20 +53,20 @@ export function usePersistWorkflowEditorModel() {
         });
     };
 
-    const addConnectionToWorkflow = async (
+    const createWorkflowConneciton = async (
       sourceWorkflowStatusId: number,
       targetWorkflowStatusId: number
     ) => {
       return api({
         toastSuccessMessage: 'Workflow connection added successfully!',
       })
-        .addConnectionToWorkflow({
+        .createWorkflowConnection({
           newWorkflowConnectionInput: {
             prevWorkflowStatusId: sourceWorkflowStatusId,
             nextWorkflowStatusId: targetWorkflowStatusId,
           },
         })
-        .then((data) => data.addConnectionToWorkflow);
+        .then((data) => data.createWorkflowConnection);
     };
 
     const insertNewStatusInWorkflow = async (
@@ -276,7 +276,7 @@ export function usePersistWorkflowEditorModel() {
             action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await addConnectionToWorkflow(
+            const result = await createWorkflowConneciton(
               sourceWorkflowStatusId,
               targetWorkflowStatusId
             );
