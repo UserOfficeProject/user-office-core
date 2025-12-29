@@ -10,13 +10,13 @@ query getWorkflow($workflowId: Int!, $entityType: WorkflowType!) {
       prevStatus {
         ...workflowStatus
         status {
-          shortCode
+          ...status
         }
       }
       nextStatus {
         ...workflowStatus
         status {
-          shortCode
+          ...status
         }
       }
       statusChangingEvents {
@@ -26,13 +26,19 @@ query getWorkflow($workflowId: Int!, $entityType: WorkflowType!) {
       }
       statusActions {
         ...connectionStatusAction
+        action {
+          ...statusAction
+          defaultConfig {
+            ...statusActionDefaultConfig
+          }
+        }
       }
     }
 
     statuses {
       ...workflowStatus
       status {
-        shortCode
+        ...status
       }
     }
   }

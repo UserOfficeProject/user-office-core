@@ -36,7 +36,9 @@ export const getWorkflowConnectionByStatusId = async (
   const matchingWorkflowStatuses = statuses.filter(
     (ws) => ws.statusId === statusId
   );
-  const matchingWorkflowStatusIds = matchingWorkflowStatuses.map((ws) => ws.id);
+  const matchingWorkflowStatusIds = matchingWorkflowStatuses.map(
+    (ws) => ws.workflowStatusId
+  );
 
   return connections.filter((conn) =>
     matchingWorkflowStatusIds.includes(conn.prevWorkflowStatusId)
@@ -85,7 +87,8 @@ const checkIfConditionsForNextStatusAreMet = async ({
 
   for (const nextWorkflowConnection of nextWorkflowConnections) {
     const nextStatusId = statuses.find(
-      (ws) => ws.id === nextWorkflowConnection.nextWorkflowStatusId
+      (ws) =>
+        ws.workflowStatusId === nextWorkflowConnection.nextWorkflowStatusId
     )?.statusId;
 
     if (!nextStatusId) {

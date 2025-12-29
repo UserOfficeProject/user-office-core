@@ -1,6 +1,6 @@
 export class WorkflowStatus {
   constructor(
-    public id: number,
+    public workflowStatusId: number,
     public workflowId: number,
     public statusId: number,
     public posX: number,

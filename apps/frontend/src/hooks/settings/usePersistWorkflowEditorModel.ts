@@ -6,6 +6,7 @@ import {
 } from 'components/settings/workflow/WorkflowEditorModel';
 import {
   ConnectionHasActionsInput,
+  ConnectionStatusAction,
   WorkflowConnection,
   Workflow,
 } from 'generated/sdk';
@@ -178,7 +179,7 @@ export function usePersistWorkflowEditorModel() {
 
           break;
         case EventType.WORKFLOW_STATUS_UPDATE_REQUESTED: {
-          const { id, posX, posY } = action.payload;
+          const { workflowStatusId, posX, posY } = action.payload;
 
           return executeAndMonitorCall(async () => {
             try {
@@ -186,7 +187,7 @@ export function usePersistWorkflowEditorModel() {
                 toastErrorMessage: 'Failed to update workflow status',
               })
                 .updateWorkflowStatus({
-                  workflowStatusId: id,
+                  workflowStatusId,
                   posX,
                   posY,
                 })
@@ -209,40 +210,23 @@ export function usePersistWorkflowEditorModel() {
           break;
         }
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
-          const { workflowId, statusId, posX, posY } = action.payload;
-
-          // Immediately add to state so it shows up in the UI
-          dispatch({
-            type: EventType.WORKFLOW_STATUS_ADDED,
-            payload: {
-              ...action.payload,
-            },
-          });
+          const { workflowId, status, posX, posY } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            try {
-              const result = await insertNewStatusInWorkflow(
-                workflowId,
-                statusId,
-                posX,
-                posY
-              );
+            const result = await insertNewStatusInWorkflow(
+              workflowId,
+              status.id,
+              posX,
+              posY
+            );
 
-              // Update the connection with the real ID from the API
-              dispatch({
-                type: EventType.WORKFLOW_STATUS_UPDATED,
-                payload: { ...action.payload, ...result },
-              });
+            // Update the connection with the real ID from the API
+            dispatch({
+              type: EventType.WORKFLOW_STATUS_ADDED,
+              payload: { ...action.payload, ...result },
+            });
 
-              return result;
-            } catch (error) {
-              // Remove from state if API call failed
-              dispatch({
-                type: EventType.WORKFLOW_STATUS_DELETED,
-                payload: { ...action.payload },
-              });
-              throw error;
-            }
+            return result;
           });
         }
 
@@ -279,7 +263,8 @@ export function usePersistWorkflowEditorModel() {
               type: EventType.STATUS_ACTIONS_UPDATED,
               payload: {
                 workflowConnection: workflowConnection,
-                statusActions: result,
+                statusActions: (result ||
+                  []) as unknown as ConnectionStatusAction[],
               },
             });
 

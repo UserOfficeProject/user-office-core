@@ -4,7 +4,16 @@ import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ConnectionLineType } from 'reactflow';
 
-import { Workflow, WorkflowStatus, WorkflowType } from 'generated/sdk';
+import {
+  ConnectionHasActionsInput,
+  ConnectionStatusAction,
+  Status,
+  StatusChangingEvent,
+  Workflow,
+  WorkflowConnection,
+  WorkflowStatus,
+  WorkflowType,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
   useReducerWithMiddleWares,
@@ -31,10 +40,108 @@ export enum EventType {
   WORKFLOW_CONNECTION_DELETED,
 }
 
-export interface Event {
-  type: EventType;
-  payload: any;
-}
+export type Event =
+  | { type: EventType.READY; payload: Workflow }
+  | {
+      type: EventType.ADD_WORKFLOW_STATUS_REQUESTED;
+      payload: {
+        workflowId: number;
+        posX: number;
+        posY: number;
+        status: Status;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_ADDED;
+      payload: {
+        workflowStatusId: number;
+        workflowId: number;
+        status: Status;
+        posX: number;
+        posY: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED;
+      payload: { workflowStatusId: number; posX: number; posY: number };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_UPDATED;
+      payload: Partial<WorkflowStatus> & { workflowStatusId: number };
+    }
+  | {
+      type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED;
+      payload: { workflowStatusId: number };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_DELETED;
+      payload: { workflowStatusId: number };
+    }
+  | {
+      type: EventType.UPDATE_WORKFLOW_METADATA_REQUESTED;
+      payload: {
+        id: number;
+        name: string;
+        description: string;
+        connectionLineType: string;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_METADATA_UPDATED;
+      payload: {
+        id: number;
+        name: string;
+        description: string;
+        connectionLineType: string;
+      };
+    }
+  | {
+      type: EventType.STATUS_CHANGING_EVENTS_ON_CONNECTION_SET;
+      payload: {
+        workflowConnection: WorkflowConnection;
+        statusChangingEvents: StatusChangingEvent[];
+      };
+    }
+  | {
+      type: EventType.SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED;
+      payload: {
+        workflowConnection: WorkflowConnection;
+        statusChangingEvents: string[];
+      };
+    }
+  | {
+      type: EventType.ADD_STATUS_ACTION_REQUESTED;
+      payload: {
+        workflowConnection: WorkflowConnection;
+        statusActions: ConnectionHasActionsInput[];
+      };
+    }
+  | {
+      type: EventType.STATUS_ACTIONS_UPDATED;
+      payload: {
+        workflowConnection: WorkflowConnection;
+        statusActions: ConnectionStatusAction[];
+      };
+    }
+  | {
+      type: EventType.ADD_WORKFLOW_CONNECTION_REQUESTED;
+      payload: {
+        sourceWorkflowStatusId: number;
+        targetWorkflowStatusId: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_CONNECTION_ADDED;
+      payload: Partial<WorkflowConnection>;
+    }
+  | {
+      type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED;
+      payload: { connectionId: number };
+    }
+  | {
+      type: EventType.WORKFLOW_CONNECTION_DELETED;
+      payload: { connectionId: number };
+    };
 
 const WorkflowEditorModel = (
   entityType: WorkflowType,
@@ -58,15 +165,11 @@ const WorkflowEditorModel = (
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED: {
           // Add the new workflow status to the state
-          if (
-            action.payload &&
-            action.payload.statusId &&
-            action.payload.status
-          ) {
+          if (action.payload && action.payload.status) {
             const newWorkflowStatus: WorkflowStatus = {
-              id: action.payload.id || 0, // Will be updated when API response comes back
+              workflowStatusId: action.payload.workflowStatusId,
               workflowId: action.payload.workflowId,
-              statusId: action.payload.statusId,
+              statusId: action.payload.status.id,
               status: action.payload.status,
               posX: action.payload.posX,
               posY: action.payload.posY,
@@ -78,12 +181,11 @@ const WorkflowEditorModel = (
         }
         case EventType.WORKFLOW_STATUS_UPDATED: {
           // If payload contains an updated status (from middleware response), update state
-          if (action.payload && action.payload.id) {
+          if (action.payload && action.payload.workflowStatusId) {
             const updatedStatus = action.payload;
             const statusIndex = draft.statuses.findIndex(
               (status) =>
-                status.id === updatedStatus.id ||
-                (status.id === 0 && status.statusId === updatedStatus.statusId)
+                status.workflowStatusId === updatedStatus.workflowStatusId
             );
             if (statusIndex !== -1) {
               draft.statuses[statusIndex] = {
@@ -100,7 +202,8 @@ const WorkflowEditorModel = (
           // Remove the workflow status by statusId
           if (action.payload.workflowStatusId) {
             draft.statuses = draft.statuses.filter(
-              (status) => status.id !== action.payload.workflowStatusId
+              (status) =>
+                status.workflowStatusId !== action.payload.workflowStatusId
             );
           }
 
@@ -137,10 +240,10 @@ const WorkflowEditorModel = (
             action.payload;
 
           const prevStatus = draft.statuses.find(
-            (status) => status.id === sourceWorkflowStatusId
+            (status) => status.workflowStatusId === sourceWorkflowStatusId
           )!;
           const nextStatus = draft.statuses.find(
-            (status) => status.id === targetWorkflowStatusId
+            (status) => status.workflowStatusId === targetWorkflowStatusId
           )!;
 
           draft.connections.push({
@@ -195,10 +298,12 @@ const WorkflowEditorModel = (
         entityType: entityType,
       })
       .then((data) => {
-        memoizedDispatch({
-          type: EventType.READY,
-          payload: data.workflow,
-        });
+        if (data.workflow) {
+          memoizedDispatch({
+            type: EventType.READY,
+            payload: { ...data.workflow, entityType },
+          });
+        }
       });
   }, [api, memoizedDispatch, workflowId, entityType]);
 

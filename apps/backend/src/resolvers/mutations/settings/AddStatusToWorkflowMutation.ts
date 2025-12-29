@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../../context';
 import { WorkflowConnection } from '../../types/WorkflowConnection';
+import { WorkflowStatus } from '../../types/WorkflowStatus';
 
 @InputType()
 export class AddStatusToWorkflowInput implements Partial<WorkflowConnection> {
@@ -28,7 +29,7 @@ export class AddStatusToWorkflowInput implements Partial<WorkflowConnection> {
 
 @Resolver()
 export class AddStatusToWorkflowMutation {
-  @Mutation(() => WorkflowConnection)
+  @Mutation(() => WorkflowStatus)
   async addStatusToWorkflow(
     @Ctx() context: ResolverContext,
     @Arg('newWorkflowStatusInput')

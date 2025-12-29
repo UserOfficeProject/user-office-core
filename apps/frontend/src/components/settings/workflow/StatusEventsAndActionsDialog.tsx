@@ -86,19 +86,21 @@ const StatusEventsAndActionsDialog = ({
             setStatusChangingEventsOnConnection={(
               statusChangingEvents: string[]
             ) =>
+              workflowConnection &&
               dispatch({
                 type: EventType.SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED,
                 payload: {
-                  statusChangingEvents,
-                  workflowConnection,
+                  workflowConnection: workflowConnection,
+                  statusChangingEvents: statusChangingEvents,
                 },
               })
             }
             deleteWorkflowConnection={() =>
+              workflowConnection &&
               dispatch({
                 type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED,
                 payload: {
-                  connectionId: workflowConnection?.id,
+                  connectionId: workflowConnection.id,
                 },
               })
             }
@@ -113,7 +115,7 @@ const StatusEventsAndActionsDialog = ({
                   type: EventType.ADD_STATUS_ACTION_REQUESTED,
                   payload: {
                     statusActions,
-                    workflowConnection,
+                    workflowConnection: workflowConnection!,
                   },
                 });
               }}

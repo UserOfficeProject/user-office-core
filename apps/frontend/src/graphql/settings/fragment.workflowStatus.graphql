@@ -1,5 +1,5 @@
 fragment workflowStatus on WorkflowStatus {
-  id
+  workflowStatusId
   workflowId
   statusId
   posX

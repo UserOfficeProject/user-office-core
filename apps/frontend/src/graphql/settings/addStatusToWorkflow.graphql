@@ -12,6 +12,6 @@ mutation addStatusToWorkflow(
       posY: $posY
     }
   ) {
-    id
+    workflowStatusId
   }
 }

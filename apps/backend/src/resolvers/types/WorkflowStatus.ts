@@ -15,7 +15,7 @@ import { Status } from './Status';
 @ObjectType()
 export class WorkflowStatus implements Partial<WorkflowStatusOrigin> {
   @Field(() => Int)
-  public id: number;
+  public workflowStatusId: number;
 
   @Field(() => Int)
   public workflowId: number;

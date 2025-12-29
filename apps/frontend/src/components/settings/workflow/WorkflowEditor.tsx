@@ -141,7 +141,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
     state.statuses.forEach((workflowStatus) => {
       const statusId = workflowStatus.status.id.toString();
-      const nodeId = workflowStatus.id.toString();
+      const nodeId = workflowStatus.workflowStatusId.toString();
       // Use database coordinates if available, otherwise fall back to grid layout
       const nodePositionX = workflowStatus.posX;
       const nodePositionY = workflowStatus.posY;
@@ -173,8 +173,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       const newEdge = edgeFactory({
         id: edgeId, // Use connection ID to ensure unique edge identification
-        source: connection.prevStatus.id.toString(),
-        target: connection.nextStatus.id.toString(),
+        source: connection.prevStatus.workflowStatusId.toString(),
+        target: connection.nextStatus.workflowStatusId.toString(),
         type: 'workflow', // Use custom workflow edge type
         data: {
           events:
@@ -350,11 +350,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         data: {
           label: status.name,
           status,
-          onDelete: (connectionId: string) => {
+          onDelete: (nodeId: string) => {
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
               payload: {
-                connectionId: Number(connectionId),
+                workflowStatusId: parseInt(nodeId),
               },
             });
           },
@@ -369,14 +369,10 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       dispatch({
         type: EventType.ADD_WORKFLOW_STATUS_REQUESTED,
         payload: {
-          statusId: status.id,
-          status,
-          sortOrder: 0,
           workflowId: state.id,
-          nextStatusId: null,
-          prevStatusId: null,
           posX: position.x,
           posY: position.y,
+          status: status,
         },
       });
     },
@@ -411,7 +407,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
                     // Find the workflow connection for this status to check current position
                     const workflowStatus = state.statuses.find(
-                      (connection) => connection.id === parseInt(node.id)
+                      (status) => status.workflowStatusId === parseInt(node.id)
                     );
 
                     // Only dispatch update if position has actually changed
@@ -423,7 +419,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                       dispatch({
                         type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
                         payload: {
-                          connectionId: workflowStatus.id,
+                          workflowStatusId: workflowStatus.workflowStatusId,
                           posX: newPosX,
                           posY: newPosY,
                         },
