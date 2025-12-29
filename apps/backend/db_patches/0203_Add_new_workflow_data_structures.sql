@@ -69,11 +69,9 @@ BEGIN
           -- ============================================
           -- 3) workflow_status_changing_events (catalog)
           -- ============================================
-          CREATE TABLE workflow_status_changing_events (
-            status_changing_event_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            name        TEXT NOT NULL,
-            description TEXT
-          );
+          -- REMOVED: workflow_status_changing_events table is removed.
+          -- Events are now stored as strings in the code (apps/backend/src/events/event.enum.ts).
+
 
 
 
@@ -82,18 +80,14 @@ BEGIN
           -- =====================================================================
           CREATE TABLE workflow_status_connection_has_workflow_status_changing_events (
             workflow_status_connection_id BIGINT NOT NULL,
-            status_changing_event_id      BIGINT NOT NULL,
+            status_changing_event         TEXT NOT NULL,
 
             CONSTRAINT pk_wsc_has_events
-              PRIMARY KEY (workflow_status_connection_id, status_changing_event_id),
+              PRIMARY KEY (workflow_status_connection_id, status_changing_event),
 
             CONSTRAINT fk_wsche_connection
               FOREIGN KEY (workflow_status_connection_id)
-              REFERENCES workflow_status_connections (workflow_status_connection_id),
-
-            CONSTRAINT fk_wsche_event
-              FOREIGN KEY (status_changing_event_id)
-              REFERENCES workflow_status_changing_events (status_changing_event_id)
+              REFERENCES workflow_status_connections (workflow_status_connection_id)
           );
 
           -- The composite PK already prevents duplicates for (connection, event).
@@ -136,13 +130,9 @@ BEGIN
           -- ==================================================================
           CREATE TABLE proposal_has_workflow_status_changing_events (
             proposal_has_workflow_status_changing_events_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            status_changing_event_id INT  NOT NULL,
+            status_changing_event    TEXT NOT NULL,
             proposal_pk              INT  NOT NULL,
             created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
-
-            CONSTRAINT fk_phsce_event
-              FOREIGN KEY (status_changing_event_id)
-              REFERENCES workflow_status_changing_events (status_changing_event_id),
 
             CONSTRAINT fk_phsce_proposal
               FOREIGN KEY (proposal_pk)
@@ -153,7 +143,7 @@ BEGIN
           -- (If you retain rows across state changes, you can reset the window in code
           --  by comparing against proposals.state_entered_at.)
           CREATE UNIQUE INDEX uq_phsce_proposal_event
-            ON proposal_has_workflow_status_changing_events (proposal_pk, status_changing_event_id);
+            ON proposal_has_workflow_status_changing_events (proposal_pk, status_changing_event);
 
           -- Optional helper index for proposal lookups:
           CREATE INDEX ix_phsce_proposal

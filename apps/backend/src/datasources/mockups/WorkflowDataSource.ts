@@ -42,7 +42,6 @@ export const dummyWorkflowStatus = new WorkflowStatus(1, 1, 1, 100, 100);
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
-  1,
   'PROPOSAL_SUBMITTED'
 );
 

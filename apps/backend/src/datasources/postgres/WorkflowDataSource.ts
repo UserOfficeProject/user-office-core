@@ -328,8 +328,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     statusChangingEvent: StatusChangingEventRecord
   ) {
     return new StatusChangingEvent(
-      statusChangingEvent.status_changing_event_id,
-      statusChangingEvent.workflow_connection_id,
+      statusChangingEvent.workflow_status_connection_id,
       statusChangingEvent.status_changing_event
     );
   }
@@ -364,29 +363,15 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     const eventsToReturn: StatusChangingEvent[] = [];
 
     for (const eventName of statusChangingEvents) {
-      let eventId: number;
-      const existingEvent = await database('workflow_status_changing_events')
-        .select('status_changing_event_id')
-        .where('name', eventName)
-        .first();
-
-      if (existingEvent) {
-        eventId = existingEvent.status_changing_event_id;
-      } else {
-        throw new GraphQLError(
-          `Status changing event with name ${eventName} not found`
-        );
-      }
-
       await database(
         'workflow_status_connection_has_workflow_status_changing_events'
       ).insert({
         workflow_status_connection_id: workflowConnectionId,
-        status_changing_event_id: eventId,
+        status_changing_event: eventName,
       });
 
       eventsToReturn.push(
-        new StatusChangingEvent(eventId, workflowConnectionId, eventName)
+        new StatusChangingEvent(workflowConnectionId, eventName)
       );
     }
 
@@ -397,39 +382,14 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return database
-      .select(
-        'wsche.workflow_status_connection_id',
-        'wsce.status_changing_event_id',
-        'wsce.name'
-      )
-      .from(
-        'workflow_status_connection_has_workflow_status_changing_events as wsche'
-      )
-      .join(
-        'workflow_status_changing_events as wsce',
-        'wsche.status_changing_event_id',
-        'wsce.status_changing_event_id'
-      )
-      .whereIn('wsche.workflow_status_connection_id', workflowConnectionIds)
-      .then(
-        (
-          statusChangingEvents: {
-            workflow_status_connection_id: number;
-            status_changing_event_id: number;
-            name: string;
-          }[]
-        ) => {
-          return statusChangingEvents.map((statusChangingEvent) =>
-            this.createStatusChangingEventObject({
-              status_changing_event_id:
-                statusChangingEvent.status_changing_event_id,
-              workflow_connection_id:
-                statusChangingEvent.workflow_status_connection_id,
-              status_changing_event: statusChangingEvent.name,
-            })
-          );
-        }
-      );
+      .select('workflow_status_connection_id', 'status_changing_event')
+      .from('workflow_status_connection_has_workflow_status_changing_events')
+      .whereIn('workflow_status_connection_id', workflowConnectionIds)
+      .then((statusChangingEvents: StatusChangingEventRecord[]) => {
+        return statusChangingEvents.map((statusChangingEvent) =>
+          this.createStatusChangingEventObject(statusChangingEvent)
+        );
+      });
   }
 
   async getWorkflowStatus(

@@ -20,7 +20,6 @@ query getWorkflow($workflowId: Int!, $entityType: WorkflowType!) {
         }
       }
       statusChangingEvents {
-        statusChangingEventId
         workflowConnectionId
         statusChangingEvent
       }

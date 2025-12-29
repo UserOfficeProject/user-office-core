@@ -21,7 +21,6 @@ const workflowMutationsInstance = container.resolve(WorkflowMutations);
 
 const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
-  1,
   'PROPOSAL_SUBMITTED'
 );
 

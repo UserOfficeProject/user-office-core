@@ -17,7 +17,6 @@ mutation createWorkflow(
     connections {
       ...workflowConnection
       statusChangingEvents {
-        statusChangingEventId
         workflowConnectionId
         statusChangingEvent
       }

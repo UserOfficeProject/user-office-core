@@ -31,7 +31,6 @@ mutation updateWorkflow(
         }
       }
       statusChangingEvents {
-        statusChangingEventId
         workflowConnectionId
         statusChangingEvent
       }

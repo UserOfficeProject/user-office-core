@@ -616,8 +616,7 @@ export interface WorkflowStatusRecord {
 }
 
 export interface StatusChangingEventRecord {
-  readonly status_changing_event_id: number;
-  readonly workflow_connection_id: number;
+  readonly workflow_status_connection_id: number;
   readonly status_changing_event: string;
 }
 

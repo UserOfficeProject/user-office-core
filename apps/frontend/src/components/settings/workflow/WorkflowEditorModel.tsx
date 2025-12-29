@@ -260,6 +260,23 @@ const WorkflowEditorModel = (
           return draft;
         }
         case EventType.WORKFLOW_CONNECTION_ADDED: {
+          // Update the connection with the real ID from the API
+          const connectionIndex = draft.connections.findIndex(
+            (conn) =>
+              conn.prevWorkflowStatusId ===
+                action.payload.prevWorkflowStatusId &&
+              conn.nextWorkflowStatusId === action.payload.nextWorkflowStatusId
+          );
+          if (
+            connectionIndex !== -1 &&
+            draft.connections[connectionIndex].id === 0
+          ) {
+            draft.connections[connectionIndex] = {
+              ...draft.connections[connectionIndex],
+              ...action.payload,
+            };
+          }
+
           return draft;
         }
         case EventType.WORKFLOW_CONNECTION_DELETED: {
