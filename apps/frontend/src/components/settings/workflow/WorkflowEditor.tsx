@@ -169,7 +169,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       newNodes.push(newNode);
     });
     state.connections.forEach((connection) => {
-      const edgeId = `edge-${connection.id}`;
+      const edgeId = `${connection.id}`;
 
       const newEdge = edgeFactory({
         id: edgeId, // Use connection ID to ensure unique edge identification
@@ -288,12 +288,12 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       // Note: Connection is persisted by updating both source and target statuses
     },
     [
-      dispatch,
       edges,
-      enqueueSnackbar,
-      setEdges,
-      statuses,
+      state.statuses,
       state.connectionLineType,
+      setEdges,
+      dispatch,
+      enqueueSnackbar,
     ]
   );
 
@@ -303,7 +303,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       setSelectedEdge(edge);
 
       const clickedWorkflowConnection = state.connections.find(
-        (connection) => connection.id.toString() === edge.target
+        (connection) => connection.id.toString() === edge.id
       );
 
       if (!clickedWorkflowConnection) {
