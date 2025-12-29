@@ -51,11 +51,13 @@ BEGIN
             --     the composite key on workflow_has_statuses.
             CONSTRAINT fk_wsc_prev_state
               FOREIGN KEY (workflow_id, prev_workflow_status_id)
-              REFERENCES workflow_has_statuses (workflow_id, workflow_status_id),
+              REFERENCES workflow_has_statuses (workflow_id, workflow_status_id)
+              ON DELETE CASCADE,
 
             CONSTRAINT fk_wsc_next_state
               FOREIGN KEY (workflow_id, next_workflow_status_id)
               REFERENCES workflow_has_statuses (workflow_id, workflow_status_id)
+              ON DELETE CASCADE
           );
 
           -- (2) Prevent duplicate edges within a workflow.
