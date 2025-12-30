@@ -88,6 +88,7 @@ BEGIN
             CONSTRAINT fk_wsche_connection
               FOREIGN KEY (workflow_status_connection_id)
               REFERENCES workflow_status_connections (workflow_status_connection_id)
+              ON DELETE CASCADE
           );
 
           -- The composite PK already prevents duplicates for (connection, event).
@@ -116,7 +117,8 @@ BEGIN
 
             CONSTRAINT fk_wsca_connection
               FOREIGN KEY (workflow_status_connection_id)
-              REFERENCES workflow_status_connections (workflow_status_connection_id),
+              REFERENCES workflow_status_connections (workflow_status_connection_id)
+              ON DELETE CASCADE,
 
             CONSTRAINT fk_wsca_action
               FOREIGN KEY (workflow_status_action_id)
@@ -171,7 +173,8 @@ BEGIN
 
             CONSTRAINT fk_wscg_connection
               FOREIGN KEY (workflow_status_connection_id)
-              REFERENCES workflow_status_connections (workflow_status_connection_id),
+              REFERENCES workflow_status_connections (workflow_status_connection_id)
+              ON DELETE CASCADE,
 
             CONSTRAINT fk_wscg_guard
               FOREIGN KEY (workflow_status_changing_guard_id)
