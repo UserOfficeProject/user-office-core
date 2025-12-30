@@ -405,4 +405,46 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       ? this.createWorkflowStatusObject(workflowStatus)
       : null;
   }
+
+  async getWorkflowStructure(workflowId: number): Promise<{
+    workflowStatuses: {
+      workflowStatusId: number;
+      statusId: number;
+      shortCode: string;
+    }[];
+    workflowConnections: {
+      prevWorkflowStatusId: number;
+      nextWorkflowStatusId: number;
+      statusChangingEvent: string;
+    }[];
+  }> {
+    const workflowStatuses = await database
+      .select(
+        'workflow_has_statuses.workflow_status_id as workflowStatusId',
+        'workflow_has_statuses.status_id as statusId',
+        'statuses.short_code as shortCode'
+      )
+      .from('workflow_has_statuses')
+      .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')
+      .where('workflow_has_statuses.workflow_id', workflowId);
+
+    const workflowConnections = await database
+      .select(
+        'workflow_status_connections.prev_workflow_status_id as prevWorkflowStatusId',
+        'workflow_status_connections.next_workflow_status_id as nextWorkflowStatusId',
+        'workflow_status_connection_has_workflow_status_changing_events.status_changing_event as statusChangingEvent'
+      )
+      .from('workflow_status_connections')
+      .join(
+        'workflow_status_connection_has_workflow_status_changing_events',
+        'workflow_status_connections.workflow_status_connection_id',
+        'workflow_status_connection_has_workflow_status_changing_events.workflow_status_connection_id'
+      )
+      .where('workflow_status_connections.workflow_id', workflowId);
+
+    return {
+      workflowStatuses,
+      workflowConnections,
+    };
+  }
 }

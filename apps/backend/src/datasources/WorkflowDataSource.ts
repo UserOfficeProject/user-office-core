@@ -44,4 +44,16 @@ export interface WorkflowDataSource {
   getStatusChangingEventsByConnectionIds(
     workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
+  getWorkflowStructure(workflowId: number): Promise<{
+    workflowStatuses: {
+      workflowStatusId: number;
+      statusId: number;
+      shortCode: string;
+    }[];
+    workflowConnections: {
+      prevWorkflowStatusId: number;
+      nextWorkflowStatusId: number;
+      statusChangingEvent: string;
+    }[];
+  }>;
 }
