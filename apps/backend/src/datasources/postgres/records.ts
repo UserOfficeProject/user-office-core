@@ -762,8 +762,8 @@ export interface StatusActionRecord {
 }
 
 export interface WorkflowConnectionHasActionsRecord {
-  readonly connection_id: number;
-  readonly action_id: number;
+  readonly workflow_status_connection_id: number;
+  readonly workflow_status_action_id: number;
   readonly workflow_id: number;
   readonly config: string;
 }

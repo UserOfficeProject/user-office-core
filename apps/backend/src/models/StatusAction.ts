@@ -19,7 +19,6 @@ export class ConnectionHasStatusAction {
     public connectionId: number,
     public actionId: number,
     public workflowId: number,
-    public name: string,
     public type: StatusActionType,
     public config: typeof StatusActionConfig | null
   ) {}
