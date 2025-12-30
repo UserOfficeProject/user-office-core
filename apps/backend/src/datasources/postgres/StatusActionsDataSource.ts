@@ -9,7 +9,7 @@ import {
   StatusAction,
   StatusActionType,
 } from '../../models/StatusAction';
-import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 import {
   EmailActionConfig,
   StatusActionConfig,
@@ -182,8 +182,8 @@ export default class PostgresStatusActionsDataSource
     );
   }
 
-  async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+  async setStatusActionsOnConnection(
+    connectionStatusActionsInput: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[] | null> {
     const workflow = await this.workflowDataSource.getWorkflow(
       connectionStatusActionsInput.workflowId

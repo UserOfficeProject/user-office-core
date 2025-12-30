@@ -5,7 +5,7 @@ import {
   StatusAction,
   StatusActionType,
 } from '../../models/StatusAction';
-import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 
 export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
@@ -69,8 +69,8 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return dummyStatusActions;
   }
 
-  async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+  async setStatusActionsOnConnection(
+    connectionStatusActionsInput: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

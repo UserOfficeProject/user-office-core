@@ -21,7 +21,7 @@ import { UserWithRole } from '../models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { WorkflowStatus } from '../models/WorkflowStatus';
-import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
@@ -197,12 +197,10 @@ export default class WorkflowMutations {
     )
   )
   @Authorized([Roles.USER_OFFICER])
-  async addConnectionStatusActions(
+  async setStatusActionsOnConnection(
     agent: UserWithRole | null,
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+    input: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[] | null> {
-    return this.statusActionsDataSource.addConnectionStatusActions(
-      connectionStatusActionsInput
-    );
+    return this.statusActionsDataSource.setStatusActionsOnConnection(input);
   }
 }

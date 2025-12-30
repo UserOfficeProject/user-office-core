@@ -128,12 +128,12 @@ export function usePersistWorkflowEditorModel() {
           statusActions.length ? 'added' : 'removed'
         } successfully!`,
       })
-        .addConnectionStatusActions({
+        .setStatusActionsOnConnection({
           actions: statusActions,
           workflowId: workflowConnection.workflowId,
           connectionId: workflowConnection.id,
         })
-        .then((data) => data.addConnectionStatusActions);
+        .then((data) => data.setStatusActionsOnConnection);
     };
 
     return (next: FunctionType) => (action: Event) => {
