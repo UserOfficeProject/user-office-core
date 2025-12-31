@@ -290,7 +290,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async updateProposalStatus(
+  async updateProposalWfStatus(
     proposalPk: number,
     proposalWfStatusId: number
   ): Promise<Proposal> {

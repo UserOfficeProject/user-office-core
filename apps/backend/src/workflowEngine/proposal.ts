@@ -141,14 +141,14 @@ export const workflowEngine = async (
         nextStateValue !== currentWfStatus
       ) {
         const meta = machine.states[nextStateValue].meta;
-        const nextStatusId = meta?.statusId;
         const nextWfStatusId = meta?.workflowStatusId;
 
-        if (nextStatusId && nextWfStatusId) {
-          const updatedProposal = await proposalDataSource.updateProposalStatus(
-            arg.proposalPk,
-            nextStatusId
-          );
+        if (nextWfStatusId) {
+          const updatedProposal =
+            await proposalDataSource.updateProposalWfStatus(
+              arg.proposalPk,
+              nextWfStatusId
+            );
 
           const call = await callDataSource.getCall(proposal.callId);
 

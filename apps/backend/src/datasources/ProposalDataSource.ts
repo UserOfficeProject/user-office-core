@@ -45,7 +45,7 @@ export interface ProposalDataSource {
     questionary_id: number
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
-  updateProposalStatus(
+  updateProposalWfStatus(
     proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal>;

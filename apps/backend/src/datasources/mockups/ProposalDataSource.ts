@@ -244,7 +244,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async updateProposalStatus(
+  async updateProposalWfStatus(
     proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal> {
