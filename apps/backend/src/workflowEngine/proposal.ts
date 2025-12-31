@@ -1,10 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
-import { createActor, createMachine, and } from 'xstate';
+import { and, createActor, createMachine } from 'xstate';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
@@ -109,7 +108,6 @@ export type WorkflowEngineProposalType = Proposal & {
 export const workflowEngine = async (
   args: {
     proposalPk: number;
-    proposalEvents?: ProposalEventsRecord;
     currentEvent: Event;
   }[]
 ): Promise<Array<WorkflowEngineProposalType | void> | void> => {
@@ -186,7 +184,7 @@ export const workflowEngine = async (
   return validProposals;
 };
 
-export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
+export const callWorkflowEngine = async (
   eventType: Event,
   proposalPks: number[]
 ) => {
@@ -199,21 +197,9 @@ export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
     return;
   }
 
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
-  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
-    eventType,
-    proposalPks
-  );
-
   const proposalPksWithEvents = proposalPks.map((proposalPk) => {
     return {
       proposalPk,
-      proposalEvents: allProposalEvents?.find(
-        (proposalEvents) => proposalEvents.proposal_pk === proposalPk
-      ),
       currentEvent: eventType,
     };
   });

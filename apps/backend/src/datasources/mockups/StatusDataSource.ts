@@ -1,5 +1,6 @@
 import { Status } from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
+import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { StatusDataSource } from '../StatusDataSource';
 
 export const dummyStatuses = [
@@ -15,6 +16,9 @@ export const dummyStatuses = [
 ];
 
 export class StatusDataSourceMock implements StatusDataSource {
+  getDefaultWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null> {
+    throw new Error('Method not implemented.');
+  }
   // TODO: This needs to be implemented
   async createStatus(
     newStatusInput: Omit<Status, 'id' | 'is_default'>

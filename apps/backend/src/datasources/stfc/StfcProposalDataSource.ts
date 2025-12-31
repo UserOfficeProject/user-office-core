@@ -9,8 +9,8 @@ import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
-import { CallDataSource } from '../CallDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
+import PostgresCallDataSource from '../postgres/CallDataSource';
 import database from '../postgres/database';
 import {
   CallRecord,
@@ -19,14 +19,14 @@ import {
   ProposalViewRecord,
 } from '../postgres/records';
 import PostgresStatusDataSource from '../postgres/StatusDataSource';
-import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
-  new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
-  new PostgresAdminDataSource()
+  new PostgresAdminDataSource(),
+  new PostgresCallDataSource(),
+  new PostgresStatusDataSource()
 );
 
 const fieldMap: { [key: string]: string } = {
@@ -46,9 +46,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
   protected stfcUserDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
-  protected callDataSource: CallDataSource = container.resolve(
-    Tokens.CallDataSource
-  ) as CallDataSource;
 
   async getInstrumentScientistProposals(
     user: UserWithRole,

@@ -1,4 +1,5 @@
-import { isProposalSubmittedGuard } from '../workflowEngine/guards/IsProposalSubmittedGuard';
+import { IGuard } from '../workflowEngine/guards/IGuard';
+import { IsProposalSubmittedGuard } from '../workflowEngine/guards/IsProposalSubmittedGuard';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {
@@ -102,10 +103,9 @@ export enum Event {
   VISIT_CREATED = 'VISIT_CREATED',
 }
 
-export type GuardFunction = (id: number) => Promise<boolean>;
 interface EventMetadata {
   label: string;
-  guard?: GuardFunction;
+  guard?: new () => IGuard;
 }
 
 export const EventLabel = new Map<Event, EventMetadata>([
@@ -115,7 +115,7 @@ export const EventLabel = new Map<Event, EventMetadata>([
     Event.PROPOSAL_SUBMITTED,
     {
       label: 'Event occurs when proposal is submitted',
-      guard: isProposalSubmittedGuard,
+      guard: IsProposalSubmittedGuard,
     },
   ],
   [Event.PROPOSAL_DELETED, { label: 'Event occurs when proposal is removed' }],

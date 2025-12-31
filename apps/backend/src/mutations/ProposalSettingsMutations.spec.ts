@@ -8,6 +8,7 @@ import {
 import {
   dummyWorkflow,
   dummyWorkflowConnection,
+  dummyWorkflowStatus,
 } from '../datasources/mockups/WorkflowDataSource';
 import { Rejection } from '../models/Rejection';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
@@ -166,7 +167,7 @@ describe('Test Proposal settings mutations', () => {
     return expect(
       workflowMutationsInstance.addStatusToWorkflow(
         dummyUserOfficerWithRole,
-        dummyWorkflowConnection
+        dummyWorkflowStatus
       )
     ).resolves.toStrictEqual(dummyWorkflowConnection);
   });
@@ -186,9 +187,7 @@ describe('Test Proposal settings mutations', () => {
   test('A userofficer can remove proposal workflow connection', () => {
     return expect(
       workflowMutationsInstance.deleteWorkflowStatus(dummyUserOfficerWithRole, {
-        statusId: 1,
-        workflowId: 1,
-        sortOrder: 0,
+        workflowStatusId: 1,
       })
     ).resolves.toStrictEqual(true);
   });

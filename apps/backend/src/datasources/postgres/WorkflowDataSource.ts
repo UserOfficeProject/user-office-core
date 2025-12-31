@@ -488,26 +488,4 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnections: workflowConnectionsWithGuards,
     };
   }
-
-  async getDraftWorkflowStatusByCallId(
-    callId: number
-  ): Promise<WorkflowStatus | null> {
-    const workflowStatus: WorkflowStatusRecord = await database
-      .select('workflow_has_statuses.*')
-      .from('call')
-      .join('workflows', 'call.proposal_workflow_id', 'workflows.workflow_id')
-      .join(
-        'workflow_has_statuses',
-        'workflows.workflow_id',
-        'workflow_has_statuses.workflow_id'
-      )
-      .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')
-      .where('call.call_id', callId)
-      .andWhere('statuses.short_code', 'DRAFT')
-      .first();
-
-    return workflowStatus
-      ? this.createWorkflowStatusObject(workflowStatus)
-      : null;
-  }
 }

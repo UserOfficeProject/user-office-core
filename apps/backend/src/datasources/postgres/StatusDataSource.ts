@@ -3,6 +3,7 @@ import { injectable } from 'tsyringe';
 
 import { Status } from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
+import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
@@ -105,6 +106,45 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .first();
 
     return status ? this.createStatusObject(status) : null;
+  }
+
+  async getDefaultWorkflowStatus(
+    workflowId: number
+  ): Promise<WorkflowStatus | null> {
+    const workflow = await database
+      .select()
+      .from('workflows')
+      .where('workflow_id', workflowId)
+      .first();
+
+    if (!workflow) {
+      throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
+    }
+
+    const defaultStatus = await this.getDefaultStatus(workflow.entity_type);
+
+    if (!defaultStatus) {
+      return null;
+    }
+
+    const workflowStatus: WorkflowStatus | null = await database
+      .select()
+      .from('workflow_statuses')
+      .where('workflow_id', workflowId)
+      .andWhere('status_id', defaultStatus.id)
+      .first();
+
+    if (!workflowStatus) {
+      return null;
+    }
+
+    return new WorkflowStatus(
+      workflowStatus.workflowStatusId,
+      workflowStatus.workflowId,
+      workflowStatus.statusId,
+      workflowStatus.posX,
+      workflowStatus.posY
+    );
   }
 
   async getInitialStatus(

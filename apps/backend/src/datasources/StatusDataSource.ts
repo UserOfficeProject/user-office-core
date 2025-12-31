@@ -1,4 +1,5 @@
 import { Status } from '../models/Status';
+import { WorkflowStatus } from '../models/WorkflowStatus';
 import { UpdateStatusInput } from '../resolvers/mutations/settings/UpdateStatusMutation';
 
 export interface StatusDataSource {
@@ -10,4 +11,5 @@ export interface StatusDataSource {
   updateStatus(status: UpdateStatusInput): Promise<Status>;
   deleteStatus(statusId: number): Promise<Status>;
   getDefaultStatus(entityType: Status['entityType']): Promise<Status | null>;
+  getDefaultWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null>;
 }

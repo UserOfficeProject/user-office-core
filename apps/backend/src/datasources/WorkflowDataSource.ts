@@ -57,7 +57,4 @@ export interface WorkflowDataSource {
       guardNames: string[];
     }[];
   }>;
-  getDraftWorkflowStatusByCallId(
-    callId: number
-  ): Promise<WorkflowStatus | null>;
 }

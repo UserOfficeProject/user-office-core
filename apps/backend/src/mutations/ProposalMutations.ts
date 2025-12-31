@@ -841,6 +841,18 @@ export default class ProposalMutations {
         true
       );
 
+      const defaultWfStatus =
+        await this.statusDataSource.getDefaultWorkflowStatus(
+          call.proposalWorkflowId
+        );
+
+      if (!defaultWfStatus) {
+        return rejection(
+          'Could not clone the proposal because the call has misconfigured workflow statuses',
+          { call, sourceProposal }
+        );
+      }
+
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
@@ -848,6 +860,7 @@ export default class ProposalMutations {
         abstract: clonedProposal.abstract,
         proposerId: sourceProposal.proposerId,
         statusId: 1,
+        workflowStatusId: defaultWfStatus.workflowStatusId,
         created: new Date(),
         updated: new Date(),
         proposalId: clonedProposal.proposalId,

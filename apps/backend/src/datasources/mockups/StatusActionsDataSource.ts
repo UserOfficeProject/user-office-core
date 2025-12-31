@@ -12,7 +12,6 @@ export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
   1,
   1,
   1,
-  'Dummy action',
   StatusActionType.EMAIL,
   {}
 );

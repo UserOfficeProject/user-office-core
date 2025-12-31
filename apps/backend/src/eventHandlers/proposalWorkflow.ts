@@ -10,7 +10,7 @@ import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
 import {
   WorkflowEngineProposalType,
-  markProposalsEventAsDoneAndCallWorkflowEngine,
+  callWorkflowEngine,
 } from '../workflowEngine/proposal';
 
 enum ProposalInformationKeys {
@@ -77,11 +77,10 @@ const handleSubmittedProposalsAfterCallEnded = async (
     return;
   }
 
-  const updatedSubmittedProposals =
-    await markProposalsEventAsDoneAndCallWorkflowEngine(
-      Event.CALL_ENDED,
-      proposalPks
-    );
+  const updatedSubmittedProposals = await callWorkflowEngine(
+    Event.CALL_ENDED,
+    proposalPks
+  );
   if (updatedSubmittedProposals) {
     await publishProposalStatusChange(updatedSubmittedProposals);
   }
@@ -93,7 +92,7 @@ export const handleWorkflowEngineChange = async (
 ) => {
   const isArray = Array.isArray(proposalPks);
 
-  const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
+  const updatedProposals = await callWorkflowEngine(
     event.type,
     isArray ? proposalPks : [proposalPks]
   );

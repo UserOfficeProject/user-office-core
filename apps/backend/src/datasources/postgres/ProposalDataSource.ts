@@ -5,7 +5,6 @@ import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -20,23 +19,23 @@ import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/Up
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
 } from './../../resolvers/queries/ProposalsQuery';
+import CallDataSource from './CallDataSource';
 import database from './database';
 import {
   createProposalObject,
   createProposalViewObject,
+  createProposalViewObjectWithTechniques,
   createTechnicalReviewObject,
-  ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
   TechnicalReviewRecord,
   TechniqueRecord,
-  createProposalViewObjectWithTechniques,
 } from './records';
+import StatusDataSource from './StatusDataSource';
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
@@ -94,10 +93,12 @@ export async function calculateReferenceNumber(
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
-    @inject(Tokens.WorkflowDataSource)
-    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
-    private AdminDataSource: AdminDataSource
+    private adminDataSource: AdminDataSource,
+    @inject(Tokens.CallDataSource)
+    protected callDataSource: CallDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -346,8 +347,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     call_id: number,
     questionary_id: number
   ): Promise<Proposal> {
-    const draftWfStatus =
-      await this.workflowDataSource.getDraftWorkflowStatusByCallId(call_id);
+    const call = await this.callDataSource.getCall(call_id);
+
+    if (!call) {
+      throw new GraphQLError(`Call not found with id: ${call_id}`);
+    }
+
+    const draftWfStatus = await this.statusDataSource.getDefaultWorkflowStatus(
+      call.proposalWorkflowId
+    );
 
     if (!draftWfStatus) {
       throw new GraphQLError(
@@ -800,30 +808,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposal) => createProposalObject(proposal));
   }
 
-  async markEventAsDoneOnProposals(
-    event: Event,
-    proposalPks: number[]
-  ): Promise<ProposalEventsRecord[] | null> {
-    const dataToInsert = proposalPks.map((proposalPk) => ({
-      proposal_pk: proposalPk,
-      [event.toLowerCase()]: true,
-    }));
-
-    const result = await database.raw(
-      `? ON CONFLICT (proposal_pk)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('proposal_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return result.rows;
-    } else {
-      return null;
-    }
-  }
-
   async getCount(callId: number): Promise<number> {
     return database('proposals')
       .count('call_id')
@@ -945,7 +929,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
     const workflowStatus = (
-      await this.AdminDataSource.getSetting(
+      await this.adminDataSource.getSetting(
         SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS
       )
     )?.settingsValue;

@@ -1,4 +1,3 @@
-import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, Proposals } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
@@ -7,7 +6,6 @@ import { UserWithRole } from '../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../resolvers/types/User';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
-import { ProposalEventsRecord } from './postgres/records';
 
 export interface ProposalDataSource {
   getProposalsFromView(
@@ -64,10 +62,6 @@ export interface ProposalDataSource {
     submittedDate: Date
   ): Promise<Proposal | null>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
-  markEventAsDoneOnProposals(
-    event: Event,
-    proposalPk: number[]
-  ): Promise<ProposalEventsRecord[] | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   changeProposalsStatus(

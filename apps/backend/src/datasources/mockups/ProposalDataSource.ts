@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
@@ -10,7 +9,6 @@ import {
 } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import { basicDummyUser } from './UserDataSource';
@@ -358,13 +356,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     offset?: number
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
-  }
-
-  async markEventAsDoneOnProposals(
-    event: Event,
-    proposalPk: number[]
-  ): Promise<ProposalEventsRecord[] | null> {
-    return [dummyProposalEvents];
   }
 
   async getCount(callId: number): Promise<number> {

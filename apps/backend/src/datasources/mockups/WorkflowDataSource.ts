@@ -3,8 +3,8 @@ import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { Workflow, WorkflowType } from '../../models/Workflow';
 import { WorkflowConnection } from '../../models/WorkflowConnections';
 import { WorkflowStatus } from '../../models/WorkflowStatus';
-import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { AddStatusToWorkflowInput } from '../../resolvers/mutations/settings/AddStatusToWorkflowMutation';
+import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
@@ -46,6 +46,21 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
 );
 
 export class WorkflowDataSourceMock implements WorkflowDataSource {
+  getWorkflowStructure(workflowId: number): Promise<{
+    workflowStatuses: {
+      workflowStatusId: number;
+      statusId: number;
+      shortCode: string;
+    }[];
+    workflowConnections: {
+      prevWorkflowStatusId: number;
+      nextWorkflowStatusId: number;
+      statusChangingEvent: string;
+      guardNames: string[];
+    }[];
+  }> {
+    throw new Error('Method not implemented.');
+  }
   createWorkflowConnection(
     newWorkflowConnectionInput: CreateWorkflowConnectionInput
   ): Promise<WorkflowConnection> {
