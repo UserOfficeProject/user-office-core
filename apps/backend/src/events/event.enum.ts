@@ -1,4 +1,4 @@
-import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
+import { isProposalSubmittedGuard } from '../workflowEngine/guards/IsProposalSubmittedGuard';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {

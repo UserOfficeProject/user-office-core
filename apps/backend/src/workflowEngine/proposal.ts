@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
-import { createActor, createMachine } from 'xstate';
+import { createActor, createMachine, and } from 'xstate';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -10,6 +10,7 @@ import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
+import { IsProposalSubmittedGuard } from './guards/IsProposalSubmittedGuard';
 
 const getProposalWorkflowByCallId = (callId: number) => {
   const callDataSource = container.resolve<CallDataSource>(
@@ -23,13 +24,13 @@ const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
   `${shortCode}-${workflowStatusId}`;
 
 type StatusNodeConfig = {
-  on: Record<string, { target: string }>;
+  on: Record<string, any>;
   meta?: { statusId: number; workflowStatusId: number };
 };
 
 const createProposalMachine = async (
   workflowId: number,
-  currentWfStatusId: number
+  proposal: Pick<Proposal, 'workflowStatusId' | 'primaryKey'>
 ) => {
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
@@ -70,19 +71,33 @@ const createProposalMachine = async (
     const event = conn.statusChangingEvent.toUpperCase();
 
     if (sourceStatus && targetStatus && event) {
+      const guards = conn.guardNames.map((guardName) => ({ type: guardName }));
       wfStatuses[sourceStatus].on[event] = {
         target: targetStatus,
+        guard: guards.length > 0 ? and(guards) : undefined,
       };
     }
   });
 
-  const currentWfStatusName = wfStatusIdToNameMap.get(currentWfStatusId);
+  const currentWfStatusName = wfStatusIdToNameMap.get(
+    proposal.workflowStatusId
+  );
 
-  return createMachine({
-    id: `proposal-workflow-${workflowId}`,
-    initial: currentWfStatusName || draftWfStatusName,
-    states: wfStatuses,
-  });
+  const isProposalSubmittedGuard = new IsProposalSubmittedGuard();
+  await isProposalSubmittedGuard.initialize(proposal.primaryKey);
+
+  return createMachine(
+    {
+      id: `proposal-workflow-${workflowId}`,
+      initial: currentWfStatusName || draftWfStatusName,
+      states: wfStatuses,
+    },
+    {
+      guards: {
+        isProposalSubmittedGuard: () => isProposalSubmittedGuard.guard(),
+      },
+    }
+  );
 };
 
 export type WorkflowEngineProposalType = Proposal & {
@@ -125,7 +140,7 @@ export const workflowEngine = async (
 
       const machine = await createProposalMachine(
         proposalWorkflow.id,
-        proposal.workflowStatusId
+        proposal
       );
 
       const actor = createActor(machine).start();
@@ -134,12 +149,9 @@ export const workflowEngine = async (
 
       actor.send({ type: arg.currentEvent.toUpperCase() });
 
-      const nextStateValue = actor.getSnapshot().value;
+      const nextStateValue = actor.getSnapshot().value as string;
 
-      if (
-        typeof nextStateValue === 'string' &&
-        nextStateValue !== currentWfStatus
-      ) {
+      if (nextStateValue !== currentWfStatus) {
         const meta = machine.states[nextStateValue].meta;
         const nextWfStatusId = meta?.workflowStatusId;
 
