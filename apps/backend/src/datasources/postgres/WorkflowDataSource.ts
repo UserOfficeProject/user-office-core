@@ -416,6 +416,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       prevWorkflowStatusId: number;
       nextWorkflowStatusId: number;
       statusChangingEvent: string;
+      guardNames: string[];
     }[];
   }> {
     const workflowStatuses = await database
@@ -430,6 +431,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
     const workflowConnections = await database
       .select(
+        'workflow_status_connections.workflow_status_connection_id as workflowStatusConnectionId',
         'workflow_status_connections.prev_workflow_status_id as prevWorkflowStatusId',
         'workflow_status_connections.next_workflow_status_id as nextWorkflowStatusId',
         'workflow_status_connection_has_workflow_status_changing_events.status_changing_event as statusChangingEvent'
@@ -442,9 +444,70 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       )
       .where('workflow_status_connections.workflow_id', workflowId);
 
+    const connectionIds = workflowConnections.map(
+      (wc) => wc.workflowStatusConnectionId
+    );
+
+    let guards: { workflowStatusConnectionId: number; guardName: string }[] =
+      [];
+    if (connectionIds.length > 0) {
+      guards = await database
+        .select(
+          'workflow_status_connection_has_workflow_status_changing_guards.workflow_status_connection_id as workflowStatusConnectionId',
+          'workflow_status_changing_guards.name as guardName'
+        )
+        .from('workflow_status_connection_has_workflow_status_changing_guards')
+        .join(
+          'workflow_status_changing_guards',
+          'workflow_status_connection_has_workflow_status_changing_guards.workflow_status_changing_guard_id',
+          'workflow_status_changing_guards.workflow_status_changing_guard_id'
+        )
+        .whereIn(
+          'workflow_status_connection_has_workflow_status_changing_guards.workflow_status_connection_id',
+          connectionIds
+        );
+    }
+
+    const workflowConnectionsWithGuards = workflowConnections.map((wc) => {
+      const connectionGuards = guards
+        .filter(
+          (g) => g.workflowStatusConnectionId === wc.workflowStatusConnectionId
+        )
+        .map((g) => g.guardName);
+
+      return {
+        prevWorkflowStatusId: wc.prevWorkflowStatusId,
+        nextWorkflowStatusId: wc.nextWorkflowStatusId,
+        statusChangingEvent: wc.statusChangingEvent,
+        guardNames: connectionGuards,
+      };
+    });
+
     return {
       workflowStatuses,
-      workflowConnections,
+      workflowConnections: workflowConnectionsWithGuards,
     };
+  }
+
+  async getDraftWorkflowStatusByCallId(
+    callId: number
+  ): Promise<WorkflowStatus | null> {
+    const workflowStatus: WorkflowStatusRecord = await database
+      .select('workflow_has_statuses.*')
+      .from('call')
+      .join('workflows', 'call.proposal_workflow_id', 'workflows.workflow_id')
+      .join(
+        'workflow_has_statuses',
+        'workflows.workflow_id',
+        'workflow_has_statuses.workflow_id'
+      )
+      .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')
+      .where('call.call_id', callId)
+      .andWhere('statuses.short_code', 'DRAFT')
+      .first();
+
+    return workflowStatus
+      ? this.createWorkflowStatusObject(workflowStatus)
+      : null;
   }
 }

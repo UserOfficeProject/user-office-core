@@ -20,19 +20,27 @@ export default class SettingsQueries {
           (eventItem) =>
             eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL_')
         )
-        .map((eventItem) => ({
-          name: eventItem,
-          description: EventLabel.get(eventItem),
-        }));
+        .map((eventItem) => {
+          const metadata = EventLabel.get(eventItem as Event);
+
+          return {
+            name: eventItem,
+            description: metadata?.label,
+          };
+        });
 
       return allProposalEvents;
     } else if (entityType === WorkflowType.EXPERIMENT) {
       const allExperimentSafetyEvents = allEventsArray
         .filter((eventItem) => eventItem.startsWith('EXPERIMENT_'))
-        .map((eventItem) => ({
-          name: eventItem,
-          description: EventLabel.get(eventItem),
-        }));
+        .map((eventItem) => {
+          const metadata = EventLabel.get(eventItem as Event);
+
+          return {
+            name: eventItem,
+            description: metadata?.label,
+          };
+        });
 
       return allExperimentSafetyEvents;
     } else {

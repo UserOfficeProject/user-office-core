@@ -1,3 +1,5 @@
+import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
+
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {
   PROPOSAL_CREATED = 'PROPOSAL_CREATED',
@@ -100,325 +102,509 @@ export enum Event {
   VISIT_CREATED = 'VISIT_CREATED',
 }
 
-export const EventLabel = new Map<Event, string>([
-  [Event.PROPOSAL_CREATED, 'Event occurs when proposal is created'],
-  [Event.PROPOSAL_UPDATED, 'Event occurs when proposal is updated'],
-  [Event.PROPOSAL_SUBMITTED, 'Event occurs when proposal is submitted'],
-  [Event.PROPOSAL_DELETED, 'Event occurs when proposal is removed'],
+export type GuardFunction = (id: number) => Promise<boolean>;
+interface EventMetadata {
+  label: string;
+  guard?: GuardFunction;
+}
+
+export const EventLabel = new Map<Event, EventMetadata>([
+  [Event.PROPOSAL_CREATED, { label: 'Event occurs when proposal is created' }],
+  [Event.PROPOSAL_UPDATED, { label: 'Event occurs when proposal is updated' }],
+  [
+    Event.PROPOSAL_SUBMITTED,
+    {
+      label: 'Event occurs when proposal is submitted',
+      guard: isProposalSubmittedGuard,
+    },
+  ],
+  [Event.PROPOSAL_DELETED, { label: 'Event occurs when proposal is removed' }],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
-    'Event occurs when proposal feasibility review is submitted with value of feasible',
+    {
+      label:
+        'Event occurs when proposal feasibility review is submitted with value of feasible',
+    },
   ],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
-    'Event occurs when proposal feasibility review is submitted with value of unfeasible',
+    {
+      label:
+        'Event occurs when proposal feasibility review is submitted with value of unfeasible',
+    },
   ],
   [
     Event.PROPOSAL_FAPS_SELECTED,
-    'Event occurs when FAPs are assigned to a proposal',
+    { label: 'Event occurs when FAPs are assigned to a proposal' },
   ],
   [
     Event.PROPOSAL_FAPS_REMOVED,
-    'Event occurs when proposal is removed from a FAPs',
+    { label: 'Event occurs when proposal is removed from a FAPs' },
   ],
   [
     Event.PROPOSAL_INSTRUMENTS_SELECTED,
-    'Event occurs when instrument/s gets assigned to a proposal',
+    { label: 'Event occurs when instrument/s gets assigned to a proposal' },
   ],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED,
-    'Event occurs when proposal feasibility review is updated',
+    { label: 'Event occurs when proposal feasibility review is updated' },
   ],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED,
-    'Event occurs when proposal feasibility review is submitted with any value',
-  ],
-  [
-    Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
-    'Event occurs when all proposal feasibility reviews are submitted with Feasible value',
+    {
+      label:
+        'Event occurs when proposal feasibility review is submitted with any value',
+    },
   ],
   [
     Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED,
-    'Event occurs when all proposal feasibility reviews are submitted with any value',
+    {
+      label:
+        'Event occurs when all proposal feasibility reviews are submitted with any value',
+    },
+  ],
+  [
+    Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
+    {
+      label:
+        'Event occurs when all proposal feasibility reviews are submitted with Feasible value',
+    },
   ],
   [
     Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED,
-    'Event occurs when proposal sample review gets submitted with any value',
+    {
+      label:
+        'Event occurs when proposal sample review gets submitted with any value',
+    },
   ],
   [
     Event.PROPOSAL_SAMPLE_SAFE,
-    'Event occurs when proposal sample review gets submitted with value of low risk',
+    {
+      label:
+        'Event occurs when proposal sample review gets submitted with value of low risk',
+    },
   ],
   [
     Event.PROPOSAL_ALL_FAP_REVIEWERS_SELECTED,
-    'Event occurs when all FAP reviewers are selected on a proposal',
+    {
+      label: 'Event occurs when all FAP reviewers are selected on a proposal',
+    },
   ],
   [
     Event.PROPOSAL_FAP_REVIEW_UPDATED,
-    'Event occurs when at least one proposal FAP review is updated',
+    {
+      label: 'Event occurs when at least one proposal FAP review is updated',
+    },
   ],
   [
     Event.PROPOSAL_FAP_REVIEW_SUBMITTED,
-    'Event occurs when at least one proposal FAP review is submitted',
+    {
+      label: 'Event occurs when at least one proposal FAP review is submitted',
+    },
   ],
   [
     Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
-    'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
+    {
+      label:
+        'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
+    },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_SAVED,
-    'Event occurs when FAP meeting is saved on a proposal',
+    { label: 'Event occurs when FAP meeting is saved on a proposal' },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_SUBMITTED,
-    'Event occurs when FAP meeting is submitted on a proposal',
+    { label: 'Event occurs when FAP meeting is submitted on a proposal' },
   ],
   [
     Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
-    'Event occurs when all the FAP meetings are submitted for a specific proposal',
+    {
+      label:
+        'Event occurs when all the FAP meetings are submitted for a specific proposal',
+    },
   ],
   [
     Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS,
-    'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
+    {
+      label:
+        'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
+    },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN,
-    'Event occurs when FAP meeting ranking is overwritten on a proposal',
+    {
+      label:
+        'Event occurs when FAP meeting ranking is overwritten on a proposal',
+    },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_REORDER,
-    'Event occurs when proposals are reordered in FAP meeting components',
+    {
+      label:
+        'Event occurs when proposals are reordered in FAP meeting components',
+    },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED,
-    'Event occurs when instrument is submitted after FAP meeting is finalized',
-  ],
-  [
-    Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
-    'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
+    {
+      label:
+        'Event occurs when instrument is submitted after FAP meeting is finalized',
+    },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED,
-    'Event occurs when instrument is unsubmitted in the FAP meeting',
+    {
+      label: 'Event occurs when instrument is unsubmitted in the FAP meeting',
+    },
   ],
   [
-    Event.PROPOSAL_ACCEPTED,
-    'Event occurs when proposal gets final decision as accepted',
+    Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
+    {
+      label:
+        'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
+    },
   ],
   [
     Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED,
-    'Event occurs when proposal management decision is updated',
+    {
+      label: 'Event occurs when proposal management decision is updated',
+    },
   ],
   [
     Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED,
-    'Event occurs when proposal management decision is submitted',
+    {
+      label: 'Event occurs when proposal management decision is submitted',
+    },
   ],
-  [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
-  [Event.PROPOSAL_RESERVED, 'Event occurs when proposal gets reserved'],
+  [
+    Event.PROPOSAL_ACCEPTED,
+    { label: 'Event occurs when proposal gets final decision as accepted' },
+  ],
+  [
+    Event.PROPOSAL_RESERVED,
+    { label: 'Event occurs when proposal gets reserved' },
+  ],
+  [
+    Event.PROPOSAL_REJECTED,
+    { label: 'Event occurs when proposal gets rejected' },
+  ],
+  [Event.CALL_CREATED, { label: 'Event occurs on a when a call is created' }],
   [
     Event.CALL_ENDED,
-    'Event occurs on a specific call end date set on the call',
+    { label: 'Event occurs on a specific call end date set on the call' },
   ],
   [
     Event.CALL_ENDED_INTERNAL,
-    'Event occurs on a specific call internal end date set on the call',
+    {
+      label:
+        'Event occurs on a specific call internal end date set on the call',
+    },
   ],
-  [Event.CALL_CREATED, 'Event occurs on a when a call is created'],
   [
     Event.CALL_REVIEW_ENDED,
-    'Event occurs on a specific call review end date set on the call',
+    {
+      label: 'Event occurs on a specific call review end date set on the call',
+    },
   ],
   [
     Event.CALL_FAP_REVIEW_ENDED,
-    'Event occurs on a specific call FAP review end date set on the call',
+    {
+      label:
+        'Event occurs on a specific call FAP review end date set on the call',
+    },
   ],
-  [Event.USER_UPDATED, 'Event occurs when user is updated'],
-  [Event.USER_ROLE_UPDATED, 'Event occurs when user roles are updated'],
-  [Event.USER_DELETED, 'Event occurs when user is removed'],
+  [Event.USER_UPDATED, { label: 'Event occurs when user is updated' }],
+  [
+    Event.USER_ROLE_UPDATED,
+    { label: 'Event occurs when user roles are updated' },
+  ],
+  [Event.USER_DELETED, { label: 'Event occurs when user is removed' }],
   [
     Event.USER_PASSWORD_RESET_EMAIL,
-    'Event occurs when user password is reset by email',
+    { label: 'Event occurs when user password is reset by email' },
   ],
   [
     Event.EMAIL_INVITE_LEGACY,
-    '[Deprecated] Event occurs when user is created using email invite',
+    {
+      label:
+        '[Deprecated] Event occurs when user is created using email invite',
+    },
   ],
-  [Event.FAP_CREATED, 'Event occurs when FAP is created'],
-  [Event.FAP_UPDATED, 'Event occurs when FAP is updated'],
-  [Event.FAP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a FAP'],
+  [Event.FAP_CREATED, { label: 'Event occurs when FAP is created' }],
+  [Event.FAP_UPDATED, { label: 'Event occurs when FAP is updated' }],
+  [
+    Event.FAP_MEMBERS_ASSIGNED,
+    { label: 'Event occurs when we assign member/s to a FAP' },
+  ],
   [
     Event.FAP_REVIEWER_NOTIFIED,
-    'Event occurs when we notify the FAP reviewer, about its not submitted review, by email 2 days before the review end date',
+    {
+      label:
+        'Event occurs when we notify the FAP reviewer, about its not submitted review, by email 2 days before the review end date',
+    },
   ],
   [
     Event.FAP_MEMBER_REMOVED,
-    'Event occurs when FAP member gets removed from the panel',
+    { label: 'Event occurs when FAP member gets removed from the panel' },
   ],
   [
     Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL,
-    'Event occurs when FAP member gets assigned to a proposal for a review',
+    {
+      label:
+        'Event occurs when FAP member gets assigned to a proposal for a review',
+    },
   ],
   [
     Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL,
-    'Event occurs when FAP member is removed from proposal for review',
+    {
+      label: 'Event occurs when FAP member is removed from proposal for review',
+    },
   ],
   [
     Event.FAP_ALL_MEETINGS_SUBMITTED,
-    'Event occurs when all the FAP meetings are submitted for all of the proposals',
+    {
+      label:
+        'Event occurs when all the FAP meetings are submitted for all of the proposals',
+    },
   ],
-  [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
-  [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
+  [
+    Event.PROPOSAL_NOTIFIED,
+    { label: 'Event occurs when proposal is notified' },
+  ],
+  [Event.PROPOSAL_CLONED, { label: 'Event occurs when proposal is cloned' }],
   [
     Event.PROPOSAL_STATUS_ACTION_EXECUTED,
-    'Event occurs when the proposal status action is being executed in the status engine',
+    {
+      label:
+        'Event occurs when the proposal status action is being executed in the status engine',
+    },
   ],
   [
     Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
-    'Event occurs when co-proposer invites are updated for a proposal',
+    {
+      label: 'Event occurs when co-proposer invites are updated for a proposal',
+    },
   ],
   [
     Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
-    'Event occurs when co-proposer invite is sent to a user',
+    { label: 'Event occurs when co-proposer invite is sent to a user' },
   ],
   [
     Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
-    'Event occurs when user accepts the co-proposer claim for a proposal',
+    {
+      label:
+        'Event occurs when user accepts the co-proposer claim for a proposal',
+    },
   ],
   [
     Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
-    'Event occurs when visit registration invites are updated for a proposal',
+    {
+      label:
+        'Event occurs when visit registration invites are updated for a proposal',
+    },
   ],
   [
     Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
-    'Event occurs when visit registration invite is sent to a user',
+    { label: 'Event occurs when visit registration invite is sent to a user' },
   ],
   [
     Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
-    'Event occurs when user accepts the visit registration claim for a proposal',
+    {
+      label:
+        'Event occurs when user accepts the visit registration claim for a proposal',
+    },
   ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-    'Event occurs when the proposal status was changed by the workflow engine',
+    {
+      label:
+        'Event occurs when the proposal status was changed by the workflow engine',
+    },
   ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_USER,
-    'Event occurs when the proposal status was changed by the user',
+    {
+      label: 'Event occurs when the proposal status was changed by the user',
+    },
   ],
   [
     Event.TOPIC_ANSWERED,
-    'Event occurs when the user clicks save on a topic in any questionary',
+    {
+      label:
+        'Event occurs when the user clicks save on a topic in any questionary',
+    },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED,
-    'Event occurs when the new time slot is booked in the scheduler',
+    { label: 'Event occurs when the new time slot is booked in the scheduler' },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED,
-    'Event occurs when the time slots are removed in the scheduler',
+    {
+      label: 'Event occurs when the time slots are removed in the scheduler',
+    },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_ACTIVATED,
-    'Event occurs when the time slot booking is activated in the scheduler',
+    {
+      label:
+        'Event occurs when the time slot booking is activated in the scheduler',
+    },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_COMPLETED,
-    'Event occurs when the time slot booking is completed in the scheduler',
+    {
+      label:
+        'Event occurs when the time slot booking is completed in the scheduler',
+    },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_UPDATED,
-    'Event occurs when the time slot booking is updated in the scheduler',
+    {
+      label:
+        'Event occurs when the time slot booking is updated in the scheduler',
+    },
   ],
   [
     Event.PROPOSAL_BOOKING_TIME_REOPENED,
-    'Event occurs when the time slot booking is re-opened in the scheduler',
+    {
+      label:
+        'Event occurs when the time slot booking is re-opened in the scheduler',
+    },
   ],
-  [Event.INSTRUMENT_DELETED, 'Event occurs when the instrument is removed'],
+  [
+    Event.INSTRUMENT_CREATED,
+    { label: 'Event occurs when the instrument is created' },
+  ],
+  [
+    Event.INSTRUMENT_UPDATED,
+    { label: 'Event occurs when the instrument is updated' },
+  ],
+  [
+    Event.INSTRUMENT_DELETED,
+    { label: 'Event occurs when the instrument is removed' },
+  ],
+  [
+    Event.INSTRUMENT_ASSIGNED_TO_SCIENTIST,
+    {
+      label: 'Event occurs when instrument is assigned to a scientist',
+    },
+  ],
   [
     Event.PREDEFINED_MESSAGE_CREATED,
-    'Event occurs when predefined message is created',
+    { label: 'Event occurs when predefined message is created' },
   ],
   [
     Event.PREDEFINED_MESSAGE_UPDATED,
-    'Event occurs when predefined message is updated',
+    { label: 'Event occurs when predefined message is updated' },
   ],
   [
     Event.PREDEFINED_MESSAGE_DELETED,
-    'Event occurs when predefined message is removed',
+    { label: 'Event occurs when predefined message is removed' },
   ],
   [
     Event.INTERNAL_REVIEW_CREATED,
-    'Event occurs when internal (technical) review is created',
+    {
+      label: 'Event occurs when internal (technical) review is created',
+    },
   ],
   [
     Event.INTERNAL_REVIEW_UPDATED,
-    'Event occurs when internal (technical) review is updated',
+    {
+      label: 'Event occurs when internal (technical) review is updated',
+    },
   ],
   [
     Event.INTERNAL_REVIEW_DELETED,
-    'Event occurs when internal (technical) review is removed',
+    {
+      label: 'Event occurs when internal (technical) review is removed',
+    },
   ],
-  [Event.TECHNIQUE_CREATED, 'Event occurs when the technique is created'],
-  [Event.TECHNIQUE_UPDATED, 'Event occurs when the technique is updated'],
-  [Event.TECHNIQUE_DELETED, 'Event occurs when the technique is removed'],
+  [
+    Event.TECHNIQUE_CREATED,
+    { label: 'Event occurs when the technique is created' },
+  ],
+  [
+    Event.TECHNIQUE_UPDATED,
+    { label: 'Event occurs when the technique is updated' },
+  ],
+  [
+    Event.TECHNIQUE_DELETED,
+    { label: 'Event occurs when the technique is removed' },
+  ],
   [
     Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE,
-    'Event occurs when instruments are assigned to a technique',
+    {
+      label: 'Event occurs when instruments are assigned to a technique',
+    },
   ],
   [
     Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE,
-    'Event occurs when instruments are removed from a technique',
+    {
+      label: 'Event occurs when instruments are removed from a technique',
+    },
   ],
   [
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
-    'Event occurs when a proposal is assigned to techniques',
+    { label: 'Event occurs when a proposal is assigned to techniques' },
   ],
-  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
+  [Event.VISIT_CREATED, { label: 'Event occurs when visit is created' }],
   [
     Event.VISIT_REGISTRATION_APPROVED,
-    'Event occurs when visit registration is approved',
+    { label: 'Event occurs when visit registration is approved' },
   ],
   [
     Event.VISIT_REGISTRATION_CANCELLED,
-    'Event occurs when visit registration is cancelled',
+    { label: 'Event occurs when visit registration is cancelled' },
   ],
   [
     Event.EXPERIMENT_ESF_SUBMITTED,
-    'Event occurs when experiment ESF is submitted',
+    { label: 'Event occurs when experiment ESF is submitted' },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_IS,
-    'Event occurs when experiment ESF is approved by IS',
+    { label: 'Event occurs when experiment ESF is approved by IS' },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_IS,
-    'Event occurs when experiment ESF is rejected by IS',
+    { label: 'Event occurs when experiment ESF is rejected by IS' },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_ESR,
-    'Event occurs when experiment ESF is approved by ESR',
+    { label: 'Event occurs when experiment ESF is approved by ESR' },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
-    'Event occurs when experiment ESF is rejected by ESR',
+    { label: 'Event occurs when experiment ESF is rejected by ESR' },
   ],
   [
     Event.DATA_ACCESS_USERS_UPDATED,
-    'Event occurs when data access users are updated',
+    { label: 'Event occurs when data access users are updated' },
   ],
   [
     Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS,
-    'Event occurs when experiment safety management decision is submitted by IS',
+    {
+      label:
+        'Event occurs when experiment safety management decision is submitted by IS',
+    },
   ],
   [
     Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR,
-    'Event occurs when experiment safety management decision is submitted by ESR',
+    {
+      label:
+        'Event occurs when experiment safety management decision is submitted by ESR',
+    },
   ],
   [
     Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER,
-    'Event occurs when experiment safety status is changed by user',
+    { label: 'Event occurs when experiment safety status is changed by user' },
   ],
   [
     Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
-    'Event occurs when experiment safety status is changed by workflow',
+    {
+      label:
+        'Event occurs when experiment safety status is changed by workflow',
+    },
   ],
 ]);

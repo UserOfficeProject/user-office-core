@@ -19,14 +19,17 @@ const getProposalWorkflowByCallId = (callId: number) => {
   return callDataSource.getProposalWorkflowByCall(callId);
 };
 
-type StateNodeConfig = {
+const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
+  `${shortCode}-${workflowStatusId}`;
+
+type StatusNodeConfig = {
   on: Record<string, { target: string }>;
-  meta?: { statusId: number };
+  meta?: { statusId: number; workflowStatusId: number };
 };
 
 const createProposalMachine = async (
   workflowId: number,
-  currentStatusId: number
+  currentWfStatusId: number
 ) => {
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
@@ -35,40 +38,50 @@ const createProposalMachine = async (
   const { workflowStatuses, workflowConnections } =
     await workflowDataSource.getWorkflowStructure(workflowId);
 
-  const states: Record<string, StateNodeConfig> = {};
+  const draftWfStatus = workflowStatuses.find(
+    (ws) => ws.shortCode === 'DRAFT'
+  )!;
+  const draftWfStatusName = createWfStatusName(
+    draftWfStatus.shortCode,
+    draftWfStatus.workflowStatusId
+  );
+
+  const wfStatuses: Record<string, StatusNodeConfig> = {};
 
   // Map workflowStatusId to shortCode for easy lookup
-  const statusIdToShortCodeMap = new Map<number, string>();
+  const wfStatusIdToNameMap = new Map<number, string>();
 
   workflowStatuses.forEach((ws) => {
-    statusIdToShortCodeMap.set(ws.workflowStatusId, ws.shortCode);
-    states[ws.shortCode] = {
+    const wfStatusName = createWfStatusName(ws.shortCode, ws.workflowStatusId);
+    wfStatusIdToNameMap.set(ws.workflowStatusId, wfStatusName);
+    wfStatuses[wfStatusName] = {
       on: {},
       meta: {
+        workflowStatusId: ws.workflowStatusId,
         statusId: ws.statusId,
       },
     };
   });
 
   workflowConnections.forEach((conn) => {
-    const sourceState = statusIdToShortCodeMap.get(conn.prevWorkflowStatusId);
-    const targetState = statusIdToShortCodeMap.get(conn.nextWorkflowStatusId);
+    const sourceStatus = wfStatusIdToNameMap.get(conn.prevWorkflowStatusId);
+    const targetStatus = wfStatusIdToNameMap.get(conn.nextWorkflowStatusId);
     // Events are stored as strings in the DB, ensuring they match the Event enum format (usually uppercase)
     const event = conn.statusChangingEvent.toUpperCase();
 
-    if (sourceState && targetState && event) {
-      states[sourceState].on[event] = {
-        target: targetState,
+    if (sourceStatus && targetStatus && event) {
+      wfStatuses[sourceStatus].on[event] = {
+        target: targetStatus,
       };
     }
   });
 
-  const currentShortCode = statusIdToShortCodeMap.get(currentStatusId);
+  const currentWfStatusName = wfStatusIdToNameMap.get(currentWfStatusId);
 
   return createMachine({
     id: `proposal-workflow-${workflowId}`,
-    initial: currentShortCode || 'DRAFT',
-    states,
+    initial: currentWfStatusName || draftWfStatusName,
+    states: wfStatuses,
   });
 };
 
@@ -112,12 +125,12 @@ export const workflowEngine = async (
 
       const machine = await createProposalMachine(
         proposalWorkflow.id,
-        proposal.statusId
+        proposal.workflowStatusId
       );
 
       const actor = createActor(machine).start();
       const snapshot = actor.getSnapshot();
-      const currentShortCode = snapshot.value;
+      const currentWfStatus = snapshot.value;
 
       actor.send({ type: arg.currentEvent.toUpperCase() });
 
@@ -125,11 +138,13 @@ export const workflowEngine = async (
 
       if (
         typeof nextStateValue === 'string' &&
-        nextStateValue !== currentShortCode
+        nextStateValue !== currentWfStatus
       ) {
-        const nextStatusId = machine.states[nextStateValue].meta?.statusId;
+        const meta = machine.states[nextStateValue].meta;
+        const nextStatusId = meta?.statusId;
+        const nextWfStatusId = meta?.workflowStatusId;
 
-        if (nextStatusId) {
+        if (nextStatusId && nextWfStatusId) {
           const updatedProposal = await proposalDataSource.updateProposalStatus(
             arg.proposalPk,
             nextStatusId

@@ -292,12 +292,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async updateProposalStatus(
     proposalPk: number,
-    proposalStatusId: number
+    proposalWfStatusId: number
   ): Promise<Proposal> {
+    const statusId = await database('workflow_has_statuses')
+      .select('status_id')
+      .where('workflow_status_id', proposalWfStatusId)
+      .first()
+      .then((record) => record?.status_id);
+
     return database
       .update(
         {
-          status_id: proposalStatusId,
+          status_id: statusId,
+          workflow_status_id: proposalWfStatusId,
         },
         ['*']
       )
@@ -339,8 +346,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     call_id: number,
     questionary_id: number
   ): Promise<Proposal> {
+    const draftWfStatus =
+      await this.workflowDataSource.getDraftWorkflowStatusByCallId(call_id);
+
+    if (!draftWfStatus) {
+      throw new GraphQLError(
+        `Draft workflow status not found for call with id: ${call_id}`
+      );
+    }
+
     return database
-      .insert({ proposer_id, call_id, questionary_id, status_id: 1 }, ['*'])
+      .insert(
+        {
+          proposer_id,
+          call_id,
+          questionary_id,
+          status_id: 1,
+          workflow_status_id: draftWfStatus.workflowStatusId,
+        },
+        ['*']
+      )
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);

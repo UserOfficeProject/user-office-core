@@ -131,6 +131,7 @@ export interface ProposalRecord {
   readonly abstract: string;
   readonly proposer_id: number;
   readonly status_id: number;
+  readonly workflow_status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
@@ -812,6 +813,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.abstract || '',
     proposal.proposer_id,
     proposal.status_id,
+    proposal.workflow_status_id,
     proposal.created_at,
     proposal.updated_at,
     proposal.proposal_id,
