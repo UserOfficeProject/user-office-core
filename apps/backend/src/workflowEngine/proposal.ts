@@ -11,14 +11,6 @@ import { Proposal } from '../models/Proposal';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
 import { IsProposalSubmittedGuard } from './guards/IsProposalSubmittedGuard';
 
-const getProposalWorkflowByCallId = (callId: number) => {
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-
-  return callDataSource.getProposalWorkflowByCall(callId);
-};
-
 const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
   `${shortCode}-${workflowStatusId}`;
 
@@ -128,11 +120,16 @@ export const workflowEngine = async (
         return;
       }
 
-      const proposalWorkflow = await getProposalWorkflowByCallId(
+      const proposalWorkflow = await callDataSource.getProposalWorkflowByCall(
         proposal.callId
       );
 
       if (!proposalWorkflow) {
+        logger.logError('Proposal workflow not found for the proposal', {
+          proposalPk: arg.proposalPk,
+          callId: proposal.callId,
+        });
+
         return;
       }
 
