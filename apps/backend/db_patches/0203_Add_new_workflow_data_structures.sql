@@ -151,38 +151,8 @@ BEGIN
           CREATE INDEX ix_phsce_proposal
             ON proposal_has_workflow_status_changing_events (proposal_pk);
 
-          -- ============================================
-          -- 7) workflow_status_changing_guards (catalog)
-          -- ============================================
-          CREATE TABLE workflow_status_changing_guards (
-            workflow_status_changing_guard_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            name        TEXT NOT NULL,
-            description TEXT
-          );
-
-          -- =====================================================================
-          -- 8) workflow_status_connection_has_workflow_status_changing_guards (edge→guards)
-          -- =====================================================================
-          CREATE TABLE workflow_status_connection_has_workflow_status_changing_guards (
-            workflow_status_connection_id INT NOT NULL,
-            workflow_status_changing_guard_id INT NOT NULL,
-            config                        JSONB  NOT NULL DEFAULT '{}'::jsonb,
-
-            CONSTRAINT pk_wsc_has_guards
-              PRIMARY KEY (workflow_status_connection_id, workflow_status_changing_guard_id),
-
-            CONSTRAINT fk_wscg_connection
-              FOREIGN KEY (workflow_status_connection_id)
-              REFERENCES workflow_status_connections (workflow_status_connection_id)
-              ON DELETE CASCADE,
-
-            CONSTRAINT fk_wscg_guard
-              FOREIGN KEY (workflow_status_changing_guard_id)
-              REFERENCES workflow_status_changing_guards (workflow_status_changing_guard_id)
-          );
-
           -- ==================================================================
-          -- 9) Link proposals to the new workflow graph
+          -- 7) Link proposals to the new workflow graph
           -- ==================================================================
           ALTER TABLE proposals
             ADD COLUMN workflow_status_id INT NULL;
