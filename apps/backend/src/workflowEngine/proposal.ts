@@ -15,10 +15,10 @@ import {
   StateConfig,
 } from './simpleStateMachine';
 
+type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
+
 const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
   `${shortCode}-${workflowStatusId}`;
-
-type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 
 const getEventGuard = (eventName: string): GuardFn | undefined => {
   const eventMeta = EventLabel.get(eventName as Event);

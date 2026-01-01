@@ -1,4 +1,4 @@
-import { createActor, createMachine } from './simpleStateMachine';
+import { createActor, createMachine } from '.';
 
 describe('simpleStateMachine', () => {
   it('throws when the initial state is missing from the schema', () => {

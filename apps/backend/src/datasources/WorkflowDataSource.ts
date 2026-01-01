@@ -54,7 +54,6 @@ export interface WorkflowDataSource {
       prevWorkflowStatusId: number;
       nextWorkflowStatusId: number;
       statusChangingEvent: string;
-      guardNames: string[];
     }[];
   }>;
 }
