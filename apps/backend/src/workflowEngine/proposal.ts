@@ -4,83 +4,13 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
-import { Event, EventLabel } from '../events/event.enum';
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import {
-  createActor,
-  createMachine,
-  GuardFn,
-  StateConfig,
-} from './simpleStateMachine';
+import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
+import { createActor } from './simpleStateMachine/stateMachnine';
 
 type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
-
-const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
-  `${shortCode}-${workflowStatusId}`;
-
-const getEventGuard = (eventName: string): GuardFn | undefined => {
-  const eventMeta = EventLabel.get(eventName as Event);
-
-  return eventMeta?.guard;
-};
-
-const createProposalMachine = async (workflowId: number) => {
-  const workflowDataSource = container.resolve<WorkflowDataSource>(
-    Tokens.WorkflowDataSource
-  );
-
-  const { workflowStatuses, workflowConnections } =
-    await workflowDataSource.getWorkflowStructure(workflowId);
-
-  const draftWfStatus = workflowStatuses.find(
-    (ws) => ws.shortCode === 'DRAFT'
-  )!;
-  const draftWfStatusName = createWfStatusName(
-    draftWfStatus.shortCode,
-    draftWfStatus.workflowStatusId
-  );
-
-  const wfStatuses: Record<string, StateConfig> = {};
-
-  // Map workflowStatusId to shortCode for easy lookup
-  const wfStatusIdToNameMap = new Map<number, string>();
-
-  workflowStatuses.forEach((ws) => {
-    const wfStatusName = createWfStatusName(ws.shortCode, ws.workflowStatusId);
-    wfStatusIdToNameMap.set(ws.workflowStatusId, wfStatusName);
-    wfStatuses[wfStatusName] = {
-      on: {},
-      meta: {
-        workflowStatusId: ws.workflowStatusId,
-        statusId: ws.statusId,
-      },
-    };
-  });
-
-  workflowConnections.forEach((conn) => {
-    const sourceStatus = wfStatusIdToNameMap.get(conn.prevWorkflowStatusId);
-    const targetStatus = wfStatusIdToNameMap.get(conn.nextWorkflowStatusId);
-    // Events are stored as strings in the DB, ensuring they match the Event enum format (usually uppercase)
-    const event = conn.statusChangingEvent.toUpperCase();
-
-    if (sourceStatus && targetStatus && event) {
-      const guard = getEventGuard(event);
-      wfStatuses[sourceStatus].on = wfStatuses[sourceStatus].on || {};
-      wfStatuses[sourceStatus].on![event] = {
-        target: targetStatus,
-        guard,
-      };
-    }
-  });
-
-  return createMachine({
-    id: `proposal-workflow-${workflowId}`,
-    initial: draftWfStatusName,
-    states: wfStatuses,
-  });
-};
 
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
@@ -111,11 +41,11 @@ export const workflowEngine = async (
         return;
       }
 
-      const proposalWorkflow = await callDataSource.getProposalWorkflowByCall(
-        proposal.callId
-      );
+      const proposalWorkflowId = (
+        await callDataSource.getProposalWorkflowByCall(proposal.callId)
+      )?.id;
 
-      if (!proposalWorkflow) {
+      if (!proposalWorkflowId) {
         logger.logError('Proposal workflow not found for the proposal', {
           proposalPk: arg.proposalPk,
           callId: proposal.callId,
@@ -124,7 +54,7 @@ export const workflowEngine = async (
         return;
       }
 
-      const machine = await createProposalMachine(proposalWorkflow.id);
+      const machine = await createWorkflowMachine(proposalWorkflowId);
 
       const proposalStartStatus = Object.entries(machine.schema.states).find(
         ([, state]) => {
@@ -161,7 +91,7 @@ export const workflowEngine = async (
 
           return {
             ...updatedProposal,
-            workflowId: proposalWorkflow.id,
+            workflowId: proposalWorkflowId,
             prevStatusId: proposal.statusId,
             callShortCode: call?.shortCode || '',
           };

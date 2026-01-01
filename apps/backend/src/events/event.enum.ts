@@ -1,5 +1,5 @@
-import { isProposalSubmittedGuard } from '../workflowEngine/guards/proposal/isProposalSubmittedGuard';
-import { GuardFn } from '../workflowEngine/simpleStateMachine';
+import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
+import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachnine';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {
