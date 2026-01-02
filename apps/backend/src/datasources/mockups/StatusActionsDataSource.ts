@@ -40,8 +40,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return dummyConnectionHasStatusAction;
   }
   async getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

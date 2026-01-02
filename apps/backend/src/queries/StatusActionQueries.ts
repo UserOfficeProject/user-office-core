@@ -41,9 +41,9 @@ export default class StatusActionQueries {
   @Authorized([Roles.USER_OFFICER])
   async getConnectionStatusActions(
     agent: UserWithRole | null,
-    { connectionId, workflowId }: { connectionId: number; workflowId: number }
+    { workflowConnectionId }: { workflowConnectionId: number }
   ) {
-    return this.dataSource.getConnectionStatusActions(connectionId, workflowId);
+    return this.dataSource.getConnectionStatusActions(workflowConnectionId);
   }
 
   @Authorized([Roles.USER_OFFICER])

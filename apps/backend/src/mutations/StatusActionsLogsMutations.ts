@@ -56,7 +56,6 @@ export default class StatusActionsLogsMutations {
 
         return {
           ...proposal,
-          workflowId: proposalWorkflow.id,
         };
       })
     );

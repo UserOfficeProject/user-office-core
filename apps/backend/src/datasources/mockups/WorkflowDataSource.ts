@@ -53,9 +53,10 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
       shortCode: string;
     }[];
     workflowConnections: {
+      workflowStatusConnectionId: number;
       prevWorkflowStatusId: number;
       nextWorkflowStatusId: number;
-      statusChangingEvent: string;
+      statusChangingEvents: string[];
     }[];
   }> {
     throw new Error('Method not implemented.');

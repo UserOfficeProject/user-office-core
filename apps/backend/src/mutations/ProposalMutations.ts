@@ -585,7 +585,6 @@ export default class ProposalMutations {
 
           return {
             ...fullProposal,
-            workflowId: proposalWorkflow.id,
           };
         })
       );

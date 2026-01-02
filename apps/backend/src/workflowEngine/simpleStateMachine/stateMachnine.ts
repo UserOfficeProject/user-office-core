@@ -4,8 +4,9 @@ export type GuardFn = (entity: Entity) => boolean | Promise<boolean>;
 export type ActionFn = (entity: Entity) => void | Promise<void>;
 
 export type TransitionConfig = {
+  connectionId: number;
   target: string;
-  guard?: GuardFn;
+  guards: GuardFn[];
 };
 
 export type StateConfig = {
@@ -38,7 +39,9 @@ export const createMachine = (schema: MachineSchema): Machine => {
 
 export type Actor = {
   getState: () => string;
-  event: (eventName: string) => Promise<string>;
+  event: (
+    eventName: string
+  ) => Promise<{ nextStateValue: string; connectionId: number }>;
 };
 
 export const createActor = (
@@ -51,7 +54,7 @@ export const createActor = (
   }
 
   const { schema } = machine;
-  let currentState = startingState ?? schema.initial;
+  const currentState = startingState ?? schema.initial;
 
   if (!schema.states[currentState]) {
     throw new Error(`Unknown state "${currentState}"`);
@@ -68,32 +71,36 @@ export const createActor = (
 
   const getState = () => currentState;
 
-  const event = async (eventName: string) => {
+  const event = async (
+    eventName: string
+  ): Promise<{ nextStateValue: string; connectionId: number }> => {
     const stateConfig = schema.states[currentState];
     const transition = stateConfig?.on?.[eventName];
 
     if (!stateConfig || !transition) {
-      return currentState;
+      return {
+        nextStateValue: currentState,
+        connectionId: -1,
+      };
     }
 
     // all Guards from current state to target state must pass
-    const allGuardsFromCurrentState = Object.values(
-      stateConfig.on || {}
-    ).filter((t) => t.target === transition.target && t.guard);
-
-    for (const guardTransition of allGuardsFromCurrentState) {
-      if (guardTransition.guard) {
-        const result = await guardTransition.guard(entity);
-        if (!result) {
-          return currentState;
-        }
+    for (const guardTransition of transition.guards) {
+      const result = await guardTransition(entity);
+      if (!result) {
+        return {
+          nextStateValue: currentState,
+          connectionId: transition.connectionId,
+        };
       }
     }
 
-    currentState = transition.target;
-    await runAction(currentState);
+    await runAction(transition.target);
 
-    return currentState;
+    return {
+      nextStateValue: transition.target,
+      connectionId: transition.connectionId,
+    };
   };
 
   return { getState, event };

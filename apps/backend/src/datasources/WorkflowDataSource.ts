@@ -51,9 +51,10 @@ export interface WorkflowDataSource {
       shortCode: string;
     }[];
     workflowConnections: {
+      workflowStatusConnectionId: number;
       prevWorkflowStatusId: number;
       nextWorkflowStatusId: number;
-      statusChangingEvent: string;
+      statusChangingEvents: string[];
     }[];
   }>;
 }

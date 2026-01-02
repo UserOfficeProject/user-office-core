@@ -55,8 +55,7 @@ export class WorkflowConnectionResolver {
       await context.queries.statusAction.getConnectionStatusActions(
         context.user,
         {
-          connectionId: workflowConnection.id,
-          workflowId: workflowConnection.workflowId,
+          workflowConnectionId: workflowConnection.id,
         }
       );
 

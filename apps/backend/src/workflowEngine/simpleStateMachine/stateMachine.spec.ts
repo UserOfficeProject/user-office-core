@@ -19,7 +19,11 @@ describe('simpleStateMachine', () => {
         pending: {
           action: initialAction,
           on: {
-            APPROVE: { target: 'approved' },
+            APPROVE: {
+              target: 'approved',
+              guards: [],
+              connectionId: 0,
+            },
           },
         },
         approved: {
@@ -48,7 +52,11 @@ describe('simpleStateMachine', () => {
       states: {
         draft: {
           on: {
-            SUBMIT: { target: 'submitted', guard },
+            SUBMIT: {
+              target: 'submitted',
+              guards: [guard],
+              connectionId: 0,
+            },
           },
         },
         submitted: {},
@@ -74,7 +82,11 @@ describe('simpleStateMachine', () => {
       states: {
         start: {
           on: {
-            NEXT: { target: 'missing' },
+            NEXT: {
+              target: 'missing',
+              guards: [],
+              connectionId: 0,
+            },
           },
         },
       },

@@ -13,9 +13,8 @@ import { createActor } from './simpleStateMachine/stateMachnine';
 type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 
 export type WorkflowEngineProposalType = Proposal & {
-  workflowId: number;
   prevStatusId: number;
-  callShortCode: string;
+  workflowStatusConnectionId: number;
 };
 
 export const workflowEngine = async (
@@ -56,7 +55,7 @@ export const workflowEngine = async (
 
       const machine = await createWorkflowMachine(proposalWorkflowId);
 
-      const proposalStartStatus = Object.entries(machine.schema.states).find(
+      const proposalWfStatus = Object.entries(machine.schema.states).find(
         ([, state]) => {
           return (
             (state.meta as WorkflowStateMeta | undefined)?.workflowStatusId ===
@@ -68,11 +67,13 @@ export const workflowEngine = async (
       const actor = createActor(
         machine,
         { id: proposal.primaryKey },
-        proposalStartStatus
+        proposalWfStatus
       );
       const currentWfStatus = actor.getState();
 
-      const nextStateValue = await actor.event(arg.currentEvent.toUpperCase());
+      const { nextStateValue, connectionId } = await actor.event(
+        arg.currentEvent.toUpperCase()
+      );
 
       if (nextStateValue !== currentWfStatus) {
         const meta = machine.schema.states[nextStateValue]?.meta as
@@ -87,13 +88,9 @@ export const workflowEngine = async (
               nextWfStatusId
             );
 
-          const call = await callDataSource.getCall(proposal.callId);
-
           return {
             ...updatedProposal,
-            workflowId: proposalWorkflowId,
-            prevStatusId: proposal.statusId,
-            callShortCode: call?.shortCode || '',
+            workflowStatusConnectionId: connectionId,
           };
         }
       }

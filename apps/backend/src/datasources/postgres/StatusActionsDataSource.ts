@@ -80,8 +80,7 @@ export default class PostgresStatusActionsDataSource
   }
 
   async getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]> {
     const statusActionRecords: (StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
@@ -92,7 +91,6 @@ export default class PostgresStatusActionsDataSource
       .join('workflow_status_connection_has_workflow_status_actions as wca', {
         'wca.workflow_status_action_id': 'wsa.workflow_status_action_id',
       })
-      .where('wca.workflow_id', workflowId)
       .andWhere('wca.workflow_status_connection_id', workflowConnectionId);
 
     const statusActions = statusActionRecords.map((statusActionRecord) =>

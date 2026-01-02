@@ -6,8 +6,7 @@ import { SetStatusActionsOnConnectionInput } from '../resolvers/mutations/settin
 
 export interface StatusActionsDataSource {
   getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]>;
   getConnectionStatusAction(
     workflowConnectionId: number,

@@ -413,9 +413,10 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       shortCode: string;
     }[];
     workflowConnections: {
+      workflowStatusConnectionId: number;
       prevWorkflowStatusId: number;
       nextWorkflowStatusId: number;
-      statusChangingEvent: string;
+      statusChangingEvents: string[];
     }[];
   }> {
     const workflowStatuses = await database
@@ -436,18 +437,47 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         'workflow_status_connection_has_workflow_status_changing_events.status_changing_event as statusChangingEvent'
       )
       .from('workflow_status_connections')
-      .join(
+      .leftJoin(
         'workflow_status_connection_has_workflow_status_changing_events',
         'workflow_status_connections.workflow_status_connection_id',
         'workflow_status_connection_has_workflow_status_changing_events.workflow_status_connection_id'
       )
       .where('workflow_status_connections.workflow_id', workflowId);
 
-    const normalizedWorkflowConnections = workflowConnections.map((wc) => ({
-      prevWorkflowStatusId: wc.prevWorkflowStatusId,
-      nextWorkflowStatusId: wc.nextWorkflowStatusId,
-      statusChangingEvent: wc.statusChangingEvent,
-    }));
+    const normalizedWorkflowConnectionsMap = new Map<
+      number,
+      {
+        workflowStatusConnectionId: number;
+        prevWorkflowStatusId: number;
+        nextWorkflowStatusId: number;
+        statusChangingEvents: string[];
+      }
+    >();
+
+    workflowConnections.forEach((wc) => {
+      const existingConnection = normalizedWorkflowConnectionsMap.get(
+        wc.workflowStatusConnectionId
+      );
+
+      if (!existingConnection) {
+        normalizedWorkflowConnectionsMap.set(wc.workflowStatusConnectionId, {
+          workflowStatusConnectionId: wc.workflowStatusConnectionId,
+          prevWorkflowStatusId: wc.prevWorkflowStatusId,
+          nextWorkflowStatusId: wc.nextWorkflowStatusId,
+          statusChangingEvents: [],
+        });
+      }
+
+      if (wc.statusChangingEvent) {
+        normalizedWorkflowConnectionsMap
+          .get(wc.workflowStatusConnectionId)!
+          .statusChangingEvents.push(wc.statusChangingEvent);
+      }
+    });
+
+    const normalizedWorkflowConnections = Array.from(
+      normalizedWorkflowConnectionsMap.values()
+    );
 
     return {
       workflowStatuses,

@@ -14,10 +14,22 @@ const workflowMachineCache = new Map<
 const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
   `${shortCode}-${workflowStatusId}`;
 
-const getEventGuard = (eventName: string): GuardFn | undefined => {
-  const eventMeta = EventMetadataByEvent.get(eventName as Event);
+const getEventsGuards = (events: string[]): GuardFn[] => {
+  const guards: GuardFn[] = [];
 
-  return eventMeta?.guard;
+  events.forEach((eventName) => {
+    const event = Event[eventName as keyof typeof Event];
+    if (!event) {
+      return;
+    }
+
+    const eventMetadata = EventMetadataByEvent.get(event);
+    if (eventMetadata?.guard) {
+      guards.push(eventMetadata.guard);
+    }
+  });
+
+  return guards;
 };
 
 export const createWorkflowMachine = async (workflowId: number) => {
@@ -38,9 +50,7 @@ export const createWorkflowMachine = async (workflowId: number) => {
     await workflowDataSource.getWorkflowStructure(workflowId);
 
   const wfStatuses: Record<string, StateConfig> = {};
-
-  // Map workflowStatusId to shortCode for easy lookup
-  const wfStatusIdToNameMap = new Map<number, string>();
+  const wfStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to shortCode for easy lookup
 
   workflowStatuses.forEach((ws) => {
     const wfStatusName = createWfStatusName(ws.shortCode, ws.workflowStatusId);
@@ -57,17 +67,27 @@ export const createWorkflowMachine = async (workflowId: number) => {
   workflowConnections.forEach((conn) => {
     const sourceStatus = wfStatusIdToNameMap.get(conn.prevWorkflowStatusId);
     const targetStatus = wfStatusIdToNameMap.get(conn.nextWorkflowStatusId);
-    // Events are stored as strings in the DB, ensuring they match the Event enum format (usually uppercase)
-    const event = conn.statusChangingEvent.toUpperCase();
 
-    if (sourceStatus && targetStatus && event) {
-      const guard = getEventGuard(event);
+    if (!sourceStatus || !targetStatus) {
+      return;
+    }
+
+    conn.statusChangingEvents.forEach((eventName) => {
+      // Events are stored as strings in the DB, ensuring they match the Event enum format (usually uppercase)
+      const event = eventName.toUpperCase();
+
+      if (!event) {
+        return;
+      }
+
+      const guards = getEventsGuards(conn.statusChangingEvents);
       wfStatuses[sourceStatus].on = wfStatuses[sourceStatus].on || {};
       wfStatuses[sourceStatus].on![event] = {
+        connectionId: conn.workflowStatusConnectionId,
         target: targetStatus,
-        guard,
+        guards,
       };
-    }
+    });
   });
 
   const defaultWfStatus =
@@ -79,7 +99,7 @@ export const createWorkflowMachine = async (workflowId: number) => {
     states: wfStatuses,
   });
 
-  workflowMachineCache.set(workflowId, machine);
+  // workflowMachineCache.set(workflowId, machine); // TODO enable cache after testing
 
   return machine;
 };
