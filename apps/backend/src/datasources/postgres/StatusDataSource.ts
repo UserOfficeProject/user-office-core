@@ -7,7 +7,7 @@ import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
-import { StatusRecord } from './records';
+import { StatusRecord, WorkflowStatusRecord } from './records';
 
 @injectable()
 export default class PostgresStatusDataSource implements StatusDataSource {
@@ -127,9 +127,9 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       return null;
     }
 
-    const workflowStatus: WorkflowStatus | null = await database
+    const workflowStatus: WorkflowStatusRecord | null = await database
       .select()
-      .from('workflow_statuses')
+      .from('workflow_has_statuses')
       .where('workflow_id', workflowId)
       .andWhere('status_id', defaultStatus.id)
       .first();
@@ -139,11 +139,11 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     }
 
     return new WorkflowStatus(
-      workflowStatus.workflowStatusId,
-      workflowStatus.workflowId,
-      workflowStatus.statusId,
-      workflowStatus.posX,
-      workflowStatus.posY
+      workflowStatus.workflow_status_id,
+      workflowStatus.workflow_id,
+      workflowStatus.status_id,
+      workflowStatus.pos_x,
+      workflowStatus.pos_y
     );
   }
 

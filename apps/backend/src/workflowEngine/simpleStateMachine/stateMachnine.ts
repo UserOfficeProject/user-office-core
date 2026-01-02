@@ -72,19 +72,22 @@ export const createActor = (
     const stateConfig = schema.states[currentState];
     const transition = stateConfig?.on?.[eventName];
 
-    if (!transition) {
+    if (!stateConfig || !transition) {
       return currentState;
     }
 
-    if (transition.guard) {
-      const result = await transition.guard(entity);
-      if (!result) {
-        return currentState;
-      }
-    }
+    // all Guards from current state to target state must pass
+    const allGuardsFromCurrentState = Object.values(
+      stateConfig.on || {}
+    ).filter((t) => t.target === transition.target && t.guard);
 
-    if (!schema.states[transition.target]) {
-      throw new Error(`Unknown target state "${transition.target}"`);
+    for (const guardTransition of allGuardsFromCurrentState) {
+      if (guardTransition.guard) {
+        const result = await guardTransition.guard(entity);
+        if (!result) {
+          return currentState;
+        }
+      }
     }
 
     currentState = transition.target;

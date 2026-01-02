@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { injectable } from 'tsyringe';
 
 import { Authorized } from '../decorators';
-import { Event, EventLabel } from '../events/event.enum';
+import { Event, EventMetadataByEvent } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { WorkflowType } from '../models/Workflow';
@@ -21,7 +21,7 @@ export default class SettingsQueries {
             eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL_')
         )
         .map((eventItem) => {
-          const metadata = EventLabel.get(eventItem as Event);
+          const metadata = EventMetadataByEvent.get(eventItem as Event);
 
           return {
             name: eventItem,
@@ -34,7 +34,7 @@ export default class SettingsQueries {
       const allExperimentSafetyEvents = allEventsArray
         .filter((eventItem) => eventItem.startsWith('EXPERIMENT_'))
         .map((eventItem) => {
-          const metadata = EventLabel.get(eventItem as Event);
+          const metadata = EventMetadataByEvent.get(eventItem as Event);
 
           return {
             name: eventItem,

@@ -1,3 +1,4 @@
+import { isProposalInstrumentsSelectedGuard } from '../workflowEngine/guards/isProposalInstrumentsSelectedGuard';
 import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
 import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachnine';
 
@@ -108,7 +109,7 @@ interface EventMetadata {
   guard?: GuardFn;
 }
 
-export const EventLabel = new Map<Event, EventMetadata>([
+export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [Event.PROPOSAL_CREATED, { label: 'Event occurs when proposal is created' }],
   [Event.PROPOSAL_UPDATED, { label: 'Event occurs when proposal is updated' }],
   [
@@ -143,7 +144,10 @@ export const EventLabel = new Map<Event, EventMetadata>([
   ],
   [
     Event.PROPOSAL_INSTRUMENTS_SELECTED,
-    { label: 'Event occurs when instrument/s gets assigned to a proposal' },
+    {
+      label: 'Event occurs when instrument/s gets assigned to a proposal',
+      guard: isProposalInstrumentsSelectedGuard,
+    },
   ],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED,

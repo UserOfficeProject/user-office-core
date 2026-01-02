@@ -3,25 +3,35 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { StatusDataSource } from '../../datasources/StatusDataSource';
 import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
-import { Event, EventLabel } from '../../events/event.enum';
+import { Event, EventMetadataByEvent } from '../../events/event.enum';
 import { createMachine, GuardFn, StateConfig } from './stateMachnine';
+
+const workflowMachineCache = new Map<
+  number,
+  ReturnType<typeof createMachine>
+>();
 
 const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
   `${shortCode}-${workflowStatusId}`;
 
 const getEventGuard = (eventName: string): GuardFn | undefined => {
-  const eventMeta = EventLabel.get(eventName as Event);
+  const eventMeta = EventMetadataByEvent.get(eventName as Event);
 
   return eventMeta?.guard;
 };
 
 export const createWorkflowMachine = async (workflowId: number) => {
+  const cachedMachine = workflowMachineCache.get(workflowId);
+  if (cachedMachine) {
+    return cachedMachine;
+  }
+
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
   );
 
   const statusDataSource = container.resolve<StatusDataSource>(
-    Tokens.StatusActionsDataSource
+    Tokens.StatusDataSource
   );
 
   const { workflowStatuses, workflowConnections } =
@@ -63,9 +73,13 @@ export const createWorkflowMachine = async (workflowId: number) => {
   const defaultWfStatus =
     (await statusDataSource.getDefaultWorkflowStatus(workflowId))!;
 
-  return createMachine({
+  const machine = createMachine({
     id: `workflow-${workflowId}`,
     initial: wfStatusIdToNameMap.get(defaultWfStatus.workflowStatusId)!,
     states: wfStatuses,
   });
+
+  workflowMachineCache.set(workflowId, machine);
+
+  return machine;
 };
