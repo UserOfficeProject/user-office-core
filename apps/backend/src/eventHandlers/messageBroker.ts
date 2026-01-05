@@ -130,7 +130,6 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
-
   const dataAccessUsersWithInstitution =
     await dataAccessUsersDataSource.getDataAccessUsersWithInstitution(
       proposal.primaryKey
