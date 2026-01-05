@@ -796,4 +796,22 @@ export default class PostgresInstrumentDataSource
         return result?.count === '1';
       });
   }
+
+  async getInstrumentsByFapIds(fapId: number[]): Promise<Instrument[]> {
+    return database
+      .select('i.*')
+      .from('instruments as i')
+      .join('call_has_instruments as chi', {
+        'i.instrument_id': 'chi.instrument_id',
+      })
+      .where('chi.fap_id', 'in', fapId)
+      .distinct()
+      .then((instruments: InstrumentRecord[]) => {
+        const result = instruments.map((instrument) =>
+          this.createInstrumentObject(instrument)
+        );
+
+        return result;
+      });
+  }
 }

@@ -90,4 +90,11 @@ export class InstrumentQuery {
       proposalPk
     );
   }
+
+  @Query(() => [Instrument], { nullable: true })
+  async getInstrumentsOfReviewer(
+    @Ctx() context: ResolverContext
+  ): Promise<Instrument[]> {
+    return context.queries.instrument.getFapReviewerInstruments(context.user);
+  }
 }
