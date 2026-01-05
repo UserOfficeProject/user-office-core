@@ -85,7 +85,7 @@ export default class PostgresEmailTemplateDataSource
       )
       .from('email_templates')
       .then((emailTemplates: EmailTemplateRecord[]) => {
-        if (emailTemplates?.length === 0) {
+        if (emailTemplates?.length !== 1) {
           throw new GraphQLError(`Failed to create email template '${name}'`);
         }
 
@@ -113,7 +113,7 @@ export default class PostgresEmailTemplateDataSource
       .from('email_templates')
       .where('email_templates.email_template_id', emailTemplateId)
       .then((emailTemplates: EmailTemplateRecord[]) => {
-        if (emailTemplates === undefined || emailTemplates.length !== 1) {
+        if (emailTemplates?.length !== 1) {
           throw new GraphQLError(
             `Failed to update email template with id '${emailTemplateId}'`
           );
@@ -130,7 +130,7 @@ export default class PostgresEmailTemplateDataSource
       .from('email_templates')
       .returning('*')
       .then((emailTemplates: EmailTemplateRecord[]) => {
-        if (emailTemplates === undefined || emailTemplates.length !== 1) {
+        if (emailTemplates?.length !== 1) {
           throw new GraphQLError(
             `Could not delete emailTemplate with id:${id}`
           );
