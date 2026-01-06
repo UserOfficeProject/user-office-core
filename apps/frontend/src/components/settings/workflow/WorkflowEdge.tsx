@@ -77,10 +77,23 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
 
   const events = data?.events || [];
   const statusActions = data?.statusActions || [];
+  const edgeStyle =
+    events.length > 0
+      ? style
+      : {
+          ...style,
+          strokeDasharray: '4 4',
+          stroke: style.stroke ?? 'rgba(168, 168, 168, 0.5)',
+        };
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        style={edgeStyle}
+        markerEnd={markerEnd}
+      />
       <EdgeLabelRenderer>
         <div
           style={{
