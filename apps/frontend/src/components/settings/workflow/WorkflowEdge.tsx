@@ -82,8 +82,7 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
       ? style
       : {
           ...style,
-          strokeDasharray: '4 4',
-          stroke: style.stroke ?? 'rgba(168, 168, 168, 0.5)',
+          strokeDasharray: '2 4',
         };
 
   return (
