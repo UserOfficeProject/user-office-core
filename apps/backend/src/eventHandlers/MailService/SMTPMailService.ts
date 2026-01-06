@@ -220,6 +220,7 @@ export class SMTPMailService extends MailService {
                 },
                 bcc: bccAddress,
                 subject: template.subject,
+                html: template.body,
               }
             : {
                 to: isProduction
@@ -227,10 +228,9 @@ export class SMTPMailService extends MailService {
                   : <string>process.env.SINK_EMAIL,
                 bcc: bccAddress,
                 subject: template.subject,
+                html: template.body,
               }),
         },
-        locals: options.substitution_data,
-        template: template.body,
       };
 
       emailPromises.push(this.emailTemplate.send(emailOptions));
