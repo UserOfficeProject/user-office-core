@@ -15,6 +15,7 @@ BEGIN
 
 
       DROP TABLE IF EXISTS status_changing_events;
+      DROP TABLE IF EXISTS proposal_events;
       END;
     END IF;
 END;

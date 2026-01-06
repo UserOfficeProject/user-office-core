@@ -639,44 +639,6 @@ export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly review_grades: number[];
 }
 
-export interface ProposalEventsRecord {
-  readonly proposal_pk: number;
-  readonly proposal_created: boolean;
-  readonly proposal_submitted: boolean;
-  readonly proposal_feasibility_review_feasible: boolean;
-  readonly proposal_feasibility_review_unfeasible: boolean;
-  readonly call_ended: boolean;
-  readonly call_ended_internal: boolean;
-  readonly call_review_ended: boolean;
-  readonly proposal_faps_selected: boolean;
-  readonly proposal_instruments_selected: boolean;
-  readonly proposal_feasibility_review_submitted: boolean;
-  readonly proposal_sample_review_submitted: boolean;
-  readonly proposal_all_fap_reviewers_selected: boolean;
-  readonly proposal_management_decision_updated: boolean;
-  readonly proposal_management_decision_submitted: boolean;
-  readonly proposal_all_fap_reviews_submitted: boolean;
-  readonly proposal_fap_review_updated: boolean;
-  readonly proposal_feasibility_review_updated: boolean;
-  readonly proposal_sample_safe: boolean;
-  readonly proposal_fap_review_submitted: boolean;
-  readonly proposal_fap_meeting_submitted: boolean;
-  readonly proposal_all_fap_meetings_submitted: boolean;
-  readonly proposal_all_reviews_submitted_for_all_faps: boolean;
-  readonly proposal_all_fap_meeting_instrument_submitted: boolean;
-  readonly proposal_instrument_submitted: boolean;
-  readonly proposal_accepted: boolean;
-  readonly proposal_reserved: boolean;
-  readonly proposal_rejected: boolean;
-  readonly proposal_notified: boolean;
-  readonly proposal_booking_time_activated: boolean;
-  readonly proposal_booking_time_updated: boolean;
-  readonly proposal_booking_time_slot_added: boolean;
-  readonly proposal_booking_time_slots_removed: boolean;
-  readonly proposal_booking_time_completed: boolean;
-  readonly proposal_booking_time_reopened: boolean;
-}
-
 export interface FeatureRecord {
   readonly feature_id: string;
   readonly is_enabled: boolean;

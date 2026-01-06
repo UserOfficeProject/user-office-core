@@ -125,32 +125,6 @@ BEGIN
               REFERENCES workflow_status_actions (workflow_status_action_id)
           );
 
-            
-
-          -- ==================================================================
-          -- 6) proposal_has_workflow_status_changing_events (instance-scoped events)
-          -- ==================================================================
-          CREATE TABLE proposal_has_workflow_status_changing_events (
-            proposal_has_workflow_status_changing_events_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            status_changing_event    TEXT NOT NULL,
-            proposal_pk              INT  NOT NULL,
-            created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
-
-            CONSTRAINT fk_phsce_proposal
-              FOREIGN KEY (proposal_pk)
-              REFERENCES proposals (proposal_pk)
-          );
-
-          -- Ensure at most one row per (proposal, event) in the current accumulation window.
-          -- (If you retain rows across state changes, you can reset the window in code
-          --  by comparing against proposals.state_entered_at.)
-          CREATE UNIQUE INDEX uq_phsce_proposal_event
-            ON proposal_has_workflow_status_changing_events (proposal_pk, status_changing_event);
-
-          -- Optional helper index for proposal lookups:
-          CREATE INDEX ix_phsce_proposal
-            ON proposal_has_workflow_status_changing_events (proposal_pk);
-
           -- ==================================================================
           -- 7) Link proposals to the new workflow graph
           -- ==================================================================
