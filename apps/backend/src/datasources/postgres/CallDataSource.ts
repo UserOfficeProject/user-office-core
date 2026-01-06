@@ -167,7 +167,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     if (filter?.proposalStatusShortCode) {
       query
         .join(
-          'workflow_connections as w',
+          'workflow_has_statuses as w',
           'call.proposal_workflow_id',
           'w.workflow_id'
         )
