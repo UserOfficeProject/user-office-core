@@ -39,7 +39,7 @@ let proposal2Id: string;
 
 context('Status actions tests', () => {
   beforeEach(function () {
-    cy.resetDB();
+    cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
 
     cy.updateFeature({
