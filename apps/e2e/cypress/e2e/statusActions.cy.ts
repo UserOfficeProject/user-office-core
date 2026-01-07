@@ -39,8 +39,24 @@ let proposal2Id: string;
 
 context('Status actions tests', () => {
   beforeEach(function () {
-    cy.resetDB(true);
+    cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createEmailTemplate({
+      createdByUserId: 0,
+      name: 'my-first-email',
+      description: 'My First Email',
+      subject: 'My First Subject',
+      body: 'My First Body',
+    });
+
+    cy.createEmailTemplate({
+      createdByUserId: 0,
+      name: 'my-second-email',
+      description: 'My Second Email',
+      subject: 'My Second Subject',
+      body: 'My Second Body',
+    });
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
