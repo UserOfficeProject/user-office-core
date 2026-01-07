@@ -132,7 +132,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
             combineEmails: true,
@@ -226,7 +226,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'My Second Email',
+              id: 'my-second-email',
               name: 'My Second Email',
             },
           },
@@ -301,7 +301,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
           },
@@ -462,7 +462,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
             otherRecipientEmails: [faker.internet.email()],
@@ -583,7 +583,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
             otherRecipientEmails: [statusActionEmail],
@@ -697,7 +697,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
           },
@@ -708,7 +708,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'My First Email',
+              id: 'my-first-email',
               name: 'My First Email',
             },
             otherRecipientEmails: [faker.internet.email()],
