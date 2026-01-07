@@ -30,7 +30,7 @@ import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
-import { callWorkflowEngine } from '../workflowEngine/proposal';
+import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -428,6 +428,8 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+
   const handleWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -436,7 +438,10 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await callWorkflowEngine(eventType, [proposalPk]);
+    await workflowEngine.run({
+      event: eventType,
+      proposalPks: [proposalPk],
+    });
   };
 
   const cancelVisit = async (visit: Visit) => {

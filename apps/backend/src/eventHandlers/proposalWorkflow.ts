@@ -9,8 +9,8 @@ import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
 import {
+  ProposalWorkflowEngine,
   WorkflowEngineProposalType,
-  callWorkflowEngine,
 } from '../workflowEngine/proposal';
 
 enum ProposalInformationKeys {
@@ -60,6 +60,9 @@ const handleSubmittedProposalsAfterCallEnded = async (
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
+
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+
   const notEndedInternalCalls = await callDataSource
     .getCalls({
       isEnded: true,
@@ -77,10 +80,10 @@ const handleSubmittedProposalsAfterCallEnded = async (
     return;
   }
 
-  const updatedSubmittedProposals = await callWorkflowEngine(
-    Event.CALL_ENDED,
-    proposalPks
-  );
+  const updatedSubmittedProposals = await workflowEngine.run({
+    event: Event.CALL_ENDED,
+    proposalPks,
+  });
   if (updatedSubmittedProposals) {
     await publishProposalStatusChange(updatedSubmittedProposals);
   }
@@ -92,10 +95,11 @@ export const handleWorkflowEngineChange = async (
 ) => {
   const isArray = Array.isArray(proposalPks);
 
-  const updatedProposals = await callWorkflowEngine(
-    event.type,
-    isArray ? proposalPks : [proposalPks]
-  );
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+  const updatedProposals = await workflowEngine.run({
+    event: event.type,
+    proposalPks: isArray ? proposalPks : [proposalPks],
+  });
 
   if (
     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&

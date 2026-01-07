@@ -57,6 +57,7 @@ import {
 } from '../factory/xlsx/stfc/StfcFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
+import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
 import { Tokens } from './Tokens';
@@ -138,5 +139,7 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
+
+mapClass(Tokens.ProposalWorkflowEngine, ProposalWorkflowEngine);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
