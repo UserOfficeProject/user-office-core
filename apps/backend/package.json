@@ -52,6 +52,8 @@
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
+    "casbin": "^5.41.0",
+    "casbin-sequelize-adapter": "^2.7.1",
     "clamscan": "^2.1.2",
     "class-validator": "^0.14.0",
     "cors": "^2.8.5",

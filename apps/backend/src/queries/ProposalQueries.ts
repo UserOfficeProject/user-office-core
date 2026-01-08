@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
+import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -27,7 +28,9 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.CasbinService)
+    private casbinService: CasbinService
   ) {}
 
   @Authorized()
@@ -53,10 +56,19 @@ export default class ProposalQueries {
     ) {
       proposal = omit(proposal, 'commentForUser') as Proposal;
     }
-    if (
-      this.userAuth.isApiToken(agent) ||
-      (await this.hasReadRights(agent, proposal))
-    ) {
+    // if (
+    //   this.userAuth.isApiToken(agent) ||
+    //   (await this.hasReadRights(agent, proposal))
+    // ) {
+    //   return proposal;
+    // } else {
+    //   return null;
+    // }
+
+    const userCtx = agent ? { role: agent.currentRole?.shortCode } : {};
+    const proposalCtx = { type: 'proposal', ...proposal };
+
+    if (await this.casbinService.enforce(userCtx, proposalCtx, 'read')) {
       return proposal;
     } else {
       return null;

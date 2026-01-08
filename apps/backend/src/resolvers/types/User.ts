@@ -1,3 +1,4 @@
+import { container } from 'tsyringe';
 import {
   Arg,
   ArgsType,
@@ -12,6 +13,7 @@ import {
   Root,
 } from 'type-graphql';
 
+import { CasbinService } from '../../casbin/casbinService';
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
@@ -156,10 +158,38 @@ export class UserResolver {
     @Arg('filter', () => UserProposalsFilter, { nullable: true })
     filter: UserProposalsFilter
   ) {
-    return context.queries.proposal.dataSource.getUserProposals(
-      user.id,
-      filter
-    );
+    if (!context.user || !context.user.currentRole) {
+      return [];
+    }
+
+    const casbinService = container.resolve(CasbinService);
+
+    const allProposals =
+      await context.queries.proposal.dataSource.getUserProposals(
+        user.id,
+        filter
+      );
+
+    const userCtx = context.user
+      ? { role: context.user.currentRole?.shortCode }
+      : {};
+
+    const allowedProposals: Proposal[] = [];
+    for (const proposal of allProposals) {
+      const proposalCtx = { type: 'proposal', ...proposal };
+
+      const hasAccess = await casbinService.enforce(
+        userCtx,
+        proposalCtx,
+        'read'
+      );
+
+      if (hasAccess) {
+        allowedProposals.push(proposal);
+      }
+    }
+
+    return allowedProposals;
   }
 
   @FieldResolver(() => [Experiment])

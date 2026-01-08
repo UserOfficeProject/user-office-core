@@ -40,6 +40,21 @@ statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
 statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
 statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
+// @ObjectType()
+// export class ProposalPermissions {
+//   @Field(() => Boolean)
+//   public create: boolean;
+
+//   @Field(() => Boolean)
+//   public read: boolean;
+
+//   @Field(() => Boolean)
+//   public update: boolean;
+
+//   @Field(() => Boolean)
+//   public delete: boolean;
+// }
+
 @ObjectType()
 @Directive('@key(fields: "primaryKey")')
 export class Proposal implements Partial<ProposalOrigin> {
@@ -302,6 +317,14 @@ export class ProposalResolver {
       proposal.primaryKey
     );
   }
+
+  // @FieldResolver(() => ProposalPermissions, { nullable: false })
+  // permissions(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+  //   return ctx.queries.questionary.getProposalAttachments(
+  //     ctx.user,
+  //     proposal.primaryKey
+  //   );
+  // }
 }
 
 export async function resolveProposalReference(
