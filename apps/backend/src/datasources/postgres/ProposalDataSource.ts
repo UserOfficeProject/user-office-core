@@ -6,6 +6,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
+import { checkPermissionDefault } from '../../middlewares/casbinAuthorization';
 import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -472,10 +473,25 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalViewRecord[]) => {
-        const props = proposals.map((proposal) =>
-          createProposalViewObject(proposal)
+      .then(async (proposals: ProposalViewRecord[]) => {
+        const permissionFlags = await Promise.all(
+          proposals.map((proposal) => {
+            const filters = {
+              call: proposal.call_id ?? '*',
+              instrument: proposal.instruments?.[0]?.id ?? '',
+            };
+
+            return checkPermissionDefault('proposal', 'view', filters); // Promise<boolean>
+          })
         );
+
+        // Filter proposals using the resolved booleans
+        const authorizedProposals = proposals.filter(
+          (_, idx) => permissionFlags[idx]
+        );
+
+        // Map to view objects
+        const props = authorizedProposals.map(createProposalViewObject);
 
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,

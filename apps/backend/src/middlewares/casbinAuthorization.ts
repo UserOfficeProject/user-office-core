@@ -2,10 +2,10 @@ import { getEnforcer } from '../auth/casbin/enforcer';
 import { UserWithRole } from '../models/User';
 
 export interface AuthorizationFilters {
-  call?: string;
+  call?: number;
   technique?: string;
+  instrument?: number;
   facility?: string;
-  instrument?: string;
 }
 
 /**
@@ -31,8 +31,64 @@ export async function checkPermission(
     action,
     call,
     tech,
+    inst,
+    fac
+  );
+
+  return allowed;
+}
+
+export async function checkPermissionForUser(
+  user: UserWithRole,
+  object: string,
+  action: string,
+  filters: AuthorizationFilters = {}
+): Promise<boolean> {
+  const e = await getEnforcer();
+
+  const subject = user.id.toString();
+  const call = filters.call ?? '';
+  const tech = filters.technique ?? '';
+  const fac = filters.facility ?? '';
+  const inst = filters.instrument ?? '';
+
+  const allowed = await e.enforce(
+    subject,
+    object,
+    action,
+    call,
+    tech,
     fac,
     inst
+  );
+
+  return allowed;
+}
+
+export async function checkPermissionDefault(
+  object: string,
+  action: string,
+  filters: AuthorizationFilters = {}
+): Promise<boolean> {
+  const e = await getEnforcer();
+  await e.loadPolicy();
+
+  const rules = await e.getPolicy();
+
+  const subject = '10';
+  const call = filters.call ?? '*';
+  const tech = filters.technique ?? '*';
+  const fac = filters.facility ?? '*';
+  const inst = filters.instrument ?? '*';
+
+  const allowed = await e.enforce(
+    subject,
+    object,
+    action,
+    call,
+    tech,
+    inst,
+    fac
   );
 
   return allowed;
