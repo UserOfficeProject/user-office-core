@@ -3,6 +3,7 @@ export const Tokens = {
   AdminDataSource: Symbol('AdminDataSource'),
   AssetRegistrar: Symbol('AssetRegistrar'),
   CallDataSource: Symbol('CallDataSource'),
+  CasbinService: Symbol('CasbinService'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
@@ -62,4 +63,5 @@ export const Tokens = {
   ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
   TagDataSource: Symbol('TagDataSource'),
+  CasbinEnforcer: Symbol('CasbinEnforcer'),
 };

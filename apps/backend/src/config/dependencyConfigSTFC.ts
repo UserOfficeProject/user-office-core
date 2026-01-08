@@ -5,6 +5,7 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { CasbinService } from '../casbin/casbinService';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -140,3 +141,5 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+
+mapClass(Tokens.CasbinService, CasbinService);
