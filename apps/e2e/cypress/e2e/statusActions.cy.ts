@@ -149,7 +149,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
             combineEmails: true,
           },
@@ -243,7 +243,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-second-email',
-              name: 'My Second Email',
+              name: 'my-second-email',
             },
           },
         ],
@@ -318,7 +318,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
           },
         ],
@@ -479,7 +479,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
             otherRecipientEmails: [faker.internet.email()],
           },
@@ -600,7 +600,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
             otherRecipientEmails: [statusActionEmail],
           },
@@ -714,7 +714,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
           },
           {
@@ -725,7 +725,7 @@ context('Status actions tests', () => {
             },
             emailTemplate: {
               id: 'my-first-email',
-              name: 'My First Email',
+              name: 'my-first-email',
             },
             otherRecipientEmails: [faker.internet.email()],
           },
