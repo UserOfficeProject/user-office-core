@@ -208,32 +208,32 @@ export class SMTPMailService extends MailService {
     }
 
     options.recipients.forEach((participant) => {
-      const emailOptions = {
-        message: {
-          ...(typeof participant.address !== 'string'
-            ? {
-                to: {
-                  address: isProduction
-                    ? participant.address?.email
+      emailPromises.push(
+        this.emailTemplate.send({
+          message: {
+            ...(typeof participant.address !== 'string'
+              ? {
+                  to: {
+                    address: isProduction
+                      ? participant.address?.email
+                      : <string>process.env.SINK_EMAIL,
+                    name: participant.address?.header_to,
+                  },
+                  bcc: bccAddress,
+                  subject: template.subject,
+                  html: template.body,
+                }
+              : {
+                  to: isProduction
+                    ? participant.address
                     : <string>process.env.SINK_EMAIL,
-                  name: participant.address?.header_to,
-                },
-                bcc: bccAddress,
-                subject: template.subject,
-                html: template.body,
-              }
-            : {
-                to: isProduction
-                  ? participant.address
-                  : <string>process.env.SINK_EMAIL,
-                bcc: bccAddress,
-                subject: template.subject,
-                html: template.body,
-              }),
-        },
-      };
-
-      emailPromises.push(this.emailTemplate.send(emailOptions));
+                  bcc: bccAddress,
+                  subject: template.subject,
+                  html: template.body,
+                }),
+          },
+        })
+      );
     });
 
     return Promise.allSettled(emailPromises).then((results) => {

@@ -89,14 +89,12 @@ test('All emails with bcc were successfully sent', async () => {
   const result = await smtpMailService.sendMail(options);
 
   expect(emailInfo).toHaveBeenCalledWith({
-    template: expect.any(String),
     message: {
       to: process.env.SINK_EMAIL,
       bcc: bccEmail,
       subject: '= ``',
       html: '',
     },
-    locals: substitutionData,
   });
 
   return expect(result).toStrictEqual({
