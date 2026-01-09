@@ -106,6 +106,7 @@ export function createTechnicalReviewStub(
       proposerId: 0,
       technicalReviews: [],
       statusId: 0,
+      workflowStatusId: 0,
       visits: [],
       updated: new Date(),
       submittedDate: new Date(),
