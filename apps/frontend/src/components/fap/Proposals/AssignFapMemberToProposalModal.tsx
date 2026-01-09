@@ -27,7 +27,11 @@ type AssignFapMemberToProposalModalProps = {
 const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 
 const columns = [
-  { title: 'Name', field: 'firstname' },
+  {
+    title: 'Name',
+    render: (rowData: FapAssignedMember) =>
+      rowData.preferredname ? rowData.preferredname : rowData.firstname,
+  },
   { title: 'Surname', field: 'lastname' },
   { title: 'Proposal Count', field: 'proposalsCountByCall' },
   {

@@ -28,7 +28,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useRenewToken } from 'hooks/common/useRenewToken';
-import { useFapReviewersData } from 'hooks/fap/useFapReviewersData';
+import { FapMember, useFapReviewersData } from 'hooks/fap/useFapReviewersData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -43,7 +43,13 @@ type FapMembersProps = {
 };
 
 const columns = [
-  { title: 'Name', field: 'user.firstname' },
+  {
+    title: 'Name',
+    render: (rowData: FapMember) =>
+      rowData.user.preferredname
+        ? rowData.user.preferredname
+        : rowData.user.firstname,
+  },
   {
     title: 'Surname',
     field: 'user.lastname',
