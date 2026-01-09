@@ -142,7 +142,7 @@ const UserManagementTable = ({
             mtOptions={{
               showTitle: false,
               toolbar: false,
-              paging: false,
+              paging: true,
               headerStyle: {
                 padding: '4px 10px',
               },
