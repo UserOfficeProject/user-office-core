@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -64,6 +65,8 @@ export default class StatusActionQueries {
 
         const emailTemplatesResult =
           await this.emailService.getEmailTemplates();
+
+        logger.logInfo('Email templates', { emailTemplatesResult });
 
         return new EmailActionDefaultConfig(
           allEmailRecipients,
