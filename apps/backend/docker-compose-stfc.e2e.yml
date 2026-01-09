@@ -1,6 +1,6 @@
 services:
   clam-antivirus:
-    image: clamav/clamav:0.104
+    image: clamav/clamav:1.5.1
     ports:
       - "3310:3310"
 
@@ -40,13 +40,13 @@ services:
       - "4500:4500"
     cap_add:
       - SYS_ADMIN
- 
+
   mockServer:
     image: mockserver/mockserver:5.13.0
     command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080
-  
+
   mockserver-client:
     image: "ghcr.io/userofficeproject/stfc-mockserver-client:master"
     command: sh -c "sleep 5 && node src/mockserver.js"

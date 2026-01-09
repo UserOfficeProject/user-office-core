@@ -18,11 +18,29 @@ const endpoint = '/graphql';
 const clientNameHeader = 'apollographql-client-name';
 const clientName = 'UOP frontend';
 
+export async function sendClientLog(
+  errorPayload: string,
+  token?: string | null
+) {
+  if (!token) return;
+
+  try {
+    await getSdk(
+      new GraphQLClient(endpoint)
+        .setHeader(clientNameHeader, clientName)
+        .setHeader('authorization', `Bearer ${token}`)
+    ).addClientLog({ error: errorPayload });
+  } catch (sendError) {
+    console.error('Failed to send client log', sendError);
+  }
+}
+
 const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
   userMessage: string,
   error: ClientError | string,
-  writeToServerLog = true
+  writeToServerLog = true,
+  token?: string
 ) => {
   enqueueSnackbar(userMessage, {
     variant: 'error',
@@ -33,10 +51,7 @@ const notifyAndLog = async (
   console.error({ userMessage, error });
 
   if (writeToServerLog) {
-    await getSdk(
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar, true)
-    ).addClientLog({ error: JSON.stringify({ userMessage, error }) });
+    await sendClientLog(JSON.stringify({ userMessage, error }), token);
   }
 };
 
@@ -49,8 +64,7 @@ export function getUnauthorizedApi() {
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
-    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
-    private skipErrorReport?: boolean
+    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar']
   ) {
     super(endpoint);
     this.setHeader(clientNameHeader, clientName);
@@ -63,13 +77,6 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     return super
       .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
       .catch((error) => {
-        // if the `notificationWithClientLog` fails
-        // and it fails while reporting an error, it can
-        // easily cause an infinite loop
-        if (this.skipErrorReport) {
-          throw error;
-        }
-
         if (!error || !error.response) {
           notifyAndLog(
             this.enqueueSnackbar,
@@ -132,11 +139,16 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         const newToken = data.token;
         this.setHeader('authorization', `Bearer ${newToken}`);
         this.tokenRenewed && this.tokenRenewed(newToken as string);
+        this.token = newToken;
+        this.renewalDate = this.getRenewalDate(this.token);
+        this.externalToken = this.getExternalToken(this.token);
       } catch (error) {
         notifyAndLog(
           this.enqueueSnackbar,
           'Server rejected user credentials',
-          JSON.stringify(error)
+          JSON.stringify(error),
+          true,
+          this.token
         );
         this.onSessionExpired();
       }
@@ -154,7 +166,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'No response received from server',
             error,
-            false
+            false,
+            this.token
           );
         } else if (
           error.response.error &&
@@ -164,7 +177,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Connection problem!',
             error,
-            false
+            false,
+            this.token
           );
         } else if (
           error.response.errors &&
@@ -175,7 +189,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Your session has expired, you will need to log in again through the external homepage',
             error,
-            false
+            false,
+            this.token
           );
           this.onSessionExpired();
         } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
@@ -183,7 +198,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Your session has expired, you will need to log in again.',
             error,
-            false
+            false,
+            this.token
           );
           this.onSessionExpired();
         } else {
@@ -192,7 +208,9 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           notifyAndLog(
             this.enqueueSnackbar,
             graphQLError?.message || 'Something went wrong!',
-            error
+            error,
+            true,
+            this.token
           );
         }
 
