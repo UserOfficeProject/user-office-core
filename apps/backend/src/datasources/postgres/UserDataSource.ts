@@ -395,7 +395,8 @@ export default class PostgresUserDataSource implements UserDataSource {
     department: string,
     position: string,
     email: string,
-    telephone: string
+    telephone: string,
+    unique_id: string | undefined
   ): Promise<User> {
     return database
       .insert({
@@ -414,6 +415,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         position,
         email,
         telephone,
+        unique_id,
       })
       .returning(['*'])
       .into('users')

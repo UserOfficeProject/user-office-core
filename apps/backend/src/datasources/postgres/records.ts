@@ -1,6 +1,6 @@
 import {
-  ProposalPdfTemplateRecord,
   ExperimentSafetyPdfTemplateRecord,
+  ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
 import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
@@ -251,6 +251,7 @@ export interface UserRecord {
   readonly username: string;
   readonly preferredname: string;
   readonly oidc_sub: string | null;
+  readonly unique_id: string | undefined;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
@@ -971,6 +972,7 @@ export const createUserObject = (user: UserRecord) => {
     user.username,
     user.preferredname,
     user.oidc_sub,
+    user.unique_id,
     user.oauth_refresh_token,
     user.oauth_issuer,
     user.gender,

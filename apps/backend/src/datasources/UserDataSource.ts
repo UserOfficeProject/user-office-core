@@ -5,8 +5,8 @@ import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
-  UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
@@ -72,7 +72,8 @@ export interface UserDataSource {
     department: string,
     position: string,
     email: string,
-    telephone: string
+    telephone: string,
+    unique_id: string | undefined
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;

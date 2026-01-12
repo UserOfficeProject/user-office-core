@@ -56,6 +56,7 @@ export const dummyUserOfficer = new User(
   'JoDo',
   'Hailey',
   '324235',
+  '182082741',
   '683142616',
   'issuer',
   'male',
@@ -90,6 +91,7 @@ export const dummyUser = new User(
   'JaDa',
   'Meta',
   '12312414',
+  '182082741',
   '568567353',
   'issuer',
   'male',
@@ -209,6 +211,7 @@ export const dummyPlaceHolderUser = new User(
   'JaDa',
   'Meta',
   '12312414',
+  '182082741',
   '568567353',
   'issuer',
   'male',
@@ -231,6 +234,7 @@ export const dummyUserNotOnProposal = new User(
   'Doe',
   'NoDO',
   'Damion',
+  '182082741',
   '182082741',
   'Apricot',
   'issuer',
@@ -514,7 +518,8 @@ export class UserDataSourceMock implements UserDataSource {
     department: string,
     position: string,
     email: string,
-    telephone: string
+    telephone: string,
+    unique_id: string | undefined
   ) {
     // Generate a new user ID
     const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;
@@ -527,6 +532,7 @@ export class UserDataSourceMock implements UserDataSource {
       username,
       preferredname || '',
       oidc_sub,
+      unique_id,
       oauth_refresh_token,
       oauth_issuer,
       gender || 'unspecified',

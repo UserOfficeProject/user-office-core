@@ -32,9 +32,9 @@ import {
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
-  UpdateUserRolesArgs,
-  UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+  UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
@@ -591,7 +591,8 @@ export default class UserMutations {
         department ?? '',
         position,
         email,
-        telephone ?? ''
+        telephone ?? '',
+        undefined
       );
 
       await this.dataSource.addUserRole({
