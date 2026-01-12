@@ -1,30 +1,90 @@
-/**
- * Add ticket request
- * @param proposalTitle proposal title
- * @param containerId  container id
- * @param experimentStartDate experiment start date
- * @param experimentEndDate experiment end date
- * @param dateRequested experiment date requested
- * @returns the SOAP request
- */
-const getRequest = (
-  proposalId: string,
+import { getEnvOrThrow } from '../utils/getEnvOrThrow';
+
+const getAddCaseManagementRequestPayload = (
   proposalTitle: string,
   containerId: string,
-  experimentStartDate: Date,
-  experimentEndDate: Date,
   dateRequested: Date,
-  localContactEmail: string,
-  location: string
+  localContactEmail: string
 ) => ({
-  proposalId,
-  proposalTitle,
-  containerId,
-  experimentStartDate,
-  experimentEndDate,
-  dateRequested,
-  localContactEmail,
-  location,
+  CASEID: {
+    CASECODE: 'string',
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
+      DESCRIPTION: getEnvOrThrow('EAM_ORGANIZATION_NAME'),
+    },
+    DESCRIPTION: proposalTitle,
+  },
+  EQUIPMENTID: {
+    EQUIPMENTCODE: containerId,
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
+      DESCRIPTION: getEnvOrThrow('EAM_ORGANIZATION_NAME'),
+    },
+    DESCRIPTION: proposalTitle,
+  },
+  CASETYPE: {
+    TYPECODE: 'CMCONT',
+    DESCRIPTION: 'Container',
+  },
+  DEPARTMENTID: {
+    DEPARTMENTCODE: 'SMPL',
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: '*',
+      DESCRIPTION: 'Default',
+    },
+    DESCRIPTION: 'Sample Management',
+  },
+  STATUS: {
+    STATUSCODE: 'O',
+    DESCRIPTION: 'Open',
+  },
+  RSTATUS: {
+    STATUSCODE: 'O',
+    DESCRIPTION: 'Open',
+  },
+  CREATEDBY: {
+    USERCODE: localContactEmail,
+    DESCRIPTION: localContactEmail,
+  },
+  CREATEDDATE: {
+    YEAR: dateRequested.getFullYear(),
+    MONTH: dateRequested.getMonth() + 1,
+    DAY: dateRequested.getDate(),
+  },
+  CaseDetails: {
+    CASECLASSID: {
+      CLASSCODE: 'CSM',
+      ORGANIZATIONID: {
+        ORGANIZATIONCODE: '*',
+        DESCRIPTION: 'Default',
+      },
+      DESCRIPTION: 'Container Sample Management',
+    },
+    LOCATIONID: {
+      LOCATIONCODE: getEnvOrThrow('EAM_LOCATION_CODE'),
+      ORGANIZATIONID: {
+        ORGANIZATIONCODE: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
+        DESCRIPTION: getEnvOrThrow('EAM_ORGANIZATION_NAME'),
+      },
+      DESCRIPTION: 'ESS Buildings',
+    },
+    SERVICEPROBLEMID: {
+      SERVICEPROBLEMCODE: 'CSM',
+      ORGANIZATIONID: {
+        ORGANIZATIONCODE: '*',
+        DESCRIPTION: 'Default',
+      },
+      DESCRIPTION: 'Container Sample Management',
+    },
+  },
+  // proposalId,
+  // proposalTitle,
+  // containerId,
+  // experimentStartDate,
+  // experimentEndDate,
+  // dateRequested,
+  // localContactEmail,
+  // location,
 });
 
-export default getRequest;
+export default getAddCaseManagementRequestPayload;

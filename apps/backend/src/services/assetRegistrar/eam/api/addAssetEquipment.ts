@@ -24,7 +24,7 @@ import {
   SHIPMENT_SENDER_PHONE_KEY,
 } from '../../../../models/Shipment';
 import { DataType } from '../../../../models/Template';
-import getRequest from '../requests/AddAssetEquipment';
+import getAddAssetEquipmentRequestPayload from '../requests/AddAssetEquipment';
 import { createAndLogError } from '../utils/createAndLogError';
 import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 import { performApiRequest } from '../utils/performApiRequest';
@@ -75,8 +75,7 @@ async function getAnswer(
 }
 
 /**
- * Creates container in EAM
- * @returns newly created container ID
+ * Creates Asset Equipment in EAM
  */
 export async function createContainer(shipmentId: number) {
   const shipmentDataSource = container.resolve<ShipmentDataSource>(
@@ -129,10 +128,10 @@ export async function createContainer(shipmentId: number) {
   );
 
   // TODO: Review the instruments code representation
-  const request = getRequest(
-    equipmentPartCode,
+  const requestPayload = getAddAssetEquipmentRequestPayload(
     proposal.proposalId,
     proposal.title,
+    equipmentPartCode,
     weight,
     width,
     height,
@@ -151,7 +150,21 @@ export async function createContainer(shipmentId: number) {
     senderPhone ?? 'No value',
     instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
-  const response = await performApiRequest('/equipment', request);
 
-  return response.data;
+  const {
+    Result: {
+      ResultData: {
+        ASSETID: { EQUIPMENTCODE = null },
+      },
+    },
+  } = await performApiRequest('/assets', requestPayload);
+
+  if (!EQUIPMENTCODE) {
+    throw createAndLogError('EAM Asset creation failed', {
+      shipmentId,
+      request: requestPayload,
+    });
+  }
+
+  return EQUIPMENTCODE;
 }
