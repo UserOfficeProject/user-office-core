@@ -30,7 +30,7 @@ export class User {
     public username: string,
     public preferredname: string | undefined,
     public oidcSub: string | null,
-    public uniqueId: string | undefined,
+    public uniqueId: string | null,
     public oauthRefreshToken: string | null,
     public oauthIssuer: string | null,
     public gender: string,

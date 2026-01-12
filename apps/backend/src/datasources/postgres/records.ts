@@ -251,7 +251,7 @@ export interface UserRecord {
   readonly username: string;
   readonly preferredname: string;
   readonly oidc_sub: string | null;
-  readonly unique_id: string | undefined;
+  readonly unique_id: string | null;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;

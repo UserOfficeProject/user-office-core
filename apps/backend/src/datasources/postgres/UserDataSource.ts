@@ -396,7 +396,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    unique_id: string | undefined
+    unique_id: string | null
   ): Promise<User> {
     return database
       .insert({

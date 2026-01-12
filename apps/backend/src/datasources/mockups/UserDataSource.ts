@@ -519,7 +519,7 @@ export class UserDataSourceMock implements UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    unique_id: string | undefined
+    unique_id: string | null
   ) {
     // Generate a new user ID
     const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;

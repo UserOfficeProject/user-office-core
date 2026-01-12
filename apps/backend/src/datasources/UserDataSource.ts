@@ -73,7 +73,7 @@ export interface UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    unique_id: string | undefined
+    unique_id: string | null
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;

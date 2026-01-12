@@ -121,7 +121,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     '',
-    undefined,
+    null,
     '',
     '',
     '',

@@ -592,7 +592,7 @@ export default class UserMutations {
         position,
         email,
         telephone ?? '',
-        undefined
+        null
       );
 
       await this.dataSource.addUserRole({
