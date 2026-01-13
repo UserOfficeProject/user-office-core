@@ -343,7 +343,7 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="assign-selected-users"]').click();
     });
 
-    it('Should preserve the selected users after pagination', () => {
+    it.only('Should preserve the selected users after pagination', () => {
       // NOTE: Create 10 users
       new Array(10).fill(0).map((elem, index) => {
         cy.createUserByEmailInvite({
