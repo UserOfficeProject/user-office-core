@@ -77,14 +77,6 @@ const getAddCaseManagementRequestPayload = (
       DESCRIPTION: 'Container Sample Management',
     },
   },
-  // proposalId,
-  // proposalTitle,
-  // containerId,
-  // experimentStartDate,
-  // experimentEndDate,
-  // dateRequested,
-  // localContactEmail,
-  // location,
 });
 
 export default getAddCaseManagementRequestPayload;

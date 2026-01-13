@@ -4,25 +4,7 @@ const date = new Date();
 
 const getAddAssetEquipmentRequestPayload = (
   proposalId: string,
-  proposalTitle: string,
-  partCode: string,
-  weightKilograms: number,
-  widthMeters: number,
-  heightMeters: number,
-  lengthMeters: number,
-  isDangerousGoods: string,
-  dangerousGoodsUnNumber: string,
-  dangerousGoodsDetails: string,
-  shipmentSampleRisks: string,
-  parcelValue: string,
-  shipmentSenderCompany: string,
-  shipmentSenderStreetAddress: string,
-  shipmentSenderZipCode: string,
-  shipmentSenderCityCountry: string,
-  shipmentSenderName: string,
-  shipmentSenderEmail: string,
-  shipmentSenderPhone: string,
-  instrumentShortCodes: string[]
+  proposalTitle: string
 ) => ({
   ASSETID: {
     EQUIPMENTCODE: proposalId + '-' + date.valueOf(),
