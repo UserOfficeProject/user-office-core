@@ -191,7 +191,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   }
   async addStatusToWorkflow(newWorkflowStatusInput: {
     workflowId: number;
-    statusId: number;
+    statusId: string;
     posX: number;
     posY: number;
   }): Promise<WorkflowStatus> {
@@ -409,7 +409,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   async getWorkflowStructure(workflowId: number): Promise<{
     workflowStatuses: {
       workflowStatusId: number;
-      statusId: number;
+      statusId: string;
       shortCode: string;
     }[];
     workflowConnections: {

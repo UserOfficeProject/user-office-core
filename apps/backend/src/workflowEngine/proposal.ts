@@ -141,7 +141,7 @@ export class ProposalWorkflowEngine {
 
         return {
           ...updatedProposal,
-          prevStatusId: proposal.statusId,
+          prevStatusId: proposal.workflowStatusId,
           workflowStatusConnectionId: connectionId,
         };
       }

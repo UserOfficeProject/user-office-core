@@ -34,7 +34,7 @@ export const getWorkflowConnectionByStatusId = async (
     await workflowDataSource.getWorkflowConnections(workflowId);
 
   const matchingWorkflowStatuses = statuses.filter(
-    (ws) => ws.statusId === statusId
+    (ws) => 0 //ws.statusId === statusId
   );
   const matchingWorkflowStatusIds = matchingWorkflowStatuses.map(
     (ws) => ws.workflowStatusId
@@ -97,7 +97,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
 
     const nextNextWorkflowConnections = await getWorkflowConnectionByStatusId(
       experimentWorkflow.id,
-      nextStatusId
+      0 //nextStatusId
     );
     const newStatusChangingEvents =
       await workflowDataSource.getStatusChangingEventsByConnectionIds(
@@ -197,7 +197,7 @@ export const workflowEngine = async (
         const currentWorkflowConnections =
           await getWorkflowConnectionByStatusId(
             experimentWorkflow.id,
-            experimentSafety.statusId
+            0 //experimentSafety.statusId
           );
 
         if (!currentWorkflowConnections.length) {

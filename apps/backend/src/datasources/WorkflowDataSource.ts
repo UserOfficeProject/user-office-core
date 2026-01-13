@@ -26,7 +26,7 @@ export interface WorkflowDataSource {
   ): Promise<WorkflowConnection | null>;
   addStatusToWorkflow(newWorkflowStatusInput: {
     workflowId: number;
-    statusId: number;
+    statusId: string;
     posX: number;
     posY: number;
   }): Promise<WorkflowStatus>;
@@ -47,7 +47,7 @@ export interface WorkflowDataSource {
   getWorkflowStructure(workflowId: number): Promise<{
     workflowStatuses: {
       workflowStatusId: number;
-      statusId: number;
+      statusId: string;
       shortCode: string;
     }[];
     workflowConnections: {

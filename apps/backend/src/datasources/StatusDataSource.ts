@@ -6,10 +6,11 @@ export interface StatusDataSource {
   createStatus(
     newStatusInput: Omit<Status, 'id' | 'isDefault'>
   ): Promise<Status>;
-  getStatus(statusId: number): Promise<Status | null>;
+  getStatus(statusId: string): Promise<Status | null>;
+  getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;
   updateStatus(status: UpdateStatusInput): Promise<Status>;
-  deleteStatus(statusId: number): Promise<Status>;
+  deleteStatus(statusId: string): Promise<Status>;
   getDefaultStatus(entityType: Status['entityType']): Promise<Status | null>;
   getDefaultWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null>;
 }

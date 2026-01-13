@@ -31,7 +31,7 @@ const publishExperimentSafetyStatusChange = async (
       const experimentSafetyStatus = await statusDataSource.getStatus(
         updatedExperimentSafety.statusId
       );
-      const previousExperimentStatus = await statusDataSource.getStatus(
+      const previousExperimentStatus = await statusDataSource.getWorkflowStatus(
         updatedExperimentSafety.prevStatusId
       );
 
@@ -41,7 +41,7 @@ const publishExperimentSafetyStatusChange = async (
         isRejection: false,
         key: 'experimentsafety',
         loggedInUserId: null,
-        description: `From "${previousExperimentStatus?.name}" to "${experimentSafetyStatus?.name}"`,
+        description: `From "${previousExperimentStatus?.statusId}" to "${experimentSafetyStatus}.workflowStatus"`, // TODO: fix to use workflowStatus
       });
     }
   });

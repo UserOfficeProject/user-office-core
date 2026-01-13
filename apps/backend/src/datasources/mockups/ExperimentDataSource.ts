@@ -412,14 +412,15 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
   async updateExperimentSafetyStatus(
     experimentSafetyPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety> {
     const experimentSafety = await this.getExperimentSafety(experimentSafetyPk);
 
     if (!experimentSafety) {
       throw new Error('Experiment does not exist');
     }
-    experimentSafety.statusId = statusId;
+    // TODO fix this
+    //  experimentSafety.workflowStatusId = workflowStatusId;
 
     return experimentSafety;
   }

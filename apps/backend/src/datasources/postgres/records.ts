@@ -130,7 +130,7 @@ export interface ProposalRecord {
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
-  readonly status_id: number;
+  readonly status_id: string;
   readonly workflow_status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
@@ -154,7 +154,7 @@ export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
   readonly principal_investigator: number;
-  readonly proposal_status_id: number;
+  readonly proposal_status_id: string;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
@@ -583,7 +583,7 @@ export interface ShipmentRecord {
 }
 
 export interface StatusRecord {
-  readonly status_id: number;
+  readonly status_id: string;
   readonly short_code: string;
   readonly name: string;
   readonly description: string;
@@ -611,7 +611,7 @@ export interface WorkflowConnectionRecord {
 export interface WorkflowStatusRecord {
   readonly workflow_status_id: number;
   readonly workflow_id: number;
-  readonly status_id: number;
+  readonly status_id: string;
   readonly pos_x: number;
   readonly pos_y: number;
 }
@@ -1485,7 +1485,7 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_id: number;
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
-  readonly status_id: number | null;
+  readonly status_id: string | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;
   readonly created_at: Date;

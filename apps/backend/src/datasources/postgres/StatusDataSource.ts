@@ -42,7 +42,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(addedStatus);
   }
 
-  async getStatus(statusId: number): Promise<Status | null> {
+  async getStatus(statusId: string): Promise<Status | null> {
     const status: StatusRecord = await database
       .select()
       .from('statuses')
@@ -50,6 +50,28 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .first();
 
     return status ? this.createStatusObject(status) : null;
+  }
+
+  async getWorkflowStatus(
+    workflowStatusId: number
+  ): Promise<WorkflowStatus | null> {
+    const workflowStatus: WorkflowStatusRecord = await database
+      .select()
+      .from('workflow_has_statuses')
+      .where('workflow_status_id', workflowStatusId)
+      .first();
+
+    if (!workflowStatus) {
+      return null;
+    }
+
+    return new WorkflowStatus(
+      workflowStatus.workflow_status_id,
+      workflowStatus.workflow_id,
+      workflowStatus.status_id,
+      workflowStatus.pos_x,
+      workflowStatus.pos_y
+    );
   }
 
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
@@ -81,7 +103,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(updatedStatus);
   }
 
-  async deleteStatus(statusId: number): Promise<Status> {
+  async deleteStatus(statusId: string): Promise<Status> {
     const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
       .andWhere('is_default', false)

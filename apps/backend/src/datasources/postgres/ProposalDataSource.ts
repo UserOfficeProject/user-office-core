@@ -858,7 +858,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return createProposalObject(newProposal);
   }
 
-  async changeProposalsStatus(
+  async changeProposalsWorkflowStatus(
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {

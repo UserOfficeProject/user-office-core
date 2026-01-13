@@ -64,8 +64,8 @@ export interface ProposalDataSource {
   deleteProposal(primaryKey: number): Promise<Proposal>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
-  changeProposalsStatus(
-    statusId: number,
+  changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals>;
   getRelatedUsersOnProposals(id: number): Promise<number[]>;

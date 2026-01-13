@@ -37,7 +37,7 @@ describe('simpleStateMachine', () => {
     expect(initialAction).toHaveBeenCalledWith({ id: 1 });
 
     const nextState = await actor.event('APPROVE');
-    expect(nextState).toBe('approved');
+    expect(nextState.nextStateValue).toBe('approved');
     expect(actor.getState()).toBe('approved');
     expect(approvedAction).toHaveBeenCalledWith({ id: 1 });
   });
@@ -66,11 +66,11 @@ describe('simpleStateMachine', () => {
     const actor = createActor(machine, { id: 2 });
 
     const firstAttempt = await actor.event('SUBMIT');
-    expect(firstAttempt).toBe('draft');
+    expect(firstAttempt.nextStateValue).toBe('draft');
     expect(actor.getState()).toBe('draft');
 
     const secondAttempt = await actor.event('SUBMIT');
-    expect(secondAttempt).toBe('submitted');
+    expect(secondAttempt.nextStateValue).toBe('submitted');
     expect(actor.getState()).toBe('submitted');
     expect(guard).toHaveBeenCalledTimes(2);
     expect(guard).toHaveBeenLastCalledWith({ id: 2 });

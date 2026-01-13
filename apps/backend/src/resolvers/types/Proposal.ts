@@ -52,8 +52,8 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public abstract: string;
 
-  @Field(() => Int)
-  public statusId: number;
+  @Field(() => String)
+  public statusId: string;
 
   @Field(() => Int)
   public workflowStatusId: number;

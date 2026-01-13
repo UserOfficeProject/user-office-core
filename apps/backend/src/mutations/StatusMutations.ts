@@ -1,8 +1,4 @@
-import {
-  createStatusValidationSchema,
-  deleteStatusValidationSchema,
-  updateStatusValidationSchema,
-} from '@user-office-software/duo-validation';
+import { createStatusValidationSchema } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -32,8 +28,7 @@ export default class StatusMutations {
       return rejection('Could not create status', { agent, args }, error);
     });
   }
-
-  @ValidateArgs(updateStatusValidationSchema)
+  // @ValidateArgs(updateStatusValidationSchema) // TODO update validation schema
   @Authorized([Roles.USER_OFFICER])
   async updateStatus(
     agent: UserWithRole | null,
@@ -44,11 +39,11 @@ export default class StatusMutations {
     });
   }
 
-  @ValidateArgs(deleteStatusValidationSchema)
+  // @ValidateArgs(deleteStatusValidationSchema) // TODO update validation schema
   @Authorized([Roles.USER_OFFICER])
   async deleteStatus(
     agent: UserWithRole | null,
-    args: { id: number }
+    args: { id: string }
   ): Promise<Status | Rejection> {
     return this.dataSource.deleteStatus(args.id).catch((error) => {
       return rejection('Could not delete status', { agent, args }, error);

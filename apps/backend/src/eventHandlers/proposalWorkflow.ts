@@ -32,10 +32,10 @@ const publishProposalStatusChange = async (
   );
   updatedProposals.map(async (updatedProposal) => {
     if (updatedProposal) {
-      const proposalStatus = await statusDataSource.getStatus(
-        updatedProposal.statusId
+      const proposalStatus = await statusDataSource.getWorkflowStatus(
+        updatedProposal.workflowStatusId
       );
-      const previousProposalStatus = await statusDataSource.getStatus(
+      const previousProposalStatus = await statusDataSource.getWorkflowStatus(
         updatedProposal.prevStatusId
       );
 
@@ -45,7 +45,7 @@ const publishProposalStatusChange = async (
         isRejection: false,
         key: 'proposal',
         loggedInUserId: null,
-        description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
+        description: `From "${previousProposalStatus?.statusId}" to "${proposalStatus?.statusId}"`,
       });
     }
   });

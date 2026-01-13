@@ -54,7 +54,7 @@ export const createActor = (
   }
 
   const { schema } = machine;
-  const currentState = startingState ?? schema.initial;
+  let currentState = startingState ?? schema.initial;
 
   if (!schema.states[currentState]) {
     throw new Error(`Unknown state "${currentState}"`);
@@ -95,7 +95,12 @@ export const createActor = (
       }
     }
 
+    if (!schema.states[transition.target]) {
+      throw new Error(`Unknown target state "${transition.target}"`);
+    }
+
     await runAction(transition.target);
+    currentState = transition.target;
 
     return {
       nextStateValue: transition.target,

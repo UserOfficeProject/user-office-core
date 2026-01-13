@@ -22,7 +22,6 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { WorkflowType } from '../models/Workflow';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
@@ -119,9 +118,17 @@ export default class ExperimentMutations {
       );
     }
 
-    const experimentSafetyWorkflowDefaultStatus =
-      await this.statusDataSource.getDefaultStatus(WorkflowType.EXPERIMENT);
-    if (!experimentSafetyWorkflowDefaultStatus) {
+    if (!call.experimentWorkflowId) {
+      return rejection(
+        'Can not create Experiment Safety, because system has no Experiment Workflow configured'
+      );
+    }
+
+    const experimentSafetyDefaultWorkflowStatus =
+      await this.statusDataSource.getDefaultWorkflowStatus(
+        call.experimentWorkflowId
+      );
+    if (!experimentSafetyDefaultWorkflowStatus) {
       return rejection(
         'Can not create Experiment Safety, because system has no default status for Experiment Safety'
       );
@@ -141,7 +148,7 @@ export default class ExperimentMutations {
       experimentPk,
       newEsiQuestionary.questionaryId,
       agent!.id,
-      experimentSafetyWorkflowDefaultStatus.id
+      experimentSafetyDefaultWorkflowStatus.workflowStatusId
     );
   }
 

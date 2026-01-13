@@ -117,8 +117,8 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
   public principalInvestigatorId: number;
 
-  @Field(() => Int)
-  public statusId: number;
+  @Field(() => String)
+  public statusId: string;
 
   @Field(() => String)
   public statusName: string;

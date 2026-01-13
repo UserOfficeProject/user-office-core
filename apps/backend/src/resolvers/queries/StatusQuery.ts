@@ -7,7 +7,7 @@ import { Status } from '../types/Status';
 @ArgsType()
 export class StatusArgs {
   @Field(() => Int)
-  statusId: number;
+  statusId: string;
 }
 
 @ArgsType()

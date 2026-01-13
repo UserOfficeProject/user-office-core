@@ -11,6 +11,7 @@ import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { dummyWorkflowStatuses } from './StatusDataSource';
 import { basicDummyUser } from './UserDataSource';
 
 export let dummyProposal: Proposal;
@@ -34,7 +35,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.statusId || 1,
+    values?.statusId || 'DRAFT',
     values?.workflowStatusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
@@ -150,7 +151,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
       managementDecisionSubmitted: true,
-      statusId: 2,
+      statusId: 'FEASIBILITY_REVIEW',
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
@@ -163,7 +164,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       '',
       1,
-      1,
+      'DRAFT',
       '',
       '',
       'shortCode',
@@ -251,7 +252,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (!proposal) {
       throw new Error('Proposal does not exist');
     }
-    proposal.statusId = proposalStatusId;
+    proposal.workflowStatusId = proposalStatusId;
 
     return proposal;
   }
@@ -366,12 +367,18 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return dummyProposal;
   }
 
-  async changeProposalsStatus(
-    statusId: number,
+  async changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
     const proposals = allProposals.map((p) => {
-      return { ...p, statusId };
+      return {
+        ...p,
+        workflowStatusId,
+        statusId: dummyWorkflowStatuses.find(
+          (ws) => ws.workflowStatusId === workflowStatusId
+        )?.statusId as string,
+      };
     });
 
     return { proposals: proposals };

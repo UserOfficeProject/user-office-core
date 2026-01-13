@@ -20,8 +20,8 @@ export class WorkflowStatus implements Partial<WorkflowStatusOrigin> {
   @Field(() => Int)
   public workflowId: number;
 
-  @Field(() => Int)
-  public statusId: number;
+  @Field(() => String)
+  public statusId: string;
 
   @Field(() => Int)
   public posX: number;
