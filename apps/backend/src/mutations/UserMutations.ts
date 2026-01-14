@@ -526,9 +526,7 @@ export default class UserMutations {
       oidcSub,
       gender,
       birthDate,
-      institutionRoRId,
-      institutionName,
-      institutionCountry,
+      institution: institutionInput,
       department,
       position,
       email,
@@ -543,15 +541,15 @@ export default class UserMutations {
       return rejection('Invalid birth date format', { birthDate, args });
     }
 
-    const institution = await this.userAuth.getOrCreateUserInstitution({
-      institution_ror_id: institutionRoRId,
-      institution_name: institutionName,
-      institution_country: institutionCountry,
-    });
+    const institution = await this.userAuth.getOrCreateUserInstitution(
+      institutionInput.institutionId ??
+        institutionInput.manual ??
+        institutionInput.rorId
+    );
 
     if (!institution) {
       return rejection('Invalid Input for the Institution', {
-        institutionRoRId,
+        institutionInput,
         args,
       });
     }

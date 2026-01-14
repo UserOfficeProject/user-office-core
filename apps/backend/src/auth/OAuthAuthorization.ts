@@ -1,26 +1,21 @@
-import 'reflect-metadata';
 import { env } from 'process';
+import 'reflect-metadata';
 
 import { logger } from '@user-office-software/duo-logger';
 import { OpenIdClient } from '@user-office-software/openid';
 import { ValidTokenSet } from '@user-office-software/openid/lib/model/ValidTokenSet';
 import { ValidUserInfo } from '@user-office-software/openid/lib/model/ValidUserInfo';
 import { GraphQLError } from 'graphql';
-import { UserinfoResponse } from 'openid-client';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
+import { Institution } from '../models/Institution';
 import { Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
+import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 import { UserAuthorization } from './UserAuthorization';
-
-interface UserinfoResponseWithInstitution extends UserinfoResponse {
-  institution_ror_id?: string;
-  institution_name?: string;
-  institution_country?: string;
-}
 
 export class OAuthAuthorization extends UserAuthorization {
   private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
@@ -85,38 +80,66 @@ export class OAuthAuthorization extends UserAuthorization {
     });
   }
 
-  public async getOrCreateUserInstitution(
-    userInfo: UserinfoResponseWithInstitution
-  ) {
-    if (!userInfo.institution_name || !userInfo.institution_country) {
-      return null;
+  private async getOrCreateInstitutionByRorId(
+    rorId: string
+  ): Promise<Institution | null> {
+    let institution = await this.adminDataSource.getInstitutionByRorId(rorId);
+    if (!institution) {
+      institution = await this.adminDataSource.createInstitution({
+        name: 'Unknown institution',
+        country: null,
+        rorId: rorId,
+      });
     }
 
-    let institution = userInfo.institution_ror_id
-      ? await this.adminDataSource.getInstitutionByRorId(
-          userInfo.institution_ror_id
-        )
-      : await this.adminDataSource.getInstitutionByName(
-          userInfo.institution_name
-        );
+    return institution;
+  }
+
+  private async getOrCreateInstitutionByManualInput(manualInput: {
+    name: string;
+    country: string;
+  }): Promise<Institution | null> {
+    let institution = await this.adminDataSource.getInstitutionByName(
+      manualInput.name
+    );
 
     if (!institution) {
-      let institutionCountry = await this.adminDataSource.getCountryByName(
-        userInfo.institution_country
+      let country = await this.adminDataSource.getCountryByName(
+        manualInput.country
       );
-
-      if (!institutionCountry) {
-        institutionCountry = await this.adminDataSource.createCountry(
-          userInfo.institution_country
-        );
+      if (!country) {
+        // create country if it does not exist
+        country = await this.adminDataSource.createCountry(manualInput.country);
       }
-      const newInstitution = {
-        name: userInfo.institution_name,
-        country: institutionCountry.countryId,
-        rorId: userInfo.institution_ror_id,
-      };
-      institution =
-        await this.adminDataSource.createInstitution(newInstitution);
+      institution = await this.adminDataSource.createInstitution({
+        name: manualInput.name,
+        country: country.countryId,
+        rorId: undefined,
+      });
+    }
+
+    return institution;
+  }
+
+  private async getOrCreateInstitutionById(
+    id: number
+  ): Promise<Institution | null> {
+    const institution = await this.adminDataSource.getInstitution(id);
+
+    return institution;
+  }
+
+  public async getOrCreateUserInstitution(input: GetOrCreateInstitutionInput) {
+    let institution: Institution | null = null;
+    if (typeof input === 'string') {
+      // ROR ID provided
+      institution = await this.getOrCreateInstitutionByRorId(input);
+    } else if (input instanceof Object) {
+      // Manual institution details provided
+      institution = await this.getOrCreateInstitutionByManualInput(input);
+    } else if (typeof input === 'number') {
+      // Institution ID provided
+      institution = await this.getOrCreateInstitutionById(input);
     }
 
     return institution;
@@ -127,7 +150,17 @@ export class OAuthAuthorization extends UserAuthorization {
     tokenSet: ValidTokenSet
   ): Promise<User> {
     const client = await OpenIdClient.getInstance();
-    const institution = await this.getOrCreateUserInstitution(userInfo);
+    let institutionInput: GetOrCreateInstitutionInput = null;
+    if (userInfo.institution_ror_id) {
+      institutionInput = userInfo.institution_ror_id as string;
+    } else if (userInfo.institution_name && userInfo.institution_country) {
+      institutionInput = {
+        country: userInfo.institution_country as string,
+        name: userInfo.institution_name as string,
+      };
+    }
+
+    const institution = await this.getOrCreateUserInstitution(institutionInput);
     const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
       userInfo.sub
     );

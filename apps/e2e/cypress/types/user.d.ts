@@ -5,6 +5,7 @@ import {
   UpdateUserMutation,
   CreateUserByEmailInviteMutationVariables,
   CreateUserByEmailInviteMutation,
+  UpsertUserByOidcSubMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { TestUserId } from './../support/user';
@@ -98,6 +99,18 @@ declare global {
        *    cy.getAndStoreFeaturesEnabled()
        */
       getAndStoreFeaturesEnabled: () => Cypress.Chainable<GetFeaturesQuery>;
+
+      /***
+       * Upserts user by OIDC sub
+       *
+       * @returns {typeof upsertUserByOidc}
+       * @memberof Chainable
+       * @example
+       *    cy.upsertUserByOidc(upsertUserByOidcSubInput: UpsertUserByOidcSubMutationVariables)
+       */
+      upsertUserByOidc: (
+        upsertUserByOidcSubInput: UpsertUserByOidcSubMutationVariables
+      ) => Cypress.Chainable<User>;
     }
   }
 }

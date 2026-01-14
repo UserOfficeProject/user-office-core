@@ -19,8 +19,8 @@ export class UpdateInstitutionsArgs {
   @Field(() => String, { nullable: true })
   name: string;
 
-  @Field(() => Int)
-  country: number;
+  @Field(() => Int, { nullable: true })
+  country: number | null;
 
   @Field(() => String, { nullable: true })
   rorId?: string;

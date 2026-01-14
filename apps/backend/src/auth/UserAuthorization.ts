@@ -11,6 +11,7 @@ import { Institution } from '../models/Institution';
 import { Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
+import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 import { AdminDataSource } from './../datasources/AdminDataSource';
 
 export abstract class UserAuthorization {
@@ -192,11 +193,9 @@ export abstract class UserAuthorization {
     iss: string | null
   ): Promise<User | null>;
 
-  abstract getOrCreateUserInstitution(userInfo: {
-    institution_ror_id?: string;
-    institution_name?: string;
-    institution_country?: string;
-  }): Promise<Institution | null>;
+  abstract getOrCreateUserInstitution(
+    institution: GetOrCreateInstitutionInput
+  ): Promise<Institution | null>;
 
   abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
 

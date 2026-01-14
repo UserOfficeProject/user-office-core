@@ -31,6 +31,10 @@ export class InstitutionResolver {
     @Root() institution: InstitutionOrigin,
     @Ctx() context: ResolverContext
   ): Promise<Entry | null> {
+    if (institution.country === null) {
+      return null;
+    }
+
     return context.queries.admin.getCountry(institution.country);
   }
 }
