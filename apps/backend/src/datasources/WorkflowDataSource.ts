@@ -48,7 +48,6 @@ export interface WorkflowDataSource {
     workflowStatuses: {
       workflowStatusId: number;
       statusId: string;
-      shortCode: string;
     }[];
     workflowConnections: {
       workflowStatusConnectionId: number;

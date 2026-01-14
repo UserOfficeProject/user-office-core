@@ -26,7 +26,7 @@ describe('Test Proposal settings mutations', () => {
     const result = (await statusMutationsInstance.createStatus(
       dummyUserWithRole,
       {
-        shortCode: 'NEW',
+        id: 'NEW',
         name: 'new',
         description: 'new',
         entityType: WorkflowType.PROPOSAL,
@@ -39,7 +39,7 @@ describe('Test Proposal settings mutations', () => {
   test('A userofficer can not create proposal status with bad input arguments', () => {
     return expect(
       statusMutationsInstance.createStatus(dummyUserOfficerWithRole, {
-        shortCode: 'Test',
+        id: 'Test',
         name: 'Test',
         description: 'This is some small description',
         entityType: WorkflowType.PROPOSAL,
@@ -49,7 +49,7 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can create proposal status', () => {
     const newStatus = {
-      shortCode: 'NEW',
+      id: 'NEW',
       name: 'NEW',
       description: 'NEW',
       entityType: WorkflowType.PROPOSAL as const,
@@ -65,7 +65,6 @@ describe('Test Proposal settings mutations', () => {
       dummyUserWithRole,
       {
         id: 'DRAFT',
-        shortCode: 'UPDATE',
         name: 'update',
         description: 'update',
         isDefault: false,

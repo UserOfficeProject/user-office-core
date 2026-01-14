@@ -3,9 +3,7 @@ import { WorkflowStatus } from '../models/WorkflowStatus';
 import { UpdateStatusInput } from '../resolvers/mutations/settings/UpdateStatusMutation';
 
 export interface StatusDataSource {
-  createStatus(
-    newStatusInput: Omit<Status, 'id' | 'isDefault'>
-  ): Promise<Status>;
+  createStatus(newStatusInput: Omit<Status, 'isDefault'>): Promise<Status>;
   getStatus(statusId: string): Promise<Status | null>;
   getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;

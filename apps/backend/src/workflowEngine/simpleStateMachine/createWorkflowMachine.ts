@@ -11,8 +11,8 @@ const workflowMachineCache = new Map<
   ReturnType<typeof createMachine>
 >();
 
-const createWfStatusName = (shortCode: string, workflowStatusId: number) =>
-  `${shortCode}-${workflowStatusId}`;
+const createWfStatusName = (statusId: string, workflowStatusId: number) =>
+  `${statusId}-${workflowStatusId}`;
 
 const getEventsGuards = (events: string[]): GuardFn[] => {
   const guards: GuardFn[] = [];
@@ -53,7 +53,7 @@ export const createWorkflowMachine = async (workflowId: number) => {
   const wfStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to shortCode for easy lookup
 
   workflowStatuses.forEach((ws) => {
-    const wfStatusName = createWfStatusName(ws.shortCode, ws.workflowStatusId);
+    const wfStatusName = createWfStatusName(ws.statusId, ws.workflowStatusId);
     wfStatusIdToNameMap.set(ws.workflowStatusId, wfStatusName);
     wfStatuses[wfStatusName] = {
       on: {},

@@ -9,9 +9,6 @@ export class UpdateStatusInput {
   public id: string;
 
   @Field(() => String, { nullable: true })
-  public shortCode?: string;
-
-  @Field(() => String, { nullable: true })
   public name?: string;
 
   @Field(() => String, { nullable: true })

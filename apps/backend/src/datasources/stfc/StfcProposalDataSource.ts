@@ -63,7 +63,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const techniqueProposalCallIds: number[] = (
       await this.callDataSource.getCalls({
-        proposalStatusShortCode: 'QUICK_REVIEW',
+        proposalStatus: 'QUICK_REVIEW',
       })
     ).map((call) => call.id);
 

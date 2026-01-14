@@ -18,7 +18,7 @@ export default class StatusMutations {
     private dataSource: StatusDataSource
   ) {}
 
-  @ValidateArgs(createStatusValidationSchema)
+  @ValidateArgs(createStatusValidationSchema) // TODO: update validation schema
   @Authorized([Roles.USER_OFFICER])
   async createStatus(
     agent: UserWithRole | null,

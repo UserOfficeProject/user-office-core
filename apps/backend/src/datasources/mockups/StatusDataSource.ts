@@ -41,9 +41,9 @@ export class StatusDataSourceMock implements StatusDataSource {
   }
   // TODO: This needs to be implemented
   async createStatus(
-    newStatusInput: Omit<Status, 'id' | 'is_default'>
+    newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
-    return { ...newStatusInput, id: 'DRAFT', isDefault: false };
+    return { ...newStatusInput, isDefault: false };
   }
   async getStatus(statusId: string): Promise<Status | null> {
     return dummyStatuses.find((s) => s.id === statusId) as Status;
