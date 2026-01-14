@@ -67,6 +67,7 @@ BEGIN
      , comment_for_user
      , notified
      , submitted
+     , management_decision_submitted
     )
     VALUES 
     (
@@ -83,7 +84,8 @@ BEGIN
      , NULL              
      , NULL              
      , true              
-     , true              
+     , true
+     , true            
     );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
@@ -107,6 +109,7 @@ BEGIN
      , comment_for_user
      , notified
      , submitted
+     , management_decision_submitted
     )
     VALUES 
     (
@@ -123,7 +126,8 @@ BEGIN
      , NULL              
      , NULL              
      , true              
-     , true              
+     , true  
+     , true            
     );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (2, 2);
