@@ -14,7 +14,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { WorkflowType } from '../models/Workflow';
 import InstrumentMutations from './InstrumentMutations';
 
 let statusDataSource: StatusDataSourceMock;
@@ -205,19 +204,6 @@ describe('Test Instrument Mutations', () => {
 
   describe('Test technique proposal instrument assignment', () => {
     test('A user officer can change the instrument of a technique proposal from any status', () => {
-      const proposal = { statusId: 'DRAFT' };
-
-      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
-        {
-          id: proposal.statusId,
-          shortCode: 'EXPIRED',
-          name: 'Expired',
-          description: '',
-          isDefault: true,
-          entityType: WorkflowType.PROPOSAL,
-        },
-      ]);
-
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyUserOfficerWithRole,
@@ -235,19 +221,6 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('A scientist cannot change the instrument of a technique proposal from any status', () => {
-      const proposal = { statusId: 'DRAFT' };
-
-      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
-        {
-          id: proposal.statusId,
-          shortCode: 'EXPIRED',
-          name: 'Expired',
-          description: '',
-          isDefault: true,
-          entityType: WorkflowType.PROPOSAL,
-        },
-      ]);
-
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,

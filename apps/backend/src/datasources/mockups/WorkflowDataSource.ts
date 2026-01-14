@@ -20,9 +20,8 @@ export const dummyWorkflow = new Workflow(
 );
 
 export const dummyStatuses = [
-  new Status('DRAFT', 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+  new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
   new Status(
-    'FEASIBILITY_REVIEW',
     'FEASIBILITY_REVIEW',
     'Feasibility review',
     '',
@@ -59,8 +58,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
       workflowStatuses: dummyWorkflowStatuses.map((ws) => ({
         workflowStatusId: ws.workflowStatusId,
         statusId: ws.statusId,
-        shortCode:
-          dummyStatuses.find((s) => s.id === ws.statusId)?.shortCode || '',
+        shortCode: dummyStatuses.find((s) => s.id === ws.statusId)?.id || '',
       })),
       workflowConnections: dummyWorkflowConnections.map((wc) => ({
         workflowStatusConnectionId: wc.id,

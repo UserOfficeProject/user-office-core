@@ -584,7 +584,6 @@ export interface ShipmentRecord {
 
 export interface StatusRecord {
   readonly status_id: string;
-  readonly short_code: string;
   readonly name: string;
   readonly description: string;
   readonly is_default: boolean;

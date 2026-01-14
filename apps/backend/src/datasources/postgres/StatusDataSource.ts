@@ -14,7 +14,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   private createStatusObject(status: StatusRecord) {
     return new Status(
       status.status_id,
-      status.short_code,
       status.name,
       status.description,
       status.is_default,
@@ -23,11 +22,11 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   }
 
   async createStatus(
-    newStatusInput: Omit<Status, 'id' | 'is_default'>
+    newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
     const [addedStatus]: StatusRecord[] = await database
       .insert({
-        short_code: newStatusInput.shortCode,
+        id: newStatusInput.id,
         name: newStatusInput.name,
         description: newStatusInput.description,
         entity_type: newStatusInput.entityType,

@@ -415,9 +415,8 @@ describe('Test technique proposal change status', () => {
   const expiredId = 7;
 
   const dummyProposalStatuses = [
-    new Status('DRAFT', 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+    new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
     new Status(
-      'SUBMITTED_LOCKED',
       'SUBMITTED_LOCKED',
       'Submitted (locked)',
       '',
@@ -426,38 +425,21 @@ describe('Test technique proposal change status', () => {
     ),
     new Status(
       'UNDER_REVIEW',
-      'UNDER_REVIEW',
       'Under review',
       '',
       false,
       WorkflowType.PROPOSAL
     ),
+    new Status('APPROVED', 'Approved', '', false, WorkflowType.PROPOSAL),
     new Status(
-      'APPROVED',
-      'APPROVED',
-      'Approved',
-      '',
-      false,
-      WorkflowType.PROPOSAL
-    ),
-    new Status(
-      'UNSUCCESSFUL',
       'UNSUCCESSFUL',
       'Unsuccessful',
       '',
       false,
       WorkflowType.PROPOSAL
     ),
+    new Status('FINISHED', 'Finished', '', false, WorkflowType.PROPOSAL),
     new Status(
-      'FINISHED',
-      'FINISHED',
-      'Finished',
-      '',
-      false,
-      WorkflowType.PROPOSAL
-    ),
-    new Status(
-      'NON-TP',
       'NON-TP',
       'Non-technique proposal',
       '',

@@ -9,9 +9,6 @@ export class Status implements Partial<StatusOrigin> {
   public id: string;
 
   @Field(() => String)
-  public shortCode: string;
-
-  @Field(() => String)
   public name: string;
 
   @Field(() => String)

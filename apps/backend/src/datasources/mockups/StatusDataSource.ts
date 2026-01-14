@@ -4,9 +4,8 @@ import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { StatusDataSource } from '../StatusDataSource';
 
 export const dummyStatuses = [
-  new Status('DRAFT', 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+  new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
   new Status(
-    'FEASIBILITY_REVIEW',
     'FEASIBILITY_REVIEW',
     'Feasibility review',
     '',

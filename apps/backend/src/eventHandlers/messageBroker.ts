@@ -185,7 +185,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
       mapUserWithInstitutionToMember
     ),
     visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
-    newStatus: proposalStatus?.shortCode,
+    newStatus: proposalStatus?.id,
     submitted: proposal.submitted,
   };
 
