@@ -1,4 +1,5 @@
 import {
+  Arg,
   Args,
   ArgsType,
   Ctx,
@@ -6,7 +7,6 @@ import {
   Int,
   Mutation,
   Resolver,
-  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';

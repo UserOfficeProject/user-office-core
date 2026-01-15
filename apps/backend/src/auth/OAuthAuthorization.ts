@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { env } from 'process';
+import 'reflect-metadata';
 
 import { logger } from '@user-office-software/duo-logger';
 import { OpenIdClient } from '@user-office-software/openid';
@@ -176,7 +176,8 @@ export class OAuthAuthorization extends UserAuthorization {
         '',
         (userInfo.position as string) ?? '',
         userInfo.email,
-        ''
+        '',
+        userInfo.unique_id as string
       );
 
       const roleID = this.getUserRole(newUser);
