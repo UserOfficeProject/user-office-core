@@ -29,7 +29,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('No Previous Collaborators');
 
@@ -99,7 +99,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -192,7 +192,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.finishedLoading();
 
@@ -277,7 +277,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -343,7 +343,7 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="assign-selected-users"]').click();
     });
 
-    it.only('Should preserve the selected users after pagination', () => {
+    it('Should preserve the selected users after pagination', () => {
       // NOTE: Create 10 users
       new Array(10).fill(0).map((elem, index) => {
         cy.createUserByEmailInvite({
@@ -364,11 +364,11 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.finishedLoading();
 
-      cy.get('@modal').contains('10 rows').click();
+      cy.get('@modal').scrollIntoView().contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');
@@ -524,7 +524,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]');
+      cy.get('[data-cy=participant-modal]');
 
       cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
 

@@ -134,7 +134,7 @@ const UserManagementTable = ({
         >
           {title}
         </Typography>
-        <div>
+        <>
           <MaterialTable
             data={users}
             columns={[
@@ -182,7 +182,6 @@ const UserManagementTable = ({
                   removeUser(oldData);
                   resolve();
                 }),
-              isDeletable: (rowData) => currentUser.id !== rowData.id,
             }}
           />
 
@@ -238,7 +237,7 @@ const UserManagementTable = ({
               </Button>
             </Tooltip>
           </ActionButtonContainer>
-        </div>
+        </>
       </FormControl>
     </Box>
   );
