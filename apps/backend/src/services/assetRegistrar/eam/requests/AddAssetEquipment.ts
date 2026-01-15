@@ -1,13 +1,11 @@
 import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 
-const date = new Date();
-
 const getAddAssetEquipmentRequestPayload = (
   proposalId: string,
   proposalTitle: string
 ) => ({
   ASSETID: {
-    EQUIPMENTCODE: proposalId + '-' + date.valueOf(),
+    EQUIPMENTCODE: proposalId + '-' + new Date().valueOf(),
     ORGANIZATIONID: {
       ORGANIZATIONCODE: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
       DESCRIPTION: getEnvOrThrow('EAM_ORGANIZATION_NAME'),
