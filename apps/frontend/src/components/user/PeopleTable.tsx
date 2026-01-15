@@ -76,8 +76,6 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   selectedUsers?: number[];
   mtOptions?: Options<T>;
   columns?: Column<T>[];
-  preserveSelf?: boolean;
-  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   selectedParticipants?: BasicUserDetails[];
   setSelectedParticipants?: React.Dispatch<
     React.SetStateAction<BasicUserDetails[]>
@@ -177,11 +175,8 @@ const PeopleTable = ({
   columns,
   mtOptions,
   onRemove,
-  preserveSelf,
   search,
   title,
-  setPrincipalInvestigator,
-  persistUrlQueryParams = false,
 }: PeopleTableProps) => {
   const [query, setQuery] = useState<{
     subtractUsers: number[];
@@ -213,9 +208,7 @@ const PeopleTable = ({
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
-  const sortDirection = persistUrlQueryParams
-    ? searchParams.get('sortDirection')
-    : '';
+  const sortDirection = searchParams.get('sortDirection');
   useEffect(() => {
     if (!data) {
       return;
@@ -238,11 +231,6 @@ const PeopleTable = ({
   }
   const EmailIcon = (): JSX.Element => <Email />;
 
-  const handleChangeCoIToPi = (user: BasicUserDetails) => {
-    onRemove?.(user);
-    setPrincipalInvestigator?.(user);
-  };
-
   const actionArray = [];
   action &&
     !selection &&
@@ -262,29 +250,6 @@ const PeopleTable = ({
       isFreeAction: true,
       tooltip: 'Add by email',
       onClick: () => setSendUserEmail(true),
-    });
-
-  setPrincipalInvestigator &&
-    onRemove &&
-    actionArray.push({
-      icon: () => (
-        <Button data-cy="assign-as-pi" component="a" href="#" variant="text">
-          Assign <br /> as PI
-        </Button>
-      ),
-      tooltip: 'Set Principal Investigator',
-      onClick: (
-        event: React.MouseEvent<JSX.Element>,
-        rowData: BasicUserDetails | BasicUserDetails[]
-      ) => {
-        event.preventDefault();
-
-        return new Promise<void>(() => {
-          const user = Array.isArray(rowData) ? rowData[0] : rowData;
-          handleChangeCoIToPi(user);
-          tableRef.current && tableRef.current.onQueryChange({});
-        });
-      },
     });
 
   const invitationButtons: InvitationButtonProps[] = [];
@@ -533,7 +498,7 @@ const PeopleTable = ({
           }
           columns={setSortDirectionOnSortField(
             columns ? columns : localColumns,
-            persistUrlQueryParams ? searchParams.get('sortField') : '',
+            searchParams.get('sortField'),
             sortDirection === PaginationSortDirection.ASC
               ? PaginationSortDirection.ASC
               : sortDirection === PaginationSortDirection.DESC
@@ -543,74 +508,65 @@ const PeopleTable = ({
           onSelectionChange={handleColumnSelectionChange}
           data={fetchRemoteUsersData}
           onPageChange={(page) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                searchParams.set('page', page.toString());
+            setSearchParams((searchParams) => {
+              searchParams.set('page', page.toString());
 
-                return searchParams;
-              });
+              return searchParams;
+            });
           }}
           onRowsPerPageChange={(pageSize) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                searchParams.set('pageSize', pageSize.toString());
-                searchParams.set('page', '0');
+            setSearchParams((searchParams) => {
+              searchParams.set('pageSize', pageSize.toString());
+              searchParams.set('page', '0');
 
-                return searchParams;
-              });
+              return searchParams;
+            });
           }}
           onSearchChange={(searchText) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                if (searchText) {
-                  searchParams.set('search', searchText);
-                  searchParams.set('page', '0');
-                } else {
-                  searchParams.delete('search');
-                }
+            setSearchParams((searchParams) => {
+              if (searchText) {
+                searchParams.set('search', searchText);
+                searchParams.set('page', '0');
+              } else {
+                searchParams.delete('search');
+              }
 
-                return searchParams;
-              });
+              return searchParams;
+            });
           }}
           onOrderCollectionChange={(orderByCollection) => {
             const [orderBy] = orderByCollection;
 
             if (!orderBy) {
-              persistUrlQueryParams &&
-                setSearchParams((searchParams) => {
-                  searchParams.delete('sortField');
-                  searchParams.delete('sortDirection');
+              setSearchParams((searchParams) => {
+                searchParams.delete('sortField');
+                searchParams.delete('sortDirection');
 
-                  return searchParams;
-                });
+                return searchParams;
+              });
             } else {
-              persistUrlQueryParams &&
-                setSearchParams((searchParams) => {
-                  searchParams.set('sortField', orderBy.orderByField);
-                  searchParams.set('sortDirection', orderBy.orderDirection);
+              setSearchParams((searchParams) => {
+                searchParams.set('sortField', orderBy.orderByField);
+                searchParams.set('sortDirection', orderBy.orderDirection);
 
-                  return searchParams;
-                });
+                return searchParams;
+              });
             }
           }}
           options={{
             search: search,
-            searchText: persistUrlQueryParams
-              ? searchParams.get('search') || undefined
-              : undefined,
+            searchText: searchParams.get('search') || undefined,
             debounceInterval: 400,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
-            pageSize:
-              persistUrlQueryParams && searchParams.get('pageSize')
-                ? +searchParams.get('pageSize')!
-                : undefined,
-            initialPage:
-              persistUrlQueryParams && searchParams.get('page')
-                ? +searchParams.get('page')!
-                : 0,
+            pageSize: searchParams.get('pageSize')
+              ? +searchParams.get('pageSize')!
+              : undefined,
+            initialPage: searchParams.get('page')
+              ? +searchParams.get('page')!
+              : 0,
             ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
@@ -628,9 +584,7 @@ const PeopleTable = ({
                       (onRemove as FunctionType)(oldData);
                     }),
                   isDeletable: (rowData) => {
-                    return (
-                      getCurrentUser()?.user.id !== rowData.id || !preserveSelf
-                    );
+                    return getCurrentUser()?.user.id !== rowData.id;
                   },
                 }
               : {}
