@@ -15,8 +15,8 @@ import { ConnectionStatusAction } from 'generated/sdk';
 
 interface WorkflowEdgeData {
   events: string[];
-  sourceStatusShortCode: string;
-  targetStatusShortCode: string;
+  sourceStatusId: string;
+  targetStatusId: string;
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
@@ -103,7 +103,7 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
         >
           {events.length > 0 && (
             <List
-              data-cy={`edge-label-events-list-${data?.sourceStatusShortCode}-${data?.targetStatusShortCode}`}
+              data-cy={`edge-label-events-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >
               {events.map((e) => (
                 <li key={e}>{e}</li>
@@ -112,7 +112,7 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           )}
           {statusActions.length > 0 && (
             <List
-              data-cy={`edge-label-actions-list-${data?.sourceStatusShortCode}-${data?.targetStatusShortCode}`}
+              data-cy={`edge-label-actions-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >
               {statusActions.map((e) => (
                 <li key={e.actionId}>{`⚡ ${e.action.name}`}</li>

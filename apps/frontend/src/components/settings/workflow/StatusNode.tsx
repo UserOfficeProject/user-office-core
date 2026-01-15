@@ -76,11 +76,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
 
   return (
     <div data-cy={`connection_${data.status.id}`}>
-      <StyledHandle
-        type="target"
-        position={Position.Top}
-        hidden={WORKFLOW_INITIAL_STATUSES.includes(data.status.id)}
-      />
+      <StyledHandle type="target" position={Position.Top} />
       <Container>
         <Title>
           <TitleContent onClick={handleToggleExpand}>
@@ -94,7 +90,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                data.onDelete(id); // Pass the node ID instead of status ID
+                data.onDelete(id);
               }}
               title="Delete status"
               sx={{
