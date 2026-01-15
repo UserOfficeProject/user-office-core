@@ -3,10 +3,7 @@ import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import {
-  UpdateUserByOidcSubArgs,
-  UpdateUserByIdArgs,
-} from '../resolvers/mutations/UpdateUserMutation';
+import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
 export interface UserDataSource {
@@ -74,7 +71,6 @@ export interface UserDataSource {
     rorId?: string
   ): Promise<number>;
   update(user: UpdateUserByIdArgs): Promise<User>;
-  updateUserByOidcSub(args: UpdateUserByOidcSubArgs): Promise<User | null>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(

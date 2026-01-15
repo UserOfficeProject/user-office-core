@@ -8,7 +8,6 @@ import {
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
-import { Args } from 'type-graphql';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -21,7 +20,6 @@ import { AuthJwtPayload, User, UserRole, UserWithRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import {
   UpdateUserRolesArgs,
-  UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
@@ -141,49 +139,6 @@ export default class UserMutations {
           err
         );
       });
-  }
-
-  @Authorized()
-  @EventBus(Event.USER_UPDATED)
-  async updateUserByOidcSub(
-    agent: UserWithRole | null,
-    @Args() args: UpdateUserByOidcSubArgs
-  ): Promise<User | Rejection> {
-    const isUpdatingOwnUser = agent?.oidcSub === args.oidcSub;
-    if (
-      !this.userAuth.isApiToken(agent) &&
-      !this.userAuth.isUserOfficer(agent) &&
-      !isUpdatingOwnUser
-    ) {
-      return rejection(
-        'Can not update user because of insufficient permissions',
-        {
-          args,
-          agent,
-          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
-        }
-      );
-    }
-
-    try {
-      const updatedUser = await this.dataSource.updateUserByOidcSub(args);
-
-      if (!updatedUser) {
-        return rejection(
-          'USER_NOT_FOUND',
-          { oidcSub: args.oidcSub },
-          new Error(`User with OIDC sub ${args.oidcSub} not found`)
-        );
-      }
-
-      return updatedUser;
-    } catch (error) {
-      return rejection(
-        'INTERNAL_ERROR',
-        { agent, args },
-        error instanceof Error ? error : new Error(String(error))
-      );
-    }
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)

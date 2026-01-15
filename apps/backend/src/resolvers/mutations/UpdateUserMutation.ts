@@ -90,12 +90,4 @@ export class UpdateUserMutation {
   ) {
     return context.mutations.user.setUserNotPlaceholder(context.user, id);
   }
-
-  @Mutation(() => User)
-  updateUserByOidcSub(
-    @Args() input: UpdateUserByOidcSubArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.user.updateUserByOidcSub(context.user, input);
-  }
 }

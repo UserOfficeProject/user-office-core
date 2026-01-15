@@ -93,9 +93,10 @@ export class UserResolver {
     @Arg('callId', () => Int, { nullable: true }) callId: number,
     @Arg('instrumentId', () => Int, { nullable: true }) instrumentId: number,
     @Arg('status', () => ReviewStatus, { nullable: true }) status: number,
-    @Arg('reviewer', () => ReviewerFilter, { nullable: true })
-    reviewer: number,
-    @Ctx() context: ResolverContext
+    @Arg('reviewer', () => ReviewerFilter, { nullable: true }) reviewer: number,
+    @Arg('active', () => Boolean, { nullable: true }) active: boolean,
+    @Ctx()
+    context: ResolverContext
   ) {
     if (!context.user || !context.user.currentRole) {
       return [];
@@ -115,7 +116,8 @@ export class UserResolver {
         user.id,
         callId,
         instrumentId,
-        status
+        status,
+        active
       );
     } else {
       return context.queries.review.dataSource.getAllUsersReviews(
@@ -123,7 +125,8 @@ export class UserResolver {
         user.id,
         callId,
         instrumentId,
-        status
+        status,
+        active
       );
     }
   }

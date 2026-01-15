@@ -99,10 +99,10 @@ context('PageTable component tests', () => {
         });
 
       cy.intercept('POST', '/graphql', (req) => {
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(req.continue()), 1000); // delay by 1 second to see the loader
-        });
-      }).as('delayedRequest');
+        if (req.body?.operationName === 'getUsers') {
+          req.alias = 'getUsers';
+        }
+      });
 
       cy.get('[data-cy="people-table"] thead')
         .contains('Firstname')
@@ -110,10 +110,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
-      cy.wait('@delayedRequest');
-
+      cy.wait('@getUsers');
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
@@ -131,10 +128,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
-      cy.wait('@delayedRequest');
-
+      cy.wait('@getUsers');
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
