@@ -117,6 +117,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       instrumentId: selectedInstrumentId,
       status: getFilterStatus(reviewStatus),
       reviewer: getFilterReviewer(reviewer),
+      active: true,
     });
 
   useEffect(() => {
