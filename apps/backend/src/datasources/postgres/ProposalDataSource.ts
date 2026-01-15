@@ -45,17 +45,16 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
-  'technicalReviews.status': "technical_reviews->0->'status'",
-  'technicalReviews.timeAllocation': "technical_reviews->0->'timeAllocation'",
+  'technicalReviews.status': 'technical_review_status',
+  'technicalReviews.timeAllocation': 'technical_review_time_allocation',
   // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
-  technicalReviewAssigneesFullName:
-    "technical_reviews->0->'technicalReviewAssignee'->'firstname'",
-  'faps.code': "faps->0->'code'",
+  technicalReviewAssigneesFullName: 'technical_review_assignee',
+  'faps.code': 'fap_code',
   callShortCode: 'call_short_code',
-  'instruments.name': "instruments->0->'name'",
+  'instruments.name': 'instrument_name',
   statusName: 'proposal_status_id',
   'instruments.managementTimeAllocation':
-    "instruments->0->'managementTimeAllocation'",
+    'instrument_management_time_allocation',
   proposalId: 'proposal_id',
   title: 'title',
   submitted: 'submitted',
@@ -392,7 +391,24 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       : [];
 
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        '*',
+        database.raw("instruments->0->'name' AS instrument_name"),
+        database.raw(
+          "instruments->0->'managementTimeAllocation' AS instrument_management_time_allocation"
+        ),
+        database.raw(
+          "technical_reviews->0->'status' AS technical_review_status"
+        ),
+        database.raw(
+          "technical_reviews->0->'timeAllocation' AS technical_review_time_allocation"
+        ),
+        database.raw(
+          "technical_reviews->0->'technicalReviewAssignee'->'firstname' AS technical_review_assignee"
+        ),
+        database.raw("faps->0->'code' AS fap_code"),
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposal_table_view')
       .join(
         'users',
