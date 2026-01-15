@@ -185,7 +185,7 @@ const CallGeneralInfo = ({
       const result = selectedProposalWorkFlow.statuses.some(
         (workflowStatus) => {
           return (
-            workflowStatus.status.id ===
+            workflowStatus.statusId ===
             ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
           );
         }

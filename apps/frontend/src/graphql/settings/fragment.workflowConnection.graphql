@@ -3,4 +3,6 @@ fragment workflowConnection on WorkflowConnection {
   workflowId
   prevWorkflowStatusId
   nextWorkflowStatusId
+  sourceHandle
+  targetHandle
 }

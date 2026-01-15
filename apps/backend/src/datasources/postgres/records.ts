@@ -605,6 +605,8 @@ export interface WorkflowConnectionRecord {
   readonly workflow_id: number;
   readonly prev_workflow_status_id: number;
   readonly next_workflow_status_id: number;
+  readonly source_handle: string;
+  readonly target_handle: string;
 }
 
 export interface WorkflowStatusRecord {

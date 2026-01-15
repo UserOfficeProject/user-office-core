@@ -55,7 +55,9 @@ export function usePersistWorkflowEditorModel() {
 
     const createWorkflowConneciton = async (
       sourceWorkflowStatusId: number,
-      targetWorkflowStatusId: number
+      targetWorkflowStatusId: number,
+      sourceHandle: string,
+      targetHandle: string
     ) => {
       return api({
         toastSuccessMessage: 'Workflow connection added successfully!',
@@ -64,6 +66,8 @@ export function usePersistWorkflowEditorModel() {
           newWorkflowConnectionInput: {
             prevWorkflowStatusId: sourceWorkflowStatusId,
             nextWorkflowStatusId: targetWorkflowStatusId,
+            sourceHandle: sourceHandle,
+            targetHandle: targetHandle,
           },
         })
         .then((data) => data.createWorkflowConnection);
@@ -272,13 +276,19 @@ export function usePersistWorkflowEditorModel() {
           });
         }
         case EventType.ADD_WORKFLOW_CONNECTION_REQUESTED: {
-          const { sourceWorkflowStatusId, targetWorkflowStatusId } =
-            action.payload;
+          const {
+            sourceWorkflowStatusId,
+            targetWorkflowStatusId,
+            sourceHandle,
+            targetHandle,
+          } = action.payload;
 
           return executeAndMonitorCall(async () => {
             const result = await createWorkflowConneciton(
               sourceWorkflowStatusId,
-              targetWorkflowStatusId
+              targetWorkflowStatusId,
+              sourceHandle,
+              targetHandle
             );
 
             dispatch({

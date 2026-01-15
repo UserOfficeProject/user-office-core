@@ -128,6 +128,8 @@ export type Event =
       payload: {
         sourceWorkflowStatusId: number;
         targetWorkflowStatusId: number;
+        sourceHandle: string;
+        targetHandle: string;
       };
     }
   | {
@@ -255,6 +257,8 @@ const WorkflowEditorModel = (
             nextStatus,
             statusChangingEvents: [],
             statusActions: [],
+            sourceHandle: action.payload.sourceHandle,
+            targetHandle: action.payload.targetHandle,
           });
 
           return draft;

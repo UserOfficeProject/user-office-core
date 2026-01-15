@@ -43,6 +43,8 @@ BEGIN
             workflow_id                   INT NOT NULL,
             prev_workflow_status_id       INT NOT NULL,
             next_workflow_status_id       INT NOT NULL,
+            source_handle                 VARCHAR(255) NOT NULL DEFAULT 'bottom-source',
+            target_handle                 VARCHAR(255) NOT NULL DEFAULT 'top-target',
 
             CONSTRAINT fk_wsc_workflow
               FOREIGN KEY (workflow_id) REFERENCES workflows (workflow_id),

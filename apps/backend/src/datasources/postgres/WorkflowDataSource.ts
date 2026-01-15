@@ -43,7 +43,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.workflow_status_connection_id,
       workflowConnection.workflow_id,
       workflowConnection.prev_workflow_status_id,
-      workflowConnection.next_workflow_status_id
+      workflowConnection.next_workflow_status_id,
+      workflowConnection.source_handle,
+      workflowConnection.target_handle
     );
   }
 
@@ -278,6 +280,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
           newWorkflowConnectionInput.prevWorkflowStatusId,
         next_workflow_status_id:
           newWorkflowConnectionInput.nextWorkflowStatusId,
+        source_handle: newWorkflowConnectionInput.sourceHandle,
+        target_handle: newWorkflowConnectionInput.targetHandle,
       })
       .returning('*');
 

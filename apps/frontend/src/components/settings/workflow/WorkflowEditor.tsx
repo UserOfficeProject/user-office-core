@@ -175,6 +175,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         id: edgeId, // Use connection ID to ensure unique edge identification
         source: connection.prevStatus.workflowStatusId.toString(),
         target: connection.nextStatus.workflowStatusId.toString(),
+        sourceHandle: connection.sourceHandle,
+        targetHandle: connection.targetHandle,
         type: 'workflow', // Use custom workflow edge type
         data: {
           events:
@@ -239,11 +241,16 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         return;
       }
 
+      const sourceHandle = connection.sourceHandle ?? 'bottom-source';
+      const targetHandle = connection.targetHandle ?? 'top-target';
+
       // Add the connection to the graph
       const newEdge = edgeFactory({
         id: `temp-${connection.source}-${connection.target}`, // Temporary ID until persisted
         source: connection.source,
         target: connection.target,
+        sourceHandle,
+        targetHandle,
         type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
@@ -265,6 +272,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         payload: {
           sourceWorkflowStatusId: sourceWfStatus.workflowStatusId, // Use connection ID for persistence
           targetWorkflowStatusId: targetWfStatus.workflowStatusId,
+          sourceHandle,
+          targetHandle,
         },
       });
 

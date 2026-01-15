@@ -3,6 +3,8 @@ export class WorkflowConnection {
     public id: number,
     public workflowId: number,
     public prevWorkflowStatusId: number,
-    public nextWorkflowStatusId: number
+    public nextWorkflowStatusId: number,
+    public sourceHandle: string,
+    public targetHandle: string
   ) {}
 }

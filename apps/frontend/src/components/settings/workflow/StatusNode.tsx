@@ -76,7 +76,19 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
 
   return (
     <div data-cy={`connection_${data.status.id}`}>
-      <StyledHandle type="target" position={Position.Top} />
+      <StyledHandle type="target" position={Position.Top} id="top-target" />
+      <StyledHandle
+        type="target"
+        position={Position.Right}
+        id="right-target"
+        style={{ top: '30%' }}
+      />
+      <StyledHandle
+        type="source"
+        position={Position.Right}
+        id="right-source"
+        style={{ top: '70%' }}
+      />
       <Container>
         <Title>
           <TitleContent onClick={handleToggleExpand}>
@@ -109,8 +121,12 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
         <Description expanded={expanded}>
           {data.status.id} {data.status.description}
         </Description>
+        <StyledHandle
+          type="source"
+          position={Position.Bottom}
+          id="bottom-source"
+        />
       </Container>
-      <StyledHandle type="source" position={Position.Bottom} />
     </div>
   );
 };

@@ -28,6 +28,12 @@ export class WorkflowConnection implements Partial<WorkflowConnectionOrigin> {
 
   @Field(() => Int)
   public nextWorkflowStatusId: number;
+
+  @Field(() => String)
+  public sourceHandle: string;
+
+  @Field(() => String)
+  public targetHandle: string;
 }
 
 @Resolver(() => WorkflowConnection)
