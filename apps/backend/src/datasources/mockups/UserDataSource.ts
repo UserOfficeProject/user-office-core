@@ -9,10 +9,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import {
-  UpdateUserByIdArgs,
-  UpdateUserByOidcSubArgs,
-} from '../../resolvers/mutations/UpdateUserMutation';
+import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
@@ -399,17 +396,6 @@ export class UserDataSourceMock implements UserDataSource {
 
   async update(user: UpdateUserByIdArgs): Promise<User> {
     return dummyUser;
-  }
-
-  async updateUserByOidcSub(
-    args: UpdateUserByOidcSubArgs
-  ): Promise<User | null> {
-    if (dummyUser.oidcSub === args.oidcSub) {
-      return { ...dummyUser, ...args };
-    }
-
-    // User not found
-    return null;
   }
 
   async me(id: number) {

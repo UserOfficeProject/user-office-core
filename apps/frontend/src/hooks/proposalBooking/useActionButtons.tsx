@@ -271,7 +271,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
-        navigate(`/DeclareShipments/${event.experimentPk}`);
+        navigate(`/Experiments/${event.experimentPk}/Shipments`);
       }
     );
   };

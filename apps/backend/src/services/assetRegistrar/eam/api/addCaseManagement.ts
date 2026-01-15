@@ -5,11 +5,14 @@ import { ExperimentDataSource } from '../../../../datasources/ExperimentDataSour
 import { ProposalDataSource } from '../../../../datasources/ProposalDataSource';
 import { ShipmentDataSource } from '../../../../datasources/ShipmentDataSource';
 import { UserDataSource } from '../../../../datasources/UserDataSource';
-import getRequest from '../requests/AddCaseManagement';
+import getAddCaseManagementRequestPayload from '../requests/AddCaseManagement';
 import { createAndLogError } from '../utils/createAndLogError';
 import { performApiRequest } from '../utils/performApiRequest';
 
-export async function createTicket(shipmentId: number, containerId: string) {
+export async function createCaseManagement(
+  shipmentId: number,
+  containerId: string
+) {
   const shipmentDataSource = container.resolve<ShipmentDataSource>(
     Tokens.ShipmentDataSource
   );
@@ -53,16 +56,12 @@ export async function createTicket(shipmentId: number, containerId: string) {
   if (experiment.localContactId) {
     localContact = await userDataSource.getUser(experiment.localContactId);
   }
-  const request = getRequest(
-    proposal.proposalId,
+  const requestPayload = getAddCaseManagementRequestPayload(
     proposal.title,
     containerId,
     experiment.startsAt,
-    experiment.endsAt,
-    experiment.startsAt, // This is not correct, but we need a design decision to fix this
-    localContact?.email ?? 'not set',
-    'DEMAX'
+    localContact?.email ?? 'not set'
   );
 
-  await performApiRequest('ticket', request); // The Create Ticket API is still not yet live. Hence this 'ticket' should be replaced once the API is live.
+  await performApiRequest('/casemanagement', requestPayload);
 }
