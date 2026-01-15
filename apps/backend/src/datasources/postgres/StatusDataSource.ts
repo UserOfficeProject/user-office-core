@@ -21,6 +21,18 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     );
   }
 
+  private createWorkflowStatusObject = (
+    workflowStatus: WorkflowStatusRecord
+  ) => {
+    return new WorkflowStatus(
+      workflowStatus.workflow_status_id,
+      workflowStatus.workflow_id,
+      workflowStatus.status_id,
+      workflowStatus.pos_x,
+      workflowStatus.pos_y
+    );
+  };
+
   async createStatus(
     newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
@@ -64,13 +76,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       return null;
     }
 
-    return new WorkflowStatus(
-      workflowStatus.workflow_status_id,
-      workflowStatus.workflow_id,
-      workflowStatus.status_id,
-      workflowStatus.pos_x,
-      workflowStatus.pos_y
-    );
+    return this.createWorkflowStatusObject(workflowStatus);
   }
 
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
@@ -81,6 +87,16 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .orderBy('status_id', 'asc');
 
     return statuses.map((status) => this.createStatusObject(status));
+  }
+
+  async getAllWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]> {
+    const workflowStatuses: WorkflowStatusRecord[] = await database
+      .select()
+      .from('workflow_has_statuses')
+      .where('workflow_id', workflowId)
+      .orderBy('workflow_status_id', 'asc');
+
+    return workflowStatuses.map(this.createWorkflowStatusObject);
   }
 
   async updateStatus(status: UpdateStatusInput): Promise<Status> {
@@ -159,13 +175,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       return null;
     }
 
-    return new WorkflowStatus(
-      workflowStatus.workflow_status_id,
-      workflowStatus.workflow_id,
-      workflowStatus.status_id,
-      workflowStatus.pos_x,
-      workflowStatus.pos_y
-    );
+    return this.createWorkflowStatusObject(workflowStatus);
   }
 
   async getInitialStatus(

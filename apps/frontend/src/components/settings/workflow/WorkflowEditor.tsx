@@ -181,8 +181,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
             connection.statusChangingEvents?.map(
               (e) => e.statusChangingEvent
             ) || [],
-          sourceStatusShortCode: connection.prevStatus.status.shortCode,
-          targetStatusShortCode: connection.nextStatus.status.shortCode,
+          sourceStatusShortCode: connection.prevStatus.status.id,
+          targetStatusShortCode: connection.nextStatus.status.id,
           workflowConnectionId: connection.id, // Use target connection ID (destination)
           statusActions: connection.statusActions || [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
@@ -227,23 +227,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         return;
       }
 
-      // Check if target node already has a parent (restrict to only one parent)
-      const targetHasParentInEdges = edges.some(
-        (edge) => edge.target === connection.target
-      );
-
-      if (targetHasParentInEdges) {
-        enqueueSnackbar(
-          'Node can only have one parent connection. Try adding another status of the same type instead.',
-          {
-            variant: 'warning',
-            className: 'snackbar-warning',
-          }
-        );
-
-        return;
-      }
-
       // Find source and target status names for the edge data
       const sourceWfStatus = state.statuses.find(
         (s) => s.workflowStatusId.toString() === connection.source
@@ -264,8 +247,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
-          sourceStatusShortCode: sourceWfStatus.status.shortCode,
-          targetStatusShortCode: targetWfStatus.status.shortCode,
+          sourceStatusShortCode: sourceWfStatus.status.id,
+          targetStatusShortCode: targetWfStatus.status.id,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
         },
@@ -346,7 +329,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       const newNode: Node = {
         id: statusId,
         type: 'statusNode',
-        ariaLabel: `connection_${status.shortCode}`,
+        ariaLabel: `connection_${status.id}`,
         data: {
           label: status.name,
           status,

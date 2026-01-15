@@ -410,7 +410,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     workflowStatuses: {
       workflowStatusId: number;
       statusId: string;
-      shortCode: string;
     }[];
     workflowConnections: {
       workflowStatusConnectionId: number;
@@ -422,8 +421,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     const workflowStatuses = await database
       .select(
         'workflow_has_statuses.workflow_status_id as workflowStatusId',
-        'workflow_has_statuses.status_id as statusId',
-        'statuses.short_code as shortCode'
+        'workflow_has_statuses.status_id as statusId'
       )
       .from('workflow_has_statuses')
       .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')

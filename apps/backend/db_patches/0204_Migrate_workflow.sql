@@ -8,9 +8,13 @@ DECLARE
     v_connection_id INT;
     v_unmapped_actions BIGINT := 0;
     v_unmapped_events BIGINT := 0;
-  v_logs_updated BIGINT := 0;
-  v_unmapped_logs BIGINT := 0;
-  has_status_actions_logs BOOLEAN := FALSE;
+    v_logs_updated BIGINT := 0;
+    v_unmapped_logs BIGINT := 0;
+    has_status_actions_logs BOOLEAN := FALSE;
+    call_has_workflow_id BOOLEAN := FALSE;
+    call_has_proposal_workflow_id BOOLEAN := FALSE;
+    v_proposals_updated BIGINT := 0;
+    v_unmapped_proposals BIGINT := 0;
     node_rec RECORD;
     edge_rec RECORD;
 BEGIN
@@ -49,6 +53,28 @@ BEGIN
             DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_action_id_fkey,
             DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_fkey,
             DROP CONSTRAINT IF EXISTS status_actions_logs_action_id_fkey;
+        END IF;
+
+        SELECT EXISTS (
+                 SELECT 1
+                 FROM information_schema.columns
+                 WHERE table_schema = 'public'
+                   AND table_name = 'call'
+                   AND column_name = 'workflow_id'
+               )
+          INTO call_has_workflow_id;
+
+        SELECT EXISTS (
+                 SELECT 1
+                 FROM information_schema.columns
+                 WHERE table_schema = 'public'
+                   AND table_name = 'call'
+                   AND column_name = 'proposal_workflow_id'
+               )
+          INTO call_has_proposal_workflow_id;
+
+        IF NOT call_has_workflow_id AND NOT call_has_proposal_workflow_id THEN
+          RAISE EXCEPTION 'call table must expose either workflow_id or proposal_workflow_id to migrate proposals.';
         END IF;
 
         CREATE TEMP TABLE tmp_workflow_status_map (
@@ -141,7 +167,7 @@ BEGIN
         WHERE edge_map.workflow_connection_id IS NULL;
 
         IF v_unmapped_actions > 0 THEN
-          RAISE WARNING '% workflow actions could not be migrated because their connection does not reference a previous node.', v_unmapped_actions;
+          RAISE WARNING USING MESSAGE = format('%s workflow actions could not be migrated because their connection does not reference a previous node.', v_unmapped_actions);
         END IF;
 
         INSERT INTO workflow_status_connection_has_workflow_status_changing_events (
@@ -161,7 +187,7 @@ BEGIN
         WHERE edge_map.workflow_connection_id IS NULL;
 
         IF v_unmapped_events > 0 THEN
-          RAISE WARNING '% workflow events could not be migrated because their connection does not reference a previous node.', v_unmapped_events;
+          RAISE WARNING USING MESSAGE = format('%s workflow events could not be migrated because their connection does not reference a previous node.', v_unmapped_events);
         END IF;
 
         IF has_status_actions_logs THEN
@@ -185,7 +211,7 @@ BEGIN
           WHERE edge_map.workflow_connection_id IS NULL;
 
           IF v_unmapped_logs > 0 THEN
-            RAISE WARNING '% status action logs could not be remapped because their workflow connection is missing a previous node.', v_unmapped_logs;
+            RAISE WARNING USING MESSAGE = format('%s status action logs could not be remapped because their workflow connection is missing a previous node.', v_unmapped_logs);
           END IF;
 
           ALTER TABLE status_actions_logs
@@ -197,6 +223,80 @@ BEGIN
               FOREIGN KEY (action_id)
               REFERENCES workflow_status_actions (workflow_status_action_id)
               ON DELETE CASCADE;
+        END IF;
+
+        CREATE TEMP TABLE tmp_call_workflow_map (
+          call_id INT PRIMARY KEY,
+          workflow_id INT
+        ) ON COMMIT DROP;
+
+        IF call_has_proposal_workflow_id THEN
+          INSERT INTO tmp_call_workflow_map (call_id, workflow_id)
+          SELECT call_id, proposal_workflow_id
+          FROM call
+          WHERE proposal_workflow_id IS NOT NULL;
+        END IF;
+
+        IF call_has_workflow_id THEN
+          INSERT INTO tmp_call_workflow_map (call_id, workflow_id)
+          SELECT call_id, workflow_id
+          FROM call
+          WHERE workflow_id IS NOT NULL
+          ON CONFLICT (call_id) DO UPDATE
+            SET workflow_id = COALESCE(EXCLUDED.workflow_id, tmp_call_workflow_map.workflow_id);
+        END IF;
+
+        CREATE TEMP TABLE tmp_workflow_status_lookup (
+          workflow_id INT NOT NULL,
+          status_id INT NOT NULL,
+          workflow_status_id INT NOT NULL,
+          PRIMARY KEY (workflow_id, status_id)
+        ) ON COMMIT DROP;
+
+        INSERT INTO tmp_workflow_status_lookup (workflow_id, status_id, workflow_status_id)
+        SELECT workflow_id,
+               status_id,
+               MIN(workflow_status_id) AS workflow_status_id
+        FROM workflow_has_statuses
+        GROUP BY workflow_id, status_id;
+
+        WITH proposal_status_matches AS (
+          SELECT p.proposal_pk,
+                 lookup.workflow_status_id
+          FROM proposals p
+          JOIN tmp_call_workflow_map call_map
+            ON call_map.call_id = p.call_id
+          JOIN tmp_workflow_status_lookup lookup
+            ON lookup.workflow_id = call_map.workflow_id
+           AND lookup.status_id = p.status_id
+        )
+        UPDATE proposals p
+        SET workflow_status_id = matches.workflow_status_id
+        FROM proposal_status_matches matches
+        WHERE matches.proposal_pk = p.proposal_pk;
+
+        GET DIAGNOSTICS v_proposals_updated = ROW_COUNT;
+
+        SELECT COUNT(*)
+        INTO v_unmapped_proposals
+        FROM proposals p
+        LEFT JOIN tmp_call_workflow_map call_map
+          ON call_map.call_id = p.call_id
+        LEFT JOIN tmp_workflow_status_lookup lookup
+          ON lookup.workflow_id = call_map.workflow_id
+         AND lookup.status_id = p.status_id
+        WHERE p.workflow_status_id IS NULL
+          AND call_map.workflow_id IS NOT NULL
+          AND p.status_id IS NOT NULL;
+
+        IF v_proposals_updated = 0 THEN
+          RAISE NOTICE 'No proposals required workflow_status_id backfill.';
+        ELSE
+          RAISE NOTICE USING MESSAGE = format('%s proposals updated with workflow_status_id.', v_proposals_updated);
+        END IF;
+
+        IF v_unmapped_proposals > 0 THEN
+          RAISE WARNING USING MESSAGE = format('%s proposals could not be mapped to workflow_status_id during migration.', v_unmapped_proposals);
         END IF;
 
         DROP TABLE IF EXISTS workflow_connection_has_actions;

@@ -106,19 +106,19 @@ export class ProposalWorkflowEngine {
 
     const machine = await createWorkflowMachine(proposalWorkflowId);
 
-    const proposalWfStatus = Object.entries(machine.schema.states).find(
+    const currentProposalState = Object.entries(machine.schema.states).find(
       ([, state]) => {
         return (
           (state.meta as WorkflowStateMeta | undefined)?.workflowStatusId ===
           proposal.workflowStatusId
         );
       }
-    )?.[0];
+    )?.[0]; // find the state matching proposalWorkflowStatusId in the state machine
 
     const actor = createActor(
       machine,
       { id: proposal.primaryKey },
-      proposalWfStatus
+      currentProposalState
     );
     const currentWfStatus = actor.getState();
 

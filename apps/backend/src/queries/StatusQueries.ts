@@ -29,4 +29,18 @@ export default class StatusQueries {
 
     return statuses;
   }
+
+  @Authorized()
+  async getWorkflowStatus(agent: UserWithRole | null, id: number) {
+    const status = await this.dataSource.getWorkflowStatus(id);
+
+    return status;
+  }
+
+  @Authorized()
+  async getAllWorkflowStatuses(agent: UserWithRole | null, workflowId: number) {
+    const statuses = await this.dataSource.getAllWorkflowStatuses(workflowId);
+
+    return statuses;
+  }
 }

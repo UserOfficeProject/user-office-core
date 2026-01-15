@@ -55,7 +55,7 @@ import {
   InstrumentMinimalFragment,
   ProposalViewInstrument,
   ProposalsFilter,
-  Status,
+  WorkflowStatus,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -607,15 +607,15 @@ const ProposalTableOfficer = ({
     refreshTableData();
   };
 
-  const changeStatusOnProposals = async (status: Status) => {
+  const changeStatusOnProposals = async (workflowStatus: WorkflowStatus) => {
     const proposalPks = getSelectedProposalPks();
-    if (status?.id && proposalPks.length) {
+    if (workflowStatus?.workflowStatusId && proposalPks.length) {
       const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
         proposalPks: proposalPks,
-        statusId: status.id,
+        workflowStatusId: workflowStatus.workflowStatusId,
       });
       refreshTableData();
     }

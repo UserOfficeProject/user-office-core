@@ -26,9 +26,6 @@ mutation createWorkflow(
     }
     statuses {
       ...workflowStatus
-      status {
-        shortCode
-      }
     }
   }
 }

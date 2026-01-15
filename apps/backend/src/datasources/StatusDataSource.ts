@@ -7,6 +7,7 @@ export interface StatusDataSource {
   getStatus(statusId: string): Promise<Status | null>;
   getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;
+  getAllWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]>;
   updateStatus(status: UpdateStatusInput): Promise<Status>;
   deleteStatus(statusId: string): Promise<Status>;
   getDefaultStatus(entityType: Status['entityType']): Promise<Status | null>;

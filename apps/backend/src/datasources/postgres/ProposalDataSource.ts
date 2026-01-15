@@ -859,17 +859,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async changeProposalsWorkflowStatus(
-    statusId: number,
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    const dataToUpdate: { status_id: number; submitted?: boolean } = {
-      status_id: statusId,
-    };
+    const workflowStatus =
+      await this.statusDataSource.getWorkflowStatus(workflowStatusId);
 
-    // NOTE: If status is DRAFT re-open the proposal for submission
-    if (statusId === 1) {
-      dataToUpdate.submitted = false;
-    }
+    const dataToUpdate: Partial<ProposalRecord> = {
+      workflow_status_id: workflowStatusId,
+      status_id: workflowStatus?.statusId,
+      submitted: workflowStatus?.statusId === 'DRAFT' ? false : undefined,
+    };
 
     const result: ProposalRecord[] = await database
       .update(dataToUpdate, ['*'])
@@ -947,9 +947,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((value) => value.proposal_workflow_id);
 
     const result = await database('workflow_has_statuses')
-      .join('statuses', 'workflow_has_statuses.status_id', 'statuses.status_id')
       .where('workflow_has_statuses.workflow_id', proposalWorkflowId)
-      .andWhere('statuses.short_code', workflowStatus)
+      .andWhere('workflow_has_statuses.status_id', workflowStatus)
       .first();
 
     return !!result;

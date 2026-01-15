@@ -27,7 +27,7 @@ const CreateUpdateProposalStatus = ({
   const initialValues = proposalStatus
     ? proposalStatus
     : {
-        shortCode: '',
+        id: '',
         name: '',
         description: '',
         entityType: WorkflowType.PROPOSAL,
@@ -42,7 +42,6 @@ const CreateUpdateProposalStatus = ({
             const { updateStatus } = await api({
               toastSuccessMessage: 'Proposal status updated successfully',
             }).updateStatus({
-              id: proposalStatus.id,
               ...values,
             });
 
@@ -79,7 +78,7 @@ const CreateUpdateProposalStatus = ({
             label="Short code"
             type="text"
             sx={{
-              ...(!!initialValues.shortCode && {
+              ...(!!initialValues.id && {
                 '& .MuiInputBase-root.Mui-disabled': {
                   color: 'rgba(0, 0, 0, 0.7) !important',
                 },
@@ -89,7 +88,7 @@ const CreateUpdateProposalStatus = ({
             fullWidth
             data-cy="shortCode"
             required
-            disabled={!!initialValues.shortCode || isExecutingCall}
+            disabled={!!initialValues.id || isExecutingCall}
           />
           <Field
             name="name"

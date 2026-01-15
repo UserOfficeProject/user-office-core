@@ -171,8 +171,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           'call.proposal_workflow_id',
           'w.workflow_id'
         )
-        .leftJoin('statuses as s', 'w.status_id', 's.status_id')
-        .where('s.short_code', filter.proposalStatus)
+        .where('w.status_id', filter.proposalStatus)
         .distinctOn('call.call_id');
     }
 

@@ -1,6 +1,6 @@
 mutation addStatusToWorkflow(
   $workflowId: Int!
-  $statusId: Int!
+  $statusId: String!
   $posX: Int!
   $posY: Int!
 ) {

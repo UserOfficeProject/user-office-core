@@ -66,8 +66,7 @@ export function createFapReviewStub(
       questionaryId: 0,
       proposalId: '',
       status: {
-        id: 0,
-        shortCode: 'DRAFT',
+        id: 'DRAFT',
         description: '',
         name: '',
         isDefault: true,
@@ -92,7 +91,7 @@ export function createFapReviewStub(
       reviews: [],
       proposerId: 0,
       technicalReviews: [],
-      statusId: 0,
+      statusId: 'DRAFT',
       workflowStatusId: 0,
       visits: [],
       updated: new Date(),

@@ -75,11 +75,11 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div data-cy={`connection_${data.status.shortCode}`}>
+    <div data-cy={`connection_${data.status.id}`}>
       <StyledHandle
         type="target"
         position={Position.Top}
-        hidden={WORKFLOW_INITIAL_STATUSES.includes(data.status.shortCode)}
+        hidden={WORKFLOW_INITIAL_STATUSES.includes(data.status.id)}
       />
       <Container>
         <Title>
@@ -89,8 +89,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
               {data.status.name}
             </Typography>
           </TitleContent>
-          {WORKFLOW_INITIAL_STATUSES.includes(data.status.shortCode) ===
-            false && (
+          {WORKFLOW_INITIAL_STATUSES.includes(data.status.id) === false && (
             <IconButton
               size="small"
               onClick={(e) => {
@@ -112,7 +111,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
           )}
         </Title>
         <Description expanded={expanded}>
-          {data.status.shortCode} {data.status.description}
+          {data.status.id} {data.status.description}
         </Description>
       </Container>
       <StyledHandle type="source" position={Position.Bottom} />

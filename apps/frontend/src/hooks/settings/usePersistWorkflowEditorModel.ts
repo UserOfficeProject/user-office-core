@@ -71,7 +71,7 @@ export function usePersistWorkflowEditorModel() {
 
     const insertNewStatusInWorkflow = async (
       workflowId: number,
-      statusId: number,
+      statusId: string,
       posX: number,
       posY: number
     ) => {

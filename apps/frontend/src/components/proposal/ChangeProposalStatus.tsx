@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import { Status, WorkflowType } from 'generated/sdk';
-import { useStatusesData } from 'hooks/settings/useStatusesData';
+import { WorkflowStatus } from 'generated/sdk';
+import { useWorkflowStatusesData } from 'hooks/settings/useWorkflowStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
   selectedStatusId: yup.string().required('You must select proposal status'),
@@ -19,9 +19,9 @@ const changeProposalStatusValidationSchema = yup.object().shape({
 
 type ChangeProposalStatusProps = {
   close: () => void;
-  changeStatusOnProposals: (status: Status) => Promise<void>;
+  changeStatusOnProposals: (workflowStatus: WorkflowStatus) => Promise<void>;
   allSelectedProposalsHaveInstrument: boolean;
-  selectedProposalStatuses: number[];
+  selectedProposalStatuses: string[];
 };
 
 const ChangeProposalStatus = ({
@@ -34,7 +34,7 @@ const ChangeProposalStatus = ({
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
-  } = useStatusesData(WorkflowType.PROPOSAL);
+  } = useWorkflowStatusesData(1); // TODO use real workflow id
 
   const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
     (item) => item === selectedProposalStatuses[0]
@@ -52,7 +52,7 @@ const ChangeProposalStatus = ({
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedStatus = proposalStatuses.find(
-            (call) => call.id === values.selectedStatusId
+            (status) => status.statusId === values.selectedStatusId
           );
 
           if (!selectedStatus) {
@@ -86,8 +86,8 @@ const ChangeProposalStatus = ({
                   label="Select proposal status"
                   loading={loadingProposalStatuses}
                   items={proposalStatuses.map((status) => ({
-                    value: status.id,
-                    text: status.name,
+                    value: status.statusId,
+                    text: status.status.name,
                   }))}
                   required
                   disabled={isSubmitting}
@@ -95,13 +95,13 @@ const ChangeProposalStatus = ({
                 />
               </Grid>
             </Grid>
-            {values.selectedStatusId === 1 && (
+            {values.selectedStatusId === 'DRAFT' && (
               <Alert severity="warning">
                 Be aware that changing status to &quot;DRAFT&quot; will reopen
                 proposal for changes and submission.
               </Alert>
             )}
-            {values.selectedStatusId === 8 &&
+            {values.selectedStatusId === 'SCHEDULING' &&
               !allSelectedProposalsHaveInstrument && (
                 <Alert severity="warning">
                   {`Be aware that proposal/s not assigned to an ${i18n.format(

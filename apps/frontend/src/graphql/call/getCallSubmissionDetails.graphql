@@ -8,9 +8,6 @@ query getCallSubmissionDetails($callId: Int!) {
       }
       statuses {
         ...workflowStatus
-        status {
-          shortCode
-        }
       }
     }
   }

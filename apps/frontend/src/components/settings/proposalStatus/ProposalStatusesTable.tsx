@@ -44,7 +44,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
     />
   );
 
-  const deleteProposalStatus = async (id: number) => {
+  const deleteProposalStatus = async (id: string) => {
     return await api({
       toastSuccessMessage: 'Proposal status deleted successfully',
     })

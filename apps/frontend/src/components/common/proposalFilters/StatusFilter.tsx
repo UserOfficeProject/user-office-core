@@ -12,13 +12,13 @@ import { Status } from 'generated/sdk';
 type StatusFilterProps = {
   statuses?: Status[];
   isLoading?: boolean;
-  onChange?: Dispatch<number>;
+  onChange?: Dispatch<string>;
   shouldShowAll?: boolean;
-  statusId?: number;
-  hiddenStatuses: number[];
+  statusId?: string;
+  hiddenStatuses: string[];
 };
 
-function isStatusVisible(hiddenStatuses: number[], status: Status) {
+function isStatusVisible(hiddenStatuses: string[], status: Status) {
   if (hiddenStatuses != null) {
     for (let i = 0; i < hiddenStatuses.length; i++) {
       if (hiddenStatuses[i] === status.id) return false;
@@ -66,13 +66,13 @@ const StatusFilter = ({
 
                 return searchParams;
               });
-              onChange?.(status.target.value as number);
+              onChange?.(status.target.value);
             }}
-            value={statusId || 0}
-            defaultValue={0}
+            value={statusId || ''}
+            defaultValue={''}
             data-cy="status-filter"
           >
-            {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value={''}>All</MenuItem>}
             {statuses.map(
               (status) =>
                 isStatusVisible(hiddenStatuses, status) && (

@@ -111,7 +111,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               status.statusId &&
               currentStatusId &&
               status.statusId === currentStatusId &&
-              editableStatusesShortCodes?.includes(status.status.shortCode)
+              editableStatusesShortCodes?.includes(status.statusId)
           );
 
         if (proposal.status != null && hasUpcomingEditableStatus) {
@@ -142,7 +142,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     <>
       <ProposalQuestionaryReview data={proposal} />
       <NavigationFragment
-        disabled={proposal.status?.id === 0}
+        disabled={proposal.status?.id === ''}
         isLoading={isSubmitting}
       >
         <NavigButton

@@ -320,9 +320,9 @@ const ProposalTableInstrumentScientist = ({
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: false,
     },
-    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    proposalStatusId: proposalStatusId,
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    excludeProposalStatusIds: [9],
+    excludeProposalStatusIds: ['SCHEDULING'],
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,
       dataType,
@@ -982,7 +982,7 @@ const ProposalTableInstrumentScientist = ({
               setProposalFilter={setProposalFilter}
               filter={proposalFilter}
               hiddenStatuses={
-                proposalFilter.excludeProposalStatusIds as number[]
+                proposalFilter.excludeProposalStatusIds as string[]
               }
             />
           </Grid>

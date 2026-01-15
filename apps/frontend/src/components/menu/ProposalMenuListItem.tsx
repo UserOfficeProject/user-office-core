@@ -27,7 +27,7 @@ export function ProposalMenuListItem() {
 
   const calls = useCallsData(
     {
-      proposalStatusShortCode: 'QUICK_REVIEW',
+      proposalStatus: 'QUICK_REVIEW',
     },
     CallsDataQuantity.MINIMAL
   ).calls;
