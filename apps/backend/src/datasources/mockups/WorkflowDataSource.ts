@@ -31,8 +31,8 @@ export const dummyStatuses = [
 ];
 
 export const dummyWorkflowConnections = [
-  new WorkflowConnection(1, 1, 1, 2),
-  new WorkflowConnection(2, 1, 2, 1),
+  new WorkflowConnection(1, 1, 1, 2, 'bottom-source', 'top-target'),
+  new WorkflowConnection(2, 1, 2, 1, 'bottom-source', 'top-target'),
 ];
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(

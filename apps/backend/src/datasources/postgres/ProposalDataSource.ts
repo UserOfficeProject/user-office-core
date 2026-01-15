@@ -369,7 +369,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           proposer_id,
           call_id,
           questionary_id,
-          status_id: 1,
+          status_id: draftWfStatus.statusId,
           workflow_status_id: draftWfStatus.workflowStatusId,
         },
         ['*']

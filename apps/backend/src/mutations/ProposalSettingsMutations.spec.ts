@@ -162,11 +162,18 @@ describe('Test Proposal settings mutations', () => {
     return expect(
       workflowMutationsInstance.createWorkflowConnection(
         dummyUserOfficerWithRole,
-        { nextWorkflowStatusId: 2, prevWorkflowStatusId: 1 }
+        {
+          nextWorkflowStatusId: 2,
+          prevWorkflowStatusId: 1,
+          sourceHandle: 'bottom-source',
+          targetHandle: 'top-target',
+        }
       )
     ).resolves.toMatchObject({
       nextWorkflowStatusId: 2,
       prevWorkflowStatusId: 1,
+      sourceHandle: 'bottom-source',
+      targetHandle: 'top-target',
     });
   });
 
