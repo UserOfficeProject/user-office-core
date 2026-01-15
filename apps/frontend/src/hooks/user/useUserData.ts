@@ -62,6 +62,7 @@ export function useUserWithReviewsData(filters?: {
   instrumentId?: number | null;
   status?: ReviewStatus;
   reviewer?: ReviewerFilter;
+  active?: boolean;
 }) {
   const api = useDataApi();
   const [userWithReviewsFilter, setUserWithReviewsFilter] = useState(filters);

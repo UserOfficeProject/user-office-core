@@ -677,7 +677,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/DeclareShipments/:experimentPk"
+          path="/Experiments/:experimentPk/Shipments"
           element={
             <TitledRoute
               title="Declare Shipments"

@@ -10,7 +10,7 @@ import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { IdleContextPicker } from 'context/IdleContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { UserContextProvider } from 'context/UserContextProvider';
-import { getUnauthorizedApi } from 'hooks/common/useDataApi';
+import { sendClientLog } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
 import AppRoutes from './AppRoutes';
@@ -72,19 +72,30 @@ function Root() {
 
 const router = createBrowserRouter([{ path: '*', element: <Root /> }]);
 
-class App extends React.Component {
-  state = { errorUserInformation: '' };
-  static getDerivedStateFromError() {
+type ErrorUserInformation = {
+  id: string | number;
+  currentRole: string | null;
+};
+
+type AppState = {
+  errorUserInformation: ErrorUserInformation | null;
+  errorToken: string | null;
+};
+
+class App extends React.Component<Record<string, never>, AppState> {
+  state: AppState = { errorUserInformation: null, errorToken: null };
+  static getDerivedStateFromError(): AppState {
     // Update state so the next render will show the fallback UI.
     const user = localStorage.getItem('user');
-    const errorUserInformation = {
+    const token = localStorage.getItem('token');
+    const errorUserInformation: ErrorUserInformation = {
       id: user ? JSON.parse(user).id : 'Not logged in',
       currentRole: localStorage.getItem('currentRole'),
     };
 
     clearSession();
 
-    return { errorUserInformation };
+    return { errorUserInformation, errorToken: token };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -98,7 +109,7 @@ class App extends React.Component {
     } catch {
       errorMessage = 'Exception while preparing error message';
     } finally {
-      getUnauthorizedApi().addClientLog({ error: errorMessage });
+      void sendClientLog(errorMessage, this.state.errorToken);
     }
   }
 
