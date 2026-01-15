@@ -152,7 +152,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         type: 'statusNode',
         data: {
           label: workflowStatus.status.name,
-          status: workflowStatus.status,
+          workflowStatus: workflowStatus,
           statusId: statusId,
           onDelete: (workflowStatusId: string) => {
             dispatch({
@@ -341,7 +341,10 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         ariaLabel: `connection_${status.id}`,
         data: {
           label: status.name,
-          status,
+          workflowStatus: {
+            workflowStatusId: 0, // Temporary ID until persisted
+            status: status,
+          },
           onDelete: (nodeId: string) => {
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,

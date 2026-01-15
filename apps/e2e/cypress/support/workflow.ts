@@ -3,12 +3,12 @@ import {
   AddConnectionStatusActionsMutationVariables,
   AddWorkflowStatusMutation,
   AddWorkflowStatusMutationVariables,
-  SetStatusChangingEventsOnConnectionMutation,
-  SetStatusChangingEventsOnConnectionMutationVariables,
   CreateStatusMutation,
   CreateStatusMutationVariables,
   CreateWorkflowMutation,
   CreateWorkflowMutationVariables,
+  SetStatusChangingEventsOnConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutationVariables,
   Status,
 } from '@user-office-software-libs/shared-types';
 
@@ -100,7 +100,7 @@ function createDataTransferMock() {
  */
 
 function dragStatusIntoWorkflow(
-  status: Pick<Status, 'shortCode' | 'id'>,
+  status: Pick<Status, 'id'>,
   options: {
     clientX?: number;
     clientY?: number;
@@ -108,7 +108,7 @@ function dragStatusIntoWorkflow(
 ) {
   const { clientX = 500, clientY = 300 } = options;
 
-  const sourceSelector = `[data-cy="status_${status.shortCode}"]`;
+  const sourceSelector = `[data-cy="status_${status.id}"]`;
   const targetSelector = '[data-testid="rf__background"]';
   cy.get(sourceSelector).then(($element) => {
     const sourceElement = $element[0];
@@ -147,14 +147,14 @@ function dragStatusIntoWorkflow(
  * @param options - Additional options for the connection operation
  */
 function connectReactFlowNodes(
-  sourceStatus: Pick<Status, 'shortCode'>,
-  targetStatus: Pick<Status, 'shortCode'>,
+  sourceStatus: Pick<Status, 'id'>,
+  targetStatus: Pick<Status, 'id'>,
   options?: {
     force?: boolean;
   }
 ) {
-  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.shortCode}"] [data-handlepos="bottom"]`;
-  const targetNodeSelector = `[data-cy="connection_${targetStatus.shortCode}"] [data-handlepos="top"]`;
+  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.id}"] [data-handlepos="bottom"]`;
+  const targetNodeSelector = `[data-cy="connection_${targetStatus.id}"] [data-handlepos="top"]`;
   cy.get(sourceNodeSelector).click(options);
   cy.get(targetNodeSelector).click(options);
 }

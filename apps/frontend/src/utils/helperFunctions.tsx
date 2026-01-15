@@ -68,6 +68,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     principalInvestigator: proposal.proposer || null,
     principalInvestigatorId: proposal.proposer?.id,
     title: proposal.title,
+    workflowStatusId: proposal.workflowStatusId,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
     statusName: proposal.status?.name || '',

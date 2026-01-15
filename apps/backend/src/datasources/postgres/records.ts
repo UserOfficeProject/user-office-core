@@ -154,6 +154,7 @@ export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
   readonly principal_investigator: number;
+  readonly proposal_workflow_status_id: number;
   readonly proposal_status_id: string;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
@@ -848,6 +849,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_pk,
     proposal.title || '',
     proposal.principal_investigator,
+    proposal.proposal_workflow_status_id,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
@@ -1329,6 +1331,7 @@ export const createProposalViewObjectWithTechniques = (
     proposal.proposal_pk,
     proposal.title || '',
     proposal.principal_investigator,
+    proposal.proposal_workflow_status_id,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,

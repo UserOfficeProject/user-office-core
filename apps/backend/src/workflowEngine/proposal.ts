@@ -101,6 +101,8 @@ export class ProposalWorkflowEngine {
     )?.id;
 
     if (!proposalWorkflowId) {
+      logger.logError('Workflow not found for proposal', { proposalPk });
+
       return;
     }
 

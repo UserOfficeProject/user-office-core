@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 
-import { Status } from 'generated/sdk';
+import { WorkflowStatus } from 'generated/sdk';
 import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
 const Container = styled(Paper)({
@@ -60,7 +60,7 @@ interface StatusNodeProps {
   id: string; // Node ID from React Flow
   data: {
     label: string;
-    status: Status;
+    workflowStatus: WorkflowStatus;
     onDelete: (connectionId: string) => void;
   };
   selected: boolean;
@@ -75,7 +75,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div data-cy={`connection_${data.status.id}`}>
+    <div data-cy={`connection_${data.workflowStatus.statusId}`}>
       <StyledHandle type="target" position={Position.Top} id="top-target" />
       <StyledHandle
         type="target"
@@ -94,10 +94,11 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
           <TitleContent onClick={handleToggleExpand}>
             <ExpandIcon expanded={expanded} />
             <Typography variant="subtitle1" color="black" fontSize={'13px'}>
-              {data.status.name}
+              {data.workflowStatus.status.name}
             </Typography>
           </TitleContent>
-          {WORKFLOW_INITIAL_STATUSES.includes(data.status.id) === false && (
+          {WORKFLOW_INITIAL_STATUSES.includes(data.workflowStatus.statusId) ===
+            false && (
             <IconButton
               size="small"
               onClick={(e) => {
@@ -119,8 +120,18 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
           )}
         </Title>
         <Description expanded={expanded}>
-          {data.status.id} {data.status.description}
+          {data.workflowStatus.status.id}{' '}
+          {data.workflowStatus.status.description}
         </Description>
+        <Typography
+          variant="caption"
+          color="textSecondary"
+          sx={{ padding: '0 10px 10px 10px' }}
+          hidden={!expanded}
+        >
+          Workflow Status ID: {data.workflowStatus.workflowStatusId}
+        </Typography>
+
         <StyledHandle
           type="source"
           position={Position.Bottom}

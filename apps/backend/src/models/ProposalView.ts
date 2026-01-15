@@ -11,6 +11,7 @@ export class ProposalView {
     public primaryKey: number,
     public title: string,
     public principalInvestigatorId: number,
+    public workflowStatusId: number,
     public statusId: string,
     public statusName: string,
     public statusDescription: string,

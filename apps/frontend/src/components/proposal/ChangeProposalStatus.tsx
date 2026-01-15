@@ -14,14 +14,17 @@ import { WorkflowStatus } from 'generated/sdk';
 import { useWorkflowStatusesData } from 'hooks/settings/useWorkflowStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
-  selectedStatusId: yup.string().required('You must select proposal status'),
+  selectedWorkflowStatusId: yup
+    .string()
+    .required('You must select proposal status'),
 });
 
 type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (workflowStatus: WorkflowStatus) => Promise<void>;
   allSelectedProposalsHaveInstrument: boolean;
-  selectedProposalStatuses: string[];
+  selectedProposalStatuses: number[];
+  selectedProposalsWorkflowIds: number[];
 };
 
 const ChangeProposalStatus = ({
@@ -29,34 +32,63 @@ const ChangeProposalStatus = ({
   changeStatusOnProposals,
   allSelectedProposalsHaveInstrument,
   selectedProposalStatuses,
+  selectedProposalsWorkflowIds,
 }: ChangeProposalStatusProps) => {
   const { t } = useTranslation();
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
-  } = useWorkflowStatusesData(1); // TODO use real workflow id
+  } = useWorkflowStatusesData(selectedProposalsWorkflowIds[0]);
 
-  const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
-    (item) => item === selectedProposalStatuses[0]
+  const allSelectedProposalsHaveSameWorkflowStatus =
+    selectedProposalStatuses.every(
+      (item) => item === selectedProposalStatuses[0]
+    );
+
+  const allProposalsHaveSameWorkflow = selectedProposalsWorkflowIds.every(
+    (id) => id === selectedProposalsWorkflowIds[0]
   );
 
-  const selectedProposalsStatus = allSelectedProposalsHaveSameStatus
-    ? selectedProposalStatuses[0]
-    : null;
+  const selectedProposalsWorkflowStatus =
+    allSelectedProposalsHaveSameWorkflowStatus
+      ? selectedProposalStatuses[0]
+      : null;
+
+  if (!allProposalsHaveSameWorkflow) {
+    return (
+      <Container component="main" maxWidth="xs">
+        <Alert severity="error" sx={{ mt: 4 }}>
+          All selected proposals must belong to the same workflow in order to
+          change their status.
+        </Alert>
+        <Button
+          fullWidth
+          sx={(theme) => ({
+            margin: theme.spacing(3, 0, 2),
+          })}
+          onClick={close}
+          data-cy="close-proposal-status-change-error"
+        >
+          Close
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          selectedStatusId: selectedProposalsStatus,
+          selectedWorkflowStatusId: selectedProposalsWorkflowStatus,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedStatus = proposalStatuses.find(
-            (status) => status.statusId === values.selectedStatusId
+            (status) =>
+              status.workflowStatusId === values.selectedWorkflowStatusId
           );
 
           if (!selectedStatus) {
-            actions.setFieldError('selectedStatusId', 'Required');
+            actions.setFieldError('selectedWorkflowStatusId', 'Required');
 
             return;
           }
@@ -82,11 +114,11 @@ const ChangeProposalStatus = ({
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
-                  name="selectedStatusId"
+                  name="selectedWorkflowStatusId"
                   label="Select proposal status"
                   loading={loadingProposalStatuses}
                   items={proposalStatuses.map((status) => ({
-                    value: status.statusId,
+                    value: status.workflowStatusId,
                     text: status.status.name,
                   }))}
                   required
@@ -95,13 +127,19 @@ const ChangeProposalStatus = ({
                 />
               </Grid>
             </Grid>
-            {values.selectedStatusId === 'DRAFT' && (
+            {proposalStatuses.find(
+              (status) =>
+                status.workflowStatusId === values.selectedWorkflowStatusId
+            )?.statusId === 'DRAFT' && (
               <Alert severity="warning">
                 Be aware that changing status to &quot;DRAFT&quot; will reopen
                 proposal for changes and submission.
               </Alert>
             )}
-            {values.selectedStatusId === 'SCHEDULING' &&
+            {proposalStatuses.find(
+              (status) =>
+                status.workflowStatusId === values.selectedWorkflowStatusId
+            )?.statusId === 'SCHEDULING' &&
               !allSelectedProposalsHaveInstrument && (
                 <Alert severity="warning">
                   {`Be aware that proposal/s not assigned to an ${i18n.format(
@@ -110,7 +148,7 @@ const ChangeProposalStatus = ({
                   )} will not be shown in the scheduler after changing status to "SCHEDULING"`}
                 </Alert>
               )}
-            {!values.selectedStatusId && (
+            {!values.selectedWorkflowStatusId && (
               <Alert
                 severity="warning"
                 data-cy="proposal-different-statuses-change"

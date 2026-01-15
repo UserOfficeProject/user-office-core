@@ -1024,10 +1024,13 @@ const ProposalTableOfficer = ({
             changeStatusOnProposals={changeStatusOnProposals}
             close={(): void => setOpenChangeProposalStatus(false)}
             selectedProposalStatuses={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.statusId
+              (selectedProposal) => selectedProposal.workflowStatusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposalsData.every(
               (selectedProposal) => selectedProposal.instruments?.length
+            )}
+            selectedProposalsWorkflowIds={selectedProposalsData.map(
+              (selectedProposal) => selectedProposal.workflowId
             )}
           />
         </DialogContent>

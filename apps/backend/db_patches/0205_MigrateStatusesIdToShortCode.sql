@@ -179,6 +179,7 @@ BEGIN
             p.proposal_pk,
             p.title,
             p.proposer_id AS principal_investigator,
+            p.workflow_status_id AS proposal_workflow_status_id,
             p.status_id AS proposal_status_id,
             s.name AS proposal_status_name,
             s.description AS proposal_status_description,
