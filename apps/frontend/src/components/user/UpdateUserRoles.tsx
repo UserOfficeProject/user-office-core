@@ -98,12 +98,15 @@ export default function UpdateUserRoles(props: UpdateUserRolesProps) {
         }}
         editable={{
           onRowDelete: (oldData) =>
-            new Promise<void>(async (resolve) => {
+            new Promise<void>((resolve, reject) => {
               const newRoles = removeRole(oldData);
               if (newRoles) {
-                await sendUpdateRoles(newRoles);
+                sendUpdateRoles(newRoles)
+                  .then(() => resolve())
+                  .catch(() => reject());
+              } else {
+                resolve();
               }
-              resolve();
             }),
         }}
       />

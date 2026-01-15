@@ -1,9 +1,8 @@
 import { immerable } from 'immer';
 
-import { Questionary } from 'generated/sdk';
+import { Questionary, TemplateGroupId } from 'generated/sdk';
 
 import { ExperimentSafetyWithQuestionary } from './ExperimentSafetyWithQuestionary';
-import { TemplateGroupId } from '../../../generated/sdk';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ExperimentSafetySubmissionState extends QuestionarySubmissionState {

@@ -14,6 +14,8 @@ type InputComponentType<T> = T & {
   templateGroup: TemplateGroupId;
 };
 
+const rand = Math.random();
+
 /**
  * Adds a clickable checkmark to the table indicating which template is active
  * @param Component Input component
@@ -27,7 +29,8 @@ function withMarkTemplateAsActiveAction<T>(
     const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
       props.templateGroup
     );
-    const [seed, setSeed] = useState(Math.random());
+
+    const [seed, setSeed] = useState(rand);
 
     if (activeTemplateId === undefined) {
       return <UOLoader />;

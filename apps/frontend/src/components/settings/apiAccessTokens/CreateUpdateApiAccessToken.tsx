@@ -221,7 +221,7 @@ const CreateUpdateApiAccessToken = ({
             });
 
             close(updateApiAccessToken);
-          } catch (error) {
+          } catch {
             close(null);
           }
         } else {
@@ -239,7 +239,7 @@ const CreateUpdateApiAccessToken = ({
             );
 
             close(createApiAccessToken, false);
-          } catch (error) {
+          } catch {
             close(null);
           }
         }

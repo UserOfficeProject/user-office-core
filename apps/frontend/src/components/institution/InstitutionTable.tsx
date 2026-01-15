@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { Link } from '@mui/material';
+import { Typography, Link } from '@mui/material';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
@@ -48,7 +47,7 @@ const InstitutionPage = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

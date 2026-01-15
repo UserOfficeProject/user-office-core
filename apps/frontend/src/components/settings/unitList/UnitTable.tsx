@@ -47,7 +47,7 @@ const UnitTable = () => {
       }).deleteUnit({ id: id as string });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

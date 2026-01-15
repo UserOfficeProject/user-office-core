@@ -157,7 +157,7 @@ const TechnicalBulkReassignModal = ({
           (inst) => inst.id === data.instrumentId
         );
 
-        const userList = instrument ? [...instrument?.scientists] : [];
+        const userList = instrument ? [...instrument.scientists] : [];
         if (
           !userList.find(
             (user) => user.id === instrument?.instrumentContact?.id

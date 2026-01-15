@@ -1,9 +1,10 @@
 import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -124,7 +125,7 @@ const AssignInstrumentsToCall = ({
       });
 
       assignInstrumentsToCall(response.assignInstrumentsToCall.instruments);
-    } catch (error) {
+    } catch {
       return;
     }
   };

@@ -1,7 +1,7 @@
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import IconButton from '@mui/material/IconButton';
-import { TextFieldProps } from '@mui/material/TextField';
 import MuiTextField, {
+  TextFieldProps,
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';

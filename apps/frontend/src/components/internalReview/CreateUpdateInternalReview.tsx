@@ -93,7 +93,7 @@ const CreateUpdateInternalReview = ({
             setUsersData(data.users?.users || []);
           }
         });
-    } catch (error) {
+    } catch {
       close(null);
     }
   };
@@ -153,7 +153,7 @@ const CreateUpdateInternalReview = ({
             });
 
             close(updateInternalReview as InternalReview);
-          } catch (error) {
+          } catch {
             close(null);
           }
         } else {
@@ -171,7 +171,7 @@ const CreateUpdateInternalReview = ({
             });
 
             close(createInternalReview as InternalReview);
-          } catch (error) {
+          } catch {
             close(null);
           }
         }

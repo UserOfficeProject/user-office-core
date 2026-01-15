@@ -54,7 +54,7 @@ const UpdateInstitution = ({ close, institution }: UpdateInstitutionProps) => {
       });
 
       close(updateInstitution);
-    } catch (error) {
+    } catch {
       close(null);
     }
   };

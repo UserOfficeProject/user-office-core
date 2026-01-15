@@ -10,11 +10,11 @@ import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import i18n from 'i18n';
-import { useCallback, ReactElement } from 'react';
-import React, { useState } from 'react';
+import React, { useCallback, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -22,8 +22,10 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
   UpdateCallInput,
   AssignInstrumentsToCallMutation,
+  InstrumentWithAvailabilityTime,
+  UserRole,
+  Call,
 } from 'generated/sdk';
-import { InstrumentWithAvailabilityTime, UserRole, Call } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -36,7 +38,6 @@ import withConfirm from 'utils/withConfirm';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CallReorder from './CallOrderEditor';
-// eslint-disable-next-line import/order
 import CallStatusFilter, {
   CallStatus,
   CallStatusFilters,
@@ -250,7 +251,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       setCalls(newObjectsArray);
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

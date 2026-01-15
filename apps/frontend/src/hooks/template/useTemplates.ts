@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetTemplatesQuery } from 'generated/sdk';
+import { GetTemplatesQuery, TemplatesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-
-import { TemplatesFilter } from './../../generated/sdk';
 
 type Templates = GetTemplatesQuery['templates'];
 

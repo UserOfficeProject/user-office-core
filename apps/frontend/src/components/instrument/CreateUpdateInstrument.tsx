@@ -10,9 +10,10 @@ import {
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik, FormikProps } from 'formik';
-import i18n from 'i18n';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TextField from 'components/common/FormikUITextField';
@@ -95,7 +96,7 @@ const CreateUpdateInstrument = ({
             setUsersData(data.users?.users || []);
           }
         });
-    } catch (error) {
+    } catch {
       close(null);
     }
   };
@@ -175,7 +176,7 @@ const CreateUpdateInstrument = ({
               });
 
               close(updateInstrument);
-            } catch (error) {
+            } catch {
               close(null);
             }
           },
@@ -202,7 +203,7 @@ const CreateUpdateInstrument = ({
           });
 
           close(updateInstrument);
-        } catch (error) {
+        } catch {
           close(null);
         }
       }
@@ -217,7 +218,7 @@ const CreateUpdateInstrument = ({
         }).createInstrument(values);
 
         close(createInstrument);
-      } catch (error) {
+      } catch {
         close(null);
       }
     }

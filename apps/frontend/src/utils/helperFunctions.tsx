@@ -158,6 +158,7 @@ export const isCallEnded = (
 export const urlValidationSchema = () => {
   return Yup.string()
     .matches(
+      // eslint-disable-next-line no-useless-escape
       /https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63})|(localhost))\b([-a-zA-Z0-9@:%_\+.~#?&/=]*)/i,
       'Provide a valid URL that includes the HTTP or HTTPS protocol'
     )

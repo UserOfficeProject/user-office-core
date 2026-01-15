@@ -1,10 +1,11 @@
 import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete, Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
@@ -268,18 +269,19 @@ const AssignedInstrumentsTable = ({
                 (instrument) => instrument.id === instrumentUpdatedData.id
               );
               const instrumentUpdatePromise = new Promise<void>(
-                async (resolve, reject) => {
+                (resolve, reject) => {
                   if (
                     instrumentUpdatedData &&
                     instrumentUpdatedData.availabilityTime &&
                     selectedInstrument?.availabilityTime !==
                       instrumentUpdatedData.availabilityTime
                   ) {
-                    await updateInstrument({
+                    updateInstrument({
                       id: instrumentUpdatedData.id,
                       availabilityTime: instrumentUpdatedData.availabilityTime,
-                    });
-                    resolve();
+                    })
+                      .then(() => resolve())
+                      .catch((error) => reject(error));
                   } else {
                     reject();
                   }
@@ -288,15 +290,16 @@ const AssignedInstrumentsTable = ({
 
               const fapUpdatePromise =
                 new Promise<UpdateFapToCallInstrumentMutation>(
-                  async (resolve, reject) => {
+                  (resolve, reject) => {
                     if (
                       instrumentUpdatedData &&
                       selectedInstrument?.fapId !== instrumentUpdatedData.fapId
                     ) {
-                      const response = await updateFapToCallInstrument({
+                      updateFapToCallInstrument({
                         ...instrumentUpdatedData,
-                      });
-                      resolve(response);
+                      })
+                        .then((response) => resolve(response))
+                        .catch((error) => reject(error));
                     } else {
                       reject();
                     }

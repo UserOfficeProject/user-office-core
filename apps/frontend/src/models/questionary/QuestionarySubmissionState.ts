@@ -4,8 +4,14 @@ import { Reducer } from 'react';
 
 import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { GenericTemplateFragment, Maybe, TemplateGroupId } from 'generated/sdk';
-import { Answer, Questionary } from 'generated/sdk';
+import {
+  GenericTemplateFragment,
+  Maybe,
+  TemplateGroupId,
+  Answer,
+  Questionary,
+  SampleFragment,
+} from 'generated/sdk';
 import { deepClone } from 'utils/json';
 import { clamp } from 'utils/Math';
 import {
@@ -14,7 +20,6 @@ import {
 } from 'utils/useReducerWithMiddleWares';
 import { WithConfirmType } from 'utils/withConfirm';
 
-import { SampleFragment } from './../../generated/sdk';
 import { ExperimentSampleWithQuestionary } from './experimentSample/ExperimentSampleWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
 import { StepType } from './StepType';

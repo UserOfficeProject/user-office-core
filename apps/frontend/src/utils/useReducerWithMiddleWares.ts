@@ -23,6 +23,7 @@ function compose(
 }
 
 //TODO: Learn more about this
+// I agree idk what this is doing either
 export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   reducer: R,
   initialState: ReducerState<R>,
@@ -32,6 +33,7 @@ export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   let state = hook[0];
   const setState = hook[1];
   const dispatch = (action: any): ReducerAction<R> => {
+    // eslint-disable-next-line react-hooks/immutability
     state = reducer(state, action);
     setState(state);
 

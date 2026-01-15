@@ -160,7 +160,7 @@ function ParticipantSelector({
 
         setOptions(users?.users || []);
       }
-    } catch (error) {
+    } catch {
       setOptions([]);
     } finally {
       isPendingSearch.current = false;
