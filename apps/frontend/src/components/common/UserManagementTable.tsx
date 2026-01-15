@@ -159,6 +159,7 @@ const UserManagementTable = ({
                 ? (user) => onUserAction('setPrincipalInvestigator', user)
                 : undefined
             }
+            persistUrlQueryParams={true}
           />
 
           {invites.length > 0 && (
