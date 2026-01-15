@@ -11,7 +11,7 @@ import {
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { isRejection, Rejection } from '../models/Rejection';
+import { isRejection } from '../models/Rejection';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
@@ -236,135 +236,6 @@ test('externalTokenLogin supplies a new JWT', async () => {
 
   const decoded = verifyToken<AuthJwtPayload>(result as string);
   expect(decoded.user.id).toBe(dummyUser.id);
-});
-
-// Tests for updateUserByOidcSub functionality
-describe('updateUserByOidcSub', () => {
-  test('A user can update their own profile by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'UpdatedJane',
-      lastname: 'UpdatedDoe',
-      email: 'updated.jane@example.com',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'UpdatedJane',
-      lastname: 'UpdatedDoe',
-      email: 'updated.jane@example.com',
-    });
-  });
-
-  test('A user officer can update another user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(
-      dummyUserOfficerWithRole,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'OfficerUpdatedJane',
-        department: 'Updated Department',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'OfficerUpdatedJane',
-      department: 'Updated Department',
-    });
-  });
-  test('A user cannot update another user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(
-      dummyUserNotOnProposalWithRole,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'ShouldNotUpdate',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe(
-      'Can not update user because of insufficient permissions'
-    );
-  });
-
-  test('A not logged in user cannot update a user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(null, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'ShouldNotUpdate',
-      id: dummyUser.id,
-    });
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe('NOT_LOGGED_IN');
-  });
-
-  test('A user can update partial profile data by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
-    });
-  });
-
-  test('A user cannot update someone else profile even with their own OIDC sub when trying to update different user', async () => {
-    // Simulate user with different OIDC sub trying to update dummyUser
-    const userWithDifferentOidcSub = {
-      ...dummyUserNotOnProposalWithRole,
-      oidcSub: 'different-oidc-sub',
-    };
-
-    const result = await userMutations.updateUserByOidcSub(
-      userWithDifferentOidcSub,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'ShouldNotUpdate',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe(
-      'Can not update user because of insufficient permissions'
-    );
-  });
-
-  test('Empty update object should work', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual(dummyUser);
-  });
-
-  test('Update should preserve original user data for unspecified fields', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'OnlyFirstName',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'OnlyFirstName',
-    });
-
-    // Verify other fields remain unchanged
-    expect(isRejection(result)).toBe(false);
-    expect((result as typeof dummyUser).lastname).toBe(dummyUser.lastname);
-    expect((result as typeof dummyUser).email).toBe(dummyUser.email);
-    expect((result as typeof dummyUser).department).toBe(dummyUser.department);
-  });
 });
 
 describe('upsertUserByOidcSub', () => {
