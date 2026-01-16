@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import { WorkflowStatus } from 'generated/sdk';
+import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
 const Container = styled(Paper)({
@@ -56,7 +57,7 @@ const StyledHandle = styled(Handle)({
   background: '#333',
 });
 
-interface StatusNodeProps {
+interface StatusNodeProps extends WithConfirmProps {
   id: string; // Node ID from React Flow
   data: {
     label: string;
@@ -66,7 +67,7 @@ interface StatusNodeProps {
   selected: boolean;
 }
 
-const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
+const StatusNode: React.FC<StatusNodeProps> = ({ id, data, confirm }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleToggleExpand = (e: React.MouseEvent) => {
@@ -103,7 +104,15 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                data.onDelete(id);
+                confirm(
+                  () => {
+                    data.onDelete(id);
+                  },
+                  {
+                    title: 'Delete status',
+                    description: `Are you sure you want to delete the status?`,
+                  }
+                )();
               }}
               title="Delete status"
               sx={{
@@ -142,4 +151,4 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
   );
 };
 
-export default StatusNode;
+export default withConfirm(StatusNode);
