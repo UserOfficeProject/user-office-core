@@ -27,13 +27,16 @@ context('PageTable component tests', () => {
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
-      cy.get('[data-cy=add-participant-button]').click();
-
-      cy.get('[data-cy=participant-modal]').as('modal');
+      cy.get('[data-cy="add-participant-button"]').click();
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(
         initialDBData.users.user2.email
       );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user2.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]');
 
       cy.get('[role=presentation]')
         .contains(initialDBData.users.user2.lastName)
