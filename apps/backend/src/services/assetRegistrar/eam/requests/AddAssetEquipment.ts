@@ -1,180 +1,38 @@
-const date = new Date();
+import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 
-/**
- * Add Asset Equipment
- * @param proposalTitle title of the proposal
- * @param weightKilograms weight in kilograms
- * @param widthMeters width in meters
- * @param heightMeters height in meters
- * @param lengthMeters length in meters
- * @returns the JSON Payload
- */
-const getRequest = (
-  partCode: string,
+const getAddAssetEquipmentRequestPayload = (
   proposalId: string,
-  proposalTitle: string,
-  weightKilograms: number,
-  widthMeters: number,
-  heightMeters: number,
-  lengthMeters: number,
-  isDangerousGoods: string,
-  dangerousGoodsUnNumber: string,
-  dangerousGoodsDetails: string,
-  shipmentSampleRisks: string,
-  parcelValue: string,
-  shipmentSenderCompany: string,
-  shipmentSenderStreetAddress: string,
-  shipmentSenderZipCode: string,
-  shipmentSenderCityCountry: string,
-  shipmentSenderName: string,
-  shipmentSenderEmail: string,
-  shipmentSenderPhone: string,
-  instrumentShortCodes: string[]
+  proposalTitle: string
 ) => ({
-  description: proposalTitle.substr(0, 80),
-  organization: 'ESS',
-  code: partCode + '-' + proposalId + date.valueOf(),
-  typeCode: 'A',
-  statusCode: 'I',
-  departmentCode: 'SMPL',
-  customField: [
-    {
-      code: '10000001',
-      label: 'Weight (Kg)',
-      classCode: 'SMPCON',
-      value: weightKilograms,
-      lovType: '-',
-      lovValidate: '-',
+  ASSETID: {
+    EQUIPMENTCODE: proposalId + '-' + new Date().valueOf(),
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
+      DESCRIPTION: getEnvOrThrow('EAM_ORGANIZATION_NAME'),
     },
-    {
-      code: '10000002',
-      label: 'Width (m)',
-      classCode: 'SMPCON',
-      value: widthMeters,
-      lovType: '-',
-      lovValidate: '-',
+    DESCRIPTION: proposalTitle,
+  },
+  DESCRIPTION: proposalTitle,
+  STATUS: {
+    STATUSCODE: 'I',
+    DESCRIPTION: 'Installed',
+  },
+  DEPARTMENTID: {
+    DEPARTMENTCODE: 'SMPL',
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: '*',
+      DESCRIPTION: 'Default',
     },
-    {
-      code: '10000003',
-      label: 'Height (m)',
-      classCode: 'SMPCON',
-      value: heightMeters,
-      lovType: '-',
-      lovValidate: '-',
+    DESCRIPTION: 'Sample Management',
+  },
+  CLASSID: {
+    CLASSCODE: 'SMPCON',
+    ORGANIZATIONID: {
+      ORGANIZATIONCODE: '*',
+      DESCRIPTION: 'Default',
     },
-    {
-      code: '10000004',
-      label: 'Length (m)',
-      classCode: 'SMPCON',
-      value: lengthMeters,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000001',
-      label: 'Dangerous Goods',
-      classCode: 'SMPCON',
-      value: isDangerousGoods,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000002',
-      label: 'Dangerous Goods UN Number',
-      classCode: 'SMPCON',
-      value: dangerousGoodsUnNumber,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000003',
-      label: 'Specify all dangerous goods in detail',
-      classCode: 'SMPCON',
-      value: dangerousGoodsDetails,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000004',
-      label: 'Specify risks for shipment associated with samples, if any',
-      classCode: 'SMPCON',
-      value: shipmentSampleRisks,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000005',
-      label: 'Value (EUR)',
-      classCode: 'SMPCON',
-      value: parcelValue,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000006',
-      label: 'Sender Company',
-      classCode: 'SMPCON',
-      value: shipmentSenderCompany,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000007',
-      label: 'Sender street address',
-      classCode: 'SMPCON',
-      value: shipmentSenderStreetAddress,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000008',
-      label: 'Sender Zip code',
-      classCode: 'SMPCON',
-      value: shipmentSenderZipCode,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000009',
-      label: 'Sender City / Country',
-      classCode: 'SMPCON',
-      value: shipmentSenderCityCountry,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000010',
-      label: 'Sender Name',
-      classCode: 'SMPCON',
-      value: shipmentSenderName,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000011',
-      label: 'Sender Email',
-      classCode: 'SMPCON',
-      value: shipmentSenderEmail,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000012',
-      label: 'Sender Phone Number',
-      classCode: 'SMPCON',
-      value: shipmentSenderPhone,
-      lovType: '-',
-      lovValidate: '-',
-    },
-    {
-      code: 'SM000013',
-      label: 'Instrument',
-      classCode: 'SMPCON',
-      value: instrumentShortCodes.join(', '),
-      lovType: '-',
-      lovValidate: '-',
-    },
-  ],
+    DESCRIPTION: 'Sample Container',
+  },
 });
 
-export default getRequest;
+export default getAddAssetEquipmentRequestPayload;
