@@ -53,13 +53,13 @@ export class CallAuthorization {
 
     const call = await this.callDataSource.getCall(callPk);
 
-    // Tag still needed in context despite being filtered at db level
-    const tag = (await this.tagDataSource.getCallsTags(callPk))[0];
+    // Tags still needed in context despite being filtered at db level
+    const tags = await this.tagDataSource.getCallsTags(callPk);
 
     const callCtx = {
       type: 'call',
       ...call,
-      tag: tag,
+      tags: tags,
     };
 
     return this.casbinService.enforce(userCtx, callCtx, 'read');

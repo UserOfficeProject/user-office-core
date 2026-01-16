@@ -18,7 +18,12 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
+import {
+  Call,
+  FeatureId,
+  ProposalAccess,
+  ProposalPublicStatus,
+} from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -193,7 +198,7 @@ const ProposalTable = ({
         notified: resultProposal.notified,
         proposerId: resultProposal.proposer?.id,
         call: resultProposal.call,
-        proposalAccess: resultProposal.proposalAccess,
+        proposalAccess: resultProposal.proposalAccess as ProposalAccess,
       };
 
       const newProposalsData = [newClonedProposal, ...partialProposalsData];
@@ -311,9 +316,7 @@ const ProposalTable = ({
 
             return {
               icon: DeleteIcon,
-              tooltip: canDelete
-                ? 'Delete proposal'
-                : 'Only the PI can delete unsubmitted proposals',
+              tooltip: 'Delete proposal',
               disabled: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(

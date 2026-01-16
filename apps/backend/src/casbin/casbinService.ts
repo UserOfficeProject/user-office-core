@@ -30,7 +30,7 @@ export class CasbinService {
         database: config.database!,
         logging: false,
       },
-      false
+      true
     );
 
     const enforcer = await newEnforcer(modelPath, adapter);
@@ -49,16 +49,16 @@ export class CasbinService {
     await enforcer.loadPolicy();
   }
 
-  async enforce(sub: unknown, obj: unknown, act: unknown, ctx?: unknown) {
+  async enforce(sub: unknown, obj: unknown, act: unknown): Promise<boolean> {
     // Temp workaround
     await this.reloadPolicy();
 
     const enforcer = await this.enforcerPromise;
 
-    console.log('Request:', { sub, obj, act, ctx });
+    console.log('Request:', { sub, obj, act });
     console.log('Policies:', await enforcer.getPolicy());
 
-    const result = await enforcer.enforce(sub, obj, act, ctx);
+    const result = await enforcer.enforce(sub, obj, act, {});
 
     console.log('Result:', result);
 
