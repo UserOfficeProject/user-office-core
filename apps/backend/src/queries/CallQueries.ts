@@ -65,6 +65,7 @@ export default class CallQueries {
      */
 
     const allowedCalls: Call[] = [];
+    // Could pass a list for performance
     for (const call of calls) {
       if (await this.callAuth.canRead(agent, call.id)) {
         allowedCalls.push(call);
