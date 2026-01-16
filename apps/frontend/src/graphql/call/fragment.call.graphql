@@ -69,4 +69,10 @@ fragment call on Call {
   submissionMessage
   isActive
   isActiveInternal
+  tags {
+    shortCode
+  }
+  callAccess {
+    canArchive
+  }
 }

@@ -466,6 +466,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
             (rowData) => ({
               icon: rowData.isActive ? Archive : Unarchive,
               tooltip: `${rowData.isActive ? 'Archive' : 'Unarchive'} call`,
+              disabled: !rowData.callAccess.canArchive,
               onClick: (): void => changeCallActiveStatus(rowData as Call),
               position: 'row',
             }),

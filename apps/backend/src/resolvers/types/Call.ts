@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
+import { CallAccess } from './CallAccess';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { Tag } from './Tag';
@@ -172,9 +173,14 @@ export class CallInstrumentsResolver {
     return startCall <= now && endCallInternal >= now;
   }
 
-  @FieldResolver(() => Tag)
+  @FieldResolver(() => [Tag], { nullable: true })
   async tags(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.tag.dataSource.getCallsTags(call.id);
+  }
+
+  @FieldResolver(() => CallAccess)
+  callAccess(@Root() call: Call, @Ctx() ctx: ResolverContext) {
+    return ctx.auth.callAuthorization.getPermissions(ctx.user, call.id);
   }
 }
 

@@ -176,6 +176,13 @@ export default class PostgresCallDataSource implements CallDataSource {
         .distinctOn('call.call_id');
     }
 
+    if (filter?.hasTag) {
+      query
+        .join('tag_call as tc', 'tc.call_id', 'call.call_id')
+        .join('tag as t', 't.tag_id', 'tc.tag_id')
+        .where('t.short_code', 'ISIS');
+    }
+
     return query.then((callDB: CallRecord[]) => {
       return callDB.map((call) => createCallObject(call));
     });

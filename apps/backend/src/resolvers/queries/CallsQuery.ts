@@ -58,6 +58,9 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isCallUpcoming?: boolean;
+
+  @Field(() => String, { nullable: true })
+  public hasTag?: string;
 }
 
 @Resolver()
