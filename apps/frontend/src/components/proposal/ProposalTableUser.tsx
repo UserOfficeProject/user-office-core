@@ -83,7 +83,7 @@ const ProposalTableUser = () => {
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
-                proposalAccess: proposal.proposalAccess,
+                proposalAccess: proposal.proposalAccess as ProposalAccess,
               };
             }),
         };

@@ -304,7 +304,7 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => ProposalAccess)
+  @FieldResolver(() => ProposalAccess, { nullable: true })
   proposalAccess(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
     return ctx.auth.proposalAuthorization.getPermissions(
       ctx.user,

@@ -101,6 +101,7 @@ export function createFapReviewStub(
       experiments: null,
       experimentSequence: null,
       fileId: null,
+      proposalAccess: null,
     },
   };
 }
