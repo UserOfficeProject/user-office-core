@@ -386,11 +386,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     sortField?: string,
     sortDirection?: string,
     searchText?: string,
-    principleInvestigator?: number[]
+    principleInvestigator?: number[],
+    instrumentFilter?: string[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     const principalInvestigator = principleInvestigator
       ? principleInvestigator
       : [];
+
+    const instrumentFilters = instrumentFilter ? instrumentFilter : [];
 
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
@@ -406,10 +409,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('call_id', filter?.callId);
         }
 
+        // New: filter by instrumentFilter param (array of ids or names)
+        if (instrumentFilters.length) {
+          query.andWhere(function () {
+            instrumentFilters.forEach((inst) => {
+              this.orWhereRaw(
+                "jsonb_path_exists(instruments, '$[*].name \\? (@ == :instrumentName:)')",
+                { instrumentName: inst }
+              );
+            });
+          });
+        }
+
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
         } else if (filter?.instrumentFilter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentFilter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
             { instrumentId: filter.instrumentFilter.instrumentId }

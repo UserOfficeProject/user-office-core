@@ -21,6 +21,7 @@ import ProposalPdfTemplateMutations from '../mutations/ProposalPdfTemplateMutati
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
+import RoleTagsMutation from '../mutations/RoleTagsMutation';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
 import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
@@ -50,6 +51,7 @@ import ProposalPdfTemplateQueries from '../queries/ProposalPdfTemplateQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
+import RoleTagsQuery from '../queries/RoleTagsQuery';
 import SampleQueries from '../queries/SampleQueries';
 import SettingsQueries from '../queries/SettingsQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
@@ -100,6 +102,7 @@ interface ResolverContextQueries {
   statusAction: StatusActionQueries;
   tag: TagQueries;
   experiment: ExperimentQueries;
+  roleTags: RoleTagsQuery;
 }
 
 interface ResolverContextMutations {
@@ -132,6 +135,7 @@ interface ResolverContextMutations {
   workflow: WorkflowMutations;
   tag: TagMutations;
   experiment: ExperimentMutations;
+  roleTags: RoleTagsMutation;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;
@@ -154,3 +158,5 @@ export interface BasicResolverContext {
 export interface ResolverContext extends BasicResolverContext {
   user: UserWithRole | null;
 }
+
+// View context file

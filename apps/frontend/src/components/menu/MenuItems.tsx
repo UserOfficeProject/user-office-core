@@ -326,6 +326,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     </div>
   );
 
+  const dynamicReadUser = (
+    <div data-cy="instrument-scientist-menu-items">
+      <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Proposals" />
+      </ListItemButton>
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -342,7 +353,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:
-      return null;
+      return dynamicReadUser;
   }
 };
 

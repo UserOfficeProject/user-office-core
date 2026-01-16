@@ -3,6 +3,7 @@ import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
+import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
@@ -95,6 +96,9 @@ export interface UserDataSource {
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
+  createRole(args: CreateRoleArgs): Promise<Role>;
+  updateRole(args: CreateRoleArgs): Promise<Role>;
+  deleteRole(id: number): Promise<Role | null>;
   getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
     {
       user: User;

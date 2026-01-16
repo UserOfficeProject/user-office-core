@@ -1,0 +1,5 @@
+mutation removeTagFromRole($roleId: Int!, $tagId: Int!) {
+  removeTagFromRole(roleId: $roleId, tagId: $tagId) {
+    success
+  }
+}

@@ -16,7 +16,9 @@ export interface ProposalDataSource {
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string
+    searchText?: string,
+    principleInvestigator?: number[],
+    instrumentFilter?: string[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }>;
   // Read
   get(primaryKey: number): Promise<Proposal | null>;

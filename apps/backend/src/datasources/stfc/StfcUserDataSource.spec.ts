@@ -144,9 +144,16 @@ describe('Role tests', () => {
     const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
     mockGetRoles.mockImplementation(() =>
       Promise.resolve([
-        new Role(1, Roles.USER, 'User', ''),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', ''),
-        new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist', ''),
+        new Role(1, Roles.USER, 'User', '', [], true),
+        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
+        new Role(
+          3,
+          Roles.INSTRUMENT_SCIENTIST,
+          'Instrument Scientist',
+          '',
+          [],
+          true
+        ),
       ])
     );
 
@@ -169,7 +176,7 @@ describe('Role tests', () => {
 
     return expect(roles[0]).toEqual(
       expect.objectContaining(
-        new Role(expect.any(Number), Roles.USER, 'User', '')
+        new Role(expect.any(Number), Roles.USER, 'User', '', [], true)
       )
     );
   });
@@ -181,9 +188,16 @@ describe('Role tests', () => {
       userdataSource.getUserRoles(dummyUserNumber)
     ).resolves.toEqual(
       expect.arrayContaining([
-        new Role(1, Roles.USER, 'User', ''),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', ''),
-        new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist', ''),
+        new Role(1, Roles.USER, 'User', '', [], true),
+        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
+        new Role(
+          3,
+          Roles.INSTRUMENT_SCIENTIST,
+          'Instrument Scientist',
+          '',
+          [],
+          true
+        ),
       ])
     );
   });
