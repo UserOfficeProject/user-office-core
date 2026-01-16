@@ -8,7 +8,6 @@ import {
   UserWithRole,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
@@ -20,9 +19,7 @@ export const basicDummyUser = new BasicUserDetails(
   'john',
   'org',
   1,
-  'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
-  false,
   'test@email.com',
   '',
   '',
@@ -36,9 +33,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   'john',
   'org',
   1,
-  'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
-  false,
   'test@email.com',
   '',
   '',
@@ -54,16 +49,9 @@ export const dummyUserOfficer = new User(
   'Hailey',
   '324235',
   '683142616',
-  'issuer',
-  'male',
-  new Date('1990-01-25'),
   3,
-  'Other',
-  'IT department',
-  'Producer',
+  'issuer',
   'Dorris83@gmail.com',
-  '+46700568256',
-  false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
@@ -88,16 +76,9 @@ export const dummyUser = new User(
   'Meta',
   '12312414',
   '568567353',
-  'issuer',
-  'male',
-  new Date('1981-05-04'),
   3,
-  'Other',
-  'IT department',
-  'Architect',
+  'issuer',
   'Cleve30@yahoo.com',
-  '+38978414058',
-  false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
@@ -207,16 +188,9 @@ export const dummyPlaceHolderUser = new User(
   'Meta',
   '12312414',
   '568567353',
-  'issuer',
-  'male',
-  new Date('1981-05-04'),
   3,
-  'Other',
-  'IT department',
-  'Architect',
+  'issuer',
   'placeholder@ess.se',
-  '+46700568256',
-  true,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
@@ -230,16 +204,9 @@ export const dummyUserNotOnProposal = new User(
   'Damion',
   '182082741',
   'Apricot',
-  'issuer',
-  'female',
-  new Date('1991-11-08'),
   5,
-  'Other',
-  'IT department',
-  'Facilitator',
   'Tyrique41@hotmail.com',
   '+46700568256',
-  false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
@@ -274,9 +241,6 @@ export class UserDataSourceMock implements UserDataSource {
 
     return existingUser || null;
   }
-  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
-    return 5;
-  }
   async createInstitution(name: string, countryId?: number): Promise<number> {
     return 1;
   }
@@ -307,9 +271,7 @@ export class UserDataSourceMock implements UserDataSource {
       'John',
       'ESS',
       2,
-      'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
-      false,
       'test@email.com',
       '',
       '',
@@ -489,18 +451,12 @@ export class UserDataSourceMock implements UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution_id: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ) {
     // Generate a new user ID
     const newId = Math.max(...this.mockUsers.map((u) => u.id)) + 1;
@@ -510,20 +466,13 @@ export class UserDataSourceMock implements UserDataSource {
       user_title || 'unspecified',
       firstname,
       lastname,
-      username,
       preferredname || '',
       oidc_sub,
       oauth_refresh_token,
       oauth_issuer,
-      gender || 'unspecified',
-      birthdate,
       institution_id || 1,
       'Test institution',
-      department,
-      position,
       email,
-      telephone,
-      false,
       new Date().toISOString(),
       new Date().toISOString()
     );
