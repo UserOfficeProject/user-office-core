@@ -1,9 +1,0 @@
-query getPermissions(
-  $permissionsAction: PermissionsAction!
-  $resource: PermissionsResource!
-) {
-  getPermissions(
-    permissionsAction: $permissionsAction
-    resource: $resource
-  )
-}

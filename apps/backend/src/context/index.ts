@@ -1,3 +1,5 @@
+import { CallAuthorization } from '../auth/CallAuthorization';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
@@ -135,15 +137,23 @@ interface ResolverContextMutations {
   experiment: ExperimentMutations;
   emailTemplate: EmailTemplateMutations;
 }
+
 interface ResolverContextServices {
   pdfServices: PDFServices;
 }
+
 interface ResolverContextLoader {
   user: UsersLoader;
   basicUser: BasicUserDetailsLoader;
 }
 
+interface ResolverContextAuth {
+  proposalAuthorization: ProposalAuthorization;
+  callAuthorization: CallAuthorization;
+}
+
 export interface BasicResolverContext {
+  auth: ResolverContextAuth;
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
   clients: {

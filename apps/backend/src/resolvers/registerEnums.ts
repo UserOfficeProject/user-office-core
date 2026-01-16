@@ -35,7 +35,6 @@ import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { PaginationSortDirection } from '../utils/pagination';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
-import { PermissionsActionEnum } from './queries/GetPermissionsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
@@ -107,8 +106,5 @@ export const registerEnums = () => {
   });
   registerEnumType(FapReviewVisibility, {
     name: 'FapReviewVisibility',
-  });
-  registerEnumType(PermissionsActionEnum, {
-    name: 'PermissionsAction',
   });
 };
