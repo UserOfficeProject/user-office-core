@@ -243,7 +243,7 @@ context('Invites tests', () => {
       cy.getAndStoreFeaturesEnabled();
     });
 
-    it('Should be able to accept invite and then see that in log', function () {
+    it('Should be able to accept invite with the code and then see that in log', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
@@ -488,6 +488,58 @@ context('Invites tests', () => {
       cy.get('[role=presentation]')
         .contains(`No results found for "${email}"`)
         .should('exist');
+    });
+  });
+
+  describe('Accepting co-proposer invites without code', () => {
+    beforeEach(() => {
+      cy.resetDB(true);
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it('Should be able to view and accept the outstanding invites with the proposal information', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+        this.skip();
+      }
+
+      cy.login('user3', initialDBData.roles.user);
+      cy.visit('/');
+
+      // Check notification box appears
+      cy.get('[data-testid="proposal-invite-notification"]').should('exist');
+      cy.get('[data-testid="proposal-invite-notification"]').should(
+        'contain.text',
+        'outstanding invitation'
+      );
+      // Proposal should NOT be in the table before accepting
+      cy.get('[data-cy="proposal-table"]').should('exist');
+      cy.get('[data-cy="proposal-table"]').should(
+        'not.contain.text',
+        initialDBData.proposal.title
+      );
+      cy.get('[data-testid="view-invitations-btn"]').click();
+      // Dialog should open and show proposal info
+      cy.get('[data-testid="proposal-invite-dialog"]').should('exist');
+      cy.get('[data-testid="proposal-invite-dialog"]').should(
+        'contain.text',
+        initialDBData.proposal.title
+      );
+      cy.get('[data-testid="proposal-invite-dialog"]').should(
+        'contain.text',
+        initialDBData.users.user1.firstName
+      );
+      cy.get(`[data-testid=accept-invite-btn-1]`).click();
+      // Success snackbar and dialog closes
+      cy.get('.SnackbarItem-variantSuccess').should('exist');
+      // Proposal should now be in the table after accepting
+      cy.get('[data-cy="proposal-table"]').should(
+        'contain.text',
+        initialDBData.proposal.title
+      );
     });
   });
 });

@@ -212,4 +212,9 @@ export default class ProposalQueries {
       proposalPk
     );
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  async getInvitedProposal(agent: UserWithRole | null, inviteId: number) {
+    return this.dataSource.getInvitedProposal(inviteId);
+  }
 }
