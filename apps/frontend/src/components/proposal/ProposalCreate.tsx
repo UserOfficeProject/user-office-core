@@ -53,6 +53,7 @@ export function createProposalStub(
     samples: [],
     genericTemplates: [],
     call: call,
+    dataAccessUsers: [],
   };
 }
 
