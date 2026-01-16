@@ -29,7 +29,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(
         initialDBData.users.user2.email

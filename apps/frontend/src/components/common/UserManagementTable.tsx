@@ -1,3 +1,4 @@
+import MaterialTable from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
@@ -10,9 +11,8 @@ import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import PeopleTable from 'components/user/PeopleTable';
 import { UserContext } from 'context/UserContextProvider';
-import { BasicUserDetails, Invite, UserRole } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 
 import ParticipantSelector from '../proposal/ParticipantSelector';
 
@@ -25,7 +25,6 @@ export type UserManagementTableProps = {
   setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
   title: string;
-  preserveSelf?: boolean;
   addButtonLabel?: string;
   addButtonTooltip?: string;
   /** Disable the add button */
@@ -44,7 +43,6 @@ const UserManagementTable = ({
   setInvites,
   sx,
   title,
-  preserveSelf,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
   disabled = false,
@@ -104,29 +102,55 @@ const UserManagementTable = ({
         >
           {title}
         </Typography>
-        <div>
-          <PeopleTable
-            selection={false}
-            mtOptions={{
-              showTitle: false,
-              toolbar: false,
-              paging: false,
-              headerStyle: {
-                padding: '4px 10px',
-              },
-            }}
-            isFreeAction={true}
+        <>
+          <MaterialTable
             data={users}
-            search={false}
-            userRole={UserRole.USER}
-            invitationUserRole={UserRole.USER}
-            onRemove={removeUser}
-            preserveSelf={preserveSelf}
-            setPrincipalInvestigator={
-              onUserAction
-                ? (user) => onUserAction('setPrincipalInvestigator', user)
-                : undefined
-            }
+            columns={[
+              { title: 'Firstname', field: 'firstname' },
+              { title: 'Lastname', field: 'lastname' },
+              { title: 'Preferred name', field: 'preferredname' },
+              { title: 'Institution', field: 'institution' },
+            ]}
+            options={{
+              showTitle: false,
+              paging: true,
+              pageSize: 10,
+            }}
+            actions={[
+              {
+                hidden: !onUserAction,
+                icon: () => (
+                  <Button
+                    data-cy="assign-as-pi"
+                    component="a"
+                    href="#"
+                    variant="text"
+                  >
+                    Assign <br /> as PI
+                  </Button>
+                ),
+                tooltip: 'Set Principal Investigator',
+                onClick: (
+                  event: React.MouseEvent<JSX.Element>,
+                  rowData: BasicUserDetails | BasicUserDetails[]
+                ) => {
+                  event.preventDefault();
+
+                  return new Promise<void>(() => {
+                    const user = Array.isArray(rowData) ? rowData[0] : rowData;
+                    removeUser(user);
+                    onUserAction?.('setPrincipalInvestigator', user);
+                  });
+                },
+              },
+            ]}
+            editable={{
+              onRowDelete: (oldData) =>
+                new Promise<void>((resolve) => {
+                  removeUser(oldData);
+                  resolve();
+                }),
+            }}
           />
 
           {invites.length > 0 && (
@@ -181,7 +205,7 @@ const UserManagementTable = ({
               </Button>
             </Tooltip>
           </ActionButtonContainer>
-        </div>
+        </>
       </FormControl>
     </Box>
   );

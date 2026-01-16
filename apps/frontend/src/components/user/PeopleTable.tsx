@@ -66,8 +66,6 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   selectedUsers?: number[];
   mtOptions?: Options<T>;
   columns?: Column<T>[];
-  preserveSelf?: boolean;
-  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   selectedParticipants?: BasicUserDetails[];
   setSelectedParticipants?: React.Dispatch<
     React.SetStateAction<BasicUserDetails[]>
@@ -143,10 +141,8 @@ const PeopleTable = ({
   columns,
   mtOptions,
   onRemove,
-  preserveSelf,
   search,
   title,
-  setPrincipalInvestigator,
 }: PeopleTableProps) => {
   const [query, setQuery] = useState<{
     subtractUsers: number[];
@@ -178,11 +174,6 @@ const PeopleTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.length]);
 
-  const handleChangeCoIToPi = (user: BasicUserDetails) => {
-    onRemove?.(user);
-    setPrincipalInvestigator?.(user);
-  };
-
   const actionArray = [];
   action &&
     !selection &&
@@ -194,29 +185,6 @@ const PeopleTable = ({
         event: React.MouseEvent<JSX.Element>,
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
-    });
-
-  setPrincipalInvestigator &&
-    onRemove &&
-    actionArray.push({
-      icon: () => (
-        <Button data-cy="assign-as-pi" component="a" href="#" variant="text">
-          Assign <br /> as PI
-        </Button>
-      ),
-      tooltip: 'Set Principal Investigator',
-      onClick: (
-        event: React.MouseEvent<JSX.Element>,
-        rowData: BasicUserDetails | BasicUserDetails[]
-      ) => {
-        event.preventDefault();
-
-        return new Promise<void>(() => {
-          const user = Array.isArray(rowData) ? rowData[0] : rowData;
-          handleChangeCoIToPi(user);
-          tableRef.current && tableRef.current.onQueryChange({});
-        });
-      },
     });
 
   const invitationButtons: InvitationButtonProps[] = [];
@@ -430,9 +398,7 @@ const PeopleTable = ({
                       (onRemove as FunctionType)(oldData);
                     }),
                   isDeletable: (rowData) => {
-                    return (
-                      getCurrentUser()?.user.id !== rowData.id || !preserveSelf
-                    );
+                    return getCurrentUser()?.user.id !== rowData.id;
                   },
                 }
               : {}
