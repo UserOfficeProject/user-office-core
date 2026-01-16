@@ -9,7 +9,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { Role, Roles } from '../models/Role';
+import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
@@ -265,35 +265,35 @@ export class ProposalAuthorization {
 
     // Check data access
 
-    const proposalIsntruments =
-      await this.instrumentDataSource.getInstrumentsByProposalPk(
-        proposal.primaryKey
-      );
+    // const proposalIsntruments =
+    //   await this.instrumentDataSource.getInstrumentsByProposalPk(
+    //     proposal.primaryKey
+    //   );
 
-    const rolesArray: Role[] = await this.userDataSource.getUserRoles(agent.id);
-    const userRoles: Record<string, { dataAccess: string[] }> =
-      rolesArray.reduce(
-        (acc, role) => {
-          acc[role.shortCode] = { dataAccess: role.dataAccess };
+    // const rolesArray: Role[] = await this.userDataSource.getUserRoles(agent.id);
+    // const userRoles: Record<string, { dataAccess: string[] }> =
+    //   rolesArray.reduce(
+    //     (acc, role) => {
+    //       acc[role.shortCode] = { dataAccess: role.dataAccess };
 
-          return acc;
-        },
-        {} as Record<string, { dataAccess: string[] }>
-      );
-    proposalIsntruments.forEach((instrument) => {
-      agent.currentRole?.shortCode &&
-        userRoles[agent.currentRole.shortCode]?.dataAccess.some(
-          (dataAccess) => {
-            if (
-              dataAccess.toLowerCase() === instrument.shortCode.toLowerCase()
-            ) {
-              hasAccess = true;
+    //       return acc;
+    //     },
+    //     {} as Record<string, { dataAccess: string[] }>
+    //   );
+    // proposalIsntruments.forEach((instrument) => {
+    //   agent.currentRole?.shortCode &&
+    //     userRoles[agent.currentRole.shortCode]?.dataAccess.some(
+    //       (dataAccess) => {
+    //         if (
+    //           dataAccess.toLowerCase() === instrument.shortCode.toLowerCase()
+    //         ) {
+    //           hasAccess = true;
 
-              return true;
-            }
-          }
-        );
-    });
+    //           return true;
+    //         }
+    //       }
+    //     );
+    // });
 
     if (hasAccess) {
       return true;

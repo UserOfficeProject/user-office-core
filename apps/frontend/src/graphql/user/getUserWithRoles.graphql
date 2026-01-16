@@ -7,7 +7,7 @@ query getUserWithRoles($userId: Int!) {
       shortCode
       title
       description
-      dataAccess
+      isRootRole
       permissions
     }
   }

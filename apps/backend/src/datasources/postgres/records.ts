@@ -287,7 +287,7 @@ export interface RoleRecord {
   readonly title: string;
   readonly description: string;
   readonly permissions: string[]; // Changed from string to string[]
-  readonly data_access: string[]; // Changed from string to string[]
+  readonly is_root_role: boolean;
 }
 
 export interface ReviewRecord {
@@ -1215,7 +1215,7 @@ export const createRoleObject = (role: RoleRecord) => {
     role.title,
     role.description,
     role.permissions,
-    role.data_access
+    role.is_root_role
   );
 };
 

@@ -1,0 +1,5 @@
+mutation addTagToRole($roleId: Int!, $tagId: Int!) {
+  addTagToRole(roleId: $roleId, tagId: $tagId) {
+    success
+  }
+}

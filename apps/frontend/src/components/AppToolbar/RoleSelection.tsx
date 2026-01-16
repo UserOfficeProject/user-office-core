@@ -10,7 +10,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-const columns: Column<Role>[] = [
+const columns: Column<Partial<Role>>[] = [
   {
     title: 'Action',
     field: 'roleAction',
@@ -49,9 +49,9 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
     onClose();
   };
 
-  const RoleAction = (rowData: Role) => (
+  const RoleAction = (rowData: Partial<Role>) => (
     <>
-      {rowData.shortCode.toUpperCase() === currentRole?.valueOf() ? (
+      {rowData.shortCode?.toUpperCase() === currentRole?.valueOf() ? (
         <Button
           variant="text"
           disabled
@@ -63,7 +63,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
         <Button
           variant="text"
           disabled={loading}
-          onClick={() => selectUserRole(rowData)}
+          onClick={() => selectUserRole(rowData as Role)}
           data-cy={`select-role-${rowData.shortCode}`}
         >
           Use

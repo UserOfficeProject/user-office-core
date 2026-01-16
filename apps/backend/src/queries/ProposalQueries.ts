@@ -105,10 +105,10 @@ export default class ProposalQueries {
     sortDirection?: string,
     searchText?: string
   ) {
-    let instrumentFilters: string[] = [];
-    if (agent && this.userAuth.isDynamicProposalReader(agent)) {
-      instrumentFilters = agent.currentRole?.dataAccess || [];
-    }
+    const instrumentFilters: string[] = [];
+    // if (agent && this.userAuth.isDynamicProposalReader(agent)) {
+    //   instrumentFilters = agent.currentRole?.dataAccess || [];
+    // }
 
     try {
       // leave await here because getProposalsFromView might thrown an exception

@@ -5,7 +5,7 @@ export class Role {
     public title: string,
     public description: string,
     public permissions: string[], // New field for permissions
-    public dataAccess: string[] // New field for data access
+    public isRootRole: boolean
   ) {}
 }
 

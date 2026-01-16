@@ -7,7 +7,7 @@ query getMyRoles {
       shortCode
       title
       description
-      dataAccess
+      isRootRole
       permissions
     }
   }

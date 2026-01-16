@@ -444,7 +444,7 @@ export class FapDataSourceMock implements FapDataSource {
       title: 'Fap Chair',
       description: '',
       permissions: [],
-      dataAccess: [],
+      isRootRole: true,
     };
   }
 

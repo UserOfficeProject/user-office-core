@@ -80,7 +80,7 @@ export const dummyUserOfficerWithRole: UserWithRole = {
     shortCode: 'user_officer',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -117,7 +117,7 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -130,7 +130,7 @@ export const dummyUserWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -143,7 +143,7 @@ export const dummyFapChairWithRole: UserWithRole = {
     shortCode: 'fap_chair',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -156,7 +156,7 @@ export const dummyFapSecretaryWithRole: UserWithRole = {
     shortCode: 'fap_secretary',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -169,7 +169,7 @@ export const dummyFapReviewerWithRole: UserWithRole = {
     shortCode: 'fap_reviewer',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -182,7 +182,7 @@ export const dummySampleReviewer: UserWithRole = {
     shortCode: 'experiment_safety_reviewer',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -195,7 +195,7 @@ export const dummyInternalReviewer: UserWithRole = {
     shortCode: 'internal_reviewer',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
 };
 
@@ -208,7 +208,7 @@ export const dummyInstrumentScientist: UserWithRole = {
     shortCode: 'instrument_scientist',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -222,7 +222,7 @@ export const dummyVisitorWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -281,7 +281,7 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
     permissions: [],
-    dataAccess: [],
+    isRootRole: true,
   },
   externalTokenValid: true,
 };
@@ -398,7 +398,7 @@ export class UserDataSourceMock implements UserDataSource {
           title: 'User Officer',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: true,
         },
       ];
     } else if (id === dummyInstrumentScientist.id) {
@@ -409,7 +409,7 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'instrument_scientist',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: true,
         },
       ];
     } else if (id === 1001) {
@@ -420,7 +420,7 @@ export class UserDataSourceMock implements UserDataSource {
           title: 'Fap Reviewer',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: true,
         },
       ];
     } else if (id === dummyFapChairWithRole.id) {
@@ -431,7 +431,7 @@ export class UserDataSourceMock implements UserDataSource {
           title: 'Fap Chair',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: true,
         },
       ];
     } else {
@@ -442,7 +442,7 @@ export class UserDataSourceMock implements UserDataSource {
           title: 'User',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: true,
         },
       ];
     }
@@ -456,7 +456,7 @@ export class UserDataSourceMock implements UserDataSource {
         title: 'User Officer',
         description: '',
         permissions: [],
-        dataAccess: [],
+        isRootRole: true,
       },
       {
         id: 2,
@@ -464,7 +464,7 @@ export class UserDataSourceMock implements UserDataSource {
         title: 'User',
         description: '',
         permissions: [],
-        dataAccess: [],
+        isRootRole: true,
       },
     ];
   }
@@ -636,7 +636,7 @@ export class UserDataSourceMock implements UserDataSource {
       title: 'User Officer',
       description: '',
       permissions: [],
-      dataAccess: [],
+      isRootRole: true,
     };
   }
 

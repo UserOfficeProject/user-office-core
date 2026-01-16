@@ -1,7 +1,17 @@
 import 'reflect-metadata';
-import { Field, ObjectType, Int } from 'type-graphql';
+import {
+  Field,
+  ObjectType,
+  Int,
+  FieldResolver,
+  Root,
+  Ctx,
+  Resolver,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { Role as RoleOrigin } from '../../models/Role';
+import { Tag } from './Tag';
 
 @ObjectType()
 export class Role implements Partial<RoleOrigin> {
@@ -17,8 +27,8 @@ export class Role implements Partial<RoleOrigin> {
   @Field()
   public description: string;
 
-  @Field(() => [String])
-  public dataAccess: string[];
+  @Field(() => Boolean)
+  public isRootRole: boolean;
 
   @Field(() => [String])
   public permissions: string[];
@@ -28,9 +38,25 @@ export class Role implements Partial<RoleOrigin> {
     shortCode: string;
     title: string;
     description: string;
-    dataAccess: string[];
+    isRootRole: boolean;
     permissions: string[];
   }) {
     Object.assign(this, initObj);
+  }
+}
+
+@Resolver(() => Role)
+export class RoleResolver {
+  @FieldResolver(() => [Tag], { nullable: true })
+  async tags(
+    @Root() role: Role,
+    @Ctx() context: ResolverContext
+  ): Promise<Tag[] | null> {
+    const tags = await context.queries.roleTags.getTagsByRoleId(
+      context.user,
+      role.id
+    );
+
+    return tags;
   }
 }

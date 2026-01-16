@@ -4,7 +4,11 @@ query getRoles {
     shortCode
     title
     description
-    dataAccess
+    isRootRole
     permissions
+    tags {
+      id
+      name
+    }
   }
 }

@@ -115,7 +115,7 @@ test('A instrument sci cannot access proposals they are not on', async () => {
           shortCode: 'instrument_scientist',
           description: '',
           permissions: [],
-          dataAccess: [],
+          isRootRole: false,
         },
       },
       1

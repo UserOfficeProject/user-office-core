@@ -1,45 +1,72 @@
-import { Typography } from '@mui/material';
+import Apartment from '@mui/icons-material/Apartment';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Role } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 
 import RoleModal from './RoleModal';
 
 const RoleManagement: React.FC = () => {
-  const [roles, setRoles] = useState<
-    {
-      id: number;
-      shortCode: string;
-      title: string;
-      description: string;
-      dataAccess: string[];
-      permissions: string[];
-    }[]
-  >([]);
+  interface RoleRow {
+    id: number;
+    shortCode: string;
+    title: string;
+    description: string;
+    dataAccess: string[];
+    permissions: string[];
+    tags?: { id: number; name: string }[];
+  }
+
+  const [roles, setRoles] = useState<RoleRow[]>([]);
+  const [allTags, setAllTags] = useState<{ id: number; name: string }[]>([]);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<RoleRow | null>(null);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
   const { api } = useDataApiWithFeedback();
 
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchRolesAndTags = async () => {
       try {
-        const response = await api().getRoles();
+        const [rolesResponse, tagsResponse] = await Promise.all([
+          api().getRoles(),
+          api().getTags(),
+        ]);
         setRoles(
-          (response.roles || []).map((role) => ({
-            ...role,
-            dataAccess: role.dataAccess || undefined,
-            permissions: role.permissions || undefined,
+          (rolesResponse.roles || []).map((role) => ({
+            id: role.id,
+            shortCode: role.shortCode,
+            title: role.title,
+            description: role.description,
+            dataAccess: [],
+            permissions: [],
+            tags: role.tags || [],
+          }))
+        );
+        setAllTags(
+          (tagsResponse.tags || []).map((tag) => ({
+            id: tag.id,
+            name: tag.name,
           }))
         );
       } catch (error) {
-        console.error('Error fetching roles:', error);
+        console.error('Error fetching roles and tags:', error);
       }
     };
 
-    fetchRoles();
+    fetchRolesAndTags();
   }, [api]);
 
   const handleRoleSubmit = async () => {
@@ -49,22 +76,17 @@ const RoleManagement: React.FC = () => {
       .then((response) =>
         setRoles(
           (response.roles || []).map((role) => ({
-            ...role,
-            dataAccess: role.dataAccess || undefined,
-            permissions: role.permissions || undefined,
+            id: role.id,
+            shortCode: role.shortCode,
+            title: role.title,
+            description: role.description,
+            dataAccess: [],
+            permissions: [],
+            tags: role.tags || [],
           }))
         )
       );
   };
-
-  interface RoleRow {
-    id: number;
-    shortCode: string;
-    title: string;
-    description: string;
-    dataAccess: string[];
-    permissions: string[];
-  }
 
   const columns: Array<{
     title: string;
@@ -75,14 +97,50 @@ const RoleManagement: React.FC = () => {
     { title: 'Title', field: 'title' },
     { title: 'Description', field: 'description' },
     {
-      title: 'Data Access',
-      field: 'dataAccess',
-      render: (rowData) => rowData.dataAccess?.join(', ') || '-',
-    },
-    {
-      title: 'Permissions',
-      field: 'permissions',
-      render: (rowData) => rowData.permissions?.join(', ') || '-',
+      title: 'Tags',
+      field: 'tags',
+      render: (rowData) => (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          {rowData.tags && rowData.tags.length > 0 ? (
+            rowData.tags.map((tag) => (
+              <Chip
+                key={tag.id}
+                label={tag.name}
+                size="small"
+                onDelete={async () => {
+                  try {
+                    await api({
+                      toastSuccessMessage: 'Tag removed from role',
+                    }).removeTagFromRole({
+                      roleId: rowData.id,
+                      tagId: tag.id,
+                    });
+                    // Refresh roles after tag removal
+                    const response = await api().getRoles();
+                    setRoles(
+                      (response.roles || []).map((role) => ({
+                        id: role.id,
+                        shortCode: role.shortCode,
+                        title: role.title,
+                        description: role.description,
+                        dataAccess: [],
+                        permissions: [],
+                        tags: role.tags || [],
+                      }))
+                    );
+                  } catch (error) {
+                    console.error('Error removing tag:', error);
+                  }
+                }}
+              />
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No tags
+            </Typography>
+          )}
+        </Box>
+      ),
     },
   ];
   const deleteRole = async (id: number | string) => {
@@ -104,20 +162,77 @@ const RoleManagement: React.FC = () => {
   };
 
   const createModal = (
-    onUpdate: FunctionType<void, [Role | null]>,
-    onCreate: FunctionType<void, [Role | null]>,
-    editRole: Role | null
+    onUpdate: (
+      object: RoleRow | null,
+      shouldCloseAfterUpdate?: boolean
+    ) => void,
+    onCreate: (
+      object: RoleRow | null,
+      shouldCloseAfterCreation?: boolean
+    ) => void,
+    editRole: RoleRow | null
   ) => (
     <RoleModal
       open={!!editRole || true} // Ensure modal opens for both create and update
-      onClose={() => (!!editRole ? onUpdate(null) : onCreate(null))}
-      role={editRole} // Pass `null` for create mode, or the role object for update mode
+      onClose={() => (editRole ? onUpdate(null) : onCreate(null))}
+      role={
+        editRole
+          ? ({
+              id: editRole.id,
+              shortCode: editRole.shortCode,
+              title: editRole.title,
+              description: editRole.description,
+              isRootRole: false,
+              tags: editRole.tags || [],
+            } as Role)
+          : null
+      } // Pass `null` for create mode, or the role object for update mode (ensure tags is an array)
       onSubmit={() => {
         handleRoleSubmit();
-        !!editRole ? onUpdate(null) : onCreate(null);
+        editRole ? onUpdate(null) : onCreate(null);
       }}
     />
   );
+
+  const handleAssignTag = async () => {
+    if (!selectedRole || !selectedTagId) return;
+
+    try {
+      await api({
+        toastSuccessMessage: 'Tag assigned to role successfully',
+      }).addTagToRole({
+        roleId: selectedRole.id,
+        tagId: selectedTagId,
+      });
+
+      // Refresh roles after tag assignment
+      const response = await api().getRoles();
+      setRoles(
+        (response.roles || []).map((role) => ({
+          id: role.id,
+          shortCode: role.shortCode,
+          title: role.title,
+          description: role.description,
+          dataAccess: [],
+          permissions: [],
+          tags: role.tags || [],
+        }))
+      );
+
+      setTagDialogOpen(false);
+      setSelectedRole(null);
+      setSelectedTagId(null);
+    } catch (error) {
+      console.error('Error assigning tag:', error);
+    }
+  };
+
+  const getAvailableTags = (): { id: number; name: string }[] => {
+    if (!selectedRole) return allTags;
+    const assignedTagIds = (selectedRole.tags || []).map((tag) => tag.id);
+
+    return allTags.filter((tag) => !assignedTagIds.includes(tag.id));
+  };
 
   return (
     <StyledContainer maxWidth={false}>
@@ -144,8 +259,84 @@ const RoleManagement: React.FC = () => {
             search: true,
             paging: true,
           }}
+          actions={[
+            {
+              icon: () => <Apartment />,
+              tooltip: 'Assign Tag',
+              onClick: (event, rowData) => {
+                setSelectedRole(rowData as RoleRow);
+                setTagDialogOpen(true);
+              },
+              position: 'row',
+            },
+          ]}
         />
       </StyledPaper>
+
+      <Dialog
+        open={tagDialogOpen}
+        onClose={() => setTagDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Assign Tag to Role</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {selectedRole && (
+            <>
+              <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                Role: <strong>{selectedRole.title}</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Select a tag to assign:
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {getAvailableTags().length > 0 ? (
+                  getAvailableTags().map((tag) => (
+                    <Box
+                      key={tag.id}
+                      sx={{
+                        p: 1.5,
+                        border:
+                          selectedTagId === tag.id ? '2px solid' : '1px solid',
+                        borderColor:
+                          selectedTagId === tag.id ? 'primary.main' : 'divider',
+                        borderRadius: 1,
+                        cursor: 'pointer',
+                        backgroundColor:
+                          selectedTagId === tag.id
+                            ? 'action.selected'
+                            : 'transparent',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'action.hover',
+                        },
+                      }}
+                      onClick={() => setSelectedTagId(tag.id)}
+                    >
+                      <Typography variant="body2">{tag.name}</Typography>
+                    </Box>
+                  ))
+                ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    All available tags are already assigned to this role.
+                  </Typography>
+                )}
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTagDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleAssignTag}
+            variant="contained"
+            disabled={!selectedTagId || getAvailableTags().length === 0}
+          >
+            Assign
+          </Button>
+        </DialogActions>
+      </Dialog>
     </StyledContainer>
   );
 };

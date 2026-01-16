@@ -222,7 +222,7 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.title,
               role.description,
               role.permissions,
-              role.data_access
+              role.is_root_role
             )
         )
       );
@@ -244,7 +244,7 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.title,
               role.description,
               role.permissions,
-              role.data_access
+              role.is_root_role
             )
         )
       );
@@ -833,7 +833,7 @@ export default class PostgresUserDataSource implements UserDataSource {
             role.title,
             role.description,
             role.permissions,
-            role.data_access
+            role.is_root_role
           )
       );
   }
@@ -931,7 +931,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       roleRecord.title,
       roleRecord.description,
       roleRecord.permissions, // No need to parse as it's already in array format
-      roleRecord.data_access // No need to parse as it's already in array format
+      roleRecord.data_access
     );
   }
 
