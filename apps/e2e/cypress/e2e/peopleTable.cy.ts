@@ -29,7 +29,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('No Previous Collaborators');
 
@@ -99,7 +99,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -192,7 +192,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.finishedLoading();
 
@@ -277,7 +277,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
@@ -364,11 +364,11 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]').as('modal');
+      cy.get('[data-cy=participant-modal]').as('modal');
 
       cy.finishedLoading();
 
-      cy.get('@modal').contains('10 rows').click();
+      cy.get('@modal').scrollIntoView().contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');
@@ -433,10 +433,10 @@ context('PageTable component tests', () => {
         });
 
       cy.intercept('POST', '/graphql', (req) => {
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(req.continue()), 1000); // delay by 1 second to see the loader
-        });
-      }).as('delayedRequest');
+        if (req.body?.operationName === 'getUsers') {
+          req.alias = 'getUsers';
+        }
+      });
 
       cy.get('[data-cy="people-table"] thead')
         .contains('Firstname')
@@ -444,10 +444,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
-      cy.wait('@delayedRequest');
-
+      cy.wait('@getUsers');
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
@@ -465,10 +462,7 @@ context('PageTable component tests', () => {
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
-      cy.get('[data-cy="people-table"] [role="progressbar"]').should('exist');
-
-      cy.wait('@delayedRequest');
-
+      cy.wait('@getUsers');
       cy.finishedLoading();
 
       cy.get('[data-cy="people-table"] tbody tr')
@@ -530,7 +524,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"] [role="dialog"]');
+      cy.get('[data-cy=participant-modal]');
 
       cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
 

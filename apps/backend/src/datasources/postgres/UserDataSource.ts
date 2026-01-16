@@ -14,10 +14,7 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import {
-  UpdateUserByIdArgs,
-  UpdateUserByOidcSubArgs,
-} from '../../resolvers/mutations/UpdateUserMutation';
+import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database, { isUniqueConstraintError } from './database';
@@ -123,61 +120,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         throw new GraphQLError('User already exists');
       }
       throw new GraphQLError('Could not update user. Check your Inputs.');
-    }
-  }
-
-  async updateUserByOidcSub(
-    args: UpdateUserByOidcSubArgs
-  ): Promise<User | null> {
-    const {
-      firstname,
-      user_title,
-      lastname,
-      preferredname,
-      gender,
-      birthdate,
-      institutionId,
-      department,
-      position,
-      email,
-      telephone,
-      placeholder,
-      oauthRefreshToken,
-      oauthIssuer,
-    } = args;
-    try {
-      const [userRecord]: UserRecord[] = await database
-        .update({
-          firstname,
-          user_title,
-          lastname,
-          preferredname,
-          gender,
-          birthdate,
-          institution_id: institutionId,
-          department,
-          position,
-          email,
-          telephone,
-          placeholder,
-          oauth_refresh_token: oauthRefreshToken,
-          oauth_issuer: oauthIssuer,
-          updated_at: new Date(),
-        })
-        .from('users')
-        .where('oidc_sub', args.oidcSub)
-        .returning(['*']);
-
-      if (!userRecord) {
-        return null;
-      }
-
-      return createUserObject(userRecord);
-    } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new GraphQLError('User already exists');
-      }
-      throw new GraphQLError('Could not create user. Check your Inputs.');
     }
   }
 
@@ -506,7 +448,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
-      .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
