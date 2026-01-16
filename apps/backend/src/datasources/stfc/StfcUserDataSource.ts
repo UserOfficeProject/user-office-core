@@ -12,6 +12,7 @@ import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUse
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
+import { PaginationSortDirection } from '../../utils/pagination';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import { createUOWSClient } from './UOWSClient';
@@ -579,7 +580,7 @@ export class StfcUserDataSource implements UserDataSource {
         offset: offset,
         userRole: undefined,
         subtractUsers: subtractUsers,
-        orderDirection: 'asc',
+        sortDirection: PaginationSortDirection.asc,
       });
 
       if (users[0]) {
@@ -601,18 +602,22 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getPreviousCollaborators(
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     const dbUsers: BasicUserDetails[] = (
       await postgresUserDataSource.getPreviousCollaborators(
         userId,
-        filter,
         first,
         offset,
+        sortField,
+        sortDirection,
+        searchText,
         undefined,
         subtractUsers
       )

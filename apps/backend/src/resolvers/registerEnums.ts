@@ -32,6 +32,7 @@ import {
 import { UserRole } from '../models/User';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
+import { PaginationSortDirection } from '../utils/pagination';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import { EmailStatusActionRecipients } from './types/StatusActionConfig';
@@ -98,5 +99,8 @@ export const registerEnums = () => {
   });
   registerEnumType(InstrumentScientistDecisionEnum, {
     name: 'InstrumentScientistDecisionEnum',
+  });
+  registerEnumType(PaginationSortDirection, {
+    name: 'PaginationSortDirection',
   });
 };

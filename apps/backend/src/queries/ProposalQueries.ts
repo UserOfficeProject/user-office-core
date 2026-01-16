@@ -15,6 +15,7 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
 import { omit } from '../utils/helperFunctions';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class ProposalQueries {
@@ -96,7 +97,7 @@ export default class ProposalQueries {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
     try {
@@ -140,7 +141,7 @@ export default class ProposalQueries {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
     return this.dataSource.getTechniqueScientistProposals(

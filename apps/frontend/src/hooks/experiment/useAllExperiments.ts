@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ExperimentsFilter } from 'generated/sdk';
+import { ExperimentsFilter, PaginationSortDirection } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 type QueryParameters = {
   first?: number;
   offset?: number;
   sortField?: string | undefined;
-  sortDirection?: string | undefined;
+  sortDirection?: PaginationSortDirection | undefined;
   searchText?: string | undefined;
   refetch?: boolean;
 };
