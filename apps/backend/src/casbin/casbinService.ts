@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
 import path from 'path';
 
 import { Enforcer, newEnforcer } from 'casbin';
 import { SequelizeAdapter } from 'casbin-sequelize-adapter';
 import { parse } from 'pg-connection-string';
 import { injectable } from 'tsyringe';
+
+import { hasTag } from './customFunctions';
 
 @injectable()
 export class CasbinService {
@@ -27,10 +30,14 @@ export class CasbinService {
         database: config.database!,
         logging: false,
       },
-      true
+      false
     );
 
     const enforcer = await newEnforcer(modelPath, adapter);
+
+    // Custom function
+    enforcer.addFunction('hasTag', hasTag);
+
     await enforcer.loadPolicy();
     enforcer.enableAutoSave(true);
 
@@ -51,14 +58,38 @@ export class CasbinService {
     console.log('Request:', { sub, obj, act, ctx });
     console.log('Policies:', await enforcer.getPolicy());
 
-    const test = await enforcer.enforce(sub, obj, act, ctx);
+    const result = await enforcer.enforce(sub, obj, act, ctx);
 
-    console.log('Result:', test);
+    console.log('Result:', result);
 
-    return test;
+    return result;
   }
 
   async getEnforcer(): Promise<Enforcer> {
     return this.enforcerPromise;
+  }
+
+  // Get the entire policies matching the role, object, and action
+  async getPoliciesMatching(
+    role: string,
+    obj: string,
+    act: string
+  ): Promise<string[][]> {
+    return (await this.enforcerPromise).getFilteredPolicy(0, role, obj, act);
+  }
+
+  // Get the condition with matching text from the policies matching the role, object, and action
+  async getPolicyConditionMatching(
+    role: string,
+    obj: string,
+    act: string,
+    searchText: string
+  ): Promise<string | null> {
+    const policies = await this.getPoliciesMatching(role, obj, act);
+
+    return (
+      policies.map((p) => p[3]).find((c) => !!c && c.includes(searchText)) ??
+      null
+    );
   }
 }
