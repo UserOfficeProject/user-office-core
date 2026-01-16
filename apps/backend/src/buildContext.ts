@@ -1,5 +1,7 @@
 import { container } from 'tsyringe';
 
+import { CallAuthorization } from './auth/CallAuthorization';
+import { ProposalAuthorization } from './auth/ProposalAuthorization';
 import { BasicResolverContext } from './context';
 import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
 import UsersLoader from './loaders/UsersLoader';
@@ -149,6 +151,10 @@ const context: BasicResolverContext = {
   loaders: {
     user: container.resolve(UsersLoader),
     basicUser: container.resolve(BasicUserDetailsLoader),
+  },
+  auth: {
+    callAuthorization: container.resolve(CallAuthorization),
+    proposalAuthorization: container.resolve(ProposalAuthorization),
   },
 };
 

@@ -1,6 +1,12 @@
 import React, { useCallback, useState } from 'react';
 
-import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
+import {
+  Call,
+  Maybe,
+  ProposalAccess,
+  ProposalPublicStatus,
+  Status,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTable from './ProposalTable';
@@ -29,6 +35,7 @@ export type PartialProposalsDataType = {
     >
   >;
   proposerId?: number;
+  proposalAccess: ProposalAccess;
 };
 
 export type UserProposalDataType = {
@@ -76,6 +83,7 @@ const ProposalTableUser = () => {
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
+                proposalAccess: proposal.proposalAccess,
               };
             }),
         };

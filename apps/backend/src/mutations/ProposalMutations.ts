@@ -341,18 +341,16 @@ export default class ProposalMutations {
       });
     }
 
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isApiToken(agent)
-    ) {
-      if (
-        proposal.submitted ||
-        !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
-      )
-        return rejection(
-          'Can not delete proposal because proposal is submitted',
-          { agent, proposalPk }
-        );
+    // Eventually make into decorator
+    const canDelete = await this.proposalAuth.canDelete(agent!, proposalPk);
+    if (!canDelete) {
+      return rejection(
+        'Can not delete proposal because of insufficient permissions',
+        {
+          agent,
+          proposalPk,
+        }
+      );
     }
 
     try {

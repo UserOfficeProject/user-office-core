@@ -33,7 +33,6 @@ import { UserRole } from '../models/User';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
-import { PermissionsActionEnum } from './queries/GetPermissionsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
@@ -99,8 +98,5 @@ export const registerEnums = () => {
   });
   registerEnumType(InstrumentScientistDecisionEnum, {
     name: 'InstrumentScientistDecisionEnum',
-  });
-  registerEnumType(PermissionsActionEnum, {
-    name: 'PermissionsAction',
   });
 };

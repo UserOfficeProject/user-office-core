@@ -18,13 +18,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  Call,
-  FeatureId,
-  PermissionsAction,
-  ProposalPublicStatus,
-} from 'generated/sdk';
-import { useCan } from 'hooks/auth/useCan';
+import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -109,9 +103,6 @@ const ProposalTable = ({
   const [selectedProposalPk, setSelectedProposalPk] = useState<
     number | undefined
   >();
-
-  const useCanDeleteProposal = (proposalPk?: number) =>
-    useCan(PermissionsAction.DELETE, 'proposal', proposalPk);
 
   const isEmailInviteEnabled = featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
@@ -202,6 +193,7 @@ const ProposalTable = ({
         notified: resultProposal.notified,
         proposerId: resultProposal.proposer?.id,
         call: resultProposal.call,
+        proposalAccess: resultProposal.proposalAccess,
       };
 
       const newProposalsData = [newClonedProposal, ...partialProposalsData];
@@ -315,22 +307,14 @@ const ProposalTable = ({
             };
           },
           (rowData) => {
-            // const isPI = rowData.proposerId === userContext.user.id;
-            // const isSubmitted = rowData.submitted;
-            // const canDelete = isPI && !isSubmitted;
-
-            const { allowed: canDelete } = useCanDeleteProposal(
-              rowData.primaryKey
-            );
+            const canDelete = rowData.proposalAccess?.canDelete;
 
             return {
               icon: DeleteIcon,
-              tooltip: isSubmitted
-                ? 'Only draft proposals can be deleted'
-                : !isPI
-                  ? 'Only PI can delete proposal'
-                  : 'Delete proposal',
-              hidden: !canDelete,
+              tooltip: canDelete
+                ? 'Delete proposal'
+                : 'Only the PI can delete unsubmitted proposals',
+              disabled: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {

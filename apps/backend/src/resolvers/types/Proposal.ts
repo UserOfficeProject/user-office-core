@@ -26,6 +26,7 @@ import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
 import { Invite } from './Invite';
+import { ProposalAccess } from './ProposalAccess';
 import { ProposalAttachments } from './ProposalAttachments';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
@@ -39,21 +40,6 @@ const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
 statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
 statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
 statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
-
-// @ObjectType()
-// export class ProposalPermissions {
-//   @Field(() => Boolean)
-//   public create: boolean;
-
-//   @Field(() => Boolean)
-//   public read: boolean;
-
-//   @Field(() => Boolean)
-//   public update: boolean;
-
-//   @Field(() => Boolean)
-//   public delete: boolean;
-// }
 
 @ObjectType()
 @Directive('@key(fields: "primaryKey")')
@@ -318,13 +304,13 @@ export class ProposalResolver {
     );
   }
 
-  // @FieldResolver(() => ProposalPermissions, { nullable: false })
-  // permissions(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
-  //   return ctx.queries.questionary.getProposalAttachments(
-  //     ctx.user,
-  //     proposal.primaryKey
-  //   );
-  // }
+  @FieldResolver(() => ProposalAccess)
+  proposalAccess(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+    return ctx.auth.proposalAuthorization.getPermissions(
+      ctx.user,
+      proposal.primaryKey
+    );
+  }
 }
 
 export async function resolveProposalReference(

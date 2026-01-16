@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
+import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
@@ -12,6 +13,7 @@ import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
+import { ProposalAccess } from '../resolvers/types/ProposalAccess';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
@@ -35,7 +37,9 @@ export class ProposalAuthorization {
     private statusDataSource: StatusDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
-    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization,
+    @inject(Tokens.CasbinService)
+    private casbinService: CasbinService
   ) {}
 
   private async resolveProposal(
@@ -365,5 +369,33 @@ export class ProposalAuthorization {
     }
 
     return false;
+  }
+
+  /*
+   * Casbin
+   */
+
+  async getPermissions(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<ProposalAccess> {
+    if (!agent) {
+      return { canDelete: false };
+    }
+
+    return { canDelete: await this.canDelete(agent, proposalPk) };
+  }
+
+  async canDelete(agent: UserWithRole | null, proposalPk: number) {
+    const userCtx = {
+      role: agent?.currentRole?.shortCode,
+      userId: agent?.id,
+    };
+
+    const proposal = await this.proposalDataSource.get(proposalPk);
+
+    const proposalCtx = { type: 'proposal', ...proposal };
+
+    return this.casbinService.enforce(userCtx, proposalCtx, 'delete');
   }
 }
