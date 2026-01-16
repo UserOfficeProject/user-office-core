@@ -13,6 +13,10 @@ export interface StatusActionsDataSource {
     workflowConnectionId: number,
     statusActionId: number
   ): Promise<ConnectionHasStatusAction>;
+  hasEmailTemplateIdConnectionStatusAction(
+    emailTemplateName: string
+  ): Promise<boolean>;
+
   updateConnectionStatusAction(
     data: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction>;

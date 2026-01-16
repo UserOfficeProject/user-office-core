@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -6,30 +7,45 @@ import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 import SMTPPool from 'nodemailer/lib/smtp-pool';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import pug from 'pug';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
+import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
 import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
-import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
+import { ELIEmailTemplate, MailService, SendMailResults } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
-  private emailTemplates: EmailTemplates<any>;
+  private emailTemplate: EmailTemplates<any>;
+  private emailTemplateDataSource: EmailTemplateDataSource;
 
   constructor() {
     super();
 
+    logger.logInfo('Initializing SMTPMailService', {});
+
+    this.emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+      Tokens.EmailTemplateDataSource
+    );
+
     const attachments = [];
 
     if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
-      attachments.push({
-        filename: 'logo.png',
-        path: process.env.EMAIL_FOOTER_IMAGE_PATH,
-        cid: 'logo1',
-      });
+      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
+        attachments.push({
+          filename: 'logo.png',
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+          cid: 'logo1',
+        });
+      } else {
+        logger.logWarn('Email footer image path does not exist', {
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        });
+      }
     }
 
     let smtpTransport:
@@ -52,7 +68,7 @@ export class SMTPMailService extends MailService {
       });
     }
 
-    this.emailTemplates = new EmailTemplates({
+    this.emailTemplate = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
         attachments,
@@ -65,7 +81,22 @@ export class SMTPMailService extends MailService {
           relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
         },
       },
-      getPath: this.getEmailTemplatePath,
+      render: (view: string, locals?: any) => {
+        return new Promise((resolve, reject) => {
+          const lastSlashIndex = view.lastIndexOf('/');
+          const templateBody =
+            lastSlashIndex !== -1 ? view.substring(0, lastSlashIndex) : view;
+
+          this.emailTemplate
+            .juiceResources(templateBody)
+            .then((html) => {
+              resolve(html);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      },
     });
   }
 
@@ -74,6 +105,49 @@ export class SMTPMailService extends MailService {
       process.env.EMAIL_TEMPLATE_PATH || '',
       `${template}.${type}`
     );
+  }
+
+  private async getEmailTemplate(options: EmailSettings): Promise<{
+    subject: string;
+    body: string;
+  } | null> {
+    if (process.env.NODE_ENV === 'test') {
+      return { subject: '= ``', body: '' };
+    }
+
+    let templateBody = '';
+    let templateSubject = '';
+
+    const emailTemplate =
+      await this.emailTemplateDataSource.getEmailTemplateByName(
+        options.content.template
+      );
+
+    if (emailTemplate) {
+      templateBody = emailTemplate.body;
+      templateSubject = emailTemplate.subject;
+    } else {
+      const templateBodyPath =
+        this.getEmailTemplatePath('html', options.content.template) + '.pug';
+      const templateSubjectPath =
+        this.getEmailTemplatePath('subject', options.content.template) + '.pug';
+
+      try {
+        templateBody = readFileSync(templateBodyPath, 'utf-8');
+        templateSubject = readFileSync(templateSubjectPath, 'utf-8');
+      } catch (error) {
+        logger.logError('Email template file not found', {
+          error: error,
+        });
+
+        return null;
+      }
+    }
+
+    return {
+      subject: pug.render(templateSubject, {}),
+      body: pug.render(templateBody, options.substitution_data || {}),
+    };
   }
 
   private getSmtpAuthOptions() {
@@ -115,15 +189,19 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const template =
-      this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
+    const template = await this.getEmailTemplate(options);
 
-    if (
-      !(await (this.emailTemplates as any).templateExists(template)) &&
-      process.env.NODE_ENV !== 'test'
-    ) {
-      logger.logError('Template does not exist', {
-        templateId: template,
+    if (!template) {
+      logger.logError('Email template not found', {
+        template: options.content.template,
+      });
+
+      return { results: sendMailResults };
+    }
+
+    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+      logger.logInfo('Skipping email sending', {
+        template: options.content.template,
       });
 
       return { results: sendMailResults };
@@ -131,8 +209,7 @@ export class SMTPMailService extends MailService {
 
     options.recipients.forEach((participant) => {
       emailPromises.push(
-        this.emailTemplates.send({
-          template: options.content.template_id,
+        this.emailTemplate.send({
           message: {
             ...(typeof participant.address !== 'string'
               ? {
@@ -143,15 +220,18 @@ export class SMTPMailService extends MailService {
                     name: participant.address?.header_to,
                   },
                   bcc: bccAddress,
+                  subject: template.subject,
+                  html: template.body,
                 }
               : {
                   to: isProduction
                     ? participant.address
                     : <string>process.env.SINK_EMAIL,
                   bcc: bccAddress,
+                  subject: template.subject,
+                  html: template.body,
                 }),
           },
-          locals: options.substitution_data,
         })
       );
     });
@@ -174,54 +254,15 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async getEmailTemplates(): ResultsPromise<STFCEmailTemplate[]> {
+  async getEmailTemplates(): ResultsPromise<ELIEmailTemplate[]> {
+    const emailTemplates =
+      await this.emailTemplateDataSource.getEmailTemplates();
+
     return {
-      results: [
-        {
-          id: 'clf-proposal-submitted-pi',
-          name: 'CLF PI Co-I Submission Email',
-        },
-        {
-          id: 'isis-proposal-submitted-pi',
-          name: 'ISIS PI Co-I Submission Email',
-        },
-        {
-          id: 'isis-rapid-proposal-submitted-pi',
-          name: 'ISIS Rapid PI Co-I Submission Email',
-        },
-        {
-          id: 'isis-rapid-proposal-submitted-uo',
-          name: 'ISIS Rapid User Office Submission Email',
-        },
-        {
-          id: 'xpress-proposal-submitted-pi',
-          name: 'ISIS Xpress PI Co-I Submission Email',
-        },
-        {
-          id: 'xpress-proposal-submitted-sc',
-          name: 'ISIS Xpress Scientist Submission Email',
-        },
-        {
-          id: 'xpress-proposal-under-review',
-          name: 'ISIS Xpress PI Co-I Under Review Email',
-        },
-        {
-          id: 'xpress-proposal-approved',
-          name: 'ISIS Xpress PI Co-I Approval Email',
-        },
-        {
-          id: 'xpress-proposal-sra',
-          name: 'ISIS Xpress SRA Request Email',
-        },
-        {
-          id: 'xpress-proposal-unsuccessful',
-          name: 'ISIS Xpress PI Co-I Reject Email',
-        },
-        {
-          id: 'xpress-proposal-finished',
-          name: 'ISIS Xpress PI Co-I Finish Email',
-        },
-      ],
+      results: emailTemplates.emailTemplates.map((template) => ({
+        id: template.id,
+        name: template.name || '',
+      })),
     };
   }
 }

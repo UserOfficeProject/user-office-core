@@ -6,6 +6,7 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+import { EmailTemplateId } from './emailTemplateId';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
@@ -26,7 +27,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
           return;
         }
-        const templateID = 'call-created-email';
+
         const notificationEmailAddress = process.env.FBS_EMAIL;
         const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
           shortCode,
@@ -35,7 +36,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
         }))(event.call);
         const emailSettings = callCreationEmail<typeof eventCallPartial>(
           eventCallPartial,
-          templateID,
+          EmailTemplateId.CALL_CREATED_EMAIL,
           notificationEmailAddress
         );
 
@@ -67,7 +68,7 @@ const callCreationEmail = function createNotificationEmail<T>(
 ): EmailSettings {
   const emailSettings: EmailSettings = {
     content: {
-      template_id: templateID,
+      template: templateID,
     },
     substitution_data: {
       ...notificationInput,

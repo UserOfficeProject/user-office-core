@@ -1,9 +1,9 @@
 import {
-  ProposalPdfTemplateRecord,
   ExperimentSafetyPdfTemplateRecord,
+  ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -14,6 +14,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { EmailTemplate } from '../../models/EmailTemplate';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
@@ -367,6 +368,15 @@ export interface CallRecord {
   readonly is_active: boolean;
   readonly sort_order: number;
   readonly experiment_workflow_id: number;
+}
+
+export interface EmailTemplateRecord {
+  readonly email_template_id: number;
+  readonly created_by: number;
+  readonly name: string;
+  readonly description: string;
+  readonly subject: string;
+  readonly body: string;
 }
 
 export interface PageTextRecord {
@@ -1057,6 +1067,19 @@ export const createCallObject = (call: CallRecord) => {
     call.is_active,
     call.sort_order,
     call.experiment_workflow_id
+  );
+};
+
+export const createEmailTemplateObject = (
+  emailTemplate: EmailTemplateRecord
+) => {
+  return new EmailTemplate(
+    emailTemplate.email_template_id,
+    emailTemplate.created_by,
+    emailTemplate.name,
+    emailTemplate.description,
+    emailTemplate.subject,
+    emailTemplate.body
   );
 };
 
