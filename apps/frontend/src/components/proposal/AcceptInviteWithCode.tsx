@@ -7,13 +7,13 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-interface AcceptInviteProps {
+interface AcceptInviteWithCodeProps {
   title?: string;
   onAccepted?: () => void;
   onClose?: () => void;
 }
 
-function AcceptInvite(props: AcceptInviteProps) {
+function AcceptInviteWithCode(props: AcceptInviteWithCodeProps) {
   const { api } = useDataApiWithFeedback();
 
   const [successfullyAccepted, setSuccessfullyAccepted] = React.useState(false);
@@ -25,7 +25,7 @@ function AcceptInvite(props: AcceptInviteProps) {
       }}
       onSubmit={async (values): Promise<void> => {
         api({ toastSuccessMessage: 'Code verification successful' })
-          .acceptInvite({ code: values.code })
+          .acceptInviteWithCode({ code: values.code })
           .then(() => {
             setSuccessfullyAccepted(true);
             props.onAccepted?.();
@@ -65,4 +65,4 @@ function AcceptInvite(props: AcceptInviteProps) {
   );
 }
 
-export default AcceptInvite;
+export default AcceptInviteWithCode;
