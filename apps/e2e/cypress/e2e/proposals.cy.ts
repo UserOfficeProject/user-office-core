@@ -1162,13 +1162,19 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[data-cy="invite-user-autocomplete"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .find('.MuiAutocomplete-clearIndicator')
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user2.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user2.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
