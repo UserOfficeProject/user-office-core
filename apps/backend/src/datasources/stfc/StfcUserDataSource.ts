@@ -536,19 +536,19 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getUsers({
-    filter,
+    searchText,
     first,
     offset,
     subtractUsers,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
 
-    if (filter) {
+    if (searchText) {
       userDetails = [];
 
       const BasicPeopleByLastName: BasicPersonDetailsDTO[] | null =
         await UOWSClient.basicPersonDetails
-          .getBasicPersonDetails(undefined, filter, undefined)
+          .getBasicPersonDetails(undefined, searchText, undefined)
           .catch((error) => {
             logger.logError(
               'An error occurred while fetching searchable person details using getBasicPersonDetails',
@@ -575,7 +575,7 @@ export class StfcUserDataSource implements UserDataSource {
       }
     } else {
       const { users } = await postgresUserDataSource.getUsers({
-        filter: undefined,
+        searchText: undefined,
         first: first,
         offset: offset,
         userRole: undefined,

@@ -26,9 +26,6 @@ class UserQueryResult {
 
 @ArgsType()
 export class UsersArgs {
-  @Field(() => String, { nullable: true })
-  filter?: string;
-
   @Field(() => Int, { nullable: true })
   first?: number;
 
