@@ -24,7 +24,11 @@ import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+} from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
 import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { ProposalView } from '../../models/ProposalView';
@@ -171,6 +175,13 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
+}
+
+export interface InvitedProposalRecord {
+  readonly proposal_id: string;
+  readonly proposer_name: string;
+  readonly title: string;
+  readonly abstract: string;
 }
 
 export interface TopicRecord {
@@ -901,6 +912,15 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   );
 };
 
+export const createInvitedProposalObject = (record: InvitedProposalRecord) => {
+  return new InvitedProposal(
+    record.proposal_id,
+    record.proposer_name,
+    record.title,
+    record.abstract
+  );
+};
+
 export const createFieldDependencyObject = (
   fieldDependency: FieldDependencyRecord & { natural_key: string }
 ) => {
@@ -1002,7 +1022,8 @@ export const createBasicUserObject = (
     user.placeholder,
     user.email,
     user.country,
-    user.user_title
+    user.user_title,
+    user.oidc_sub
   );
 };
 

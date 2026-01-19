@@ -40,7 +40,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
-  const [textLen, setTextLen] = useState(state?.proposal.abstract ?? 0);
+  const [textLen, setTextLen] = useState(
+    state?.proposal?.abstract?.length ?? 0
+  );
   const { featuresMap } = useContext(FeatureContext);
   const isLegacyInviteFlow = featuresMap.get(
     FeatureId.EMAIL_INVITE_LEGACY

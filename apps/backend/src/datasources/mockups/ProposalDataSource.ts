@@ -2,7 +2,12 @@ import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
-import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+  Proposals,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import {
   TechnicalReview,
@@ -19,6 +24,7 @@ export let dummyProposal: Proposal;
 export let dummyProposalView: ProposalView;
 export let dummyProposalSubmitted: Proposal;
 export let dummyProposalWithNotActiveCall: Proposal;
+export let dummyProposalWithoutInvitation: Proposal;
 
 let allProposals: Proposal[];
 
@@ -160,6 +166,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       callId: 2,
     });
 
+    dummyProposalWithoutInvitation = dummyProposalFactory({
+      primaryKey: 4,
+      title: 'Proposal without invitation',
+      proposalId: 'no-invite',
+    });
+
     dummyProposalView = new ProposalView(
       1,
       '',
@@ -207,6 +219,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       dummyProposal,
       dummyProposalSubmitted,
       dummyProposalWithNotActiveCall,
+      dummyProposalWithoutInvitation,
     ];
 
     this.proposalsUpdated = [];
@@ -404,7 +417,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
-    return dummyProposal.proposalId === proposalId ? dummyProposal : null;
+    return allProposals.find((p) => p.proposalId === proposalId) || null;
   }
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
@@ -421,5 +434,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     searchText?: string
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
+  }
+
+  getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
+    throw new Error('Method not implemented.');
   }
 }

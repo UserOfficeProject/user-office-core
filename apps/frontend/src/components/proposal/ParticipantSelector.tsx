@@ -218,6 +218,7 @@ function ParticipantSelector({
       createdByUserId: 0,
       isEmailSent: false,
       expiresAt: null,
+      proposal: null,
     };
   };
   const handleSubmit = () => {
