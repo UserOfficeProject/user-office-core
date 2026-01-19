@@ -28,6 +28,7 @@ BEGIN
         INSERT INTO policies (ptype, v0, v1, v2, v3, v4)
         VALUES ('p', 'user_officer', 'call', 'archive', 'regexMatch(r.obj.shortCode, ''LSF'')', 'allow');
 
+        DROP TABLE IF EXISTS casbin_rule CASCADE;
         
         CREATE OR REPLACE VIEW casbin_rule AS
         SELECT

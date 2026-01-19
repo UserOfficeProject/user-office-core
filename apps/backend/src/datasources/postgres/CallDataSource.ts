@@ -37,9 +37,11 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
   async getCall(id: number): Promise<Call | null> {
     return database
-      .select()
-      .from('call')
-      .where('call_id', id)
+      .select('c.*', 'chi.instrument_id')
+      .from({ c: 'call' })
+      .leftJoin({ chi: 'call_has_instruments' }, 'chi.call_id', 'c.call_id')
+      .distinctOn('c.call_id')
+      .where('c.call_id', id)
       .first()
       .then((call: CallRecord | null) =>
         call ? createCallObject(call) : null

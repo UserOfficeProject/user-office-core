@@ -34,7 +34,9 @@ export class Call {
     public technicalReviewTemplateId: number,
     public isActive: boolean,
     public sort_order: number,
-    public experimentWorkflowId: number | undefined
+    public experimentWorkflowId: number | undefined,
+    public instrument_id: number | undefined,
+    public technique_id: number | undefined
   ) {}
 }
 
