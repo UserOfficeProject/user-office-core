@@ -5,44 +5,49 @@ DECLARE
 BEGIN
     IF register_patch('9998_CasbinPOC.sql', 'simonfernandes', 'Casbin', '2026-01-16') THEN
       BEGIN
-      CREATE TABLE IF NOT EXISTS policies (
-          id BIGSERIAL PRIMARY KEY,
-          ptype VARCHAR(128) NOT NULL,
-          v0 VARCHAR(128) NOT NULL DEFAULT '',
-          v1 VARCHAR(128) NOT NULL DEFAULT '',
-          v2 VARCHAR(128) NOT NULL DEFAULT '',
-          v3 VARCHAR(128) NOT NULL DEFAULT '',
-          v4 VARCHAR(128) NOT NULL DEFAULT '',
-          v5 VARCHAR(128) NOT NULL DEFAULT ''
-        );
+        CREATE TABLE IF NOT EXISTS policies (
+            id         BIGSERIAL PRIMARY KEY,
+            ptype      VARCHAR(128) NOT NULL,
+            role       VARCHAR(128) NOT NULL DEFAULT '',
+            "object"   VARCHAR(128) NOT NULL DEFAULT '',
+            action     VARCHAR(128) NOT NULL DEFAULT '',
+            facility   VARCHAR(128) NOT NULL DEFAULT '',
+            "call"     VARCHAR(128) NOT NULL DEFAULT '',
+            instrument VARCHAR(128) NOT NULL DEFAULT '',
+            effect     VARCHAR(128) NOT NULL DEFAULT ''  -- e.g., 'allow' or 'deny'
+          );
 
-        /* Can only delete proposal if PI of proposal and proposal is submitted */
-        INSERT INTO policies (ptype, v0, v1, v2, v3, v4)
-        VALUES ('p', 'user', 'proposal', 'delete', 'r.obj.proposerId == r.sub.userId && r.obj.submitted', 'allow');
+          
+        INSERT INTO policies (ptype, role, "object", action, facility, "call", instrument, effect)
+        VALUES ('p', 'user_officer', 'call', 'read', 'ISIS', '2026', '1', 'allow');
 
-        /* Can only read calls with ISIS tag and 2026 in shortCode */
-        INSERT INTO policies (ptype, v0, v1, v2, v3, v4)
-        VALUES ('p', 'user_officer', 'call', 'read', 'hasTag(r.obj.tags, ''ISIS'') && regexMatch(r.obj.shortCode, ''2026'')', 'allow');
-
-        /* Can only archive LSF calls */
-        INSERT INTO policies (ptype, v0, v1, v2, v3, v4)
-        VALUES ('p', 'user_officer', 'call', 'archive', 'regexMatch(r.obj.shortCode, ''LSF'')', 'allow');
 
         DROP TABLE IF EXISTS casbin_rule CASCADE;
-        
+          
         CREATE OR REPLACE VIEW casbin_rule AS
         SELECT
-            id,
-            ptype,
-            v0,
-            v1,
-            v2,
-            v3,
-            v4,
-            v5
+          id,
+          ptype,
+          role     AS v0,
+          "object" AS v1,
+          action   AS v2,
+          /* v3: dynamically composed ABAC expression */
+          CASE
+            WHEN (NULLIF(facility,'') IS NULL AND NULLIF("call",'') IS NULL AND NULLIF(instrument,'') IS NULL)
+              THEN 'true'
+            ELSE array_to_string(
+              ARRAY[
+                CASE WHEN NULLIF(facility,'')   IS NOT NULL THEN format('hasTag(r.obj.tags, %L)', facility) END,
+                CASE WHEN NULLIF("call",'')     IS NOT NULL THEN format('regexMatch(r.obj.shortCode, %L)', "call") END,
+                CASE WHEN NULLIF(instrument,'') IS NOT NULL THEN format('regexMatch(r.obj.instrument_id, %L)', instrument) END
+              ],
+              ' && '
+            )
+          END AS v3,
+          effect AS v4,
+          ''::text AS v5
         FROM policies;
 
-        /* Creating ISIS tag and assigning latest 10 calls to it */
         INSERT INTO tag (name, short_code)
         VALUES ('ISIS', 'ISIS')
         RETURNING tag_id INTO tag_id_var;
