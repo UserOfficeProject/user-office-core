@@ -41,9 +41,9 @@ describe('OAuthAuthorization', () => {
     country = 'testCountry',
   }: {
     user: User;
-    rorId?: string;
-    name?: string;
-    country?: string;
+    rorId?: string | null;
+    name?: string | null;
+    country?: string | null;
   }) =>
     (mockOpenIdClient.login = jest.fn().mockResolvedValue({
       userProfile: {
@@ -128,8 +128,8 @@ describe('OAuthAuthorization', () => {
 
     expect(mockAdminDataSource.createCountry).not.toHaveBeenCalled();
     expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
-      name: 'testName',
-      country: testCountry.countryId,
+      name: 'Unknown institution',
+      country: null,
       rorId: 'testRorId',
     });
     expect(
@@ -161,7 +161,8 @@ describe('OAuthAuthorization', () => {
       .spyOn(mockAdminDataSource, 'createInstitution')
       .mockResolvedValue({ id: expectedInstitutionId } as Institution);
 
-    mockOpenIdLoginResponse({ user: dummyUser });
+    // make dummyUser without ror_id
+    mockOpenIdLoginResponse({ user: dummyUser, rorId: null });
     await oauthAuthorization.externalTokenLogin('valid', '', null);
 
     expect(mockAdminDataSource.createCountry).toHaveBeenCalledWith(
@@ -170,7 +171,7 @@ describe('OAuthAuthorization', () => {
     expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
       name: 'testName',
       country: testCountry.countryId,
-      rorId: 'testRorId',
+      rorId: undefined,
     });
 
     expect(

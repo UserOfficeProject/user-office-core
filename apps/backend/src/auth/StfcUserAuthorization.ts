@@ -22,6 +22,7 @@ import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
+import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
@@ -349,11 +350,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     return true;
   }
 
-  getOrCreateUserInstitution(userInfo: {
-    institution_ror_id?: string;
-    institution_name?: string;
-    institution_country?: string;
-  }): Promise<Institution | null> {
+  getOrCreateUserInstitution(
+    _input: GetOrCreateInstitutionInput
+  ): Promise<Institution | null> {
     throw new Error('Method not implemented.');
   }
 }

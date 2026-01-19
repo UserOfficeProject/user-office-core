@@ -4,20 +4,6 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('User login tests', () => {
-  const userOne = 'user1';
-  const userTwo = 'user2';
-  const userOneInstitutionInfo = {
-    institution_ror_id: 'Test_ror_id_1',
-    institution_country: 'China',
-    institution_name: 'Test Institution',
-  };
-
-  const userTwoInstitutionInfo = {
-    institution_ror_id: 'Test_ror_id_2',
-    institution_country: 'TestCountry',
-    institution_name: 'Test Institution2',
-  };
-
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
@@ -31,32 +17,28 @@ context('User login tests', () => {
         this.skip();
       }
 
-      cy.login(userOne, initialDBData.roles.user);
-      cy.visit('/');
-      cy.logout();
+      const institutionRorId = 'https://ror.org/not-in-db';
 
-      cy.login('officer');
+      cy.upsertUserByOidc({
+        oidcSub: 'some-unique-sub',
+        email: 'email@example.com',
+        institution: {
+          rorId: institutionRorId,
+        },
+        firstName: 'Test',
+        lastName: 'User',
+        position: 'Researcher',
+        username: 'testuser',
+      });
+
       cy.contains('Institutions').click();
 
       cy.finishedLoading();
 
-      cy.get('input[aria-label="Search"]')
-        .focus()
-        .type(userOneInstitutionInfo.institution_name);
+      cy.get('input[aria-label="Search"]').focus().type(institutionRorId);
 
       cy.get('[data-cy="institutions-table"]').as('institutionsTable');
-      cy.get('@institutionsTable')
-        .contains(userOneInstitutionInfo.institution_name)
-        .parents('tr')
-        .within(() => {
-          cy.get('td:nth-child(4)')
-            .invoke('text')
-            .then((text) => {
-              expect(text.trim()).to.eq(
-                userOneInstitutionInfo.institution_ror_id
-              );
-            });
-        });
+      cy.get('@institutionsTable').contains(institutionRorId);
     });
 
     it('Should create new entry for country, if the given country is not found', function () {
@@ -64,30 +46,39 @@ context('User login tests', () => {
         this.skip();
       }
 
-      cy.login(userTwo, initialDBData.roles.user);
-      cy.visit('/');
-      cy.logout();
+      const institutionCountry = 'NewCountry';
+      const institutionName = 'Test Institution NewCountry';
 
-      cy.login('officer');
+      cy.upsertUserByOidc({
+        oidcSub: 'some-unique-sub',
+        email: 'email@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        position: 'Researcher',
+        institution: {
+          manual: {
+            name: institutionName,
+            country: institutionCountry,
+          },
+        },
+        username: 'testuser',
+      });
+
       cy.contains('Institutions').click();
 
       cy.finishedLoading();
 
-      cy.get('input[aria-label="Search"]')
-        .focus()
-        .type(userOneInstitutionInfo.institution_name);
+      cy.get('input[aria-label="Search"]').focus().type(institutionName);
 
       cy.get('[data-cy="institutions-table"]').as('institutionsTable');
       cy.get('@institutionsTable')
-        .contains(userTwoInstitutionInfo.institution_name)
+        .contains(institutionName)
         .parents('tr')
         .within(() => {
           cy.get('td:nth-child(3)')
             .invoke('text')
             .then((text) => {
-              expect(text.trim()).to.eq(
-                userTwoInstitutionInfo.institution_country
-              );
+              expect(text.trim()).to.eq(institutionCountry);
             });
         });
     });

@@ -1,14 +1,16 @@
 import jsonwebtoken from 'jsonwebtoken';
-import { container } from 'tsyringe';
+import { container, Lifecycle } from 'tsyringe';
 
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
+import { Tokens } from '../config/Tokens';
 import {
   dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
-  dummyUserOfficer,
-  dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
+  dummyUserOfficer,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection } from '../models/Rejection';
@@ -37,7 +39,16 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const userMutations = container.resolve(UserMutations);
+let userMutations: UserMutations;
+
+beforeEach(() => {
+  container.register(
+    Tokens.UserAuthorization,
+    { useClass: UserAuthorizationMock },
+    { lifecycle: Lifecycle.Singleton }
+  );
+  userMutations = container.resolve(UserMutations);
+});
 
 test('A user can invite another user by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
@@ -253,12 +264,14 @@ describe('upsertUserByOidcSub', () => {
         preferredName: null,
         gender: null,
         birthDate: null,
-        institutionRoRId: '',
+        institution: {
+          rorId: 'dummy-ror-id',
+          manual: null,
+          institutionId: null,
+        },
         department: null,
         position: '',
         telephone: null,
-        institutionName: '',
-        institutionCountry: '',
       }
     );
     // Check if the result has the oidcsub
@@ -278,12 +291,14 @@ describe('upsertUserByOidcSub', () => {
         preferredName: null,
         gender: null,
         birthDate: null,
-        institutionRoRId: '',
+        institution: {
+          rorId: '',
+          manual: null,
+          institutionId: null,
+        },
         department: null,
         position: '',
         telephone: null,
-        institutionName: '',
-        institutionCountry: '',
       }
     );
 
@@ -308,9 +323,11 @@ describe('upsertUserByOidcSub', () => {
         preferredName: 'Johnny',
         gender: 'male',
         birthDate: '1985-05-15',
-        institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
-        institutionName: 'CERN', // This should match the existing institution
-        institutionCountry: 'Switzerland',
+        institution: {
+          rorId: existingRorId, // This should find Dummy Research Institute in our mock
+          manual: null,
+          institutionId: null,
+        },
         department: 'Physics Department',
         position: 'Senior Researcher',
         telephone: '+41-22-767-6111',
@@ -344,9 +361,11 @@ describe('upsertUserByOidcSub', () => {
         preferredName: 'Maria',
         gender: 'female',
         birthDate: '1980-03-22',
-        institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
-        institutionName: 'New Research Institute',
-        institutionCountry: 'Germany',
+        institution: {
+          rorId: newRorId, // This ROR ID doesn't exist in mock
+          manual: null,
+          institutionId: null,
+        },
         department: 'Materials Science',
         position: 'Principal Investigator',
         telephone: '+49-30-12345678',
