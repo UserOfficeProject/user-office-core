@@ -180,7 +180,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       query
         .join('tag_call as tc', 'tc.call_id', 'call.call_id')
         .join('tag as t', 't.tag_id', 'tc.tag_id')
-        .where('t.short_code', 'ISIS');
+        .where('t.short_code', filter.hasTag);
     }
 
     return query.then((callDB: CallRecord[]) => {
