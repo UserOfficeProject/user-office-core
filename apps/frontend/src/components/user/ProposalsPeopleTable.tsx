@@ -283,7 +283,7 @@ const ProposalsPeopleTable = ({
 
         const { previousCollaborators } = await api().getPreviousCollaborators({
           userId: userId,
-          filter: tableQuery.search,
+          searchText: tableQuery.search,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
           subtractUsers: query.subtractUsers,
