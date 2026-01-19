@@ -9,6 +9,7 @@ import './src/env-loader.js';
 import './src/config';
 
 import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';
+import { CasbinService } from './src/casbin/casbinService';
 import { Tokens } from './src/config/Tokens';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
@@ -52,7 +53,7 @@ async function bootstrap() {
   startAsyncJobs(); // TODO: Should we do this here? Or those jobs should be started in a separate process?
   container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
-  container.resolve<() => void>(Tokens.CasbinService);
+  container.resolve<CasbinService>(Tokens.CasbinService);
 }
 startTracing();
 bootstrap();

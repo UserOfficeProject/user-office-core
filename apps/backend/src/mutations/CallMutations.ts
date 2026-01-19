@@ -5,6 +5,7 @@ import {
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
+import { CallAuthorization } from '../auth/CallAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { TagDataSource } from '../datasources/TagDataSource';
@@ -33,7 +34,9 @@ export default class CallMutations {
   constructor(
     @inject(Tokens.CallDataSource) private dataSource: CallDataSource,
     @inject(Tokens.TagDataSource)
-    private tagDataSource: TagDataSource
+    private tagDataSource: TagDataSource,
+    @inject(Tokens.CallAuthorization)
+    private callAuth: CallAuthorization
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -97,6 +100,22 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: UpdateCallInput
   ): Promise<Call | Rejection> {
+    const existingCall = await this.dataSource.getCall(args.id);
+
+    if (existingCall?.isActive != args.isActive) {
+      const canArchive = await this.callAuth.canArchive(agent, args.id);
+
+      if (!canArchive) {
+        return rejection(
+          'User does not have permission to archive/unarchive this call',
+          {
+            agent,
+            callId: args.id,
+          }
+        );
+      }
+    }
+
     try {
       const updatedCall = await this.dataSource.update(args);
 
