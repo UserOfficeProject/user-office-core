@@ -271,14 +271,23 @@ context('visits tests', () => {
       // add visitors
       cy.get('[data-cy=add-participant-button]').click();
       cy.finishedLoading();
-      cy.get('[name=email]').type('david@teleworm.us{enter}');
-      cy.finishedLoading();
-      cy.get('[data-cy=co-proposers]')
-        .contains('Beckley')
-        .parent()
-        .find('[type=checkbox]')
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user2.email
+      );
+      cy.get('[role=presentation][data-popper-placement]')
+        .contains(initialDBData.users.user2.lastName)
         .click();
-      cy.get('[data-cy=assign-selected-users]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user3.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user3.lastName)
+        .click();
+      cy.finishedLoading();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
 
       // specify team lead
       cy.get('[data-cy=team-lead-user-dropdown]').click();

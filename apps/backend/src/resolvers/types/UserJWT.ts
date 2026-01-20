@@ -23,13 +23,7 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   public oidcSub: string | null;
 
   @Field()
-  public placeholder: boolean;
-
-  @Field()
   public created: string;
-
-  @Field()
-  public position: string;
 
   @Field()
   public institutionId: number;
