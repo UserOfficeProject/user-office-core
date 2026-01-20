@@ -13,13 +13,12 @@ BEGIN
             action     VARCHAR(128) NOT NULL DEFAULT '',
             facility   VARCHAR(128) NOT NULL DEFAULT '',
             "call"     VARCHAR(128) NOT NULL DEFAULT '',
-            instrument VARCHAR(128) NOT NULL DEFAULT '',
+            instrument_ids TEXT[] NOT NULL DEFAULT '{}',
             effect     VARCHAR(128) NOT NULL DEFAULT ''  -- e.g., 'allow' or 'deny'
           );
 
-          
-        INSERT INTO policies (ptype, role, "object", action, facility, "call", instrument, effect)
-        VALUES ('p', 'user_officer', 'call', 'read', 'ISIS', '2026', '1', 'allow');
+        INSERT INTO policies (ptype, role, "object", action, facility, "call", instrument_ids, effect)
+        VALUES ('p', 'user_officer', 'call', 'read', 'ISIS', '2026', ARRAY['1','2'], 'allow');
 
 
         DROP TABLE IF EXISTS casbin_rule CASCADE;
@@ -33,16 +32,35 @@ BEGIN
           action   AS v2,
           /* v3: dynamically composed ABAC expression */
           CASE
-            WHEN (NULLIF(facility,'') IS NULL AND NULLIF("call",'') IS NULL AND NULLIF(instrument,'') IS NULL)
-              THEN 'true'
-            ELSE array_to_string(
-              ARRAY[
-                CASE WHEN NULLIF(facility,'')   IS NOT NULL THEN format('hasTag(r.obj.tags, %L)', facility) END,
-                CASE WHEN NULLIF("call",'')     IS NOT NULL THEN format('regexMatch(r.obj.shortCode, %L)', "call") END,
-                CASE WHEN NULLIF(instrument,'') IS NOT NULL THEN format('regexMatch(r.obj.instrument_id, %L)', instrument) END
-              ],
-              ' && '
+            WHEN (
+                NULLIF(facility, '') IS NULL
+                AND NULLIF("call", '') IS NULL
+                AND (instrument_ids IS NULL OR array_length(instrument_ids, 1) = 0)
             )
+            THEN 'true'
+            ELSE array_to_string(
+                  array_remove(ARRAY[
+                    -- facility → hasTag(...)
+                    CASE
+                      WHEN NULLIF(facility, '') IS NOT NULL
+                      THEN format('hasTag(r.obj.tags, %L)', facility)
+                    END,
+                    -- call → regexMatch on shortCode
+                    CASE
+                      WHEN NULLIF("call", '') IS NOT NULL
+                      THEN format('regexMatch(r.obj.shortCode, %L)', "call")
+                    END,
+                    -- instruments → OR chain of equality checks
+                    CASE
+                      WHEN instrument_ids IS NOT NULL AND array_length(instrument_ids, 1) > 0
+                      THEN '(' || (
+                              SELECT string_agg(format('r.obj.instrument_id == %L', x), ' || ')
+                              FROM unnest(instrument_ids) AS t(x)
+                            ) || ')'
+                    END
+                  ], NULL),
+                  ' && '
+                )
           END AS v3,
           effect AS v4,
           ''::text AS v5
