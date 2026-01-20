@@ -12,7 +12,7 @@ import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
-import { User, UserRole } from '../models/User';
+import { User } from '../models/User';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
@@ -270,15 +270,6 @@ interface UserDeletedEvent extends GeneralEvent {
   user: User;
 }
 
-interface EmailInviteOld extends GeneralEvent {
-  type: Event.EMAIL_INVITE_LEGACY;
-  emailinviteresponse: {
-    userId: number;
-    inviterId: number;
-    role: UserRole;
-  };
-}
-
 interface FapCreatedEvent extends GeneralEvent {
   type: Event.FAP_CREATED;
   fap: Fap;
@@ -490,7 +481,6 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
-  | EmailInviteOld
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | FapCreatedEvent

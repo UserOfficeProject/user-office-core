@@ -31,7 +31,6 @@ export const Tokens = {
   ProposalSettingsDataSource: Symbol('ProposalSettingsDataSource'),
   StatusActionsDataSource: Symbol('StatusActionsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
-  RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
   RoleClaimDataSource: Symbol('RoleClaimDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
   FapDataSource: Symbol('FapDataSource'),

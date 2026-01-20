@@ -15,10 +15,6 @@ context('Invites tests', () => {
   describe('Creating invites', () => {
     beforeEach(() => {
       cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
 
       cy.login('user1', initialDBData.roles.user);
@@ -236,10 +232,6 @@ context('Invites tests', () => {
   describe('Accepting invites', () => {
     beforeEach(() => {
       cy.resetDB(true);
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
     });
 
@@ -283,10 +275,6 @@ context('Invites tests', () => {
 
     beforeEach(() => {
       cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
 
       const email = initialDBData.users.user2.email;
@@ -381,10 +369,6 @@ context('Invites tests', () => {
       cy.resetDB(true);
       cy.updateFeature({
         action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
         featureIds: [FeatureId.EMAIL_INVITE],
       });
       cy.updateFeature({
@@ -443,7 +427,6 @@ context('Invites tests', () => {
         'not.exist'
       );
     });
-
     it('Should not be able to add duplicate co-proposer in modal', () => {
       const lastName = initialDBData.users.user2.lastName;
       const email = initialDBData.users.user2.email;
@@ -494,18 +477,10 @@ context('Invites tests', () => {
   describe('Accepting co-proposer invites without code', () => {
     beforeEach(() => {
       cy.resetDB(true);
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
       cy.getAndStoreFeaturesEnabled();
     });
 
     it('Should be able to view and accept the outstanding invites with the proposal information', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
-        this.skip();
-      }
-
       cy.login('user3', initialDBData.roles.user);
       cy.visit('/');
 

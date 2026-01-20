@@ -27,7 +27,6 @@ import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSourc
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
 import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
@@ -87,7 +86,6 @@ mapClass(Tokens.StatusDataSource, StatusDataSourceMock);
 mapClass(Tokens.ExperimentDataSource, ExperimentDataSourceMock);
 mapClass(Tokens.StatusActionsDataSource, StatusActionsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
-mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);
 mapClass(Tokens.FapDataSource, FapDataSourceMock);
 mapClass(Tokens.SampleDataSource, SampleDataSourceMock);
