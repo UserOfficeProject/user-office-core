@@ -427,6 +427,51 @@ context('Invites tests', () => {
         'not.exist'
       );
     });
+    it('Should not be able to add duplicate co-proposer in modal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer already on proposal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy="add-participant-button"]').click({ force: true });
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer when co-proposer is PI', () => {
+      const email = initialDBData.users.user1.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
   });
 
   describe('Accepting co-proposer invites without code', () => {
