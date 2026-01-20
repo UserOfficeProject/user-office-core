@@ -69,6 +69,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     const mockEvent = {
       type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+      loggedInUserId: 2,
       invite: {
         id: 1, // This will match the default mock data
         email: inviteEmail,
