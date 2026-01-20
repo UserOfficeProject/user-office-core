@@ -32,6 +32,7 @@ import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDa
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -70,6 +71,7 @@ async function skipEmailHandler(event: ApplicationEvent) {
   logger.logInfo('Skip email sending', { event });
 }
 
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);

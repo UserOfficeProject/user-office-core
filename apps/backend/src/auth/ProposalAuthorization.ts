@@ -4,6 +4,7 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
@@ -33,6 +34,8 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.StatusDataSource)
     private statusDataSource: StatusDataSource,
+    @inject(Tokens.InstrumentDataSource)
+    private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
@@ -260,6 +263,41 @@ export class ProposalAuthorization {
 
     let hasAccess = false;
 
+    // Check data access
+
+    // const proposalIsntruments =
+    //   await this.instrumentDataSource.getInstrumentsByProposalPk(
+    //     proposal.primaryKey
+    //   );
+
+    // const rolesArray: Role[] = await this.userDataSource.getUserRoles(agent.id);
+    // const userRoles: Record<string, { dataAccess: string[] }> =
+    //   rolesArray.reduce(
+    //     (acc, role) => {
+    //       acc[role.shortCode] = { dataAccess: role.dataAccess };
+
+    //       return acc;
+    //     },
+    //     {} as Record<string, { dataAccess: string[] }>
+    //   );
+    // proposalIsntruments.forEach((instrument) => {
+    //   agent.currentRole?.shortCode &&
+    //     userRoles[agent.currentRole.shortCode]?.dataAccess.some(
+    //       (dataAccess) => {
+    //         if (
+    //           dataAccess.toLowerCase() === instrument.shortCode.toLowerCase()
+    //         ) {
+    //           hasAccess = true;
+
+    //           return true;
+    //         }
+    //       }
+    //     );
+    // });
+
+    if (hasAccess) {
+      return true;
+    }
     switch (currentRole) {
       case Roles.USER:
         hasAccess =

@@ -5,7 +5,7 @@ import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
-import { Role } from 'generated/sdk';
+import { Role as RoleSDK } from 'generated/sdk';
 import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useUserWithRolesData } from 'hooks/user/useUserWithRoles';
 import { tableIcons } from 'utils/materialIcons';
@@ -18,6 +18,8 @@ const columns = [{ title: 'Name', field: 'title' }];
 interface UpdateUserRolesProps {
   id: number;
 }
+
+type Role = Omit<RoleSDK, 'tags'>;
 
 export default function UpdateUserRoles(props: UpdateUserRolesProps) {
   const { userData, setUserData, loading } = useUserWithRolesData({
