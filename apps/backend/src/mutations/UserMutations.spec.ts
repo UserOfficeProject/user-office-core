@@ -2,7 +2,6 @@ import jsonwebtoken from 'jsonwebtoken';
 import { container } from 'tsyringe';
 
 import {
-  dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
@@ -10,9 +9,8 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { isRejection } from '../models/Rejection';
-import { AuthJwtPayload, User, UserRole } from '../models/User';
+import { AuthJwtPayload, User } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
@@ -38,90 +36,6 @@ const badToken = jsonwebtoken.sign(
 );
 
 const userMutations = container.resolve(UserMutations);
-
-test('A user can invite another user by email', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    5,
-    dummyUser.id,
-    UserRole.USER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.USER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user must be logged in to invite another user by email', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(null, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.USER,
-    })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
-});
-
-test('A user cannot invite another user by email if the user already has an account', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserNotOnProposalWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyUser.email,
-      userRole: UserRole.USER,
-    })
-  ).rejects.toThrow('Can not create account because account already exists');
-});
-
-test('A user can reinvite another user by email if the user has not created an account', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    dummyPlaceHolderUser.id,
-    dummyUser.id,
-    UserRole.USER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
-      userRole: UserRole.USER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user officer can invite a reviewer by email', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    dummyPlaceHolderUser.id,
-    dummyUserOfficer.id,
-    UserRole.FAP_REVIEWER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserOfficerWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
-      userRole: UserRole.FAP_REVIEWER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user cannot invite a reviewer by email', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.FAP_REVIEWER,
-    })
-  ).rejects.toThrow('Can not create user for this role');
-});
 
 test('A user can update its own name', () => {
   return expect(
@@ -249,14 +163,8 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'User',
         email: 'new.user@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
-        department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -274,14 +182,8 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'UpsertedDoe',
         email: 'upserted.jane.doe@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
-        department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -304,16 +206,10 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Scientist',
         email: 'john.scientist@dummy-research.org',
         userTitle: 'Dr.',
-        username: 'jscientist',
         preferredName: 'Johnny',
-        gender: 'male',
-        birthDate: '1985-05-15',
         institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
         institutionName: 'CERN', // This should match the existing institution
         institutionCountry: 'Switzerland',
-        department: 'Physics Department',
-        position: 'Senior Researcher',
-        telephone: '+41-22-767-6111',
       }
     );
 
@@ -340,16 +236,10 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Researcher',
         email: 'maria.researcher@newinstitute.edu',
         userTitle: 'Prof.',
-        username: 'mresearcher',
         preferredName: 'Maria',
-        gender: 'female',
-        birthDate: '1980-03-22',
         institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
         institutionName: 'New Research Institute',
         institutionCountry: 'Germany',
-        department: 'Materials Science',
-        position: 'Principal Investigator',
-        telephone: '+49-30-12345678',
       }
     );
 

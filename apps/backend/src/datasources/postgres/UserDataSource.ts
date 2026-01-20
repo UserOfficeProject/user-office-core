@@ -14,7 +14,6 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
@@ -78,77 +77,36 @@ export default class PostgresUserDataSource implements UserDataSource {
       user_title,
       lastname,
       preferredname,
-      gender,
-      birthdate,
       institutionId,
-      department,
-      position,
       email,
-      telephone,
-      placeholder,
       oidcSub,
       oauthRefreshToken,
       oauthIssuer,
-      username,
     } = user;
 
-    try {
-      const [userRecord]: UserRecord[] = await database
-        .update({
-          firstname,
-          user_title,
-          lastname,
-          preferredname,
-          gender,
-          birthdate,
-          institution_id: institutionId,
-          department,
-          position,
-          email,
-          telephone,
-          placeholder,
-          oidc_sub: oidcSub,
-          oauth_refresh_token: oauthRefreshToken,
-          oauth_issuer: oauthIssuer,
-          username,
-        })
-        .from('users')
-        .where('user_id', user.id)
-        .returning(['*']);
-
-      return createUserObject(userRecord);
-    } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new GraphQLError('User already exists');
-      }
-      throw new GraphQLError('Could not update user. Check your Inputs.');
-    }
-  }
-
-  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
-    const { firstname, lastname, email } = args;
-
-    return database
-      .insert({
-        user_title: '',
+    const [userRecord]: UserRecord[] = await database
+      .update({
         firstname,
+        user_title,
         lastname,
-        username: email,
-        preferredname: firstname,
-        oauth_refresh_token: '',
-        oauth_issuer: '',
-        gender: '',
-        birthdate: '2000-01-01',
-        institution_id: 1,
-        department: '',
-        position: '',
+        preferredname,
+        institution_id: institutionId,
         email,
-        telephone: '',
-        placeholder: true,
+        oidc_sub: oidcSub,
+        oauth_refresh_token: oauthRefreshToken,
+        oauth_issuer: oauthIssuer,
       })
-      .returning(['*'])
-      .into('users')
-      .then((user: UserRecord[]) => user[0].user_id);
+      .from('users')
+      .where('user_id', user.id)
+      .returning(['*']);
+
+    return createUserObject(userRecord);
+  }
+  catch(error: any) {
+    if (isUniqueConstraintError(error)) {
+      throw new GraphQLError('User already exists');
+    }
+    throw new GraphQLError('Could not update user. Check your Inputs.');
   }
 
   async getRoles(): Promise<Role[]> {
@@ -332,36 +290,24 @@ export default class PostgresUserDataSource implements UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution_id: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ): Promise<User> {
     return database
       .insert({
         user_title,
         firstname,
         lastname,
-        username,
         preferredname,
         oidc_sub,
         oauth_refresh_token,
         oauth_issuer,
-        gender,
-        birthdate,
         institution_id,
-        department,
-        position,
         email,
-        telephone,
       })
       .returning(['*'])
       .into('users')
@@ -428,16 +374,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       user_title: '',
       firstname: '',
       lastname: '',
-      username: userId.toString(),
       preferredname: '',
       oauth_refresh_token: '',
-      gender: '',
-      birthdate: '2000-01-01',
       institution_id: 1,
-      department: '',
-      position: '',
       email: userId.toString(),
-      telephone: '',
     };
   }
 

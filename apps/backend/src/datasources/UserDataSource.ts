@@ -4,14 +4,12 @@ import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
-  createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
@@ -59,18 +57,12 @@ export interface UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refreshtoken: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;

@@ -20,7 +20,6 @@ import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
-import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import RoleTagsMutation from './mutations/RoleTagsMutation';
 import SampleMutations from './mutations/SampleMutations';
@@ -123,7 +122,6 @@ const context: BasicResolverContext = {
     ),
     proposal: container.resolve(ProposalMutations),
     questionary: container.resolve(QuestionaryMutations),
-    redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
     sample: container.resolve(SampleMutations),
     fap: container.resolve(FapMutations),
