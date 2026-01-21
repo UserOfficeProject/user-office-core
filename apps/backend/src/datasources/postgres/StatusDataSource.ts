@@ -181,14 +181,14 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   async getInitialStatus(
     entityType: Status['entityType']
   ): Promise<Status | null> {
-    const shortCode =
+    const statusId =
       entityType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
 
     const status: StatusRecord = await database
       .select()
       .from('statuses')
       .where('entity_type', entityType)
-      .andWhere('short_code', shortCode)
+      .andWhere('status_id', statusId)
       .first();
 
     return status ? this.createStatusObject(status) : null;

@@ -279,12 +279,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const updateProposalStatus = async (
     proposalPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Proposal status updated successfully!',
     }).changeTechniqueProposalsStatus({
-      workflowStatusId: statusId,
+      workflowStatusId: workflowStatusId,
       proposalPks: [proposalPk],
     });
 

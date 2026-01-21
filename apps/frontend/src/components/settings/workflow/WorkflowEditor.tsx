@@ -396,7 +396,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onEdgeClick={onEdgeClick}
                 onNodeDragStop={(event, node) => {
                   // Extract statusId from node data
-                  if (node.data && node.data.status && node.position) {
+                  if (node.data && node.data.workflowStatus && node.position) {
                     const newPosX = Math.round(node.position.x);
                     const newPosY = Math.round(node.position.y);
 
