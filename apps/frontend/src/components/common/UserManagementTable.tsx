@@ -11,11 +11,9 @@ import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 
-import ParticipantModal from '../proposal/ParticipantModal';
 import ParticipantSelector from '../proposal/ParticipantSelector';
 
 export type UserManagementTableProps = {
@@ -53,10 +51,6 @@ const UserManagementTable = ({
   allowInviteByEmail = false,
 }: UserManagementTableProps) => {
   const [modalOpen, setOpen] = useState(false);
-  const { featuresMap } = useContext(FeatureContext);
-  const isLegacyInviteFlow = featuresMap.get(
-    FeatureId.EMAIL_INVITE_LEGACY
-  )?.isEnabled;
   const currentUser = useContext(UserContext)?.user;
 
   const removeUser = (user: BasicUserDetails) => {
@@ -75,13 +69,6 @@ const UserManagementTable = ({
     setUsers([...users, ...props.users]);
     setInvites?.([...invites, ...props.invites]);
     setOpen(false);
-  };
-
-  const addUsers = (addedUsers: BasicUserDetails[]) => {
-    handleAddParticipants({
-      users: addedUsers,
-      invites: [],
-    });
   };
 
   const handleDeleteInvite = (invite: Invite) => {
@@ -103,28 +90,9 @@ const UserManagementTable = ({
     />
   );
 
-  const LegacyInviteComponent = (
-    <ParticipantModal
-      show={modalOpen}
-      close={() => setOpen(false)}
-      addParticipants={addUsers}
-      selectedUsers={[...users.map((user) => user.id), ...excludeUserIds]}
-      title={title}
-      selection={true}
-      userRole={UserRole.USER}
-      participant={true}
-      setPrincipalInvestigator={
-        onUserAction
-          ? (user) => onUserAction('setPrincipalInvestigator', user)
-          : undefined
-      }
-    />
-  );
-
   return (
     <Box sx={sx}>
-      {modalOpen &&
-        (isLegacyInviteFlow ? LegacyInviteComponent : InviteComponent)}
+      {modalOpen && InviteComponent}
       <FormControl margin="dense" fullWidth>
         <Typography
           sx={{
