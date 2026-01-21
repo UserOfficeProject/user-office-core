@@ -5,16 +5,11 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import Email from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
-import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -37,8 +32,6 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
-
-import InviteUserForm from './InviteUserForm';
 
 type InvitationButtonProps = {
   title: string;
@@ -89,27 +82,6 @@ const localColumns = [
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
 ];
-
-const getTitle = ({
-  t,
-  invitationUserRole,
-}: {
-  t: TFunction<'translation', undefined>;
-  invitationUserRole?: UserRole;
-}): string => {
-  switch (invitationUserRole) {
-    case UserRole.USER_OFFICER:
-      return 'Invite User';
-    case UserRole.FAP_CHAIR:
-      return 'Invite ' + t('Fap') + ' Chair';
-    case UserRole.FAP_SECRETARY:
-      return 'Invite ' + t('Fap') + ' Secretary';
-    case UserRole.INSTRUMENT_SCIENTIST:
-      return 'Invite ' + t('instrumentSci');
-    default:
-      return 'Invite User';
-  }
-};
 
 async function getUserByEmail(
   email: string,
@@ -167,9 +139,7 @@ const PeopleTable = ({
   userRole,
   data,
   action,
-  emailInvite,
   emailSearch,
-  invitationUserRole,
   isFreeAction,
   showInvitationButtons,
   columns,
@@ -187,24 +157,15 @@ const PeopleTable = ({
     userRole: userRole ? userRole : null,
   });
   const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
-    FeatureId.EMAIL_INVITE
-  )?.isEnabled;
   const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
   const api = useDataApi();
-  const [sendUserEmail, setSendUserEmail] = useState(false);
-  const [inviteUserModal, setInviteUserModal] = useState({
-    show: false,
-    title: '',
-    userRole: UserRole.USER,
-  });
+
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
@@ -222,18 +183,6 @@ const PeopleTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.length]);
 
-  if (sendUserEmail && invitationUserRole && action) {
-    return (
-      <InviteUserForm
-        title={getTitle({ t, invitationUserRole })}
-        action={action.fn}
-        close={() => setSendUserEmail(false)}
-        userRole={invitationUserRole}
-      />
-    );
-  }
-  const EmailIcon = (): JSX.Element => <Email />;
-
   const actionArray = [];
   action &&
     !selection &&
@@ -246,41 +195,8 @@ const PeopleTable = ({
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });
-  emailInvite &&
-    isEmailInviteEnabled &&
-    actionArray.push({
-      icon: EmailIcon,
-      isFreeAction: true,
-      tooltip: 'Add by email',
-      onClick: () => setSendUserEmail(true),
-    });
 
   const invitationButtons: InvitationButtonProps[] = [];
-
-  if (showInvitationButtons) {
-    invitationButtons.push(
-      {
-        title: 'Invite User',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite User',
-            userRole: UserRole.USER,
-          }),
-        'data-cy': 'invite-user-button',
-      },
-      {
-        title: 'Invite Reviewer',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite Reviewer',
-            userRole: UserRole.FAP_REVIEWER,
-          }),
-        'data-cy': 'invite-reviewer-button',
-      }
-    );
-  }
 
   const handleColumnSelectionChange = (
     selectedItems: BasicUserDetailsWithRole[],
@@ -461,36 +377,6 @@ const PeopleTable = ({
           },
         }}
       >
-        <Dialog
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-          open={inviteUserModal.show}
-          onClose={(): void =>
-            setInviteUserModal({
-              ...inviteUserModal,
-              show: false,
-            })
-          }
-          style={{ backdropFilter: 'blur(6px)' }}
-        >
-          <DialogContent>
-            <InviteUserForm
-              title={inviteUserModal.title}
-              userRole={inviteUserModal.userRole}
-              close={() =>
-                setInviteUserModal({
-                  ...inviteUserModal,
-                  show: false,
-                })
-              }
-              action={(invitedUser) => {
-                if (invitedUser) {
-                  tableRef.current && tableRef.current.onQueryChange({});
-                }
-              }}
-            />
-          </DialogContent>
-        </Dialog>
         <MaterialTable
           tableRef={tableRef}
           icons={tableIcons}

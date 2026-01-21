@@ -68,13 +68,8 @@ context('Event log tests', () => {
         firstname: newFirstName,
         user_title: 'Dr.',
         lastname: 'Doe',
-        gender: 'male',
-        birthdate: new Date('2000/01/01'),
         institutionId: 1,
-        department: 'IT',
-        position: 'Dirrector',
         email: faker.internet.email(),
-        telephone: '555-123-4567',
       });
 
       cy.login('officer');
