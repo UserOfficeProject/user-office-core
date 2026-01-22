@@ -30,6 +30,7 @@ import ProposalReviewContent, {
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
 import {
+  PaginationSortDirection,
   ProposalsFilter,
   SettingsId,
   UserRole,
@@ -616,7 +617,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   addColumns(columns, techniquesColumns());
   addColumns(columns, statusColumn());
 
-  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
+  columns = setSortDirectionOnSortField(
+    columns,
+    sortField,
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
+  );
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
     new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
@@ -653,7 +662,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                   : [],
             },
             sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
             searchText: tableQuery.search,

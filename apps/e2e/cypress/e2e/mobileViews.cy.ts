@@ -34,27 +34,22 @@ context('Mobile views tests', () => {
 
     cy.get('[role="presentation"] [role="dialog"]').as('modal');
 
-    cy.get('@modal').contains('No Previous Collaborators');
+    cy.get('[data-cy="invite-user-autocomplete"]').type(
+      initialDBData.users.user2.email
+    );
 
-    cy.get('@modal')
-      .find('[data-cy="assign-selected-users"]')
-      .should('be.visible');
+    cy.get('[role=presentation]')
+      .contains(initialDBData.users.user2.lastName)
+      .click();
+
+    cy.get('[data-cy="invite-user-submit-button"]')
+      .should('be.enabled')
+      .click();
 
     cy.finishedLoading();
 
-    cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
-
-    cy.get('[data-cy="findUser"]').click();
-    cy.finishedLoading();
-
-    cy.get('@modal')
-      .find('tr[index="0"]')
-      .contains(initialDBData.users.user2.firstName);
-
-    cy.get('@modal').contains('1 user(s) selected');
-
-    cy.get('@modal')
-      .find('[data-cy="assign-selected-users"]')
-      .should('be.visible');
+    cy.get('[data-cy="co-proposers"]').contains(
+      initialDBData.users.user2.lastName
+    );
   });
 });
