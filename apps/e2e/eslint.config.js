@@ -61,9 +61,6 @@ export default defineConfig([
     },
 
     rules: {
-      //
-      // Import rules
-      //
       "import/order": [
         "error",
         {
@@ -83,9 +80,6 @@ export default defineConfig([
         },
       ],
 
-      //
-      // TypeScript
-      //
       "@typescript-eslint/no-use-before-define": ["error"],
       "@typescript-eslint/no-empty-function": [
         "error",
@@ -104,34 +98,16 @@ export default defineConfig([
           format: ["PascalCase", "camelCase"],
         },
       ],
-      // "@typescript-eslint/ban-types": [
-      //   "error",
-      //   {
-      //     types: {
-      //       Function: {
-      //         message: "Use `FunctionType` instead",
-      //         fixWith: "FunctionType",
-      //       },
-      //     },
-      //   },
-      // ],
+
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
 
-      //
-      // Unused imports
-      //
+
       "unused-imports/no-unused-imports": "error",
 
-      //
-      // Cypress
-      //
       "cypress/unsafe-to-chain-command": "off",
-
-      //
-      // Prettier
-      //
+      
       "prettier/prettier": "error",
 
       "no-unused-expressions": "off", // disable original rule
