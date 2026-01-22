@@ -25,20 +25,6 @@ export const dummyWorkflowStatuses = [
 ];
 
 export class StatusDataSourceMock implements StatusDataSource {
-  async getWorkflowStatus(
-    workflowStatusId: number
-  ): Promise<WorkflowStatus | null> {
-    return (
-      dummyWorkflowStatuses.find(
-        (ws) => ws.workflowStatusId === workflowStatusId
-      ) || null
-    );
-  }
-  async getDefaultWorkflowStatus(
-    workflowId: number
-  ): Promise<WorkflowStatus | null> {
-    return dummyWorkflowStatuses[0];
-  }
   // TODO: This needs to be implemented
   async createStatus(
     newStatusInput: Omit<Status, 'is_default'>
@@ -50,9 +36,6 @@ export class StatusDataSourceMock implements StatusDataSource {
   }
   async getAllStatuses(): Promise<Status[]> {
     return dummyStatuses;
-  }
-  async getAllWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]> {
-    return dummyWorkflowStatuses;
   }
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     return { ...status, entityType: WorkflowType.PROPOSAL };

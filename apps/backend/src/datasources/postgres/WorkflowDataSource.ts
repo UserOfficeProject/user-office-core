@@ -178,6 +178,41 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
+  async getDefaultWorkflowStatus(
+    workflowId: number
+  ): Promise<WorkflowStatus | null> {
+    const workflow = await database
+      .select()
+      .from('workflows')
+      .where('workflow_id', workflowId)
+      .first();
+
+    if (!workflow) {
+      throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
+    }
+
+    const defaultStatus = await this.statusDataSource.getDefaultStatus(
+      workflow.entity_type
+    );
+
+    if (!defaultStatus) {
+      return null;
+    }
+
+    const workflowStatus: WorkflowStatusRecord | null = await database
+      .select()
+      .from('workflow_has_statuses')
+      .where('workflow_id', workflowId)
+      .andWhere('status_id', defaultStatus.id)
+      .first();
+
+    if (!workflowStatus) {
+      return null;
+    }
+
+    return this.createWorkflowStatusObject(workflowStatus);
+  }
+
   async getWorkflowConnection(
     connectionId: number
   ): Promise<WorkflowConnection | null> {

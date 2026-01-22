@@ -56,7 +56,7 @@ export class WorkflowResolver {
     @Root() workflow: Workflow,
     @Ctx() context: ResolverContext
   ): Promise<WorkflowStatus[]> {
-    const statuses = await context.queries.workflow.getStatuses(
+    const statuses = await context.queries.workflow.getWorkflowStatuses(
       context.user,
       workflow.id
     );

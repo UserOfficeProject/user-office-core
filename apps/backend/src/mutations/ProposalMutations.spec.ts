@@ -3,10 +3,10 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import {
-  ProposalDataSourceMock,
-  dummyProposalWithNotActiveCall,
-  dummyProposalSubmitted,
   dummyProposal,
+  dummyProposalSubmitted,
+  dummyProposalWithNotActiveCall,
+  ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
@@ -17,6 +17,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
@@ -28,6 +29,7 @@ const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
+let workflowDataSource: WorkflowDataSourceMock;
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
@@ -37,6 +39,10 @@ beforeEach(() => {
 
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
+  );
+
+  workflowDataSource = container.resolve<WorkflowDataSourceMock>(
+    Tokens.WorkflowDataSource
   );
 });
 
@@ -466,7 +472,7 @@ describe('Test technique proposal change status', () => {
       .mockResolvedValue(dummyProposalStatuses);
 
     jest
-      .spyOn(statusDataSource, 'getWorkflowStatus')
+      .spyOn(workflowDataSource, 'getWorkflowStatus')
       .mockImplementation((id: number) => {
         return Promise.resolve(
           dummyWorkflowStatuses.find((ws) => ws.workflowStatusId === id) || null

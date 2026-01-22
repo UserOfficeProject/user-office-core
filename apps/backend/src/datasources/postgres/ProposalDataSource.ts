@@ -19,6 +19,7 @@ import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/Up
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -35,7 +36,6 @@ import {
   TechnicalReviewRecord,
   TechniqueRecord,
 } from './records';
-import StatusDataSource from './StatusDataSource';
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
@@ -97,8 +97,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     private adminDataSource: AdminDataSource,
     @inject(Tokens.CallDataSource)
     protected callDataSource: CallDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -353,9 +353,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new GraphQLError(`Call not found with id: ${call_id}`);
     }
 
-    const draftWfStatus = await this.statusDataSource.getDefaultWorkflowStatus(
-      call.proposalWorkflowId
-    );
+    const draftWfStatus =
+      await this.workflowDataSource.getDefaultWorkflowStatus(
+        call.proposalWorkflowId
+      );
 
     if (!draftWfStatus) {
       throw new GraphQLError(
@@ -863,7 +864,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalPks: number[]
   ): Promise<Proposals> {
     const workflowStatus =
-      await this.statusDataSource.getWorkflowStatus(workflowStatusId);
+      await this.workflowDataSource.getWorkflowStatus(workflowStatusId);
 
     const dataToUpdate: Partial<ProposalRecord> = {
       workflow_status_id: workflowStatusId,

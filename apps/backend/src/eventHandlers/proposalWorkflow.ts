@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -27,15 +27,15 @@ const publishProposalStatusChange = async (
   }
   const eventBus = resolveApplicationEventBus();
 
-  const statusDataSource = container.resolve<StatusDataSource>(
-    Tokens.StatusDataSource
+  const workflowDataSource = container.resolve<WorkflowDataSource>(
+    Tokens.WorkflowDataSource
   );
   updatedProposals.map(async (updatedProposal) => {
     if (updatedProposal) {
-      const proposalStatus = await statusDataSource.getWorkflowStatus(
+      const proposalStatus = await workflowDataSource.getWorkflowStatus(
         updatedProposal.workflowStatusId
       );
-      const previousProposalStatus = await statusDataSource.getWorkflowStatus(
+      const previousProposalStatus = await workflowDataSource.getWorkflowStatus(
         updatedProposal.prevStatusId
       );
 

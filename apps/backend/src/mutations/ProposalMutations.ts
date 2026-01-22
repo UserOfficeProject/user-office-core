@@ -21,9 +21,9 @@ import ProposalInternalCommentsDataSource from '../datasources/postgres/Proposal
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
@@ -54,8 +54,6 @@ export default class ProposalMutations {
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
@@ -75,7 +73,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -648,13 +648,13 @@ export default class ProposalMutations {
       );
     }
 
-    const newWorkflowStatus = await this.statusDataSource.getWorkflowStatus(
+    const newWorkflowStatus = await this.workflowDataSource.getWorkflowStatus(
       args.workflowStatusId
     );
 
     for (const proposal of proposals) {
       const currentWorkflowStatus =
-        await this.statusDataSource.getWorkflowStatus(
+        await this.workflowDataSource.getWorkflowStatus(
           proposal.workflowStatusId
         );
 
@@ -841,7 +841,7 @@ export default class ProposalMutations {
       );
 
       const defaultWfStatus =
-        await this.statusDataSource.getDefaultWorkflowStatus(
+        await this.workflowDataSource.getDefaultWorkflowStatus(
           call.proposalWorkflowId
         );
 

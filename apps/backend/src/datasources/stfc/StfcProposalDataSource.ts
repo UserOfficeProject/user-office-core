@@ -19,6 +19,7 @@ import {
   ProposalViewRecord,
 } from '../postgres/records';
 import PostgresStatusDataSource from '../postgres/StatusDataSource';
+import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
@@ -26,7 +27,7 @@ import { StfcUserDataSource } from './StfcUserDataSource';
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresAdminDataSource(),
   new PostgresCallDataSource(),
-  new PostgresStatusDataSource()
+  new PostgresWorkflowDataSource(new PostgresStatusDataSource())
 );
 
 const fieldMap: { [key: string]: string } = {

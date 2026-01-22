@@ -8,8 +8,8 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import {
@@ -52,8 +52,8 @@ export default class ExperimentMutations {
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
@@ -125,7 +125,7 @@ export default class ExperimentMutations {
     }
 
     const experimentSafetyDefaultWorkflowStatus =
-      await this.statusDataSource.getDefaultWorkflowStatus(
+      await this.workflowDataSource.getDefaultWorkflowStatus(
         call.experimentWorkflowId
       );
     if (!experimentSafetyDefaultWorkflowStatus) {

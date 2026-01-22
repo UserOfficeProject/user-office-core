@@ -13,30 +13,35 @@ export interface WorkflowDataSource {
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
   updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
-  deleteWorkflowConnection(
-    connectionId: number
+
+  createWorkflowConnection(
+    newWorkflowConnectionInput: CreateWorkflowConnectionInput
+  ): Promise<WorkflowConnection>;
+  getWorkflowConnection(
+    connectionId: WorkflowConnection['id']
   ): Promise<WorkflowConnection | null>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnection[]>;
-  getWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]>;
-  getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
-  getWorkflowConnection(
-    connectionId: WorkflowConnection['id']
+  deleteWorkflowConnection(
+    connectionId: number
   ): Promise<WorkflowConnection | null>;
+
   addStatusToWorkflow(newWorkflowStatusInput: {
     workflowId: number;
     statusId: string;
     posX: number;
     posY: number;
   }): Promise<WorkflowStatus>;
-  createWorkflowConnection(
-    newWorkflowConnectionInput: CreateWorkflowConnectionInput
-  ): Promise<WorkflowConnection>;
+  getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
+  getWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]>;
   updateWorkflowStatus(
     workflowStatus: UpdateWorkflowStatusInput
   ): Promise<WorkflowStatus>;
   deleteWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus>;
+
+  getDefaultWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null>;
+
   setStatusChangingEventsOnConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]
@@ -44,6 +49,7 @@ export interface WorkflowDataSource {
   getStatusChangingEventsByConnectionIds(
     workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
+
   getWorkflowStructure(workflowId: number): Promise<{
     workflowStatuses: {
       workflowStatusId: number;

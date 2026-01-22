@@ -45,7 +45,7 @@ export default class WorkflowQueries {
   }
 
   @Authorized()
-  async getStatuses(agent: UserWithRole | null, workflowId: number) {
+  async getWorkflowStatuses(agent: UserWithRole | null, workflowId: number) {
     return this.dataSource.getWorkflowStatuses(workflowId);
   }
 

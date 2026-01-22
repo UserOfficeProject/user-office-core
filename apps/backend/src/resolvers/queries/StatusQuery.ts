@@ -46,7 +46,7 @@ export class StatusQuery {
     @Args() args: WorkflowStatusArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.status.getWorkflowStatus(context.user, args.id);
+    return context.queries.workflow.getWorkflowStatus(context.user, args.id);
   }
 
   @Query(() => [WorkflowStatus])
@@ -54,7 +54,7 @@ export class StatusQuery {
     @Args() args: WorkflowStatusesArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.status.getAllWorkflowStatuses(
+    return context.queries.workflow.getWorkflowStatuses(
       context.user,
       args.workflowId
     );

@@ -63,22 +63,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return status ? this.createStatusObject(status) : null;
   }
 
-  async getWorkflowStatus(
-    workflowStatusId: number
-  ): Promise<WorkflowStatus | null> {
-    const workflowStatus: WorkflowStatusRecord = await database
-      .select()
-      .from('workflow_has_statuses')
-      .where('workflow_status_id', workflowStatusId)
-      .first();
-
-    if (!workflowStatus) {
-      return null;
-    }
-
-    return this.createWorkflowStatusObject(workflowStatus);
-  }
-
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
     const statuses: StatusRecord[] = await database
       .select('*')
@@ -87,16 +71,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .orderBy('status_id', 'asc');
 
     return statuses.map((status) => this.createStatusObject(status));
-  }
-
-  async getAllWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]> {
-    const workflowStatuses: WorkflowStatusRecord[] = await database
-      .select()
-      .from('workflow_has_statuses')
-      .where('workflow_id', workflowId)
-      .orderBy('workflow_status_id', 'asc');
-
-    return workflowStatuses.map(this.createWorkflowStatusObject);
   }
 
   async updateStatus(status: UpdateStatusInput): Promise<Status> {
@@ -143,39 +117,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .first();
 
     return status ? this.createStatusObject(status) : null;
-  }
-
-  async getDefaultWorkflowStatus(
-    workflowId: number
-  ): Promise<WorkflowStatus | null> {
-    const workflow = await database
-      .select()
-      .from('workflows')
-      .where('workflow_id', workflowId)
-      .first();
-
-    if (!workflow) {
-      throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
-    }
-
-    const defaultStatus = await this.getDefaultStatus(workflow.entity_type);
-
-    if (!defaultStatus) {
-      return null;
-    }
-
-    const workflowStatus: WorkflowStatusRecord | null = await database
-      .select()
-      .from('workflow_has_statuses')
-      .where('workflow_id', workflowId)
-      .andWhere('status_id', defaultStatus.id)
-      .first();
-
-    if (!workflowStatus) {
-      return null;
-    }
-
-    return this.createWorkflowStatusObject(workflowStatus);
   }
 
   async getInitialStatus(
