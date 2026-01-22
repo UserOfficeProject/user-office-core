@@ -1353,6 +1353,16 @@ export interface TechniqueRecord {
   readonly full_count: number;
 }
 
+export interface PermissionRecord {
+  readonly id: number;
+  readonly role: string;
+  readonly object: string;
+  readonly action: string;
+  readonly call: string;
+  readonly facility: string;
+  readonly instrument_ids: string[];
+}
+
 export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;

@@ -11,6 +11,7 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
+import PermissionsPage from './permissions/PermissionsPage';
 import ProposalPage from './proposal/ProposalPage';
 import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
 import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
@@ -334,6 +335,14 @@ const AppRoutes = () => {
                 title={i18n.format(t('Technique'), 'plural')}
                 element={<TechniquesPage />}
               />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/Permissions"
+            element={
+              <TitledRoute title="Permissions" element={<PermissionsPage />} />
             }
           />
         )}

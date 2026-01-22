@@ -1,0 +1,9 @@
+fragment permission on Permission {
+  id
+  role
+  object
+  action
+  call
+  instrument_ids
+  facility
+}
