@@ -1,26 +1,28 @@
 import eslint from '@eslint/js';
-import tsParser from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 import prettier from 'eslint-plugin-prettier';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 import pluginCypress from 'eslint-plugin-cypress'
+import pluginChaiFriendly from 'eslint-plugin-chai-friendly';
 
 export default defineConfig([
   {
     ignores: ["node_modules/",
               "dist/",
-            "cypress/node_modules",
-            ".next",
-            "build",
-            "dist",
-            "public",
-            "src/serviceWorker.js",
-            "src/setupProxy.js",
-            "src/generated/sdk.ts",
-            "server.js",
-            ],
+              "cypress/node_modules",
+              ".next",
+              "build",
+              "dist",
+              "public",
+              "src/serviceWorker.js",
+              "src/setupProxy.js",
+              "src/generated/sdk.ts",
+              "server.js",
+              "webpack.config.js",
+              "eslint.config.js" // Some weird bug with eslint causes it to fail to find the typescript-eslint node module
+              ],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
@@ -32,7 +34,7 @@ export default defineConfig([
     files: ["cypress/**/*.ts"],
 
     languageOptions: {
-      parser: tsParser,
+      parser: tseslint.parser,
       ecmaVersion: 2018,
       sourceType: "module",
 
@@ -47,6 +49,7 @@ export default defineConfig([
     plugins: {
       "unused-imports": unusedImports,
       prettier,
+      'chai-friendly': pluginChaiFriendly,
     },
 
     settings: {
@@ -130,6 +133,13 @@ export default defineConfig([
       // Prettier
       //
       "prettier/prettier": "error",
+
+      "no-unused-expressions": "off", // disable original rule
+      "@typescript-eslint/no-unused-expressions": "off", // disable the typescript version of the rule as it reports incorrectly in some cases
+      "chai-friendly/no-unused-expressions": [
+        'error',
+        { allowShortCircuit: true, allowTernary: true },
+      ],
     },
   },
 ]);
