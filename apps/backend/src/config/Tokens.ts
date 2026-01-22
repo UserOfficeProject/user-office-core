@@ -20,6 +20,7 @@ export const Tokens = {
   InstrumentDataSource: Symbol('InstrumentDataSource'),
   InviteDataSource: Symbol('InviteDataSource'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
+  PermissionDataSource: Symbol('PermissionDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),

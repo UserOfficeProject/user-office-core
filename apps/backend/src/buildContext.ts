@@ -49,6 +49,7 @@ import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import InternalReviewQueries from './queries/InternalReviewQueries';
 import InviteQueries from './queries/InviteQueries';
+import PermissionQueries from './queries/PermissionQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalPdfTemplateQueries from './queries/ProposalPdfTemplateQueries';
 import ProposalQueries from './queries/ProposalQueries';
@@ -108,6 +109,7 @@ const context: BasicResolverContext = {
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
     emailTemplate: container.resolve(EmailTemplateQueries),
+    permission: container.resolve(PermissionQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),

@@ -1,0 +1,8 @@
+query getPermissions {
+  permissions {
+    permissions {
+      ...permission
+    }
+    totalCount
+  }
+}

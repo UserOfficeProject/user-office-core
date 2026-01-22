@@ -48,6 +48,7 @@ import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
 import InternalReviewQueries from '../queries/InternalReviewQueries';
 import InviteQueries from '../queries/InviteQueries';
+import PermissionQueries from '../queries/PermissionQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalPdfTemplateQueries from '../queries/ProposalPdfTemplateQueries';
 import ProposalQueries from '../queries/ProposalQueries';
@@ -104,6 +105,7 @@ interface ResolverContextQueries {
   tag: TagQueries;
   experiment: ExperimentQueries;
   emailTemplate: EmailTemplateQueries;
+  permission: PermissionQueries;
 }
 
 interface ResolverContextMutations {
