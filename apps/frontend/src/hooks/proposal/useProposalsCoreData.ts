@@ -5,14 +5,19 @@ import {
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
+import {
+  PaginationSortDirection,
+  ProposalsFilter,
+  ProposalView,
+  UserRole,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 type QueryParameters = {
   first?: number;
   offset?: number;
   sortField?: string | undefined;
-  sortDirection?: string | undefined;
+  sortDirection?: PaginationSortDirection | undefined;
   searchText?: string | undefined;
   refetch?: boolean;
 };

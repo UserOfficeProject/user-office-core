@@ -15,6 +15,7 @@ import {
 } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -143,7 +144,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number | undefined,
     offset?: number | undefined,
     sortField?: string | undefined,
-    sortDirection?: string | undefined,
+    sortDirection?: PaginationSortDirection | undefined,
     searchText?: string | undefined
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return { totalCount: 0, proposalViews: [] };
@@ -430,7 +431,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };

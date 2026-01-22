@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -25,8 +26,10 @@ import {
   Maybe,
   getSdk,
   BasicUserDetailsFragment,
+  PaginationSortDirection,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -70,6 +73,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   setSelectedParticipants?: React.Dispatch<
     React.SetStateAction<BasicUserDetails[]>
   >;
+  persistUrlQueryParams?: boolean;
 };
 
 const localColumns = [
@@ -143,6 +147,7 @@ const PeopleTable = ({
   onRemove,
   search,
   title,
+  persistUrlQueryParams = false,
 }: PeopleTableProps) => {
   const [query, setQuery] = useState<{
     subtractUsers: number[];
@@ -161,9 +166,13 @@ const PeopleTable = ({
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
+  const sortDirection = persistUrlQueryParams
+    ? searchParams.get('sortDirection')
+    : '';
   useEffect(() => {
     if (!data) {
       return;
@@ -247,13 +256,18 @@ const PeopleTable = ({
         try {
           const [orderBy] = tableQuery.orderByCollection;
           const { users } = await api().getUsers({
-            filter: tableQuery.search,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
-            orderBy: orderBy?.orderByField,
-            orderDirection: orderBy?.orderDirection,
             subtractUsers: query.subtractUsers,
             userRole: query.userRole,
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            searchText: tableQuery.search,
           });
 
           const filteredData = data
@@ -371,16 +385,86 @@ const PeopleTable = ({
               {title}
             </Typography>
           }
-          columns={columns ?? localColumns}
+          columns={setSortDirectionOnSortField(
+            columns ? columns : localColumns,
+            persistUrlQueryParams ? searchParams.get('sortField') : '',
+            sortDirection === PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : sortDirection === PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined
+          )}
           onSelectionChange={handleColumnSelectionChange}
           data={fetchRemoteUsersData}
+          onPageChange={(page) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                searchParams.set('page', page.toString());
+
+                return searchParams;
+              });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                searchParams.set('pageSize', pageSize.toString());
+                searchParams.set('page', '0');
+
+                return searchParams;
+              });
+          }}
+          onSearchChange={(searchText) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                if (searchText) {
+                  searchParams.set('search', searchText);
+                  searchParams.set('page', '0');
+                } else {
+                  searchParams.delete('search');
+                }
+
+                return searchParams;
+              });
+          }}
+          onOrderCollectionChange={(orderByCollection) => {
+            const [orderBy] = orderByCollection;
+
+            if (!orderBy) {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.delete('sortField');
+                  searchParams.delete('sortDirection');
+
+                  return searchParams;
+                });
+            } else {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.set('sortField', orderBy.orderByField);
+                  searchParams.set('sortDirection', orderBy.orderDirection);
+
+                  return searchParams;
+                });
+            }
+          }}
           options={{
             search: search,
+            searchText: persistUrlQueryParams
+              ? searchParams.get('search') || undefined
+              : undefined,
             debounceInterval: 400,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
+            pageSize:
+              persistUrlQueryParams && searchParams.get('pageSize')
+                ? +searchParams.get('pageSize')!
+                : undefined,
+            initialPage:
+              persistUrlQueryParams && searchParams.get('page')
+                ? +searchParams.get('page')!
+                : 0,
             ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
