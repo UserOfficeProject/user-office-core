@@ -1,0 +1,18 @@
+query getCoProposerInvites {
+  me {
+    coProposerInvites {
+      id
+      code
+      email
+      createdAt
+      createdByUserId
+      claimedAt
+      claimedByUserId
+      isEmailSent
+      expiresAt
+      proposal {
+        ...invitedProposal
+      }
+    }
+  }
+}

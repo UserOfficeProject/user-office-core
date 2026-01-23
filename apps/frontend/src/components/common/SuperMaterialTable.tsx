@@ -7,13 +7,12 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { PaginationSortDirection } from 'generated/sdk';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import StyledDialog from './StyledDialog';
-
-export type SortDirectionType = 'asc' | 'desc' | undefined;
 
 interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   createModal?: (
@@ -90,7 +89,15 @@ export function SuperMaterialTable<Entry extends EntryID>({
     options.searchText = search || undefined;
   }
 
-  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
+  columns = setSortDirectionOnSortField(
+    columns,
+    sortField,
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
+  );
 
   const onCreated = (
     objectAdded: Entry | null,

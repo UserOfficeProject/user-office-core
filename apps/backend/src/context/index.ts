@@ -19,7 +19,6 @@ import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations'
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from '../mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
-import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
@@ -115,7 +114,6 @@ interface ResolverContextMutations {
   experimentSafetyPdfTemplate: ExperimentSafetyPdfTemplateMutations;
   proposal: ProposalMutations;
   questionary: QuestionaryMutations;
-  redeemCodes: RedeemCodesMutations;
   review: ReviewMutations;
   sample: SampleMutations;
   fap: FapMutations;
