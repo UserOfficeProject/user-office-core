@@ -800,11 +800,9 @@ export default class PostgresInstrumentDataSource
   async getInstrumentsByFapIds(fapId: number[]): Promise<Instrument[]> {
     return database
       .select('i.*')
-      .from('instruments as i')
-      .join('call_has_instruments as chi', {
-        'i.instrument_id': 'chi.instrument_id',
-      })
-      .where('chi.fap_id', 'in', fapId)
+      .from('fap_proposals as fp')
+      .join('instruments as i', { 'fp.instrument_id': 'i.instrument_id' })
+      .where('fp.fap_id', 'in', fapId)
       .distinct()
       .then((instruments: InstrumentRecord[]) => {
         const result = instruments.map((instrument) =>
