@@ -1,14 +1,14 @@
 import { Column } from '@material-table/core';
 import { Typography } from '@mui/material';
-import i18n from 'i18n';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { usePermissionsData } from 'hooks/permission/usePermissionsData';
+import { FunctionType } from 'utils/utilTypes';
 
-import { PermissionFragment, UserRole } from '../../generated/sdk';
+import EditPermission from './EditPermission';
+import { Permission, PermissionFragment, UserRole } from '../../generated/sdk';
 
 const PermissionsTable = () => {
   const {
@@ -19,7 +19,16 @@ const PermissionsTable = () => {
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const { t } = useTranslation();
+  const createModal = (
+    onCreate: FunctionType<void, [Permission | null]>,
+    onUpdate: FunctionType<void, [Permission | null]>,
+    editPermission: Permission | null
+  ) => (
+    <EditPermission
+      permission={editPermission}
+      close={(permission: Permission | null) => onUpdate(permission)}
+    />
+  );
 
   const columns: Column<PermissionFragment>[] = [
     {
@@ -43,7 +52,7 @@ const PermissionsTable = () => {
       field: 'facility',
     },
     {
-      title: i18n.format(t('instrument'), 'plural'),
+      title: 'Instruments',
       render: (data) => {
         const ids = Array.isArray(data.instrument_ids)
           ? data.instrument_ids.flatMap((x) => x.split(','))
@@ -66,6 +75,7 @@ const PermissionsTable = () => {
     <>
       <div data-cy="permissions-table">
         <SuperMaterialTable
+          createModal={createModal}
           setData={setPermissions}
           hasAccess={{
             create: isUserOfficer,
