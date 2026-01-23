@@ -107,7 +107,7 @@ export default defineConfig([
       "unused-imports/no-unused-imports": "error",
 
       "cypress/unsafe-to-chain-command": "off",
-      
+
       "prettier/prettier": "error",
 
       "no-unused-expressions": "off", // disable original rule
@@ -115,6 +115,11 @@ export default defineConfig([
       "chai-friendly/no-unused-expressions": [
         'error',
         { allowShortCircuit: true, allowTernary: true },
+      ],
+
+      "padding-line-between-statements": [
+        "error",
+        { "blankLine": "always", "prev": "*", "next": "return" }
       ],
     },
   },
