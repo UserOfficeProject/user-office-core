@@ -6,4 +6,6 @@ fragment permission on Permission {
   call
   instrument_ids
   facility
+  instrument_operator
+  custom_filter
 }

@@ -24,4 +24,10 @@ export class Permission implements Partial<PermissionOrigin> {
 
   @Field()
   public facility: string;
+
+  @Field()
+  public instrument_operator: string;
+
+  @Field()
+  public custom_filter: string;
 }

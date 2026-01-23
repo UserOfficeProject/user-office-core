@@ -52,6 +52,14 @@ const PermissionsTable = () => {
         return ids.join(', ');
       },
     },
+    {
+      title: 'Instrument Operator',
+      field: 'instrument_operator',
+    },
+    {
+      title: 'Custom Filter',
+      field: 'custom_filter',
+    },
   ];
 
   return (

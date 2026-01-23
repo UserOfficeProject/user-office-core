@@ -17,7 +17,9 @@ export default class PostgresPermissionDataSource
       permission.action,
       permission.call,
       permission.instrument_ids,
-      permission.facility
+      permission.facility,
+      permission.instrument_operator,
+      permission.custom_filter
     );
   }
 

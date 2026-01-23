@@ -1361,6 +1361,8 @@ export interface PermissionRecord {
   readonly call: string;
   readonly facility: string;
   readonly instrument_ids: string[];
+  readonly instrument_operator: string;
+  readonly custom_filter: string;
 }
 
 export interface TechniqueHasInstrumentsRecord {

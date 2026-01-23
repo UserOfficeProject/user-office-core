@@ -6,6 +6,8 @@ export class Permission {
     public action: string,
     public call: string,
     public instrument_ids: string[],
-    public facility: string
+    public facility: string,
+    public instrument_operator: string,
+    public custom_filter: string
   ) {}
 }
