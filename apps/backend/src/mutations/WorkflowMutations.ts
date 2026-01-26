@@ -1,6 +1,8 @@
 import {
+  addNextStatusEventsValidationSchema,
   addStatusActionsToConnectionValidationSchema,
   createWorkflowValidationSchema,
+  deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
   updateWorkflowValidationSchema,
 } from '@user-office-software/duo-validation';
@@ -118,7 +120,7 @@ export default class WorkflowMutations {
     }
   }
 
-  // @ValidateArgs(addNextStatusEventsValidationSchema)
+  @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async setStatusChangingEventsOnConnection(
     agent: UserWithRole | null,
@@ -138,7 +140,7 @@ export default class WorkflowMutations {
       });
   }
 
-  // @ValidateArgs(deleteWorkflowStatusValidationSchema) // TODO update schema
+  @ValidateArgs(deleteWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflowStatus(
     agent: UserWithRole | null,
