@@ -50,14 +50,13 @@ context('Status actions tests', () => {
 
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
@@ -137,14 +136,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.reload();
         cy.addConnectionStatusActions({
@@ -155,7 +153,7 @@ context('Status actions tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -227,14 +225,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -245,7 +242,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -301,14 +298,13 @@ context('Status actions tests', () => {
       const invalidEmail = 'test@test';
       const validEmail = faker.internet.email();
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -318,7 +314,7 @@ context('Status actions tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -458,14 +454,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 150,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -476,7 +471,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -583,14 +578,13 @@ context('Status actions tests', () => {
         exchanges: ['user_office_backend.fanout'],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -606,7 +600,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -705,15 +699,15 @@ context('Status actions tests', () => {
         exchanges: ['user_office_backend.fanout'],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
       }).then((result) => {
-        const connection = result.addWorkflowStatus;
+        const connection = result.createWorkflowConnection;
         if (connection) {
           cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,

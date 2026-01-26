@@ -5,11 +5,13 @@ import {
   CreateWorkflowMutation,
   CreateStatusMutationVariables,
   CreateStatusMutation,
-  AddWorkflowStatusMutationVariables,
   AddWorkflowStatusMutation,
   AddConnectionStatusActionsMutation,
+  AddStatusToWorkflowMutation,
   AddConnectionStatusActionsMutationVariables,
+  AddStatusToWorkflowMutationVariables,
   Status,
+  CreateWorkflowConnectionMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -52,16 +54,20 @@ declare global {
       ) => Cypress.Chainable<SetStatusChangingEventsOnConnectionMutation>;
 
       /**
-       * Add proposal status to workflow.
+       * Add proposal status to workflow and optionally create connection from previous status.
        *
-       * @returns {typeof addWorkflowStatus}
+       * @returns {typeof addStatusToWorkflow}
        * @memberof Chainable
        * @example
-       *    cy.addWorkflowStatus(addWorkflowStatusInput: AddWorkflowStatusMutationVariables)
+       *    cy.addStatusToWorkflow(addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables)
        */
-      addWorkflowStatus: (
-        addWorkflowStatusInput: AddWorkflowStatusMutationVariables
-      ) => Cypress.Chainable<AddWorkflowStatusMutation>;
+      addStatusToWorkflow: (
+        addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables & {
+          prevId?: number;
+        }
+      ) => Cypress.Chainable<
+        AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
+      >;
       /**
        * Add proposal status action to workflow connection.
        *
@@ -92,7 +98,7 @@ declare global {
        * cy.dragStatusIntoWorkflow(initialDBData.proposalStatuses.draft, { clientX: 100, clientY: 200 });
        */
       dragStatusIntoWorkflow(
-        sourceSelector: Pick<Status, 'shortCode' | 'id'>,
+        sourceSelector: Pick<Status, 'id'>,
         options?: {
           clientX?: number;
           clientY?: number;
@@ -112,8 +118,8 @@ declare global {
        * );
        */
       connectReactFlowNodes(
-        sourceStatus: Pick<Status, 'shortCode'>,
-        targetStatus: Pick<Status, 'shortCode'>,
+        sourceStatus: { id: number },
+        targetStatus: { id: number },
         options?: {
           force?: boolean;
         }
