@@ -1,4 +1,32 @@
+import { isCallEndedGuard } from '../workflowEngine/guards/isCallEndedGuard';
+import { isCallEndedInternalGuard } from '../workflowEngine/guards/isCallEndedInternalGuard';
+import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapReviewEndedGuard';
+import { isCallReviewEndedGuard } from '../workflowEngine/guards/isCallReviewEndedGuard';
+import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
+import { isProposalAllFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingInstrumentSubmittedGuard';
+import { isProposalAllFapMeetingsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingsSubmittedGuard';
+import { isProposalAllFapReviewersSelectedGuard } from '../workflowEngine/guards/isProposalAllFapReviewersSelectedGuard';
+import { isProposalAllFapReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapReviewsSubmittedGuard';
+import { isProposalAllFeasibilityReviewsFeasibleGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsFeasibleGuard';
+import { isProposalAllFeasibilityReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsSubmittedGuard';
+import { isProposalAllReviewsSubmittedForAllFapsGuard } from '../workflowEngine/guards/isProposalAllReviewsSubmittedForAllFapsGuard';
+import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
+import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
+import { isProposalBookingTimeCompletedGuard } from '../workflowEngine/guards/isProposalBookingTimeCompletedGuard';
+import { isProposalFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentSubmittedGuard';
+import { isProposalFapMeetingInstrumentUnsubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentUnsubmittedGuard';
+import { isProposalFapReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFapReviewSubmittedGuard';
+import { isProposalFapsSelectedGuard } from '../workflowEngine/guards/isProposalFapsSelectedGuard';
+import { isProposalFeasibilityReviewFeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewFeasibleGuard';
+import { isProposalFeasibilityReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewSubmittedGuard';
+import { isProposalFeasibilityReviewUnfeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewUnfeasibleGuard';
 import { isProposalInstrumentsSelectedGuard } from '../workflowEngine/guards/isProposalInstrumentsSelectedGuard';
+import { isProposalManagementDecisionSubmittedGuard } from '../workflowEngine/guards/isProposalManagementDecisionSubmittedGuard';
+import { isProposalNotifiedGuard } from '../workflowEngine/guards/isProposalNotifiedGuard';
+import { isProposalRejectedGuard } from '../workflowEngine/guards/isProposalRejectedGuard';
+import { isProposalReservedGuard } from '../workflowEngine/guards/isProposalReservedGuard';
+import { isProposalSampleReviewSubmittedGuard } from '../workflowEngine/guards/isProposalSampleReviewSubmittedGuard';
+import { isProposalSampleSafeGuard } from '../workflowEngine/guards/isProposalSampleSafeGuard';
 import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
 import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachnine';
 
@@ -124,6 +152,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when proposal feasibility review is submitted with value of feasible',
+      guard: isProposalFeasibilityReviewFeasibleGuard,
     },
   ],
   [
@@ -131,11 +160,15 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when proposal feasibility review is submitted with value of unfeasible',
+      guard: isProposalFeasibilityReviewUnfeasibleGuard,
     },
   ],
   [
     Event.PROPOSAL_FAPS_SELECTED,
-    { label: 'Event occurs when FAPs are assigned to a proposal' },
+    {
+      label: 'Event occurs when FAPs are assigned to a proposal',
+      guard: isProposalFapsSelectedGuard,
+    },
   ],
   [
     Event.PROPOSAL_FAPS_REMOVED,
@@ -157,6 +190,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when proposal feasibility review is submitted with any value',
+      guard: isProposalFeasibilityReviewSubmittedGuard,
     },
   ],
   [
@@ -164,6 +198,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when all proposal feasibility reviews are submitted with any value',
+      guard: isProposalAllFeasibilityReviewsSubmittedGuard,
     },
   ],
   [
@@ -171,6 +206,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when all proposal feasibility reviews are submitted with Feasible value',
+      guard: isProposalAllFeasibilityReviewsFeasibleGuard,
     },
   ],
   [
@@ -178,6 +214,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when proposal sample review gets submitted with any value',
+      guard: isProposalSampleReviewSubmittedGuard,
     },
   ],
   [
@@ -185,12 +222,14 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when proposal sample review gets submitted with value of low risk',
+      guard: isProposalSampleSafeGuard,
     },
   ],
   [
     Event.PROPOSAL_ALL_FAP_REVIEWERS_SELECTED,
     {
       label: 'Event occurs when all FAP reviewers are selected on a proposal',
+      guard: isProposalAllFapReviewersSelectedGuard,
     },
   ],
   [
@@ -203,6 +242,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_FAP_REVIEW_SUBMITTED,
     {
       label: 'Event occurs when at least one proposal FAP review is submitted',
+      guard: isProposalFapReviewSubmittedGuard,
     },
   ],
   [
@@ -210,6 +250,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
+      guard: isProposalAllFapReviewsSubmittedGuard,
     },
   ],
   [
@@ -225,6 +266,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when all the FAP meetings are submitted for a specific proposal',
+      guard: isProposalAllFapMeetingsSubmittedGuard,
     },
   ],
   [
@@ -232,6 +274,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
+      guard: isProposalAllReviewsSubmittedForAllFapsGuard,
     },
   ],
   [
@@ -253,12 +296,14 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when instrument is submitted after FAP meeting is finalized',
+      guard: isProposalFapMeetingInstrumentSubmittedGuard,
     },
   ],
   [
     Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED,
     {
       label: 'Event occurs when instrument is unsubmitted in the FAP meeting',
+      guard: isProposalFapMeetingInstrumentUnsubmittedGuard,
     },
   ],
   [
@@ -266,6 +311,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
+      guard: isProposalAllFapMeetingInstrumentSubmittedGuard,
     },
   ],
   [
@@ -278,36 +324,51 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED,
     {
       label: 'Event occurs when proposal management decision is submitted',
+      guard: isProposalManagementDecisionSubmittedGuard,
     },
   ],
   [
     Event.PROPOSAL_ACCEPTED,
-    { label: 'Event occurs when proposal gets final decision as accepted' },
+    {
+      label: 'Event occurs when proposal gets final decision as accepted',
+      guard: isProposalAcceptedGuard,
+    },
   ],
   [
     Event.PROPOSAL_RESERVED,
-    { label: 'Event occurs when proposal gets reserved' },
+    {
+      label: 'Event occurs when proposal gets reserved',
+      guard: isProposalReservedGuard,
+    },
   ],
   [
     Event.PROPOSAL_REJECTED,
-    { label: 'Event occurs when proposal gets rejected' },
+    {
+      label: 'Event occurs when proposal gets rejected',
+      guard: isProposalRejectedGuard,
+    },
   ],
   [Event.CALL_CREATED, { label: 'Event occurs on a when a call is created' }],
   [
     Event.CALL_ENDED,
-    { label: 'Event occurs on a specific call end date set on the call' },
+    {
+      label: 'Event occurs on a specific call end date set on the call',
+      guard: isCallEndedGuard,
+    },
   ],
   [
     Event.CALL_ENDED_INTERNAL,
     {
       label:
         'Event occurs on a specific call internal end date set on the call',
+      guard: isCallEndedInternalGuard,
     },
   ],
   [
     Event.CALL_REVIEW_ENDED,
     {
       label: 'Event occurs on a specific call review end date set on the call',
+      guard: isCallReviewEndedGuard,
     },
   ],
   [
@@ -315,6 +376,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs on a specific call FAP review end date set on the call',
+      guard: isCallFapReviewEndedGuard,
     },
   ],
   [Event.USER_UPDATED, { label: 'Event occurs when user is updated' }],
@@ -366,7 +428,10 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   ],
   [
     Event.PROPOSAL_NOTIFIED,
-    { label: 'Event occurs when proposal is notified' },
+    {
+      label: 'Event occurs when proposal is notified',
+      guard: isProposalNotifiedGuard,
+    },
   ],
   [Event.PROPOSAL_CLONED, { label: 'Event occurs when proposal is cloned' }],
   [
@@ -446,6 +511,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when the time slot booking is activated in the scheduler',
+      guard: isProposalBookingTimeActivatedGuard,
     },
   ],
   [
@@ -453,6 +519,7 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when the time slot booking is completed in the scheduler',
+      guard: isProposalBookingTimeCompletedGuard,
     },
   ],
   [
@@ -543,7 +610,10 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   ],
   [
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
-    { label: 'Event occurs when a proposal is assigned to techniques' },
+    {
+      label: 'Event occurs when a proposal is assigned to techniques',
+      guard: isProposalAssignedToTechniquesGuard,
+    },
   ],
   [Event.VISIT_CREATED, { label: 'Event occurs when visit is created' }],
   [
