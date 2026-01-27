@@ -21,14 +21,16 @@ export interface ReviewDataSource {
     userId?: number,
     callId?: number,
     instrumentId?: number,
-    submitted?: number
+    submitted?: number,
+    active?: boolean
   ): Promise<Review[]>;
   getAllUsersReviews(
     fapIds: number[],
     userId?: number,
     callId?: number,
     instrumentId?: number,
-    submitted?: number
+    submitted?: number,
+    active?: boolean
   ): Promise<Review[]>;
   getAssignmentReview(
     fapId: number,

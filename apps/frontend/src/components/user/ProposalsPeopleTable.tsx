@@ -5,7 +5,6 @@ import MaterialTable, {
   QueryResult,
 } from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
-import Email from '@mui/icons-material/Email';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
@@ -27,8 +26,6 @@ import {
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
-
-import InviteUserForm from './InviteUserForm';
 
 // This component is for displaying and picking from a users previous collaborators to work on a proposal.
 // The table loads a users most recent and frequent collaborators for the user to choose from.
@@ -126,8 +123,6 @@ const ProposalsPeopleTable = ({
   selection,
   setSelectedParticipants,
   action,
-  emailInvite,
-  invitationUserRole,
   selectedUsers,
   title,
   userRole,
@@ -147,23 +142,10 @@ const ProposalsPeopleTable = ({
   )?.isEnabled;
 
   const api = useDataApi();
-  const [sendUserEmail, setSendUserEmail] = useState(false);
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-
-  if (sendUserEmail && invitationUserRole && action) {
-    return (
-      <InviteUserForm
-        title={'Invite User'}
-        action={action.fn}
-        close={() => setSendUserEmail(false)}
-        userRole={invitationUserRole}
-      />
-    );
-  }
-  const EmailIcon = (): JSX.Element => <Email />;
 
   // Typescript doesn't like this not being typed explicitly
   const actionArray:
@@ -195,15 +177,6 @@ const ProposalsPeopleTable = ({
         event: React.MouseEvent<JSX.Element>,
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
-    });
-
-  emailInvite &&
-    isEmailInviteEnabled &&
-    actionArray.push({
-      icon: EmailIcon,
-      isFreeAction: true,
-      tooltip: 'Add by email',
-      onClick: () => setSendUserEmail(true),
     });
 
   function selectedParticipantsChanged(
@@ -283,7 +256,7 @@ const ProposalsPeopleTable = ({
 
         const { previousCollaborators } = await api().getPreviousCollaborators({
           userId: userId,
-          filter: tableQuery.search,
+          searchText: tableQuery.search,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
           subtractUsers: query.subtractUsers,

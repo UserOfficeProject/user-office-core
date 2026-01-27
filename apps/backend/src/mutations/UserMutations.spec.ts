@@ -2,7 +2,6 @@ import jsonwebtoken from 'jsonwebtoken';
 import { container } from 'tsyringe';
 
 import {
-  dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
@@ -10,9 +9,8 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { isRejection, Rejection } from '../models/Rejection';
-import { AuthJwtPayload, User, UserRole } from '../models/User';
+import { isRejection } from '../models/Rejection';
+import { AuthJwtPayload, User } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
@@ -38,90 +36,6 @@ const badToken = jsonwebtoken.sign(
 );
 
 const userMutations = container.resolve(UserMutations);
-
-test('A user can invite another user by email', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    5,
-    dummyUser.id,
-    UserRole.USER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.USER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user must be logged in to invite another user by email', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(null, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.USER,
-    })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
-});
-
-test('A user cannot invite another user by email if the user already has an account', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserNotOnProposalWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyUser.email,
-      userRole: UserRole.USER,
-    })
-  ).rejects.toThrow('Can not create account because account already exists');
-});
-
-test('A user can reinvite another user by email if the user has not created an account', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    dummyPlaceHolderUser.id,
-    dummyUser.id,
-    UserRole.USER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
-      userRole: UserRole.USER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user officer can invite a reviewer by email', () => {
-  const emailInviteResponse = new EmailInviteResponse(
-    dummyPlaceHolderUser.id,
-    dummyUserOfficer.id,
-    UserRole.FAP_REVIEWER
-  );
-
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserOfficerWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: dummyPlaceHolderUser.email,
-      userRole: UserRole.FAP_REVIEWER,
-    })
-  ).resolves.toStrictEqual(emailInviteResponse);
-});
-
-test('A user cannot invite a reviewer by email', () => {
-  return expect(
-    userMutations.createUserByEmailInvite(dummyUserWithRole, {
-      firstname: 'firstname',
-      lastname: 'lastname',
-      email: 'email@google.com',
-      userRole: UserRole.FAP_REVIEWER,
-    })
-  ).rejects.toThrow('Can not create user for this role');
-});
 
 test('A user can update its own name', () => {
   return expect(
@@ -238,135 +152,6 @@ test('externalTokenLogin supplies a new JWT', async () => {
   expect(decoded.user.id).toBe(dummyUser.id);
 });
 
-// Tests for updateUserByOidcSub functionality
-describe('updateUserByOidcSub', () => {
-  test('A user can update their own profile by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'UpdatedJane',
-      lastname: 'UpdatedDoe',
-      email: 'updated.jane@example.com',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'UpdatedJane',
-      lastname: 'UpdatedDoe',
-      email: 'updated.jane@example.com',
-    });
-  });
-
-  test('A user officer can update another user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(
-      dummyUserOfficerWithRole,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'OfficerUpdatedJane',
-        department: 'Updated Department',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'OfficerUpdatedJane',
-      department: 'Updated Department',
-    });
-  });
-  test('A user cannot update another user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(
-      dummyUserNotOnProposalWithRole,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'ShouldNotUpdate',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe(
-      'Can not update user because of insufficient permissions'
-    );
-  });
-
-  test('A not logged in user cannot update a user by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(null, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'ShouldNotUpdate',
-      id: dummyUser.id,
-    });
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe('NOT_LOGGED_IN');
-  });
-
-  test('A user can update partial profile data by OIDC sub', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
-    });
-  });
-
-  test('A user cannot update someone else profile even with their own OIDC sub when trying to update different user', async () => {
-    // Simulate user with different OIDC sub trying to update dummyUser
-    const userWithDifferentOidcSub = {
-      ...dummyUserNotOnProposalWithRole,
-      oidcSub: 'different-oidc-sub',
-    };
-
-    const result = await userMutations.updateUserByOidcSub(
-      userWithDifferentOidcSub,
-      {
-        oidcSub: dummyUser.oidcSub as string,
-        firstname: 'ShouldNotUpdate',
-        id: dummyUser.id,
-      }
-    );
-
-    expect(isRejection(result)).toBe(true);
-    expect((result as Rejection).reason).toBe(
-      'Can not update user because of insufficient permissions'
-    );
-  });
-
-  test('Empty update object should work', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual(dummyUser);
-  });
-
-  test('Update should preserve original user data for unspecified fields', async () => {
-    const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
-      oidcSub: dummyUser.oidcSub as string,
-      firstname: 'OnlyFirstName',
-      id: dummyUser.id,
-    });
-
-    expect(result).toEqual({
-      ...dummyUser,
-      firstname: 'OnlyFirstName',
-    });
-
-    // Verify other fields remain unchanged
-    expect(isRejection(result)).toBe(false);
-    expect((result as typeof dummyUser).lastname).toBe(dummyUser.lastname);
-    expect((result as typeof dummyUser).email).toBe(dummyUser.email);
-    expect((result as typeof dummyUser).department).toBe(dummyUser.department);
-  });
-});
-
 describe('upsertUserByOidcSub', () => {
   test('A user can be created if OIDC sub does not exist', async () => {
     const newOidcSub = 'new-unique-oidc-sub';
@@ -378,14 +163,8 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'User',
         email: 'new.user@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
-        department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -403,14 +182,8 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'UpsertedDoe',
         email: 'upserted.jane.doe@example.com',
         userTitle: null,
-        username: null,
         preferredName: null,
-        gender: null,
-        birthDate: null,
         institutionRoRId: '',
-        department: null,
-        position: '',
-        telephone: null,
         institutionName: '',
         institutionCountry: '',
       }
@@ -433,16 +206,10 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Scientist',
         email: 'john.scientist@dummy-research.org',
         userTitle: 'Dr.',
-        username: 'jscientist',
         preferredName: 'Johnny',
-        gender: 'male',
-        birthDate: '1985-05-15',
         institutionRoRId: existingRorId, // This should find Dummy Research Institute in our mock
         institutionName: 'CERN', // This should match the existing institution
         institutionCountry: 'Switzerland',
-        department: 'Physics Department',
-        position: 'Senior Researcher',
-        telephone: '+41-22-767-6111',
       }
     );
 
@@ -469,16 +236,10 @@ describe('upsertUserByOidcSub', () => {
         lastName: 'Researcher',
         email: 'maria.researcher@newinstitute.edu',
         userTitle: 'Prof.',
-        username: 'mresearcher',
         preferredName: 'Maria',
-        gender: 'female',
-        birthDate: '1980-03-22',
         institutionRoRId: newRorId, // This ROR ID doesn't exist in mock
         institutionName: 'New Research Institute',
         institutionCountry: 'Germany',
-        department: 'Materials Science',
-        position: 'Principal Investigator',
-        telephone: '+49-30-12345678',
       }
     );
 

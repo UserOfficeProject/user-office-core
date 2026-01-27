@@ -1,5 +1,19 @@
-query getStatusActionsLogs($filter: StatusActionsLogsFilter,$searchText: String,  $first: Int, $sortField: String, $sortDirection: String, $offset: Int) {
-  statusActionsLogs(filter: $filter, first: $first, sortField: $sortField, sortDirection: $sortDirection, searchText: $searchText, offset: $offset) {
+query getStatusActionsLogs(
+  $filter: StatusActionsLogsFilter
+  $searchText: String
+  $first: Int
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+  $offset: Int
+) {
+  statusActionsLogs(
+    filter: $filter
+    first: $first
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+    offset: $offset
+  ) {
     statusActionsLogs {
       ...statusActionsLog
     }

@@ -29,7 +29,7 @@ import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import AcceptInvite from './AcceptInvite';
+import AcceptInviteWithCode from './AcceptInviteWithCode';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import DataAccessUsersModal from './DataAccessUsersModal';
 import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
@@ -353,7 +353,7 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <AcceptInvite
+            <AcceptInviteWithCode
               onAccepted={() => {
                 searchQuery().then((data) => {
                   if (data) {

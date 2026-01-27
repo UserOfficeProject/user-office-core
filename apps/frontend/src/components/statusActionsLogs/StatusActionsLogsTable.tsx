@@ -13,6 +13,7 @@ import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import {
+  PaginationSortDirection,
   StatusActionsLog,
   StatusActionsLogsFilter,
   StatusActionType,
@@ -115,7 +116,15 @@ const StatusActionsLogsTable = ({
     return v;
   });
   if (sortField && sortDirection) {
-    columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
+    columns = setSortDirectionOnSortField(
+      columns,
+      sortField,
+      sortDirection == PaginationSortDirection.ASC
+        ? PaginationSortDirection.ASC
+        : sortDirection == PaginationSortDirection.DESC
+          ? PaginationSortDirection.DESC
+          : undefined
+    );
   }
   if (localStorageValue) {
     columns = columns.map((column) => ({
@@ -176,7 +185,12 @@ const StatusActionsLogsTable = ({
           filter,
           searchText: tableQuery.search,
           sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
+          sortDirection:
+            orderBy?.orderDirection == PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection == PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
         });

@@ -218,4 +218,10 @@ describe('Test Admin Mutations', () => {
       })
     ).resolves.toBe(true);
   });
+
+  test('An unauthenticated user can not add client log', () => {
+    return expect(
+      adminMutations.addClientLog(null, 'Some error')
+    ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
+  });
 });

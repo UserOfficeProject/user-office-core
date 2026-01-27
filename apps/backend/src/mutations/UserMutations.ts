@@ -1,39 +1,25 @@
 import { logger } from '@user-office-software/duo-logger';
 import {
   addUserRoleValidationSchema,
-  createUserByEmailInviteValidationSchema,
   deleteUserValidationSchema,
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
-import { DateTime } from 'luxon';
 import { inject, injectable } from 'tsyringe';
-import { Args } from 'type-graphql';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { AdminDataSource } from '../datasources/AdminDataSource';
-import { RedeemCodesDataSource } from '../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import {
-  AuthJwtPayload,
-  User,
-  UserRole,
-  UserRoleShortCodeMap,
-  UserWithRole,
-} from '../models/User';
+import { AuthJwtPayload, User, UserRole, UserWithRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
   UpdateUserRolesArgs,
-  UpdateUserByOidcSubArgs,
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
@@ -44,10 +30,7 @@ import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 export default class UserMutations {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource,
-    @inject(Tokens.RedeemCodesDataSource)
-    private redeemCodeDataSource: RedeemCodesDataSource
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
   ) {}
 
   createHash(password: string): string {
@@ -78,93 +61,6 @@ export default class UserMutations {
     }
 
     return user;
-  }
-
-  createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
-    return new EmailInviteResponse(userId, agentId, role);
-  }
-
-  @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
-  @Authorized()
-  @EventBus(Event.EMAIL_INVITE_LEGACY)
-  async createUserByEmailInvite(
-    agent: UserWithRole | null,
-    args: CreateUserByEmailInviteArgs
-  ): Promise<EmailInviteResponse> {
-    let userId: number | null = null;
-    let role: UserRole = args.userRole;
-
-    if (!agent) {
-      throw rejection('Agent is not defined', {
-        agent,
-        args,
-        code: ApolloServerErrorCodeExtended.INVALID_TOKEN,
-      });
-    }
-    // Check if email exist in database and if user has been invited before
-    const user = await this.dataSource.getByEmail(args.email);
-    if (user && user.placeholder) {
-      userId = user.id;
-
-      return this.createEmailInviteResponse(userId, agent.id, role);
-    } else if (user) {
-      throw rejection('Can not create account because account already exists', {
-        args,
-        code: ApolloServerErrorCodeExtended.BAD_REQUEST,
-      });
-    }
-
-    if (
-      args.userRole === UserRole.FAP_REVIEWER &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-
-      const newUserRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[role]
-      );
-
-      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.FAP_REVIEWER;
-    } else if (args.userRole === UserRole.USER) {
-      userId = await this.dataSource.createInviteUser(args);
-
-      const newUserRole = await this.dataSource.getRoleByShortCode(
-        UserRoleShortCodeMap[role]
-      );
-
-      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
-      role = UserRole.USER;
-    } else if (
-      args.userRole === UserRole.FAP_CHAIR &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_CHAIR;
-    } else if (
-      args.userRole === UserRole.FAP_SECRETARY &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.FAP_SECRETARY;
-    } else if (
-      args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
-      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
-    ) {
-      userId = await this.dataSource.createInviteUser(args);
-      role = UserRole.INSTRUMENT_SCIENTIST;
-    }
-
-    if (!userId) {
-      throw rejection('Can not create user for this role', {
-        args,
-      });
-    } else {
-      await this.redeemCodeDataSource.createRedeemCode(userId, agent.id);
-
-      return this.createEmailInviteResponse(userId, agent.id, role);
-    }
   }
 
   @ValidateArgs(updateUserValidationBackendSchema)
@@ -243,49 +139,6 @@ export default class UserMutations {
           err
         );
       });
-  }
-
-  @Authorized()
-  @EventBus(Event.USER_UPDATED)
-  async updateUserByOidcSub(
-    agent: UserWithRole | null,
-    @Args() args: UpdateUserByOidcSubArgs
-  ): Promise<User | Rejection> {
-    const isUpdatingOwnUser = agent?.oidcSub === args.oidcSub;
-    if (
-      !this.userAuth.isApiToken(agent) &&
-      !this.userAuth.isUserOfficer(agent) &&
-      !isUpdatingOwnUser
-    ) {
-      return rejection(
-        'Can not update user because of insufficient permissions',
-        {
-          args,
-          agent,
-          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
-        }
-      );
-    }
-
-    try {
-      const updatedUser = await this.dataSource.updateUserByOidcSub(args);
-
-      if (!updatedUser) {
-        return rejection(
-          'USER_NOT_FOUND',
-          { oidcSub: args.oidcSub },
-          new Error(`User with OIDC sub ${args.oidcSub} not found`)
-        );
-      }
-
-      return updatedUser;
-    } catch (error) {
-      return rejection(
-        'INTERNAL_ERROR',
-        { agent, args },
-        error instanceof Error ? error : new Error(String(error))
-      );
-    }
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)
@@ -416,8 +269,6 @@ export default class UserMutations {
           lastname: user.lastname,
           oidcSub: user.oidcSub,
           institutionId: user.institutionId,
-          placeholder: user.placeholder,
-          position: user.position,
           preferredname: user.preferredname,
         },
         roles,
@@ -521,27 +372,15 @@ export default class UserMutations {
       userTitle,
       firstName,
       lastName,
-      username,
       preferredName,
       oidcSub,
-      gender,
-      birthDate,
       institutionRoRId,
       institutionName,
       institutionCountry,
-      department,
-      position,
       email,
-      telephone,
     } = args;
 
     const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
-
-    let formattedBirthDate: DateTime | null = null;
-    formattedBirthDate = birthDate ? DateTime.fromISO(birthDate) : null;
-    if (formattedBirthDate && !formattedBirthDate.isValid) {
-      return rejection('Invalid birth date format', { birthDate, args });
-    }
 
     const institution = await this.userAuth.getOrCreateUserInstitution({
       institution_ror_id: institutionRoRId,
@@ -559,18 +398,12 @@ export default class UserMutations {
     if (userWithOAuthSubMatch) {
       const updatedUser = await this.dataSource.update({
         ...userWithOAuthSubMatch,
-        birthdate: formattedBirthDate?.toJSDate(),
-        department: department ?? undefined,
         email,
         firstname: firstName,
-        username: username ?? undefined,
-        gender: gender ?? undefined,
         lastname: lastName,
         oidcSub: oidcSub,
         institutionId: institution.id,
-        position: position,
         preferredname: preferredName ?? undefined,
-        telephone: telephone ?? undefined,
         user_title: userTitle ?? undefined,
       });
 
@@ -580,18 +413,12 @@ export default class UserMutations {
         userTitle ?? '',
         firstName,
         lastName,
-        username ?? '',
         preferredName ?? '',
         oidcSub,
         '',
         '',
-        gender ?? '',
-        formattedBirthDate?.toJSDate() ?? new Date(),
         institution.id,
-        department ?? '',
-        position,
-        email,
-        telephone ?? ''
+        email
       );
 
       await this.dataSource.addUserRole({

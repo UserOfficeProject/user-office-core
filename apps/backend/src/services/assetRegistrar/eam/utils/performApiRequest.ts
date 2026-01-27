@@ -3,15 +3,17 @@ import { getEnvOrThrow } from './getEnvOrThrow';
 
 export async function performApiRequest(uri: string, requestData: object) {
   try {
+    const base64Credentials = btoa(
+      `${getEnvOrThrow('EAM_AUTH_USER')}:${getEnvOrThrow('EAM_AUTH_PASSWORD')}`
+    );
     const response = await fetch(getEnvOrThrow('EAM_API_URL') + uri, {
       method: 'POST',
       body: JSON.stringify(requestData),
       headers: {
         'Content-Type': 'application/json',
-        INFOR_USER: getEnvOrThrow('EAM_AUTH_USER'),
-        INFOR_PASSWORD: getEnvOrThrow('EAM_AUTH_PASSWORD'),
-        INFOR_TENANT: getEnvOrThrow('EAM_AUTH_TENANT'),
-        INFOR_ORGANIZATION: getEnvOrThrow('EAM_AUTH_ORGANIZATION'),
+        Authorization: `Basic ${base64Credentials}`,
+        tenant: getEnvOrThrow('EAM_AUTH_TENANT'),
+        organization: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
       },
     });
     const data = await response.json();

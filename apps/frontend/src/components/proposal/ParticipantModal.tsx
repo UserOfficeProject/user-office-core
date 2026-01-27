@@ -96,6 +96,7 @@ const ParticipantModal = ({
       }}
       maxWidth="sm"
       fullWidth
+      data-cy="participant-modal"
     >
       <DialogTitle
         sx={{

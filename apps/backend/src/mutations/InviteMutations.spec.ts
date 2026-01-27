@@ -47,27 +47,27 @@ describe('Test Invite Mutations', () => {
 
   test('A user can accept valid invite code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'invite-code')
+      inviteMutations.acceptWithCode(dummyUserWithRole, 'invite-code')
     ).resolves.toBeInstanceOf(Invite);
   });
 
   test('A user can not accept invalid code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'invalid-invite-code')
+      inviteMutations.acceptWithCode(dummyUserWithRole, 'invalid-invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code not found');
   });
 
   test('A user can not accept code twice', async () => {
-    await inviteMutations.accept(dummyUserWithRole, 'invite-code');
+    await inviteMutations.acceptWithCode(dummyUserWithRole, 'invite-code');
 
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'invite-code')
+      inviteMutations.acceptWithCode(dummyUserWithRole, 'invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code already claimed');
   });
 
   test('A user can not accept expired code', async () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'expired-invite-code')
+      inviteMutations.acceptWithCode(dummyUserWithRole, 'expired-invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code has expired');
   });
 
@@ -374,5 +374,44 @@ describe('Test Invite Mutations', () => {
     expect(invite.templateId).toBe(
       'user-office-registration-invitation-co-proposer'
     );
+  });
+
+  test('A user can accept valid co proposer invite without code', async () => {
+    const invite = await inviteMutations.acceptCoProposerInvite(
+      { ...dummyUserWithRole, email: 'test2@example.com' },
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Invite);
+  });
+
+  test('A user can not accept co proposer invite without code if email does not match', async () => {
+    const invite = await inviteMutations.acceptCoProposerInvite(
+      { ...dummyUserWithRole, email: 'mismatch@example.com' },
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
+  });
+
+  test('A user can not accept co proposer invite without code if proposal is invalid', async () => {
+    const invite = await inviteMutations.acceptCoProposerInvite(
+      dummyUserWithRole,
+      'invalid-short-code'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Proposal not found');
+  });
+
+  test('A user cannot accept a non existing co proposer invite for an existing proposal without code', async () => {
+    const invite = await inviteMutations.acceptCoProposerInvite(
+      dummyUserWithRole,
+      'no-invite'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
   });
 });

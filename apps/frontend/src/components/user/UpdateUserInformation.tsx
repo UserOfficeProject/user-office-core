@@ -1,31 +1,20 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import { useTheme } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
-import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import DatePicker from 'components/common/FormikUIDatePicker';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { SettingsId, UpdateUserMutationVariables } from 'generated/sdk';
-import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { UpdateUserMutationVariables } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useCountries } from 'hooks/user/useCountries';
 import { useUserData } from 'hooks/user/useUserData';
@@ -38,42 +27,26 @@ interface UpdateUserInformationProps {
 export default function UpdateUserInformation(
   props: UpdateUserInformationProps
 ) {
-  const theme = useTheme();
   const { user } = useContext(UserContext);
   const { userData } = useUserData({ userId: props.id });
-  const { format } = useFormattedDateTime({
-    settingsFormatToUse: SettingsId.DATE_FORMAT,
-  });
+
   const { api } = useDataApiWithFeedback();
   const countries = useCountries();
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const [countriesList, setCountriesList] = useState<Option[]>([]);
 
-  // NOTE: User should be older than 18 years.
-  const userMaxBirthDate = DateTime.now().minus({ years: 18 });
-
   if (!userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
 
   const initialValues = {
-    username: userData.username,
     firstname: userData.firstname,
     lastname: userData.lastname,
     preferredname: userData.preferredname || '',
-    gender:
-      userData.gender !== 'male' && userData.gender !== 'female'
-        ? 'other'
-        : userData.gender,
-    othergender: userData.gender,
-    birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
     institutionId: userData.institutionId,
-    department: userData.department,
-    position: userData.position,
     oldEmail: userData.email,
     email: userData.email,
-    telephone: userData.telephone,
     user_title: userData.user_title,
     oidcSub: userData.oidcSub,
   };
@@ -84,12 +57,6 @@ export default function UpdateUserInformation(
     { text: 'Dr.', value: 'Dr.' },
     { text: 'Prof.', value: 'Prof.' },
     { text: 'Rather not say', value: 'unspecified' },
-  ];
-
-  const genderOptions: Option[] = [
-    { text: 'Female', value: 'female' },
-    { text: 'Male', value: 'male' },
-    { text: 'Other', value: 'other' },
   ];
 
   if (!institutionsList.length && institutions.length) {
@@ -123,8 +90,6 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           institutionId: values.institutionId ? +values.institutionId : null,
-          gender:
-            values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
 
         await sendUserUpdate({
@@ -136,25 +101,6 @@ export default function UpdateUserInformation(
     >
       {({ isSubmitting, values }) => (
         <Form>
-          <Typography variant="h6" component="h2" gutterBottom>
-            User Information
-            <Box
-              sx={{
-                '& > * + *': {
-                  margin: theme.spacing(0.5),
-                },
-              }}
-            >
-              {userData.placeholder && (
-                <Chip
-                  color="primary"
-                  icon={<AccountCircleIcon />}
-                  size="small"
-                  label="Placeholder user"
-                />
-              )}
-            </Box>
-          </Typography>
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
@@ -191,75 +137,16 @@ export default function UpdateUserInformation(
                   type="text"
                   data-cy="preferredname"
                 />
-                <Field
-                  name="gender"
-                  component={Select}
-                  options={genderOptions}
-                  inputLabel={{ htmlFor: 'gender', required: true }}
-                  label="Gender"
-                  data-cy="gender"
-                  required
-                />
-                {values.gender === 'other' && (
-                  <Field
-                    name="othergender"
-                    label="Please specify gender"
-                    id="othergender-input"
-                    component={TextField}
-                    type="text"
-                    data-cy="othergender"
-                  />
-                )}
-                <Field
-                  name="birthdate"
-                  label="Birthdate"
-                  id="birthdate-input"
-                  format={format}
-                  inputProps={{ placeholder: format }}
-                  component={DatePicker}
-                  textField={{
-                    fullWidth: true,
-                    'data-cy': 'birthdate',
-                  }}
-                  maxDate={userMaxBirthDate}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
-                />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={6}>
-              <FormControl fullWidth margin="normal">
-                <InputLabel shrink>
-                  ORCID iD{' '}
-                  <Box
-                    component="img"
-                    sx={{
-                      verticalAlign: 'middle',
-                      marginLeft: theme.spacing(0.5),
-                      width: '16px',
-                      height: '16px',
-                      border: '0px',
-                    }}
-                    src="/images/orcid.png"
-                    alt="ORCID iD icon"
-                  />
-                </InputLabel>
-                <Link
-                  href={'https://orcid.org/' + values.oidcSub}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  sx={{ marginTop: theme.spacing(3) }}
-                >
-                  https://orcid.org/{values.oidcSub}
-                </Link>
-              </FormControl>
               <Field
-                name="username"
-                label="Username"
-                id="username-input"
+                name="oidcSub"
+                label="OIDC Subject"
+                id="oidcSub-input"
                 component={TextField}
                 type="text"
-                autoComplete="off"
-                data-cy="username"
+                data-cy="oidcSub"
                 disabled
               />
               <FormikUIAutocomplete
@@ -285,39 +172,12 @@ export default function UpdateUserInformation(
                 </>
               )}
               <Field
-                name="department"
-                label="Department"
-                id="department-input"
-                component={TextField}
-                type="text"
-                data-cy="department"
-                required
-              />
-              <Field
-                name="position"
-                label="Position"
-                id="position-input"
-                component={TextField}
-                type="text"
-                data-cy="position"
-                required
-              />
-              <Field
                 name="email"
                 label="E-mail"
                 id="email-input"
                 component={TextField}
                 type="email"
                 data-cy="email"
-              />
-              <Field
-                name="telephone"
-                label="Telephone"
-                id="telephone-input"
-                component={TextField}
-                type="text"
-                data-cy="telephone"
-                required
               />
             </Grid>
           </Grid>

@@ -24,34 +24,13 @@ class UpdateUserArgs {
   public lastname?: string;
 
   @Field(() => String, { nullable: true })
-  public username?: string;
-
-  @Field(() => String, { nullable: true })
   public preferredname?: string;
-
-  @Field(() => String, { nullable: true })
-  public gender?: string;
-
-  @Field({ nullable: true })
-  public birthdate?: Date;
 
   @Field(() => Int, { nullable: true })
   public institutionId?: number;
 
   @Field(() => String, { nullable: true })
-  public department?: string;
-
-  @Field(() => String, { nullable: true })
-  public position?: string;
-
-  @Field(() => String, { nullable: true })
   public email?: string;
-
-  @Field(() => String, { nullable: true })
-  public telephone?: string;
-
-  @Field(() => String, { nullable: true })
-  public placeholder?: boolean;
 
   @Field(() => [Int], { nullable: true })
   public roles?: number[];
@@ -110,13 +89,5 @@ export class UpdateUserMutation {
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.user.setUserNotPlaceholder(context.user, id);
-  }
-
-  @Mutation(() => User)
-  updateUserByOidcSub(
-    @Args() input: UpdateUserByOidcSubArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.user.updateUserByOidcSub(context.user, input);
   }
 }

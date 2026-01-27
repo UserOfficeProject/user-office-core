@@ -16,6 +16,7 @@ import {
 } from '../models/User';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { verifyToken } from '../utils/jwt';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class UserQueries {
@@ -68,9 +69,7 @@ export default class UserQueries {
         user.preferredname,
         user.institution,
         user.institutionId,
-        user.position,
         user.created,
-        user.placeholder,
         user.email,
         user.country,
         user.user_title,
@@ -103,9 +102,7 @@ export default class UserQueries {
       user.preferredname,
       user.institution,
       user.institutionId,
-      user.position,
       user.created,
-      user.placeholder,
       user.email,
       user.country,
       user.user_title,
@@ -140,17 +137,21 @@ export default class UserQueries {
   async getPreviousCollaborators(
     agent: UserWithRole | null,
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
     return this.dataSource.getPreviousCollaborators(
       userId,
-      filter,
       first,
       offset,
+      sortField,
+      sortDirection,
+      searchText,
       userRole,
       subtractUsers
     );

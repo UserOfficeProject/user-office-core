@@ -349,7 +349,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     userId?: number,
     callId?: number,
     instrumentId?: number,
-    status?: ReviewStatus
+    status?: ReviewStatus,
+    active?: boolean
   ): Promise<Review[]> {
     return database
       .select()
@@ -377,6 +378,16 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
 
         if (status !== undefined && status !== null) {
           qb.where('fap_reviews.status', status);
+        }
+
+        if (active) {
+          qb.join('proposals', {
+            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+          });
+          qb.join('call', {
+            'call.call_id': 'proposals.call_id',
+          });
+          qb.where('call.call_fap_review_ended', false);
         }
       })
       .whereIn('fap_id', fapIds)
@@ -414,7 +425,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     userId?: number,
     callId?: number,
     instrumentId?: number,
-    status?: ReviewStatus
+    status?: ReviewStatus,
+    active?: boolean
   ): Promise<Review[]> {
     return database
       .select('fapReviewsTemp.*')
@@ -439,6 +451,16 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
 
             if (status !== null && status !== undefined) {
               qb.where('fap_reviews.status', status);
+            }
+
+            if (active) {
+              qb.join('proposals', {
+                'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+              });
+              qb.join('call', {
+                'call.call_id': 'proposals.call_id',
+              });
+              qb.where('call.call_fap_review_ended', false);
             }
           })
           .whereIn('fap_id', fapIds)

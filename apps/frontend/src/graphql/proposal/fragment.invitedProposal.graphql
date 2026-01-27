@@ -1,0 +1,6 @@
+fragment invitedProposal on InvitedProposal {
+  abstract
+  proposalId
+  proposerName
+  title
+}
