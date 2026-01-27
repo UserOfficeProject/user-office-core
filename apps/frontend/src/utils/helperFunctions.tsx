@@ -75,7 +75,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     title: proposal.title,
     workflowStatusId: proposal.workflowStatusId,
     status: proposal.status?.name || '',
-    statusId: proposal.status?.id || 1,
+    statusId: proposal.status?.id || 'DRAFT',
     statusName: proposal.status?.name || '',
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,

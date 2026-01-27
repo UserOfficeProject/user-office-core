@@ -1207,7 +1207,7 @@ context('Settings tests', () => {
         );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="5"]').click();
+      cy.get('[role="listbox"] [data-value="FAP_REVIEW"]').click();
 
       cy.finishedLoading();
 
@@ -1220,7 +1220,7 @@ context('Settings tests', () => {
         );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="1"]').click();
+      cy.get('[role="listbox"] [data-value="DRAFT"]').click();
 
       cy.finishedLoading();
 

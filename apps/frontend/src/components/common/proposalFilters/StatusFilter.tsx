@@ -68,11 +68,11 @@ const StatusFilter = ({
               });
               onChange?.(status.target.value);
             }}
-            value={statusId || ''}
-            defaultValue={''}
+            value={statusId || 'ALL'}
+            defaultValue={'ALL'}
             data-cy="status-filter"
           >
-            {shouldShowAll && <MenuItem value={''}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value={'ALL'}>All</MenuItem>}
             {statuses.map(
               (status) =>
                 isStatusVisible(hiddenStatuses, status) && (
@@ -93,7 +93,7 @@ StatusFilter.propTypes = {
   isLoading: PropTypes.bool,
   onChange: PropTypes.func,
   shouldShowAll: PropTypes.bool,
-  statusId: PropTypes.number,
+  statusId: PropTypes.string,
 };
 
 export default StatusFilter;

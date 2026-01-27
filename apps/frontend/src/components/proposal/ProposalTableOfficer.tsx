@@ -97,7 +97,7 @@ export type ProposalSelectionType = {
   callId: number;
   instruments: ProposalViewInstrument[] | null;
   fapInstruments: FapInstrument[] | null;
-  statusId: number;
+  statusId: string;
 };
 
 let columns: Column<ProposalViewData>[] = [
