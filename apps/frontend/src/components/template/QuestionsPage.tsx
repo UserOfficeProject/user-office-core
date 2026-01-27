@@ -17,6 +17,7 @@ import {
 import {
   BasicUserDetailsFragment,
   DataType,
+  PaginationSortDirection,
   QuestionsFilter,
   TemplateCategoryId,
 } from 'generated/sdk';
@@ -98,7 +99,12 @@ function QuestionsPage() {
           filter,
           searchText: tableQuery.search,
           sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
+          sortDirection:
+            orderBy?.orderDirection == PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection == PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
         });
@@ -113,10 +119,15 @@ function QuestionsPage() {
       }
     });
 
+  const sortDirection = searchParams.get('sortDirection');
   columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
-    searchParams.get('sortDirection')
+    sortDirection === PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection === PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
   );
 
   return (
