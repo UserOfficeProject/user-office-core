@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -12,7 +13,9 @@ import { CallsFilter } from '../resolvers/queries/CallsQuery';
 export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.FapDataSource)
+    public fapDataSource: FapDataSource
   ) {}
 
   @Authorized()
@@ -56,5 +59,22 @@ export default class CallQueries {
   @Authorized()
   async getCallOfAnswersProposal(user: UserWithRole | null, answerId: number) {
     return this.dataSource.getCallByAnswerIdProposal(answerId);
+  }
+
+  async getCallsOfReviewer(agent: UserWithRole | null) {
+    if (!agent || !agent.id) {
+      return [];
+    }
+
+    if (!agent.currentRole) {
+      return [];
+    }
+
+    const faps = await this.fapDataSource.getUserFapsByRoleAndFapId(
+      agent.id,
+      agent.currentRole
+    );
+
+    return this.dataSource.getCallsOfFaps(faps.map((fap) => fap.id));
   }
 }

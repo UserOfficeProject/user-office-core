@@ -23,9 +23,9 @@ import {
   UserRole,
   UserWithReviewsQuery,
 } from 'generated/sdk';
-import { useCallsData } from 'hooks/call/useCallsData';
+import { useReviewerCallsData } from 'hooks/call/useReviewerCallData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
+import { useReviewerInstrumentData } from 'hooks/instrument/useReviewerInstrumentData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { capitalize, setSortDirectionOnSortField } from 'utils/helperFunctions';
@@ -84,8 +84,8 @@ const columns: (
 
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const { calls, loadingCalls } = useCallsData();
-  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
+  const { calls, loadingCalls } = useReviewerCallsData();
+  const { instruments, loadingInstruments } = useReviewerInstrumentData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
