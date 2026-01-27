@@ -33,8 +33,8 @@ import WorkflowMetadataEditor from './WorkflowMetadataEditor';
 
 interface EdgeData {
   events: string[];
-  sourceStatusShortCode: string;
-  targetStatusShortCode: string;
+  sourceStatusId: string;
+  targetStatusId: string;
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
@@ -66,7 +66,7 @@ const edgeFactory = (
     sourceHandle: edgeData.sourceHandle || null,
     targetHandle: edgeData.targetHandle || null,
     data: 'data' in edgeData ? edgeData.data : undefined,
-    ariaLabel: `Edge from ${edgeData.data.sourceStatusShortCode} to ${edgeData.data.targetStatusShortCode}`,
+    ariaLabel: `Edge from ${edgeData.data.sourceStatusId} to ${edgeData.data.targetStatusId}`,
   } as Edge<EdgeData>;
 };
 
@@ -183,8 +183,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
             connection.statusChangingEvents?.map(
               (e) => e.statusChangingEvent
             ) || [],
-          sourceStatusShortCode: connection.prevStatus.status.id,
-          targetStatusShortCode: connection.nextStatus.status.id,
+          sourceStatusId: connection.prevStatus.status.id,
+          targetStatusId: connection.nextStatus.status.id,
           workflowConnectionId: connection.id, // Use target connection ID (destination)
           statusActions: connection.statusActions || [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
@@ -254,8 +254,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
-          sourceStatusShortCode: sourceWfStatus.status.id,
-          targetStatusShortCode: targetWfStatus.status.id,
+          sourceStatusId: sourceWfStatus.status.id,
+          targetStatusId: targetWfStatus.status.id,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
         },

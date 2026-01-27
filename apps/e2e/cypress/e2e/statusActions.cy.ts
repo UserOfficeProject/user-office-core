@@ -34,6 +34,13 @@ const newCall = {
   surveyComment: faker.lorem.word(10),
 };
 
+const instrument = {
+  name: `0000. ${faker.lorem.words(2)}`,
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(5),
+  managerUserId: 1,
+};
+
 let proposal1Id: string;
 let proposal2Id: string;
 
@@ -41,6 +48,17 @@ context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createInstrument(instrument).then((result) => {
+      if (result.createInstrument) {
+        const createdInstrumentId = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+        });
+      }
+    });
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
@@ -586,6 +604,10 @@ context('Status actions tests', () => {
         posX: 0,
         posY: 200,
       }).then((result) => {
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_INSTRUMENTS_SELECTED],
+        });
         cy.addConnectionStatusActions({
           actions: [
             {
@@ -609,6 +631,27 @@ context('Status actions tests', () => {
       cy.visit('/');
 
       cy.finishedLoading();
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]')
+        .contains('Loading...')
+        .should('not.exist');
+
+      cy.get('#selectedInstrumentIds-input').first().click();
+
+      cy.get('[data-cy="instrument-selection-options"] li')
+        .contains(instrument.name)
+        .click();
+
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
       cy.contains(proposalTitle)
         .parent()

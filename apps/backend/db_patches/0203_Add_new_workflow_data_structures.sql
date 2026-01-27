@@ -108,7 +108,7 @@ BEGIN
             workflow_status_connection_id INT NOT NULL,
             workflow_status_action_id     INT NOT NULL,
             workflow_id                   INT NOT NULL,
-            config                        JSONB  NOT NULL DEFAULT '{}'::jsonb,
+            config                        JSONB,
 
             CONSTRAINT pk_wsc_has_actions
               PRIMARY KEY (workflow_status_connection_id, workflow_status_action_id),
