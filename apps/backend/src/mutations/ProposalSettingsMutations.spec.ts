@@ -67,7 +67,6 @@ describe('Test Proposal settings mutations', () => {
         id: 'DRAFT',
         name: 'update',
         description: 'update',
-        isDefault: false,
       }
     )) as Rejection;
 
@@ -80,7 +79,6 @@ describe('Test Proposal settings mutations', () => {
       shortCode: 'UPDATE',
       name: 'update',
       description: 'update',
-      isDefault: false,
     };
 
     return expect(

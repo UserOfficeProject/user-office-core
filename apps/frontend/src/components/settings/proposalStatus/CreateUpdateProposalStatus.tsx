@@ -73,9 +73,9 @@ const CreateUpdateProposalStatus = ({
             {proposalStatus ? 'Update' : 'Create new'} proposal status
           </Typography>
           <Field
-            name="shortCode"
-            id="shortCode"
-            label="Short code"
+            name="id"
+            id="id"
+            label="Status ID"
             type="text"
             sx={{
               ...(!!initialValues.id && {
@@ -86,7 +86,7 @@ const CreateUpdateProposalStatus = ({
             }}
             component={TextField}
             fullWidth
-            data-cy="shortCode"
+            data-cy="id"
             required
             disabled={!!initialValues.id || isExecutingCall}
           />

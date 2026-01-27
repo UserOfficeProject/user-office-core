@@ -13,9 +13,6 @@ export class UpdateStatusInput {
 
   @Field(() => String, { nullable: true })
   public description?: string;
-
-  @Field(() => Boolean, { nullable: true })
-  public isDefault?: boolean;
 }
 
 @Resolver()

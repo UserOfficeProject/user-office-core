@@ -3,11 +3,10 @@ import { injectable } from 'tsyringe';
 
 import { Status } from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
-import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
-import { StatusRecord, WorkflowStatusRecord } from './records';
+import { StatusRecord } from './records';
 
 @injectable()
 export default class PostgresStatusDataSource implements StatusDataSource {
@@ -21,24 +20,12 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     );
   }
 
-  private createWorkflowStatusObject = (
-    workflowStatus: WorkflowStatusRecord
-  ) => {
-    return new WorkflowStatus(
-      workflowStatus.workflow_status_id,
-      workflowStatus.workflow_id,
-      workflowStatus.status_id,
-      workflowStatus.pos_x,
-      workflowStatus.pos_y
-    );
-  };
-
   async createStatus(
     newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
     const [addedStatus]: StatusRecord[] = await database
       .insert({
-        id: newStatusInput.id,
+        status_id: newStatusInput.id,
         name: newStatusInput.name,
         description: newStatusInput.description,
         entity_type: newStatusInput.entityType,
@@ -77,6 +64,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
         {
+          status_id: status.id,
           name: status.name,
           description: status.description,
         },
