@@ -8,7 +8,7 @@ import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimData
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { eliEmailHandler } from './eliEmailHandler';
-import { EmailTemplateId } from './emailTemplateId';
+import { EmailTemplateName } from './emailTemplateName';
 
 // Mock MailService
 const mockMailService = {
@@ -62,7 +62,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.PROPOSAL_CREATED,
+            template: EmailTemplateName.PROPOSAL_CREATED,
           },
         })
       );
@@ -91,7 +91,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.ACCEPTED_PROPOSAL,
+            template: EmailTemplateName.ACCEPTED_PROPOSAL,
           },
         })
       );
@@ -120,7 +120,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.REJECTED_PROPOSAL,
+            template: EmailTemplateName.REJECTED_PROPOSAL,
           },
         })
       );
@@ -149,7 +149,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.RESERVED_PROPOSAL,
+            template: EmailTemplateName.RESERVED_PROPOSAL,
           },
         })
       );
@@ -174,7 +174,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.REVIEW_REMINDER,
+            template: EmailTemplateName.REVIEW_REMINDER,
           },
         })
       );
@@ -207,7 +207,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.INTERNAL_REVIEW_CREATED,
+            template: EmailTemplateName.INTERNAL_REVIEW_CREATED,
           },
         })
       );
@@ -240,7 +240,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.INTERNAL_REVIEW_UPDATED,
+            template: EmailTemplateName.INTERNAL_REVIEW_UPDATED,
           },
         })
       );
@@ -273,7 +273,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template: EmailTemplateId.INTERNAL_REVIEW_DELETED,
+            template: EmailTemplateName.INTERNAL_REVIEW_DELETED,
           },
         })
       );

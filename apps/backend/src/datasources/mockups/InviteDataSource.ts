@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
+import { EmailTemplateName } from '../../eventHandlers/email/emailTemplateName';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
@@ -65,7 +65,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         true,
         null,
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
+        EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_USER
       ),
       new Invite(
         2,
@@ -77,7 +77,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         1,
         true,
         null,
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+        EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
       ),
       new Invite(
         3,
@@ -89,7 +89,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         false,
         new Date('2022-01-01'),
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
+        EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
       ),
     ];
 
@@ -143,7 +143,7 @@ export class InviteDataSourceMock implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
-    templateId?: EmailTemplateId | null;
+    templateId?: EmailTemplateName | null;
   }): Promise<Invite> {
     const { code, email, createdByUserId, expiresAt, templateId } = args;
 
@@ -157,7 +157,7 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       false,
       expiresAt ?? null,
-      templateId ?? (null as EmailTemplateId | null)
+      templateId ?? (null as EmailTemplateName | null)
     );
 
     this.invites.push(newInvite);

@@ -1,4 +1,4 @@
-import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
+import { EmailTemplateName } from '../eventHandlers/email/emailTemplateName';
 
 export class Invite {
   constructor(
@@ -11,6 +11,6 @@ export class Invite {
     public claimedByUserId: number | null,
     public isEmailSent: boolean,
     public expiresAt: Date | null,
-    public templateId: EmailTemplateId | null
+    public templateId: EmailTemplateName | null
   ) {}
 }

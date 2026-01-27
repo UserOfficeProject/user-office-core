@@ -18,7 +18,7 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails, UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId } from './emailTemplateId';
+import { EmailTemplateName } from './emailTemplateName';
 
 export async function eliEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -105,14 +105,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateId = EmailTemplateId.PROPOSAL_CREATED;
+      const templateName = EmailTemplateName.PROPOSAL_CREATED;
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+        await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
       const options: EmailSettings = {
         content: {
-          template: emailTemplate?.name || templateId || '',
+          template: emailTemplate?.name || templateName || '',
         },
         substitution_data: {
           preferredName: principalInvestigator.preferredname,
@@ -150,13 +150,13 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
       const { finalStatus } = event.proposal;
-      let templateId = '';
+      let templateName = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
+        templateName = EmailTemplateName.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = EmailTemplateId.REJECTED_PROPOSAL;
+        templateName = EmailTemplateName.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = EmailTemplateId.RESERVED_PROPOSAL;
+        templateName = EmailTemplateName.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -164,12 +164,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       }
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+        await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateId || '',
+            template: emailTemplate?.name || templateName || '',
           },
           substitution_data: {
             preferredName: principalInvestigator.preferredname,
@@ -203,14 +203,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateId = EmailTemplateId.REVIEW_REMINDER;
+      const templateName = EmailTemplateName.REVIEW_REMINDER;
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+        await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateId || '',
+            template: emailTemplate?.name || templateName || '',
           },
           substitution_data: {
             preferredName: fapReviewer.preferredname,
@@ -284,21 +284,21 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         }
       }
 
-      let templateId = EmailTemplateId.INTERNAL_REVIEW_CREATED;
+      let templateName = EmailTemplateName.INTERNAL_REVIEW_CREATED;
 
       if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
-        templateId = EmailTemplateId.INTERNAL_REVIEW_UPDATED;
+        templateName = EmailTemplateName.INTERNAL_REVIEW_UPDATED;
       } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
-        templateId = EmailTemplateId.INTERNAL_REVIEW_DELETED;
+        templateName = EmailTemplateName.INTERNAL_REVIEW_DELETED;
       }
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+        await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateId || '',
+            template: emailTemplate?.name || templateName || '',
           },
           substitution_data: {
             assignedByPreferredName: assignedBy.preferredname,
@@ -328,12 +328,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 }
 
-function getTemplateIdForRole(role: UserRole): string {
+function gettemplateNameForRole(role: UserRole): string {
   switch (role) {
     case UserRole.USER:
-      return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
+      return EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_USER;
     case UserRole.INTERNAL_REVIEWER:
-      return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
+      return EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
     default:
       throw new Error('No valid user role set for email invitation');
   }
@@ -342,7 +342,7 @@ function getTemplateIdForRole(role: UserRole): string {
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
-  templateId: string
+  templateName: string
 ) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -353,12 +353,12 @@ async function sendInviteEmail(
   );
 
   const emailTemplate =
-    await emailTemplateDataSource.getEmailTemplateByName(templateId);
+    await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
   return mailService
     .sendMail({
       content: {
-        template: emailTemplate?.name || templateId || '',
+        template: emailTemplate?.name || templateName || '',
       },
       substitution_data: {
         email: invite.email,
@@ -373,7 +373,7 @@ async function sendInviteEmail(
       await inviteDataSource.update({
         id: invite.id,
         isEmailSent: true,
-        templateId: templateId,
+        templateId: templateName,
       });
       logger.logInfo('Successful email transmission', { res });
     })

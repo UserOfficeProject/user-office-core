@@ -3,7 +3,7 @@ import {
   ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
-import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
+import { EmailTemplateName } from '../../eventHandlers/email/emailTemplateName';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -1423,7 +1423,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
-  readonly template_id: EmailTemplateId | null;
+  readonly template_id: EmailTemplateName | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1437,7 +1437,7 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_by,
     invite.is_email_sent,
     invite.expires_at,
-    invite.template_id as EmailTemplateId | null
+    invite.template_id as EmailTemplateName | null
   );
 
 export interface RoleClaimRecord {
