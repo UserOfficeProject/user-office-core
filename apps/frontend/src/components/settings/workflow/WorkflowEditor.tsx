@@ -6,7 +6,6 @@ import {
   Connection,
   ConnectionLineType,
   Edge,
-  MarkerType,
   Node,
   ReactFlowInstance,
   useEdgesState,
@@ -14,11 +13,7 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {
-  ConnectionStatusAction,
-  WorkflowConnection,
-  WorkflowType,
-} from 'generated/sdk';
+import { WorkflowConnection, WorkflowType } from 'generated/sdk';
 import { usePersistWorkflowEditorModel } from 'hooks/settings/usePersistWorkflowEditorModel';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -30,45 +25,11 @@ import StatusPicker from './StatusPicker';
 import WorkflowCanvas from './WorkflowCanvas';
 import WorkflowEditorModel, { Event, EventType } from './WorkflowEditorModel';
 import WorkflowMetadataEditor from './WorkflowMetadataEditor';
-
-interface EdgeData {
-  events: string[];
-  sourceStatusId: string;
-  targetStatusId: string;
-  workflowConnectionId?: number;
-  statusActions: ConnectionStatusAction[];
-  connectionLineType?: ConnectionLineType;
-}
-
-const edgeFactory = (
-  edgeData: Edge<EdgeData> & { data: EdgeData }
-): Edge<EdgeData> => {
-  const base = {
-    animated: false,
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      width: 20,
-      height: 20,
-    },
-    style: { cursor: 'pointer' },
-  };
-
-  // Ensure we have valid source and target
-  if (!edgeData.source || !edgeData.target) {
-    throw new Error('Edge must have source and target');
-  }
-
-  return {
-    ...base,
-    id: edgeData.id,
-    source: edgeData.source,
-    target: edgeData.target,
-    sourceHandle: edgeData.sourceHandle || null,
-    targetHandle: edgeData.targetHandle || null,
-    data: 'data' in edgeData ? edgeData.data : undefined,
-    ariaLabel: `Edge from ${edgeData.data.sourceStatusId} to ${edgeData.data.targetStatusId}`,
-  } as Edge<EdgeData>;
-};
+import {
+  EdgeData,
+  edgeFactory,
+  mapWorkflowToNodesAndEdges,
+} from './workflowUtils';
 
 const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -136,63 +97,17 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
   // Convert workflow connections to React Flow nodes and edges when state changes
   React.useEffect(() => {
-    const newNodes: Node[] = [];
-    const newEdges: Edge<EdgeData>[] = [];
-
-    state.statuses.forEach((workflowStatus) => {
-      const statusId = workflowStatus.status.id.toString();
-      const nodeId = workflowStatus.workflowStatusId.toString();
-      // Use database coordinates if available, otherwise fall back to grid layout
-      const nodePositionX = workflowStatus.posX;
-      const nodePositionY = workflowStatus.posY;
-
-      // Create node for the status
-      const newNode = {
-        id: nodeId,
-        type: 'statusNode',
-        data: {
-          label: workflowStatus.status.name,
-          workflowStatus: workflowStatus,
-          statusId: statusId,
-          onDelete: (workflowStatusId: string) => {
-            dispatch({
-              type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
-              payload: {
-                workflowStatusId: parseInt(workflowStatusId),
-              },
-            });
+    const { nodes: newNodes, edges: newEdges } = mapWorkflowToNodesAndEdges(
+      state,
+      (workflowStatusId: string) => {
+        dispatch({
+          type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+          payload: {
+            workflowStatusId: parseInt(workflowStatusId),
           },
-        },
-        position: { x: nodePositionX, y: nodePositionY },
-      };
-
-      newNodes.push(newNode);
-    });
-    state.connections.forEach((connection) => {
-      const edgeId = `${connection.id}`;
-
-      const newEdge = edgeFactory({
-        id: edgeId, // Use connection ID to ensure unique edge identification
-        source: connection.prevStatus.workflowStatusId.toString(),
-        target: connection.nextStatus.workflowStatusId.toString(),
-        sourceHandle: connection.sourceHandle,
-        targetHandle: connection.targetHandle,
-        type: 'workflow', // Use custom workflow edge type
-        data: {
-          events:
-            connection.statusChangingEvents?.map(
-              (e) => e.statusChangingEvent
-            ) || [],
-          sourceStatusId: connection.prevStatus.status.id,
-          targetStatusId: connection.nextStatus.status.id,
-          workflowConnectionId: connection.id, // Use target connection ID (destination)
-          statusActions: connection.statusActions || [],
-          connectionLineType: state.connectionLineType as ConnectionLineType,
-        },
-      });
-
-      newEdges.push(newEdge);
-    });
+        });
+      }
+    );
 
     setNodes(newNodes);
     setEdges(newEdges);

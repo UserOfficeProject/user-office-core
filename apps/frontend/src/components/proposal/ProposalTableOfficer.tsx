@@ -1027,7 +1027,7 @@ const ProposalTableOfficer = ({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={openChangeProposalStatus}
-        maxWidth="xs"
+        maxWidth="lg"
         onClose={(): void => setOpenChangeProposalStatus(false)}
         fullWidth
       >

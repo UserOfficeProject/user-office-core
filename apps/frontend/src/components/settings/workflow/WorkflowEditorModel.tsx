@@ -147,9 +147,14 @@ export type Event =
 
 const WorkflowEditorModel = (
   entityType: WorkflowType,
-  middlewares?: Array<ReducerMiddleware<Workflow, Event>>
+  middlewares?: Array<ReducerMiddleware<Workflow, Event>>,
+  externalWorkflowId?: number
 ) => {
-  const { workflowId } = useParams<{ workflowId: string }>();
+  const params = useParams<{ workflowId: string }>();
+  // Use external ID if provided, otherwise fallback to URL params
+  const workflowId =
+    externalWorkflowId ||
+    (params.workflowId ? parseInt(params.workflowId) : undefined);
   const blankInitTemplate: Workflow = {
     id: 0,
     name: '',
@@ -315,7 +320,7 @@ const WorkflowEditorModel = (
 
     api()
       .getWorkflow({
-        workflowId: parseInt(workflowId),
+        workflowId: workflowId,
         entityType: entityType,
       })
       .then((data) => {

@@ -5,12 +5,13 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
 import i18n from 'i18n';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import { WorkflowStatus } from 'generated/sdk';
+import WorkflowView from 'components/settings/workflow/WorkflowView';
+import { WorkflowStatus, WorkflowType } from 'generated/sdk';
 import { useWorkflowStatusesData } from 'hooks/settings/useWorkflowStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
@@ -54,6 +55,34 @@ const ChangeProposalStatus = ({
       ? selectedProposalStatuses[0]
       : null;
 
+  const highlightedNodes = useMemo(() => {
+    // We don't have proposal IDs passed down, only statuses.
+    // So we just group by status ID and put a dummy entity count.
+    // In a real scenario, we would map actual proposal IDs here.
+    const counts = selectedProposalStatuses.reduce(
+      (acc, statusId) => {
+        const workflowStatus = proposalStatuses.find(
+          (ws) => ws.workflowStatusId === statusId
+        );
+        if (workflowStatus) {
+          const id = workflowStatus.status.id;
+          if (!acc[id]) {
+            acc[id] = [];
+          }
+          acc[id].push('Proposal ' + acc[id].length); // Placeholder ID
+        }
+
+        return acc;
+      },
+      {} as Record<string, string[]>
+    );
+
+    return Object.entries(counts).map(([statusId, entities]) => ({
+      statusId,
+      entities,
+    }));
+  }, [selectedProposalStatuses, proposalStatuses]);
+
   if (!allProposalsHaveSameWorkflow) {
     return (
       <Container component="main" maxWidth="xs">
@@ -76,7 +105,7 @@ const ChangeProposalStatus = ({
   }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="lg">
       <Formik
         initialValues={{
           selectedWorkflowStatusId: selectedProposalsWorkflowStatus,
@@ -98,76 +127,109 @@ const ChangeProposalStatus = ({
         }}
         validationSchema={changeProposalStatusValidationSchema}
       >
-        {({ isSubmitting, values }): JSX.Element => (
+        {({ isSubmitting, values, setFieldValue }): JSX.Element => (
           <Form>
-            <Typography
-              variant="h6"
-              component="h1"
-              sx={{
-                fontSize: '18px',
-                padding: '22px 0 0',
-              }}
-            >
-              Change proposal(s) status
-            </Typography>
-
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormikUIAutocomplete
-                  name="selectedWorkflowStatusId"
-                  label="Select proposal status"
-                  loading={loadingProposalStatuses}
-                  items={proposalStatuses.map((status) => ({
-                    value: status.workflowStatusId,
-                    text: status.status.name,
-                  }))}
-                  required
-                  disabled={isSubmitting}
-                  data-cy="status-selection"
-                />
+                <Typography
+                  variant="h6"
+                  component="h1"
+                  sx={{
+                    fontSize: '18px',
+                    padding: '22px 0 0',
+                  }}
+                >
+                  Change proposal(s) status
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} md={8}>
+                <div style={{ height: '500px', border: '1px solid #ddd' }}>
+                  <WorkflowView
+                    workflowId={selectedProposalsWorkflowIds[0]}
+                    entityType={WorkflowType.PROPOSAL}
+                    highlightedNodes={highlightedNodes}
+                    selectedStatusId={
+                      proposalStatuses.find(
+                        (s) =>
+                          s.workflowStatusId === values.selectedWorkflowStatusId
+                      )?.status.id
+                    }
+                    onNodeClicked={(statusId, workflowStatusId) => {
+                      setFieldValue(
+                        'selectedWorkflowStatusId',
+                        workflowStatusId
+                      );
+                    }}
+                  />
+                </div>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <FormikUIAutocomplete
+                      name="selectedWorkflowStatusId"
+                      label="Select proposal status"
+                      loading={loadingProposalStatuses}
+                      items={proposalStatuses.map((status) => ({
+                        value: status.workflowStatusId,
+                        text: status.status.name,
+                      }))}
+                      required
+                      disabled={isSubmitting}
+                      data-cy="status-selection"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    {proposalStatuses.find(
+                      (status) =>
+                        status.workflowStatusId ===
+                        values.selectedWorkflowStatusId
+                    )?.statusId === 'DRAFT' && (
+                      <Alert severity="warning">
+                        Be aware that changing status to &quot;DRAFT&quot; will
+                        reopen proposal for changes and submission.
+                      </Alert>
+                    )}
+                    {proposalStatuses.find(
+                      (status) =>
+                        status.workflowStatusId ===
+                        values.selectedWorkflowStatusId
+                    )?.statusId === 'SCHEDULING' &&
+                      !allSelectedProposalsHaveInstrument && (
+                        <Alert severity="warning">
+                          {`Be aware that proposal/s not assigned to an ${i18n.format(
+                            t('instrument'),
+                            'lowercase'
+                          )} will not be shown in the scheduler after changing status to "SCHEDULING"`}
+                        </Alert>
+                      )}
+                    {!values.selectedWorkflowStatusId && (
+                      <Alert
+                        severity="warning"
+                        data-cy="proposal-different-statuses-change"
+                      >
+                        Be aware that selected proposals have different statuses
+                        and changing status will affect all of them.
+                      </Alert>
+                    )}
+                    <Button
+                      type="submit"
+                      fullWidth
+                      sx={(theme) => ({
+                        margin: theme.spacing(3, 0, 2),
+                      })}
+                      disabled={loadingProposalStatuses || isSubmitting}
+                      data-cy="submit-proposal-status-change"
+                    >
+                      Change status
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
-            {proposalStatuses.find(
-              (status) =>
-                status.workflowStatusId === values.selectedWorkflowStatusId
-            )?.statusId === 'DRAFT' && (
-              <Alert severity="warning">
-                Be aware that changing status to &quot;DRAFT&quot; will reopen
-                proposal for changes and submission.
-              </Alert>
-            )}
-            {proposalStatuses.find(
-              (status) =>
-                status.workflowStatusId === values.selectedWorkflowStatusId
-            )?.statusId === 'SCHEDULING' &&
-              !allSelectedProposalsHaveInstrument && (
-                <Alert severity="warning">
-                  {`Be aware that proposal/s not assigned to an ${i18n.format(
-                    t('instrument'),
-                    'lowercase'
-                  )} will not be shown in the scheduler after changing status to "SCHEDULING"`}
-                </Alert>
-              )}
-            {!values.selectedWorkflowStatusId && (
-              <Alert
-                severity="warning"
-                data-cy="proposal-different-statuses-change"
-              >
-                Be aware that selected proposals have different statuses and
-                changing status will affect all of them.
-              </Alert>
-            )}
-            <Button
-              type="submit"
-              fullWidth
-              sx={(theme) => ({
-                margin: theme.spacing(3, 0, 2),
-              })}
-              disabled={loadingProposalStatuses || isSubmitting}
-              data-cy="submit-proposal-status-change"
-            >
-              Change status
-            </Button>
           </Form>
         )}
       </Formik>
