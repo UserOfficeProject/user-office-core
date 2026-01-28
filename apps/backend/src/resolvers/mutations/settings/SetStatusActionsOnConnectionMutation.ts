@@ -28,7 +28,7 @@ export class ConnectionHasActionsInput {
 }
 
 @InputType()
-export class AddConnectionStatusActionsInput
+export class SetStatusActionsOnConnectionInput
   implements Partial<ConnectionHasStatusAction>
 {
   @Field(() => Int)
@@ -42,16 +42,16 @@ export class AddConnectionStatusActionsInput
 }
 
 @Resolver()
-export class AddConnectionStatusActionsMutation {
+export class SetStatusActionsOnConnectionMutation {
   @Mutation(() => [ConnectionStatusAction], { nullable: true })
-  async addConnectionStatusActions(
+  async setStatusActionsOnConnection(
     @Ctx() context: ResolverContext,
-    @Arg('newConnectionStatusActionsInput')
-    newConnectionStatusActionsInput: AddConnectionStatusActionsInput
+    @Arg('input')
+    input: SetStatusActionsOnConnectionInput
   ) {
-    return context.mutations.workflow.addConnectionStatusActions(
+    return context.mutations.workflow.setStatusActionsOnConnection(
       context.user,
-      newConnectionStatusActionsInput
+      input
     );
   }
 }

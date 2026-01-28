@@ -129,11 +129,10 @@ context('Proposal tests', () => {
         entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
-          cy.addWorkflowStatus({
+          cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
-            sortOrder: 1,
-            prevStatusId: 1,
+            prevId: result.createWorkflow.statuses[0].workflowId,
             posX: 0,
             posY: 200,
           });
@@ -807,7 +806,9 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowStatusId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.fapMeeting
+            .id,
         proposalPks: [createdProposalPk],
       });
       cy.login('officer');
@@ -852,7 +853,8 @@ context('Proposal tests', () => {
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
+        workflowStatusId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.fapReview.id,
         proposalPks: [createdProposalPk],
       });
 

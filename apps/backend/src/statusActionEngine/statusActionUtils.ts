@@ -172,7 +172,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         let sampleAnswers: Answer[] = [];
         const quickReviewCalls = await callDataSource
           .getCalls({
-            proposalStatusShortCode: 'QUICK_REVIEW',
+            proposalStatus: 'QUICK_REVIEW',
           })
           .then((calls) => calls.map((call) => call.id));
         if (quickReviewCalls.includes(proposal.callId)) {

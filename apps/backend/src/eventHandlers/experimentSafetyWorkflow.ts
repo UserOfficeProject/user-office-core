@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusDataSource } from '../datasources/StatusDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -26,14 +27,18 @@ const publishExperimentSafetyStatusChange = async (
   const statusDataSource = container.resolve<StatusDataSource>(
     Tokens.StatusDataSource
   );
+  const workflowDataSource = container.resolve<WorkflowDataSource>(
+    Tokens.WorkflowDataSource
+  );
   updatedExperimentSafeties.map(async (updatedExperimentSafety) => {
     if (updatedExperimentSafety && updatedExperimentSafety.statusId) {
       const experimentSafetyStatus = await statusDataSource.getStatus(
         updatedExperimentSafety.statusId
       );
-      const previousExperimentStatus = await statusDataSource.getStatus(
-        updatedExperimentSafety.prevStatusId
-      );
+      const previousExperimentStatus =
+        await workflowDataSource.getWorkflowStatus(
+          updatedExperimentSafety.prevStatusId
+        );
 
       return eventBus.publish({
         type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
@@ -41,7 +46,7 @@ const publishExperimentSafetyStatusChange = async (
         isRejection: false,
         key: 'experimentsafety',
         loggedInUserId: null,
-        description: `From "${previousExperimentStatus?.name}" to "${experimentSafetyStatus?.name}"`,
+        description: `From "${previousExperimentStatus?.statusId}" to "${experimentSafetyStatus}.workflowStatus"`, // TODO: fix to use workflowStatus
       });
     }
   });

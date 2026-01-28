@@ -119,7 +119,7 @@ export const collectExperimentPDFData = async (
   // Get the status of the experiment safety
   const experimentSafetyStatus = await baseContext.queries.status.getStatus(
     user,
-    experimentSafety.statusId ?? 0
+    experimentSafety.statusId ?? 'NULL'
   );
 
   const esiQuestionarySteps =

@@ -5,14 +5,13 @@ import {
   StatusAction,
   StatusActionType,
 } from '../../models/StatusAction';
-import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 
 export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
   1,
   1,
   1,
-  'Dummy action',
   StatusActionType.EMAIL,
   {}
 );
@@ -41,8 +40,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return dummyConnectionHasStatusAction;
   }
   async getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }
@@ -69,8 +67,8 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return dummyStatusActions;
   }
 
-  async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+  async setStatusActionsOnConnection(
+    connectionStatusActionsInput: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

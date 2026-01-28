@@ -16,6 +16,7 @@ import {
   WorkflowType,
 } from '../../models/Workflow';
 import { WorkflowConnection } from './WorkflowConnection';
+import { WorkflowStatus } from './WorkflowStatus';
 
 @ObjectType()
 export class Workflow implements Partial<WorkflowOrigin> {
@@ -38,18 +39,32 @@ export class Workflow implements Partial<WorkflowOrigin> {
 @Resolver(() => Workflow)
 export class WorkflowResolver {
   @FieldResolver(() => [WorkflowConnection])
-  async workflowConnections(
+  async connections(
     @Root() workflow: Workflow,
     @Ctx() context: ResolverContext
   ): Promise<WorkflowConnection[]> {
-    const connections = await context.queries.workflow.getWorkflowConnections(
+    const connections = await context.queries.workflow.getConnections(
       context.user,
       workflow.id
     );
 
     return isRejection(connections) ? [] : connections;
   }
+
+  @FieldResolver(() => [WorkflowStatus])
+  async statuses(
+    @Root() workflow: Workflow,
+    @Ctx() context: ResolverContext
+  ): Promise<WorkflowStatus[]> {
+    const statuses = await context.queries.workflow.getWorkflowStatuses(
+      context.user,
+      workflow.id
+    );
+
+    return isRejection(statuses) ? [] : statuses;
+  }
 }
+
 @ObjectType()
 export class WorkflowEvent {
   @Field(() => Event)

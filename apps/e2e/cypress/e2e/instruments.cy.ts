@@ -12,7 +12,7 @@ import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();
-  cy.get('[role="listbox"] [data-value="0"]').click();
+  cy.get('[role="listbox"] [data-value="ALL"]').click();
 };
 
 context('Instrument tests', () => {
@@ -486,7 +486,6 @@ context('Instrument tests', () => {
       cy.get('[role="dialog"]').contains('Technical review').click();
 
       cy.get('[data-cy="save-and-continue-button"]').should('not.be.disabled');
-      //cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] label').should(
         'include.text',

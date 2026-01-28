@@ -49,7 +49,7 @@ type ProposalFilterBarProps = {
   proposalStatuses?: { data: Status[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
-  hiddenStatuses: number[];
+  hiddenStatuses: string[];
 };
 
 const ProposalFilterBar = ({
@@ -101,11 +101,11 @@ const ProposalFilterBar = ({
 
       <Grid item sm={4} xs={12}>
         <ProposalStatusFilter
-          statusId={filter.proposalStatusId as number}
+          statusId={filter.proposalStatusId as string}
           statuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
-          hiddenStatuses={filter.excludeProposalStatusIds as number[]}
+          hiddenStatuses={filter.excludeProposalStatusIds as string[]}
           onChange={(proposalStatusId) => {
             setProposalFilter({
               ...filter,

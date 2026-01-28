@@ -1,8 +1,8 @@
-mutation changeProposalsStatus(
-  $proposalPks: [Int!]!
-  $statusId: Int!
-) {
+mutation changeProposalsStatus($proposalPks: [Int!]!, $workflowStatusId: Int!) {
   changeProposalsStatus(
-    changeProposalsStatusInput: { proposalPks: $proposalPks, statusId: $statusId }
+    changeProposalsStatusInput: {
+      proposalPks: $proposalPks
+      workflowStatusId: $workflowStatusId
+    }
   )
 }

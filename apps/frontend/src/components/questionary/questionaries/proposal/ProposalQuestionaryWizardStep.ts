@@ -33,7 +33,7 @@ export class ProposalQuestionaryWizardStep extends QuestionaryWizardStep {
 
   private getProposalStatus(proposal: ProposalWithQuestionary) {
     if (proposal.status != null) {
-      return proposal.status.shortCode.toString();
+      return proposal.status.id;
     } else {
       return 'Proposal Status is null';
     }

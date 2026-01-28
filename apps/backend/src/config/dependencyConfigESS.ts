@@ -58,6 +58,7 @@ import {
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { isDevelopment } from '../utils/helperFunctions';
+import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
@@ -145,3 +146,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
+mapClass(Tokens.ProposalWorkflowEngine, ProposalWorkflowEngine);

@@ -1,4 +1,4 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
 import { Status } from '../../types/Status';
@@ -7,7 +7,7 @@ import { Status } from '../../types/Status';
 export class DeleteStatusMutation {
   @Mutation(() => Status)
   async deleteStatus(
-    @Arg('id', () => Int) id: number,
+    @Arg('id', () => String) id: string,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.status.deleteStatus(context.user, {

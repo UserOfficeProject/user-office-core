@@ -112,9 +112,12 @@ context('App settings tests', () => {
         );
       }
       if (initialDBData.getFormats().statusFilter === 'ALL') {
-        cy.get('[data-cy="status-filter"] input').should('have.value', 0);
+        cy.get('[data-cy="status-filter"] input').should('have.value', 'ALL');
       } else {
-        cy.get('[data-cy="status-filter"] input').should('have.value', 2);
+        cy.get('[data-cy="status-filter"] input').should(
+          'have.value',
+          'FEASIBILITY_REVIEW'
+        );
       }
     });
   });

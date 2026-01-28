@@ -17,7 +17,7 @@ export default class StatusQueries {
   ) {}
 
   @Authorized()
-  async getStatus(agent: UserWithRole | null, id: number) {
+  async getStatus(agent: UserWithRole | null, id: string) {
     const status = await this.dataSource.getStatus(id);
 
     return status;

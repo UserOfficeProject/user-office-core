@@ -1,0 +1,8 @@
+query getWorkflowStatuses($workflowId: Int!) {
+  workflowStatuses(workflowId: $workflowId) {
+    ...workflowStatus
+    status {
+      ...status
+    }
+  }
+}
