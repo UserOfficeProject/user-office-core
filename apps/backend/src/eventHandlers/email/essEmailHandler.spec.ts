@@ -1,13 +1,13 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import { logger } from '@user-office-software/duo-logger';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import {
-  ProposalDataSourceMock,
   dummyProposal,
+  ProposalDataSourceMock,
 } from '../../datasources/mockups/ProposalDataSource';
 import {
   basicDummyUser,
@@ -17,7 +17,8 @@ import {
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
-import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
+import { EmailTemplateName } from './emailTemplateName';
+import { essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
 const mockMailService = {
@@ -84,7 +85,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+        template: EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED,
       },
       substitution_data: {
         piPreferredname: expect.any(String),
@@ -135,8 +136,8 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id:
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
+        template:
+          EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
       },
       substitution_data: {
         email: inviteEmail,
@@ -160,7 +161,7 @@ describe('essEmailHandler co-proposer invites', () => {
       dummyUser.id,
       false,
       null,
-      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+      EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED
     );
 
     // Mock proposalDataSource.get to return null
@@ -201,7 +202,7 @@ describe('essEmailHandler co-proposer invites', () => {
       dummyUser.id,
       false,
       null,
-      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+      EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED
     );
 
     // Mock userDataSource.getUser to return null for the principal investigator (first call)
@@ -245,7 +246,7 @@ describe('essEmailHandler co-proposer invites', () => {
       dummyUser.id,
       false,
       null,
-      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+      EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED
     );
 
     // Mock userDataSource.getUser to return dummyUser for principal investigator but null for claimer
@@ -289,7 +290,7 @@ describe('essEmailHandler co-proposer invites', () => {
       dummyUser.id,
       false,
       null,
-      EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
+      EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED
     );
 
     // Mock userDataSource.getUser to return dummyUser for principal investigator but null for claimer
@@ -330,7 +331,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
       expect(sendMailsSpy).toHaveBeenCalledTimes(1);
       const arg = sendMailsSpy.mock.calls[0][0];
-      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
+      expect(arg.content.template).toBe(EmailTemplateName.PROPOSAL_SUBMITTED);
 
       // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
       expect(arg.recipients).toEqual([
