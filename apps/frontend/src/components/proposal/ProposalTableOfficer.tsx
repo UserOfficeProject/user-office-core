@@ -15,7 +15,7 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 import Warning from '@mui/icons-material/Warning';
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, Tooltip, Link } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -439,6 +439,30 @@ const ProposalTableOfficer = ({
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
+
+    if (v.field === 'statusName') {
+      return {
+        ...v,
+        render: (rowData: ProposalViewData) => (
+          <Link
+            component="button"
+            variant="body2"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              setSearchParams((searchParams) => {
+                searchParams.delete('selection');
+                searchParams.append('selection', rowData.primaryKey.toString());
+
+                return searchParams;
+              });
+              setOpenChangeProposalStatus(true);
+            }}
+          >
+            {rowData.statusName}
+          </Link>
+        ),
+      };
+    }
 
     return v;
   });
