@@ -752,10 +752,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]').contains('DRAFT').click();
 
@@ -776,10 +776,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]')
         .contains(initialDBData.proposalStatuses.fapMeeting.name)
@@ -1097,7 +1097,7 @@ context('Proposal tests', () => {
 
       cy.get('[index="0"] input').check();
       cy.get('[data-cy="change-proposal-status"]').click();
-      cy.get('#selectedStatusId-input').click();
+      cy.get('#selectedWorkflowStatusId-input').click();
       cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
