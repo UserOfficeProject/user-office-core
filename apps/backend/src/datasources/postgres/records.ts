@@ -602,6 +602,7 @@ export interface WorkflowRecord {
   readonly full_count: number;
   readonly entity_type: WorkflowType;
   readonly connection_line_type: string;
+  readonly updated_at: Date;
 }
 
 export interface WorkflowConnectionRecord {
@@ -611,6 +612,19 @@ export interface WorkflowConnectionRecord {
   readonly next_workflow_status_id: number;
   readonly source_handle: string;
   readonly target_handle: string;
+}
+
+export interface WorkflowStructure {
+  workflowStatuses: {
+    workflowStatusId: number;
+    statusId: string;
+  }[];
+  workflowConnections: {
+    workflowStatusConnectionId: number;
+    prevWorkflowStatusId: number;
+    nextWorkflowStatusId: number;
+    statusChangingEvents: string[];
+  }[];
 }
 
 export interface WorkflowStatusRecord {

@@ -65,7 +65,7 @@ export class ProposalWorkflowEngine {
 
     const proposalsWithChangedStatuses = await Promise.all(
       normalizedInput.map(({ proposalPk, currentEvent }) =>
-        this.runInternal(proposalPk, currentEvent)
+        this.runOne(proposalPk, currentEvent)
       )
     );
 
@@ -80,7 +80,10 @@ export class ProposalWorkflowEngine {
     return validProposals;
   }
 
-  private async runInternal(
+  /**
+   * Internal method to run the workflow engine for a single proposal and event.
+   */
+  private async runOne(
     proposalPk: number,
     event: Event
   ): Promise<WorkflowEngineProposalType | void> {

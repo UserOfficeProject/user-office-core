@@ -1,7 +1,6 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { StatusDataSource } from '../../datasources/StatusDataSource';
 import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
 import { Event, EventMetadataByEvent } from '../../events/event.enum';
 import { createMachine, GuardFn, StateConfig } from './stateMachnine';
@@ -42,15 +41,11 @@ export const createWorkflowMachine = async (workflowId: number) => {
     Tokens.WorkflowDataSource
   );
 
-  const statusDataSource = container.resolve<StatusDataSource>(
-    Tokens.StatusDataSource
-  );
-
   const { workflowStatuses, workflowConnections } =
     await workflowDataSource.getWorkflowStructure(workflowId);
 
   const wfStatuses: Record<string, StateConfig> = {};
-  const wfStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to shortCode for easy lookup
+  const wfStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to statusId for easy lookup
 
   workflowStatuses.forEach((ws) => {
     const wfStatusName = createWfStatusName(ws.statusId, ws.workflowStatusId);
@@ -73,7 +68,6 @@ export const createWorkflowMachine = async (workflowId: number) => {
     }
 
     conn.statusChangingEvents.forEach((eventName) => {
-      // Events are stored as strings in the DB, ensuring they match the Event enum format (usually uppercase)
       const event = eventName.toUpperCase();
 
       if (!event) {
@@ -99,7 +93,7 @@ export const createWorkflowMachine = async (workflowId: number) => {
     states: wfStatuses,
   });
 
-  // workflowMachineCache.set(workflowId, machine); // TODO enable cache after testing
+  workflowMachineCache.set(workflowId, machine); // TODO enable cache after testing
 
   return machine;
 };

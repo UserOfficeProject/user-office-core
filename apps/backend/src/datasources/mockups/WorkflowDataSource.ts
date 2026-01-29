@@ -8,6 +8,7 @@ import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/setting
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
+import { WorkflowStructure } from '../postgres/records';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import { dummyWorkflowStatuses } from './StatusDataSource';
 
@@ -41,19 +42,7 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
 );
 
 export class WorkflowDataSourceMock implements WorkflowDataSource {
-  async getWorkflowStructure(workflowId: number): Promise<{
-    workflowStatuses: {
-      workflowStatusId: number;
-      statusId: string;
-      shortCode: string;
-    }[];
-    workflowConnections: {
-      workflowStatusConnectionId: number;
-      prevWorkflowStatusId: number;
-      nextWorkflowStatusId: number;
-      statusChangingEvents: string[];
-    }[];
-  }> {
+  async getWorkflowStructure(workflowId: number): Promise<WorkflowStructure> {
     return {
       workflowStatuses: dummyWorkflowStatuses.map((ws) => ({
         workflowStatusId: ws.workflowStatusId,
@@ -106,6 +95,10 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
 
   async updateWorkflow(Workflow: UpdateWorkflowInput): Promise<Workflow> {
     return dummyWorkflow;
+  }
+
+  async updateWorkflowTimestamp(workflowId: number): Promise<void> {
+    return;
   }
 
   async deleteWorkflow(WorkflowId: number): Promise<Workflow> {

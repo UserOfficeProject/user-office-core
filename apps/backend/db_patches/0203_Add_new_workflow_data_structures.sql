@@ -9,7 +9,10 @@ BEGIN
      ) THEN
       BEGIN
 
-
+          -- ===============================
+          -- 0) Update workflows table
+          -- ===============================
+          ALTER TABLE workflows ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
 
           -- ===============================
           -- 1) workflow_has_statuses

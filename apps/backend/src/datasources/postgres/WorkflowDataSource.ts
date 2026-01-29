@@ -17,11 +17,20 @@ import {
   WorkflowConnectionRecord,
   WorkflowRecord,
   WorkflowStatusRecord,
+  WorkflowStructure,
 } from './records';
 import StatusDataSource from './StatusDataSource';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
+  private workflowStructureCache = new Map<
+    number,
+    {
+      updatedAt: number;
+      structure: WorkflowStructure;
+    }
+  >();
+
   constructor(
     @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
   ) {}
@@ -139,6 +148,16 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         return this.createWorkflowObject(records[0]);
       });
   }
+
+  async updateWorkflowTimestamp(workflowId: number): Promise<void> {
+    await database
+      .update({
+        updated_at: new Date(),
+      })
+      .from('workflows')
+      .where('workflow_id', workflowId);
+  }
+
   async deleteWorkflow(workflowId: number): Promise<Workflow> {
     return database('workflows')
       .where('workflow_id', workflowId)
@@ -150,6 +169,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
             `Could not delete workflow with id: ${workflowId} `
           );
         }
+
+        this.workflowStructureCache.delete(workflowId);
 
         return this.createWorkflowObject(workflows[0]);
       });
@@ -253,6 +274,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       throw new GraphQLError('Could not create workflow status');
     }
 
+    await this.updateWorkflowTimestamp(newWorkflowStatusInput.workflowId);
+
     return this.createWorkflowStatusObject(workflowStatusRecord);
   }
 
@@ -273,6 +296,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     if (!updatedStatus) {
       throw new GraphQLError('Could not update workflow status');
     }
+
+    await this.updateWorkflowTimestamp(updatedStatus.workflow_id);
 
     return this.createWorkflowStatusObject(updatedStatus);
   }
@@ -324,6 +349,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       throw new GraphQLError('Could not create workflow connection');
     }
 
+    await this.updateWorkflowTimestamp(createdConnection.workflow_id);
+
     return this.createWorkflowConnectionObject(createdConnection);
   }
 
@@ -340,6 +367,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     if (!deletedConnection) {
       return null;
     }
+
+    await this.updateWorkflowTimestamp(deletedConnection.workflow_id);
 
     return this.createWorkflowConnectionObject(deletedConnection);
   }
@@ -359,6 +388,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         `Could not delete from workflow_has_statuses with workflow_status_id: ${workflowStatusId} `
       );
     }
+
+    await this.updateWorkflowTimestamp(deletedStatus.workflow_id);
 
     return this.createWorkflowStatusObject(deletedStatus);
   }
@@ -414,6 +445,10 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       );
     }
 
+    if (workflowConnection) {
+      await this.updateWorkflowTimestamp(workflowConnection.workflowId);
+    }
+
     return eventsToReturn;
   }
 
@@ -445,18 +480,26 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       : null;
   }
 
-  async getWorkflowStructure(workflowId: number): Promise<{
-    workflowStatuses: {
-      workflowStatusId: number;
-      statusId: string;
-    }[];
-    workflowConnections: {
-      workflowStatusConnectionId: number;
-      prevWorkflowStatusId: number;
-      nextWorkflowStatusId: number;
-      statusChangingEvents: string[];
-    }[];
-  }> {
+  async getWorkflowStructure(workflowId: number): Promise<WorkflowStructure> {
+    const workflow = await database
+      .select('updated_at')
+      .from('workflows')
+      .where('workflow_id', workflowId)
+      .first();
+
+    if (!workflow) {
+      throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
+    }
+
+    const cacheEntry = this.workflowStructureCache.get(workflowId);
+    if (
+      cacheEntry &&
+      workflow.updated_at &&
+      cacheEntry.updatedAt === new Date(workflow.updated_at).getTime()
+    ) {
+      return cacheEntry.structure;
+    }
+
     const workflowStatuses = await database
       .select(
         'workflow_has_statuses.workflow_status_id as workflowStatusId',
@@ -515,6 +558,16 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     const normalizedWorkflowConnections = Array.from(
       normalizedWorkflowConnectionsMap.values()
     );
+
+    if (workflow.updated_at) {
+      this.workflowStructureCache.set(workflowId, {
+        updatedAt: new Date(workflow.updated_at).getTime(),
+        structure: {
+          workflowStatuses,
+          workflowConnections: normalizedWorkflowConnections,
+        },
+      });
+    }
 
     return {
       workflowStatuses,

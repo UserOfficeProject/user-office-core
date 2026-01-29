@@ -6,12 +6,14 @@ import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/C
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
+import { WorkflowStructure } from './postgres/records';
 
 export interface WorkflowDataSource {
   createWorkflow(newWorkflowInput: CreateWorkflowInput): Promise<Workflow>;
   getWorkflow(workflowId: number): Promise<Workflow | null>;
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
   updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow>;
+  updateWorkflowTimestamp(workflowId: number): Promise<void>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
 
   createWorkflowConnection(
@@ -50,16 +52,5 @@ export interface WorkflowDataSource {
     workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
 
-  getWorkflowStructure(workflowId: number): Promise<{
-    workflowStatuses: {
-      workflowStatusId: number;
-      statusId: string;
-    }[];
-    workflowConnections: {
-      workflowStatusConnectionId: number;
-      prevWorkflowStatusId: number;
-      nextWorkflowStatusId: number;
-      statusChangingEvents: string[];
-    }[];
-  }>;
+  getWorkflowStructure(workflowId: number): Promise<WorkflowStructure>;
 }
