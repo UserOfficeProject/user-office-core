@@ -51,7 +51,7 @@ context('Settings tests', () => {
       cy.contains('Proposal statuses').click();
       cy.finishedLoading();
       cy.contains('Create').click();
-      cy.get('#shortCode').type(id);
+      cy.get('#id').type(id);
       cy.get('#name').type(name);
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
@@ -93,7 +93,7 @@ context('Settings tests', () => {
 
       cy.contains('DRAFT').parent().find('[aria-label="Edit"]').click();
 
-      cy.get('#shortCode').should('be.disabled');
+      cy.get('#id').should('be.disabled');
 
       cy.get('#name').clear();
       cy.get('#name').type(newName);
