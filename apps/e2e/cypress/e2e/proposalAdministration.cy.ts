@@ -62,6 +62,13 @@ context('Proposal administration tests', () => {
         });
       }
 
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'SCHEDULING',
+        posX: 400,
+        posY: 200,
+      });
+
       cy.createProposal({ callId: initialDBData.call.id }).then(
         ({ createProposal }) => {
           if (createProposal) {
@@ -243,10 +250,10 @@ context('Proposal administration tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]').contains('SCHEDULING').click();
 
@@ -273,10 +280,10 @@ context('Proposal administration tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]').contains('DRAFT').click();
 
