@@ -123,6 +123,12 @@ context('Proposal tests', () => {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        posX: 0,
+        posY: 200,
+      });
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
@@ -132,7 +138,6 @@ context('Proposal tests', () => {
           cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
-            prevId: result.createWorkflow.statuses[0].workflowId,
             posX: 0,
             posY: 200,
           });
