@@ -16,4 +16,14 @@ export default class AccessQueries {
 
       return this.dataSource.canAccess(userId, action, subject);
     }
+
+  @Authorized()
+  async getAccessRule(agent: UserWithRole | null, id: number) {
+    return this.dataSource.getAccessRule(id);
+  }
+
+  @Authorized()
+  async getAccessRules(agent: UserWithRole | null) {
+    return this.dataSource.getAccessRules();
+  }
 }

@@ -1,11 +1,12 @@
 import { injectable } from 'tsyringe';
-import { createMongoAbility, ForbiddenError, ForcedSubject, MongoAbility, RawRuleOf } from '@casl/ability';
-import { Fap } from '../../models/Fap';
+import { createMongoAbility, ForcedSubject, MongoAbility, RawRuleOf } from '@casl/ability';
 import { AccessDataSource } from '../AccessDataSource';
 import database from './database';
 import {
   AccessRecord,
+  createAccessRuleObject,
 } from './records';
+import { CreateAccessRuleInput } from '../../resolvers/mutations/CreateAccessRuleMutation';
 
 export const actions = ['update','read'] as const;
 export const subjects = ['Fap'] as const;
@@ -35,7 +36,7 @@ export default class PostgresAccessDataSource implements AccessDataSource {
     return rules;
   }
 
-  canAccess(id: number, action: typeof actions[number], subject: typeof subjects[number]) {
+  async canAccess(id: number, action: typeof actions[number], subject: typeof subjects[number]) {
     return database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
@@ -45,5 +46,57 @@ export default class PostgresAccessDataSource implements AccessDataSource {
     .andWhere('p.action', action)
     .andWhere('p.subject', subject)
     .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access)).can(action, subject) : false);
+  }
+
+  async getAccessRule(id: number) {
+    return database
+    .select('p.permission_id', 'p.action', 'p.subject', 'p.action', 'p.conditions', 'rhp.role_id', 'r.shortcode as role')
+    .from('permissions as p')
+    .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
+    .join('roles as r', 'rhp.role_id', 'r.role_id')
+    .where('p.permission_id', id)
+    .first()
+    .then((access: AccessRecord) =>
+            access ? createAccessRuleObject(access) : null
+  );
+  }
+
+  async getAccessRules() {
+    return database
+    .select('p.permission_id', 'p.action', 'p.subject', 'p.action', 'p.conditions', 'rhp.role_id', 'r.short_code as role')
+    .from('permissions as p')
+    .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
+    .join('roles as r', 'rhp.role_id', 'r.role_id')
+    .then((access: AccessRecord[]) => {
+      const result = access.map(a => createAccessRuleObject(a))
+      return {
+          totalCount: access ? access.length : 0,
+          accessRule: result,
+        };
+    });
+  }
+
+  async deleteAccessRule(id: number) {
+    return database
+      .where('permissions.permission_id', id)
+      .del()
+      .from('permissions')
+      .returning('*')
+      .then((access: AccessRecord[]) => createAccessRuleObject(access[0])
+    );
+  }
+
+  async createAccessRule(args: CreateAccessRuleInput) {
+    return database
+      .insert({
+        role_id: args.role_id,
+        subject: args.subject,
+        action: args.action,
+        conditions: args.conditions
+      })
+      .into('permissions')
+      .returning('*')
+      .then((access: AccessRecord[]) => createAccessRuleObject(access[0])
+    );
   }
 }

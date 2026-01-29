@@ -77,6 +77,7 @@ import {
 } from '../../resolvers/types/ProposalView';
 import { FeedbackStatus } from './../../models/Feedback';
 import { actions, subjects } from './AccessDataSource';
+import { AccessRule } from '../../models/AccessRule';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
 declare module 'knex/types/tables' {
@@ -1147,6 +1148,17 @@ export const createSettingsObject = (record: SettingsRecord) => {
   );
 };
 
+export const createAccessRuleObject = (record: AccessRecord) => {
+  return new AccessRule(
+    record.permission_id,
+    record.role,
+    record.role_id,
+    record.subject,
+    record.action,
+    record.conditions
+  );
+};
+
 export const createFapObject = (fap: FapRecord) => {
   return new Fap(
     fap.fap_id,
@@ -1553,6 +1565,8 @@ export interface ExperimentSafetyEventsRecord {
 
 export interface AccessRecord {
   readonly permission_id: number;
+  readonly role: string;
+  readonly role_id: number;
   readonly action: typeof actions[number];
   readonly subject: typeof subjects[number];
   readonly conditions: string;

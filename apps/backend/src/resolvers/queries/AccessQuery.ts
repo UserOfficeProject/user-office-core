@@ -1,5 +1,6 @@
 import { Query, Arg, Ctx, Resolver, Int, InputType, Field } from 'type-graphql';
 import { ResolverContext } from '../../context';
+import { AccessRule } from '../types/AccessRule';
 
 @InputType()
 export class AccessFilter {
@@ -21,5 +22,13 @@ export class AccessQuery {
     @Arg('filter', () => AccessFilter) filter: AccessFilter
   ) {
     return context.queries.access.get(context.user, filter)
+  }
+
+  @Query(() => AccessRule)
+  accessRule(
+    @Ctx() context: ResolverContext,
+    @Arg('id', () => Int) id: number
+  ) {
+    return context.queries.access.getAccessRule(context.user, id)
   }
 }

@@ -140,6 +140,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
+      <Tooltip title="Access">
+        <ListItemButton component={NavLink} to="/Access">
+          <ListItemIcon>
+            <CommentQuestionIcon />
+          </ListItemIcon>
+          <ListItemText primary="Access" />
+        </ListItemButton>
+      </Tooltip>
       {isTechniqueProposalsEnabled && (
         <Tooltip title={t('Technique Proposals')}>
           <ListItemButton component={NavLink} to={techniqueProposalUrl}>

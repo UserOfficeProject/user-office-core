@@ -66,6 +66,7 @@ import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
 import WorkflowQueries from '../queries/WorkflowQueries';
 import AccessQueries from '../queries/AccessQueries';
+import AccessMutations from '../mutations/AccessMutations';
 
 interface ResolverContextQueries {
   admin: AdminQueries;
@@ -134,6 +135,7 @@ interface ResolverContextMutations {
   workflow: WorkflowMutations;
   tag: TagMutations;
   experiment: ExperimentMutations;
+  access: AccessMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;
