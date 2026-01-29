@@ -128,7 +128,7 @@ BEGIN
           );
 
           -- ==================================================================
-          -- 7) Link proposals to the new workflow graph
+          -- 7) Link proposals and experiment_safety to the new workflow graph
           -- ==================================================================
           ALTER TABLE proposals
             ADD COLUMN workflow_status_id INT NULL;
@@ -137,6 +137,16 @@ BEGIN
             ADD CONSTRAINT fk_proposals_workflow_status
             FOREIGN KEY (workflow_status_id)
             REFERENCES workflow_has_statuses (workflow_status_id);
+
+          ALTER TABLE experiment_safety
+            ADD COLUMN workflow_status_id INT NULL;
+
+          ALTER TABLE experiment_safety
+            ADD CONSTRAINT fk_experiment_safety_workflow_status
+            FOREIGN KEY (workflow_status_id)
+            REFERENCES workflow_has_statuses (workflow_status_id);
+
+        
             
       END;
     END IF;

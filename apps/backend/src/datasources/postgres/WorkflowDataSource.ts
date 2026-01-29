@@ -191,7 +191,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
     }
 
-    const defaultStatus = await this.statusDataSource.getDefaultStatus(
+    const defaultStatus = await this.statusDataSource.getInitialStatus(
       workflow.entity_type
     );
 
