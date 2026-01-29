@@ -24,7 +24,7 @@ const RoleManagement: React.FC = () => {
     shortCode: string;
     title: string;
     description: string;
-    dataAccess: string[];
+    isRootRole: boolean;
     permissions: string[];
     tags?: { id: number; name: string }[];
   }
@@ -50,7 +50,7 @@ const RoleManagement: React.FC = () => {
             shortCode: role.shortCode,
             title: role.title,
             description: role.description,
-            dataAccess: [],
+            isRootRole: role.isRootRole,
             permissions: [],
             tags: role.tags || [],
           }))
@@ -80,7 +80,7 @@ const RoleManagement: React.FC = () => {
             shortCode: role.shortCode,
             title: role.title,
             description: role.description,
-            dataAccess: [],
+            isRootRole: role.isRootRole,
             permissions: [],
             tags: role.tags || [],
           }))
@@ -123,7 +123,7 @@ const RoleManagement: React.FC = () => {
                         shortCode: role.shortCode,
                         title: role.title,
                         description: role.description,
-                        dataAccess: [],
+                        isRootRole: role.isRootRole,
                         permissions: [],
                         tags: role.tags || [],
                       }))
@@ -136,7 +136,7 @@ const RoleManagement: React.FC = () => {
             ))
           ) : (
             <Typography variant="body2" color="textSecondary">
-              No tags
+              {rowData.isRootRole ? 'NA' : 'No tags'}
             </Typography>
           )}
         </Box>
@@ -213,7 +213,7 @@ const RoleManagement: React.FC = () => {
           shortCode: role.shortCode,
           title: role.title,
           description: role.description,
-          dataAccess: [],
+          isRootRole: role.isRootRole,
           permissions: [],
           tags: role.tags || [],
         }))
@@ -252,6 +252,10 @@ const RoleManagement: React.FC = () => {
               Existing Roles
             </Typography>
           }
+          editable={{
+            isDeleteHidden: (rowData: RoleRow) => rowData.isRootRole,
+            isEditHidden: (rowData: RoleRow) => rowData.isRootRole,
+          }}
           columns={columns}
           data={roles}
           isLoading={false}
@@ -260,7 +264,7 @@ const RoleManagement: React.FC = () => {
             paging: true,
           }}
           actions={[
-            {
+            (rowData: RoleRow) => ({
               icon: () => <Apartment />,
               tooltip: 'Assign Tag',
               onClick: (event, rowData) => {
@@ -268,7 +272,8 @@ const RoleManagement: React.FC = () => {
                 setTagDialogOpen(true);
               },
               position: 'row',
-            },
+              hidden: rowData.isRootRole,
+            }),
           ]}
         />
       </StyledPaper>

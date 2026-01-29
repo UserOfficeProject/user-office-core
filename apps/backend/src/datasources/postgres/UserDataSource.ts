@@ -753,15 +753,11 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async createRole(args: CreateRoleArgs): Promise<Role> {
-    const { shortCode, title, description, permissions, dataAccess } = args;
+    const { shortCode, title, description, permissions } = args;
 
     const postgresPermissions = Array.isArray(permissions)
       ? this.toPostgresArray(permissions)
       : permissions;
-
-    const postgresDataAccess = Array.isArray(dataAccess)
-      ? this.toPostgresArray(dataAccess)
-      : dataAccess;
 
     const [roleRecord] = await database
       .insert({
@@ -769,7 +765,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         title,
         description,
         permissions: postgresPermissions,
-        data_access: postgresDataAccess,
+        is_root_role: false,
       })
       .into('roles')
       .returning('*');
@@ -779,29 +775,23 @@ export default class PostgresUserDataSource implements UserDataSource {
       roleRecord.short_code,
       roleRecord.title,
       roleRecord.description,
-      roleRecord.permissions, // No need to parse as it's already in array format
-      roleRecord.data_access // No need to parse as it's already in array format
+      roleRecord.permissions,
+      roleRecord.isRootRole
     );
   }
 
   async updateRole(args: UpdateRoleArgs): Promise<Role> {
-    const { roleID, shortCode, title, description, permissions, dataAccess } =
-      args;
+    const { roleID, title, description, permissions } = args;
 
     const postgresPermissions = Array.isArray(permissions)
       ? this.toPostgresArray(permissions)
       : permissions;
-
-    const postgresDataAccess = Array.isArray(dataAccess)
-      ? this.toPostgresArray(dataAccess)
-      : dataAccess;
 
     const [roleRecord] = await database
       .update({
         title,
         description,
         permissions: postgresPermissions,
-        data_access: postgresDataAccess,
       })
       .from('roles')
       .where('role_id', roleID)
@@ -812,8 +802,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       roleRecord.short_code,
       roleRecord.title,
       roleRecord.description,
-      roleRecord.permissions, // No need to parse as it's already in array format
-      roleRecord.data_access
+      roleRecord.permissions,
+      roleRecord.isRootRole
     );
   }
 

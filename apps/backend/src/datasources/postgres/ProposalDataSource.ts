@@ -387,7 +387,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     sortDirection?: string,
     searchText?: string,
     principleInvestigator?: number[],
-    instrumentFilter?: string[]
+    instrumentFilter?: number[],
+    callFilter?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     const principalInvestigator = principleInvestigator
       ? principleInvestigator
@@ -409,22 +410,31 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('call_id', filter?.callId);
         }
 
-        // New: filter by instrumentFilter param (array of ids or names)
-        if (instrumentFilters.length) {
+        // If either instrumentFilter (ids) or callFilter is provided,
+        // return proposals that match any instrument id OR any call id.
+        if (
+          (instrumentFilters && instrumentFilters.length) ||
+          (callFilter && callFilter.length)
+        ) {
           query.andWhere(function () {
-            instrumentFilters.forEach((inst) => {
-              this.orWhereRaw(
-                "jsonb_path_exists(instruments, '$[*].name \\? (@ == :instrumentName:)')",
-                { instrumentName: inst }
-              );
-            });
+            if (instrumentFilters && instrumentFilters.length) {
+              instrumentFilters.forEach((inst) => {
+                this.orWhereRaw(
+                  'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+                  { instrumentId: inst }
+                );
+              });
+            }
+
+            if (callFilter && callFilter.length) {
+              this.orWhereIn('call_id', callFilter);
+            }
           });
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
         } else if (filter?.instrumentFilter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentFilter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
             { instrumentId: filter.instrumentFilter.instrumentId }

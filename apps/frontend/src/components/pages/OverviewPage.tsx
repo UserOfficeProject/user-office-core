@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
+import ProposalTableReader from 'components/proposal/ProposalTableReader';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
@@ -66,6 +67,13 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
+    case UserRole.DYNAMIC_PROPOSAL_READER:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableReader />
+        </Paper>
+      );
+      break;
     default:
       roleBasedOverView = (
         <Paper>
@@ -83,6 +91,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   return (
     <StyledContainer maxWidth={false}>
       {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+        props.userRole !== UserRole.DYNAMIC_PROPOSAL_READER &&
         Object.values(UserRole).includes(props.userRole) && (
           <Paper>
             {loadingContent ? (

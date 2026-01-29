@@ -4,16 +4,15 @@ import {
   Typography,
   TextField,
   Button,
-  Checkbox,
+  Select,
+  MenuItem,
   FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Grid,
+  InputLabel,
+  CircularProgress,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { Role } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 interface RoleModalProps {
@@ -24,7 +23,6 @@ interface RoleModalProps {
     shortCode: string;
     title: string;
     description: string;
-    dataAccess?: string[];
     permissions?: string[];
   } | null;
   onSubmit: () => void;
@@ -40,26 +38,67 @@ const RoleModal: React.FC<RoleModalProps> = ({
   const [shortCode, setShortCode] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [dataAccess, setDataAccess] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<
+    {
+      shortCode: string;
+      title?: string;
+    }[]
+  >([]);
+  const [loadingRoles, setLoadingRoles] = useState(false);
   const { api } = useDataApiWithFeedback();
-  const { instruments, loadingInstruments } = useInstrumentsData();
 
   useEffect(() => {
     if (isEditMode && role) {
       setShortCode(role.shortCode || '');
       setTitle(role.title || '');
       setDescription(role.description || '');
-      setDataAccess(role.dataAccess || []);
       setPermissions(role.permissions || []);
     } else {
       setShortCode('');
       setTitle('');
       setDescription('');
-      setDataAccess([]);
       setPermissions([]);
     }
   }, [isEditMode, role]);
+
+  // Fetch root roles when modal opens so user can pick an existing shortCode
+  useEffect(() => {
+    const fetchRootRoles = async () => {
+      setLoadingRoles(true);
+      try {
+        // Adjust the API call name/args if your backend uses a different query
+        const res = await api().getRoles({});
+        const roles = Array.isArray(res) ? res : res?.roles ?? [];
+        setAvailableRoles(
+          roles
+            .filter((role) => role.isRootRole)
+            .map((r: Role) => ({ shortCode: r.shortCode, title: r.title }))
+        );
+
+        // Ensure current edit role shortCode is present in availableRoles
+        if (isEditMode && role && role.shortCode) {
+          const exists = roles.some(
+            (r: Role) => r.shortCode === role.shortCode
+          );
+          if (!exists) {
+            setAvailableRoles((prev) => [
+              ...prev,
+              { shortCode: role.shortCode, title: role.title },
+            ]);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch root roles', e);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    if (open) {
+      fetchRootRoles();
+    }
+  }, [open, api, isEditMode, role]);
 
   const handleSubmit = async () => {
     const apiCall = isEditMode
@@ -67,11 +106,10 @@ const RoleModal: React.FC<RoleModalProps> = ({
           toastSuccessMessage: 'Role updated successfully',
         }).updateRole({
           args: {
-            roleID: role.id,
+            roleID: role!.id,
             shortCode,
             title,
             description,
-            dataAccess,
             permissions,
           },
         })
@@ -82,7 +120,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
             shortCode,
             title,
             description,
-            dataAccess,
             permissions,
           },
         });
@@ -101,45 +138,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
     }
   };
 
-  const renderDataAccess = () => {
-    if (loadingInstruments) {
-      return <Typography>Loading data access options...</Typography>;
-    }
-
-    return (
-      <FormControl component="fieldset" variant="standard" fullWidth>
-        <FormLabel component="legend">Instruments</FormLabel>
-        <FormGroup>
-          <Grid container spacing={1}>
-            {instruments.map((instrument, index) => (
-              <Grid item md={6} xs={12} key={index}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={dataAccess.includes(instrument.name)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setDataAccess([...dataAccess, instrument.name]);
-                        } else {
-                          setDataAccess(
-                            dataAccess.filter(
-                              (access) => access !== instrument.name
-                            )
-                          );
-                        }
-                      }}
-                    />
-                  }
-                  label={instrument.name}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </FormGroup>
-      </FormControl>
-    );
-  };
-
   return (
     <Dialog
       open={open}
@@ -152,14 +150,39 @@ const RoleModal: React.FC<RoleModalProps> = ({
         <Typography variant="h6">
           {isEditMode ? 'Update Role' : 'Create New Role'}
         </Typography>
-        <TextField
-          label="Short Code"
-          value={shortCode}
-          onChange={(e) => setShortCode(e.target.value)}
+        <FormControl
           fullWidth
           margin="normal"
-          disabled={isEditMode}
-        />
+          disabled={isEditMode || loadingRoles}
+        >
+          <InputLabel id="role-shortcode-label">Short Code</InputLabel>
+          <Select
+            labelId="role-shortcode-label"
+            value={shortCode}
+            label="Short Code"
+            onChange={(e) => setShortCode(e.target.value as string)}
+            renderValue={(val) =>
+              val || (loadingRoles ? 'Loading...' : 'Select a role')
+            }
+          >
+            {loadingRoles && (
+              <MenuItem value="" disabled>
+                <CircularProgress size={20} />
+              </MenuItem>
+            )}
+            {!loadingRoles && availableRoles.length === 0 && (
+              <MenuItem value="" disabled>
+                No root roles available
+              </MenuItem>
+            )}
+            {!loadingRoles &&
+              availableRoles.map((r) => (
+                <MenuItem key={r.shortCode} value={r.shortCode}>
+                  {r.shortCode} {r.title ? `— ${r.title}` : ''}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
         <TextField
           label="Title"
           value={title}
@@ -174,11 +197,6 @@ const RoleModal: React.FC<RoleModalProps> = ({
           fullWidth
           margin="normal"
         />
-        {/* Data Access Section */}
-        <div>
-          <Typography variant="h6">Data Access</Typography>
-          {renderDataAccess()}
-        </div>
         <Button
           onClick={handleSubmit}
           variant="contained"

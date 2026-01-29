@@ -17,9 +17,6 @@ export class CreateRoleArgs {
 
   @Field(() => [String])
   permissions: string[];
-
-  @Field(() => [String])
-  dataAccess: string[];
 }
 
 @ObjectType()

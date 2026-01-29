@@ -20,9 +20,6 @@ export class UpdateRoleArgs {
 
   @Field(() => [String])
   permissions: string[];
-
-  @Field(() => [String])
-  dataAccess: string[];
 }
 
 @ObjectType()

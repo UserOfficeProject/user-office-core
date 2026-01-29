@@ -5,9 +5,11 @@ import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import TagDataSource from '../datasources/postgres/TagDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
@@ -29,7 +31,9 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
+    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource
   ) {}
 
   @Authorized()
@@ -105,15 +109,24 @@ export default class ProposalQueries {
     sortDirection?: string,
     searchText?: string
   ) {
-    const instrumentFilters: string[] = [];
-    // if (agent && this.userAuth.isDynamicProposalReader(agent)) {
-    //   instrumentFilters = agent.currentRole?.dataAccess || [];
-    // }
+    const instrumentFilter: number[] = [];
+    const callFilter: number[] = [];
 
+    if (agent && agent.currentRole?.isRootRole === false) {
+      const tags = await this.roleDataSource.getTagsByRoleId(
+        agent.currentRole!.id
+      );
+      for (const tag of tags) {
+        const instruments = await this.tagDataSource.getTagInstruments(tag.id);
+        instrumentFilter.push(
+          ...instruments.map((instrument) => instrument.id)
+        );
+
+        const calls = await this.tagDataSource.getTagCalls(tag.id);
+        callFilter.push(...calls.map((call) => call.id));
+      }
+    }
     try {
-      // leave await here because getProposalsFromView might thrown an exception
-      // and we want to handle it here
-
       return await this.dataSource.getProposalsFromView(
         filter,
         first,
@@ -122,7 +135,8 @@ export default class ProposalQueries {
         sortDirection,
         searchText,
         undefined,
-        instrumentFilters
+        instrumentFilter,
+        callFilter
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });
