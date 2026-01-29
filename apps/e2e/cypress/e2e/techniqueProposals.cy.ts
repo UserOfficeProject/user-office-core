@@ -578,7 +578,7 @@ context('Technique Proposal tests', () => {
     });
   });
 
-  describe.skip('Technique proposal basic tests', () => {
+  describe('Technique proposal basic tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
@@ -1133,7 +1133,7 @@ context('Technique Proposal tests', () => {
     });
   });
 
-  describe.skip('Techniques advanced tests', () => {
+  describe('Techniques advanced tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
