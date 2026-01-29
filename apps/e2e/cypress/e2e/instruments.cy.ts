@@ -77,6 +77,18 @@ context('Instrument tests', () => {
 
   describe('Instruments basic tests', () => {
     beforeEach(() => {
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
+
       cy.login('officer');
       cy.visit('/');
 
@@ -201,6 +213,18 @@ context('Instrument tests', () => {
           roles: [initialDBData.roles.instrumentScientist],
         });
       }
+
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
