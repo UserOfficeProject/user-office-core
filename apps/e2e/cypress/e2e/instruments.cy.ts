@@ -4,6 +4,7 @@ import {
   TechnicalReviewStatus,
   FeatureId,
   SettingsId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -1032,6 +1033,18 @@ context('Instrument tests', () => {
           roles: [initialDBData.roles.instrumentScientist],
         });
       }
+
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {

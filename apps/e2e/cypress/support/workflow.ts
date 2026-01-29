@@ -35,8 +35,13 @@ const createStatus = (
 };
 
 const addStatusToWorkflow = (
-  addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables & {
+  addStatusToWorkflowInput: Omit<
+    AddStatusToWorkflowMutationVariables,
+    'posX' | 'posY'
+  > & {
     prevId?: number;
+    posX?: number;
+    posY?: number;
   }
 ): Cypress.Chainable<
   AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
@@ -46,7 +51,11 @@ const addStatusToWorkflow = (
   return cy
     .wrap(null)
     .then<AddStatusToWorkflowMutation>(() =>
-      api.addStatusToWorkflow(addStatusToWorkflowInput)
+      api.addStatusToWorkflow({
+        ...addStatusToWorkflowInput,
+        posX: addStatusToWorkflowInput.posX ?? 0,
+        posY: addStatusToWorkflowInput.posY ?? 0,
+      })
     )
     .then<AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation>(
       (request) => {

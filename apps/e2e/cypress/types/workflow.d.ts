@@ -62,8 +62,13 @@ declare global {
        *    cy.addStatusToWorkflow(addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables)
        */
       addStatusToWorkflow: (
-        addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables & {
+        addStatusToWorkflowInput: Omit<
+          AddStatusToWorkflowMutationVariables,
+          'posX' | 'posY'
+        > & {
           prevId?: number;
+          posX?: number;
+          posY?: number;
         }
       ) => Cypress.Chainable<
         AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
