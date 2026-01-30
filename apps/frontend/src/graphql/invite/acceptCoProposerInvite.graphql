@@ -1,0 +1,5 @@
+mutation acceptCoProposerInvite($proposalId: String!) {
+  acceptCoProposerInvite(proposalId: $proposalId) {
+    ...invite
+  }
+}

@@ -112,7 +112,8 @@ export default class AdminMutations {
     return await this.dataSource.deleteInstitution(id);
   }
 
-  async addClientLog(error: string) {
+  @Authorized()
+  async addClientLog(agent: UserWithRole | null, error: string) {
     logger.logError('Error received from client', { error });
 
     return true;
