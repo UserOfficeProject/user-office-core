@@ -49,6 +49,7 @@ import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
 import FapMutations from './FapMutations';
 import InstrumentMutations from './InstrumentMutations';
+import { AccessDataSource } from '../datasources/AccessDataSource';
 
 @injectable()
 export default class ProposalMutations {
@@ -79,7 +80,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource
+    private templateDataSource: TemplateDataSource,
+    @inject(Tokens.AccessDataSource)
+    private accessDataSource: AccessDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -341,19 +344,26 @@ export default class ProposalMutations {
       });
     }
 
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isApiToken(agent)
-    ) {
-      if (
-        proposal.submitted ||
-        !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
-      )
+      if (!this.userAuth.isApiToken(agent) && !this.proposalAuth.canDelete(agent, proposalPk)) {
         return rejection(
           'Can not delete proposal because proposal is submitted',
           { agent, proposalPk }
         );
-    }
+      }
+
+    // if (
+    //   !this.userAuth.isUserOfficer(agent) &&
+    //   !this.userAuth.isApiToken(agent)
+    // ) {
+    //   if (
+    //     proposal.submitted ||
+    //     !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
+    //   )
+    //     return rejection(
+    //       'Can not delete proposal because proposal is submitted',
+    //       { agent, proposalPk }
+    //     );
+    // }
 
     try {
       const result = await this.proposalDataSource.deleteProposal(proposalPk);

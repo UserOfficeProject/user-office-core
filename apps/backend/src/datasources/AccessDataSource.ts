@@ -3,6 +3,7 @@ import { CreateAccessRuleInput } from "../resolvers/mutations/CreateAccessRuleMu
 
 export interface AccessDataSource {
   canAccess(id: number, action: string, subject: string): Promise<boolean>;
+  canAccess2(userRole: string, action: string, subjectType: string, object: any): Promise<boolean>;
   getAccessRule(id: number): Promise<AccessRule | null>;
   getAccessRules(): Promise<{ totalCount: number; accessRule: AccessRule[] }>;
   deleteAccessRule(id: number): Promise<AccessRule | null>;

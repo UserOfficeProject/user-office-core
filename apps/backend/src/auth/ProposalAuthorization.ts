@@ -15,6 +15,7 @@ import { Proposal } from '../resolvers/types/Proposal';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
+import { AccessDataSource } from '../datasources/AccessDataSource';
 
 @injectable()
 export class ProposalAuthorization {
@@ -35,7 +36,9 @@ export class ProposalAuthorization {
     private statusDataSource: StatusDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
-    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization,
+    @inject(Tokens.AccessDataSource)
+    private accessDataSource: AccessDataSource
   ) {}
 
   private async resolveProposal(
@@ -365,5 +368,18 @@ export class ProposalAuthorization {
     }
 
     return false;
+  }
+
+  async canDelete(agent: UserWithRole | null, proposalPk: number) {
+    const proposal = await this.proposalDataSource.get(proposalPk);
+
+    const user = {
+      role: agent?.currentRole?.shortCode,
+      userId: agent?.id,
+    };
+
+    const ctx = {proposal, user}
+    const can = await this.accessDataSource.canAccess2(user.role ? user.role : 'user', 'delete', 'proposal', ctx);
+    return can
   }
 }

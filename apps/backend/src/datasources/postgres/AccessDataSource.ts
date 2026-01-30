@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { createMongoAbility, ForcedSubject, MongoAbility, RawRuleOf } from '@casl/ability';
+import { createMongoAbility, ForcedSubject, MongoAbility, RawRuleOf, subject } from '@casl/ability';
 import { AccessDataSource } from '../AccessDataSource';
 import database from './database';
 import {
@@ -8,8 +8,8 @@ import {
 } from './records';
 import { CreateAccessRuleInput } from '../../resolvers/mutations/CreateAccessRuleMutation';
 
-export const actions = ['update','read'] as const;
-export const subjects = ['Fap'] as const;
+export const actions = ['update', 'read', 'delete'] as const;
+export const subjects = ['Fap', 'Proposal'] as const;
 type rule = {
   action: typeof actions[number],
   subject: typeof subjects[number]
@@ -46,6 +46,18 @@ export default class PostgresAccessDataSource implements AccessDataSource {
     .andWhere('p.action', action)
     .andWhere('p.subject', subject)
     .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access)).can(action, subject) : false);
+  }
+
+  async canAccess2(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object: any) {
+    return database
+    .select('p.action', 'p.subject', 'p.conditions')
+    .from('permissions as p')
+    .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
+    .join('roles as r', 'rhp.role_id', 'ru.role_id')
+    .where('r.short_code', userRole)
+    .andWhere('p.action', action)
+    .andWhere('p.subject', subjectType)
+    .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access)).can(action, subject(subjectType, object)) : false);
   }
 
   async getAccessRule(id: number) {
