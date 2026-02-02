@@ -105,6 +105,7 @@ export const handleWorkflowEngineChange = async (
     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
     updatedProposals?.length
   ) {
+    // publish PROPOSAL_STATUS_CHANGED_BY_WORKFLOW event to the EventBus
     await publishProposalStatusChange(updatedProposals);
     if (event.type === Event.PROPOSAL_SUBMITTED) {
       await handleSubmittedProposalsAfterCallEnded(updatedProposals);

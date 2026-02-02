@@ -304,6 +304,9 @@ BEGIN
         DROP TABLE IF EXISTS workflow_connections;
         DROP SEQUENCE IF EXISTS proposal_workflow_connections_proposal_workflow_connection__seq;
         DROP SEQUENCE IF EXISTS next_status_events_next_status_event_id_seq;
+
+        DROP TABLE IF EXISTS proposal_events;
+        DROP TABLE IF EXISTS experiment_safety_events;
       END;
     END IF;
 END;

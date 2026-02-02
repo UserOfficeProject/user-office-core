@@ -149,7 +149,41 @@ BEGIN
             FOREIGN KEY (workflow_status_id)
             REFERENCES workflow_has_statuses (workflow_status_id);
 
-        
+          -- ==================================================================
+          -- 8) Sync status_id from workflow_status_id
+          -- ==================================================================
+          CREATE OR REPLACE FUNCTION set_status_from_workflow_status()
+          RETURNS trigger
+          LANGUAGE plpgsql AS
+          $func$
+          BEGIN
+              IF NEW.workflow_status_id IS NULL THEN
+                  NEW.status_id := NULL;
+                  RETURN NEW;
+              END IF;
+
+              SELECT whs.status_id
+                INTO NEW.status_id
+                FROM workflow_has_statuses AS whs
+               WHERE whs.workflow_status_id = NEW.workflow_status_id;
+
+              IF NOT FOUND THEN
+                  RAISE EXCEPTION 'workflow_status_id % does not exist', NEW.workflow_status_id;
+              END IF;
+
+              RETURN NEW;
+          END;
+          $func$;
+
+          CREATE TRIGGER trg_set_proposal_status
+          BEFORE INSERT OR UPDATE OF workflow_status_id
+          ON proposals
+          FOR EACH ROW EXECUTE FUNCTION set_status_from_workflow_status();
+
+          CREATE TRIGGER trg_set_experiment_safety_status
+          BEFORE INSERT OR UPDATE OF workflow_status_id
+          ON experiment_safety
+          FOR EACH ROW EXECUTE FUNCTION set_status_from_workflow_status();
             
       END;
     END IF;

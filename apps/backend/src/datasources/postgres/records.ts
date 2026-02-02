@@ -1488,6 +1488,7 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_id: number;
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
+  readonly workflow_status_id: number | null;
   readonly status_id: string | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;

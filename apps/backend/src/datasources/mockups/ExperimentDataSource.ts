@@ -1,4 +1,3 @@
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentSafety,
@@ -45,6 +44,7 @@ const dummyExperimentSafetyFactory = (
     values?.esiQuestionarySubmittedAt ?? null,
     values?.createdBy ?? 1,
     values?.statusId ?? null,
+    values?.workflowStatusId ?? 1,
     values?.safetyReviewQuestionaryId ?? 1,
     values?.reviewedBy ?? null,
     values?.createdAt ?? new Date(),
@@ -130,13 +130,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
       totalCount: this.experiments.length,
       experiments: this.experiments,
     };
-  }
-
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    return [dummyExperimentSafetyEvents];
   }
 
   async getExperimentSafetyEvents(
@@ -368,6 +361,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
             : safety.esiQuestionarySubmittedAt,
           safety.createdBy,
           safety.statusId,
+          safety.workflowStatusId,
           updateFields.safetyReviewQuestionaryId !== undefined
             ? updateFields.safetyReviewQuestionaryId
             : safety.safetyReviewQuestionaryId,

@@ -1,7 +1,6 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -9,7 +8,7 @@ import { Event } from '../events/event.enum';
 import { searchObjectByKey } from '../utils/helperFunctions';
 import {
   WorkflowEngineExperimentType,
-  markExperimentSafetyEventAsDoneAndCallWorkflowEngine,
+  ExperimentWorkflowEngine,
 } from '../workflowEngine/experiment';
 
 enum ExperimentInformationKeys {
@@ -24,20 +23,17 @@ const publishExperimentSafetyStatusChange = async (
   }
   const eventBus = resolveApplicationEventBus();
 
-  const statusDataSource = container.resolve<StatusDataSource>(
-    Tokens.StatusDataSource
-  );
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
   );
   updatedExperimentSafeties.map(async (updatedExperimentSafety) => {
-    if (updatedExperimentSafety && updatedExperimentSafety.statusId) {
-      const experimentSafetyStatus = await statusDataSource.getStatus(
-        updatedExperimentSafety.statusId
+    if (updatedExperimentSafety && updatedExperimentSafety.workflowStatusId) {
+      const experimentSafetyStatus = await workflowDataSource.getWorkflowStatus(
+        updatedExperimentSafety.workflowStatusId
       );
       const previousExperimentStatus =
         await workflowDataSource.getWorkflowStatus(
-          updatedExperimentSafety.prevStatusId
+          updatedExperimentSafety.prevWorkflowStatusId
         );
 
       return eventBus.publish({
@@ -46,7 +42,7 @@ const publishExperimentSafetyStatusChange = async (
         isRejection: false,
         key: 'experimentsafety',
         loggedInUserId: null,
-        description: `From "${previousExperimentStatus?.statusId}" to "${experimentSafetyStatus}.workflowStatus"`, // TODO: fix to use workflowStatus
+        description: `From "${previousExperimentStatus?.statusId}" to "${experimentSafetyStatus?.statusId}"`,
       });
     }
   });
@@ -57,16 +53,18 @@ export const handleWorkflowEngineChange = async (
   experimentPks: number[] | number
 ) => {
   const isArray = Array.isArray(experimentPks);
-  const updatedExperimentSafeties =
-    await markExperimentSafetyEventAsDoneAndCallWorkflowEngine(
-      event.type,
-      isArray ? experimentPks : [experimentPks]
-    );
+
+  const workflowEngine = container.resolve(ExperimentWorkflowEngine);
+  const updatedExperimentSafeties = await workflowEngine.run({
+    event: event.type,
+    experimentPks: isArray ? experimentPks : [experimentPks],
+  });
 
   if (
     event.type !== Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER &&
     updatedExperimentSafeties?.length
   ) {
+    // publish event EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW to the EventBus
     await publishExperimentSafetyStatusChange(updatedExperimentSafeties);
   }
 };

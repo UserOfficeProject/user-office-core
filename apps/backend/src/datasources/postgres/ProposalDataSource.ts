@@ -889,7 +889,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     const dataToUpdate: Partial<ProposalRecord> = {
       workflow_status_id: workflowStatusId,
-      status_id: workflowStatus?.statusId,
       submitted: workflowStatus?.statusId === 'DRAFT' ? false : undefined,
     };
 
