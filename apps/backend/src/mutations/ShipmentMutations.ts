@@ -244,6 +244,10 @@ export default class ShipmentMutations {
       );
     }
 
+    if (args.sampleIds.length === 0) {
+      return rejection('At least one sample must be selected', { args });
+    }
+
     // TODO check if samplesIds provided belongs to the proposal
 
     return this.shipmentDataSource.addSamples(args);

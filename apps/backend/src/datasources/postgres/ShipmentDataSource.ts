@@ -151,12 +151,14 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       .where({ shipment_id: shipmentId })
       .delete('*');
 
-    await database('shipments_has_samples').insert(
-      sampleIds.map((sampleId) => ({
-        shipment_id: shipmentId,
-        sample_id: sampleId,
-      }))
-    );
+    if (sampleIds.length > 0) {
+      await database('shipments_has_samples').insert(
+        sampleIds.map((sampleId) => ({
+          shipment_id: shipmentId,
+          sample_id: sampleId,
+        }))
+      );
+    }
 
     return shipment;
   }
