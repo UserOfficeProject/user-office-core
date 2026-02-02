@@ -144,6 +144,7 @@ export default class ShipmentMutations {
         })
         .then((shipment) => shipment);
     } catch (error) {
+      const errorMessage = (error as Error).message;
       logger.logException(
         'Error occurred while registering asset into EAM',
         error as Error,
@@ -151,7 +152,8 @@ export default class ShipmentMutations {
       );
 
       return rejection(
-        'Could not submit shipment because an error occurred. Please try again later.',
+        errorMessage ||
+          'Could not submit shipment because an error occurred. Please try again later.',
         { args },
         error
       );
