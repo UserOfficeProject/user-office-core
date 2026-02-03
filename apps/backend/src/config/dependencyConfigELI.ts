@@ -56,7 +56,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
-import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 import { configureELIDevelopmentEnvironment } from './eli/configureELIEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
@@ -146,4 +145,3 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-mapClass(Tokens.ProposalWorkflowEngine, ProposalWorkflowEngine);

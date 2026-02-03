@@ -51,7 +51,6 @@ import {
 import { createApplicationEventBus } from '../events';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
@@ -124,8 +123,6 @@ mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () =>
   setLogger(new ConsoleLogger({ colorize: true }))
 );
-
-mapClass(Tokens.ProposalWorkflowEngine, ProposalWorkflowEngine);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());

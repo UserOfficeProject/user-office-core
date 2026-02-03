@@ -57,7 +57,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
@@ -137,7 +136,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
-
-mapClass(Tokens.ProposalWorkflowEngine, ProposalWorkflowEngine);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
