@@ -526,7 +526,7 @@ context('Proposal tests', () => {
     //     .should('not.be.checked');
     // });
 
-    it.only('Should be able to see proposal allocation time unit on the proposal', function () {
+    it('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
