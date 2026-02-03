@@ -5,11 +5,6 @@ import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
 import { Event, EventMetadataByEvent } from '../../events/event.enum';
 import { createMachine, GuardFn, StateConfig } from './stateMachnine';
 
-const workflowMachineCache = new Map<
-  number,
-  ReturnType<typeof createMachine>
->();
-
 const createWfStatusName = (statusId: string, workflowStatusId: number) =>
   `${statusId}-${workflowStatusId}`;
 
@@ -32,11 +27,6 @@ const getEventsGuards = (events: string[]): GuardFn[] => {
 };
 
 export const createWorkflowMachine = async (workflowId: number) => {
-  const cachedMachine = workflowMachineCache.get(workflowId);
-  if (cachedMachine) {
-    return cachedMachine;
-  }
-
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
   );
@@ -92,8 +82,6 @@ export const createWorkflowMachine = async (workflowId: number) => {
     initial: wfStatusIdToNameMap.get(defaultWfStatus.workflowStatusId)!,
     states: wfStatuses,
   });
-
-  workflowMachineCache.set(workflowId, machine); // TODO enable cache after testing
 
   return machine;
 };

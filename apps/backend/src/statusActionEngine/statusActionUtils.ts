@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -10,7 +9,6 @@ import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLo
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { InstrumentWithManagementTime } from '../models/Instrument';
@@ -493,42 +491,6 @@ export const constructProposalStatusChangeEvent = (
   } as ApplicationEvent;
 
   return event;
-};
-
-export const publishProposalMessageToTheEventBus = async (
-  proposal: WorkflowEngineProposalType,
-  messageDescription: string,
-  exchange?: string,
-  loggedInUserId?: number
-) => {
-  const eventBus = resolveApplicationEventBus();
-  const event = constructProposalStatusChangeEvent(
-    proposal,
-    loggedInUserId || null,
-    messageDescription,
-    exchange
-  );
-
-  return eventBus
-    .publish(event)
-    .catch((e) => logger.logError(`EventBus publish failed ${event.type}`, e));
-};
-export const publishMessageToTheEventBus = async (
-  proposals: WorkflowEngineProposalType[],
-  messageDescription: string,
-  exchange?: string,
-  loggedInUserId?: number
-) => {
-  await Promise.all(
-    proposals.map(async (proposal) =>
-      publishProposalMessageToTheEventBus(
-        proposal,
-        messageDescription,
-        exchange,
-        loggedInUserId
-      )
-    )
-  );
 };
 
 export const statusActionLogger = (args: {
