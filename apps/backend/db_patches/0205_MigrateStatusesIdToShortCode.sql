@@ -268,7 +268,8 @@ BEGIN
             FROM instrument_has_proposals ihp_1
             JOIN instruments i ON i.instrument_id = ihp_1.instrument_id
             GROUP BY ihp_1.proposal_pk
-        ) ihp ON ihp.proposal_pk = p.proposal_pk;
+        ) ihp ON ihp.proposal_pk = p.proposal_pk
+        ORDER BY p.proposal_pk;
 
 
 
