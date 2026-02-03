@@ -286,7 +286,7 @@ context('Settings tests', () => {
         const workflow = result.createWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
-          prevWfStatusId = workflow.connections[0].id;
+          prevWfStatusId = workflow.statuses[0].workflowStatusId;
 
           cy.createTemplate({
             name: 'default esi template',

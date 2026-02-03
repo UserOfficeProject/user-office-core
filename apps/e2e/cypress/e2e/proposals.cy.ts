@@ -49,6 +49,7 @@ context('Proposal tests', () => {
   let createdProposalId: string;
   let createdCallId: number;
   let createdTemplateId: number;
+  let createdFapMeetingWorkflowStatusId: number;
   const textQuestion = faker.lorem.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -126,6 +127,11 @@ context('Proposal tests', () => {
       cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.fapMeeting.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
+      }).then((workflowStatusResult) => {
+        if (workflowStatusResult.addStatusToWorkflow) {
+          createdFapMeetingWorkflowStatusId =
+            workflowStatusResult.addStatusToWorkflow.workflowStatusId;
+        }
       });
       cy.createWorkflow({
         name: proposalWorkflow.name,
@@ -807,9 +813,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        workflowStatusId:
-          initialDBData.workflows.defaultWorkflow.workflowStatuses.fapMeeting
-            .id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
       cy.login('officer');
@@ -838,7 +842,7 @@ context('Proposal tests', () => {
         .uncheck();
 
       cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
-        .parent()
+        .closest('tr')
         .find('[type="checkbox"]')
         .check();
       cy.get('[data-cy="change-proposal-status"]').click();
@@ -854,8 +858,7 @@ context('Proposal tests', () => {
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        workflowStatusId:
-          initialDBData.workflows.defaultWorkflow.workflowStatuses.fapReview.id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
 

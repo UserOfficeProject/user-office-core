@@ -601,8 +601,6 @@ context('Status actions tests', () => {
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         prevId:
           initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
-        posX: 0,
-        posY: 200,
       }).then((result) => {
         cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: result.createWorkflowConnection.id,
@@ -747,8 +745,6 @@ context('Status actions tests', () => {
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         prevId:
           initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
-        posX: 0,
-        posY: 200,
       }).then((result) => {
         const connection = result.createWorkflowConnection;
         if (connection) {
