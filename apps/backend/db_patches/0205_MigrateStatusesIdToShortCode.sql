@@ -324,15 +324,11 @@ BEGIN
             WHERE p.status_id <> 'EXPIRED'
             AND p.status_id <> 'DRAFT'
         ) proposal
-        LEFT JOIN (
-            SELECT
-                fr.proposal_pk,
-                AVG(
-                    CASE
-                        WHEN fr.grade ~ '^\d+(\.\d+)?$' THEN fr.grade::double precision
+                LEFT JOIN ( SELECT fr.proposal_pk,
+                        avg(CASE 
+                        WHEN fr.grade ~ '^\d+(\.\d+)\?$' THEN fr.grade::double precision
                         ELSE NULL
-                    END
-                ) AS avg
+                    END) AS avg
             FROM fap_proposals fp
             JOIN fap_reviews fr ON fr.proposal_pk = fp.proposal_pk
             GROUP BY fr.proposal_pk
