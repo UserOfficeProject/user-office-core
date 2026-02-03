@@ -109,9 +109,8 @@ const addFeasibilityReviewToDefaultWorkflow = (): Cypress.Chainable<
 > => {
   return cy.addStatusToWorkflow({
     statusId: initialDBData.proposalStatuses.feasibilityReview.id,
-    workflowId: 1,
-    posX: 0,
-    posY: 200,
+    workflowId: initialDBData.workflows.defaultWorkflow.id,
+    prevId: 1,
   });
 };
 /**

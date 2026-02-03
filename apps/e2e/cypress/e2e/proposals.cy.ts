@@ -126,8 +126,6 @@ context('Proposal tests', () => {
       cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.fapMeeting.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        posX: 0,
-        posY: 200,
       });
       cy.createWorkflow({
         name: proposalWorkflow.name,
@@ -138,8 +136,6 @@ context('Proposal tests', () => {
           cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
-            posX: 0,
-            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }

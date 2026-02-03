@@ -38,6 +38,7 @@ import {
   TechniqueRecord,
   InvitedProposalRecord,
   createInvitedProposalObject,
+  WorkflowStatusRecord,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
@@ -967,12 +968,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const result = await database('workflow_has_statuses')
-      .where('workflow_has_statuses.workflow_id', proposalWorkflowId)
-      .andWhere('workflow_has_statuses.status_id', workflowStatus)
-      .first();
+    const proposalStatus = await database<WorkflowStatusRecord>(
+      'workflow_has_statuses'
+    ).where('workflow_id', proposalWorkflowId);
 
-    return !!result;
+    return !!proposalStatus.find((status) =>
+      status.status_id.match(workflowStatus)
+    );
   }
 
   createTechniqueObject(technique: TechniqueRecord): Technique {
