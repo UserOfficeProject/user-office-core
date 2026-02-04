@@ -60,15 +60,14 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      cy.get('@proposalStatusesTable')
-        .find('span[aria-label="Last Page"] > button')
-        .as('lastPageButtonElement');
-
-      cy.get('@lastPageButtonElement').click({ force: true });
-
       cy.get('[data-cy="proposal-statuses-table"]').as(
         'proposalStatusesTableNew'
       );
+
+      cy.get('@proposalStatusesTableNew')
+        .find('[placeholder="Search"]')
+        .type(id);
+
       cy.get('@proposalStatusesTableNew')
         .find('tr[level="0"]')
         .last()
@@ -124,12 +123,9 @@ context('Settings tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
-
       cy.get('@proposalStatusesTable')
-        .find('span[aria-label="Last Page"] > button')
-        .as('lastPageButtonElement');
-
-      cy.get('@lastPageButtonElement').click({ force: true });
+        .find('[placeholder="Search"]')
+        .type(name);
 
       cy.contains(name).parent().find('[aria-label="Delete"]').click();
 
@@ -151,13 +147,13 @@ context('Settings tests', () => {
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
     const instrument1 = {
-      name: faker.random.words(2),
-      shortCode: faker.random.alphaNumeric(15),
-      description: faker.random.words(5),
+      name: faker.lorem.words(2),
+      shortCode: faker.string.alphanumeric(15),
+      description: faker.lorem.words(5),
       managerUserId: initialDBData.users.user1.id,
     };
     let createdWorkflowId: number;
-    let prevWfStatusId: number;
+    let createdDraftWfStatusId: number;
     let createdEsiTemplateId: number;
     let createdInstrumentId: number;
 
@@ -178,9 +174,7 @@ context('Settings tests', () => {
       cy.addStatusToWorkflow({
         statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 100,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       }).then((result) => {
         const connection = result.addStatusToWorkflow;
         if (connection) {
@@ -239,7 +233,7 @@ context('Settings tests', () => {
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 500,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       }).then((result) => {
         const connection = result.createWorkflowConnection;
         if (connection) {
@@ -286,7 +280,7 @@ context('Settings tests', () => {
         const workflow = result.createWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
-          prevWfStatusId = workflow.statuses[0].workflowStatusId;
+          createdDraftWfStatusId = workflow.statuses[0].workflowStatusId;
 
           cy.createTemplate({
             name: 'default esi template',
@@ -317,7 +311,7 @@ context('Settings tests', () => {
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       }).then((result) => {
         cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: result.createWorkflowConnection.id,
@@ -400,7 +394,7 @@ context('Settings tests', () => {
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       }).then((result) => {
         cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: result.createWorkflowConnection.id,
@@ -491,7 +485,7 @@ context('Settings tests', () => {
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       }).then((result) => {
         cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: result.createWorkflowConnection.id,
@@ -572,27 +566,26 @@ context('Settings tests', () => {
       cy.addStatusToWorkflow({
         statusId: statuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        prevId: prevWfStatusId,
-      }).then((result) => {
+        prevId: createdDraftWfStatusId,
+      }).then(({ createWorkflowConnection: connectionFromDraft }) => {
         cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
+          workflowConnectionId: connectionFromDraft.id,
           statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
         });
       });
+
       cy.addStatusToWorkflow({
         statusId: statuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        prevId: wfStatuses.editableSubmitted.id,
-      }).then((result) => {
-        cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
-          statusChangingEvents: [Event.CALL_ENDED],
-        });
-      });
+        prevId: createdDraftWfStatusId,
+      }).then(
+        ({ createWorkflowConnection: connectionFromSubmittedInternal }) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: connectionFromSubmittedInternal.id,
+            statusChangingEvents: [Event.CALL_ENDED],
+          });
+        }
+      );
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -729,7 +722,7 @@ context('Settings tests', () => {
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 150,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
       });
       cy.login('officer');
       cy.visit('/');
@@ -1489,7 +1482,7 @@ context('Settings tests', () => {
       cy.addStatusToWorkflow({
         statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
-        prevId: prevWfStatusId,
+        prevId: createdDraftWfStatusId,
         posX: 0,
         posY: 200,
       }).then((result) => {
