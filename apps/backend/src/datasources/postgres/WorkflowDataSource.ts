@@ -327,7 +327,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
     if (prevStatus.workflowId !== nextStatus.workflowId) {
       throw new GraphQLError(
-        'Cannot connect statuses from different workflows'
+        `Cannot connect statuses from different workflows previous status belongs to workflow id: ${prevStatus.workflowId} while next status belongs to workflow id: ${nextStatus.workflowId}`
       );
     }
 
