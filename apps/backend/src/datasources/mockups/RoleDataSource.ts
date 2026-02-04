@@ -1,6 +1,6 @@
 import { RoleDataSource, Tag } from '../RoleDataSource';
 
-export class MockRoleDataSource implements RoleDataSource {
+export class RoleDataSourceMock implements RoleDataSource {
   private roleTagsMap: Map<number, Set<number>> = new Map();
   private tags: Map<number, string> = new Map([
     [1, 'admin'],
