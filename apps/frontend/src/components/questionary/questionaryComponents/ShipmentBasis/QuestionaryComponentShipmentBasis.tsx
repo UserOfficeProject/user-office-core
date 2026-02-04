@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { FormikErrors } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -129,7 +130,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
         </FormControl>
       )}
 
-      {!loadingSamples && samples.length > 0 && (
+      {!loadingSamples && (
         <FormControl
           sx={{
             marginTop: theme.spacing(1),
@@ -137,29 +138,41 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
             width: '100%',
             boxSizing: 'border-box',
           }}
+          error={!!fieldErrors?.samples}
         >
-          <InputLabel id="sample-ids">Select samples</InputLabel>
-          <Select
-            labelId="sample-ids"
-            multiple
-            onChange={(event) => {
-              const newSampleIds = event.target.value as number[];
-              const newSamples = samples.filter((sample) =>
-                newSampleIds.includes(sample.id)
-              );
-              setSampleIds(newSampleIds);
-              handleChange({ samples: newSamples });
-            }}
-            value={sampleIds}
-            fullWidth
-            data-cy="samples-dropdown"
-          >
-            {samples.map((sample) => (
-              <MultiMenuItem key={sample.id} value={sample.id}>
-                {sample.title}
-              </MultiMenuItem>
-            ))}
-          </Select>
+          {samples.length > 0 ? (
+            <>
+              <InputLabel id="sample-ids">Select samples</InputLabel>
+              <Select
+                labelId="sample-ids"
+                multiple
+                onChange={(event) => {
+                  const newSampleIds = event.target.value as number[];
+                  const newSamples = samples.filter((sample) =>
+                    newSampleIds.includes(sample.id)
+                  );
+                  setSampleIds(newSampleIds);
+                  handleChange({ samples: newSamples });
+                }}
+                value={sampleIds}
+                fullWidth
+                data-cy="samples-dropdown"
+              >
+                {samples.map((sample) => (
+                  <MultiMenuItem key={sample.id} value={sample.id}>
+                    {sample.title}
+                  </MultiMenuItem>
+                ))}
+              </Select>
+            </>
+          ) : (
+            proposalPk && (
+              <Typography color="error">
+                No samples found for this proposal. Please add samples to the
+                proposal first.
+              </Typography>
+            )
+          )}
           <ProposalErrorLabel>{fieldErrors?.samples}</ProposalErrorLabel>
         </FormControl>
       )}
@@ -217,10 +230,23 @@ const shipmentBasisPreSubmit =
       }
     }
 
-    await api.addSamplesToShipment({
+    const { addSamplesToShipment } = await api.addSamplesToShipment({
       shipmentId: shipmentId,
       sampleIds: samplesToSampleIds(shipment.samples),
     });
+
+    if (addSamplesToShipment) {
+      dispatch({
+        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+        itemWithQuestionary: {
+          ...addSamplesToShipment,
+          questionary: {
+            ...addSamplesToShipment.questionary,
+            steps: state.questionary.steps,
+          },
+        },
+      });
+    }
 
     return returnValue;
   };
