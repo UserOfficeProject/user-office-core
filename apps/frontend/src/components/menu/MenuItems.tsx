@@ -1,4 +1,4 @@
-import { Science, Topic, Apartment } from '@mui/icons-material';
+import { Science, Topic, Apartment, Security } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -246,6 +246,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       <SettingsMenuListItem />
+      <Tooltip title="Permissions">
+        <ListItemButton component={NavLink} to="/Permissions">
+          <ListItemIcon>
+            <Security />
+          </ListItemIcon>
+          <ListItemText primary="Permissions" />
+        </ListItemButton>
+      </Tooltip>
     </div>
   );
 

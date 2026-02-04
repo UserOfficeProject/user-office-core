@@ -31,6 +31,7 @@ const MergeInstitutionsPage = lazy(
 );
 const InstrumentsPage = lazy(() => import('./instrument/InstrumentsPage'));
 const TechniquesPage = lazy(() => import('./technique/TechniquesPage'));
+const PermissionsPage = lazy(() => import('./permission/PermissionsPage'));
 const HelpPage = lazy(() => import('./pages/HelpPage'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
@@ -334,6 +335,14 @@ const AppRoutes = () => {
                 title={i18n.format(t('Technique'), 'plural')}
                 element={<TechniquesPage />}
               />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/Permissions"
+            element={
+              <TitledRoute title="Permissions" element={<PermissionsPage />} />
             }
           />
         )}

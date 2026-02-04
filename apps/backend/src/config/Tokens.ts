@@ -5,6 +5,7 @@ export const Tokens = {
   CallDataSource: Symbol('CallDataSource'),
   CallAuthorization: Symbol('CallAuthorization'),
   CasbinService: Symbol('CasbinService'),
+  CasbinConditionDataSource: Symbol('CasbinConditionDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),

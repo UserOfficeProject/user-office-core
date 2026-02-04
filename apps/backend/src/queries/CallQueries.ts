@@ -1,9 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { CallAuthorization } from '../auth/CallAuthorization';
-import { CallFilterTranslation } from '../auth/filterTranslation/CallFilterTranslation';
 import { UserAuthorization } from '../auth/UserAuthorization';
-import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized } from '../decorators';
@@ -17,8 +15,7 @@ export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
     @inject(Tokens.CallAuthorization) private callAuth: CallAuthorization,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.CasbinService) private casbinService: CasbinService
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -34,35 +31,9 @@ export default class CallQueries {
       delete filter?.isActiveInternal;
     }
 
-    /*
-     * Check Casbin policy conditions to see whether a db filter is needed
-     */
-
-    const policyWithHasTag =
-      await this.casbinService.getPolicyConditionMatching(
-        agent?.currentRole?.shortCode || '',
-        'call',
-        'read',
-        'hasTag'
-      );
-
-    if (policyWithHasTag) {
-      // Overly simplified - does not account for OR in policy conditions so could over-filter
-      const translationService = new CallFilterTranslation();
-      const populatedFilter =
-        await translationService.translateHasTagFilter(policyWithHasTag);
-
-      filter = {
-        ...filter,
-        ...populatedFilter,
-      };
-    }
+    delete filter?.proposalStatusShortCode;
 
     const calls = await this.dataSource.getCalls(filter);
-
-    /*
-     * Run Casbin on the smaller set of calls to do fine-grained filtering.
-     */
 
     const allowedCalls: Call[] = [];
     // Could pass a list for performance

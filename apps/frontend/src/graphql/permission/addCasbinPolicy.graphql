@@ -1,0 +1,14 @@
+mutation addCasbinPolicy(
+  $subject: String!
+  $object: String!
+  $action: String!
+  $condition: String!
+) {
+  addCasbinPolicy(
+    subject: $subject
+    object: $object
+    action: $action
+    condition: $condition
+    allowOrDeny: "allow"
+  )
+}

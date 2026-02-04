@@ -9,6 +9,7 @@ import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthori
 import { CasbinService } from '../casbin/casbinService';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
+import PostgresCasbinConditionDataSource from '../datasources/postgres/CasbinConditionDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -144,4 +145,5 @@ mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 
+mapClass(Tokens.CasbinConditionDataSource, PostgresCasbinConditionDataSource);
 mapClass(Tokens.CasbinService, CasbinService);
