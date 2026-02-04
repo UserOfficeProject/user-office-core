@@ -57,6 +57,7 @@ export async function createCaseManagement(
     localContact = await userDataSource.getUser(experiment.localContactId);
   }
   const requestPayload = getAddCaseManagementRequestPayload(
+    proposal.proposalId,
     proposal.title,
     containerId,
     experiment.startsAt,
