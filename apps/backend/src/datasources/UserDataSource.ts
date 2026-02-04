@@ -6,6 +6,7 @@ import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
 import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
@@ -36,9 +37,11 @@ export interface UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getPreviousCollaborators(
     user_id: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;

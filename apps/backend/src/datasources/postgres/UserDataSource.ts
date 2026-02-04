@@ -17,6 +17,7 @@ import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
 import database, { isUniqueConstraintError } from './database';
 import {
@@ -30,6 +31,14 @@ import {
   createInstitutionObject,
   createUserObject,
 } from './records';
+
+const fieldMap: { [key: string]: string } = {
+  created_at: 'created_at',
+  firstname: 'firstname',
+  preferredname: 'preferredname',
+  lastname: 'lastname',
+  institution: 'i.institution',
+};
 
 export default class PostgresUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
@@ -382,25 +391,25 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getUsers({
-    filter,
+    searchText,
     first,
     offset,
     userRole,
     subtractUsers,
-    orderBy,
-    orderDirection = 'desc',
+    sortField = 'created_at',
+    sortDirection,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .modify((query) => {
-        if (filter) {
+        if (searchText) {
           query.andWhere((qb) => {
-            qb.whereILikeEscaped('institution', '%?%', filter)
-              .orWhereILikeEscaped('firstname', '%?%', filter)
-              .orWhereILikeEscaped('preferredname', '%?%', filter)
-              .orWhereILikeEscaped('lastname', '%?%', filter);
+            qb.whereILikeEscaped('institution', '%?%', searchText)
+              .orWhereILikeEscaped('firstname', '%?%', searchText)
+              .orWhereILikeEscaped('preferredname', '%?%', searchText)
+              .orWhereILikeEscaped('lastname', '%?%', searchText);
           });
         }
         if (first) {
@@ -417,8 +426,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         if (subtractUsers && subtractUsers.length > 0) {
           query.whereNotIn('users.user_id', subtractUsers);
         }
-        if (orderBy) {
-          query.orderBy(orderBy, orderDirection);
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderBy(sortField, sortDirection);
         }
       })
       .then(
@@ -437,14 +450,24 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async getPreviousCollaborators(
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     if (userId == -1) {
-      return this.getUsers({ filter, first, offset, userRole, subtractUsers });
+      return this.getUsers({
+        searchText,
+        first,
+        offset,
+        userRole,
+        subtractUsers,
+        sortField,
+        sortDirection,
+      });
     }
 
     const lastCollaborators = await this.getMostRecentCollaborators(userId);
@@ -461,14 +484,22 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
-        if (filter) {
+        if (searchText) {
           query.andWhere((qb) => {
-            qb.whereILikeEscaped('institution', '%?%', filter)
-              .orWhereILikeEscaped('firstname', '%?%', filter)
-              .orWhereILikeEscaped('preferredname', '%?%', filter)
-              .orWhereILikeEscaped('lastname', '%?%', filter);
+            qb.whereILikeEscaped('institution', '%?%', searchText)
+              .orWhereILikeEscaped('firstname', '%?%', searchText)
+              .orWhereILikeEscaped('preferredname', '%?%', searchText)
+              .orWhereILikeEscaped('lastname', '%?%', searchText);
           });
         }
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderBy(sortField, sortDirection);
+        }
+
         if (first) {
           query.limit(first);
         }
@@ -559,7 +590,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('pu')
       .whereIn('pu.proposal_pk', proposals)
       .groupBy('pu.user_id')
-      .orderByRaw('count(pu.user_id) DESC')
+      .orderBy('pu.user_id', 'desc')
       .limit(10)
       .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }

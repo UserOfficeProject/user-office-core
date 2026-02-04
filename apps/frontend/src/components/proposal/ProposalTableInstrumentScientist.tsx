@@ -42,6 +42,7 @@ import {
   UserRole,
   ProposalViewTechnicalReviewAssignee,
   WorkflowType,
+  PaginationSortDirection,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -758,7 +759,15 @@ const ProposalTableInstrumentScientist = ({
   } else {
     removeColumns(columns, fapReviewColumns(t));
   }
-  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
+  columns = setSortDirectionOnSortField(
+    columns,
+    sortField,
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
+  );
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />

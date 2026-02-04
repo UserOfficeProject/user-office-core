@@ -12,6 +12,7 @@ import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
+import { PaginationSortDirection } from '../../utils/pagination';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import { createUOWSClient } from './UOWSClient';
@@ -528,19 +529,19 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getUsers({
-    filter,
+    searchText,
     first,
     offset,
     subtractUsers,
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
 
-    if (filter) {
+    if (searchText) {
       userDetails = [];
 
       const BasicPeopleByLastName: BasicPersonDetailsDTO[] | null =
         await UOWSClient.basicPersonDetails
-          .getBasicPersonDetails(undefined, filter, undefined)
+          .getBasicPersonDetails(undefined, searchText, undefined)
           .catch((error) => {
             logger.logError(
               'An error occurred while fetching searchable person details using getBasicPersonDetails',
@@ -567,12 +568,12 @@ export class StfcUserDataSource implements UserDataSource {
       }
     } else {
       const { users } = await postgresUserDataSource.getUsers({
-        filter: undefined,
+        searchText: undefined,
         first: first,
         offset: offset,
         userRole: undefined,
         subtractUsers: subtractUsers,
-        orderDirection: 'asc',
+        sortDirection: PaginationSortDirection.asc,
       });
 
       if (users[0]) {
@@ -594,18 +595,22 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getPreviousCollaborators(
     userId: number,
-    filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     const dbUsers: BasicUserDetails[] = (
       await postgresUserDataSource.getPreviousCollaborators(
         userId,
-        filter,
         first,
         offset,
+        sortField,
+        sortDirection,
+        searchText,
         undefined,
         subtractUsers
       )

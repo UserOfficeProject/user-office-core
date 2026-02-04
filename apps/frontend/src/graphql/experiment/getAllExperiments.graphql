@@ -3,7 +3,7 @@ query getExperiments(
   $first: Int
   $offset: Int
   $sortField: String
-  $sortDirection: String
+  $sortDirection: PaginationSortDirection
   $searchText: String
 ) {
   allExperiments(
