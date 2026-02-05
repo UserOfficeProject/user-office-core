@@ -16,14 +16,6 @@ export class AccessFilter {
 
 @Resolver()
 export class AccessQuery {
-  @Query(() => Boolean)
-  canAccess(
-    @Ctx() context: ResolverContext,
-    @Arg('filter', () => AccessFilter) filter: AccessFilter
-  ) {
-    return context.queries.access.get(context.user, filter)
-  }
-
   @Query(() => AccessRule)
   accessRule(
     @Ctx() context: ResolverContext,

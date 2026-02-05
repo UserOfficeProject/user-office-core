@@ -344,7 +344,7 @@ export default class ProposalMutations {
       });
     }
 
-      if (!this.userAuth.isApiToken(agent) && !this.proposalAuth.canDelete(agent, proposalPk)) {
+      if (!(await this.proposalAuth.canDelete(agent, proposalPk))) {
         return rejection(
           'Can not delete proposal because proposal is submitted',
           { agent, proposalPk }

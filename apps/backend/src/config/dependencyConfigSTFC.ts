@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
+import { FapAuthorization } from '../auth/FapAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -119,6 +120,7 @@ mapClass(Tokens.TagDataSource, PostgresTagDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
+mapClass(Tokens.FapAuthorization, FapAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);

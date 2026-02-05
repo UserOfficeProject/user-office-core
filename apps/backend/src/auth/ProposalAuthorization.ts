@@ -379,7 +379,6 @@ export class ProposalAuthorization {
     };
 
     const ctx = {proposal, user}
-    const can = await this.accessDataSource.canAccess2(user.role ? user.role : 'user', 'delete', 'proposal', ctx);
-    return can
+    return this.accessDataSource.canAccess2(user.role ? user.role : 'user', 'delete', 'proposal', ctx);
   }
 }

@@ -9,10 +9,12 @@ import {
 import { CreateAccessRuleInput } from '../../resolvers/mutations/CreateAccessRuleMutation';
 
 export const actions = ['update', 'read', 'delete'] as const;
-export const subjects = ['Fap', 'Proposal'] as const;
+export const subjects = ['fap', 'proposal'] as const;
+
 type rule = {
   action: typeof actions[number],
-  subject: typeof subjects[number]
+  subject: typeof subjects[number],
+  conditions: any
 }
 
 export type Abilities = [
@@ -27,37 +29,82 @@ export const createAbility = (rules: RawRuleOf<AppAbility>[]) => createMongoAbil
 export default class PostgresAccessDataSource implements AccessDataSource {
   createAbility = (rules: RawRuleOf<AppAbility>[]) => createMongoAbility<AppAbility>(rules);
 
-  convertToRule = (accessRecords: AccessRecord[]): RawRuleOf<AppAbility>[]  => {
+  convertToRule = (accessRecords: AccessRecord[], object: any): RawRuleOf<AppAbility>[] => {
     const rules: rule[] = [];
-    accessRecords.forEach(accessRecord => { rules.push({action: accessRecord.action,
-      subject: accessRecord.subject
-    })});
+
+    accessRecords.forEach(accessRecord => {
+      rules.push(
+        {
+          action: accessRecord.action,
+          subject: accessRecord.subject,
+          conditions: accessRecord.conditions == null ? null : this.substituteConditionsValues(JSON.parse(accessRecord.conditions), this.flatten(object))
+        }
+      )
+    });
 
     return rules;
   }
 
-  async canAccess(id: number, action: typeof actions[number], subject: typeof subjects[number]) {
-    return database
-    .select('p.action', 'p.subject', 'p.conditions')
-    .from('permissions as p')
-    .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
-    .join('role_user as ru', 'rhp.role_id', 'ru.role_id')
-    .where('ru.user_id', id)
-    .andWhere('p.action', action)
-    .andWhere('p.subject', subject)
-    .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access)).can(action, subject) : false);
+  substituteConditionsValues(conditions: any, object: any) {
+    const result: any = {};
+
+    function recurse (cur: any, prop: any, parent: any | null) {
+        if (typeof cur === 'string' && Object.keys(object).includes(cur) && parent != null) { //is this a string?
+            parent[prop] = object[cur];
+        }
+         else {
+          let isEmpty = true;
+            for (let p in cur) {
+                isEmpty = false;
+                recurse(cur[p], p, cur); //recurse into nested object
+            }
+            if (isEmpty && prop) {
+                result[prop] = {};
+            }
+            if(parent == null){
+              return
+            }
+        }
+      }
+
+      recurse(conditions, "", null);
+
+    return conditions;
   }
 
+  flatten(object: any) {
+    const result: any = {}; //accumulator
+    function recurse (cur: any, prop: any) {
+        if (Object(cur) !== cur) { //is this a literal?
+            result[prop] = cur; //store it in the accumulator object
+        } else if (Array.isArray(cur)) {
+             result[prop] = cur;
+        } else {
+            let isEmpty = true;
+            for (let p in cur) {
+                isEmpty = false;
+                recurse(cur[p], prop ? prop+"."+p : p); //recurse into nested object
+            }
+            if (isEmpty && prop) {
+                result[prop] = {};
+            }
+        }
+    }
+    recurse(object, "");
+
+    return result;
+}
+
   async canAccess2(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object: any) {
-    return database
+    return await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
-    .join('roles as r', 'rhp.role_id', 'ru.role_id')
+    .join('roles as r', 'rhp.role_id', 'r.role_id')
     .where('r.short_code', userRole)
     .andWhere('p.action', action)
     .andWhere('p.subject', subjectType)
-    .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access)).can(action, subject(subjectType, object)) : false);
+    .then((access: AccessRecord[] | null) => access ? createAbility(this.convertToRule(access, object)).can(action, subject(subjectType, object)) : false);
   }
 
   async getAccessRule(id: number) {

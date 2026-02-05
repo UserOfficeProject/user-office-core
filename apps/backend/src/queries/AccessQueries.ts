@@ -11,13 +11,6 @@ export default class AccessQueries {
   {}
 
   @Authorized()
-    async get(agent: UserWithRole | null, filter: AccessFilter) {
-      const {userId, action, subject} = filter;
-
-      return this.dataSource.canAccess(userId, action, subject);
-    }
-
-  @Authorized()
   async getAccessRule(agent: UserWithRole | null, id: number) {
     return this.dataSource.getAccessRule(id);
   }

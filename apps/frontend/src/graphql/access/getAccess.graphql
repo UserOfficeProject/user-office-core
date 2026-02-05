@@ -1,3 +1,0 @@
-query getAccess($filter: AccessFilter!) {
-  canAccess(filter: $filter)
-}

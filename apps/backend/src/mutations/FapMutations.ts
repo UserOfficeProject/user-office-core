@@ -11,6 +11,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { FapAuthorization } from '../auth/FapAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -71,8 +72,8 @@ export default class FapMutations {
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
-    @inject(Tokens.AccessDataSource)
-    private accessDataSource: AccessDataSource
+    @inject(Tokens.FapAuthorization)
+    private fapAuth: FapAuthorization,
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
@@ -108,7 +109,8 @@ export default class FapMutations {
     args: UpdateFapArgs
   ): Promise<Fap | Rejection> {
     try {
-      if(agent != null && !(await this.accessDataSource.canAccess(agent.id, 'update', 'Fap'))) {
+
+      if (!(await this.fapAuth.canEdit(agent, args.id))) {
         throw error('user does not have sufficient permissions');
       }
 

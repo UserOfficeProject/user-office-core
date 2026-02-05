@@ -42,6 +42,7 @@ export const Tokens = {
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
+  FapAuthorization: Symbol('FapAuthorization'),
   VisitAuthorization: Symbol('VisitAuthorization'),
   VisitRegistrationAuthorization: Symbol('VisitRegistrationAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
