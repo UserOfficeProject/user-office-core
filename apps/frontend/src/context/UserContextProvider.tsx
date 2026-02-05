@@ -14,6 +14,7 @@ interface UserContextData {
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
+  currentRoleId: number;
   impersonatingUserId: number | undefined;
   isInternalUser: boolean;
   handleLogin: React.Dispatch<string | null | undefined>;
@@ -30,6 +31,7 @@ interface DecodedTokenData
   > {
   exp: number;
   currentRole: Role;
+  currentRoleId: number;
   impersonatingUserId: number | undefined;
 }
 
@@ -55,6 +57,7 @@ const initUserData: UserContextData = {
   token: '',
   roles: [],
   currentRole: null,
+  currentRoleId: 0,
   isInternalUser: false,
   impersonatingUserId: undefined,
   handleLogin: (value) => value,
@@ -93,6 +96,7 @@ const checkLocalStorage = (
           user: decoded.user,
           roles: decoded.roles,
           currentRole: localStorage.currentRole,
+          currentRoleId: parseInt(localStorage.currentRoleId, 10),
           isInternalUser: decoded.isInternalUser,
           token: localStorage.token,
           expToken: decoded.exp,
@@ -115,6 +119,7 @@ const reducer = (
     case ActionType.SETUSERFROMLOCALSTORAGE:
       return {
         currentRole: action.payload.currentRole,
+        currentRoleId: parseInt(action.payload.currentRoleId, 10),
         user: action.payload.user,
         roles: action.payload.roles,
         isInternalUser: action.payload.isInternalUser,
@@ -136,6 +141,7 @@ const reducer = (
       localStorage.expToken = exp;
       localStorage.isInternalUser = isInternalUser;
       localStorage.currentRole = currentRole.shortCode.toUpperCase();
+      localStorage.currentRoleId = currentRole.id;
       localStorage.impersonatingUserId = impersonatingUserId;
 
       return {
@@ -146,6 +152,7 @@ const reducer = (
         roles: roles,
         isInternalUser: isInternalUser,
         currentRole: roles[0].shortCode.toUpperCase(),
+        currentRoleId: roles[0].id,
         impersonatingUserId: impersonatingUserId,
       };
     }
@@ -156,6 +163,7 @@ const reducer = (
       localStorage.token = action.payload;
       localStorage.expToken = exp;
       localStorage.currentRole = currentRole.shortCode.toUpperCase();
+      localStorage.currentRoleId = currentRole.id;
       localStorage.isInternalUser = isInternalUser;
 
       return {
@@ -165,14 +173,20 @@ const reducer = (
         isInternalUser: isInternalUser,
         expToken: exp,
         currentRole: currentRole.shortCode.toUpperCase(),
+        currentRoleId: currentRole.id,
       };
     }
     case ActionType.SELECTROLE:
+      const currentRoleId = state.roles.find(
+        (role) => role.shortCode.toUpperCase() === action.payload.toUpperCase()
+      )?.id as number;
       localStorage.currentRole = action.payload.toUpperCase();
+      localStorage.currentRoleId = currentRoleId;
 
       return {
         ...state,
         currentRole: action.payload.toUpperCase(),
+        currentRoleId: currentRoleId,
       };
     case ActionType.LOGOFFUSER:
       return {

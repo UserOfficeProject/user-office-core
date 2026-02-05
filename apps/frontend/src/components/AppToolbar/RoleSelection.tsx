@@ -26,7 +26,7 @@ const columns: Column<Partial<Role>>[] = [
 ];
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
-  const { currentRole, token } = useContext(UserContext);
+  const { currentRoleId, token } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
 
   const RoleAction = (rowData: Partial<Role>) => (
     <>
-      {rowData.shortCode?.toUpperCase() === currentRole?.valueOf() ? (
+      {rowData.id === currentRoleId ? (
         <Button
           variant="text"
           disabled
