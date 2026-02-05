@@ -128,6 +128,8 @@ export default class ProposalQueries {
       }
     }
     try {
+      // leave await here because getProposalsFromView might thrown an exception
+      // and we want to handle it here
       return await this.dataSource.getProposalsFromView(
         filter,
         first,

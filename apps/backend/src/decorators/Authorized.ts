@@ -65,7 +65,7 @@ const Authorized = (roles: Roles[] = []) => {
       const userRoles: Record<string, { permissions: string[] }> =
         rolesArray.reduce(
           (acc, role) => {
-            acc[role.shortCode] = { permissions: role.permissions };
+            acc[role.id] = { permissions: role.permissions };
 
             return acc;
           },
@@ -74,8 +74,8 @@ const Authorized = (roles: Roles[] = []) => {
 
       //check if user has dynamic role with permissions for this method
       if (
-        agent.currentRole?.shortCode &&
-        userRoles[agent.currentRole.shortCode]?.permissions.some(
+        agent.currentRole?.id &&
+        userRoles[agent.currentRole.id]?.permissions.some(
           (permission: string) =>
             permission === `${target.constructor.name}.${name}`
         )
