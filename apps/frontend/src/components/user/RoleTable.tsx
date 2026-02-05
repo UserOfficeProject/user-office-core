@@ -35,6 +35,7 @@ const RoleTable = ({ add, activeRoles }: RoleTableProps) => {
         onSelectionChange={(data) => setSelectedRoles(data)}
         options={{
           search: true,
+          pageSize: 10,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
