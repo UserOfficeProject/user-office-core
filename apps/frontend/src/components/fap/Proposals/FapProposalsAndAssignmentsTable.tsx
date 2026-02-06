@@ -110,62 +110,6 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     field: 'dateAssignedFormatted',
   },
   {
-    title: 'Reviewers',
-    render: (data) => data.assignments?.length,
-  },
-  {
-    title: 'Reviews',
-    render: (rowData) => {
-      const totalReviews = rowData.assignments?.length;
-      const gradedProposals = rowData.assignments?.filter(
-        (assignment) =>
-          assignment.review !== null && assignment.review.grade !== null
-      );
-      const countReviews = gradedProposals?.length || 0;
-
-      return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
-    },
-  },
-  {
-    title: 'Average grade',
-    render: (rowData) => {
-      const avgGrade = average(
-        getGradesFromReviews(
-          getReviewsFromAssignments(rowData.assignments ?? [])
-        )
-      );
-
-      return avgGrade === 0 ? '-' : `${avgGrade}`;
-    },
-    customSort: (a, b) =>
-      average(
-        getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
-      ) -
-      average(
-        getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
-      ),
-  },
-  {
-    title: 'Deviation',
-    field: 'deviation',
-    render: (rowData) => {
-      const stdDeviation = standardDeviation(
-        getGradesFromReviews(
-          getReviewsFromAssignments(rowData.assignments ?? [])
-        )
-      );
-
-      return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
-    },
-    customSort: (a, b) =>
-      standardDeviation(
-        getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
-      ) -
-      standardDeviation(
-        getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
-      ),
-  },
-  {
     title: 'Instrument',
     field: 'instrument.name',
   },
@@ -204,6 +148,66 @@ const FapProposalsAndAssignmentsTable = ({
     UserRole.USER_OFFICER,
   ]);
   const { t } = useTranslation();
+
+  hasRightToAssignReviewers &&
+    FapProposalColumns.push(
+      {
+        title: 'Reviewers',
+        render: (data) => data.assignments?.length,
+      },
+      {
+        title: 'Reviews',
+        render: (rowData) => {
+          const totalReviews = rowData.assignments?.length;
+          const gradedProposals = rowData.assignments?.filter(
+            (assignment) =>
+              assignment.review !== null && assignment.review.grade !== null
+          );
+          const countReviews = gradedProposals?.length || 0;
+
+          return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
+        },
+      },
+      {
+        title: 'Average grade',
+        render: (rowData) => {
+          const avgGrade = average(
+            getGradesFromReviews(
+              getReviewsFromAssignments(rowData.assignments ?? [])
+            )
+          );
+
+          return avgGrade === 0 ? '-' : `${avgGrade}`;
+        },
+        customSort: (a, b) =>
+          average(
+            getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
+          ) -
+          average(
+            getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
+          ),
+      },
+      {
+        title: 'Deviation',
+        field: 'deviation',
+        render: (rowData) => {
+          const stdDeviation = standardDeviation(
+            getGradesFromReviews(
+              getReviewsFromAssignments(rowData.assignments ?? [])
+            )
+          );
+
+          return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+        },
+        customSort: (a, b) =>
+          standardDeviation(
+            getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
+          ) -
+          standardDeviation(
+            getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
+          ),
+      }
+    );
 
   const translatedColumns = FapProposalColumns.map((column) =>
     column.title === 'Instrument'
@@ -788,12 +792,16 @@ const FapProposalsAndAssignmentsTable = ({
               nRowsSelected: '{0} proposal(s) selected',
             },
           }}
-          detailPanel={[
-            {
-              tooltip: 'Show Reviewers',
-              render: ReviewersTable,
-            },
-          ]}
+          detailPanel={
+            hasRightToAssignReviewers
+              ? [
+                  {
+                    tooltip: 'Show Reviewers',
+                    render: ReviewersTable,
+                  },
+                ]
+              : []
+          }
           actions={tableActions}
           options={{
             search: true,
