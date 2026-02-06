@@ -22,6 +22,7 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { TagDataSource } from '../TagDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
@@ -103,7 +104,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     @inject(Tokens.WorkflowDataSource)
     private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
-    private AdminDataSource: AdminDataSource
+    private AdminDataSource: AdminDataSource,
+    @inject(Tokens.TagDataSource)
+    private tagDataSource: TagDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -387,14 +390,31 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     sortDirection?: PaginationSortDirection,
     searchText?: string,
     principleInvestigator?: number[],
-    instrumentFilter?: number[],
-    callFilter?: number[]
+    tags?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
-    const principalInvestigator = principleInvestigator
-      ? principleInvestigator
-      : [];
+    const principalInvestigator = principleInvestigator ?? [];
 
-    const instrumentFilters = instrumentFilter ? instrumentFilter : [];
+    let instrumentFilter: number[] | undefined;
+    let callFilter: number[] | undefined;
+
+    if (tags) {
+      const results = await Promise.all(
+        tags.map(async (tag) => ({
+          instruments: await this.tagDataSource.getTagInstruments(tag),
+          calls: await this.tagDataSource.getTagCalls(tag),
+        }))
+      );
+
+      const uniqueInstrumentIds = new Set(
+        results.flatMap((r) => r.instruments.map((i) => i.id))
+      );
+      const uniqueCallIds = new Set(
+        results.flatMap((r) => r.calls.map((c) => c.id))
+      );
+
+      instrumentFilter = Array.from(uniqueInstrumentIds);
+      callFilter = Array.from(uniqueCallIds);
+    }
 
     return database
       .select([
@@ -429,13 +449,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         // If either instrumentFilter (ids) or callFilter is provided,
         // return proposals that match any instrument id OR any call id.
-        if (
-          (instrumentFilters && instrumentFilters.length) ||
-          (callFilter && callFilter.length)
-        ) {
+        if (instrumentFilter || callFilter) {
           query.andWhere(function () {
-            if (instrumentFilters && instrumentFilters.length) {
-              instrumentFilters.forEach((inst) => {
+            if (instrumentFilter) {
+              instrumentFilter.forEach((inst) => {
                 this.orWhereRaw(
                   'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
                   { instrumentId: inst }
@@ -443,7 +460,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               });
             }
 
-            if (callFilter && callFilter.length) {
+            if (callFilter) {
               this.orWhereIn('call_id', callFilter);
             }
           });

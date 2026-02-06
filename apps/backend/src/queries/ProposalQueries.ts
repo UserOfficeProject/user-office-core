@@ -110,23 +110,14 @@ export default class ProposalQueries {
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
-    const instrumentFilter: number[] = [];
-    const callFilter: number[] = [];
-
+    let tags: number[] | undefined = undefined;
     if (agent && agent.currentRole?.isRootRole === false) {
-      const tags = await this.roleDataSource.getTagsByRoleId(
-        agent.currentRole!.id
+      const tagsObj = await this.roleDataSource.getTagsByRoleId(
+        agent!.currentRole!.id
       );
-      for (const tag of tags) {
-        const instruments = await this.tagDataSource.getTagInstruments(tag.id);
-        instrumentFilter.push(
-          ...instruments.map((instrument) => instrument.id)
-        );
-
-        const calls = await this.tagDataSource.getTagCalls(tag.id);
-        callFilter.push(...calls.map((call) => call.id));
-      }
+      tags = tagsObj.map((tag) => tag.id);
     }
+
     try {
       // leave await here because getProposalsFromView might thrown an exception
       // and we want to handle it here
@@ -138,8 +129,7 @@ export default class ProposalQueries {
         sortDirection,
         searchText,
         undefined,
-        instrumentFilter,
-        callFilter
+        tags
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });
