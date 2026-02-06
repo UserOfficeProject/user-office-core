@@ -9,12 +9,14 @@ import TextField from '@mui/material/TextField';
 import React, { useContext, useMemo, useState } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
+import UOLoader from 'components/common/UOLoader';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import { UserContext } from 'context/UserContextProvider';
 import {
   ExperimentSafetyReviewerDecisionEnum,
   InstrumentScientistDecisionEnum,
+  Status,
   UserRole,
 } from 'generated/sdk';
 import { useDownloadPDFExperimentSafety } from 'hooks/experiment/useDownloadPDFExperimentSafety';
@@ -37,6 +39,12 @@ function ExperimentSafetyReviewSummary({
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ExperimentSafetyReviewContextType;
+
+  const [
+    updatedExperimentSafetyReviewState,
+    setUpdatedExperimentSafetyReviewState,
+  ] = useState<Status>();
+  const [refetchingStatus, setRefetchingStatus] = useState(false);
 
   // Initialize decision and comment based on current role and existing data
   const getInitialDecision = useMemo(() => {
@@ -80,9 +88,6 @@ function ExperimentSafetyReviewSummary({
   const [isFormLocked, setIsFormLocked] = useState<boolean>(
     getInitialDecision !== ''
   );
-  const [isDownloadEnabled, setIsDownloadEnabled] = useState<boolean>(
-    state?.experimentSafety.status?.shortCode === 'ESF_APPROVED'
-  );
 
   const downloadExperimentSafety = useDownloadPDFExperimentSafety();
 
@@ -93,6 +98,121 @@ function ExperimentSafetyReviewSummary({
   if (!state.experimentSafety.safetyReviewQuestionaryId) {
     throw new Error('Experiment safety review questionary not found');
   }
+
+  const refreshExperimentSafetyStatus = async () => {
+    let callCount = 0;
+    const maxCalls = 3;
+    const intervalMs = 2000;
+    let isApproved = false;
+
+    // Set loading state to true at the beginning
+    setRefetchingStatus(true);
+
+    const makeApiCall = async () => {
+      try {
+        const { experimentSafety } = await api().getExperimentSafety({
+          experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+        });
+        if (!experimentSafety) {
+          throw new Error('Experiment safety review not found');
+        }
+        if (experimentSafety.status) {
+          setUpdatedExperimentSafetyReviewState(experimentSafety.status);
+          // Check if status is ESF_APPROVED
+          if (experimentSafety.status.shortCode === 'ESF_APPROVED') {
+            isApproved = true;
+          }
+        }
+      } finally {
+        callCount++;
+        if (callCount >= maxCalls || isApproved) {
+          setRefetchingStatus(false);
+        }
+      }
+    };
+
+    // Start the first call after 3 seconds
+    setTimeout(() => {
+      makeApiCall();
+
+      // Set up interval for remaining calls
+      const intervalId = setInterval(() => {
+        if (callCount >= maxCalls || isApproved) {
+          clearInterval(intervalId);
+
+          return;
+        }
+        makeApiCall();
+      }, intervalMs);
+    }, intervalMs);
+  };
+
+  const handleSubmit = () => {
+    confirm(
+      async () => {
+        setIsSubmitting(true);
+        try {
+          if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+            // Call the instrument scientist mutation
+            const { submitInstrumentScientistExperimentSafetyReview } =
+              await api({
+                toastSuccessMessage: 'Safety review submitted successfully',
+              }).submitInstrumentScientistExperimentSafetyReview({
+                experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+                decision: decision as InstrumentScientistDecisionEnum,
+                comment: comment,
+              });
+
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary:
+                submitInstrumentScientistExperimentSafetyReview,
+            });
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary:
+                submitInstrumentScientistExperimentSafetyReview,
+            });
+
+            refreshExperimentSafetyStatus();
+          } else {
+            // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
+            const { submitExperimentSafetyReviewerExperimentSafetyReview } =
+              await api({
+                toastSuccessMessage: 'Safety review submitted successfully',
+              }).submitExperimentSafetyReviewerExperimentSafetyReview({
+                experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+                decision: decision as ExperimentSafetyReviewerDecisionEnum,
+                comment: comment,
+              });
+
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary:
+                submitExperimentSafetyReviewerExperimentSafetyReview,
+            });
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary:
+                submitExperimentSafetyReviewerExperimentSafetyReview,
+            });
+
+            refreshExperimentSafetyStatus();
+            // Update download enabled state based on the actual status
+          }
+          // Lock the form after successful submission
+          setIsFormLocked(true);
+        } finally {
+          setIsSubmitting(false);
+        }
+      },
+      {
+        title: 'Please confirm',
+        description:
+          'Are you sure want to submit the Experiment Safety Review?',
+      }
+    )();
+  };
 
   return (
     <>
@@ -157,86 +277,7 @@ function ExperimentSafetyReviewSummary({
           </NavigButton>
         ) : (
           <NavigButton
-            onClick={() => {
-              confirm(
-                async () => {
-                  setIsSubmitting(true);
-                  try {
-                    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
-                      // Call the instrument scientist mutation
-                      const {
-                        submitInstrumentScientistExperimentSafetyReview,
-                      } = await api({
-                        toastSuccessMessage:
-                          'Safety review submitted successfully',
-                      }).submitInstrumentScientistExperimentSafetyReview({
-                        experimentSafetyPk:
-                          state.experimentSafety.experimentSafetyPk,
-                        decision: decision as InstrumentScientistDecisionEnum,
-                        comment: comment,
-                      });
-
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                        itemWithQuestionary:
-                          submitInstrumentScientistExperimentSafetyReview,
-                      });
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                        itemWithQuestionary:
-                          submitInstrumentScientistExperimentSafetyReview,
-                      });
-
-                      // Update download enabled state based on the actual status
-                      setIsDownloadEnabled(
-                        submitInstrumentScientistExperimentSafetyReview?.status
-                          ?.shortCode === 'ESF_APPROVED'
-                      );
-                    } else {
-                      // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
-                      const {
-                        submitExperimentSafetyReviewerExperimentSafetyReview,
-                      } = await api({
-                        toastSuccessMessage:
-                          'Safety review submitted successfully',
-                      }).submitExperimentSafetyReviewerExperimentSafetyReview({
-                        experimentSafetyPk:
-                          state.experimentSafety.experimentSafetyPk,
-                        decision:
-                          decision as ExperimentSafetyReviewerDecisionEnum,
-                        comment: comment,
-                      });
-
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                        itemWithQuestionary:
-                          submitExperimentSafetyReviewerExperimentSafetyReview,
-                      });
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                        itemWithQuestionary:
-                          submitExperimentSafetyReviewerExperimentSafetyReview,
-                      });
-
-                      // Update download enabled state based on the actual status
-                      setIsDownloadEnabled(
-                        submitExperimentSafetyReviewerExperimentSafetyReview
-                          ?.status?.shortCode === 'ESF_APPROVED'
-                      );
-                    }
-                    // Lock the form after successful submission
-                    setIsFormLocked(true);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                },
-                {
-                  title: 'Please confirm',
-                  description:
-                    'Are you sure want to submit the Experiment Safety Review?',
-                }
-              )();
-            }}
+            onClick={handleSubmit}
             isBusy={isSubmitting}
             disabled={!decision}
             data-cy="button-submit-experiment-safety-review"
@@ -252,9 +293,25 @@ function ExperimentSafetyReviewSummary({
             )
           }
           color="secondary"
-          disabled={!isDownloadEnabled}
+          disabled={
+            refetchingStatus ||
+            (updatedExperimentSafetyReviewState
+              ? !(
+                  updatedExperimentSafetyReviewState.shortCode ===
+                  'ESF_APPROVED'
+                )
+              : !(state?.experimentSafety.status?.shortCode === 'ESF_APPROVED'))
+          }
+          sx={{ minWidth: '250px' }}
         >
-          Download Safety Review Document
+          {refetchingStatus ? (
+            <>
+              <UOLoader size={16} />
+              <span style={{ marginLeft: '8px' }}>Fetching Status...</span>
+            </>
+          ) : (
+            'Download Safety Review Document'
+          )}
         </Button>
       </NavigationFragment>
     </>
