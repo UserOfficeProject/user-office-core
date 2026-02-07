@@ -164,6 +164,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
             renderValue={(val) =>
               val || (loadingRoles ? 'Loading...' : 'Select a role')
             }
+            data-cy="role-shortcode-select"
           >
             {loadingRoles && (
               <MenuItem value="" disabled>
@@ -189,6 +190,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
           onChange={(e) => setTitle(e.target.value)}
           fullWidth
           margin="normal"
+          data-cy="role-title-input"
         />
         <TextField
           label="Description"
@@ -196,12 +198,14 @@ const RoleModal: React.FC<RoleModalProps> = ({
           onChange={(e) => setDescription(e.target.value)}
           fullWidth
           margin="normal"
+          data-cy="role-description-input"
         />
         <Button
           onClick={handleSubmit}
           variant="contained"
           color="primary"
           style={{ marginTop: '20px' }}
+          data-cy="submit-role-button"
         >
           {isEditMode ? 'Update Role' : 'Create Role'}
         </Button>

@@ -337,6 +337,7 @@ const RoleManagement: React.FC = () => {
             onClick={handleAssignTag}
             variant="contained"
             disabled={!selectedTagId || getAvailableTags().length === 0}
+            data-cy="assign-selected-tags"
           >
             Assign
           </Button>
