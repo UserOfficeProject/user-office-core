@@ -9,6 +9,7 @@ import UpdateShipment from './UpdateShipment';
 type CreateUpdateShipmentProps = {
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
+  onDirtyStateChange?: (isDirty: boolean) => void;
   experimentPk: number;
   shipment: ShipmentFragment | null;
 };
@@ -16,6 +17,7 @@ type CreateUpdateShipmentProps = {
 function CreateUpdateShipment({
   onShipmentSubmitted,
   onShipmentCreated,
+  onDirtyStateChange,
   experimentPk,
   shipment,
 }: CreateUpdateShipmentProps) {
@@ -23,12 +25,14 @@ function CreateUpdateShipment({
     <UpdateShipment
       shipment={shipment}
       onShipmentSubmitted={onShipmentSubmitted}
+      onDirtyStateChange={onDirtyStateChange}
     />
   ) : (
     <CreateShipment
       experimentPk={experimentPk}
       onShipmentSubmitted={onShipmentSubmitted}
       onShipmentCreated={onShipmentCreated}
+      onDirtyStateChange={onDirtyStateChange}
     />
   );
 }
