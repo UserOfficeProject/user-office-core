@@ -18,7 +18,8 @@ BEGIN
     (1, 10, 390, 'NOT_ALLOCATED'),
     (1, 10, 450, 'SCHEDULING'),
     (1, 10, 520, 'EXPIRED'),
-    (1, 10, 770, 'EDITABLE_SUBMITTED_INTERNAL');
+    (1, 10, 580, 'EDITABLE_SUBMITTED_INTERNAL'),
+    (1, 10, 640, 'EDITABLE_SUBMITTED');
 
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (2, 'Instrument 2', 'INSTR2', 'Test instrument 2', 0);
