@@ -152,6 +152,19 @@ function createWorkflowForInstrumentScientist() {
   return cy.createWorkflow(workflow).then((createWorkflowResult) => {
     if (createWorkflowResult.createWorkflow) {
       const workflowData = createWorkflowResult.createWorkflow;
+      cy.createStatus({
+        id: 'IS_REVIEW',
+        name: 'Instrument Scientist Review',
+        description: 'Instrument Scientist Review',
+        entityType: WorkflowType.EXPERIMENT,
+      });
+
+      cy.createStatus({
+        id: 'REJECTED',
+        name: 'Instrument Scientist Review',
+        description: 'Instrument Scientist Review',
+        entityType: WorkflowType.EXPERIMENT,
+      });
 
       return cy
         .addStatusToWorkflow({
@@ -162,7 +175,7 @@ function createWorkflowForInstrumentScientist() {
           posY: 75,
         })
         .then((result) => {
-          if (result.addStatusToWorkflow) {
+          if (result.createWorkflowConnection) {
             return cy
               .setStatusChangingEventsOnConnection({
                 workflowConnectionId: result.createWorkflowConnection.id,
@@ -178,11 +191,11 @@ function createWorkflowForInstrumentScientist() {
                     posY: 213,
                   })
                   .then((secondResult) => {
-                    if (secondResult.addStatusToWorkflow) {
+                    if (secondResult.createWorkflowConnection) {
                       return cy
                         .setStatusChangingEventsOnConnection({
                           workflowConnectionId:
-                            secondResult.addStatusToWorkflow.workflowStatusId,
+                            secondResult.createWorkflowConnection.id,
                           statusChangingEvents: [
                             TEST_CONSTANTS.EVENTS.ESF_APPROVED_BY_IS,
                           ],
@@ -198,12 +211,11 @@ function createWorkflowForInstrumentScientist() {
                               posY: 218,
                             })
                             .then((thirdResult) => {
-                              if (thirdResult.addStatusToWorkflow) {
+                              if (thirdResult.createWorkflowConnection) {
                                 return cy
                                   .setStatusChangingEventsOnConnection({
                                     workflowConnectionId:
-                                      thirdResult.addStatusToWorkflow
-                                        .workflowStatusId,
+                                      thirdResult.createWorkflowConnection.id,
                                     statusChangingEvents: [
                                       TEST_CONSTANTS.EVENTS.ESF_REJECTED_BY_IS,
                                     ],

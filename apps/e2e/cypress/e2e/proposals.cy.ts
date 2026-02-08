@@ -1102,7 +1102,9 @@ context('Proposal tests', () => {
       cy.get('[index="0"] input').check();
       cy.get('[data-cy="change-proposal-status"]').click();
       cy.get('#selectedWorkflowStatusId-input').click();
-      cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
+      cy.get('[role="listbox"]')
+        .contains(/^EDITABLE_SUBMITTED$/)
+        .click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
       cy.login('user1', initialDBData.roles.user);
