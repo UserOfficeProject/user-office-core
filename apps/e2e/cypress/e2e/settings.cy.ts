@@ -171,60 +171,82 @@ context('Settings tests', () => {
     };
 
     const addWorkflowWithChangingEvents = () => {
+      // Add FEASIBILITY_REVIEW
       cy.addStatusToWorkflow({
         statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
         prevId: createdDraftWfStatusId,
-      }).then((result) => {
-        const connection = result.addStatusToWorkflow;
-        if (connection) {
-          cy.setStatusChangingEventsOnConnection({
-            workflowConnectionId: connection.workflowStatusId,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+      })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((feasibilityReviewWfStatusId) => {
+          // Add FAP_SELECTION
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapSelection.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 200,
+            prevId: feasibilityReviewWfStatusId,
           });
-        }
-      });
-      cy.addStatusToWorkflow({
-        statusId: statuses.fapSelection.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        prevId: wfStatuses.feasibilityReview.id,
-      }).then((result) => {
-        if (result.addStatusToWorkflow) {
-          cy.setStatusChangingEventsOnConnection({
-            workflowConnectionId: result.addStatusToWorkflow.workflowStatusId,
-            statusChangingEvents: [
-              Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
-              Event.PROPOSAL_INSTRUMENTS_SELECTED,
-            ],
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [
+                Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
+                Event.PROPOSAL_INSTRUMENTS_SELECTED,
+              ],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((fapSelectionWfStatusId) => {
+          // Add FAP_REVIEW
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapReview.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 300,
+            prevId: fapSelectionWfStatusId,
           });
-        }
-      });
-      cy.addStatusToWorkflow({
-        statusId: statuses.fapReview.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 300,
-        prevId: wfStatuses.fapSelection.id,
-      }).then((result) => {
-        cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
-          statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((fapReviewWfStatusId) => {
+          // Add FAP_MEETING
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapMeeting.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 400,
+            prevId: fapReviewWfStatusId,
+          });
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: connection.id,
+            statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
+          });
         });
-      });
-      cy.addStatusToWorkflow({
-        statusId: statuses.fapMeeting.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 400,
-        prevId: wfStatuses.fapReview.id,
-      }).then((result) => {
-        cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
-          statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
-        });
-      });
     };
 
     const addWorkflowWithBranchesAndChangingEvents = () => {
@@ -757,7 +779,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.closeModal();
@@ -774,7 +796,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.get(
@@ -1686,7 +1708,7 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.closeModal();
@@ -1703,7 +1725,7 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.get(
