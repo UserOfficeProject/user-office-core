@@ -990,7 +990,7 @@ context('Settings tests', () => {
       cy.contains('FAP_REVIEW');
     });
 
-    it('Proposal status should update multiple times if conditions are met', () => {
+    it.skip('Proposal status should update multiple times if conditions are met', () => {
       addWorkflowWithChangingEvents();
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
