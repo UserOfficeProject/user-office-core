@@ -652,7 +652,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               callId: callId,
               instrumentFilter: instrumentFilter,
               techniqueFilter: techniqueFilter,
-              proposalStatusId: proposalStatusId,
+              proposalStatusId:
+                proposalStatusId === 'ALL' ? undefined : proposalStatusId,
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
@@ -789,7 +790,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           callId: callId,
           instrumentFilter: instrumentFilter,
           techniqueFilter: techniqueFilter,
-          proposalStatusId: proposalStatusId,
+          proposalStatusId:
+            proposalStatusId === 'ALL' ? undefined : proposalStatusId,
           text: text,
           referenceNumbers: referenceNumbers,
           dateFilter: dateFilter,
