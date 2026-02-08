@@ -552,10 +552,25 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                   if (e.target.value) {
                     confirm(
                       () => {
-                        updateProposalStatus(
-                          rowData.primaryKey,
-                          +e.target.value
-                        );
+                        api()
+                          .getWorkflowStatuses({
+                            workflowId: rowData.workflowId,
+                          })
+                          .then(({ workflowStatuses }) => {
+                            const selectedWorkflowStatus =
+                              workflowStatuses?.find(
+                                (s) => s.statusId === e.target.value
+                              );
+                            if (!selectedWorkflowStatus) {
+                              throw new Error(
+                                'Selected workflow status not found'
+                              );
+                            }
+                            updateProposalStatus(
+                              rowData.primaryKey,
+                              selectedWorkflowStatus.workflowStatusId
+                            );
+                          });
                       },
                       {
                         title: 'Change status',
