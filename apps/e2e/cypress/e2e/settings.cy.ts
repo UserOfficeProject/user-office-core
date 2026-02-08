@@ -1273,6 +1273,8 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
+      cy.get('[role="dialog"]').get('[data-cy="confirm-ok"]').click();
+
       cy.notification({
         variant: 'success',
         text: 'Workflow status removed successfully',
