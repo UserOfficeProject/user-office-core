@@ -574,23 +574,28 @@ context('Settings tests', () => {
         statusId: statuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
         prevId: createdDraftWfStatusId,
-      }).then(({ createWorkflowConnection: connectionFromDraft }) => {
-        cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: connectionFromDraft.id,
-          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-        });
-      });
-
-      cy.addStatusToWorkflow({
-        statusId: statuses.editableSubmittedInternal.id,
-        workflowId: createdWorkflowId,
-        prevId: createdDraftWfStatusId,
       }).then(
-        ({ createWorkflowConnection: connectionFromSubmittedInternal }) => {
+        ({
+          createWorkflowConnection: connectionFromDraft,
+          addStatusToWorkflow: editableSubmittedWfStatus,
+        }) => {
           cy.setStatusChangingEventsOnConnection({
-            workflowConnectionId: connectionFromSubmittedInternal.id,
-            statusChangingEvents: [Event.CALL_ENDED],
+            workflowConnectionId: connectionFromDraft.id,
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
+
+          cy.addStatusToWorkflow({
+            statusId: statuses.editableSubmittedInternal.id,
+            workflowId: createdWorkflowId,
+            prevId: editableSubmittedWfStatus.workflowStatusId,
+          }).then(
+            ({ createWorkflowConnection: connectionFromSubmittedInternal }) => {
+              cy.setStatusChangingEventsOnConnection({
+                workflowConnectionId: connectionFromSubmittedInternal.id,
+                statusChangingEvents: [Event.CALL_ENDED],
+              });
+            }
+          );
         }
       );
 
@@ -616,6 +621,7 @@ context('Settings tests', () => {
         endCall: currentDayStart.plus({ days: -3 }),
         endCallInternal: currentDayStart.plus({ days: 365 }),
         proposalWorkflowId: createdWorkflowId,
+        callEnded: true,
       });
 
       cy.contains(internalProposalTitle)

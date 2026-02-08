@@ -31,6 +31,7 @@ mutation updateCall(
   $faps: [Int!]
   $isActive: Boolean
   $callFapReviewEnded: Boolean
+  $callEnded: Boolean
 ) {
   updateCall(
     updateCallInput: {
@@ -66,6 +67,7 @@ mutation updateCall(
       faps: $faps
       isActive: $isActive
       callFapReviewEnded: $callFapReviewEnded
+      callEnded: $callEnded
     }
   ) {
     ...call
