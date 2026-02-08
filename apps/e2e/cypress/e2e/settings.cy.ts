@@ -228,43 +228,50 @@ context('Settings tests', () => {
     };
 
     const addWorkflowWithBranchesAndChangingEvents = () => {
+      // Add FEASIBILITY_REVIEW from DRAFT
       cy.addStatusToWorkflow({
         statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 500,
+        posY: 100,
         prevId: createdDraftWfStatusId,
       }).then((result) => {
+        const createdFeasibilityReviewWfStatus = result.addStatusToWorkflow;
         const connection = result.createWorkflowConnection;
-        if (connection) {
-          cy.setStatusChangingEventsOnConnection({
-            workflowConnectionId: connection.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
-      });
-      cy.addStatusToWorkflow({
-        statusId: statuses.fapSelection.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 600,
-        prevId: wfStatuses.feasibilityReview.id,
-      }).then((result) => {
+
         cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
-          statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
+          workflowConnectionId: connection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
         });
-      });
-      cy.addStatusToWorkflow({
-        statusId: statuses.notFeasible.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 700,
-        prevId: wfStatuses.feasibilityReview.id,
-      }).then((result) => {
-        cy.setStatusChangingEventsOnConnection({
-          workflowConnectionId: result.createWorkflowConnection.id,
-          statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE],
+
+        // Add FAP_SELECTION from FEASIBILITY_REVIEW
+        cy.addStatusToWorkflow({
+          statusId: statuses.fapSelection.id,
+          workflowId: createdWorkflowId,
+          posX: -100,
+          posY: 200,
+          prevId: createdFeasibilityReviewWfStatus.workflowStatusId,
+        }).then((result) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: result.createWorkflowConnection.id,
+            statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
+          });
+        });
+
+        // Add NOT_FEASIBLE from FEASIBILITY_REVIEW
+        cy.addStatusToWorkflow({
+          statusId: statuses.notFeasible.id,
+          workflowId: createdWorkflowId,
+          posX: 100,
+          posY: 200,
+          prevId: createdFeasibilityReviewWfStatus.workflowStatusId,
+        }).then((result) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: result.createWorkflowConnection.id,
+            statusChangingEvents: [
+              Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
+            ],
+          });
         });
       });
     };
@@ -1340,7 +1347,9 @@ context('Settings tests', () => {
       const secondProposalAbstract = faker.random.words(5);
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
+
       addWorkflowWithBranchesAndChangingEvents();
+
       createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
