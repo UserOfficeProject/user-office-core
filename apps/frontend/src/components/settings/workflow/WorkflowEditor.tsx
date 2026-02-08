@@ -253,7 +253,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       const newNode: Node = {
         id: statusId,
         type: 'statusNode',
-        ariaLabel: `connection_${status.id}`,
+        ariaLabel: `workflow_status_${status.id}`,
         data: {
           label: status.name,
           workflowStatus: {

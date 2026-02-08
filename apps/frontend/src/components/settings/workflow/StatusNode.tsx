@@ -144,7 +144,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({
   };
 
   return (
-    <div data-cy={`connection_${data.workflowStatus.statusId}`}>
+    <div data-cy={`workflow_status_${data.workflowStatus.statusId}`}>
       <StyledHandle type="target" position={Position.Top} id="top-target" />
       <StyledHandle
         type="target"

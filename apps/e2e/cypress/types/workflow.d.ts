@@ -123,8 +123,8 @@ declare global {
        * );
        */
       connectReactFlowNodes(
-        sourceStatus: { id: number },
-        targetStatus: { id: number },
+        sourceStatus: Pick<Status, 'id'>,
+        targetStatus: Pick<Status, 'id'>,
         options?: {
           force?: boolean;
         }

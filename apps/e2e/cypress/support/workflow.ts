@@ -185,14 +185,14 @@ function dragStatusIntoWorkflow(
  * @param options - Additional options for the connection operation
  */
 function connectReactFlowNodes(
-  sourceStatus: { id: number },
-  targetStatus: { id: number },
+  sourceStatus: Pick<Status, 'id'>,
+  targetStatus: Pick<Status, 'id'>,
   options?: {
     force?: boolean;
   }
 ) {
-  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.id}"] [data-handlepos="bottom"]`;
-  const targetNodeSelector = `[data-cy="connection_${targetStatus.id}"] [data-handlepos="top"]`;
+  const sourceNodeSelector = `[data-cy="workflow_status_${sourceStatus.id}"] [data-handlepos="bottom"]`;
+  const targetNodeSelector = `[data-cy="workflow_status_${targetStatus.id}"] [data-handlepos="top"]`;
   cy.get(sourceNodeSelector).click(options);
   cy.get(targetNodeSelector).click(options);
 }

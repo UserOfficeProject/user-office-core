@@ -16,10 +16,6 @@ import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 const statuses = initialDBData.proposalStatuses;
-const wfStatuses = {
-  ...initialDBData.workflows.defaultWorkflow.workflowStatuses,
-  ...initialDBData.workflows.defaultSafetyWorkflow.workflowStatuses,
-};
 
 context('Settings tests', () => {
   beforeEach(() => {
@@ -696,7 +692,10 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy^="connection_DRAFT"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy^="workflow_status_DRAFT"]').should(
+        'contain.text',
+        'DRAFT'
+      );
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
@@ -738,7 +737,7 @@ context('Settings tests', () => {
         clientY: 100,
       });
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
@@ -1280,7 +1279,9 @@ context('Settings tests', () => {
         text: 'Workflow status removed successfully',
       });
 
-      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
+      cy.get('[data-cy^="workflow_status_FEASIBILITY_REVIEW"]').should(
+        'not.exist'
+      );
     });
 
     it.skip('User Officer should be able to create proposal workflow with branches', () => {
@@ -1297,7 +1298,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
@@ -1311,7 +1312,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_FAP_SELECTION"]').should(
+      cy.get('[data-cy="workflow_status_FAP_SELECTION"]').should(
         'contain.text',
         'FAP_SELECTION'
       );
@@ -1325,7 +1326,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_NOT_FEASIBLE"]').should(
+      cy.get('[data-cy="workflow_status_NOT_FEASIBLE"]').should(
         'contain.text',
         'NOT_FEASIBLE'
       );
@@ -1335,8 +1336,8 @@ context('Settings tests', () => {
       cy.get('[title="fit view"]').click();
 
       cy.connectReactFlowNodes(
-        wfStatuses.feasibilityReview,
-        wfStatuses.fapSelection,
+        statuses.feasibilityReview,
+        statuses.fapSelection,
         {
           force: true,
         }
@@ -1347,8 +1348,8 @@ context('Settings tests', () => {
       ).should('exist');
 
       cy.connectReactFlowNodes(
-        wfStatuses.feasibilityReview,
-        wfStatuses.notFeasible,
+        statuses.feasibilityReview,
+        statuses.notFeasible,
         {
           force: true,
         }
@@ -1358,7 +1359,7 @@ context('Settings tests', () => {
         `[aria-label="Edge from FEASIBILITY_REVIEW to NOT_FEASIBLE"]`
       ).should('exist');
 
-      cy.connectReactFlowNodes(wfStatuses.draft, wfStatuses.feasibilityReview, {
+      cy.connectReactFlowNodes(statuses.draft, statuses.feasibilityReview, {
         force: true,
       });
       cy.finishedLoading();
@@ -1620,7 +1621,7 @@ context('Settings tests', () => {
       cy.notification({ variant: 'success', text: 'created successfully' });
       cy.finishedLoading();
 
-      cy.get('[data-cy^="connection_AWAITING_ESF"]').should('exist');
+      cy.get('[data-cy^="workflow_status_AWAITING_ESF"]').should('exist');
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
@@ -1665,7 +1666,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should(
+      cy.get('[data-cy^="workflow_status_ESF_IS_REVIEW"]').should(
         'contain.text',
         'ESF IS REVIEW'
       );
@@ -1686,17 +1687,17 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(statuses.esfIsReview, {
         clientX: 300,
-        clientY: 300,
+        clientY: 400,
       });
 
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should('exist');
+      cy.get('[data-cy^="workflow_status_ESF_IS_REVIEW"]').should('exist');
 
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
 
-      cy.connectReactFlowNodes(wfStatuses.awaitingEsf, wfStatuses.esfIsReview, {
+      cy.connectReactFlowNodes(statuses.awaitingEsf, statuses.esfIsReview, {
         force: true,
       });
 
@@ -1752,7 +1753,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_IS_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_ESF_IS_REVIEW"]').should(
         'contain.text',
         statuses.esfIsReview.name
       );
@@ -1766,7 +1767,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_ESR_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_ESF_ESR_REVIEW"]').should(
         'contain.text',
         statuses.esfEsrReview.name
       );
@@ -1780,7 +1781,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_REJECTED"]').should(
+      cy.get('[data-cy="workflow_status_ESF_REJECTED"]').should(
         'contain.text',
         statuses.esfRejected.name
       );
@@ -1789,19 +1790,15 @@ context('Settings tests', () => {
 
       cy.get('[title="fit view"]').click();
 
-      cy.connectReactFlowNodes(
-        wfStatuses.esfIsReview,
-        wfStatuses.esfEsrReview,
-        {
-          force: true,
-        }
-      );
+      cy.connectReactFlowNodes(statuses.esfIsReview, statuses.esfEsrReview, {
+        force: true,
+      });
       cy.finishedLoading();
       cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_ESR_REVIEW"]`).should(
         'exist'
       );
 
-      cy.connectReactFlowNodes(wfStatuses.esfIsReview, wfStatuses.esfRejected, {
+      cy.connectReactFlowNodes(statuses.esfIsReview, statuses.esfRejected, {
         force: true,
       });
       cy.finishedLoading();
@@ -1809,7 +1806,7 @@ context('Settings tests', () => {
         'exist'
       );
 
-      cy.connectReactFlowNodes(wfStatuses.awaitingEsf, wfStatuses.esfIsReview, {
+      cy.connectReactFlowNodes(statuses.awaitingEsf, statuses.esfIsReview, {
         force: true,
       });
       cy.finishedLoading();

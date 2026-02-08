@@ -171,7 +171,10 @@ context('Personal information tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      cy.get('[data-cy="connection_DRAFT"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy="workflow_status_DRAFT"]').should(
+        'contain.text',
+        'DRAFT'
+      );
 
       cy.get("[data-cy='profile-page-btn']").click();
 
