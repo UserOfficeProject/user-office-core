@@ -139,7 +139,7 @@ context('Tag tests', () => {
       });
     });
 
-    it.only('User should only see proposal if tag has been assigned to role', () => {
+    it('User should only see proposal if tag has been assigned to role', () => {
       const title: string = faker.word.words(3);
       const abstract: string = faker.word.words(3);
       cy.createTag({ name: tagName, shortCode: tagShortCode });
