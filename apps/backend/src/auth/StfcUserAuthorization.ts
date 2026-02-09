@@ -356,4 +356,15 @@ export class StfcUserAuthorization extends UserAuthorization {
   }): Promise<Institution | null> {
     throw new Error('Method not implemented.');
   }
+
+  // Temp fix for https://github.com/UserOfficeProject/issue-tracker/issues/1522
+  async canSeeAllCurrentFapReviews(
+    agent: UserWithRole | null,
+    fapId: number
+  ): Promise<boolean> {
+    return (
+      this.isUserOfficer(agent) ||
+      (await this.isChairOrSecretaryOfFap(agent, fapId))
+    );
+  }
 }
