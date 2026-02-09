@@ -364,7 +364,8 @@ export class StfcUserAuthorization extends UserAuthorization {
   ): Promise<boolean> {
     return (
       this.isUserOfficer(agent) ||
-      (await this.isChairOrSecretaryOfFap(agent, fapId))
+      (await this.isChairOrSecretaryOfFap(agent, fapId)) ||
+      !!this.isApiToken(agent)
     );
   }
 }
