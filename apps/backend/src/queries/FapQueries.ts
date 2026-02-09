@@ -188,7 +188,7 @@ export default class FapQueries {
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
       !proposalEvents?.proposal_all_fap_reviews_submitted &&
-      (await this.userAuth.canSeeAllCurrentFapReviews(agent, fapId))
+      !(await this.userAuth.canSeeAllCurrentFapReviews(agent, fapId))
     ) {
       reviewerId = agent.id;
     }
