@@ -219,4 +219,11 @@ export abstract class UserAuthorization {
 
     return isFapReviewer;
   }
+
+  async canSeeAllCurrentFapReviews(
+    agent: UserWithRole | null,
+    fapId: number
+  ): Promise<boolean> {
+    return Promise.resolve(true);
+  }
 }
