@@ -43,10 +43,6 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
-  isDynamicProposalReader(agent: UserWithRole | null) {
-    return agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
-  }
-
   isExperimentSafetyReviewer(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.EXPERIMENT_SAFETY_REVIEWER;
   }

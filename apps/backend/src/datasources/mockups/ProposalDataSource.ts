@@ -345,7 +345,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getProposals(
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    tags?: number[]
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return { totalCount: allProposals.length, proposals: allProposals };
   }

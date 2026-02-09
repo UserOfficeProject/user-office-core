@@ -11,7 +11,7 @@ import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInter
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -89,18 +89,19 @@ export default class ProposalQueries {
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
-    Roles.DYNAMIC_PROPOSAL_READER,
+    Roles.PROPOSAL_READER,
   ])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    @AgentTags tags?: number[]
   ) {
-    return this.dataSource.getProposals(filter, first, offset);
+    return this.dataSource.getProposals(filter, first, offset, tags);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.DYNAMIC_PROPOSAL_READER])
+  @Authorized([Roles.USER_OFFICER, Roles.PROPOSAL_READER])
   async getAllView(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -108,16 +109,9 @@ export default class ProposalQueries {
     offset?: number,
     sortField?: string,
     sortDirection?: PaginationSortDirection,
-    searchText?: string
+    searchText?: string,
+    @AgentTags tags?: number[]
   ) {
-    let tags: number[] | undefined = undefined;
-    if (agent && agent.currentRole?.isRootRole === false) {
-      const tagsObj = await this.roleDataSource.getTagsByRoleId(
-        agent!.currentRole!.id
-      );
-      tags = tagsObj.map((tag) => tag.id);
-    }
-
     try {
       // leave await here because getProposalsFromView might thrown an exception
       // and we want to handle it here

@@ -3,10 +3,33 @@ import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { AgentTagsMetadataKey } from './AgentTags';
+
+export { AgentTags, AgentTagsMetadataKey } from './AgentTags';
+
+const injectDynamicRoleArgs = async (
+  agent: UserWithRole,
+  args: any[],
+  indices: {
+    tags: number[];
+  }
+) => {
+  const roleDataSource = container.resolve<RoleDataSource>(
+    Tokens.RoleDataSource
+  );
+
+  const tags = await roleDataSource.getTagsByRoleId(agent.currentRole!.id);
+  const tagIds = tags.map((tag) => tag.id);
+
+  indices.tags.forEach((index) => {
+    args[index] = tagIds; // inject tag ids to the argument
+  });
+};
 
 const Authorized = (roles: Roles[] = []) => {
   return (
@@ -24,9 +47,24 @@ const Authorized = (roles: Roles[] = []) => {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
 
+      const execute = async () => {
+        if (agent?.currentRole?.isRootRole === false) {
+          const agentTagsIndices: number[] =
+            Reflect.getOwnMetadata(AgentTagsMetadataKey, target, name) || [];
+
+          if (agentTagsIndices.length > 0) {
+            await injectDynamicRoleArgs(agent!, args, {
+              tags: agentTagsIndices,
+            });
+          }
+        }
+
+        return await originalMethod?.apply(this, args);
+      };
+
       if (agent?.isApiAccessToken) {
         if (agent?.accessPermissions?.[`${target.constructor.name}.${name}`]) {
-          return await originalMethod?.apply(this, args);
+          return await execute();
         } else {
           return isMutation ? rejection('INSUFFICIENT_PERMISSIONS') : null;
         }
@@ -54,7 +92,7 @@ const Authorized = (roles: Roles[] = []) => {
       }
 
       if (roles.length === 0) {
-        return await originalMethod?.apply(this, args);
+        return await execute();
       }
 
       const userDataSource = container.resolve<UserDataSource>(
@@ -80,7 +118,7 @@ const Authorized = (roles: Roles[] = []) => {
             permission === `${target.constructor.name}.${name}`
         )
       ) {
-        return await originalMethod?.apply(this, args);
+        return await execute();
       }
 
       const hasAccessRights = roles.some(
@@ -88,7 +126,7 @@ const Authorized = (roles: Roles[] = []) => {
       );
 
       if (hasAccessRights) {
-        return await originalMethod?.apply(this, args);
+        return await execute();
       } else {
         return isMutation ? rejection('INSUFFICIENT_PERMISSIONS') : null;
       }

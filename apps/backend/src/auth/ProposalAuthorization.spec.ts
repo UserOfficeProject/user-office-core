@@ -1,5 +1,7 @@
 import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
   dummyFapChairWithRole,
   dummyFapReviewerWithRole,
@@ -13,6 +15,11 @@ import {
   dummyUserWithRole,
   dummyVisitorWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
+import { TagDataSource } from '../datasources/TagDataSource';
+import { AllocationTimeUnits } from '../models/Call';
+import { Roles } from '../models/Role';
 import { ProposalAuthorization } from './ProposalAuthorization';
 
 const proposalAuthorization = container.resolve(ProposalAuthorization);
@@ -132,5 +139,213 @@ test('A user officer has access to any proposal', async () => {
 test('A sample reviewer has access to any proposal', async () => {
   return expect(
     proposalAuthorization.hasReadRights(dummySampleReviewer, 1)
+  ).resolves.toEqual(true);
+});
+
+test('A proposal reader has access to proposal matching their instrument', async () => {
+  const proposalReader = {
+    ...dummyUserWithRole,
+    currentRole: {
+      id: 10,
+      title: 'Proposal Reader',
+      shortCode: Roles.PROPOSAL_READER,
+      description: '',
+      permissions: [],
+      isRootRole: false,
+    },
+  };
+
+  const roleDataSource = container.resolve<RoleDataSource>(
+    Tokens.RoleDataSource
+  );
+  const tagDataSource = container.resolve<TagDataSource>(Tokens.TagDataSource);
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  jest
+    .spyOn(proposalDataSource, 'get')
+    .mockResolvedValue({ primaryKey: 1, callId: 100 } as any);
+
+  // NOTE: This mock is for "proposal_reader" role which returns tags
+  jest
+    .spyOn(roleDataSource, 'getTagsByRoleId')
+    .mockResolvedValue([{ id: 1, name: 'Tag1', shortCode: 'T1' }]);
+
+  // NOTE: This mock returns instruments associated with the tags
+  jest.spyOn(tagDataSource, 'getTagInstruments').mockResolvedValue([
+    {
+      id: 1,
+      name: 'Instr1',
+      shortCode: 'I1',
+      description: '',
+      managerUserId: 1,
+    },
+  ]);
+
+  jest.spyOn(tagDataSource, 'getTagCalls').mockResolvedValue([]);
+
+  // NOTE: This mock returns instruments associated with the proposal
+  jest
+    .spyOn(instrumentDataSource, 'getInstrumentsByProposalPk')
+    .mockResolvedValue([
+      {
+        id: 1,
+        name: 'Instr1',
+        shortCode: 'I1',
+        description: '',
+        managerUserId: 1,
+        managementTimeAllocation: 0,
+      },
+    ]);
+
+  return expect(
+    proposalAuthorization.hasReadRights(proposalReader, 1)
+  ).resolves.toEqual(true);
+});
+
+test('A proposal reader does not have access to proposal not matching their instrument or call', async () => {
+  const proposalReader = {
+    ...dummyUserWithRole,
+    currentRole: {
+      id: 10,
+      title: 'Proposal Reader',
+      shortCode: Roles.PROPOSAL_READER,
+      description: '',
+      permissions: [],
+      isRootRole: false,
+    },
+  };
+
+  const roleDataSource = container.resolve<RoleDataSource>(
+    Tokens.RoleDataSource
+  );
+  const tagDataSource = container.resolve<TagDataSource>(Tokens.TagDataSource);
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  jest
+    .spyOn(proposalDataSource, 'get')
+    .mockResolvedValue({ primaryKey: 1, callId: 100 } as any);
+
+  jest
+    .spyOn(roleDataSource, 'getTagsByRoleId')
+    .mockResolvedValue([{ id: 1, name: 'Tag1', shortCode: 'T1' }]);
+
+  jest.spyOn(tagDataSource, 'getTagInstruments').mockResolvedValue([
+    {
+      id: 1,
+      name: 'Instr1',
+      shortCode: 'I1',
+      description: '',
+      managerUserId: 1,
+    },
+  ]);
+  jest.spyOn(tagDataSource, 'getTagCalls').mockResolvedValue([]);
+
+  jest
+    .spyOn(instrumentDataSource, 'getInstrumentsByProposalPk')
+    .mockResolvedValue([
+      {
+        id: 2,
+        name: 'Instr2',
+        shortCode: 'I2',
+        description: '',
+        managerUserId: 1,
+        managementTimeAllocation: 0,
+      },
+    ]);
+
+  return expect(
+    proposalAuthorization.hasReadRights(proposalReader, 1)
+  ).resolves.toEqual(false);
+});
+
+test('A proposal reader has access to proposal matching their call', async () => {
+  const proposalReader = {
+    ...dummyUserWithRole,
+    currentRole: {
+      id: 10,
+      title: 'Proposal Reader',
+      shortCode: Roles.PROPOSAL_READER,
+      description: '',
+      permissions: [],
+      isRootRole: false,
+    },
+  };
+
+  const roleDataSource = container.resolve<RoleDataSource>(
+    Tokens.RoleDataSource
+  );
+  const tagDataSource = container.resolve<TagDataSource>(Tokens.TagDataSource);
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  jest
+    .spyOn(proposalDataSource, 'get')
+    .mockResolvedValue({ primaryKey: 1, callId: 50 } as any);
+
+  jest
+    .spyOn(roleDataSource, 'getTagsByRoleId')
+    .mockResolvedValue([{ id: 1, name: 'Tag1', shortCode: 'T1' }]);
+
+  jest.spyOn(tagDataSource, 'getTagInstruments').mockResolvedValue([]);
+  jest.spyOn(tagDataSource, 'getTagCalls').mockResolvedValue([
+    {
+      id: 50,
+      shortCode: 'C1',
+      startCall: new Date(),
+      endCall: new Date(),
+      startReview: new Date(),
+      endReview: new Date(),
+      startFapReview: new Date(),
+      endFapReview: new Date(),
+      startNotify: new Date(),
+      endNotify: new Date(),
+      startCycle: new Date(),
+      endCycle: new Date(),
+      cycleComment: '',
+      surveyComment: '',
+      proposalSequence: 1,
+      isActive: true,
+      referenceNumberFormat: '',
+      proposalWorkflowId: 1,
+      templateId: 1,
+      esiTemplateId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
+      title: 'C1',
+      description: '',
+      endCallInternal: new Date(),
+      submissionMessage: '',
+      callEnded: false,
+      callEndedInternal: false,
+      callReviewEnded: false,
+      callFapReviewEnded: false,
+      proposalPdfTemplateId: 1,
+      experimentSafetyPdfTemplateId: 1,
+      fapReviewTemplateId: 1,
+      technicalReviewTemplateId: 1,
+      sort_order: 1,
+      experimentWorkflowId: 1,
+    },
+  ]);
+
+  jest
+    .spyOn(instrumentDataSource, 'getInstrumentsByProposalPk')
+    .mockResolvedValue([]);
+
+  return expect(
+    proposalAuthorization.hasReadRights(proposalReader, 1)
   ).resolves.toEqual(true);
 });

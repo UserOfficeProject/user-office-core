@@ -382,6 +382,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return query;
   }
 
+  private async resolveTagConstraints(tags: number[]): Promise<{
+    instrumentIds: number[];
+    callIds: number[];
+  }> {
+    const [instruments, calls] = await Promise.all([
+      this.tagDataSource.getTagInstruments(tags),
+      this.tagDataSource.getTagCalls(tags),
+    ]);
+
+    const instrumentIds = [...new Set(instruments.map((i) => i.id))];
+    const callIds = [...new Set(calls.map((c) => c.id))];
+
+    return { instrumentIds, callIds };
+  }
+
   async getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -398,22 +413,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     let callFilter: number[] | undefined;
 
     if (tags) {
-      const results = await Promise.all(
-        tags.map(async (tag) => ({
-          instruments: await this.tagDataSource.getTagInstruments(tag),
-          calls: await this.tagDataSource.getTagCalls(tag),
-        }))
-      );
-
-      const uniqueInstrumentIds = new Set(
-        results.flatMap((r) => r.instruments.map((i) => i.id))
-      );
-      const uniqueCallIds = new Set(
-        results.flatMap((r) => r.calls.map((c) => c.id))
-      );
-
-      instrumentFilter = Array.from(uniqueInstrumentIds);
-      callFilter = Array.from(uniqueCallIds);
+      const { instrumentIds, callIds } = await this.resolveTagConstraints(tags);
+      instrumentFilter = instrumentIds;
+      callFilter = callIds;
     }
 
     return database
@@ -548,13 +550,45 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async getProposals(
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    tags?: number[]
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
+    const { instrumentIds, callIds } = tags
+      ? await this.resolveTagConstraints(tags)
+      : { instrumentIds: [], callIds: [] };
+
     return database
       .select(['proposals.*', database.raw('count(*) OVER() AS full_count')])
       .from('proposals')
       .orderBy('proposals.proposal_pk', 'desc')
       .modify((query) => {
+        if (tags) {
+          query.andWhere((qb) => {
+            if (instrumentIds.length > 0) {
+              qb.orWhereExists((subQuery) => {
+                subQuery
+                  .select('*')
+                  .from('instrument_has_proposals')
+                  .whereRaw(
+                    'instrument_has_proposals.proposal_pk = proposals.proposal_pk'
+                  )
+                  .whereIn(
+                    'instrument_has_proposals.instrument_id',
+                    instrumentIds
+                  );
+              });
+            }
+            if (callIds.length > 0) {
+              qb.orWhereIn('proposals.call_id', callIds);
+            }
+
+            if (instrumentIds.length === 0 && callIds.length === 0) {
+              // If there are no instruments or calls, we should not see any proposals
+              qb.whereRaw('1=0');
+            }
+          });
+        }
+
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)

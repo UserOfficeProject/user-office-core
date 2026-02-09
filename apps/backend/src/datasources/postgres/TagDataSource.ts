@@ -100,19 +100,23 @@ class PostgresTagDataSource implements TagDataSource {
     return result > 0;
   }
 
-  async getTagInstruments(tagId: number): Promise<Instrument[]> {
+  async getTagInstruments(tagId: number | number[]): Promise<Instrument[]> {
+    const tagIds = Array.isArray(tagId) ? tagId : [tagId];
+
     const instruments = await database<InstrumentRecord>('tag_instrument as fi')
       .join('instruments as i', 'fi.instrument_id', 'i.instrument_id')
-      .where('tag_id', tagId)
+      .whereIn('tag_id', tagIds)
       .select('i.*');
 
     return instruments.map(createInstrumentObject);
   }
 
-  async getTagCalls(tagId: number): Promise<Call[]> {
+  async getTagCalls(tagId: number | number[]): Promise<Call[]> {
+    const tagIds = Array.isArray(tagId) ? tagId : [tagId];
+
     const calls = await database('tag_call as fc')
       .join('call as c', 'fc.call_id', 'c.call_id')
-      .where('fc.tag_id', tagId)
+      .whereIn('fc.tag_id', tagIds)
       .select('c.*');
 
     return calls.map(createCallObject);
@@ -142,6 +146,15 @@ class PostgresTagDataSource implements TagDataSource {
       .select('f.*');
 
     return tags.map(createTagObject);
+  }
+
+  async getInstrumentsAndCallsTags(
+    tags: number[]
+  ): Promise<{ instruments: Instrument[]; calls: Call[] }> {
+    const instruments = await this.getTagInstruments(tags);
+    const calls = await this.getTagCalls(tags);
+
+    return { instruments, calls };
   }
 }
 

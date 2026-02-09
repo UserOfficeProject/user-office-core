@@ -27,7 +27,8 @@ export interface ProposalDataSource {
   getProposals(
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    tags?: number[]
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getInstrumentScientistProposals(
     scientistId: UserWithRole,
