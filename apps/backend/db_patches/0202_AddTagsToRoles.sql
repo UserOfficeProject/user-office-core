@@ -9,7 +9,7 @@ BEGIN
 
       ALTER TABLE roles
       ADD COLUMN permissions TEXT[] NOT NULL DEFAULT '{}';
-      INSERT INTO roles (short_code, title, description, is_root_role) VALUES ('dynamic_proposal_reader', 'Proposal Reader', 'Can read proposals based on tags assigned to the user.', true);
+      INSERT INTO roles (short_code, title, description, is_root_role) VALUES ('proposal_reader', 'Proposal Reader', 'Can read proposals based on tags assigned to the user.', true);
       CREATE TABLE roles_has_tags (
             role_id INT NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE
           , tag_id INT NOT NULL REFERENCES tag(tag_id) ON DELETE CASCADE

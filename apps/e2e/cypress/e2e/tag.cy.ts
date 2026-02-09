@@ -183,7 +183,7 @@ context('Tag tests', () => {
         'Role that can only see calls and proposals with specific tags'
       );
       cy.get('[data-cy="role-shortcode-select"]').click();
-      cy.get('[role="listbox"]').contains('dynamic_proposal_reader').click();
+      cy.get('[role="listbox"]').contains('proposal_reader').click();
       cy.get('[data-cy="submit-role-button"]').click();
 
       cy.updateUserRoles({

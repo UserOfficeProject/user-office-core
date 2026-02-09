@@ -67,7 +67,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
-    case UserRole.DYNAMIC_PROPOSAL_READER:
+    case UserRole.PROPOSAL_READER:
       roleBasedOverView = (
         <Paper>
           <ProposalTableReader />
@@ -91,7 +91,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   return (
     <StyledContainer maxWidth={false}>
       {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
-        props.userRole !== UserRole.DYNAMIC_PROPOSAL_READER &&
+        props.userRole !== UserRole.PROPOSAL_READER &&
         Object.values(UserRole).includes(props.userRole) && (
           <Paper>
             {loadingContent ? (

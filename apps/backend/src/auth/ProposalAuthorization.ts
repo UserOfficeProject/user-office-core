@@ -299,7 +299,7 @@ export class ProposalAuthorization {
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
-      case Roles.DYNAMIC_PROPOSAL_READER:
+      case Roles.PROPOSAL_READER:
         hasAccess = true;
         break;
       default:
