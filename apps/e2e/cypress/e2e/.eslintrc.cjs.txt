@@ -1,0 +1,9 @@
+/** @type {import('eslint').Linter.Config} */
+module.exports = {
+    root: true,
+
+    plugins: ['mocha']
+};
+
+// we are using eslint 8.57.x - forcing us to use mocha 10
+// unable to use latest version of plugin - possibly an issue to update the lintet but only if neccessary
