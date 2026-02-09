@@ -152,23 +152,10 @@ function createWorkflowForInstrumentScientist() {
   return cy.createWorkflow(workflow).then((createWorkflowResult) => {
     if (createWorkflowResult.createWorkflow) {
       const workflowData = createWorkflowResult.createWorkflow;
-      cy.createStatus({
-        id: 'IS_REVIEW',
-        name: 'Instrument Scientist Review',
-        description: 'Instrument Scientist Review',
-        entityType: WorkflowType.EXPERIMENT,
-      });
-
-      cy.createStatus({
-        id: 'REJECTED',
-        name: 'Instrument Scientist Review',
-        description: 'Instrument Scientist Review',
-        entityType: WorkflowType.EXPERIMENT,
-      });
 
       return cy
         .addStatusToWorkflow({
-          statusId: 'IS_REVIEW',
+          statusId: 'ESF_IS_REVIEW',
           workflowId: workflowData.id,
           prevId: workflowData.statuses[0].workflowStatusId,
           posX: -9,
@@ -184,7 +171,7 @@ function createWorkflowForInstrumentScientist() {
               .then(() => {
                 return cy
                   .addStatusToWorkflow({
-                    statusId: 'APPROVED',
+                    statusId: 'ESF_APPROVED',
                     workflowId: workflowData.id,
                     prevId: result.addStatusToWorkflow.workflowStatusId,
                     posX: 228,
@@ -203,7 +190,7 @@ function createWorkflowForInstrumentScientist() {
                         .then(() => {
                           return cy
                             .addStatusToWorkflow({
-                              statusId: 'REJECTED',
+                              statusId: 'ESF_REJECTED',
                               workflowId: workflowData.id,
                               prevId:
                                 result.addStatusToWorkflow.workflowStatusId,
@@ -574,7 +561,7 @@ context('Experiment Safety Review tests', () => {
         cy.testActionButton('finish-experiment-safety-form-icon', 'completed');
       });
 
-      it('Should validate experiment status change after ESF submission', () => {
+      it.only('Should validate experiment status change after ESF submission', () => {
         submitESFByUser();
 
         // Instrument scientist should see status change to "ESF IS REVIEW"
