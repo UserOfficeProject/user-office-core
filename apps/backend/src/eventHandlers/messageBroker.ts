@@ -307,6 +307,10 @@ export async function createPostToRabbitMQHandler() {
     Tokens.UserDataSource
   );
 
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -332,6 +336,21 @@ export async function createPostToRabbitMQHandler() {
       case Event.EXPERIMENT_CREATED:
       case Event.EXPERIMENT_UPDATED: {
         const jsonMessage = await getExperimentMessageData(event.experiment);
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.EXPERIMENT_ESF_SUBMITTED: {
+        const experiment = await experimentDataSource.getExperiment(
+          event.experimentsafety.experimentPk
+        );
+        if (!experiment) {
+          return;
+        }
+        const jsonMessage = await getExperimentMessageData(experiment);
         await rabbitMQ.sendMessageToExchange(
           event.exchange || EXCHANGE_NAME,
           event.type,
