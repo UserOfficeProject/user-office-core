@@ -381,9 +381,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         }
 
         if (active) {
-          qb.join('proposals', {
-            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
-          });
           qb.join('call', {
             'call.call_id': 'proposals.call_id',
           });
