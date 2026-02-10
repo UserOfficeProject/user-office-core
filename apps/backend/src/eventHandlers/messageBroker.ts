@@ -605,6 +605,7 @@ export async function createListenToRabbitMQHandler() {
             key: 'experiment',
             loggedInUserId: null,
             isRejection: false,
+            blockWorkflow: true,
           });
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
@@ -675,6 +676,7 @@ export async function createListenToRabbitMQHandler() {
             key: 'experiment',
             loggedInUserId: null,
             isRejection: false,
+            blockWorkflow: true,
           });
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);

@@ -93,7 +93,7 @@ export default function createExperimentSafetyWorkflowHandler() {
   ) {
     // if the original method failed
     // there is no point of moving forward in the workflow
-    if (event.isRejection) {
+    if (event.isRejection || event.blockWorkflow) {
       return;
     }
     const { experimentInformationObject, experimentInformationKey } =

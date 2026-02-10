@@ -26,6 +26,7 @@ export interface GeneralEvent {
   description?: string;
   impersonatingUserId?: number;
   exchange?: string;
+  blockWorkflow?: boolean;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
