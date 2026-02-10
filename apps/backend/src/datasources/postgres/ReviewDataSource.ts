@@ -360,11 +360,12 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.where('user_id', userId);
         }
 
+        qb.join('proposals', {
+          'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+        });
+
         // sometimes the ID 0 is sent as a equivalent of all
         if (callId) {
-          qb.join('proposals', {
-            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
-          });
           qb.where('proposals.call_id', callId);
         }
 
@@ -432,10 +433,10 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           .select('fap_reviews.*')
           .from('fap_reviews')
           .modify((qb) => {
+            qb.join('proposals', {
+              'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+            });
             if (callId) {
-              qb.join('proposals', {
-                'proposals.proposal_pk': 'fap_reviews.proposal_pk',
-              });
               qb.where('proposals.call_id', callId);
             }
             if (instrumentId) {
@@ -451,9 +452,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
             }
 
             if (active) {
-              qb.join('proposals', {
-                'proposals.proposal_pk': 'fap_reviews.proposal_pk',
-              });
               qb.join('call', {
                 'call.call_id': 'proposals.call_id',
               });
