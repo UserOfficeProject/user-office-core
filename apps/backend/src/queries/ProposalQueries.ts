@@ -154,7 +154,7 @@ export default class ProposalQueries {
       searchText
     );
   }
-
+  // here is where we use the query function by proposal ID
   @Authorized()
   async getProposalById(agent: UserWithRole | null, proposalId: string) {
     const proposal = await this.dataSource.getProposalById(proposalId);
