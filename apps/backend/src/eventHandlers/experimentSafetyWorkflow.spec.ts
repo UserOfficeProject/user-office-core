@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { StatusDataSource } from '../datasources/StatusDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import * as eventBusModule from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -11,17 +11,13 @@ import createExperimentSafetyWorkflowHandler, {
   handleWorkflowEngineChange,
 } from './experimentSafetyWorkflow';
 
-// ---- Mock spies ----
-
 const mockPublish = jest.fn();
-const mockGetStatus = jest.fn();
 
 let spyMarkEvent: jest.SpyInstance;
 let spyResolveEventBus: jest.SpyInstance;
-let spyContainerResolve: jest.SpyInstance;
+let mockStatusDataSource: StatusDataSourceMock;
 
 beforeAll(() => {
-  // Spy on the workflow engine function — prevents the real one from running
   spyMarkEvent = jest
     .spyOn(
       workflowEngineModule,
@@ -29,7 +25,6 @@ beforeAll(() => {
     )
     .mockResolvedValue([]);
 
-  // Spy on resolveApplicationEventBus to return our mock eventBus
   spyResolveEventBus = jest
     .spyOn(eventBusModule, 'resolveApplicationEventBus')
     .mockReturnValue({ publish: mockPublish } as any);
@@ -43,29 +38,12 @@ afterAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
 
-  // Re-apply the default mock return values after clearAllMocks
   spyMarkEvent.mockResolvedValue([]);
   spyResolveEventBus.mockReturnValue({ publish: mockPublish } as any);
 
-  // Mock the StatusDataSource resolved from the container
-  mockGetStatus.mockReset();
-  spyContainerResolve = jest
-    .spyOn(container, 'resolve')
-    .mockImplementation((token: any) => {
-      if (token === Tokens.StatusDataSource) {
-        return { getStatus: mockGetStatus } as unknown as StatusDataSource;
-      }
-
-      // For other tokens, return a no-op
-      return {} as any;
-    });
+  mockStatusDataSource = container.resolve(Tokens.StatusDataSource);
+  jest.spyOn(mockStatusDataSource, 'getStatus');
 });
-
-afterEach(() => {
-  spyContainerResolve?.mockRestore();
-});
-
-// ---- Test Data ----
 
 const createMockEvent = (
   overrides: Partial<ApplicationEvent> = {}
@@ -93,8 +71,6 @@ const createMockUpdatedExperiment = (
     ...overrides,
   }) as WorkflowEngineExperimentType;
 
-// ---- Tests ----
-
 describe('experimentSafetyWorkflowHandler', () => {
   describe('Early exit conditions', () => {
     test('should return early if event.isRejection is true', async () => {
@@ -117,7 +93,6 @@ describe('experimentSafetyWorkflowHandler', () => {
 
     test('should return early if event has no experimentPk anywhere', async () => {
       const handler = createExperimentSafetyWorkflowHandler();
-      // An event with no experiment-related data
       const event = {
         type: Event.PROPOSAL_CREATED,
         isRejection: false,
@@ -150,7 +125,6 @@ describe('experimentSafetyWorkflowHandler', () => {
 
     test('should find experimentPk in a nested object (e.g., experimentsafety)', async () => {
       const handler = createExperimentSafetyWorkflowHandler();
-      // Build an event that only has experimentPk inside experimentsafety
       const event = {
         type: Event.EXPERIMENT_ESF_SUBMITTED,
         isRejection: false,
@@ -218,13 +192,13 @@ describe('handleWorkflowEngineChange', () => {
 
       spyMarkEvent.mockResolvedValue([updatedExperiment]);
 
-      mockGetStatus
-        .mockResolvedValueOnce({ name: 'Approved' }) // new statusId (called first)
-        .mockResolvedValueOnce({ name: 'Draft' }); // prevStatusId (called second)
+      jest
+        .spyOn(mockStatusDataSource, 'getStatus')
+        .mockResolvedValueOnce({ name: 'Approved' } as any) // new statusId (called first)
+        .mockResolvedValueOnce({ name: 'Draft' } as any); // prevStatusId (called second)
 
       await handleWorkflowEngineChange(event, 42);
 
-      // Wait for the async .map() inside publishExperimentSafetyStatusChange
       await new Promise(process.nextTick);
 
       expect(mockPublish).toHaveBeenCalledWith(

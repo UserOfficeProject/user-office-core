@@ -80,6 +80,7 @@ type ExperimentMessageData = {
   status: string;
   proposal?: ProposalMessageData;
   samples?: { id: number; title: string }[];
+  instrument?: { id: number; name: string; shortCode: string };
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -235,6 +236,9 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
 
   const proposal = await proposalDataSource.get(experiment.proposalPk);
   const proposalMessageDataString = proposal
@@ -259,6 +263,10 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
     })
   );
 
+  const instrument = await instrumentDataSource.getInstrument(
+    experiment.instrumentId
+  );
+
   const messageData: ExperimentMessageData = {
     experimentId: experiment.experimentId,
     experimentPk: experiment.experimentPk,
@@ -267,6 +275,13 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
     status: experiment.status,
     proposal: proposalMessageData,
     samples: samples,
+    instrument: instrument
+      ? {
+          id: instrument.id,
+          name: instrument.name,
+          shortCode: instrument.shortCode,
+        }
+      : undefined,
   };
 
   return JSON.stringify(messageData);
@@ -508,7 +523,7 @@ export async function createPostToRabbitMQHandler() {
         const jsonMessage = await getProposalMessageData(proposal);
 
         await rabbitMQ.sendMessageToExchange(
-          event.exchange || EXCHANGE_NAME,
+          EXCHANGE_NAME,
           Event.PROPOSAL_UPDATED,
           jsonMessage
         );
