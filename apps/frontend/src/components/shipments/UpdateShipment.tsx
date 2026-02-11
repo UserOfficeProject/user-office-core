@@ -9,11 +9,13 @@ import ShipmentContainer from './ShipmentContainer';
 interface UpdateShipmentProps {
   shipment: ShipmentCore;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
+  onDirtyStateChange?: (isDirty: boolean) => void;
 }
 
 function UpdateShipment({
   shipment: { id },
   onShipmentSubmitted,
+  onDirtyStateChange,
 }: UpdateShipmentProps) {
   const { shipment } = useShipment(id);
 
@@ -25,6 +27,7 @@ function UpdateShipment({
     <ShipmentContainer
       shipment={shipment}
       onShipmentSubmitted={onShipmentSubmitted}
+      onDirtyStateChange={onDirtyStateChange}
     />
   );
 }

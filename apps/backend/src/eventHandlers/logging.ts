@@ -53,14 +53,6 @@ export default function createLoggingHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.EMAIL_INVITE_LEGACY:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            event.emailinviteresponse.userId.toString()
-          );
-          break;
         case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
           const { invite, proposalPKey } = event;
 
@@ -121,7 +113,7 @@ export default function createLoggingHandler() {
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
-              async (proposalPk) => {
+              async (proposalPk: number) => {
                 const instruments =
                   await instrumentDataSource.getInstrumentsByProposalPk(
                     proposalPk
@@ -146,7 +138,7 @@ export default function createLoggingHandler() {
         }
         case Event.PROPOSAL_FAPS_SELECTED: {
           await Promise.all(
-            event.proposalpks.proposalPks.map(async (proposalPk) => {
+            event.proposalpks.proposalPks.map(async (proposalPk: number) => {
               const faps = await fapDataSource.getFapsByProposalPk(proposalPk);
 
               const description = `Selected FAPs: ${faps
