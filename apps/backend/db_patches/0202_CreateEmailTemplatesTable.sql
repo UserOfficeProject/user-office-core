@@ -7,8 +7,9 @@ BEGIN
                   created_by INT NOT NULL REFERENCES users(user_id),
                   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                   name varchar(100) NOT NULL UNIQUE,
-                  description varchar(255) NOT NULL, 
-                  subject varchar(160) NOT NULL, 
+                  description varchar(255) NOT NULL,
+                  use_template_file boolean DEFAULT FALSE,
+                  subject varchar(160), 
                   body text
             ); 
       END IF;

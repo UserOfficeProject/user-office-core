@@ -115,15 +115,28 @@ export class SMTPMailService extends MailService {
       return { subject: '= ``', body: '' };
     }
 
+    const emailTemplate =
+      await this.emailTemplateDataSource.getEmailTemplateByName(
+        options.content.template
+      );
+
+    if (!emailTemplate) {
+      logger.logError('Email template not found', {
+        template: options.content.template,
+      });
+
+      return null;
+    }
+
     let templateBody = '';
     let templateSubject = '';
 
-    const templateBodyPath =
-      this.getEmailTemplatePath('html', options.content.template) + '.pug';
-    const templateSubjectPath =
-      this.getEmailTemplatePath('subject', options.content.template) + '.pug';
+    if (emailTemplate.useTemplateFile) {
+      const templateBodyPath =
+        this.getEmailTemplatePath('html', options.content.template) + '.pug';
+      const templateSubjectPath =
+        this.getEmailTemplatePath('subject', options.content.template) + '.pug';
 
-    if (existsSync(templateBodyPath) && existsSync(templateSubjectPath)) {
       try {
         templateBody = readFileSync(templateBodyPath, 'utf-8');
         templateSubject = readFileSync(templateSubjectPath, 'utf-8');
@@ -135,21 +148,8 @@ export class SMTPMailService extends MailService {
         return null;
       }
     } else {
-      const emailTemplate =
-        await this.emailTemplateDataSource.getEmailTemplateByName(
-          options.content.template
-        );
-
-      if (emailTemplate) {
-        templateBody = emailTemplate.body;
-        templateSubject = emailTemplate.subject;
-      } else {
-        logger.logError('Email template not found', {
-          template: options.content.template,
-        });
-
-        return null;
-      }
+      templateBody = emailTemplate.body || '';
+      templateSubject = emailTemplate.subject || '';
     }
 
     return {

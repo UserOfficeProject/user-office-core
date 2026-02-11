@@ -69,6 +69,7 @@ export default class PostgresEmailTemplateDataSource
     createdByUserId: number,
     name: string,
     description: string,
+    useTemplateFile: boolean,
     subject: string,
     body: string
   ): Promise<EmailTemplate> {
@@ -80,6 +81,7 @@ export default class PostgresEmailTemplateDataSource
           description: description,
           subject: subject,
           body: body,
+          use_template_file: useTemplateFile,
         },
         ['*']
       )
@@ -97,6 +99,7 @@ export default class PostgresEmailTemplateDataSource
     emailTemplateId: number,
     name: string,
     description: string,
+    useTemplateFile: boolean,
     subject: string,
     body: string
   ): Promise<EmailTemplate> {
@@ -107,6 +110,7 @@ export default class PostgresEmailTemplateDataSource
           description: description,
           subject: subject,
           body: body,
+          use_template_file: useTemplateFile,
         },
         ['*']
       )

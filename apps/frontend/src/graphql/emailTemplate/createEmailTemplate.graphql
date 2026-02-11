@@ -2,14 +2,16 @@ mutation createEmailTemplate(
   $createdByUserId: Int!
   $name: String!
   $description: String!
-  $subject: String!
-  $body: String!
+  $useTemplateFile: Boolean!
+  $subject: String
+  $body: String
 ) {
   createEmailTemplate(
     createEmailTemplateInput: {
       createdByUserId: $createdByUserId
       name: $name
       description: $description
+      useTemplateFile: $useTemplateFile
       subject: $subject
       body: $body
     }

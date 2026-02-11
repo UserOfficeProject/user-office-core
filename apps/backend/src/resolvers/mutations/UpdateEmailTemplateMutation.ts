@@ -25,11 +25,14 @@ export class UpdateEmailTemplateInput {
   @Field(() => String)
   public description: string;
 
-  @Field(() => String)
-  public subject: string;
+  @Field(() => Boolean)
+  public useTemplateFile: boolean;
 
-  @Field(() => String)
-  public body: string;
+  @Field(() => String, { nullable: true })
+  public subject?: string;
+
+  @Field(() => String, { nullable: true })
+  public body?: string;
 }
 
 @Resolver()

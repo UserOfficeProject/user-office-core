@@ -5,6 +5,7 @@ import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { getCurrentUser } from 'context/UserContextProvider';
@@ -22,11 +23,15 @@ const CreateUpdateEmailTemplate = ({
 }: CreateUpdateEmailTemplateProps) => {
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  // const [useTemplateFile, setUseTemplateFile] = useState(
+  //   emailTemplate?.useTemplateFile || false
+  // );
 
   const initialValues = {
     id: emailTemplate?.id || 0,
     name: emailTemplate?.name || '',
     description: emailTemplate?.description || '',
+    useTemplateFile: emailTemplate?.useTemplateFile || false,
     subject: emailTemplate?.subject || '',
     body: emailTemplate?.body || '',
     createdByUserId:
@@ -62,7 +67,7 @@ const CreateUpdateEmailTemplate = ({
         }
       }}
     >
-      {({ isValid }) => (
+      {({ isValid, values }) => (
         <Form>
           <Typography variant="h6" component="h1">
             {(emailTemplate ? 'Update ' : 'Create new ') +
@@ -91,6 +96,17 @@ const CreateUpdateEmailTemplate = ({
             required
           />
           <Field
+            id="useTemplateFile"
+            name="useTemplateFile"
+            Label={{
+              label: 'Use Template File',
+            }}
+            type="checkbox"
+            component={CheckboxWithLabel}
+            data-cy="description"
+            disabled={isExecutingCall}
+          />
+          <Field
             name="subject"
             id="subject"
             label="Subject"
@@ -98,8 +114,7 @@ const CreateUpdateEmailTemplate = ({
             component={TextField}
             fullWidth
             data-cy="subject"
-            disabled={isExecutingCall}
-            required
+            disabled={isExecutingCall || values.useTemplateFile}
           />
           <Field
             id="body"
@@ -112,8 +127,7 @@ const CreateUpdateEmailTemplate = ({
             maxRows="16"
             minRows="3"
             data-cy="body"
-            disabled={isExecutingCall}
-            required
+            disabled={isExecutingCall || values.useTemplateFile}
           />
           <Button
             type="submit"

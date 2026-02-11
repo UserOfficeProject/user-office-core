@@ -16,9 +16,12 @@ export class EmailTemplate implements EmailTemplateOrigin {
   @Field(() => String, { nullable: true })
   public description: string;
 
-  @Field(() => String)
+  @Field(() => Boolean)
+  public useTemplateFile: boolean;
+
+  @Field(() => String, { nullable: true })
   public subject: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public body: string;
 }

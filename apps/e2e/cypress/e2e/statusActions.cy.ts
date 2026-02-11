@@ -46,6 +46,7 @@ context('Status actions tests', () => {
       createdByUserId: 0,
       name: 'my-first-email',
       description: 'My First Email',
+      useTemplateFile: false,
       subject: 'My First Subject',
       body: 'My First Body',
     });
@@ -54,6 +55,7 @@ context('Status actions tests', () => {
       createdByUserId: 0,
       name: 'my-second-email',
       description: 'My Second Email',
+      useTemplateFile: false,
       subject: 'My Second Subject',
       body: 'My Second Body',
     });

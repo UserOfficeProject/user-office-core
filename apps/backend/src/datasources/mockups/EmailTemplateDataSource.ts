@@ -11,6 +11,7 @@ export const dummyEmailTemplate = {
   subject: 'Welcome to Our Service',
   body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
   createdAt: '',
+  useTemplateFile: false,
 };
 
 export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
@@ -26,6 +27,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         1,
         'Dummy Email Template',
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -34,6 +36,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.PROPOSAL_CREATED,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -42,6 +45,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.ACCEPTED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -50,6 +54,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.REJECTED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -58,6 +63,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.RESERVED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -66,6 +72,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.REVIEW_REMINDER,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -74,6 +81,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.INTERNAL_REVIEW_CREATED,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -82,6 +90,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.INTERNAL_REVIEW_DELETED,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -90,6 +99,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         2,
         EmailTemplateName.INTERNAL_REVIEW_UPDATED,
         'This is a dummy email template for testing purposes.',
+        false,
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
@@ -119,6 +129,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     createdByUserId: number,
     name: string,
     description: string,
+    use_template_file: boolean,
     subject: string,
     body: string
   ): Promise<EmailTemplate> {
@@ -129,6 +140,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     id: number,
     name: string,
     description: string,
+    use_template_file: boolean,
     subject: string,
     body: string
   ): Promise<EmailTemplate> {

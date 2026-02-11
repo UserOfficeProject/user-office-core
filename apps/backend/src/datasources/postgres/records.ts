@@ -380,6 +380,7 @@ export interface EmailTemplateRecord {
   readonly description: string;
   readonly subject: string;
   readonly body: string;
+  readonly use_template_file: boolean;
 }
 
 export interface PageTextRecord {
@@ -1072,6 +1073,7 @@ export const createEmailTemplateObject = (
     emailTemplate.created_by,
     emailTemplate.name,
     emailTemplate.description,
+    emailTemplate.use_template_file,
     emailTemplate.subject,
     emailTemplate.body
   );

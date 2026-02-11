@@ -3,6 +3,7 @@ fragment emailTemplate on EmailTemplate {
   createdByUserId
   name
   description
+  useTemplateFile
   subject
   body
 }

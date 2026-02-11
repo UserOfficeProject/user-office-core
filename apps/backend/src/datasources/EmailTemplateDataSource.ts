@@ -12,16 +12,18 @@ export interface EmailTemplateDataSource {
     createdByUserId: number,
     name: string,
     description: string,
-    subject: string,
-    body: string
+    useTemplateFile: boolean,
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate>;
 
   update(
     id: number,
     name: string,
     description: string,
-    subject: string,
-    body: string
+    useTemplateFile: boolean,
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate>;
 
   delete(id: number): Promise<EmailTemplate>;

@@ -32,6 +32,7 @@ export default class EmailTemplateMutations {
         args.createdByUserId,
         args.name,
         args.description,
+        args.useTemplateFile,
         args.subject,
         args.body
       );
@@ -56,6 +57,7 @@ export default class EmailTemplateMutations {
         args.id,
         args.name,
         args.description,
+        args.useTemplateFile,
         args.subject,
         args.body
       );

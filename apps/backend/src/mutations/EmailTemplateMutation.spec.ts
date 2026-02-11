@@ -17,6 +17,7 @@ describe('Test Email Template Mutations', () => {
       emailTemplateMutations.create(dummyUserWithRole, {
         name: 'Dummy Email Template',
         description: 'This is a dummy email template for testing purposes.',
+        useTemplateFile: false,
         subject: 'Welcome to Our Service',
         body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
         createdByUserId: 1,
@@ -29,6 +30,7 @@ describe('Test Email Template Mutations', () => {
       emailTemplateMutations.create(null, {
         name: 'Dummy Email Template',
         description: 'This is a dummy email template for testing purposes.',
+        useTemplateFile: false,
         subject: 'Welcome to Our Service',
         body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
         createdByUserId: 1,
@@ -40,6 +42,7 @@ describe('Test Email Template Mutations', () => {
     const emailTemplateToCreate = {
       name: 'Dummy Email Template',
       description: 'This is a dummy email template for testing purposes.',
+      useTemplateFile: false,
       subject: 'Welcome to Our Service',
       body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
       createdByUserId: 1,
@@ -62,6 +65,7 @@ describe('Test Email Template Mutations', () => {
       id: 1,
       name: 'Dummy Email Template',
       description: 'This is a dummy email template for testing purposes.',
+      useTemplateFile: false,
       subject: 'Welcome to Our Service',
       body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
       createdByUserId: 1,

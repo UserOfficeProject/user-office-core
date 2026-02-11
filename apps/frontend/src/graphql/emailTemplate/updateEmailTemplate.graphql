@@ -3,8 +3,9 @@ mutation updateEmailTemplate(
   $createdByUserId: Int!
   $name: String!
   $description: String!
-  $subject: String!
-  $body: String!
+  $useTemplateFile: Boolean!
+  $subject: String
+  $body: String
 ) {
   updateEmailTemplate(
     updateEmailTemplateInput: {
@@ -12,6 +13,7 @@ mutation updateEmailTemplate(
       createdByUserId: $createdByUserId
       name: $name
       description: $description
+      useTemplateFile: $useTemplateFile
       subject: $subject
       body: $body
     }
