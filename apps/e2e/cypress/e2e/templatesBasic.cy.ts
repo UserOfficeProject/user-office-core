@@ -1802,6 +1802,41 @@ context('Template Basic tests', () => {
       });
     });
 
+    it('Question is not accepted when PDF file page count is outside limit when doing a partial save', () => {
+      const fileName = 'pdf_5_pages.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      // NOTE: Force is needed because file input is not visible and has display: none
+      cy.contains(fileQuestion)
+        .parent()
+        .find('input[type="file"]')
+        .selectFile(
+          {
+            contents: `cypress/fixtures/${fileName}`,
+            fileName: fileName,
+            mimeType: 'application/pdf',
+          },
+          { force: true }
+        );
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.get('[data-cy="save-button"]').focus();
+      cy.get('[data-cy="save-button"]').click();
+
+      cy.notification({
+        variant: 'error',
+        text: 'not satisfying a constraint',
+      });
+    });
+
     it('Question accepted when PDF file page count is within limit', () => {
       const fileName = 'pdf_3_pages.pdf';
 
