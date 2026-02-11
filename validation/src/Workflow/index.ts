@@ -33,12 +33,13 @@ export const moveWorkflowStatusValidationSchema = Yup.object().shape({
 });
 
 export const deleteWorkflowStatusValidationSchema = Yup.object().shape({
-  workflowStatusId: Yup.number().required(),
+  statusId: Yup.number().required(),
+  workflowId: Yup.number().required(),
 });
 
 export const addNextStatusEventsValidationSchema = Yup.object().shape({
   workflowConnectionId: Yup.number().required(),
-  statusChangingEvents: Yup.array().of(Yup.string()).required(),
+  nextStatusEvents: Yup.array().of(Yup.string()).required(),
 });
 
 export const addStatusActionsToConnectionValidationSchema = <T, U>(
