@@ -117,6 +117,17 @@ jobs:
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
+      - name: Cache validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install validation dependencies
+        if: steps.cached-node-modules-validation.outputs.cache-hit != 'true'
+        run: npm --prefix validation ci
+
       - name: Cache validation build
         id: cached-validation-build
         uses: actions/cache@v4
@@ -126,10 +137,7 @@ jobs:
 
       - name: Build validation
         if: steps.cached-validation-build.outputs.cache-hit != 'true'
-        run: |
-          cd validation
-          npm ci
-          npm run build
+        run: npm --prefix validation run build
 
       - name: Cache UOWS
         id: cached-UOWS
@@ -195,6 +203,12 @@ jobs:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
       - name: Restore validation build
         id: cached-validation-build
         uses: actions/cache@v4
