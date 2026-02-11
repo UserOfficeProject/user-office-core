@@ -688,7 +688,6 @@ context('Technique Proposal tests', () => {
         templateId: initialDBData.template.id,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         cycleComment: faker.lorem.word(10),
-        surveyComment: faker.lorem.word(10),
         esiTemplateName: esiTemplateName,
       };
 

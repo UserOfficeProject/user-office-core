@@ -56,7 +56,6 @@ context('Calls tests', () => {
     technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
     esiTemplateName: esiTemplateName,
   };
 
@@ -78,7 +77,6 @@ context('Calls tests', () => {
     technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
   };
 
   const updatedCall = {
