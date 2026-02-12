@@ -7,48 +7,48 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { AccessRuleFragment, UserRole } from 'generated/sdk';
+import { PermissionRuleFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useAccessRuleData(): {
-  loadingAccessRules: boolean;
-  accessRules: AccessRuleFragment[];
-  setAccessRulesWithLoading: Dispatch<SetStateAction<AccessRuleFragment[]>>;
+export function usePermissionRuleData(): {
+  loadingPermissionRules: boolean;
+  permissionRules: PermissionRuleFragment[];
+  setPermissionRulesWithLoading: Dispatch<SetStateAction<PermissionRuleFragment[]>>;
 } {
-  const [accessRules, setAccessRules] = useState<AccessRuleFragment[]>([]);
-  const [loadingAccessRules, setLoadingAccessRules] = useState(true);
+  const [permissionRules, setPermissionRules] = useState<PermissionRuleFragment[]>([]);
+  const [loadingPermissionRules, setLoadingPermissionRules] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
 
-  const setAccessRulesWithLoading = (
-    data: SetStateAction<AccessRuleFragment[]>
+  const setPermissionRulesWithLoading = (
+    data: SetStateAction<PermissionRuleFragment[]>
   ) => {
-    setLoadingAccessRules(true);
-    setAccessRules(data);
-    setLoadingAccessRules(false);
+    setLoadingPermissionRules(true);
+    setPermissionRules(data);
+    setLoadingPermissionRules(false);
   };
 
   useEffect(() => {
     let unmounted = false;
 
-    setLoadingAccessRules(true);
+    setLoadingPermissionRules(true);
     if (
       currentRole &&
-      [UserRole.USER_OFFICER, UserRole.INSTRUMENT_SCIENTIST].includes(
+      [UserRole.USER_OFFICER].includes(
         currentRole
       )
     ) {
       api()
-        .getAccessRules()
+        .getPermissionRules()
         .then((data) => {
           if (unmounted) {
             return;
           }
-          if (data.accessRules) {
-            setAccessRules(data.accessRules.accessRule);
+          if (data.permissionRules) {
+            setPermissionRules(data.permissionRules.permissionRule);
           }
-          setLoadingAccessRules(false);
+          setLoadingPermissionRules(false);
         });
     }
 
@@ -59,8 +59,8 @@ export function useAccessRuleData(): {
   }, [api, currentRole]);
 
   return {
-    loadingAccessRules,
-    accessRules,
-    setAccessRulesWithLoading,
+    loadingPermissionRules: loadingPermissionRules,
+    permissionRules: permissionRules,
+    setPermissionRulesWithLoading: setPermissionRulesWithLoading,
   };
 }

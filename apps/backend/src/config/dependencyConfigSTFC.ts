@@ -62,7 +62,7 @@ import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
+import PostgresPermissionDataSource from '../datasources/postgres/PermissionDataSource';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -143,4 +143,4 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
-mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);
+mapClass(Tokens.PermissionDataSource, PostgresPermissionDataSource);

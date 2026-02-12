@@ -11,7 +11,7 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
-import AccessPage from './access/AccessPage';
+import PermissionPage from './permission/PermissionPage';
 import ProposalPage from './proposal/ProposalPage';
 import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
 import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
@@ -340,9 +340,9 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
-            path="/Access"
+            path="/Permissions"
             element={
-              <TitledRoute title="Access" element={<AccessPage />} />
+              <TitledRoute title="Permissions" element={<PermissionPage />} />
             }
           />
         )}

@@ -1,0 +1,7 @@
+fragment permissionRule on PermissionRule {
+  id
+  role
+  subject
+  action
+  conditions
+}

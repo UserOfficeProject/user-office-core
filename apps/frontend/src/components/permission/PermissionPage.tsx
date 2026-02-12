@@ -2,16 +2,16 @@ import React from 'react';
 
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import AccessTable from './AccessTable';
+import PermissionsTable from './PermissionsTable';
 
-const AccessPage = () => {
+const PermissionPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <AccessTable />
+        <PermissionsTable />
       </StyledPaper>
     </StyledContainer>
   );
 };
 
-export default AccessPage;
+export default PermissionPage;

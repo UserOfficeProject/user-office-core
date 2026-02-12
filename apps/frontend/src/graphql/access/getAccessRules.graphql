@@ -1,8 +1,0 @@
-query getAccessRules {
-  accessRules {
-    accessRule {
-      ...accessRule
-    }
-    totalCount
-  }
-}

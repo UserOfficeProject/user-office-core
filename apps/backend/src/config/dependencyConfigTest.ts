@@ -56,7 +56,7 @@ import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetReg
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-import PostgresAccessDataSource from '../datasources/postgres/AccessDataSource';
+import PostgresPermissionDataSource from '../datasources/postgres/PermissionDataSource';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
@@ -131,4 +131,4 @@ mapValue(Tokens.ConfigureLogger, () =>
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
-mapClass(Tokens.AccessDataSource, PostgresAccessDataSource);
+mapClass(Tokens.PermissionDataSource, PostgresPermissionDataSource);

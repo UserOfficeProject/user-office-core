@@ -50,7 +50,7 @@ import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
 import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
-import { AccessDataSource } from '../datasources/AccessDataSource';
+import { PermissionDataSource } from '../datasources/PermissionDataSource';
 import { error } from 'console';
 import { Subject } from '@casl/ability';
 

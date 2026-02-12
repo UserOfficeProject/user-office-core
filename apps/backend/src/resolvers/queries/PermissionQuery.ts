@@ -1,9 +1,9 @@
 import { Query, Arg, Ctx, Resolver, Int, InputType, Field } from 'type-graphql';
 import { ResolverContext } from '../../context';
-import { AccessRule } from '../types/AccessRule';
+import { PermissionRule } from '../types/PermissionRule';
 
 @InputType()
-export class AccessFilter {
+export class PermissionFilter {
   @Field(() => Int)
   public userId: number;
 
@@ -15,12 +15,12 @@ export class AccessFilter {
 }
 
 @Resolver()
-export class AccessQuery {
-  @Query(() => AccessRule)
-  accessRule(
+export class PermissionQuery {
+  @Query(() => PermissionRule)
+  permissionRule(
     @Ctx() context: ResolverContext,
     @Arg('id', () => Int) id: number
   ) {
-    return context.queries.access.getAccessRule(context.user, id)
+    return context.queries.permission.getPermissionRule(context.user, id)
   }
 }

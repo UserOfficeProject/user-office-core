@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
-import { AccessDataSource } from '../datasources/AccessDataSource';
+import { PermissionDataSource } from '../datasources/PermissionDataSource';
 import { UserWithRole } from '../models/User';
 import { FapDataSource } from '../datasources/FapDataSource';
 
@@ -9,8 +9,8 @@ export class FapAuthorization {
   constructor(
     @inject(Tokens.FapDataSource)
     private fapDataSource: FapDataSource,
-    @inject(Tokens.AccessDataSource)
-    private accessDataSource: AccessDataSource
+    @inject(Tokens.PermissionDataSource)
+    private permissionDataSource: PermissionDataSource
   ) {}
 
   async canEdit(agent: UserWithRole | null, fapId: number) {
@@ -22,6 +22,6 @@ export class FapAuthorization {
     };
 
     const ctx = {fap, user}
-    return this.accessDataSource.canAccess2(user.role ? user.role : 'user', 'update', 'fap', ctx);
+    return this.permissionDataSource.hasPermission(user.role ? user.role : 'user', 'update', 'fap', ctx);
   }
 }

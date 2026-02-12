@@ -1,0 +1,19 @@
+mutation createPermissionRule(
+  $role: String!
+  $subject: String!
+  $action: String!
+  $conditions: String
+) {
+  createPermissionRule(
+    role: $role
+    subject: $subject
+    action: $action
+    conditions: $conditions
+  ) {
+    role
+    id
+    subject
+    action
+    conditions
+  }
+}

@@ -140,12 +140,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
-      <Tooltip title="Access">
-        <ListItemButton component={NavLink} to="/Access">
+      <Tooltip title="Permissions">
+        <ListItemButton component={NavLink} to="/Permissions">
           <ListItemIcon>
             <CommentQuestionIcon />
           </ListItemIcon>
-          <ListItemText primary="Access" />
+          <ListItemText primary="Permissions" />
         </ListItemButton>
       </Tooltip>
       {isTechniqueProposalsEnabled && (

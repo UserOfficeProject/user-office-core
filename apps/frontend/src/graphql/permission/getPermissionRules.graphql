@@ -1,0 +1,8 @@
+query getPermissionRules {
+  permissionRules {
+    permissionRule {
+      ...permissionRule
+    }
+    totalCount
+  }
+}

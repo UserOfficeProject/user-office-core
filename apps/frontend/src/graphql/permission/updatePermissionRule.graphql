@@ -1,0 +1,21 @@
+mutation updatePermissionRule(
+  $role: String!
+  $id: Int!
+  $subject: String!
+  $action: String!
+  $conditions: String
+) {
+  updatePermissionRule(
+    role: $role
+    id: $id
+    subject: $subject
+    action: $action
+    conditions: $conditions
+  ) {
+    role
+    id
+    subject
+    action
+    conditions
+  }
+}

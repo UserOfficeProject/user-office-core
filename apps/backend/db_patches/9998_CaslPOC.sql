@@ -11,9 +11,9 @@ BEGIN
       );
 
       CREATE TABLE IF NOT EXISTS role_has_permission (
-            role_id int REFERENCES roles (role_id) ON UPDATE CASCADE,
-            permission_id int REFERENCES permissions (permission_id) ON UPDATE CASCADE,
-            CONSTRAINT role_has_permission_pkey PRIMARY KEY (role_id, permission_id)
+            role_id integer NOT NULL REFERENCES roles (role_id) ON UPDATE CASCADE ON DELETE CASCADE,
+            permission_id integer NOT NULL REFERENCES permissions (permission_id) ON UPDATE CASCADE ON DELETE CASCADE,
+            PRIMARY KEY (role_id, permission_id)
       );
     END;
   END IF;

@@ -2,24 +2,20 @@ import Button from '@mui/material/Button';
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 
-import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TextField from 'components/common/FormikUITextField';
-import UOLoader from 'components/common/UOLoader';
-import { AccessRule } from 'generated/sdk';
-import { useRolesData } from 'hooks/user/useRolesData';
+import { PermissionRule } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type EditAccessProps = {
-  close: (accessAdded: AccessRule | null) => void;
-  access: AccessRule | null;
+type CreateUpdatePermissionProps = {
+  close: (permissionRule: PermissionRule | null) => void;
+  permission: PermissionRule | null;
 };
 
-const EditAccess = ({ close, access }: EditAccessProps) => {
-  const { isExecutingCall } = useDataApiWithFeedback();
-  const { rolesData, loading } = useRolesData();
+const CreateUpdatePermission = ({ close, permission }: CreateUpdatePermissionProps) => {
+  const { api } = useDataApiWithFeedback();
 
-  const initialValues = access
-    ? access
+  const initialValues = permission
+    ? permission
     : {
         role: '',
         subject: '',
@@ -30,8 +26,23 @@ const EditAccess = ({ close, access }: EditAccessProps) => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (): Promise<void> => {
-        close(null);
+      onSubmit={async (values) => {
+        if (permission) {
+          const { updatePermissionRule } = await api({
+            toastSuccessMessage: 'Permission updated successfully!',
+          }).updatePermissionRule({
+            ...values, id: permission.id
+          });
+          close(updatePermissionRule as PermissionRule);
+        } else {
+          const { createPermissionRule } = await api({
+            toastSuccessMessage: 'Permission created successfully!',
+          }).createPermissionRule({
+            ...values
+          });
+
+          close(createPermissionRule as PermissionRule);
+        }
       }}
     >
       {() => (
@@ -66,7 +77,6 @@ const EditAccess = ({ close, access }: EditAccessProps) => {
             type="text"
             component={TextField}
             fullWidth
-            required
           />
           <Button
             type="submit"
@@ -75,10 +85,8 @@ const EditAccess = ({ close, access }: EditAccessProps) => {
               margin: theme.spacing(3, 0, 2),
             })}
             data-cy="submit"
-            disabled={true}
           >
-            {isExecutingCall && <UOLoader size={14} />}
-            Update
+            Submit
           </Button>
         </Form>
       )}
@@ -86,4 +94,4 @@ const EditAccess = ({ close, access }: EditAccessProps) => {
   );
 };
 
-export default EditAccess;
+export default CreateUpdatePermission;

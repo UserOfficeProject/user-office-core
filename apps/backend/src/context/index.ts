@@ -65,8 +65,8 @@ import UnitQueries from '../queries/UnitQueries';
 import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
 import WorkflowQueries from '../queries/WorkflowQueries';
-import AccessQueries from '../queries/AccessQueries';
-import AccessMutations from '../mutations/AccessMutations';
+import PermissionQueries from '../queries/PermissionQueries';
+import PermissionsMutations from '../mutations/PermissionMutations';
 
 interface ResolverContextQueries {
   admin: AdminQueries;
@@ -102,7 +102,7 @@ interface ResolverContextQueries {
   statusAction: StatusActionQueries;
   tag: TagQueries;
   experiment: ExperimentQueries;
-  access: AccessQueries;
+  permission: PermissionQueries;
 }
 
 interface ResolverContextMutations {
@@ -135,7 +135,7 @@ interface ResolverContextMutations {
   workflow: WorkflowMutations;
   tag: TagMutations;
   experiment: ExperimentMutations;
-  access: AccessMutations;
+  permission: PermissionsMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

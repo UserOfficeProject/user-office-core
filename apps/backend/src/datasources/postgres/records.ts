@@ -76,8 +76,8 @@ import {
   ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
 import { FeedbackStatus } from './../../models/Feedback';
-import { actions, subjects } from './AccessDataSource';
-import { AccessRule } from '../../models/AccessRule';
+import { actions, subjects } from './PermissionDataSource';
+import { PermissionRule } from '../../models/PermissionRule';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
 declare module 'knex/types/tables' {
@@ -1148,11 +1148,10 @@ export const createSettingsObject = (record: SettingsRecord) => {
   );
 };
 
-export const createAccessRuleObject = (record: AccessRecord) => {
-  return new AccessRule(
+export const createPermissionRuleObject = (record: PermissionRecord) => {
+  return new PermissionRule(
     record.permission_id,
     record.role,
-    record.role_id,
     record.subject,
     record.action,
     record.conditions
@@ -1563,10 +1562,9 @@ export interface ExperimentSafetyEventsRecord {
   readonly experiment_esf_rejected_by_esr: boolean;
 }
 
-export interface AccessRecord {
+export interface PermissionRecord {
   readonly permission_id: number;
   readonly role: string;
-  readonly role_id: number;
   readonly action: typeof actions[number];
   readonly subject: typeof subjects[number];
   readonly conditions: string;

@@ -1,8 +1,0 @@
-fragment accessRule on AccessRule {
-  id
-  role
-  role_id
-  subject
-  action
-  conditions
-}

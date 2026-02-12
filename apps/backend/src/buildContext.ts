@@ -66,7 +66,8 @@ import UnitQueries from './queries/UnitQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
 import WorkflowQueries from './queries/WorkflowQueries';
-import AccessQueries from './queries/AccessQueries';
+import PermissionQueries from './queries/PermissionQueries';
+import PermissionMutations from './mutations/PermissionMutations';
 
 const context: BasicResolverContext = {
   queries: {
@@ -105,7 +106,7 @@ const context: BasicResolverContext = {
     settings: container.resolve(SettingsQueries),
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
-    access: container.resolve(AccessQueries),
+    permission: container.resolve(PermissionQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -139,6 +140,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowMutations),
     tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
+    permission: container.resolve(PermissionMutations)
   },
   clients: {
     scheduler: async () => {
