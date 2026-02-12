@@ -352,8 +352,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
-    default:
+    case UserRole.PROPOSAL_READER:
       return proposalReaderUser;
+    default:
+      return null;
   }
 };
 
