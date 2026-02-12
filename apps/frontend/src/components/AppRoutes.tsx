@@ -145,6 +145,7 @@ const AppRoutes = () => {
   const { t } = useTranslation();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isUser = useCheckAccess([UserRole.USER]);
+  const isProposalReader = useCheckAccess([UserRole.PROPOSAL_READER]);
   const isExperimentSafetyReviewer = useCheckAccess([
     UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
@@ -694,6 +695,11 @@ const AppRoutes = () => {
           }
         />
         {isUserOfficer ? (
+          <Route
+            path="/"
+            element={<TitledRoute title="" element={<ProposalPage />} />}
+          />
+        ) : isProposalReader ? (
           <Route
             path="/"
             element={<TitledRoute title="" element={<ProposalPage />} />}

@@ -326,7 +326,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     </div>
   );
 
-  const dynamicReadUser = (
+  const proposalReaderUser = (
     <div data-cy="instrument-scientist-menu-items">
       <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
@@ -353,7 +353,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:
-      return dynamicReadUser;
+      return proposalReaderUser;
   }
 };
 
