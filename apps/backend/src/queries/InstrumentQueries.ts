@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { Authorized } from '../decorators';
 import { Instrument, InstrumentWithManagementTime } from '../models/Instrument';
@@ -14,7 +15,9 @@ export default class InstrumentQueries {
     @inject(Tokens.InstrumentDataSource)
     public dataSource: InstrumentDataSource,
     @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    @inject(Tokens.FapDataSource)
+    public fapDataSource: FapDataSource
   ) {}
 
   @Authorized()
@@ -96,6 +99,24 @@ export default class InstrumentQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized()
+  async getFapReviewerInstruments(agent: UserWithRole | null) {
+    if (!agent || !agent.id) {
+      return [];
+    }
+
+    if (!agent.currentRole) {
+      return [];
+    }
+
+    const faps = await this.fapDataSource.getUserFapsByRoleAndFapId(
+      agent.id,
+      agent.currentRole
+    );
+
+    return this.dataSource.getInstrumentsByFapIds(faps.map((fap) => fap.id));
   }
 
   @Authorized()
