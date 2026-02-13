@@ -16,11 +16,8 @@ enum ExperimentInformationKeys {
 }
 
 const publishExperimentSafetyStatusChange = async (
-  updatedExperimentSafeties: (void | WorkflowEngineExperimentType)[]
+  updatedExperimentSafeties: WorkflowEngineExperimentType[]
 ) => {
-  if (!updatedExperimentSafeties) {
-    return;
-  }
   const eventBus = resolveApplicationEventBus();
 
   const workflowDataSource = container.resolve<WorkflowDataSource>(

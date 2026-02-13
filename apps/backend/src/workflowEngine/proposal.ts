@@ -27,10 +27,7 @@ type WorkflowRunBatchInput = {
   event: Event;
 };
 
-export type WorkflowRunInput =
-  | WorkflowRunSingleInput
-  | WorkflowRunSingleInput[]
-  | WorkflowRunBatchInput;
+export type WorkflowRunInput = WorkflowRunSingleInput | WorkflowRunBatchInput;
 
 const isBatchWorkflowInput = (
   input: WorkflowRunInput
@@ -49,7 +46,7 @@ export class ProposalWorkflowEngine {
 
   async run(
     input: WorkflowRunInput
-  ): Promise<Array<WorkflowEngineProposalType | void> | void> {
+  ): Promise<Array<WorkflowEngineProposalType>> {
     let normalizedInput: WorkflowRunSingleInput[];
 
     if (Array.isArray(input)) {

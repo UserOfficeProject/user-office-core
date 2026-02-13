@@ -20,11 +20,8 @@ enum ProposalInformationKeys {
 }
 
 const publishProposalStatusChange = async (
-  updatedProposals: (void | WorkflowEngineProposalType)[]
+  updatedProposals: WorkflowEngineProposalType[]
 ) => {
-  if (!updatedProposals) {
-    return;
-  }
   const eventBus = resolveApplicationEventBus();
 
   const workflowDataSource = container.resolve<WorkflowDataSource>(
@@ -52,11 +49,8 @@ const publishProposalStatusChange = async (
 };
 
 const handleSubmittedProposalsAfterCallEnded = async (
-  updatedProposals: (void | WorkflowEngineProposalType)[]
+  updatedProposals: WorkflowEngineProposalType[]
 ) => {
-  if (!updatedProposals) {
-    return;
-  }
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );

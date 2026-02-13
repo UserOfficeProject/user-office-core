@@ -51,7 +51,7 @@ export class ExperimentWorkflowEngine {
 
   async run(
     input: WorkflowRunInput
-  ): Promise<Array<WorkflowEngineExperimentType | void> | void> {
+  ): Promise<Array<WorkflowEngineExperimentType>> {
     let normalizedInput: WorkflowRunSingleInput[];
 
     if (Array.isArray(input)) {
