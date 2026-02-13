@@ -96,12 +96,12 @@ export async function calculateReferenceNumber(
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
     @inject(Tokens.CallDataSource)
-    protected callDataSource: CallDataSource,
-    @inject(Tokens.WorkflowDataSource)
-    private workflowDataSource: WorkflowDataSource
+    protected callDataSource: CallDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({

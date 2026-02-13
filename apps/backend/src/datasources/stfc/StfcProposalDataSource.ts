@@ -26,22 +26,10 @@ import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
+  new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
   new PostgresAdminDataSource(),
-  new PostgresCallDataSource(),
-  new PostgresWorkflowDataSource(new PostgresStatusDataSource())
+  new PostgresCallDataSource()
 );
-
-const fieldMap: { [key: string]: string } = {
-  finalStatus: 'final_status',
-  callShortCode: 'call_short_code',
-  //'instruments.name': "instruments->0->'name'",
-  statusName: 'proposal_status_id',
-  proposalId: 'proposal_id',
-  title: 'title',
-  submitted: 'submitted',
-  notified: 'notified',
-  submittedDate: 'submitted_date',
-};
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
