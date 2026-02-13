@@ -45,6 +45,7 @@
     "@opentelemetry/resource-detector-container": "^0.7.0",
     "@opentelemetry/sdk-node": "^0.200.0",
     "@opentelemetry/sdk-trace-node": "^2.0.0",
+    "@ucast/sql": "^0.1.0",
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-logger": "^2.3.2",
     "@user-office-software/duo-message-broker": "^1.8.0",

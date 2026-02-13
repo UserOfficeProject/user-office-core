@@ -46,6 +46,12 @@ declare module 'knex' {
         field: string,
         userInput: string
       ) : QueryBuilder;
+
+      casl(
+        ability: AnyAbility,
+        action: Normalize<Generics<AnyAbility>['abilities']>[0],
+        subject: string,
+      ) : QueryBuilder;
     }
   }
 }

@@ -1,4 +1,6 @@
+import { AnyAbility, Normalize, Generics } from '@casl/ability';
 import Knex from 'knex';
+import { toKnexRawQuery } from './knexTest';
 
 const escapeLike = (s: string) =>
   s.replace(/\\/g, '\\\\').replace(/[%_]/g, '\\$&');
@@ -45,6 +47,22 @@ const addExtensions = () => {
       return this.orWhereRaw('jsonb_path_exists(??, ?)', [column, jsonPath]);
     }
   );
+  Knex.QueryBuilder.extend(
+      'casl',
+      function (
+        ability: AnyAbility,
+        action: Normalize<Generics<AnyAbility>['abilities']>[0],
+        subject: string,
+      ) {
+        const [sql, replacements] = toKnexRawQuery(ability, action, subject);
+    
+        if (sql === '()') {
+          return this;
+        }
+    
+        return this.whereRaw(sql, replacements);
+      },
+    );
 };
 
 export default addExtensions;
