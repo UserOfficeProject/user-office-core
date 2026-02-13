@@ -75,7 +75,7 @@ export const createWorkflowMachine = async (workflowId: number) => {
   });
 
   const defaultWfStatus =
-    (await workflowDataSource.getDefaultWorkflowStatus(workflowId))!;
+    (await workflowDataSource.getInitialWorkflowStatus(workflowId))!;
 
   const machine = createMachine({
     id: `workflow-${workflowId}`,

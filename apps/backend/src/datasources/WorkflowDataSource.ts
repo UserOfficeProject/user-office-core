@@ -42,7 +42,7 @@ export interface WorkflowDataSource {
   ): Promise<WorkflowStatus>;
   deleteWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus>;
 
-  getDefaultWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null>;
+  getInitialWorkflowStatus(workflowId: number): Promise<WorkflowStatus | null>;
 
   setStatusChangingEventsOnConnection(
     workflowConnectionId: number,

@@ -125,7 +125,7 @@ export default class ExperimentMutations {
     }
 
     const experimentSafetyDefaultWorkflowStatus =
-      await this.workflowDataSource.getDefaultWorkflowStatus(
+      await this.workflowDataSource.getInitialWorkflowStatus(
         call.experimentWorkflowId
       );
     if (!experimentSafetyDefaultWorkflowStatus) {

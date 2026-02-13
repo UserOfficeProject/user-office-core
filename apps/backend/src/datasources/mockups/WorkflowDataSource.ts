@@ -72,7 +72,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     );
   }
 
-  async getDefaultWorkflowStatus(
+  async getInitialWorkflowStatus(
     workflowId: number
   ): Promise<WorkflowStatus | null> {
     return dummyWorkflowStatuses[0];

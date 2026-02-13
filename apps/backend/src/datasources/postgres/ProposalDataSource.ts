@@ -20,6 +20,7 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { StatusDataSource } from '../StatusDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
@@ -28,16 +29,16 @@ import {
 import CallDataSource from './CallDataSource';
 import database from './database';
 import {
+  createInvitedProposalObject,
   createProposalObject,
   createProposalViewObject,
   createProposalViewObjectWithTechniques,
   createTechnicalReviewObject,
+  InvitedProposalRecord,
   ProposalRecord,
   ProposalViewRecord,
   TechnicalReviewRecord,
   TechniqueRecord,
-  InvitedProposalRecord,
-  createInvitedProposalObject,
   WorkflowStatusRecord,
 } from './records';
 
@@ -101,7 +102,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
     @inject(Tokens.CallDataSource)
-    protected callDataSource: CallDataSource
+    protected callDataSource: CallDataSource,
+    @inject(Tokens.StatusDataSource)
+    protected statusDataSource: StatusDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -298,20 +301,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalPk: number,
     proposalWfStatusId: number
   ): Promise<Proposal> {
-    const statusId = await database('workflow_has_statuses')
-      .select('status_id')
-      .where('workflow_status_id', proposalWfStatusId)
-      .first()
-      .then((record) => record?.status_id);
-
     return database
-      .update(
-        {
-          status_id: statusId,
-          workflow_status_id: proposalWfStatusId,
-        },
-        ['*']
-      )
+      .update({ workflow_status_id: proposalWfStatusId }, ['*'])
       .from('proposals')
       .where('proposal_pk', proposalPk)
       .then((records: ProposalRecord[]) => {
@@ -356,12 +347,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new GraphQLError(`Call not found with id: ${call_id}`);
     }
 
-    const draftWfStatus =
-      await this.workflowDataSource.getDefaultWorkflowStatus(
+    const proposalInitialStatus =
+      await this.workflowDataSource.getInitialWorkflowStatus(
         call.proposalWorkflowId
       );
 
-    if (!draftWfStatus) {
+    if (!proposalInitialStatus) {
       throw new GraphQLError(
         `Draft workflow status not found for call with id: ${call_id}`
       );
@@ -373,8 +364,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           proposer_id,
           call_id,
           questionary_id,
-          status_id: draftWfStatus.statusId,
-          workflow_status_id: draftWfStatus.workflowStatusId,
+          status_id: proposalInitialStatus.statusId,
+          workflow_status_id: proposalInitialStatus.workflowStatusId,
         },
         ['*']
       )

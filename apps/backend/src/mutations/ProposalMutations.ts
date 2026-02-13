@@ -841,7 +841,7 @@ export default class ProposalMutations {
       );
 
       const defaultWfStatus =
-        await this.workflowDataSource.getDefaultWorkflowStatus(
+        await this.workflowDataSource.getInitialWorkflowStatus(
           call.proposalWorkflowId
         );
 

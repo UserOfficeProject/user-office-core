@@ -28,7 +28,8 @@ import { StfcUserDataSource } from './StfcUserDataSource';
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
   new PostgresAdminDataSource(),
-  new PostgresCallDataSource()
+  new PostgresCallDataSource(),
+  new PostgresStatusDataSource()
 );
 
 @injectable()

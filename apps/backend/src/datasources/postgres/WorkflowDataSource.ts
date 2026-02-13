@@ -10,6 +10,7 @@ import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/setting
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
+import { StatusDataSource } from '../StatusDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
@@ -19,7 +20,6 @@ import {
   WorkflowStatusRecord,
   WorkflowStructure,
 } from './records';
-import StatusDataSource from './StatusDataSource';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
@@ -199,7 +199,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
-  async getDefaultWorkflowStatus(
+  async getInitialWorkflowStatus(
     workflowId: number
   ): Promise<WorkflowStatus | null> {
     const workflow = await database
