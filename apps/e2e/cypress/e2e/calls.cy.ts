@@ -938,6 +938,7 @@ context('Calls tests', () => {
       cy.contains('Proposals').click();
       cy.contains('Calls').click();
 
+      cy.get('[data-cy="call-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Open/Upcoming').click();
 
       cy.finishedLoading();
