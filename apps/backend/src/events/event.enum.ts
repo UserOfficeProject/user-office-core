@@ -97,8 +97,6 @@ export enum Event {
   EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER',
   EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW',
   VISIT_CREATED = 'VISIT_CREATED',
-  EXPERIMENT_CREATED = 'EXPERIMENT_CREATED',
-  EXPERIMENT_UPDATED = 'EXPERIMENT_UPDATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -418,7 +416,5 @@ export const EventLabel = new Map<Event, string>([
     Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
     'Event occurs when experiment safety status is changed by workflow',
   ],
-  [Event.EXPERIMENT_CREATED, 'Event occurs when experiment is created'],
-  [Event.EXPERIMENT_UPDATED, 'Event occurs when experiment is updated'],
   [Event.VISIT_CREATED, 'Event occurs when visit is created'],
 ]);

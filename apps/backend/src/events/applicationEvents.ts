@@ -1,6 +1,5 @@
 import { Call } from '../models/Call';
 import { ExperimentSafety } from '../models/Experiment';
-import { Experiment } from '../models/Experiment';
 import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
@@ -26,7 +25,6 @@ export interface GeneralEvent {
   description?: string;
   impersonatingUserId?: number;
   exchange?: string;
-  blockWorkflow?: boolean;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -453,16 +451,6 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   experimentsafety: ExperimentSafety;
 }
 
-interface ExperimentCreatedEvent extends GeneralEvent {
-  type: Event.EXPERIMENT_CREATED;
-  experiment: Experiment;
-}
-
-interface ExperimentUpdatedEvent extends GeneralEvent {
-  type: Event.EXPERIMENT_UPDATED;
-  experiment: Experiment;
-}
-
 interface ExperimentESFSubmittedEvent extends GeneralEvent {
   type: Event.EXPERIMENT_ESF_SUBMITTED;
   experimentsafety: ExperimentSafety;
@@ -553,6 +541,4 @@ export type ApplicationEvent =
   | ExperimentSafetyManagementDecisionSubmittedByESREvent
   | ExperimentSafetyStatusChangedByWorkflowEvent
   | ExperimentSafetyStatusChangedByUserEvent
-  | ExperimentCreatedEvent
-  | ExperimentUpdatedEvent
   | ExperimentESFSubmittedEvent;

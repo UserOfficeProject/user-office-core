@@ -348,16 +348,6 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.EXPERIMENT_CREATED:
-      case Event.EXPERIMENT_UPDATED: {
-        const jsonMessage = await getExperimentMessageData(event.experiment);
-        await rabbitMQ.sendMessageToExchange(
-          event.exchange || EXCHANGE_NAME,
-          event.type,
-          jsonMessage
-        );
-        break;
-      }
       case Event.EXPERIMENT_ESF_SUBMITTED: {
         const experiment = await experimentDataSource.getExperiment(
           event.experimentsafety.experimentPk
@@ -548,7 +538,7 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const handleWorkflowEngineChange = async (
+  const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
   ) => {
@@ -611,17 +601,17 @@ export async function createListenToRabbitMQHandler() {
 
           const experiment = await experimentDataSource.create(experimentToAdd);
 
-          await handleWorkflowEngineChange(type, experimentToAdd.proposalPk);
+          await handleProposalWorkflowEngineChange(
+            type,
+            experimentToAdd.proposalPk
+          );
 
-          const eventBus = resolveApplicationEventBus();
-          await eventBus.publish({
-            type: Event.EXPERIMENT_CREATED,
-            experiment: experiment,
-            key: 'experiment',
-            loggedInUserId: null,
-            isRejection: false,
-            blockWorkflow: true,
-          });
+          const jsonMessage = await getExperimentMessageData(experiment);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            'EXPERIMENT_CREATED',
+            jsonMessage
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -654,7 +644,10 @@ export async function createListenToRabbitMQHandler() {
             );
           });
 
-          await handleWorkflowEngineChange(type, scheduledEvents[0].proposalPk);
+          await handleProposalWorkflowEngineChange(
+            type,
+            scheduledEvents[0].proposalPk
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -682,17 +675,17 @@ export async function createListenToRabbitMQHandler() {
               Experiment,
               'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
             >);
-          await handleWorkflowEngineChange(type, message.proposalPk as number);
+          await handleProposalWorkflowEngineChange(
+            type,
+            message.proposalPk as number
+          );
 
-          const eventBus = resolveApplicationEventBus();
-          await eventBus.publish({
-            type: Event.EXPERIMENT_UPDATED,
-            experiment: experiment,
-            key: 'experiment',
-            loggedInUserId: null,
-            isRejection: false,
-            blockWorkflow: true,
-          });
+          const jsonMessage = await getExperimentMessageData(experiment);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            'EXPERIMENT_UPDATED',
+            jsonMessage
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

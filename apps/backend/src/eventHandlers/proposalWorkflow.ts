@@ -135,7 +135,7 @@ export default function createHandler() {
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
     // if the original method failed
     // there is no point of moving forward in the workflow
-    if (event.isRejection || event.blockWorkflow) {
+    if (event.isRejection) {
       return;
     }
 

@@ -49,12 +49,11 @@ const createMockEvent = (
   overrides: Partial<ApplicationEvent> = {}
 ): ApplicationEvent =>
   ({
-    type: Event.EXPERIMENT_CREATED,
+    type: Event.EXPERIMENT_ESF_SUBMITTED,
     isRejection: false,
-    blockWorkflow: false,
-    key: 'experiment',
+    key: 'experimentsafety',
     loggedInUserId: null,
-    experiment: { experimentPk: 42 },
+    experimentsafety: { experimentPk: 42 },
     ...overrides,
   }) as unknown as ApplicationEvent;
 
@@ -82,21 +81,11 @@ describe('experimentSafetyWorkflowHandler', () => {
       expect(spyMarkEvent).not.toHaveBeenCalled();
     });
 
-    test('should return early if event.blockWorkflow is true', async () => {
-      const handler = createExperimentSafetyWorkflowHandler();
-      const event = createMockEvent({ blockWorkflow: true });
-
-      await handler(event);
-
-      expect(spyMarkEvent).not.toHaveBeenCalled();
-    });
-
     test('should return early if event has no experimentPk anywhere', async () => {
       const handler = createExperimentSafetyWorkflowHandler();
       const event = {
         type: Event.PROPOSAL_CREATED,
         isRejection: false,
-        blockWorkflow: false,
         key: 'proposal',
         loggedInUserId: null,
         proposal: { proposalPk: 1, title: 'Test Proposal' },
@@ -112,15 +101,16 @@ describe('experimentSafetyWorkflowHandler', () => {
     test('should find experimentPk in a flat event object (e.g., experiment key)', async () => {
       const handler = createExperimentSafetyWorkflowHandler();
       const event = createMockEvent({
-        type: Event.EXPERIMENT_CREATED,
-        experiment: { experimentPk: 100 },
+        type: Event.EXPERIMENT_ESF_SUBMITTED,
+        experimentsafety: { experimentPk: 100 },
       } as unknown as Partial<ApplicationEvent>);
 
       await handler(event);
 
-      expect(spyMarkEvent).toHaveBeenCalledWith(Event.EXPERIMENT_CREATED, [
-        100,
-      ]);
+      expect(spyMarkEvent).toHaveBeenCalledWith(
+        Event.EXPERIMENT_ESF_SUBMITTED,
+        [100]
+      );
     });
 
     test('should find experimentPk in a nested object (e.g., experimentsafety)', async () => {
@@ -128,7 +118,6 @@ describe('experimentSafetyWorkflowHandler', () => {
       const event = {
         type: Event.EXPERIMENT_ESF_SUBMITTED,
         isRejection: false,
-        blockWorkflow: false,
         key: 'experimentsafety',
         loggedInUserId: null,
         experimentsafety: { experimentPk: 77, experimentSafetyPk: 1 },
@@ -149,7 +138,6 @@ describe('experimentSafetyWorkflowHandler', () => {
       const event = {
         type: Event.PROPOSAL_UPDATED,
         isRejection: false,
-        blockWorkflow: false,
         key: 'proposal',
         loggedInUserId: null,
         proposal: { proposalPk: 5, title: 'Another' },
@@ -164,27 +152,29 @@ describe('experimentSafetyWorkflowHandler', () => {
 
 describe('handleWorkflowEngineChange', () => {
   test('should wrap a single pk into an array and call workflow engine', async () => {
-    const event = createMockEvent({ type: Event.EXPERIMENT_CREATED });
+    const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
 
     await handleWorkflowEngineChange(event, 42);
 
-    expect(spyMarkEvent).toHaveBeenCalledWith(Event.EXPERIMENT_CREATED, [42]);
+    expect(spyMarkEvent).toHaveBeenCalledWith(Event.EXPERIMENT_ESF_SUBMITTED, [
+      42,
+    ]);
   });
 
   test('should pass an array of pks directly to workflow engine', async () => {
-    const event = createMockEvent({ type: Event.EXPERIMENT_UPDATED });
+    const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
 
     await handleWorkflowEngineChange(event, [10, 20, 30]);
 
     expect(spyMarkEvent).toHaveBeenCalledWith(
-      Event.EXPERIMENT_UPDATED,
+      Event.EXPERIMENT_ESF_SUBMITTED,
       [10, 20, 30]
     );
   });
 
   describe('publishExperimentSafetyStatusChange', () => {
     test('should publish status change events when workflow engine returns updated experiments', async () => {
-      const event = createMockEvent({ type: Event.EXPERIMENT_CREATED });
+      const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       const updatedExperiment = createMockUpdatedExperiment({
         statusId: 10,
         prevStatusId: 5,
@@ -226,7 +216,7 @@ describe('handleWorkflowEngineChange', () => {
     });
 
     test('should not publish if workflow engine returns an empty array', async () => {
-      const event = createMockEvent({ type: Event.EXPERIMENT_CREATED });
+      const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       spyMarkEvent.mockResolvedValue([]);
 
       await handleWorkflowEngineChange(event, 42);
@@ -236,7 +226,7 @@ describe('handleWorkflowEngineChange', () => {
     });
 
     test('should not publish if updated experiment has no statusId', async () => {
-      const event = createMockEvent({ type: Event.EXPERIMENT_CREATED });
+      const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       const updatedExperiment = createMockUpdatedExperiment({
         statusId: undefined as unknown as number,
       });
@@ -250,7 +240,7 @@ describe('handleWorkflowEngineChange', () => {
     });
 
     test('should not publish if workflow engine returns null', async () => {
-      const event = createMockEvent({ type: Event.EXPERIMENT_CREATED });
+      const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       spyMarkEvent.mockResolvedValue(null);
 
       await handleWorkflowEngineChange(event, 42);
