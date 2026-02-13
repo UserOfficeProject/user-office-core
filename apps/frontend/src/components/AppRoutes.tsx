@@ -265,7 +265,7 @@ const AppRoutes = () => {
         {isTagsEnabled && isUserOfficer && (
           <Route
             path="/Tag"
-            element={<TitledRoute title="Tag" element={<TagPage />} />}
+            element={<TitledRoute title="Tags" element={<TagPage />} />}
           />
         )}
         <Route

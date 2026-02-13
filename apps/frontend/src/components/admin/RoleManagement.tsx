@@ -1,4 +1,3 @@
-import Apartment from '@mui/icons-material/Apartment';
 import {
   Box,
   Button,
@@ -11,6 +10,7 @@ import {
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
+import TagIcon from 'components/common/icons/TagIcon';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Role } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -265,8 +265,8 @@ const RoleManagement: React.FC = () => {
           }}
           actions={[
             (rowData: RoleRow) => ({
-              icon: () => <Apartment />,
-              tooltip: 'Assign Tag',
+              icon: () => <TagIcon />,
+              tooltip: 'Assign Tags',
               onClick: (event, rowData) => {
                 setSelectedRole(rowData as RoleRow);
                 setTagDialogOpen(true);
