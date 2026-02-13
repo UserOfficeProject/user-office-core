@@ -1,0 +1,5 @@
+mutation updateRoleTags($roleId: Int!, $tagIds: [Int!]!) {
+  updateRoleTags(roleId: $roleId, tagIds: $tagIds) {
+    ...role
+  }
+}

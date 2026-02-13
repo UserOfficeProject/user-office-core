@@ -1,5 +1,14 @@
+import { Role } from '../../models/Role';
 import { RoleDataSource, Tag } from '../RoleDataSource';
 
+const dummyRole: Role = {
+  id: 1,
+  shortCode: 'admin',
+  title: 'Administrator',
+  description: 'Has full access to all features and settings.',
+  isRootRole: false,
+  permissions: [],
+};
 export class RoleDataSourceMock implements RoleDataSource {
   private roleTagsMap: Map<number, Set<number>> = new Map();
   private tags: Map<number, string> = new Map([
@@ -8,22 +17,11 @@ export class RoleDataSourceMock implements RoleDataSource {
     [3, 'moderator'],
   ]);
 
-  async addTagToRole(roleId: number, tagId: number): Promise<void> {
-    if (!this.tags.has(tagId)) {
-      throw new Error(`Tag with id ${tagId} not found`);
-    }
+  async updateRoleTags(roleId: number, tagIds: number[]): Promise<Role> {
+    const validTagIds = tagIds.filter((tagId) => this.tags.has(tagId));
+    this.roleTagsMap.set(roleId, new Set(validTagIds));
 
-    if (!this.roleTagsMap.has(roleId)) {
-      this.roleTagsMap.set(roleId, new Set());
-    }
-
-    this.roleTagsMap.get(roleId)!.add(tagId);
-  }
-
-  async removeTagFromRole(roleId: number, tagId: number): Promise<void> {
-    if (this.roleTagsMap.has(roleId)) {
-      this.roleTagsMap.get(roleId)!.delete(tagId);
-    }
+    return dummyRole;
   }
 
   async getTagsByRoleId(roleId: number): Promise<Tag[]> {

@@ -1,6 +1,6 @@
-import { inject, injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
+import { Tokens } from '../config/Tokens'; // Correct import path for Tokens
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
@@ -9,25 +9,17 @@ import { UserWithRole } from '../models/User';
 @injectable()
 export default class RoleTagsMutation {
   constructor(
-    @inject(Tokens.RoleDataSource)
-    private roleDataSource: RoleDataSource
+    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async addTagToRole(
-    user: UserWithRole | null,
+  async updateRoleTags(
+    agent: UserWithRole | null,
     roleId: number,
-    tagId: number
-  ): Promise<void> {
-    await this.roleDataSource.addTagToRole(roleId, tagId);
-  }
+    tagIds: number[]
+  ): Promise<any> {
+    const role = await this.roleDataSource.updateRoleTags(roleId, tagIds);
 
-  @Authorized([Roles.USER_OFFICER])
-  async removeTagFromRole(
-    user: UserWithRole | null,
-    roleId: number,
-    tagId: number
-  ): Promise<void> {
-    await this.roleDataSource.removeTagFromRole(roleId, tagId);
+    return role;
   }
 }
