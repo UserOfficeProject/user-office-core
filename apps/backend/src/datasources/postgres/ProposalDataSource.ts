@@ -20,7 +20,6 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { StatusDataSource } from '../StatusDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
@@ -102,9 +101,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
     @inject(Tokens.CallDataSource)
-    protected callDataSource: CallDataSource,
-    @inject(Tokens.StatusDataSource)
-    protected statusDataSource: StatusDataSource
+    protected callDataSource: CallDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -364,7 +361,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           proposer_id,
           call_id,
           questionary_id,
-          status_id: proposalInitialStatus.statusId,
           workflow_status_id: proposalInitialStatus.workflowStatusId,
         },
         ['*']
