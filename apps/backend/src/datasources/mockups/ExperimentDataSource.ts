@@ -414,8 +414,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     if (!experimentSafety) {
       throw new Error('Experiment does not exist');
     }
-    // TODO fix this
-    //  experimentSafety.workflowStatusId = workflowStatusId;
+    experimentSafety.workflowStatusId = workflowStatusId;
 
     return experimentSafety;
   }
