@@ -31,7 +31,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/server": "^4.10.0",
+    "@apollo/server": "^5.4.0",
     "@apollo/subgraph": "^2.7.1",
     "@graphql-tools/utils": "^10.1.0",
     "@isaacs/ttlcache": "^1.4.1",
