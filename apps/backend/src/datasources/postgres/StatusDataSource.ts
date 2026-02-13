@@ -64,7 +64,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
         {
-          status_id: status.id,
           name: status.name,
           description: status.description,
         },

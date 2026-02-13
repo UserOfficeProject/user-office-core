@@ -875,6 +875,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     const workflowStatus =
       await this.workflowDataSource.getWorkflowStatus(workflowStatusId);
 
+    // NOTE: If status is DRAFT re-open the proposal for submission
     const dataToUpdate: Partial<ProposalRecord> = {
       workflow_status_id: workflowStatusId,
       submitted: workflowStatus?.statusId === 'DRAFT' ? false : undefined,

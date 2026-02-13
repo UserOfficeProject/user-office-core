@@ -614,6 +614,9 @@ export interface WorkflowConnectionRecord {
   readonly target_handle: string;
 }
 
+// NOTE: This is a data structure returned by getWorkflowStructure function in WorkflowDataSource,
+// and contains full information about workflow statuses and connections,
+// so we do not need to make multiple calls to database to get workflow structure
 export interface WorkflowStructure {
   workflowStatuses: {
     workflowStatusId: number;
