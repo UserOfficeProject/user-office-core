@@ -25,18 +25,12 @@ const ProposalChooseCall = () => {
     navigate(url);
   };
   function getDashBoardCallFilter(): CallsFilter {
-    return isInternalUser
-      ? {
-          isActive: true,
-          isEnded: false,
-          isActiveInternal: true,
-          isOrdered: true,
-        }
-      : {
-          isActive: true,
-          isEnded: false,
-          isOrdered: true,
-        };
+    return {
+      isActive: true,
+      isEnded: false,
+      isActiveInternal: isInternalUser,
+      isOrdered: true,
+    };
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
 
