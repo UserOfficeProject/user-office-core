@@ -176,7 +176,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         .distinctOn('call.call_id');
     }
     if (filter?.isOrdered) {
-      query.whereNot('sort_order', 0).orderBy('sort_order');
+      query.orderBy('sort_order');
     }
 
     return query.then((callDB: CallRecord[]) => {
