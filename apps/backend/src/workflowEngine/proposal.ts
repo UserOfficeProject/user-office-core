@@ -27,7 +27,10 @@ type WorkflowRunBatchInput = {
   event: Event;
 };
 
-export type WorkflowRunInput = WorkflowRunSingleInput | WorkflowRunBatchInput;
+export type WorkflowRunInput =
+  | WorkflowRunSingleInput
+  | WorkflowRunSingleInput[]
+  | WorkflowRunBatchInput;
 
 const isBatchWorkflowInput = (
   input: WorkflowRunInput
