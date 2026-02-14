@@ -377,7 +377,11 @@ export class UserDataSourceMock implements UserDataSource {
     institution: Institution;
     country: Country;
   } | null> {
-    return null;
+    return {
+      user: dummyUser,
+      institution: { id: 1, name: 'Test Institution', country: 1 },
+      country: { countryId: 1, country: 'Test Country' },
+    };
   }
 
   async getUsers(
@@ -416,7 +420,13 @@ export class UserDataSourceMock implements UserDataSource {
       country: Country;
     }[]
   > {
-    return [];
+    return [
+      {
+        user: dummyUser,
+        institution: { id: 1, name: 'Test Institution', country: 1 },
+        country: { countryId: 1, country: 'Test Country' },
+      },
+    ];
   }
 
   async checkScientistToProposal(
@@ -568,6 +578,12 @@ export class UserDataSourceMock implements UserDataSource {
       country: Country;
     }[]
   > {
-    return [];
+    return [
+      {
+        user: dummyUser,
+        institution: { id: 1, name: 'Test Institution', country: 1 },
+        country: { countryId: 1, country: 'Test Country' },
+      },
+    ];
   }
 }

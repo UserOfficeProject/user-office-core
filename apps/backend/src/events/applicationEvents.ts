@@ -451,6 +451,11 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   experimentsafety: ExperimentSafety;
 }
 
+interface ExperimentESFSubmittedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_SUBMITTED;
+  experimentsafety: ExperimentSafety;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -535,4 +540,5 @@ export type ApplicationEvent =
   | ExperimentSafetyManagementDecisionSubmittedByISEvent
   | ExperimentSafetyManagementDecisionSubmittedByESREvent
   | ExperimentSafetyStatusChangedByWorkflowEvent
-  | ExperimentSafetyStatusChangedByUserEvent;
+  | ExperimentSafetyStatusChangedByUserEvent
+  | ExperimentESFSubmittedEvent;
