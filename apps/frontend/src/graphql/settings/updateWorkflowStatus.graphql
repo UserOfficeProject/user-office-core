@@ -1,32 +1,11 @@
-mutation updateWorkflowStatus(
-  $id: Int!
-  $posX: Int
-  $posY: Int
-  $prevStatusId: Int
-  $nextStatusId: Int
-  $prevConnectionId: Int
-) {
+mutation updateWorkflowStatus($workflowStatusId: Int!, $posX: Int, $posY: Int) {
   updateWorkflowStatus(
     updateWorkflowStatusInput: {
-      id: $id
+      workflowStatusId: $workflowStatusId
       posX: $posX
       posY: $posY
-      prevStatusId: $prevStatusId
-      nextStatusId: $nextStatusId
-      prevConnectionId: $prevConnectionId
     }
   ) {
-    id
-    posX
-    posY
-    workflowId
-    statusId
-    sortOrder
-    nextStatusId
-    prevStatusId
-    prevConnectionId
-    status {
-      ...status
-    }
+    ...workflowStatus
   }
 }

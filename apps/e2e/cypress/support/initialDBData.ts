@@ -316,94 +316,111 @@ export default {
   },
   proposalStatuses: {
     draft: {
-      id: 1,
+      id: 'DRAFT',
       name: 'DRAFT',
-      shortCode: 'DRAFT',
     },
     feasibilityReview: {
-      id: 2,
+      id: 'FEASIBILITY_REVIEW',
       name: 'FEASIBILITY_REVIEW',
-      shortCode: 'FEASIBILITY_REVIEW',
     },
     notFeasible: {
-      id: 3,
+      id: 'NOT_FEASIBLE',
       name: 'NOT_FEASIBLE',
-      shortCode: 'NOT_FEASIBLE',
     },
     fapSelection: {
-      id: 4,
+      id: 'FAP_SELECTION',
       name: 'FAP_SELECTION',
-      shortCode: 'FAP_SELECTION',
     },
     fapReview: {
-      id: 5,
+      id: 'FAP_REVIEW',
       name: 'FAP_REVIEW',
-      shortCode: 'FAP_REVIEW',
     },
     expired: {
-      id: 9,
+      id: 'EXPIRED',
       name: 'EXPIRED',
-      shortCode: 'EXPIRED',
     },
     fapMeeting: {
-      id: 12,
+      id: 'FAP_MEETING',
       name: 'FAP Meeting',
-      shortCode: 'FAP_MEETING',
     },
     editableSubmitted: {
-      id: 14,
+      id: 'EDITABLE_SUBMITTED',
       name: 'EDITABLE_SUBMITTED',
-      shortCode: 'EDITABLE_SUBMITTED',
     },
     editableSubmittedInternal: {
-      id: 15,
+      id: 'EDITABLE_SUBMITTED_INTERNAL',
       name: 'EDITABLE_SUBMITTED_INTERNAL',
-      shortCode: 'EDITABLE_SUBMITTED_INTERNAL',
     },
     awaitingEsf: {
-      id: 17,
+      id: 'AWAITING_ESF',
       name: 'AWAITING ESF',
-      shortCode: 'AWAITING_ESF',
     },
     esfIsReview: {
-      id: 18,
+      id: 'ESF_IS_REVIEW',
       name: 'ESF_IS_REVIEW',
-      shortCode: 'ESF_IS_REVIEW',
     },
     esfEsrReview: {
-      id: 19,
+      id: 'ESF_ESR_REVIEW',
       name: 'ESF ESR REVIEW',
-      shortCode: 'ESF_ESR_REVIEW',
     },
     esfRejected: {
-      id: 20,
+      id: 'ESF_REJECTED',
       name: 'ESF REJECTED',
-      shortCode: 'ESF_REJECTED',
     },
     quickReview: {
-      id: 22,
+      id: 'QUICK_REVIEW',
       name: 'QUICK_REVIEW',
-      shortCode: 'QUICK_REVIEW',
     },
     underReview: {
-      id: 23,
+      id: 'UNDER_REVIEW',
       name: 'UNDER_REVIEW',
-      shortCode: 'UNDER_REVIEW',
     },
     approved: {
-      id: 24,
+      id: 'APPROVED',
       name: 'APPROVED',
-      shortCode: 'APPROVED',
     },
     unsuccessful: {
-      id: 25,
+      id: 'UNSUCCESSFUL',
       name: 'UNSUCCESSFUL',
-      shortCode: 'UNSUCCESSFUL',
     },
     finished: {
-      id: 26,
+      id: 'FINISHED',
       name: 'FINISHED',
-      shortCode: 'FINISHED',
+    },
+  },
+  workflows: {
+    defaultWorkflow: {
+      id: 1,
+      workflowStatuses: {
+        draft: { id: 1, statusId: 'DRAFT' },
+        feasibilityReview: { id: 2, statusId: 'FEASIBILITY_REVIEW' },
+        notFeasible: { id: 3, statusId: 'NOT_FEASIBLE' },
+        fapSelection: { id: 4, statusId: 'FAP_SELECTION' },
+        fapReview: { id: 5, statusId: 'FAP_REVIEW' },
+        expired: { id: 6, statusId: 'EXPIRED' },
+        fapMeeting: { id: 7, statusId: 'FAP_MEETING' },
+        editableSubmitted: { id: 8, statusId: 'EDITABLE_SUBMITTED' },
+        editableSubmittedInternal: {
+          id: 9,
+          statusId: 'EDITABLE_SUBMITTED_INTERNAL',
+        },
+        quickReview: { id: 15, statusId: 'QUICK_REVIEW' },
+        underReview: { id: 16, statusId: 'UNDER_REVIEW' },
+        approved: { id: 17, statusId: 'APPROVED' },
+        unsuccessful: { id: 18, statusId: 'UNSUCCESSFUL' },
+        finished: { id: 19, statusId: 'FINISHED' },
+      },
+    },
+
+    defaultSafetyWorkflow: {
+      id: 2,
+      workflowStatuses: {
+        awaitingEsf: { id: 10, statusId: 'AWAITING_ESF' },
+        esfIsReview: { id: 11, statusId: 'ESF_IS_REVIEW' },
+        esfEsrReview: { id: 12, statusId: 'ESF_ESR_REVIEW' },
+        esfRejected: { id: 13, statusId: 'ESF_REJECTED' },
+        esfApproved: { id: 14, statusId: 'ESF_APPROVED' },
+      },
     },
   },
   experiments: {
@@ -438,12 +455,6 @@ export default {
       description: 'Format used to represent date with time without seconds.',
       settingsValue: 'dd-MM-yyyy HH:mm',
     },
-  },
-  workflows: {
-    defaultWorkflow: {
-      id: 1,
-    },
-    defaultDroppableGroup: 'proposalWorkflowConnections_0',
   },
   sample1: {
     sampleId: 1,

@@ -49,6 +49,7 @@ context('Proposal tests', () => {
   let createdProposalId: string;
   let createdCallId: number;
   let createdTemplateId: number;
+  let createdFapMeetingWorkflowStatusId: number;
   const textQuestion = faker.lorem.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -123,19 +124,24 @@ context('Proposal tests', () => {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      }).then((workflowStatusResult) => {
+        if (workflowStatusResult.addStatusToWorkflow) {
+          createdFapMeetingWorkflowStatusId =
+            workflowStatusResult.addStatusToWorkflow.workflowStatusId;
+        }
+      });
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
         entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
-          cy.addWorkflowStatus({
+          cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
-            sortOrder: 1,
-            prevStatusId: 1,
-            posX: 0,
-            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -753,10 +759,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]').contains('DRAFT').click();
 
@@ -777,10 +783,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]')
         .contains(initialDBData.proposalStatuses.fapMeeting.name)
@@ -807,7 +813,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
       cy.login('officer');
@@ -836,7 +842,7 @@ context('Proposal tests', () => {
         .uncheck();
 
       cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
-        .parent()
+        .closest('tr')
         .find('[type="checkbox"]')
         .check();
       cy.get('[data-cy="change-proposal-status"]').click();
@@ -852,7 +858,7 @@ context('Proposal tests', () => {
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
 
@@ -1095,8 +1101,10 @@ context('Proposal tests', () => {
 
       cy.get('[index="0"] input').check();
       cy.get('[data-cy="change-proposal-status"]').click();
-      cy.get('#selectedStatusId-input').click();
-      cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
+      cy.get('#selectedWorkflowStatusId-input').click();
+      cy.get('[role="listbox"]')
+        .contains(/^EDITABLE_SUBMITTED$/)
+        .click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
       cy.login('user1', initialDBData.roles.user);

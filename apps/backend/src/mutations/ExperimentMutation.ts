@@ -8,8 +8,8 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import {
@@ -22,7 +22,6 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { WorkflowType } from '../models/Workflow';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
@@ -53,8 +52,8 @@ export default class ExperimentMutations {
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
@@ -119,9 +118,17 @@ export default class ExperimentMutations {
       );
     }
 
-    const experimentSafetyWorkflowDefaultStatus =
-      await this.statusDataSource.getDefaultStatus(WorkflowType.EXPERIMENT);
-    if (!experimentSafetyWorkflowDefaultStatus) {
+    if (!call.experimentWorkflowId) {
+      return rejection(
+        'Can not create Experiment Safety, because system has no Experiment Workflow configured'
+      );
+    }
+
+    const experimentSafetyDefaultWorkflowStatus =
+      await this.workflowDataSource.getInitialWorkflowStatus(
+        call.experimentWorkflowId
+      );
+    if (!experimentSafetyDefaultWorkflowStatus) {
       return rejection(
         'Can not create Experiment Safety, because system has no default status for Experiment Safety'
       );
@@ -141,7 +148,7 @@ export default class ExperimentMutations {
       experimentPk,
       newEsiQuestionary.questionaryId,
       agent!.id,
-      experimentSafetyWorkflowDefaultStatus.id
+      experimentSafetyDefaultWorkflowStatus.workflowStatusId
     );
   }
 

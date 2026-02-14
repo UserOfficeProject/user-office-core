@@ -45,97 +45,104 @@ context('Technique Proposal tests', () => {
   };
 
   const draftStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
     shortCode: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.draft.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
     name: 'DRAFT',
-    shortCode: 'SUBMITTED_LOCKED',
+    shortCode: 'DRAFT',
     description: '-',
   };
 
   const submittedStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
     name: 'Submitted (locked)',
-    shortCode: 'SUBMITTED_LOCKED',
+    statusId: 'SUBMITTED_LOCKED',
     description: '-',
   };
 
   const underReviewStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.underReview.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.underReview.id,
     name: 'Under review',
-    shortCode: 'UNDER_REVIEW',
+    statusId: 'UNDER_REVIEW',
     description: '-',
   };
 
   const approvedStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.approved.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.approved.id,
     name: 'Approved',
-    shortCode: 'APPROVED',
+    statusId: 'APPROVED',
     description: '-',
   };
 
   const unsuccessfulStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.unsuccessful.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.unsuccessful.id,
     name: 'Unsuccessful',
-    shortCode: 'UNSUCCESSFUL',
+    statusId: 'UNSUCCESSFUL',
     description: '-',
   };
 
   const finishedStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.finished.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.finished.id,
     name: 'Finished',
-    shortCode: 'FINISHED',
+    statusId: 'FINISHED',
     description: '-',
   };
 
   const expiredStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.expired.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.expired.id,
     name: 'EXPIRED',
-    shortCode: 'EXPIRED',
+    statusId: 'EXPIRED',
     description: '-',
   };
 
   const quickReviewStatus: {
-    id?: number;
+    workflowStatusId?: number;
     name: string;
-    shortCode: string;
+    statusId: string;
     description: string;
   } = {
-    id: initialDBData.proposalStatuses.quickReview.id,
+    workflowStatusId:
+      initialDBData.workflows.defaultWorkflow.workflowStatuses.quickReview.id,
     name: 'Quick review',
-    shortCode: 'QUICK_REVIEW',
+    statusId: 'QUICK_REVIEW',
     description: '-',
   };
 
@@ -238,13 +245,13 @@ context('Technique Proposal tests', () => {
     cy.resetDB();
 
     cy.createStatus({
+      id: submittedStatus.statusId,
       name: submittedStatus.name,
-      shortCode: submittedStatus.shortCode,
       description: submittedStatus.description,
       entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
-        submittedStatus.id = result.createStatus.id;
+        submittedStatus.statusId = result.createStatus.id;
       }
     });
 
@@ -256,12 +263,74 @@ context('Technique Proposal tests', () => {
       callWorkflowId = workflow.id;
 
       if (result.createWorkflow) {
-        cy.addWorkflowStatus({
-          statusId: quickReviewStatus.id as number,
+        cy.addStatusToWorkflow({
+          statusId: quickReviewStatus.statusId,
           workflowId: callWorkflowId,
-          sortOrder: 1,
           posX: 0,
           posY: 200,
+        }).then((result) => {
+          quickReviewStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: expiredStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          expiredStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: submittedStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          submittedStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: underReviewStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          underReviewStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: approvedStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          approvedStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: unsuccessfulStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          unsuccessfulStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
+        });
+
+        cy.addStatusToWorkflow({
+          statusId: finishedStatus.statusId,
+          workflowId: callWorkflowId,
+          posX: 0,
+          posY: 200,
+        }).then((result) => {
+          finishedStatus.workflowStatusId =
+            result.addStatusToWorkflow.workflowStatusId;
         });
       }
 
@@ -449,7 +518,7 @@ context('Technique Proposal tests', () => {
             })
             .then(() => {
               cy.changeProposalsStatus({
-                statusId: submittedStatus.id as number,
+                workflowStatusId: submittedStatus.workflowStatusId as number,
                 proposalPks: [createdProposalPk3],
               }).then(() => {
                 cy.assignProposalToTechniques({
@@ -477,7 +546,7 @@ context('Technique Proposal tests', () => {
             })
             .then(() => {
               cy.changeProposalsStatus({
-                statusId: submittedStatus.id as number,
+                workflowStatusId: submittedStatus.workflowStatusId as number,
                 proposalPks: [createdProposalPk4],
               });
             });
@@ -496,7 +565,7 @@ context('Technique Proposal tests', () => {
           abstract: proposal5.abstract,
         }).then(() => {
           cy.changeProposalsStatus({
-            statusId: expiredStatus.id as number,
+            workflowStatusId: expiredStatus.workflowStatusId as number,
             proposalPks: [createdProposalPk5],
           }).then(() => {
             cy.assignProposalToTechniques({
@@ -1020,7 +1089,7 @@ context('Technique Proposal tests', () => {
     it('Scientist should not see expired proposals', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: expiredStatus.id as number,
+        workflowStatusId: expiredStatus.workflowStatusId as number,
       }).then(() => {
         cy.login(scientist2);
         cy.visit('/');
@@ -1198,7 +1267,7 @@ context('Technique Proposal tests', () => {
     it('Instrument scientist able to select and assign an instrument for a proposal', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: underReviewStatus.id as number,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
       });
 
       /*
@@ -1406,7 +1475,7 @@ context('Technique Proposal tests', () => {
       */
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: draftStatus.id as number,
+        workflowStatusId: draftStatus.workflowStatusId as number,
       }).then(() => {
         cy.assignProposalsToInstruments({
           proposalPks: createdProposalPk1,
@@ -1458,7 +1527,7 @@ context('Technique Proposal tests', () => {
       */
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: finishedStatus.id as number,
+        workflowStatusId: finishedStatus.workflowStatusId as number,
       }).then(() => {
         cy.assignProposalsToInstruments({
           proposalPks: createdProposalPk1,
@@ -1504,7 +1573,7 @@ context('Technique Proposal tests', () => {
       */
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: unsuccessfulStatus.id as number,
+        workflowStatusId: unsuccessfulStatus.workflowStatusId as number,
       }).then(() => {
         cy.assignProposalsToInstruments({
           proposalPks: createdProposalPk1,
@@ -1553,7 +1622,7 @@ context('Technique Proposal tests', () => {
     it('Scientist can only change to specific statuses and cannot assign an instrument when the current status is submitted', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: submittedStatus.id as number,
+        workflowStatusId: submittedStatus.workflowStatusId as number,
       });
 
       cy.login(scientist1);
@@ -1603,7 +1672,7 @@ context('Technique Proposal tests', () => {
     it('Scientist can only change to specific statuses when the current status is under review', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: underReviewStatus.id as number,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
       });
 
       cy.login(scientist1);
@@ -1689,7 +1758,7 @@ context('Technique Proposal tests', () => {
     it('Scientist can only change to specific statuses when the current status is approved', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: approvedStatus.id as number,
+        workflowStatusId: approvedStatus.workflowStatusId as number,
       }).then(() => {
         cy.assignProposalsToInstruments({
           proposalPks: createdProposalPk1,
@@ -1741,7 +1810,7 @@ context('Technique Proposal tests', () => {
     it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: underReviewStatus.id as number,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
       });
 
       // Proposal 1 is assigned to instrument 1

@@ -81,7 +81,7 @@ function ExperimentSafetyReviewSummary({
     getInitialDecision !== ''
   );
   const [isDownloadEnabled, setIsDownloadEnabled] = useState<boolean>(
-    state?.experimentSafety.status?.shortCode === 'ESF_APPROVED'
+    state?.experimentSafety.status?.id === 'ESF_APPROVED'
   );
 
   const downloadExperimentSafety = useDownloadPDFExperimentSafety();
@@ -190,7 +190,7 @@ function ExperimentSafetyReviewSummary({
                       // Update download enabled state based on the actual status
                       setIsDownloadEnabled(
                         submitInstrumentScientistExperimentSafetyReview?.status
-                          ?.shortCode === 'ESF_APPROVED'
+                          ?.id === 'ESF_APPROVED'
                       );
                     } else {
                       // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
@@ -221,7 +221,7 @@ function ExperimentSafetyReviewSummary({
                       // Update download enabled state based on the actual status
                       setIsDownloadEnabled(
                         submitExperimentSafetyReviewerExperimentSafetyReview
-                          ?.status?.shortCode === 'ESF_APPROVED'
+                          ?.status?.id === 'ESF_APPROVED'
                       );
                     }
                     // Lock the form after successful submission

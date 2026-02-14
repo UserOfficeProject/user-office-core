@@ -4,6 +4,7 @@ import {
   TechnicalReviewStatus,
   FeatureId,
   SettingsId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -12,7 +13,7 @@ import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();
-  cy.get('[role="listbox"] [data-value="0"]').click();
+  cy.get('[role="listbox"] [data-value="ALL"]').click();
 };
 
 context('Instrument tests', () => {
@@ -76,6 +77,18 @@ context('Instrument tests', () => {
 
   describe('Instruments basic tests', () => {
     beforeEach(() => {
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
+
       cy.login('officer');
       cy.visit('/');
 
@@ -200,6 +213,18 @@ context('Instrument tests', () => {
           roles: [initialDBData.roles.instrumentScientist],
         });
       }
+
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
@@ -486,7 +511,6 @@ context('Instrument tests', () => {
       cy.get('[role="dialog"]').contains('Technical review').click();
 
       cy.get('[data-cy="save-and-continue-button"]').should('not.be.disabled');
-      //cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] label').should(
         'include.text',
@@ -1033,6 +1057,18 @@ context('Instrument tests', () => {
           roles: [initialDBData.roles.instrumentScientist],
         });
       }
+
+      cy.createStatus({
+        id: 'FEASIBILITY',
+        name: 'Feasibility',
+        description: 'Feasibility status',
+        entityType: WorkflowType.PROPOSAL,
+      });
+
+      cy.addStatusToWorkflow({
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        statusId: 'FEASIBILITY',
+      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {

@@ -7,7 +7,7 @@ import { Status } from '../../types/Status';
 @InputType()
 export class CreateStatusInput implements Partial<Status> {
   @Field(() => String)
-  public shortCode: string;
+  public id: string;
 
   @Field(() => String)
   public name: string;

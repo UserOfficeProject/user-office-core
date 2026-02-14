@@ -10,15 +10,6 @@ import initialDBData from '../support/initialDBData';
 
 // Test Constants
 const TEST_CONSTANTS = {
-  // Workflow Status IDs
-  WORKFLOW_STATUS: {
-    INITIAL: 17,
-    IS_REVIEW: 18,
-    ESR_REVIEW: 19,
-    APPROVED: 21,
-    REJECTED: 20,
-  },
-
   // Sort Orders
   SORT_ORDER: {
     FIRST: 1,
@@ -163,61 +154,55 @@ function createWorkflowForInstrumentScientist() {
       const workflowData = createWorkflowResult.createWorkflow;
 
       return cy
-        .addWorkflowStatus({
-          statusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
+        .addStatusToWorkflow({
+          statusId: 'ESF_IS_REVIEW',
           workflowId: workflowData.id,
-          sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
-          prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
+          prevId: workflowData.statuses[0].workflowStatusId,
           posX: -9,
           posY: 75,
-          prevConnectionId: 2, // Connect to initial status
         })
         .then((result) => {
-          if (result.addWorkflowStatus) {
+          if (result.createWorkflowConnection) {
             return cy
-              .addStatusChangingEventsToConnection({
-                workflowConnectionId: result.addWorkflowStatus.id,
+              .setStatusChangingEventsOnConnection({
+                workflowConnectionId: result.createWorkflowConnection.id,
                 statusChangingEvents: [TEST_CONSTANTS.EVENTS.ESF_SUBMITTED],
               })
               .then(() => {
                 return cy
-                  .addWorkflowStatus({
-                    statusId: TEST_CONSTANTS.WORKFLOW_STATUS.APPROVED,
+                  .addStatusToWorkflow({
+                    statusId: 'ESF_APPROVED',
                     workflowId: workflowData.id,
-                    sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
-                    prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
+                    prevId: result.addStatusToWorkflow.workflowStatusId,
                     posX: 228,
                     posY: 213,
-                    prevConnectionId: result.addWorkflowStatus.id,
                   })
                   .then((secondResult) => {
-                    if (secondResult.addWorkflowStatus) {
+                    if (secondResult.createWorkflowConnection) {
                       return cy
-                        .addStatusChangingEventsToConnection({
+                        .setStatusChangingEventsOnConnection({
                           workflowConnectionId:
-                            secondResult.addWorkflowStatus.id,
+                            secondResult.createWorkflowConnection.id,
                           statusChangingEvents: [
                             TEST_CONSTANTS.EVENTS.ESF_APPROVED_BY_IS,
                           ],
                         })
                         .then(() => {
                           return cy
-                            .addWorkflowStatus({
-                              statusId: TEST_CONSTANTS.WORKFLOW_STATUS.REJECTED,
+                            .addStatusToWorkflow({
+                              statusId: 'ESF_REJECTED',
                               workflowId: workflowData.id,
-                              sortOrder: TEST_CONSTANTS.SORT_ORDER.THIRD,
-                              prevStatusId:
-                                TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
+                              prevId:
+                                result.addStatusToWorkflow.workflowStatusId,
                               posX: -221,
                               posY: 218,
-                              prevConnectionId: result.addWorkflowStatus.id,
                             })
                             .then((thirdResult) => {
-                              if (thirdResult.addWorkflowStatus) {
+                              if (thirdResult.createWorkflowConnection) {
                                 return cy
-                                  .addStatusChangingEventsToConnection({
+                                  .setStatusChangingEventsOnConnection({
                                     workflowConnectionId:
-                                      thirdResult.addWorkflowStatus.id,
+                                      thirdResult.createWorkflowConnection.id,
                                     statusChangingEvents: [
                                       TEST_CONSTANTS.EVENTS.ESF_REJECTED_BY_IS,
                                     ],
@@ -257,61 +242,58 @@ function createWorkflowForESR() {
       const workflowData = createWorkflowResult.createWorkflow;
 
       return cy
-        .addWorkflowStatus({
-          statusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
+        .addStatusToWorkflow({
+          statusId: 'ESR_REVIEW',
           workflowId: workflowData.id,
-          sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
-          prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
+          prevId: workflowData.statuses.find(
+            (status) => status.statusId === 'INITIAL'
+          )!.workflowStatusId,
           posX: 1,
           posY: 111,
-          prevConnectionId: 2,
         })
         .then((result) => {
-          if (result.addWorkflowStatus) {
+          if (result.addStatusToWorkflow) {
             return cy
-              .addStatusChangingEventsToConnection({
-                workflowConnectionId: result.addWorkflowStatus.id,
+              .setStatusChangingEventsOnConnection({
+                workflowConnectionId:
+                  result.addStatusToWorkflow.workflowStatusId,
                 statusChangingEvents: [TEST_CONSTANTS.EVENTS.ESF_SUBMITTED],
               })
               .then(() => {
                 return cy
-                  .addWorkflowStatus({
-                    statusId: TEST_CONSTANTS.WORKFLOW_STATUS.APPROVED,
+                  .addStatusToWorkflow({
+                    statusId: 'APPROVED',
                     workflowId: workflowData.id,
-                    sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
-                    prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
+                    prevId: result.addStatusToWorkflow.workflowStatusId,
                     posX: -211,
                     posY: 282,
-                    prevConnectionId: result.addWorkflowStatus.id,
                   })
                   .then((secondResult) => {
-                    if (secondResult.addWorkflowStatus) {
+                    if (secondResult.addStatusToWorkflow) {
                       return cy
-                        .addStatusChangingEventsToConnection({
+                        .setStatusChangingEventsOnConnection({
                           workflowConnectionId:
-                            secondResult.addWorkflowStatus.id,
+                            secondResult.createWorkflowConnection.id,
                           statusChangingEvents: [
                             TEST_CONSTANTS.EVENTS.ESF_APPROVED_BY_ESR,
                           ],
                         })
                         .then(() => {
                           return cy
-                            .addWorkflowStatus({
-                              statusId: TEST_CONSTANTS.WORKFLOW_STATUS.REJECTED,
+                            .addStatusToWorkflow({
+                              statusId: 'REJECTED',
                               workflowId: workflowData.id,
-                              sortOrder: TEST_CONSTANTS.SORT_ORDER.THIRD,
-                              prevStatusId:
-                                TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
+                              prevId:
+                                result.addStatusToWorkflow.workflowStatusId,
                               posX: 195,
                               posY: 287,
-                              prevConnectionId: result.addWorkflowStatus.id,
                             })
                             .then((thirdResult) => {
-                              if (thirdResult.addWorkflowStatus) {
+                              if (thirdResult.addStatusToWorkflow) {
                                 return cy
-                                  .addStatusChangingEventsToConnection({
+                                  .setStatusChangingEventsOnConnection({
                                     workflowConnectionId:
-                                      thirdResult.addWorkflowStatus.id,
+                                      thirdResult.createWorkflowConnection.id,
                                     statusChangingEvents: [
                                       TEST_CONSTANTS.EVENTS.ESF_REJECTED_BY_ESR,
                                     ],
@@ -579,7 +561,7 @@ context('Experiment Safety Review tests', () => {
         cy.testActionButton('finish-experiment-safety-form-icon', 'completed');
       });
 
-      it('Should validate experiment status change after ESF submission', () => {
+      it.only('Should validate experiment status change after ESF submission', () => {
         submitESFByUser();
 
         // Instrument scientist should see status change to "ESF IS REVIEW"

@@ -14,27 +14,18 @@ mutation createWorkflow(
     name
     description
     connectionLineType
-    workflowConnections {
-      id
-      sortOrder
-      workflowId
-      statusId
-      status {
-        ...status
-      }
-      nextStatusId
-      prevStatusId
-      prevConnectionId
-      posX
-      posY
+    connections {
+      ...workflowConnection
       statusChangingEvents {
-        statusChangingEventId
         workflowConnectionId
         statusChangingEvent
       }
       statusActions {
         ...connectionStatusAction
       }
+    }
+    statuses {
+      ...workflowStatus
     }
   }
 }

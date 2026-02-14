@@ -1210,7 +1210,7 @@ context('Template Basic tests', () => {
         instrumentId: 1,
       });
 
-      cy.changeProposalsStatus({ proposalPks: [1], statusId: 2 });
+      cy.changeProposalsStatus({ proposalPks: [1], workflowStatusId: 2 });
 
       cy.login('officer');
       cy.visit('/');

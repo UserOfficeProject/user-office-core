@@ -7,14 +7,30 @@ DECLARE
   technical_review_questionary_id_var int;
 BEGIN
 
+  INSERT INTO public.workflow_has_statuses(
+    workflow_id, pos_x, pos_y, status_id)
+  VALUES
+    (1, 10,  70, 'FEASIBILITY_REVIEW'),
+    (1, 10, 150, 'NOT_FEASIBLE'),
+    (1, 10, 210, 'FAP_SELECTION'),
+    (1, 10, 270, 'FAP_REVIEW'),
+    (1, 10, 330, 'ALLOCATED'),
+    (1, 10, 390, 'NOT_ALLOCATED'),
+    (1, 10, 450, 'SCHEDULING'),
+    (1, 10, 520, 'EXPIRED'),
+    (1, 10, 580, 'EDITABLE_SUBMITTED_INTERNAL'),
+    (1, 10, 640, 'EDITABLE_SUBMITTED');
+
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (2, 'Instrument 2', 'INSTR2', 'Test instrument 2', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (3, 'Instrument 3', 'INSTR3', 'Test instrument 3', 0);
+  PERFORM setval('public.instruments_instrument_id_seq', 4, false); -- Reset sequence to avoid conflicts
 
   INSERT INTO techniques (technique_id, name, short_code, description) VALUES (1, 'Technique 1', 'TECH1', 'Test technique 1');
   INSERT INTO techniques (technique_id, name, short_code, description) VALUES (2, 'Technique 2', 'TECH2', 'Test technique 2');
   INSERT INTO techniques (technique_id, name, short_code, description) VALUES (3, 'Technique 3', 'TECH3', 'Test technique 3');
-  
+  PERFORM setval('public.techniques_technique_id_seq', 4, false);
+
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 1, NULL);
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 3, NULL);
 
@@ -56,6 +72,7 @@ BEGIN
        title
      , abstract
      , status_id
+     , workflow_status_id
      , proposer_id
      , created_at
      , updated_at
@@ -72,7 +89,8 @@ BEGIN
     (
        'Test proposal'   
      , 'Lorem ipsum'     
-     , 8                 
+     , 'SCHEDULING'   
+     , 8              
      , 1                 
      , NOW()             
      , NOW()             
@@ -90,12 +108,14 @@ BEGIN
 
   INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
   VALUES (1, 1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
+  PERFORM setval('public.technical_review_technical_review_id_seq', 2, false); -- Reset sequence to avoid conflicts
 
   INSERT INTO proposals 
     (
        title
      , abstract
      , status_id
+     , workflow_status_id
      , proposer_id
      , created_at
      , updated_at
@@ -112,7 +132,8 @@ BEGIN
     (
        'Test proposal 2'   
      , 'Lorem ipsum 2'     
-     , 8                 
+     , 'SCHEDULING'   
+     , 8              
      , 1                 
      , NOW()             
      , NOW()             
@@ -125,6 +146,7 @@ BEGIN
      , true              
      , true              
     );
+  PERFORM setval('public.proposals_proposal_id_seq', 3, false); -- Reset sequence to avoid conflicts
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (2, 2);
 

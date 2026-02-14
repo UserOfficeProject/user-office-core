@@ -13,7 +13,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   private createStatusObject(status: StatusRecord) {
     return new Status(
       status.status_id,
-      status.short_code,
       status.name,
       status.description,
       status.is_default,
@@ -22,11 +21,11 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   }
 
   async createStatus(
-    newStatusInput: Omit<Status, 'id' | 'is_default'>
+    newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
     const [addedStatus]: StatusRecord[] = await database
       .insert({
-        short_code: newStatusInput.shortCode,
+        status_id: newStatusInput.id,
         name: newStatusInput.name,
         description: newStatusInput.description,
         entity_type: newStatusInput.entityType,
@@ -41,7 +40,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(addedStatus);
   }
 
-  async getStatus(statusId: number): Promise<Status | null> {
+  async getStatus(statusId: string): Promise<Status | null> {
     const status: StatusRecord = await database
       .select()
       .from('statuses')
@@ -80,7 +79,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(updatedStatus);
   }
 
-  async deleteStatus(statusId: number): Promise<Status> {
+  async deleteStatus(statusId: string): Promise<Status> {
     const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
       .andWhere('is_default', false)
@@ -94,30 +93,17 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(removedStatus);
   }
 
-  async getDefaultStatus(
-    entityType: Status['entityType']
-  ): Promise<Status | null> {
-    const status: StatusRecord = await database
-      .select()
-      .from('statuses')
-      .where('entity_type', entityType)
-      .andWhere('is_default', true)
-      .first();
-
-    return status ? this.createStatusObject(status) : null;
-  }
-
   async getInitialStatus(
     entityType: Status['entityType']
   ): Promise<Status | null> {
-    const shortCode =
+    const statusId =
       entityType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
 
     const status: StatusRecord = await database
       .select()
       .from('statuses')
       .where('entity_type', entityType)
-      .andWhere('short_code', shortCode)
+      .andWhere('status_id', statusId)
       .first();
 
     return status ? this.createStatusObject(status) : null;

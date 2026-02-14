@@ -1,0 +1,8 @@
+fragment workflowConnection on WorkflowConnection {
+  id
+  workflowId
+  prevWorkflowStatusId
+  nextWorkflowStatusId
+  sourceHandle
+  targetHandle
+}

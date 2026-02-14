@@ -9,7 +9,7 @@ import {
   StatusAction,
   StatusActionType,
 } from '../../models/StatusAction';
-import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 import {
   EmailActionConfig,
   StatusActionConfig,
@@ -53,17 +53,15 @@ export default class PostgresStatusActionsDataSource
 
   private createConnectionStatusActionObject(
     actionStatusRecord: WorkflowConnectionHasActionsRecord & {
-      status_action_id: number;
-      name: string;
+      workflow_status_action_id: number;
       type: StatusActionType;
       config: typeof StatusActionConfig;
     }
   ) {
     return new ConnectionHasStatusAction(
-      actionStatusRecord.connection_id,
-      actionStatusRecord.status_action_id,
+      actionStatusRecord.workflow_status_connection_id,
+      actionStatusRecord.workflow_status_action_id,
       actionStatusRecord.workflow_id,
-      actionStatusRecord.name,
       actionStatusRecord.type,
       this.createStatusActionConfig(
         actionStatusRecord.type,
@@ -74,7 +72,7 @@ export default class PostgresStatusActionsDataSource
 
   private createStatusActionObject(statusActionRecord: StatusActionRecord) {
     return new StatusAction(
-      statusActionRecord.status_action_id,
+      statusActionRecord.workflow_status_action_id,
       statusActionRecord.name,
       statusActionRecord.description,
       statusActionRecord.type
@@ -82,20 +80,18 @@ export default class PostgresStatusActionsDataSource
   }
 
   async getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]> {
     const statusActionRecords: (StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
         config: typeof StatusActionConfig;
       })[] = await database
       .select()
-      .from('status_actions as sa')
-      .join('workflow_connection_has_actions as wca', {
-        'wca.action_id': 'sa.status_action_id',
+      .from('workflow_status_actions as wsa')
+      .join('workflow_status_connection_has_workflow_status_actions as wca', {
+        'wca.workflow_status_action_id': 'wsa.workflow_status_action_id',
       })
-      .where('wca.workflow_id', workflowId)
-      .andWhere('wca.connection_id', workflowConnectionId);
+      .andWhere('wca.workflow_status_connection_id', workflowConnectionId);
 
     const statusActions = statusActionRecords.map((statusActionRecord) =>
       this.createConnectionStatusActionObject(statusActionRecord)
@@ -113,12 +109,12 @@ export default class PostgresStatusActionsDataSource
         config: typeof StatusActionConfig;
       } = await database
       .select()
-      .from('status_actions as sa')
-      .join('workflow_connection_has_actions as wca', {
-        'wca.action_id': 'sa.status_action_id',
+      .from('workflow_status_actions as wsa')
+      .join('workflow_status_connection_has_workflow_status_actions as wca', {
+        'wca.workflow_status_action_id': 'wsa.workflow_status_action_id',
       })
-      .where('wca.action_id', statusActionId)
-      .andWhere('wca.connection_id', workflowConnectionId)
+      .where('wca.workflow_status_action_id', statusActionId)
+      .andWhere('wca.workflow_status_connection_id', workflowConnectionId)
       .first();
 
     if (!statusActionRecord) {
@@ -142,17 +138,15 @@ export default class PostgresStatusActionsDataSource
         },
         ['*']
       )
-      .from('workflow_connection_has_actions')
-      .where('connection_id', statusAction.connectionId)
-      .andWhere('action_id', statusAction.actionId);
+      .from('workflow_status_connection_has_workflow_status_actions')
+      .where('workflow_status_connection_id', statusAction.connectionId)
+      .andWhere('workflow_status_action_id', statusAction.actionId);
 
     if (!updatedStatusAction) {
       throw new GraphQLError(`StatusAction not found ${statusAction.actionId}`);
     }
 
     return this.createConnectionStatusActionObject({
-      status_action_id: statusAction.actionId,
-      name: statusAction.name,
       type: statusAction.type,
       ...updatedStatusAction,
     });
@@ -161,8 +155,8 @@ export default class PostgresStatusActionsDataSource
   async getStatusAction(actionId: number): Promise<StatusAction> {
     const statusAction = await database
       .select<StatusActionRecord>()
-      .from('status_actions')
-      .where('status_action_id', actionId)
+      .from('workflow_status_actions')
+      .where('workflow_status_action_id', actionId)
       .first();
 
     if (!statusAction) {
@@ -175,15 +169,15 @@ export default class PostgresStatusActionsDataSource
   async getStatusActions(): Promise<StatusAction[]> {
     const statusActions = await database
       .select<StatusActionRecord[]>('*')
-      .from('status_actions');
+      .from('workflow_status_actions');
 
     return statusActions.map((statusAction) =>
       this.createStatusActionObject(statusAction)
     );
   }
 
-  async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+  async setStatusActionsOnConnection(
+    connectionStatusActionsInput: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[] | null> {
     const workflow = await this.workflowDataSource.getWorkflow(
       connectionStatusActionsInput.workflowId
@@ -197,8 +191,9 @@ export default class PostgresStatusActionsDataSource
 
     const connectionStatusActionsToInsert =
       connectionStatusActionsInput.actions.map((item) => ({
-        connection_id: connectionStatusActionsInput.connectionId,
-        action_id: item.actionId,
+        workflow_status_connection_id:
+          connectionStatusActionsInput.connectionId,
+        workflow_status_action_id: item.actionId,
         workflow_id: connectionStatusActionsInput.workflowId,
         config: item.config ?? null,
       }));
@@ -212,20 +207,25 @@ export default class PostgresStatusActionsDataSource
         if (!connectionStatusActionsInput.actions.length) {
           const removedActions = await database
             .delete()
-            .from('workflow_connection_has_actions')
-            .where('connection_id', connectionStatusActionsInput.connectionId)
-            .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
+            .from('workflow_status_connection_has_workflow_status_actions')
+            .where(
+              'workflow_status_connection_id',
+              connectionStatusActionsInput.connectionId
+            )
             .transacting(trx);
 
           return await trx.commit(removedActions);
         }
         const currentConnectionStatusActionsIds: number[] = await database
           .select('*')
-          .from('workflow_connection_has_actions')
-          .where('connection_id', connectionStatusActionsInput.connectionId)
+          .from('workflow_status_connection_has_workflow_status_actions')
+          .where(
+            'workflow_status_connection_id',
+            connectionStatusActionsInput.connectionId
+          )
           .transacting(trx)
           .then((results: WorkflowConnectionHasActionsRecord[]) => {
-            return results.map((result) => result.action_id);
+            return results.map((result) => result.workflow_status_action_id);
           });
 
         const connectionStatusActionsIdsToRemove =
@@ -238,28 +238,41 @@ export default class PostgresStatusActionsDataSource
         if (connectionStatusActionsIdsToRemove.length) {
           await database
             .delete()
-            .from('workflow_connection_has_actions')
-            .whereIn('action_id', connectionStatusActionsIdsToRemove)
-            .where('connection_id', connectionStatusActionsInput.connectionId)
-            .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
+            .from('workflow_status_connection_has_workflow_status_actions')
+            .whereIn(
+              'workflow_status_action_id',
+              connectionStatusActionsIdsToRemove
+            )
+            .where(
+              'workflow_status_connection_id',
+              connectionStatusActionsInput.connectionId
+            )
             .transacting(trx);
         }
-        await database('workflow_connection_has_actions')
+        await database('workflow_status_connection_has_workflow_status_actions')
           .insert<
             WorkflowConnectionHasActionsRecord[]
           >(connectionStatusActionsToInsert)
-          .onConflict(['connection_id', 'action_id'])
+          .onConflict([
+            'workflow_status_connection_id',
+            'workflow_status_action_id',
+          ])
           .merge()
           .returning('*')
           .transacting(trx);
 
         const insertedStatusActions = await database
           .select('*')
-          .from('workflow_connection_has_actions as wca')
-          .join('status_actions as sa', {
-            'wca.action_id': 'sa.status_action_id ',
+          .from(
+            'workflow_status_connection_has_workflow_status_actions as wsca'
+          )
+          .join('workflow_status_actions as wsa', {
+            'wsca.workflow_status_action_id': 'wsa.workflow_status_action_id',
           })
-          .where('wca.connection_id', connectionStatusActionsInput.connectionId)
+          .where(
+            'wsca.workflow_status_connection_id',
+            connectionStatusActionsInput.connectionId
+          )
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);

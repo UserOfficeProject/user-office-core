@@ -14,7 +14,7 @@ import { isRejection } from '../../models/Rejection';
 @InputType()
 export class ChangeProposalsStatusInput {
   @Field(() => Int)
-  public statusId: number;
+  public workflowStatusId: number;
 
   @Field(() => [Int])
   public proposalPks: number[];

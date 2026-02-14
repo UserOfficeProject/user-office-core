@@ -15,7 +15,7 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 import Warning from '@mui/icons-material/Warning';
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, Tooltip, Link } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -56,7 +56,7 @@ import {
   PaginationSortDirection,
   ProposalViewInstrument,
   ProposalsFilter,
-  Status,
+  WorkflowStatus,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -97,7 +97,7 @@ export type ProposalSelectionType = {
   callId: number;
   instruments: ProposalViewInstrument[] | null;
   fapInstruments: FapInstrument[] | null;
-  statusId: number;
+  statusId: string;
 };
 
 let columns: Column<ProposalViewData>[] = [
@@ -440,6 +440,30 @@ const ProposalTableOfficer = ({
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
 
+    if (v.field === 'statusName') {
+      return {
+        ...v,
+        render: (rowData: ProposalViewData) => (
+          <Link
+            component="button"
+            variant="body2"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              setSearchParams((searchParams) => {
+                searchParams.delete('selection');
+                searchParams.append('selection', rowData.primaryKey.toString());
+
+                return searchParams;
+              });
+              setOpenChangeProposalStatus(true);
+            }}
+          >
+            {rowData.statusName}
+          </Link>
+        ),
+      };
+    }
+
     return v;
   });
 
@@ -608,15 +632,15 @@ const ProposalTableOfficer = ({
     refreshTableData();
   };
 
-  const changeStatusOnProposals = async (status: Status) => {
+  const changeStatusOnProposals = async (workflowStatus: WorkflowStatus) => {
     const proposalPks = getSelectedProposalPks();
-    if (status?.id && proposalPks.length) {
+    if (workflowStatus?.workflowStatusId && proposalPks.length) {
       const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
         proposalPks: proposalPks,
-        statusId: status.id,
+        workflowStatusId: workflowStatus.workflowStatusId,
       });
       refreshTableData();
     }
@@ -1027,7 +1051,7 @@ const ProposalTableOfficer = ({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={openChangeProposalStatus}
-        maxWidth="xs"
+        maxWidth="lg"
         onClose={(): void => setOpenChangeProposalStatus(false)}
         fullWidth
       >
@@ -1036,10 +1060,13 @@ const ProposalTableOfficer = ({
             changeStatusOnProposals={changeStatusOnProposals}
             close={(): void => setOpenChangeProposalStatus(false)}
             selectedProposalStatuses={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.statusId
+              (selectedProposal) => selectedProposal.workflowStatusId
             )}
             allSelectedProposalsHaveInstrument={selectedProposalsData.every(
               (selectedProposal) => selectedProposal.instruments?.length
+            )}
+            selectedProposalsWorkflowIds={selectedProposalsData.map(
+              (selectedProposal) => selectedProposal.workflowId
             )}
           />
         </DialogContent>

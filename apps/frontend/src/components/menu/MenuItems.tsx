@@ -70,7 +70,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const calls = useCallsData(
     {
-      proposalStatusShortCode: 'QUICK_REVIEW',
+      proposalStatus: 'QUICK_REVIEW',
     },
     CallsDataQuantity.MINIMAL
   ).calls;

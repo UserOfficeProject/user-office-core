@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import {
@@ -16,9 +15,9 @@ import {
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { dummyWorkflowStatuses } from './StatusDataSource';
 import { basicDummyUser } from './UserDataSource';
 
 export let dummyProposal: Proposal;
@@ -43,7 +42,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.statusId || 1,
+    values?.statusId || 'DRAFT',
+    values?.workflowStatusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.proposalId || 'shortCode',
@@ -158,7 +158,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
       managementDecisionSubmitted: true,
-      statusId: 2,
+      statusId: 'FEASIBILITY_REVIEW',
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
@@ -178,6 +178,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       '',
       1,
       1,
+      'DRAFT',
       '',
       '',
       'shortCode',
@@ -257,7 +258,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async updateProposalStatus(
+  async updateProposalWfStatus(
     proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal> {
@@ -266,7 +267,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (!proposal) {
       throw new Error('Proposal does not exist');
     }
-    proposal.statusId = proposalStatusId;
+    proposal.workflowStatusId = proposalStatusId;
 
     return proposal;
   }
@@ -373,19 +374,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }
 
-  async markEventAsDoneOnProposals(
-    event: Event,
-    proposalPk: number[]
-  ): Promise<ProposalEventsRecord[] | null> {
-    return [dummyProposalEvents];
-  }
-
-  async getProposalEvents(
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    return dummyProposalEvents;
-  }
-
   async getCount(callId: number): Promise<number> {
     return 1;
   }
@@ -394,20 +382,18 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return dummyProposal;
   }
 
-  async resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean> {
-    return true;
-  }
-
-  async changeProposalsStatus(
-    statusId: number,
+  async changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
     const proposals = allProposals.map((p) => {
-      return { ...p, statusId };
+      return {
+        ...p,
+        workflowStatusId,
+        statusId: dummyWorkflowStatuses.find(
+          (ws) => ws.workflowStatusId === workflowStatusId
+        )?.statusId as string,
+      };
     });
 
     return { proposals: proposals };

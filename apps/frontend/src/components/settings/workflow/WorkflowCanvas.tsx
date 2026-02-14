@@ -26,24 +26,25 @@ const edgeTypes = {
 
 interface EdgeData {
   events: string[];
-  sourceStatusShortCode: string;
-  targetStatusShortCode: string;
+  sourceStatusId: string;
+  targetStatusId: string;
 }
 
-interface WorkflowCanvasProps {
+type WorkflowCanvasProps = React.ComponentProps<typeof ReactFlow> & {
   nodes: Node[];
   edges: Edge<EdgeData>[];
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
-  onConnect: (connection: Connection) => void;
-  onInit: (instance: ReactFlowInstance) => void;
-  onDrop: (event: React.DragEvent) => void;
-  onDragOver: (event: React.DragEvent) => void;
-  onEdgeClick: (event: React.MouseEvent, edge: Edge) => void;
+  onConnect?: (connection: Connection) => void;
+  onInit?: (instance: ReactFlowInstance) => void;
+  onDrop?: (event: React.DragEvent) => void;
+  onDragOver?: (event: React.DragEvent) => void;
+  onEdgeClick?: (event: React.MouseEvent, edge: Edge) => void;
+  onNodeClick?: (event: React.MouseEvent, node: Node) => void;
   onNodeDragStop?: NodeDragHandler;
   reactFlowWrapper: React.RefObject<HTMLDivElement>;
   connectionLineType: ConnectionLineType;
-}
+};
 
 const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   nodes,
@@ -55,8 +56,10 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onDrop,
   onDragOver,
   onEdgeClick,
+  onNodeClick,
   onNodeDragStop,
   reactFlowWrapper,
+  ...rest
 }) => {
   return (
     <div
@@ -74,6 +77,7 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onEdgeClick={onEdgeClick}
+        onNodeClick={onNodeClick}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
@@ -81,8 +85,9 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
           type: 'workflow',
         }}
         fitView
+        {...rest}
       >
-        <Background color="#aaa" gap={16} />
+        <Background color="FloralWhite" gap={20} />
         <Controls />
       </ReactFlow>
     </div>

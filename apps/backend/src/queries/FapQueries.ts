@@ -4,7 +4,9 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
+import { ReviewStatus } from '../models/Review';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
@@ -15,6 +17,8 @@ export default class FapQueries {
     @inject(Tokens.FapDataSource) public dataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ReviewDataSource)
+    private reviewDataSource: ReviewDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -177,19 +181,38 @@ export default class FapQueries {
       proposalPk: number;
     }
   ) {
-    let reviewerId = null;
+    if (!agent) {
+      return null;
+    }
 
-    const proposalEvents =
-      await this.proposalDataSource.getProposalEvents(proposalPk);
+    const isApiToken = this.userAuth.isApiToken(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isChairOrSecretary = await this.userAuth.isChairOrSecretaryOfFap(
+      agent,
+      fapId
+    );
+    const isFapMember = await this.userAuth.isMemberOfFap(agent, fapId);
 
-    // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
-    if (
-      agent &&
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
-      !proposalEvents?.proposal_all_fap_reviews_submitted
-    ) {
-      reviewerId = agent.id;
+    if (!isApiToken && !isUserOfficer && !isFapMember) {
+      return null;
+    }
+
+    let reviewerId: number | null = null;
+    const canSeeAllAssignments =
+      isApiToken || isUserOfficer || isChairOrSecretary;
+
+    if (!canSeeAllAssignments) {
+      const reviews = await this.reviewDataSource.getProposalReviews(
+        proposalPk,
+        fapId
+      );
+      const allReviewsSubmitted =
+        reviews.length > 0 &&
+        reviews.every((review) => review.status === ReviewStatus.SUBMITTED);
+
+      if (!allReviewsSubmitted && agent.id) {
+        reviewerId = agent.id;
+      }
     }
 
     return this.dataSource.getFapProposalAssignments(
