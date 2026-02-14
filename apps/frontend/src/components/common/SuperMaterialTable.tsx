@@ -194,6 +194,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
             ? {
                 onRowDelete: (rowData: Entry): Promise<void> =>
                   onDeleted(rowData.id),
+                ...props.editable,
               }
             : {}
         }

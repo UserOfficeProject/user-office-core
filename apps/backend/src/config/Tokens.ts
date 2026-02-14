@@ -61,4 +61,5 @@ export const Tokens = {
   ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
   TagDataSource: Symbol('TagDataSource'),
+  RoleDataSource: Symbol('RoleDataSource'),
 };

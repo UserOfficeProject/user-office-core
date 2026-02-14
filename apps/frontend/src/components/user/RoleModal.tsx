@@ -2,9 +2,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
 
-import { Role } from 'generated/sdk';
+import { Role as RoleSDK } from 'generated/sdk';
 
 import RoleTable from './RoleTable';
+
+type Role = Omit<RoleSDK, 'tags'>;
 
 type RoleModalProps = {
   show: boolean;

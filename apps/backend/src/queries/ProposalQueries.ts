@@ -5,10 +5,13 @@ import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import TagDataSource from '../datasources/postgres/TagDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { Authorized } from '../decorators';
+import { RoleDataSource } from '../datasources/RoleDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
+import { Authorized, AgentTags } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -21,6 +24,7 @@ import { PaginationSortDirection } from '../utils/pagination';
 export default class ProposalQueries {
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.UserDataSource) public userDataSource: UserDataSource,
     @inject(Tokens.ExperimentDataSource)
     public experimentDataSource: ExperimentDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
@@ -28,7 +32,9 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
+    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource
   ) {}
 
   @Authorized()
@@ -80,17 +86,22 @@ export default class ProposalQueries {
     return this.proposalAuth.hasReadRights(agent, proposal);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.PROPOSAL_READER,
+  ])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    @AgentTags tags?: number[]
   ) {
-    return this.dataSource.getProposals(filter, first, offset);
+    return this.dataSource.getProposals(filter, first, offset, tags);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.PROPOSAL_READER])
   async getAllView(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -98,7 +109,8 @@ export default class ProposalQueries {
     offset?: number,
     sortField?: string,
     sortDirection?: PaginationSortDirection,
-    searchText?: string
+    searchText?: string,
+    @AgentTags tags?: number[]
   ) {
     try {
       // leave await here because getProposalsFromView might thrown an exception
@@ -109,7 +121,9 @@ export default class ProposalQueries {
         offset,
         sortField,
         sortDirection,
-        searchText
+        searchText,
+        undefined,
+        tags
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });

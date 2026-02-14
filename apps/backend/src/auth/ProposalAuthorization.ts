@@ -4,9 +4,12 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
+import { TagDataSource } from '../datasources/TagDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
@@ -33,6 +36,12 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.StatusDataSource)
     private statusDataSource: StatusDataSource,
+    @inject(Tokens.TagDataSource)
+    private tagDataSource: TagDataSource,
+    @inject(Tokens.RoleDataSource)
+    private roleDataSource: RoleDataSource,
+    @inject(Tokens.InstrumentDataSource)
+    private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
@@ -296,7 +305,30 @@ export class ProposalAuthorization {
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
+      case Roles.PROPOSAL_READER:
+        const userTags = (
+          await this.roleDataSource.getTagsByRoleId(agent!.currentRole!.id)
+        ).map((tag) => tag.id);
 
+        const userInstruments = (
+          await this.tagDataSource.getTagInstruments(userTags)
+        ).map((instrument) => instrument.id);
+
+        const userCalls = (await this.tagDataSource.getTagCalls(userTags)).map(
+          (call) => call.id
+        );
+
+        const proposalInstruments =
+          await this.instrumentDataSource.getInstrumentsByProposalPk(
+            proposal.primaryKey
+          );
+
+        hasAccess =
+          (proposal.callId && userCalls.includes(proposal.callId)) ||
+          proposalInstruments.some((instrument) =>
+            userInstruments.includes(instrument.id)
+          );
+        break;
       default:
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }

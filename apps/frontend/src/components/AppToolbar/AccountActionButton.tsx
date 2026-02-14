@@ -33,16 +33,14 @@ const AccountActionButton = () => {
   const [show, setShow] = useState(false);
   const { user } = useContext(UserContext);
   const settingsContext = useContext(SettingsContext);
-  const { roles, currentRole, handleLogout, impersonatingUserId } =
+  const { roles, currentRoleId, handleLogout, impersonatingUserId } =
     useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const hasMultipleRoles = getUniqueArrayBy(roles, 'id').length > 1;
   const humanReadableActiveRole = useMemo(
-    () =>
-      roles.find(({ shortCode }) => shortCode.toUpperCase() === currentRole)
-        ?.title ?? 'Unknown',
-    [roles, currentRole]
+    () => roles.find(({ id }) => id === currentRoleId)?.title ?? 'Unknown',
+    [roles, currentRoleId]
   );
 
   useEffect(() => {
