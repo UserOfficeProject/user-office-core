@@ -81,6 +81,8 @@ const localColumns = [
   { title: 'Lastname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
+  { title: 'Email', field: 'email' },
+  { title: 'OIDC Sub', field: 'oidc_sub' },
 ];
 
 async function getUserByEmail(
@@ -111,7 +113,9 @@ const getUsersTableData = (
       query.search
         ? user.firstname.toLowerCase().includes(query.search.toLowerCase()) ||
           user.lastname.toLowerCase().includes(query.search.toLowerCase()) ||
-          user.institution.toLowerCase().includes(query.search.toLowerCase())
+          user.institution.toLowerCase().includes(query.search.toLowerCase()) ||
+          user.email?.toLowerCase().includes(query.search.toLowerCase()) ||
+          user.oidc_sub?.toLowerCase().includes(query.search.toLowerCase())
         : true
     );
 
@@ -281,6 +285,12 @@ const PeopleTable = ({
                       .includes(tableQuery.search.toLowerCase()) ||
                     user.institution
                       .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.email
+                      ?.toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.oidc_sub
+                      ?.toLowerCase()
                       .includes(tableQuery.search.toLowerCase())
                   : true
               )

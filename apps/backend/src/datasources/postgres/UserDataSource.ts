@@ -244,7 +244,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .whereILikeEscaped('email', '?', email)
+      .where((qb) => {
+        qb.whereILikeEscaped('email', '?', email);
+      })
       .modify((query) => {
         if (role) {
           query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
@@ -403,7 +405,9 @@ export default class PostgresUserDataSource implements UserDataSource {
             qb.whereILikeEscaped('institution', '%?%', searchText)
               .orWhereILikeEscaped('firstname', '%?%', searchText)
               .orWhereILikeEscaped('preferredname', '%?%', searchText)
-              .orWhereILikeEscaped('lastname', '%?%', searchText);
+              .orWhereILikeEscaped('lastname', '%?%', searchText)
+              .orWhereILikeEscaped('email', '%?%', searchText)
+              .orWhereILikeEscaped('oidc_sub', '%?%', searchText);
           });
         }
         if (first) {
@@ -483,7 +487,9 @@ export default class PostgresUserDataSource implements UserDataSource {
             qb.whereILikeEscaped('institution', '%?%', searchText)
               .orWhereILikeEscaped('firstname', '%?%', searchText)
               .orWhereILikeEscaped('preferredname', '%?%', searchText)
-              .orWhereILikeEscaped('lastname', '%?%', searchText);
+              .orWhereILikeEscaped('lastname', '%?%', searchText)
+              .orWhereILikeEscaped('email', '%?%', searchText)
+              .orWhereILikeEscaped('oidc_sub', '%?%', searchText);
           });
         }
         if (sortField && sortDirection) {

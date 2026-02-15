@@ -39,7 +39,10 @@ type BasicUserDetailsWithTableData = (BasicUserDetails & {
 
 async function getUserByEmail(email: string, api: any) {
   return api()
-    .getBasicUserDetailsByEmail({ email: email, role: UserRole.USER })
+    .getBasicUserDetailsByEmail({
+      email: email,
+      role: UserRole.USER,
+    })
     .then((user: GetBasicUserDetailsByEmailQuery) => {
       const userDetails = user?.basicUserDetailsByEmail;
 
@@ -67,7 +70,8 @@ const getUsersTableData = (
     query.search
       ? user.firstname.toLowerCase().includes(query.search.toLowerCase()) ||
         user.lastname.toLowerCase().includes(query.search.toLowerCase()) ||
-        user.institution.toLowerCase().includes(query.search.toLowerCase())
+        user.institution.toLowerCase().includes(query.search.toLowerCase()) ||
+        user.email?.toLowerCase().includes(query.search.toLowerCase())
       : true
   );
 
@@ -116,6 +120,7 @@ const columns = [
   { title: 'Surname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
+  { title: 'Email', field: 'email' },
 ];
 
 const ProposalsPeopleTable = ({

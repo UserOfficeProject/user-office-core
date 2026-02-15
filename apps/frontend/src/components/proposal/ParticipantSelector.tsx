@@ -127,7 +127,9 @@ function ParticipantSelector({
       if (isValidEmail(query)) {
         setExactEmailMatch(undefined);
         const { basicUserDetailsByEmail } =
-          await api().getBasicUserDetailsByEmail({ email: query });
+          await api().getBasicUserDetailsByEmail({
+            email: query,
+          });
         const selectedUsers = categorizeSelectedItems(selectedItems).users;
 
         const userAlreadyExists =
