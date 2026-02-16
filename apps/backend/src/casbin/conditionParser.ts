@@ -9,7 +9,7 @@ export async function evalCondition(
   con: any
 ): Promise<boolean> {
   // Temp workaround - if condition is absent, model.conf should prevent this function being called
-  // if (con === 'allow') return true;
+  if (con === 'allow') return true;
 
   const casbinConditionDataSource =
     container.resolve<CasbinConditionDataSource>(
