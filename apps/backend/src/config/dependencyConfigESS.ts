@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
+import { CasbinAuthorization } from '../auth/CasbinAuthorization';
+import { CallContextFetcher } from '../auth/contexts/CallContext';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
+import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { CasbinService } from '../casbin/casbinService';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
+import PostgresCasbinConditionDataSource from '../datasources/postgres/CasbinConditionDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -147,3 +152,9 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
+
+mapClass(Tokens.CasbinConditionDataSource, PostgresCasbinConditionDataSource);
+mapClass(Tokens.CasbinService, CasbinService);
+mapClass(Tokens.CallContextFetcher, CallContextFetcher);
+mapClass(Tokens.CasbinAuthorization, CasbinAuthorization);
+mapClass(Tokens.CallAuthFilterBuilder, CallAuthFilterBuilder);

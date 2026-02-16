@@ -5,7 +5,7 @@ import { ResolverContext } from '../../context';
 @Resolver()
 export class AddCasbinPolicyMutation {
   @Mutation(() => Boolean)
-  addCasbinPolicy(
+  async addCasbinPolicy(
     @Arg('subject', () => String) subject: string,
     @Arg('object', () => String) object: string,
     @Arg('action', () => String) action: string,
@@ -13,12 +13,18 @@ export class AddCasbinPolicyMutation {
     @Arg('allowOrDeny', () => String) allowOrDeny: string,
     @Ctx() context: ResolverContext
   ): Promise<boolean> {
-    return context.auth.casbinService.addPolicyWithCondition(
+    const addedPolicy = await context.auth.casbinService.addPolicyWithCondition(
       subject,
       object,
       action,
       condition,
       allowOrDeny
     );
+
+    if (!addedPolicy) {
+      throw new Error('Failed to add policy');
+    }
+
+    return addedPolicy;
   }
 }

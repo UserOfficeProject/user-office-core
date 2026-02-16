@@ -11,7 +11,7 @@ BEGIN
           v0 VARCHAR(128) NOT NULL DEFAULT '',
           v1 VARCHAR(128) NOT NULL DEFAULT '',
           v2 VARCHAR(128) NOT NULL DEFAULT '',
-          v3 TEXT NOT NULL DEFAULT '',
+          v3 BIGINT NULL, -- references the id of the condition in casbin_condition
           v4 VARCHAR(128) NOT NULL DEFAULT '',
           v5 VARCHAR(128) NOT NULL DEFAULT ''
         );
@@ -22,6 +22,8 @@ BEGIN
           condition JSONB NOT NULL
         );
 
+        CREATE INDEX idx_casbin_rule_condition_id
+        ON casbin_rule(v3);
 
         /* Creating ISIS tag and assigning latest 10 calls to it */
         INSERT INTO tag (name, short_code)

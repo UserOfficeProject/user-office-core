@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 
-import { CallAuthorization } from '../auth/CallAuthorization';
+import { CasbinAuthorization } from '../auth/CasbinAuthorization';
+import { CallContextFetcher } from '../auth/contexts/CallContext';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
+import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
@@ -69,7 +71,6 @@ mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
-mapClass(Tokens.CallAuthorization, CallAuthorization);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
@@ -147,3 +148,6 @@ mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 
 mapClass(Tokens.CasbinConditionDataSource, PostgresCasbinConditionDataSource);
 mapClass(Tokens.CasbinService, CasbinService);
+mapClass(Tokens.CallContextFetcher, CallContextFetcher);
+mapClass(Tokens.CasbinAuthorization, CasbinAuthorization);
+mapClass(Tokens.CallAuthFilterBuilder, CallAuthFilterBuilder);

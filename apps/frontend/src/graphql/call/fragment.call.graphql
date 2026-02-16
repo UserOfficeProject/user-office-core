@@ -72,7 +72,7 @@ fragment call on Call {
   tags {
     shortCode
   }
-  callAccess {
+  callUiPermissions {
     canArchive
   }
 }

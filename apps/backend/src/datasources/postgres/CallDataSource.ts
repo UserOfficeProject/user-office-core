@@ -183,6 +183,10 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('t.short_code', filter.hasTag);
     }
 
+    if (filter?.callIds?.length) {
+      query.whereIn('call.call_id', filter.callIds);
+    }
+
     return query.then((callDB: CallRecord[]) => {
       return callDB.map((call) => createCallObject(call));
     });

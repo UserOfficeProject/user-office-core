@@ -1,10 +1,10 @@
 import { container } from 'tsyringe';
 
-import { CallAuthorization } from './auth/CallAuthorization';
 import { ProposalAuthorization } from './auth/ProposalAuthorization';
 import { CasbinService } from './casbin/casbinService';
 import { BasicResolverContext } from './context';
 import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
+import CallPermissionsLoader from './loaders/CallPermissionsLoader';
 import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
@@ -152,9 +152,9 @@ const context: BasicResolverContext = {
   loaders: {
     user: container.resolve(UsersLoader),
     basicUser: container.resolve(BasicUserDetailsLoader),
+    callPermissions: container.resolve(CallPermissionsLoader),
   },
   auth: {
-    callAuthorization: container.resolve(CallAuthorization),
     proposalAuthorization: container.resolve(ProposalAuthorization),
     casbinService: container.resolve(CasbinService),
   },

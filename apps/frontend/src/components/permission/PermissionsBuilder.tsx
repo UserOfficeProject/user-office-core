@@ -11,10 +11,10 @@ import {
   RuleGroupType,
 } from 'react-querybuilder';
 
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export function PermissionsBuilder() {
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
 
   const [subject, setSubject] = useState('user_officer');
   const [object, setObject] = useState('call');
@@ -22,34 +22,35 @@ export function PermissionsBuilder() {
 
   const fields: Field[] = [
     { name: 'call.shortCode', label: 'call.shortCode' },
-    { name: 'call.tags', label: 'call.tags' },
-    { name: 'user.facility', label: 'user.facility' },
+    { name: 'call.tag', label: 'call.tag' },
   ];
 
   const operators: Operator[] = [
     {
-      name: 'equals',
+      name: '=',
       label: '=',
     },
     {
-      name: 'hasTag',
-      label: 'has tag',
+      name: '!=',
+      label: '!=',
+    },
+    {
+      name: 'contains string',
+      label: 'contains string',
     },
   ];
 
   const [query, setQuery] = useState<RuleGroupType>({
     combinator: 'and',
-    rules: [
-      { field: 'user.facility', operator: '=', value: 'ISIS' },
-      { field: 'call.shortCode', operator: '=', value: 'ISIS Direct 2026_2' },
-      { field: 'call.tags', operator: 'hasTag', value: 'ISIS' },
-    ],
+    rules: [{ field: 'call.tag', operator: '=', value: 'ISIS' }],
   });
 
   const handleCreatePolicy = async () => {
     const formattedQuery = formatQuery(query, 'json');
 
-    await api().addCasbinPolicy({
+    await api({
+      toastSuccessMessage: 'Policy created successfully',
+    }).addCasbinPolicy({
       subject,
       object,
       action,
@@ -90,6 +91,7 @@ export function PermissionsBuilder() {
             onChange={(e) => setAction(e.target.value)}
           >
             <MenuItem value="read">read</MenuItem>
+            <MenuItem value="archive">archive</MenuItem>
           </Select>
         </FormControl>
       </Stack>

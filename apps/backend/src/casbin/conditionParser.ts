@@ -2,26 +2,28 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
-import { Tag } from '../models/Tag';
 
 export async function evalCondition(
   sub: any,
   obj: any,
   con: any
 ): Promise<boolean> {
+  // Temp workaround - if condition is absent, model.conf should prevent this function being called
+  // if (con === 'allow') return true;
+
   const casbinConditionDataSource =
     container.resolve<CasbinConditionDataSource>(
       Tokens.CasbinConditionDataSource
     );
 
-  const conditionRecord = await casbinConditionDataSource.get(Number(con));
+  const conditionRecord = await casbinConditionDataSource.get(con);
   if (!conditionRecord) return false;
 
-  const ast = conditionRecord.condition;
+  const conditionJson = conditionRecord.condition;
 
   const ctx = { user: sub, obj };
 
-  return evalNode(ast, ctx);
+  return evalNode(conditionJson, ctx);
 }
 
 function evalNode(node: any, ctx: { user: any; obj: any }): boolean {
@@ -36,12 +38,11 @@ function evalNode(node: any, ctx: { user: any; obj: any }): boolean {
   return evalRule(node, ctx);
 }
 
+// e.g. call.shortCode
 function resolveField(field: string, ctx: { user: any; obj: any }) {
-  const [root, ...path] = field.split('.');
+  const [_, ...path] = field.split('.');
 
-  let base;
-  if (root === 'user') base = ctx.user;
-  else base = ctx.obj;
+  const base = ctx.obj;
 
   return path.reduce((acc, key) => acc?.[key], base);
 }
@@ -58,16 +59,24 @@ function evalRule(rule: any, ctx: { user: any; obj: any }): boolean {
     case '!=':
       return fieldValue !== value;
 
-    case 'hasTag':
-      return hasTag(fieldValue, value);
+    case 'contains string':
+      return fieldValue && fieldValue.includes(value);
 
     default:
       throw new Error(`Unsupported operator: ${operator}`);
   }
 }
 
-export function hasTag(tags: Tag[], shortCode: string): boolean {
-  if (!tags || !Array.isArray(tags)) return false;
+export function walkAst(node: any, fn: (rule: any) => void): void {
+  if (!node) return;
 
-  return tags.some((t) => t.shortCode === shortCode);
+  if (node.combinator && Array.isArray(node.rules)) {
+    for (const child of node.rules) {
+      walkAst(child, fn);
+    }
+
+    return;
+  }
+
+  fn(node);
 }

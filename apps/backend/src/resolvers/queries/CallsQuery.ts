@@ -61,6 +61,9 @@ export class CallsFilter {
 
   @Field(() => String, { nullable: true })
   public hasTag?: string;
+
+  @Field(() => [Int], { nullable: true })
+  public callIds?: number[];
 }
 
 @Resolver()

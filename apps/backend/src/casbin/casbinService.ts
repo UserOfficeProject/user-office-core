@@ -1,105 +1,41 @@
 /* eslint-disable no-console */
-import path from 'path';
 
-import { Enforcer, newEnforcer } from 'casbin';
-import { SequelizeAdapter } from 'casbin-sequelize-adapter';
-import { parse } from 'pg-connection-string';
-import { container, injectable } from 'tsyringe';
+import { Enforcer } from 'casbin';
+import { inject, injectable } from 'tsyringe';
 
+import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
-import { evalCondition } from './customFunctions';
+import { getCasbinEnforcer } from './casbinEnforcer';
+
+type PolicyDecision =
+  | { type: 'deny' }
+  | { type: 'allow' }
+  | { type: 'conditional'; conditionId: number };
 
 @injectable()
 export class CasbinService {
-  private enforcerPromise?: Promise<Enforcer>;
-
-  private casbinConditionDataSource =
-    container.resolve<CasbinConditionDataSource>(
-      Tokens.CasbinConditionDataSource
-    );
-
-  constructor() {}
-
-  private async init(): Promise<Enforcer> {
-    const modelPath = path.join(__dirname, 'model.conf');
-    const config = parse(process.env.DATABASE_URL!);
-
-    const adapter = await SequelizeAdapter.newAdapter(
-      {
-        dialect: 'postgres',
-        host: config.host!,
-        port: config.port ? parseInt(config.port) : 5432,
-        username: config.user!,
-        password: config.password!,
-        database: config.database!,
-        logging: false,
-      },
-      false
-    );
-
-    const enforcer = await newEnforcer(modelPath, adapter);
-
-    // Custom function
-    enforcer.addFunction('evalCondition', evalCondition);
-
-    await enforcer.loadPolicy();
-    enforcer.enableAutoSave(true);
-
-    return enforcer;
-  }
+  constructor(
+    @inject(Tokens.CasbinConditionDataSource)
+    private casbinConditionDataSource: CasbinConditionDataSource
+  ) {}
 
   private getEnforcer(): Promise<Enforcer> {
-    if (!this.enforcerPromise) {
-      this.enforcerPromise = this.init();
-    }
-
-    return this.enforcerPromise;
+    return getCasbinEnforcer();
   }
 
-  async reloadPolicy(): Promise<void> {
-    const enforcer = await this.getEnforcer();
-    await enforcer.loadPolicy();
-  }
-
-  async enforce(sub: unknown, obj: unknown, act: unknown): Promise<boolean> {
-    // Temp workaround
-    await this.reloadPolicy();
-
+  async enforce(req: EnforcementRequest): Promise<boolean> {
     const enforcer = await this.getEnforcer();
 
-    console.log('Request:', { sub, obj, act });
-    console.log('Policies:', await enforcer.getPolicy());
-
-    const result = await enforcer.enforce(sub, obj, act, {});
-
-    console.log('Result:', result);
+    const result = await enforcer.enforce(req[0], req[1], req[2]);
 
     return result;
   }
 
-  // Get the entire policies matching the role, object, and action
-  async getPoliciesMatching(
-    role: string,
-    obj: string,
-    act: string
-  ): Promise<string[][]> {
-    return (await this.getEnforcer()).getFilteredPolicy(0, role, obj, act);
-  }
+  async batchEnforce(requests: Array<EnforcementRequest>): Promise<boolean[]> {
+    const enforcer = await this.getEnforcer();
 
-  // Get the condition with matching text from the policies matching the role, object, and action
-  async getPolicyConditionMatching(
-    role: string,
-    obj: string,
-    act: string,
-    searchText: string
-  ): Promise<string | null> {
-    const policies = await this.getPoliciesMatching(role, obj, act);
-
-    return (
-      policies.map((p) => p[3]).find((c) => !!c && c.includes(searchText)) ??
-      null
-    );
+    return enforcer.batchEnforce(requests);
   }
 
   async addPolicyWithCondition(
@@ -112,12 +48,44 @@ export class CasbinService {
     const conditionRecord =
       await this.casbinConditionDataSource.create(conditionJson);
 
-    return (await this.getEnforcer()).addPolicy(
+    const enforcer = await this.getEnforcer();
+
+    const addedPolicy = await enforcer.addPolicy(
       role,
       obj,
       act,
       String(conditionRecord.id),
       allowOrDeny
     );
+
+    return addedPolicy;
+  }
+
+  async getPolicyDecision(
+    role: string,
+    obj: string,
+    act: string
+  ): Promise<PolicyDecision> {
+    const enforcer = await this.getEnforcer();
+
+    const policies = await enforcer.getFilteredPolicy(0, role, obj, act);
+
+    if (policies.length === 0) {
+      return { type: 'deny' };
+    }
+
+    const conditionId = Number(policies[0][3]) || null;
+
+    if (!conditionId) {
+      return { type: 'allow' };
+    }
+
+    return { type: 'conditional', conditionId: conditionId };
+  }
+
+  async getPolicyConditionJson(id: number): Promise<string | null> {
+    const conditionRecord = await this.casbinConditionDataSource.get(id);
+
+    return conditionRecord?.condition || null;
   }
 }

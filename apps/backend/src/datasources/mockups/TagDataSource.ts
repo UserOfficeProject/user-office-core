@@ -19,6 +19,9 @@ export class TagDataSourceMock implements TagDataSource {
   getTagCalls(tagId: number): Promise<Call[]> {
     throw new Error('Method not implemented.');
   }
+  getTagsForCalls(callIds: number[]): Promise<Map<number, Tag[]>> {
+    throw new Error('Method not implemented.');
+  }
   getTags(ids: number[] | null): Promise<Tag[]> {
     throw new Error('Method not implemented.');
   }
