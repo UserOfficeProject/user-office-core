@@ -39,6 +39,7 @@ export default function PeoplePage() {
               id: user.id,
             })
           }
+          persistUrlQueryParams={true}
         />
       </StyledPaper>
     </StyledContainer>

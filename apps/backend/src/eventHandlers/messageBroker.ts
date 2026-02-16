@@ -409,19 +409,6 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.DATA_ACCESS_USERS_UPDATED: {
-        const { proposalPKey } = event;
-
-        const proposal = await proposalDataSource.get(proposalPKey);
-
-        const jsonMessage = await getProposalMessageData(proposal!);
-        await rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          Event.PROPOSAL_UPDATED,
-          jsonMessage
-        );
-        break;
-      }
     }
   };
 }

@@ -14,19 +14,10 @@ export class UpsertUserByOidcSubArgs {
   public lastName: string;
 
   @Field(() => String, { nullable: true })
-  public username: string | null;
-
-  @Field(() => String, { nullable: true })
   public preferredName: string | null;
 
   @Field(() => String)
   public oidcSub: string;
-
-  @Field(() => String, { nullable: true })
-  public gender: string | null;
-
-  @Field(() => String, { nullable: true })
-  public birthDate: string | null;
 
   @Field(() => String)
   public institutionRoRId: string;
@@ -37,17 +28,8 @@ export class UpsertUserByOidcSubArgs {
   @Field(() => String)
   public institutionCountry: string;
 
-  @Field(() => String, { nullable: true })
-  public department: string | null;
-
-  @Field(() => String)
-  public position: string;
-
   @Field(() => String)
   public email: string;
-
-  @Field(() => String, { nullable: true })
-  public telephone: string | null;
 }
 
 @Resolver()

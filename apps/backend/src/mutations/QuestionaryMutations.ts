@@ -244,7 +244,11 @@ export default class QuestionaryMutations {
         }
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
         if (
-          !isPartialSave &&
+          (!isPartialSave ||
+            (questionTemplateRelation.question.dataType ===
+              DataType.FILE_UPLOAD &&
+              value != null &&
+              value.length > 0)) &&
           !(await isMatchingConstraints(questionTemplateRelation, value))
         ) {
           return rejection(

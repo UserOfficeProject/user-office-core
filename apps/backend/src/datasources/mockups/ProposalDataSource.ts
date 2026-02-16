@@ -2,7 +2,12 @@ import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
-import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+  Proposals,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import {
   TechnicalReview,
@@ -10,6 +15,7 @@ import {
 } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -19,6 +25,7 @@ export let dummyProposal: Proposal;
 export let dummyProposalView: ProposalView;
 export let dummyProposalSubmitted: Proposal;
 export let dummyProposalWithNotActiveCall: Proposal;
+export let dummyProposalWithoutInvitation: Proposal;
 
 let allProposals: Proposal[];
 
@@ -137,7 +144,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number | undefined,
     offset?: number | undefined,
     sortField?: string | undefined,
-    sortDirection?: string | undefined,
+    sortDirection?: PaginationSortDirection | undefined,
     searchText?: string | undefined
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     return { totalCount: 0, proposalViews: [] };
@@ -158,6 +165,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       primaryKey: 3,
       questionaryId: 2,
       callId: 2,
+    });
+
+    dummyProposalWithoutInvitation = dummyProposalFactory({
+      primaryKey: 4,
+      title: 'Proposal without invitation',
+      proposalId: 'no-invite',
     });
 
     dummyProposalView = new ProposalView(
@@ -207,6 +220,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       dummyProposal,
       dummyProposalSubmitted,
       dummyProposalWithNotActiveCall,
+      dummyProposalWithoutInvitation,
     ];
 
     this.proposalsUpdated = [];
@@ -404,7 +418,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
-    return dummyProposal.proposalId === proposalId ? dummyProposal : null;
+    return allProposals.find((p) => p.proposalId === proposalId) || null;
   }
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
@@ -417,9 +431,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
+  }
+
+  getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
+    throw new Error('Method not implemented.');
   }
 }

@@ -191,7 +191,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
 
-          query.orderByRaw(`${this.fieldMap[sortField]} ${sortDirection}`);
+          query.orderBy(this.fieldMap[sortField], sortDirection);
         }
 
         if (first) {

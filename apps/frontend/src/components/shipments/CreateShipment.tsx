@@ -12,11 +12,13 @@ interface CreateShipmentProps {
   experimentPk: number;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
+  onDirtyStateChange?: (isDirty: boolean) => void;
 }
 function CreateShipment({
   experimentPk,
   onShipmentSubmitted,
   onShipmentCreated,
+  onDirtyStateChange,
 }: CreateShipmentProps) {
   const { experiment } = useExperiment(experimentPk);
   const { blankShipment, error: blankShipmentError } = useBlankShipment(
@@ -42,6 +44,7 @@ function CreateShipment({
       shipment={blankShipment}
       onShipmentSubmitted={onShipmentSubmitted}
       onShipmentCreated={onShipmentCreated}
+      onDirtyStateChange={onDirtyStateChange}
     />
   );
 }

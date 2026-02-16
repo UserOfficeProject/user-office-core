@@ -3,8 +3,8 @@ import 'reflect-metadata';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { CallContextFetcher } from '../auth/contexts/CallContext';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
+import { ELIUserAuthorization } from '../auth/ELIUserAuthorization';
 import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
-import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -29,7 +29,6 @@ import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSour
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/ProposalPdfTemplateDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
-import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
@@ -95,7 +94,6 @@ mapClass(
 );
 mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
-mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.FapDataSource, PostgresFapDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
@@ -124,7 +122,7 @@ mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.TagDataSource, PostgresTagDataSource);
 
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
-mapClass(Tokens.UserAuthorization, OAuthAuthorization);
+mapClass(Tokens.UserAuthorization, ELIUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 

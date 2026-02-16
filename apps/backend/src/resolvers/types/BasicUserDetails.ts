@@ -25,9 +25,6 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Int)
   public institutionId: number;
 
-  @Field()
-  public position: string;
-
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
@@ -35,9 +32,6 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   ])
   @Field({ nullable: true })
   public email: string;
-
-  @Field(() => Boolean, { nullable: true })
-  public placeholder?: boolean;
 
   @Field(() => Date, { nullable: true })
   public created?: Date;

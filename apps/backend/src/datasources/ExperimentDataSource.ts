@@ -12,6 +12,7 @@ import {
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 import { ExperimentSafetyEventsRecord } from './postgres/records';
 
 export interface ExperimentDataSource {
@@ -88,7 +89,7 @@ export interface ExperimentDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{
     totalCount: number;
