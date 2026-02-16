@@ -16,13 +16,13 @@ export class BasicUserDetailsQuery {
 
   @Query(() => BasicUserDetails, { nullable: true })
   basicUserDetailsByEmail(
-    @Arg('email', () => String) email: string,
+    @Arg('emailOrOidcSub', () => String) emailOrOidcSub: string,
     @Ctx() context: ResolverContext,
     @Arg('role', () => UserRole, { nullable: true }) role?: UserRole
   ) {
     return context.queries.user.getBasicUserDetailsByEmail(
       context.user,
-      email,
+      emailOrOidcSub,
       role
     );
   }

@@ -26,6 +26,12 @@ class UserQueryResult {
 
 @ArgsType()
 export class UsersArgs {
+  @Field({ nullable: true })
+  public email?: string;
+
+  @Field({ nullable: true })
+  public oidcSub?: string;
+
   @Field(() => Int, { nullable: true })
   first?: number;
 

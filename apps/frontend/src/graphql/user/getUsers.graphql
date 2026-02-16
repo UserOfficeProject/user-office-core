@@ -6,6 +6,8 @@ query getUsers(
   $sortField: String
   $sortDirection: PaginationSortDirection
   $searchText: String
+  $email: String
+  $oidcSub: String
 ) {
   users(
     first: $first
@@ -15,6 +17,8 @@ query getUsers(
     sortField: $sortField
     sortDirection: $sortDirection
     searchText: $searchText
+    email: $email
+    oidcSub: $oidcSub
   ) {
     users {
       ...basicUserDetails

@@ -388,6 +388,8 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async getUsers({
     searchText,
+    email,
+    oidcSub,
     first,
     offset,
     userRole,
@@ -409,6 +411,12 @@ export default class PostgresUserDataSource implements UserDataSource {
               .orWhereILikeEscaped('email', '%?%', searchText)
               .orWhereILikeEscaped('oidc_sub', '%?%', searchText);
           });
+        }
+        if (email) {
+          query.where('users.email', email);
+        }
+        if (oidcSub) {
+          query.where('users.oidc_sub', oidcSub);
         }
         if (first) {
           query.limit(first);
