@@ -7,10 +7,11 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
-import { Fap, UserRole } from 'generated/sdk';
+import { Fap, UserRole, FapReviewVisibility } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -47,6 +48,21 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   if (!fap) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
+
+  const reviewVisibilityOptions = [
+    {
+      value: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+      text: 'Once all reviews on a proposal are complete',
+    },
+    {
+      value: FapReviewVisibility.REVIEWS_VISIBLE,
+      text: 'Reviews visible during the FAP',
+    },
+    {
+      value: FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED,
+      text: 'Reviews visible after the FAP has ended',
+    },
+  ];
 
   return (
     <Formik
@@ -158,6 +174,18 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
+              <Grid item sm={6} xs={12}>
+                <Field
+                  id="reviewVisibility"
+                  name="reviewVisibility"
+                  label="Review visibility"
+                  onChange={handleChange}
+                  component={Select}
+                  data-cy="fap-review-visibility-filter"
+                  options={reviewVisibilityOptions}
+                  fullWidth
+                />
+              </Grid>
               <Field
                 id="active"
                 name="active"

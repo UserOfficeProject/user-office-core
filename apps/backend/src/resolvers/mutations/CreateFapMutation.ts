@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { FapReviewVisibility } from '../../models/Fap';
 import { Fap } from '../types/Fap';
 
 @ArgsType()
@@ -30,6 +31,9 @@ export class CreateFapArgs {
 
   @Field(() => Boolean)
   public active: boolean;
+
+  @Field(() => FapReviewVisibility)
+  public reviewVisibility: FapReviewVisibility;
 }
 
 @Resolver()
