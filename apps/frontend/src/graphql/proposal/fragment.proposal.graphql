@@ -22,7 +22,4 @@ fragment proposal on Proposal {
     ...fapMeetingDecision
   }
   fileId
-  proposalAccess {
-    canDelete
-  }
 }

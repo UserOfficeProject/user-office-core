@@ -114,7 +114,6 @@ export function createTechnicalReviewStub(
       experiments: null,
       experimentSequence: null,
       fileId: null,
-      proposalAccess: null,
     },
   };
 }

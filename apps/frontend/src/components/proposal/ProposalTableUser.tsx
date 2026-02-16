@@ -1,12 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import {
-  Call,
-  Maybe,
-  ProposalAccess,
-  ProposalPublicStatus,
-  Status,
-} from 'generated/sdk';
+import ProposalInviteNotification from 'components/proposal/ProposalInviteNotification';
+import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTable from './ProposalTable';
@@ -35,7 +30,6 @@ export type PartialProposalsDataType = {
     >
   >;
   proposerId?: number;
-  proposalAccess: ProposalAccess;
 };
 
 export type UserProposalDataType = {
@@ -47,7 +41,7 @@ export type UserProposalDataType = {
 const ProposalTableUser = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [refreshTableKey, setRefreshTableKey] = useState(0);
   const sendUserProposalRequest = useCallback(async () => {
     setLoading(true);
 
@@ -83,7 +77,6 @@ const ProposalTableUser = () => {
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
-                proposalAccess: proposal.proposalAccess as ProposalAccess,
               };
             }),
         };
@@ -91,12 +84,18 @@ const ProposalTableUser = () => {
   }, [api]);
 
   return (
-    <ProposalTable
-      title="My proposals"
-      search={false}
-      searchQuery={sendUserProposalRequest}
-      isLoading={loading}
-    />
+    <>
+      <ProposalInviteNotification
+        onAccept={() => setRefreshTableKey((prev) => prev + 1)}
+      />
+      <ProposalTable
+        title="My proposals"
+        search={false}
+        searchQuery={sendUserProposalRequest}
+        isLoading={loading}
+        key={refreshTableKey}
+      />
+    </>
   );
 };
 

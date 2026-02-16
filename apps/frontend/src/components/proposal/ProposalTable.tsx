@@ -18,12 +18,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  Call,
-  FeatureId,
-  ProposalAccess,
-  ProposalPublicStatus,
-} from 'generated/sdk';
+import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -34,7 +29,7 @@ import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import AcceptInvite from './AcceptInvite';
+import AcceptInviteWithCode from './AcceptInviteWithCode';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import DataAccessUsersModal from './DataAccessUsersModal';
 import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
@@ -198,7 +193,6 @@ const ProposalTable = ({
         notified: resultProposal.notified,
         proposerId: resultProposal.proposer?.id,
         call: resultProposal.call,
-        proposalAccess: resultProposal.proposalAccess as ProposalAccess,
       };
 
       const newProposalsData = [newClonedProposal, ...partialProposalsData];
@@ -312,12 +306,18 @@ const ProposalTable = ({
             };
           },
           (rowData) => {
-            const canDelete = rowData.proposalAccess?.canDelete;
+            const isPI = rowData.proposerId === userContext.user.id;
+            const isSubmitted = rowData.submitted;
+            const canDelete = isPI && !isSubmitted;
 
             return {
               icon: DeleteIcon,
-              tooltip: 'Delete proposal',
-              disabled: !canDelete,
+              tooltip: isSubmitted
+                ? 'Only draft proposals can be deleted'
+                : !isPI
+                  ? 'Only PI can delete proposal'
+                  : 'Delete proposal',
+              hidden: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {
@@ -353,7 +353,7 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <AcceptInvite
+            <AcceptInviteWithCode
               onAccepted={() => {
                 searchQuery().then((data) => {
                   if (data) {

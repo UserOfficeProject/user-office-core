@@ -26,9 +26,6 @@ query getUserProposals {
         endCall
         endCallInternal
       }
-      proposalAccess {
-        canDelete
-      }
     }
   }
 }

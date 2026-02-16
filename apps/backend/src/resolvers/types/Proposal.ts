@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
+  InvitedProposal as InvitedProposalOrigin,
   ProposalEndStatus,
   ProposalPublicStatus,
 } from '../../models/Proposal';
@@ -26,7 +27,6 @@ import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
 import { Invite } from './Invite';
-import { ProposalAccess } from './ProposalAccess';
 import { ProposalAttachments } from './ProposalAttachments';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
@@ -100,6 +100,21 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => String, { nullable: true })
   public fileId?: string | null;
+}
+
+@ObjectType()
+export class InvitedProposal implements Partial<InvitedProposalOrigin> {
+  @Field(() => String)
+  public proposalId: string;
+
+  @Field(() => String)
+  public proposerName: string;
+
+  @Field(() => String)
+  public title: string;
+
+  @Field(() => String)
+  public abstract: string;
 }
 
 @Resolver(() => Proposal)
@@ -299,14 +314,6 @@ export class ProposalResolver {
   @FieldResolver(() => ProposalAttachments, { nullable: true })
   attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
     return ctx.queries.questionary.getProposalAttachments(
-      ctx.user,
-      proposal.primaryKey
-    );
-  }
-
-  @FieldResolver(() => ProposalAccess, { nullable: true })
-  proposalAccess(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
-    return ctx.auth.proposalAuthorization.getPermissions(
       ctx.user,
       proposal.primaryKey
     );
