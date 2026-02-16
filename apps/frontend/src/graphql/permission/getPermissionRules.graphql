@@ -1,5 +1,5 @@
-query getPermissionRules {
-  permissionRules {
+query getPermissionRules($filter: PermissionRulesFilter) {
+  permissionRules(filter: $filter) {
     permissionRule {
       ...permissionRule
     }

@@ -3,6 +3,7 @@ import { Authorized } from '../decorators';
 import { UserWithRole } from '../models/User';
 import { Tokens } from '../config/Tokens';
 import { PermissionDataSource } from '../datasources/PermissionDataSource';
+import { PermissionRulesArgs } from '../resolvers/queries/PermissionsQuery';
 
 @injectable()
 export default class PermissionQueries {
@@ -15,7 +16,7 @@ export default class PermissionQueries {
   }
 
   @Authorized()
-  async getPermissionRules(agent: UserWithRole | null) {
-    return this.dataSource.getPermissionRules();
+  async getPermissionRules(agent: UserWithRole | null, filter?: PermissionRulesArgs) {
+    return this.dataSource.getPermissionRules(filter);
   }
 }

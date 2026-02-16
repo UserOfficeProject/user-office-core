@@ -18,7 +18,7 @@ import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, UserRole } from 'generated/sdk';
+import { FeatureId, PermissionRuleFragment, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
@@ -28,9 +28,12 @@ import { TemplateMenuListItem } from './TemplateMenuListItem';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
+import {Can} from '@casl/react'
+import { defineAbility } from '@casl/ability';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
+  permissionRules: PermissionRuleFragment[]
 };
 
 const ProposalsMenuListItem = () => {
@@ -68,6 +71,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
+  const ability = defineAbility((can) => {
+    can('read', 'dashboard')
+});
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
@@ -84,6 +90,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const user = (
     <div data-cy="user-menu-items">
+      <Can I="read" a="dashboard" ability={ability}>
       <Tooltip title="Dashboard">
         <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
@@ -92,6 +99,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Dashboard" />
         </ListItemButton>
       </Tooltip>
+      </Can>
+      <Can I="create" a="proposal" ability={ability}>
       <Tooltip title="New Proposal">
         <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
@@ -100,7 +109,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="New Proposal" />
         </ListItemButton>
       </Tooltip>
+      </Can>
       {isSchedulerEnabled && (
+        <Can I="read" a="experiment_times" ability={ability}>
         <Tooltip title="Experiment Times">
           <ListItemButton component={NavLink} to="/ExperimentTimes">
             <ListItemIcon>
@@ -109,8 +120,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary="Experiment Times" />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
-
+      <Can I="read" a="help" ability={ability}>
       <Tooltip title="Help">
         <ListItemButton component={NavLink} to="/HelpPage">
           <ListItemIcon>
@@ -119,11 +131,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Help" />
         </ListItemButton>
       </Tooltip>
+      </Can>
     </div>
   );
 
   const userOfficer = (
     <div data-cy="officer-menu-items">
+      <Can I="read" a="call" ability={ability}>
       <Tooltip title="Calls">
         <ListItemButton component={NavLink} to="/Calls">
           <ListItemIcon>
@@ -132,6 +146,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Calls" />
         </ListItemButton>
       </Tooltip>
+      </Can>
+      <Can I="read" a="proposal" ability={ability}>
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
@@ -140,6 +156,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
+      </Can>
+      <Can I="read" a="permission" ability={ability}>
       <Tooltip title="Permissions">
         <ListItemButton component={NavLink} to="/Permissions">
           <ListItemIcon>
@@ -148,7 +166,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Permissions" />
         </ListItemButton>
       </Tooltip>
+      </Can>
       {isTechniqueProposalsEnabled && (
+        <Can I="read" a="technique_proposal" ability={ability}>
         <Tooltip title={t('Technique Proposals')}>
           <ListItemButton component={NavLink} to={techniqueProposalUrl}>
             <ListItemIcon>
@@ -157,8 +177,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary={t('Technique Proposals')} />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
       {isSchedulerEnabled && (
+        <Can I="read" an="experiment" ability={ability}>
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
@@ -167,8 +189,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary="Experiments" />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
       {isFapEnabled && (
+        <Can I="read" a="fap" ability={ability}>
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
@@ -177,8 +201,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
       {isInstrumentManagementEnabled && (
+        <Can I="read" an="instrument" ability={ability}>
         <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
@@ -187,8 +213,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
-
+      <Can I="read" a="technique" ability={ability}>
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
@@ -197,7 +224,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
+      </Can>
       {isTagsEnabled && (
+        <Can I="read" a="tag" ability={ability}>
         <Tooltip title="Tag">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
@@ -206,6 +235,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary={'Tag'} />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
       <Tooltip title="Proposal workflows">
         <ListItemButton

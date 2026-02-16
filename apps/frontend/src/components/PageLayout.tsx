@@ -20,6 +20,7 @@ import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import AppToolbar from './AppToolbar/AppToolbar';
 import MenuItems from './menu/MenuItems';
 import InformationModal from './pages/InformationModal';
+import { usePermissionRuleData } from 'hooks/Permission/usePermissionRuleData';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -49,6 +50,7 @@ const PageLayout = ({
   header: string;
   children: React.ReactNode;
 }) => {
+  //caching would be very useful here
   const drawerWidth = 250;
   const theme = useTheme();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
@@ -60,6 +62,12 @@ const PageLayout = ({
 
   const { currentRole } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
+
+  const {
+      loadingPermissionRules,
+      permissionRules,
+      setPermissionRulesWithLoading: setPermissions,
+    } = usePermissionRuleData({role: currentRole, action: 'read'});
 
   const drawer = {
     width: drawerWidth,
@@ -163,7 +171,7 @@ const PageLayout = ({
           </Box>
           <Divider />
           <List disablePadding sx={{ overflowX: 'hidden' }}>
-            <MenuItems currentRole={currentRole} />
+            <MenuItems currentRole={currentRole} permissionRules={permissionRules}  />
           </List>
           <Divider />
         </Drawer>

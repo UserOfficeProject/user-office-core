@@ -8,6 +8,8 @@ import {
 } from './records';
 import { CreatePermissionRuleArgs } from '../../resolvers/mutations/CreatePermissionRuleMutation';
 import { UpdatePermissionRuleArgs } from '../../resolvers/mutations/UpdatePermissionRuleMutation';
+import { PermissionRulesArgs, PermissionRulesFilter } from '../../resolvers/queries/PermissionsQuery';
+import { Role } from '../../models/Role';
 
 export const actions = ['update', 'read', 'delete'] as const;
 export const subjects = ['fap', 'proposal'] as const;
@@ -128,12 +130,23 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
   );
   }
 
-  async getPermissionRules() {
+  async getPermissionRules(filter?: PermissionRulesArgs) {
     return database
     .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'rhp.role_id', 'r.title as role')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
+    .modify(query => {
+      if (filter?.filter?.role) {
+        query.where('r.title', 'ilike', `%${filter.filter.role}%`);
+      }
+      if (filter?.filter?.action) {
+        query.where('p.action', 'ilike', `%${filter.filter.action}%`);
+      }
+      if (filter?.filter?.subject) {
+        query.where('p.subject', 'ilike', `%${filter.filter.subject}%`);
+      }
+    })
     .then((permissionRecord: PermissionRecord[]) => {
       const result = permissionRecord.map(a => createPermissionRuleObject(a))
       return {

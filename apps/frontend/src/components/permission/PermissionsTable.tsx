@@ -4,7 +4,7 @@ import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { usePermissionRuleData } from 'hooks/access/useAccessRuleData';
+import { usePermissionRuleData } from 'hooks/Permission/usePermissionRuleData';
 import { FunctionType } from 'utils/utilTypes';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 

@@ -7,10 +7,10 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { PermissionRuleFragment, UserRole } from 'generated/sdk';
+import { PermissionRuleFragment, PermissionRulesFilter, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function usePermissionRuleData(): {
+export function usePermissionRuleData(filter?: PermissionRulesFilter): {
   loadingPermissionRules: boolean;
   permissionRules: PermissionRuleFragment[];
   setPermissionRulesWithLoading: Dispatch<SetStateAction<PermissionRuleFragment[]>>;
@@ -40,7 +40,7 @@ export function usePermissionRuleData(): {
       )
     ) {
       api()
-        .getPermissionRules()
+        .getPermissionRules({filter: filter})
         .then((data) => {
           if (unmounted) {
             return;
