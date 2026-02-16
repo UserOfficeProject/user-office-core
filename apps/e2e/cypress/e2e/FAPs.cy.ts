@@ -1250,13 +1250,8 @@ context('Fap reviews tests', () => {
         cy.updateUserDetails({
           ...loggedInUserParsed,
           institutionId: 1,
-          telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
-          gender: 'male',
           nationality: 1,
-          birthdate: new Date('2000/01/01'),
-          department: 'IT',
-          position: 'Dirrector',
         } as UpdateUserMutationVariables);
       }
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
@@ -1407,12 +1402,7 @@ context('Fap reviews tests', () => {
         cy.updateUserDetails({
           ...loggedInUserParsed,
           institutionId: 1,
-          telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
-          gender: 'male',
-          birthdate: new Date('2000/01/01'),
-          department: 'IT',
-          position: 'Dirrector',
         } as UpdateUserMutationVariables);
       }
 

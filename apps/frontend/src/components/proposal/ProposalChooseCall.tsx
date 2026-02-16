@@ -25,32 +25,25 @@ const ProposalChooseCall = () => {
     navigate(url);
   };
   function getDashBoardCallFilter(): CallsFilter {
-    return isInternalUser
-      ? {
-          isActive: true,
-          isEnded: false,
-          isActiveInternal: true,
-        }
-      : {
-          isActive: true,
-          isEnded: false,
-        };
+    return {
+      isActive: true,
+      isEnded: false,
+      isActiveInternal: isInternalUser,
+      isOrdered: true,
+    };
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
-  const callsOrdered = calls.sort((a, b) =>
-    a.sort_order > b.sort_order ? 1 : -1
-  );
 
   return (
     <StyledContainer>
       <StyledPaper>
         <Typography variant="h6" component="h2" gutterBottom>
-          {callsOrdered.length !== 0
+          {calls.length !== 0
             ? 'Select a call'
             : 'There are no calls open at this time'}
         </Typography>
         <List data-cy="call-list">
-          {callsOrdered.map((call) => {
+          {calls.map((call) => {
             const timeRemainingText = timeRemaining(new Date(call.endCall));
             const InternalCalltimeRemainingText = timeRemaining(
               new Date(call.endCallInternal)

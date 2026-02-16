@@ -16,6 +16,7 @@ import {
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
@@ -571,7 +572,7 @@ export default class PostgresExperimentDataSource
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
     //print all arguments
@@ -673,7 +674,7 @@ export default class PostgresExperimentDataSource
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
+          query.orderBy(sortField, sortDirection);
         }
 
         if (first) {
