@@ -241,7 +241,7 @@ export default class InviteMutations {
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
         this.inviteDataSource.create({
-          createdByUserId: agent!.id,
+          createdByUserId: agent.id,
           code: await this.generateInviteCode(),
           email: email,
           expiresAt: expirationDate,
