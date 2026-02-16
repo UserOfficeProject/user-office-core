@@ -74,8 +74,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     },
     CallsDataQuantity.MINIMAL
   ).calls;
-
-  const openCall = calls?.find((call) => call.isActive);
+  const sortedcalls = calls.sort((a, b) => (a.id > b.id ? -1 : 1));
+  const openCall = sortedcalls?.find((call) => call.isActive);
 
   const techniqueProposalUrl =
     openCall && openCall.id
