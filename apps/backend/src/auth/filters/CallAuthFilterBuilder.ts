@@ -21,14 +21,10 @@ export class CallAuthFilterBuilder {
   ): Promise<CallAuthFilter | null> {
     if (!sub) return null;
 
-    const decision = await this.casbinService.getPolicyDecision(sub, obj, act);
-
-    if (decision.type !== 'conditional') {
-      return null; // no filters needed in a non-conditional policy
-    }
-
-    const conditionJson = await this.casbinService.getPolicyConditionJson(
-      decision.conditionId
+    const conditionJson = await this.casbinService.getPolicyCondition(
+      sub,
+      obj,
+      act
     );
 
     if (!conditionJson) return null;
