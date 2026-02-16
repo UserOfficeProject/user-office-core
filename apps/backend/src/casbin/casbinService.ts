@@ -65,9 +65,7 @@ export class CasbinService {
 
     const policies = await enforcer.getFilteredPolicy(0, role, obj, act);
 
-    console.log(policies[0]);
-
-    const conditionId = Number(policies[0][3]) || null;
+    const conditionId = (policies.length && Number(policies[0][3])) || null;
 
     if (!conditionId || isNaN(conditionId)) {
       return null;
