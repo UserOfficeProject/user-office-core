@@ -3,17 +3,13 @@ import { Institution } from '../models/Institution';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
-import {
-  UpdateUserByOidcSubArgs,
-  UpdateUserByIdArgs,
-} from '../resolvers/mutations/UpdateUserMutation';
+import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
-  createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
@@ -40,9 +36,11 @@ export interface UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getPreviousCollaborators(
     user_id: number,
-    filter?: string,
     first?: number,
     offset?: number,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    searchText?: string,
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
@@ -61,18 +59,12 @@ export interface UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refreshtoken: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;
@@ -82,7 +74,6 @@ export interface UserDataSource {
     rorId?: string
   ): Promise<number>;
   update(user: UpdateUserByIdArgs): Promise<User>;
-  updateUserByOidcSub(args: UpdateUserByOidcSubArgs): Promise<User | null>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(

@@ -13,6 +13,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { DataType, TemplateCategoryId } from '../../models/Template';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { QuestionWithUsage } from '../types/QuestionWithUsage';
 
 @InputType()
@@ -68,8 +69,8 @@ export class AllQuestionsFilterArgs {
   @Field({ nullable: true })
   public sortField?: string;
 
-  @Field({ nullable: true })
-  public sortDirection?: string;
+  @Field(() => PaginationSortDirection, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
 
   @Field({ nullable: true })
   public searchText?: string;

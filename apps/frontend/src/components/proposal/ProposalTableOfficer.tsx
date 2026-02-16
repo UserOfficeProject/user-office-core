@@ -53,6 +53,7 @@ import {
   FapInstrumentInput,
   FeatureId,
   InstrumentMinimalFragment,
+  PaginationSortDirection,
   ProposalViewInstrument,
   ProposalsFilter,
   Status,
@@ -651,10 +652,16 @@ const ProposalTableOfficer = ({
     setBulkReassignData(currentUserAssignedSelectTechReviews);
   };
 
+  const sortDirection = searchParams.get('sortDirection');
+
   columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
-    searchParams.get('sortDirection')
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
   );
 
   const reviewModal = searchParams.get('reviewModal');
@@ -704,7 +711,12 @@ const ProposalTableOfficer = ({
             text: text,
           },
           sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
+          sortDirection:
+            orderBy?.orderDirection == PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection == PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
           searchText: tableQuery.search,
