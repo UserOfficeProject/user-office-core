@@ -23,17 +23,20 @@
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.13.10",
     "@types/pdf-parse": "^1.1.1",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "cypress-wait-until": "^3.0.2",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-cypress": "^2.15.2",
-    "eslint-plugin-import": "^2.29.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-chai-friendly": "^1.1.0",
+    "eslint-plugin-cypress": "^5.2.0 ",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-unused-imports": "^3.1.0",
+    "eslint-plugin-unused-imports": "^4.3.0",
     "prettier": "3.2.4",
     "ts-loader": "^9.5.1",
+    "typescript-eslint": "^8.53.1",
     "webpack": "^5.105.0"
   },
   "engines": {
@@ -41,8 +44,8 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
-    "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
+    "lint": "tsc --noEmit && eslint --quiet",
+    "lint:fix": "tsc --noEmit && eslint --quiet --fix",
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --e2e",
     "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e"

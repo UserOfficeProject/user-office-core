@@ -1,12 +1,14 @@
 import { TableProps } from '@mui/material';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalQuestionaryDetails from 'components/proposal/ProposalQuestionaryDetails';
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
-import { BasicUserDetails } from 'generated/sdk';
+import UserList from 'components/user/UserList';
+import UserListItem from 'components/user/UserListItem';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { FeatureId } from 'generated/sdk';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
-import { getFullUserNameWithBasicDetails } from 'utils/user';
 
 export default function ProposalQuestionaryReview(
   props: {
@@ -14,6 +16,10 @@ export default function ProposalQuestionaryReview(
   } & TableProps<FunctionComponent<unknown>>
 ) {
   const { data, ...restProps } = props;
+  const featureContext = useContext(FeatureContext);
+  const isDataAccessUsersEnabled = featureContext.featuresMap.get(
+    FeatureId.DATA_ACCESS_USERS
+  )?.isEnabled;
 
   if (!data.questionaryId) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -34,14 +40,25 @@ export default function ProposalQuestionaryReview(
     { label: 'Abstract', value: data.abstract },
     {
       label: 'Principal Investigator',
-      value: getFullUserNameWithBasicDetails(data.proposer),
+      value: <UserListItem user={data.proposer} />,
     },
     {
       label: 'Co-Proposers',
-      value: users
-        .map((user: BasicUserDetails) => getFullUserNameWithBasicDetails(user))
-        .join(', '),
+      value: <UserList users={users} />,
     },
+    ...(isDataAccessUsersEnabled && data.dataAccessUsers
+      ? [
+          {
+            label: 'Data Access Users',
+            value: (
+              <UserList
+                users={data.dataAccessUsers}
+                data-cy="data-access-users-list"
+              />
+            ),
+          },
+        ]
+      : []),
     ...(data.coProposerInvites?.length > 0
       ? [
           {
