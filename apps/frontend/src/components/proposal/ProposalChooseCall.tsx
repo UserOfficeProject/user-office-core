@@ -29,7 +29,8 @@ const ProposalChooseCall = () => {
       isActive: true,
       isEnded: false,
       isActiveInternal: isInternalUser,
-      isOrdered: 'sort_order',
+      sortField: 'sort_order',
+      sortDirection: 'asc',
     };
   }
   const { calls } = useCallsData(getDashBoardCallFilter());

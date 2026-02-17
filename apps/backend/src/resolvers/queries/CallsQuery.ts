@@ -60,7 +60,10 @@ export class CallsFilter {
   public isCallUpcoming?: boolean;
 
   @Field(() => String, { nullable: true })
-  public isOrdered?: string;
+  public sortField?: string;
+
+  @Field(() => String, { nullable: true })
+  public sortDirection?: string;
 }
 
 @Resolver()

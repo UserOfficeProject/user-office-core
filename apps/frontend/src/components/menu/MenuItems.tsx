@@ -71,7 +71,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
-      isOrdered: 'call_id',
+      sortField: 'call_id',
+      sortDirection: 'desc',
     },
     CallsDataQuantity.MINIMAL
   ).calls;
