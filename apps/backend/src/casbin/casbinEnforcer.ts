@@ -2,8 +2,8 @@
 import path from 'path';
 
 import { Enforcer, newEnforcer } from 'casbin';
-import { SequelizeAdapter } from 'casbin-sequelize-adapter';
-import { parse } from 'pg-connection-string';
+import { BasicAdapter } from 'casbin-basic-adapter';
+import { Client } from 'pg';
 
 import { evalCondition } from './conditionParser';
 
@@ -15,29 +15,19 @@ export async function getCasbinEnforcer(): Promise<Enforcer> {
   }
 
   const modelPath = path.join(__dirname, 'model.conf');
-  const config = parse(process.env.DATABASE_URL!);
 
-  const adapter = await SequelizeAdapter.newAdapter(
-    {
-      dialect: 'postgres',
-      host: config.host!,
-      port: config.port ? parseInt(config.port) : 5432,
-      username: config.user!,
-      password: config.password!,
-      database: config.database!,
-      logging: false,
-    },
-    false
+  const adapter = await BasicAdapter.newAdapter(
+    'pg',
+    new Client({ connectionString: process.env.DATABASE_URL })
   );
 
   enforcer = await newEnforcer(modelPath, adapter);
 
   enforcer.addFunction('evalCondition', evalCondition);
 
-  await enforcer.loadPolicy();
   enforcer.enableAutoSave(true);
 
-  enforcer.enableLog(true);
+  await enforcer.loadPolicy();
 
   return enforcer;
 }
