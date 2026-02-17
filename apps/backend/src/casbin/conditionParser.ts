@@ -5,13 +5,10 @@ import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
 
 export async function evalCondition(
-  sub: any,
+  sub: string,
   obj: any,
   con: any
 ): Promise<boolean> {
-  // Temp workaround - if condition is absent, model.conf should prevent this function being called
-  if (con === 'allow') return true;
-
   const casbinConditionDataSource =
     container.resolve<CasbinConditionDataSource>(
       Tokens.CasbinConditionDataSource
@@ -23,13 +20,14 @@ export async function evalCondition(
 
   const conditionJson = conditionRecord.condition;
 
-  const ctx = { user: sub, obj };
+  const ctx = { role: sub, obj };
 
   return evalNode(conditionJson, ctx);
 }
 
-function evalNode(node: any, ctx: { user: any; obj: any }): boolean {
+function evalNode(node: any, ctx: { role: string; obj: any }): boolean {
   if (node.combinator && Array.isArray(node.rules)) {
+    // TODO: short circuit in OR conditions when a true condition is found
     const results = node.rules.map((rule: any) => evalNode(rule, ctx));
 
     return node.combinator === 'and'
@@ -40,34 +38,12 @@ function evalNode(node: any, ctx: { user: any; obj: any }): boolean {
   return evalRule(node, ctx);
 }
 
-// e.g. call.shortCode or a function belonging to the resource
-function resolveValue(field: string, ctx: { user: any; obj: any }) {
-  // Function case
-  if (!field.includes('.')) {
-    const resource = ctx.obj?.type;
+function resolveValue(field: string, ctx: { role: string; obj: any }) {
+  const fnRegistry = functionRegistry.get(ctx.obj?.type);
 
-    if (!resource) {
-      throw new Error('Object does not contain a "type" field');
-    }
-
-    const registry = functionRegistry.get(resource);
-
-    if (!registry) {
-      throw new Error(`No auth function registry for resource "${resource}"`);
-    }
-
-    const fn = registry[field];
-
-    if (!fn) {
-      throw new Error(
-        `Unknown auth function "${field}" for resource "${resource}"`
-      );
-    }
-
-    return fn;
+  if (fnRegistry?.[field]) {
+    return fnRegistry[field];
   }
-
-  // Field case
 
   const [_, ...path] = field.split('.');
 
@@ -76,36 +52,36 @@ function resolveValue(field: string, ctx: { user: any; obj: any }) {
   return path.reduce((acc, key) => acc?.[key], base);
 }
 
-function evalRule(rule: any, ctx: { user: any; obj: any }): boolean {
-  const { field, operator, value } = rule;
+function evalRule(rule: any, ctx: { role: string; obj: any }): boolean {
+  const { field, operator, value: rightValue } = rule;
 
-  let fieldValue = resolveValue(field, ctx) ?? null;
+  let leftValue = resolveValue(field, ctx) ?? null;
 
-  if (typeof fieldValue === 'function') {
-    fieldValue = fieldValue(ctx.user, ctx.obj);
+  if (typeof leftValue === 'function') {
+    leftValue = leftValue(ctx.role, ctx.obj);
   }
 
   switch (operator) {
     case '=':
       // Temp workaround
-      if (typeof fieldValue === 'boolean') {
-        return fieldValue === (value === 'true');
+      if (typeof leftValue === 'boolean') {
+        return leftValue === (rightValue === 'true');
       }
 
-      return fieldValue === value;
+      return leftValue === rightValue;
 
     case '!=':
-      return fieldValue !== value;
+      return leftValue !== rightValue;
 
     case 'contains':
-      if (!Array.isArray(fieldValue)) return false;
+      if (!Array.isArray(leftValue)) return false;
 
-      const values = String(value)
+      const rightValues = String(rightValue)
         .split(',')
         .map((v) => v.trim())
         .filter(Boolean);
 
-      return values.some((v) => fieldValue.includes(v));
+      return rightValues.some((v) => leftValue.includes(v));
 
     default:
       throw new Error(`Unsupported operator: ${operator}`);
