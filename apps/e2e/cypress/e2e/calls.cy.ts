@@ -896,6 +896,59 @@ context('Calls tests', () => {
       cy.contains(newCall.shortCode);
     });
 
+    it('Order of calls persists ', () => {
+      cy.createCall({
+        ...newInactiveCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      let firstTableRowTextBeforeSorting: string;
+      let firstTableRowTextAfterSorting: string;
+      cy.contains('Calls').click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="order-calls-button"]').first().click();
+      cy.contains('Drag to order calls');
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .then((element) => {
+          firstTableRowTextBeforeSorting = element.text();
+        });
+      //reorder
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .dragElement([
+          { direction: 'left', length: 0 },
+          { direction: 'down', length: 1 },
+        ]);
+
+      cy.get('[data-cy="call-list-drag-item"]')
+        .last()
+        .then((element) => {
+          firstTableRowTextAfterSorting = element.text();
+          expect(firstTableRowTextBeforeSorting).not.equal(
+            firstTableRowTextAfterSorting
+          );
+        });
+
+      cy.contains('Proposals').click();
+      cy.contains('Calls').click();
+
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="order-calls-button"]').first().click();
+      cy.contains('Drag to order calls');
+      cy.get('[data-cy="call-list-drag-item"]').first();
+
+      cy.contains(newCall.shortCode);
+    });
+
     it('User officer can filter calls by their status', () => {
       cy.createCall({
         ...newInactiveCall,

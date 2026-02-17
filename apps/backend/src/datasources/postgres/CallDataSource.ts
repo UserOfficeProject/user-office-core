@@ -174,6 +174,9 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('w.status_id', filter.proposalStatus)
         .distinctOn('call.call_id');
     }
+    if (filter?.isOrdered) {
+      query.orderBy('sort_order');
+    }
 
     return query.then((callDB: CallRecord[]) => {
       return callDB.map((call) => createCallObject(call));
@@ -438,7 +441,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
   async setNewSortOrder(data: CallOrderArray): Promise<number> {
     return await database
-      .update({ sort_order: data.sort_order })
+      .update({ sort_order: data.sort_order + 1 })
       .from('call')
       .where({ call_id: data.callId });
   }
