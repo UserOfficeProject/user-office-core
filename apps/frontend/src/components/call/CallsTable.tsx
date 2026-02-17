@@ -367,7 +367,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
   const getCallOrder = (): void => {
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters, isArchivedTab),
-      isOrdered: true,
+      isOrdered: 'sort_order',
     }));
   };
 

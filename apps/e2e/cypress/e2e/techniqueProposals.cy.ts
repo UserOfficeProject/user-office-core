@@ -754,6 +754,44 @@ context('Technique Proposal tests', () => {
       cy.contains(proposal3.title);
     });
 
+    it('Technique proposals management page should default to most recent active call in call filter', function () {
+      const esiTemplateName = faker.lorem.words(2);
+      const currentDayStart = DateTime.now().startOf('day');
+
+      const newCall = {
+        shortCode: 'call 2',
+        startCall: DateTime.fromJSDate(faker.date.past()),
+        endCall: DateTime.fromJSDate(faker.date.future()),
+        startReview: currentDayStart,
+        endReview: currentDayStart,
+        startFapReview: currentDayStart,
+        endFapReview: currentDayStart,
+        startNotify: currentDayStart,
+        endNotify: currentDayStart,
+        startCycle: currentDayStart,
+        endCycle: currentDayStart,
+        templateName: initialDBData.template.name,
+        templateId: initialDBData.template.id,
+        allocationTimeUnit: AllocationTimeUnits.DAY,
+        cycleComment: faker.lorem.word(10),
+        surveyComment: faker.lorem.word(10),
+        esiTemplateName: esiTemplateName,
+      };
+
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: callWorkflowId,
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="call-filter"]').contains('call2');
+    });
+
     it('Technique proposals can be filtered by status', function () {
       cy.login('officer');
       cy.visit('/');

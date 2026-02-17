@@ -175,8 +175,10 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
-    if (filter?.isOrdered) {
-      query.orderBy('sort_order');
+    if (filter?.isOrdered == 'call_id') {
+      query.orderBy(filter.isOrdered, 'desc');
+    } else if (filter?.isOrdered) {
+      query.orderBy(filter.isOrdered);
     }
 
     return query.then((callDB: CallRecord[]) => {

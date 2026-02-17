@@ -71,11 +71,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
+      isOrdered: 'call_id',
     },
     CallsDataQuantity.MINIMAL
   ).calls;
-  const sortedcalls = calls.sort((a, b) => (a.id > b.id ? -1 : 1));
-  const openCall = sortedcalls?.find((call) => call.isActive);
+
+  const openCall = calls?.find((call) => call.isActive);
 
   const techniqueProposalUrl =
     openCall && openCall.id
