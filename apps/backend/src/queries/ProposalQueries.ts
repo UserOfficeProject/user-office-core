@@ -101,8 +101,6 @@ export default class ProposalQueries {
     searchText?: string
   ) {
     try {
-      const noWhitespaceSearchText = searchText?.trim();
-
       // leave await here because getProposalsFromView might thrown an exception
       // and we want to handle it here
       return await this.dataSource.getProposalsFromView(
@@ -111,7 +109,7 @@ export default class ProposalQueries {
         offset,
         sortField,
         sortDirection,
-        noWhitespaceSearchText
+        searchText?.trim()
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });
@@ -156,7 +154,7 @@ export default class ProposalQueries {
       searchText
     );
   }
-  // here is where we use the query function by proposal ID
+
   @Authorized()
   async getProposalById(agent: UserWithRole | null, proposalId: string) {
     const proposal = await this.dataSource.getProposalById(proposalId);

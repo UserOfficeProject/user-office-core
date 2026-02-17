@@ -1033,7 +1033,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return relatedUsers;
   }
 
-  //something here about `proposalId` is being given without validating before being given to graphql
   async getProposalById(proposalId: string): Promise<Proposal | null> {
     return database
       .select()
