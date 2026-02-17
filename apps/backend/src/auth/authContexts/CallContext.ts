@@ -3,12 +3,18 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { TagDataSource } from '../../datasources/TagDataSource';
-import { Call } from '../../models/Call';
+import { AuthContext } from '../AuthRegistry';
 
-export interface CallContextData extends Partial<Pick<Call, 'shortCode'>> {
+export interface CallContextData extends AuthContext {
   type: 'call';
-  tags?: string[] | undefined;
+  shortCode: string;
+  tags: string[];
 }
+
+export const CALL_CONTEXT_ATTRIBUTES: Array<keyof CallContextData> = [
+  'shortCode',
+  'tags',
+];
 
 @injectable()
 export class CallContextFetcher {
@@ -31,7 +37,7 @@ export class CallContextFetcher {
       const callCtx: CallContextData = {
         shortCode: call.shortCode,
         type: 'call',
-        tags: tags ? tags.get(call.id)?.map((tag) => tag.shortCode) : undefined,
+        tags: tags.get(call.id)?.map((tag) => tag.shortCode) || [],
       };
 
       contextMap.set(call.id, callCtx);

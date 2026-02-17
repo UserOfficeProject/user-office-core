@@ -1,5 +1,5 @@
 import { CallContextData } from '../authContexts/CallContext';
-import { AuthFunctionRegistry } from './authFunctions';
+import { AuthFunctionRegistry } from '../AuthRegistry';
 
 /*
  * Functions that can be used in Casbin conditions for the call resource.

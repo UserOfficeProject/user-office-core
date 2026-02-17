@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 
-import { authFunctionRegistry } from '../auth/authFunctions/authFunctions';
+import { functionRegistry } from '../auth/AuthRegistry';
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
 
@@ -50,7 +50,7 @@ function resolveValue(field: string, ctx: { user: any; obj: any }) {
       throw new Error('Object does not contain a "type" field');
     }
 
-    const registry = authFunctionRegistry.get(resource);
+    const registry = functionRegistry.get(resource);
 
     if (!registry) {
       throw new Error(`No auth function registry for resource "${resource}"`);
