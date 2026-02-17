@@ -20,7 +20,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import UOLoader from 'components/common/UOLoader';
@@ -71,18 +71,38 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     loadingStatuses: loadingProposalStatuses,
   } = useStatusesData(WorkflowType.PROPOSAL);
 
-  // Only show calls that use the quick review workflow status
-  const { calls, loadingCalls } = useCallsData(
-    {
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.MINIMAL
-  );
-
-  // Only show techniques that the user is assigned to
   const { techniques, loadingTechniques } =
     useTechniqueProposalsTechniquesData();
 
+  const instrumentIds = useMemo(() => {
+    if (loadingTechniques || !techniques) return [];
+
+    return techniques.flatMap((t) => t.instruments.map((i) => i.id));
+  }, [loadingTechniques, techniques]);
+
+  const { calls, loadingCalls, setCallsFilter } = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+      instrumentIds: [],
+    },
+    CallsDataQuantity.MINIMAL,
+    !techniques || techniques.length <= 1
+  );
+
+  console.log('instrumentIds', !techniques || techniques.length <= 1);
+  useEffect(() => {
+    setCallsFilter({
+      proposalStatusShortCode: 'QUICK_REVIEW',
+      instrumentIds,
+    });
+  }, [instrumentIds, setCallsFilter]);
+
+  console.log(
+    'calls ---',
+    JSON.stringify(loadingCalls),
+    JSON.stringify(techniques)
+    //JSON.stringify(calls)
+  );
   // Only show instruments in the user's techniques
   const { allInstruments, techniqueInstruments, loadingInstruments } =
     useTechniqueProposalInstrumentsData(techniques);
