@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import { authFunctionRegistry } from '../auth/authFunctions/authFunctions';
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
 
@@ -16,6 +17,7 @@ export async function evalCondition(
       Tokens.CasbinConditionDataSource
     );
 
+  // TODO: cache the conditions
   const conditionRecord = await casbinConditionDataSource.get(con);
   if (!conditionRecord) return false;
 
@@ -38,8 +40,35 @@ function evalNode(node: any, ctx: { user: any; obj: any }): boolean {
   return evalRule(node, ctx);
 }
 
-// e.g. call.shortCode
-function resolveField(field: string, ctx: { user: any; obj: any }) {
+// e.g. call.shortCode or a function belonging to the resource
+function resolveValue(field: string, ctx: { user: any; obj: any }) {
+  // Function case
+  if (!field.includes('.')) {
+    const resource = ctx.obj?.type;
+
+    if (!resource) {
+      throw new Error('Object does not contain a "type" field');
+    }
+
+    const registry = authFunctionRegistry.get(resource);
+
+    if (!registry) {
+      throw new Error(`No auth function registry for resource "${resource}"`);
+    }
+
+    const fn = registry[field];
+
+    if (!fn) {
+      throw new Error(
+        `Unknown auth function "${field}" for resource "${resource}"`
+      );
+    }
+
+    return fn;
+  }
+
+  // Field case
+
   const [_, ...path] = field.split('.');
 
   const base = ctx.obj;
@@ -50,17 +79,33 @@ function resolveField(field: string, ctx: { user: any; obj: any }) {
 function evalRule(rule: any, ctx: { user: any; obj: any }): boolean {
   const { field, operator, value } = rule;
 
-  const fieldValue = resolveField(field, ctx) ?? null;
+  let fieldValue = resolveValue(field, ctx) ?? null;
+
+  if (typeof fieldValue === 'function') {
+    fieldValue = fieldValue(ctx.user, ctx.obj);
+  }
 
   switch (operator) {
     case '=':
+      // Temp workaround
+      if (typeof fieldValue === 'boolean') {
+        return fieldValue === (value === 'true');
+      }
+
       return fieldValue === value;
 
     case '!=':
       return fieldValue !== value;
 
-    case 'contains string':
-      return fieldValue && fieldValue.includes(value);
+    case 'contains':
+      if (!Array.isArray(fieldValue)) return false;
+
+      const values = String(value)
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean);
+
+      return values.some((v) => fieldValue.includes(v));
 
     default:
       throw new Error(`Unsupported operator: ${operator}`);

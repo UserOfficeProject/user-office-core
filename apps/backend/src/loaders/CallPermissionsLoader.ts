@@ -2,11 +2,11 @@
 import DataLoader from 'dataloader';
 import { inject, injectable } from 'tsyringe';
 
-import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import {
   CallContextData,
   CallContextFetcher,
-} from '../auth/contexts/CallContext';
+} from '../auth/authContexts/CallContext';
+import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { UserWithRole } from '../models/User';

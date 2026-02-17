@@ -5,8 +5,8 @@ import {
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
+import { CallContextFetcher } from '../auth/authContexts/CallContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
-import { CallContextFetcher } from '../auth/contexts/CallContext';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { TagDataSource } from '../datasources/TagDataSource';

@@ -5,7 +5,7 @@ import { walkAst } from '../../casbin/conditionParser';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 
-type CallAuthFilter = Partial<Pick<CallsFilter, 'hasTag'>>;
+type CallAuthFilter = Partial<Pick<CallsFilter, 'hasTag' | 'isEnded'>>;
 
 @injectable()
 export class CallAuthFilterBuilder {
@@ -34,12 +34,21 @@ export class CallAuthFilterBuilder {
     const filters: CallAuthFilter = {};
 
     walkAst(conditionJson, (rule) => {
-      if (rule.field === 'call.tag') {
-        switch (rule.operator) {
-          case '=':
-            filters.hasTag = rule.value;
-            break;
-        }
+      const { field, operator, value } = rule;
+
+      switch (field) {
+        case 'call.tags':
+          if (operator === 'contains') {
+            filters.hasTag = value;
+          }
+          break;
+
+        case 'isCallEnded':
+          if (operator === '=' && value === 'true') {
+            // Forced example
+            filters.isEnded = true;
+          }
+          break;
       }
     });
 

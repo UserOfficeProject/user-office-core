@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
+import { CallContextFetcher } from '../auth/authContexts/CallContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
-import { CallContextFetcher } from '../auth/contexts/CallContext';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';

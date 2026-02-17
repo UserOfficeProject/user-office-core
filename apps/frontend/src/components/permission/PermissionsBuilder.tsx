@@ -22,7 +22,8 @@ export function PermissionsBuilder() {
 
   const fields: Field[] = [
     { name: 'call.shortCode', label: 'call.shortCode' },
-    { name: 'call.tag', label: 'call.tag' },
+    { name: 'call.tags', label: 'call.tags' },
+    { name: 'isCallEnded', label: 'isCallEnded' },
   ];
 
   const operators: Operator[] = [
@@ -35,14 +36,14 @@ export function PermissionsBuilder() {
       label: '!=',
     },
     {
-      name: 'contains string',
-      label: 'contains string',
+      name: 'contains',
+      label: 'contains',
     },
   ];
 
   const [query, setQuery] = useState<RuleGroupType>({
     combinator: 'and',
-    rules: [{ field: 'call.tag', operator: '=', value: 'ISIS' }],
+    rules: [{ field: 'call.tags', operator: 'contains', value: 'ISIS' }],
   });
 
   const handleCreatePolicy = async () => {

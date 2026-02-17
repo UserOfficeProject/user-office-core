@@ -7,7 +7,7 @@ import { Call } from '../../models/Call';
 
 export interface CallContextData extends Partial<Pick<Call, 'shortCode'>> {
   type: 'call';
-  tag?: string | undefined;
+  tags?: string[] | undefined;
 }
 
 @injectable()
@@ -31,7 +31,7 @@ export class CallContextFetcher {
       const callCtx: CallContextData = {
         shortCode: call.shortCode,
         type: 'call',
-        tag: tags.get(call.id)?.[0]?.shortCode ?? undefined, // Single tag for POC simplicity
+        tags: tags ? tags.get(call.id)?.map((tag) => tag.shortCode) : undefined,
       };
 
       contextMap.set(call.id, callCtx);
