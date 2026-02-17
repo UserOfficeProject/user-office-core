@@ -96,3 +96,9 @@ test('A scientist can get proposal scientist comment', () => {
     )
   ).resolves.toBe(dummyProposalInternalCommentOne);
 });
+
+test('Whitespace does not stop user-officer role getting proposal', () => {
+  return expect(
+    proposalQueries.getProposalById(dummyUserOfficerWithRole, ' shortCode ')
+  ).resolves.toBeInstanceOf(Proposal);
+});
