@@ -60,7 +60,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-
+  const isExperimentSafetyEnabled = context.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
   const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
@@ -214,6 +216,24 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposal workflows" />
         </ListItemButton>
       </Tooltip>
+
+      {isExperimentSafetyEnabled && (
+        <Tooltip title="Experiment workflows">
+          <ListItemButton
+            component={NavLink}
+            selected={
+              location.pathname.includes('/ExperimentWorkflows') ||
+              location.pathname.includes('ExperimentWorkflowEditor')
+            }
+            to={'/ExperimentWorkflows'}
+          >
+            <ListItemIcon>
+              <Science />
+            </ListItemIcon>
+            <ListItemText primary="Experiment workflows" />
+          </ListItemButton>
+        </Tooltip>
+      )}
 
       {isUserManagementEnabled && (
         <Tooltip title="Institutions">
