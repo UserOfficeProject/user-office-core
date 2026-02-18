@@ -36,19 +36,6 @@ type MenuItemsProps = {
   permissionRules: PermissionRuleFragment[]
 };
 
-const ProposalsMenuListItem = () => {
-  return (
-    <Tooltip title="Review Proposals">
-      <ListItemButton component={NavLink} to="/">
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Review Proposals" />
-      </ListItemButton>
-    </Tooltip>
-  );
-};
-
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
@@ -88,15 +75,53 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       ? `/TechniqueProposals?call=${openCall?.id}`
       : '/TechniqueProposals';
 
+  let menuItemListCy: string = "";
+  let dashboardListItemText: string = "";
+  let DashboardOrFolderIcon: typeof DashboardIcon | typeof FolderOpen = DashboardIcon;
+  let InstrumentsIcon: typeof ScienceIcon | typeof GroupWorkIcon = ScienceIcon;
+  
+  switch (currentRole) {
+    case UserRole.USER:
+      menuItemListCy = "user-menu-items";
+      dashboardListItemText = "Dashboard";
+      DashboardOrFolderIcon = DashboardIcon;
+      break;
+    case UserRole.USER_OFFICER:
+      menuItemListCy = "officer-menu-items";
+      InstrumentsIcon = ScienceIcon;
+      break;
+    case UserRole.INSTRUMENT_SCIENTIST:
+      menuItemListCy = "instrument-scientist-menu-items";
+      dashboardListItemText = "Proposals";
+      DashboardOrFolderIcon = FolderOpen;
+      InstrumentsIcon = GroupWorkIcon;
+      break;
+    case UserRole.FAP_CHAIR:
+    case UserRole.FAP_SECRETARY:
+    case UserRole.FAP_REVIEWER:
+      menuItemListCy = "FapRoles-menu-items";
+      dashboardListItemText = "Review Proposals";
+      DashboardOrFolderIcon = FolderOpen;
+      break;
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+      menuItemListCy = "reviewer-menu-items";
+      break;
+    case UserRole.INTERNAL_REVIEWER:
+      menuItemListCy = "internal-reviewer-menu-items";
+      dashboardListItemText = "Review Proposals";
+      DashboardOrFolderIcon = FolderOpen;
+      break;
+  }
+
   const user = (
-    <div data-cy="user-menu-items">
+    <div data-cy={menuItemListCy}>
       <Can I="read" a="dashboard" ability={ability}>
       <Tooltip title="Dashboard">
         <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
-          <ListItemText primary="Dashboard" />
+          <ListItemText primary={dashboardListItemText} />
         </ListItemButton>
       </Tooltip>
       </Can>
@@ -208,7 +233,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
-              <ScienceIcon />
+              <InstrumentsIcon />
             </ListItemIcon>
             <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
           </ListItemButton>
@@ -237,6 +262,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
+      <Can I="read" a="proposal_workflow" ability={ability}>
       <Tooltip title="Proposal workflows">
         <ListItemButton
           component={NavLink}
@@ -252,8 +278,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposal workflows" />
         </ListItemButton>
       </Tooltip>
+      </Can>
 
       {isUserManagementEnabled && (
+        <Can I="read" an="institution" ability={ability}>
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
             <ListItemIcon>
@@ -262,10 +290,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary="Institutions" />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
       <TemplateMenuListItem />
       <StatusActionLogsMenuListItem />
       {isUserManagementEnabled && (
+        <Can I="read" a="people" ability={ability}>
         <Tooltip title="People">
           <ListItemButton component={NavLink} to="/People">
             <ListItemIcon>
@@ -274,7 +304,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <ListItemText primary="People" />
           </ListItemButton>
         </Tooltip>
+        </Can>
       )}
+      <Can I="read" a="question" ability={ability}>
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
@@ -283,6 +315,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
+      </Can>
       <SettingsMenuListItem />
     </div>
   );
@@ -335,7 +368,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
-            <GroupWorkIcon />
+            <InstrumentsIcon />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
@@ -360,7 +393,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const internalReviewer = (
     <div data-cy="internal-reviewer-menu-items">
-      <ProposalsMenuListItem />
+      <Can I="read" a="dashboard" ability={ability}>
+    <Tooltip title="Review Proposals">
+      <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItemButton>
+    </Tooltip>
+    </Can>
     </div>
   );
 
