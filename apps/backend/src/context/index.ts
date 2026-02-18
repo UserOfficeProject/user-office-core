@@ -18,6 +18,7 @@ import GenericTemplateMutations from '../mutations/GenericTemplateMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
 import InternalReviewMutations from '../mutations/InternalReviewMutations';
 import InviteMutations from '../mutations/InviteMutations';
+import PermissionMutations from '../mutations/PermissionMutations';
 import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from '../mutations/ProposalPdfTemplateMutations';
@@ -47,6 +48,7 @@ import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
 import InternalReviewQueries from '../queries/InternalReviewQueries';
 import InviteQueries from '../queries/InviteQueries';
+import PermissionQueries from '../queries/PermissionQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalPdfTemplateQueries from '../queries/ProposalPdfTemplateQueries';
 import ProposalQueries from '../queries/ProposalQueries';
@@ -102,6 +104,7 @@ interface ResolverContextQueries {
   statusAction: StatusActionQueries;
   tag: TagQueries;
   experiment: ExperimentQueries;
+  permission: PermissionQueries;
 }
 
 interface ResolverContextMutations {
@@ -133,6 +136,7 @@ interface ResolverContextMutations {
   workflow: WorkflowMutations;
   tag: TagMutations;
   experiment: ExperimentMutations;
+  permission: PermissionMutations;
 }
 
 interface ResolverContextServices {

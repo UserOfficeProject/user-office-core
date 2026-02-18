@@ -1,30 +1,35 @@
-import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+
+@ArgsType()
+export class AddCasbinPolicyInput {
+  @Field(() => String)
+  subject: string;
+
+  @Field(() => String)
+  object: string;
+
+  @Field(() => String)
+  action: string;
+
+  @Field(() => String)
+  condition: string;
+
+  @Field(() => String)
+  effect: string;
+}
 
 @Resolver()
 export class AddCasbinPolicyMutation {
   @Mutation(() => Boolean)
   async addCasbinPolicy(
-    @Arg('subject', () => String) subject: string,
-    @Arg('object', () => String) object: string,
-    @Arg('action', () => String) action: string,
-    @Arg('condition', () => String) condition: string,
-    @Arg('allowOrDeny', () => String) allowOrDeny: string,
+    @Args() input: AddCasbinPolicyInput,
     @Ctx() context: ResolverContext
   ): Promise<boolean> {
-    const addedPolicy = await context.auth.casbinService.addPolicyWithCondition(
-      subject,
-      object,
-      action,
-      condition,
-      allowOrDeny
+    return await context.mutations.permission.addCasbinPolicy(
+      context.user,
+      input
     );
-
-    if (!addedPolicy) {
-      throw new Error('Failed to add policy');
-    }
-
-    return addedPolicy;
   }
 }

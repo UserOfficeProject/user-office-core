@@ -9,6 +9,6 @@ mutation addCasbinPolicy(
     object: $object
     action: $action
     condition: $condition
-    allowOrDeny: "allow"
+    effect: "allow"
   )
 }

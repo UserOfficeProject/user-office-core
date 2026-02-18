@@ -19,6 +19,7 @@ import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import InternalReviewMutations from './mutations/InternalReviewMutations';
 import InviteMutations from './mutations/InviteMutations';
+import PermissionMutations from './mutations/PermissionMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
@@ -48,6 +49,7 @@ import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import InternalReviewQueries from './queries/InternalReviewQueries';
 import InviteQueries from './queries/InviteQueries';
+import PermissionQueries from './queries/PermissionQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalPdfTemplateQueries from './queries/ProposalPdfTemplateQueries';
 import ProposalQueries from './queries/ProposalQueries';
@@ -106,6 +108,7 @@ const context: BasicResolverContext = {
     settings: container.resolve(SettingsQueries),
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
+    permission: container.resolve(PermissionQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -138,6 +141,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowMutations),
     tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
+    permission: container.resolve(PermissionMutations),
   },
   clients: {
     scheduler: async () => {
