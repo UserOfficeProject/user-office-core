@@ -86,7 +86,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    reviewVisibility: FapReviewVisibility
+    reviewVisibility: number
   ) {
     return database
       .insert(
@@ -114,7 +114,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     customGradeGuide: boolean,
     active: boolean,
     files: string | null,
-    reviewVisibility: FapReviewVisibility
+    reviewVisibility: number
   ) {
     return database
       .update(
@@ -1372,5 +1372,20 @@ export default class PostgresFapDataSource implements FapDataSource {
     return incompleteProposals.map((proposal) =>
       createFapProposalObject(proposal)
     );
+  }
+
+  async getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility> {
+    const visibility = await database
+      .select('rv.visibility')
+      .from('faps as f')
+      .join(
+        'review_visibility as rv',
+        'f.review_visibility_id',
+        'rv.review_visibility_id'
+      )
+      .where('f.fap_id', fapId)
+      .first();
+
+    return visibility as FapReviewVisibility;
   }
 }

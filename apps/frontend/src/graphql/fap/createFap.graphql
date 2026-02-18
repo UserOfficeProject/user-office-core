@@ -5,7 +5,7 @@ mutation createFap(
   $gradeGuide: String
   $customGradeGuide: Boolean
   $active: Boolean!
-  $reviewVisibility: FapReviewVisibility!
+  $reviewVisibility: Int!
 ) {
   createFap(
     code: $code

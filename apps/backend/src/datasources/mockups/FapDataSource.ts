@@ -37,7 +37,7 @@ export const dummyFap = new Fap(
   null,
   null,
   null,
-  FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+  1
 );
 
 export const anotherDummyFap = new Fap(
@@ -51,7 +51,7 @@ export const anotherDummyFap = new Fap(
   null,
   null,
   null,
-  FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+  1
 );
 
 const reviewVisibilityTestingFap = new Fap(
@@ -65,23 +65,23 @@ const reviewVisibilityTestingFap = new Fap(
   null,
   null,
   null,
-  FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+  1
 );
 
 export const dummyFapProposalsComplete: Fap = {
   ...reviewVisibilityTestingFap,
   id: 3,
-  reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+  reviewVisibility: 1,
 };
 export const dummyFapReviewPeriodEnded: Fap = {
   ...reviewVisibilityTestingFap,
   id: 4,
-  reviewVisibility: FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED,
+  reviewVisibility: 3,
 };
 export const dummyFapReviewsVisible: Fap = {
   ...reviewVisibilityTestingFap,
   id: 5,
-  reviewVisibility: FapReviewVisibility.REVIEWS_VISIBLE,
+  reviewVisibility: 2,
 };
 
 export const dummyFapWithoutCode = new Fap(
@@ -95,7 +95,7 @@ export const dummyFapWithoutCode = new Fap(
   null,
   null,
   null,
-  FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+  1
 );
 
 export const dummyFaps = [
@@ -320,7 +320,7 @@ export class FapDataSourceMock implements FapDataSource {
       null,
       null,
       null,
-      FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+      1
     );
   }
 
@@ -344,7 +344,7 @@ export class FapDataSourceMock implements FapDataSource {
       null,
       null,
       null,
-      FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE
+      1
     );
   }
 
@@ -618,5 +618,25 @@ export class FapDataSourceMock implements FapDataSource {
     userId?: number | undefined
   ): Promise<FapProposal[]> {
     throw new Error('Method not implemented.');
+  }
+
+  async getFapReviewVisibility(fapId: number) {
+    const reviewVisibilityMap = new Map<number, FapReviewVisibility>([
+      [1, FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE],
+      [2, FapReviewVisibility.REVIEWS_VISIBLE],
+      [3, FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED],
+    ]);
+
+    if (fapId && fapId > 0) {
+      for (const fap of dummyFaps) {
+        if (fapId === fap.id) {
+          const reviewVis = reviewVisibilityMap.get(fap.reviewVisibility);
+
+          return reviewVis ?? null;
+        }
+      }
+    }
+
+    return null;
   }
 }

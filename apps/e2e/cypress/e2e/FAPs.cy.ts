@@ -13,7 +13,6 @@ import {
   WorkflowType,
   TemplateCategoryId,
   DataType,
-  FapReviewVisibility,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -285,7 +284,7 @@ function initializationBeforeTests() {
       numberRatingsRequired: 2,
       gradeGuide: fap1.gradeGuide,
       active: true,
-      reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+      reviewVisibility: 1,
     }).then((result) => {
       if (result.createFap) {
         createdFapId = result.createFap.id;
@@ -2497,7 +2496,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
-              reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({
@@ -2570,7 +2569,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
-              reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.updateCall({
@@ -2719,7 +2718,7 @@ context('Fap meeting components tests', () => {
         active: true,
         numberRatingsRequired: 2,
         gradeGuide: fap2.gradeGuide,
-        reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+        reviewVisibility: 1,
       }).then((fapResult) => {
         if (fapResult.createFap) {
           cy.updateCall({
@@ -3341,7 +3340,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
-              reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({

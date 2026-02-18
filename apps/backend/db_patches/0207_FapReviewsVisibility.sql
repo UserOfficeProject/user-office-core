@@ -8,11 +8,20 @@ BEGIN
         '2026-02-10'
     ) THEN
 
+        CREATE TABLE IF NOT EXISTS review_visibility (
+            review_visibility_id  serial PRIMARY KEY,
+            visibility VARCHAR(100) NOT NULL
+        );
+
+        INSERT INTO review_visibility(visibility) VALUES('proposal_reviews_complete');
+        INSERT INTO review_visibility(visibility) VALUES('reviews_visible');
+        INSERT INTO review_visibility(visibility) VALUES('reviews_visible_fap_ended');
+
         ALTER TABLE faps
-            ADD COLUMN IF NOT exists review_visibility text;
+            ADD COLUMN IF NOT exists review_visibility INT NOT NULL REFERENCES review_visibility(review_visibility_id) DEFAULT 1;
             
         UPDATE faps
-        SET review_visibility = 'proposal_reviews_complete';
+        SET review_visibility = 1;
 
         ALTER TABLE proposal_events
             ADD column IF NOT exists call_fap_review_ended BOOLEAN DEFAULT FALSE;

@@ -32,7 +32,7 @@ export interface FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    reviewVisibility: FapReviewVisibility
+    reviewVisibility: number
   ): Promise<Fap>;
   update(
     id: number,
@@ -43,7 +43,7 @@ export interface FapDataSource {
     customGradeGuide: boolean | null,
     active: boolean,
     files: string | null,
-    reviewVisibility: FapReviewVisibility
+    reviewVisibility: number
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
@@ -174,4 +174,5 @@ export interface FapDataSource {
     fapId: number,
     userId?: number
   ): Promise<FapProposal[]>;
+  getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
 }

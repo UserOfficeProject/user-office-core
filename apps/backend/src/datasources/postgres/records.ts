@@ -16,13 +16,7 @@ import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
-import {
-  Fap,
-  FapAssignment,
-  FapProposal,
-  FapReviewer,
-  FapReviewVisibility,
-} from '../../models/Fap';
+import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
 import { GenericTemplate } from '../../models/GenericTemplate';
@@ -440,7 +434,12 @@ export interface FapRecord {
   readonly active: boolean;
   readonly full_count: number;
   readonly files: string | null;
-  readonly review_visibility: string;
+  readonly review_visibility: number;
+}
+
+export interface FapReviewVisibilityRecord {
+  readonly review_visibility_id: number;
+  readonly visibility: string;
 }
 
 export interface FapSecretariesRecord {
@@ -1160,7 +1159,7 @@ export const createFapObject = (fap: FapRecord) => {
     [],
     [],
     fap.files ? JSON.stringify(fap.files) : null,
-    fap.review_visibility as FapReviewVisibility
+    fap.review_visibility
   );
 };
 

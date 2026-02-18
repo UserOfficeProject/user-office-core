@@ -7,7 +7,7 @@ mutation updateFap(
   $customGradeGuide: Boolean
   $active: Boolean!
   $files: String
-  $reviewVisibility: FapReviewVisibility
+  $reviewVisibility: Int
 ) {
   updateFap(
     id: $id

@@ -10,8 +10,10 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { Fap, FapReviewVisibility } from 'generated/sdk';
+import { Fap } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+import { reviewVisibilityOptions } from './FapGeneralInfo';
 
 type AddFapProps = {
   close: (fapAdded: Fap | null) => void;
@@ -21,21 +23,6 @@ const AddFap = ({ close }: AddFapProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
-  const reviewVisibilityOptions = [
-    {
-      value: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
-      text: 'Once all reviews on a proposal are complete',
-    },
-    {
-      value: FapReviewVisibility.REVIEWS_VISIBLE,
-      text: 'Reviews visible during the FAP',
-    },
-    {
-      value: FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED,
-      text: 'Reviews visible after the FAP has ended',
-    },
-  ];
-
   return (
     <Formik
       initialValues={{
@@ -43,7 +30,7 @@ const AddFap = ({ close }: AddFapProps) => {
         description: '',
         numberRatingsRequired: 2,
         active: true,
-        reviewVisibility: FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE,
+        reviewVisibility: 1,
       }}
       onSubmit={async (values): Promise<void> => {
         try {
@@ -116,6 +103,7 @@ const AddFap = ({ close }: AddFapProps) => {
             name="reviewVisibility"
             label="Review visibility"
             component={Select}
+            onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
             data-cy="fap-review-visibility-filter"
             options={reviewVisibilityOptions}
             required

@@ -17,7 +17,7 @@ export class Fap {
     public fapChairUserIds: number[] | null,
     public fapSecretariesUserIds: number[] | null,
     public files: string | null,
-    public reviewVisibility: FapReviewVisibility
+    public reviewVisibility: number
   ) {}
 }
 

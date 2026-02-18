@@ -12,7 +12,6 @@ import { ResolverContext } from '../../context';
 import {
   Fap as FapBase,
   FapProposalCount as FapProposalCountBase,
-  FapReviewVisibility,
 } from '../../models/Fap';
 import { BasicUserDetails } from './BasicUserDetails';
 
@@ -47,8 +46,8 @@ export class Fap implements Partial<FapBase> {
   @Field(() => Boolean)
   public active: boolean;
 
-  @Field(() => FapReviewVisibility)
-  public reviewVisibility: FapReviewVisibility;
+  @Field(() => Int)
+  public reviewVisibility: number;
 
   public fapChairUserIds: number[] | null;
 
