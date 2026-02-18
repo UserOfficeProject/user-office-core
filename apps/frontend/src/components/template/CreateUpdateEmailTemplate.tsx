@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { getCurrentUser } from 'context/UserContextProvider';
 import { EmailTemplateFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -23,9 +22,6 @@ const CreateUpdateEmailTemplate = ({
 }: CreateUpdateEmailTemplateProps) => {
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  // const [useTemplateFile, setUseTemplateFile] = useState(
-  //   emailTemplate?.useTemplateFile || false
-  // );
 
   const initialValues = {
     id: emailTemplate?.id || 0,
@@ -34,10 +30,6 @@ const CreateUpdateEmailTemplate = ({
     useTemplateFile: emailTemplate?.useTemplateFile || false,
     subject: emailTemplate?.subject || '',
     body: emailTemplate?.body || '',
-    createdByUserId:
-      emailTemplate?.createdByUserId ||
-      (getCurrentUser()?.user.id as number) ||
-      0,
   };
 
   return (
@@ -90,6 +82,7 @@ const CreateUpdateEmailTemplate = ({
             label="Description"
             type="text"
             component={TextField}
+            multiline
             fullWidth
             data-cy="description"
             disabled={isExecutingCall}
@@ -103,7 +96,7 @@ const CreateUpdateEmailTemplate = ({
             }}
             type="checkbox"
             component={CheckboxWithLabel}
-            data-cy="description"
+            data-cy="use-template-file"
             disabled={isExecutingCall}
           />
           <Field

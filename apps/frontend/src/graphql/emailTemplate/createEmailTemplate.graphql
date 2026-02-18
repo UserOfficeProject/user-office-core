@@ -1,5 +1,4 @@
 mutation createEmailTemplate(
-  $createdByUserId: Int!
   $name: String!
   $description: String!
   $useTemplateFile: Boolean!
@@ -8,7 +7,6 @@ mutation createEmailTemplate(
 ) {
   createEmailTemplate(
     createEmailTemplateInput: {
-      createdByUserId: $createdByUserId
       name: $name
       description: $description
       useTemplateFile: $useTemplateFile

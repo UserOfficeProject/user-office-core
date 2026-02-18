@@ -18,27 +18,11 @@ export default class EmailTemplateQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, id: number) {
-    const emailTemplate = await this.dataSource.getEmailTemplate(id);
-
-    if (!emailTemplate) {
-      return null;
-    }
-
-    if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
-      return emailTemplate;
-    } else {
-      return null;
-    }
+    return await this.dataSource.getEmailTemplate(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
   async getAll(agent: UserWithRole | null, filter: EmailTemplatesFilter) {
-    const emailTemplates = this.dataSource.getEmailTemplates(filter);
-
-    if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
-      return emailTemplates;
-    } else {
-      return null;
-    }
+    return this.dataSource.getEmailTemplates(filter);
   }
 }

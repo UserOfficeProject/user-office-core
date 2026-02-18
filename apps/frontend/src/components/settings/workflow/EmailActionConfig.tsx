@@ -177,9 +177,9 @@ const EmailActionConfig = ({
       return (
         emailTemplates.find(
           (template) =>
-            template.name ===
+            template.id ===
             recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
-              ?.emailTemplate?.name
+              ?.emailTemplate?.id
         ) || null
       );
     } else {
@@ -254,7 +254,7 @@ const EmailActionConfig = ({
                         options={emailTemplates || []}
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) =>
-                          option.name === value.name
+                          option.id === value.id
                         }
                         renderInput={(params) => (
                           <TextField

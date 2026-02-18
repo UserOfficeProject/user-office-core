@@ -6,7 +6,7 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateName } from './emailTemplateName';
+import { EmailTemplateId } from './emailTemplateId';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
@@ -36,7 +36,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
         }))(event.call);
         const emailSettings = callCreationEmail<typeof eventCallPartial>(
           eventCallPartial,
-          EmailTemplateName.CALL_CREATED_EMAIL,
+          EmailTemplateId.CALL_CREATED_EMAIL,
           notificationEmailAddress
         );
 

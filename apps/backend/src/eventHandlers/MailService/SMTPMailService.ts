@@ -16,7 +16,7 @@ import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSour
 import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
-import { ELIEmailTemplate, MailService, SendMailResults } from './MailService';
+import { MailService, SendMailResults, SMTPEmailTemplate } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
@@ -107,7 +107,7 @@ export class SMTPMailService extends MailService {
     );
   }
 
-  private async getEmailTemplate(options: EmailSettings): Promise<{
+  private async compileEmailTemplate(options: EmailSettings): Promise<{
     subject: string;
     body: string;
   } | null> {
@@ -197,7 +197,7 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const template = await this.getEmailTemplate(options);
+    const template = await this.compileEmailTemplate(options);
 
     if (!template) {
       logger.logError('Email template not found', {
@@ -262,13 +262,13 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async getEmailTemplates(): ResultsPromise<ELIEmailTemplate[]> {
+  async getEmailTemplates(): ResultsPromise<SMTPEmailTemplate[]> {
     const emailTemplates =
       await this.emailTemplateDataSource.getEmailTemplates();
 
     return {
       results: emailTemplates.emailTemplates.map((template) => ({
-        id: template.id,
+        id: template.id.toString(),
         name: template.name || '',
       })),
     };

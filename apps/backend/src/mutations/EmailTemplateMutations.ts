@@ -27,9 +27,13 @@ export default class EmailTemplateMutations {
     agent: UserWithRole | null,
     args: CreateEmailTemplateInput
   ): Promise<EmailTemplate | Rejection> {
+    if (!agent) {
+      return rejection('Unauthorized', { args });
+    }
+
     try {
       const createdEmailTemplate = await this.dataSource.create(
-        args.createdByUserId,
+        agent.id,
         args.name,
         args.description,
         args.useTemplateFile,
@@ -86,7 +90,7 @@ export default class EmailTemplateMutations {
 
     const has =
       await this.statusActionsDataSource.hasEmailTemplateIdConnectionStatusAction(
-        emailTemplate.name
+        emailTemplate.id
       );
 
     if (has) {
@@ -101,15 +105,6 @@ export default class EmailTemplateMutations {
 
       return result;
     } catch (error) {
-      // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
-      if ((error as { code: string }).code === '23503') {
-        return rejection(
-          'Failed to delete call, it has dependencies which need to be deleted first',
-          { emailTemplateId },
-          error
-        );
-      }
-
       return rejection(
         'Failed to delete email template',
         {

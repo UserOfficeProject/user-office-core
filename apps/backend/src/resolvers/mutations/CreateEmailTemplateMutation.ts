@@ -1,21 +1,10 @@
-import {
-  Arg,
-  Ctx,
-  Field,
-  InputType,
-  Int,
-  Mutation,
-  Resolver,
-} from 'type-graphql';
+import { Arg, Ctx, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { EmailTemplate } from '../types/EmailTemplate';
 
 @InputType()
 export class CreateEmailTemplateInput {
-  @Field(() => Int)
-  public createdByUserId: number;
-
   @Field(() => String)
   public name: string;
 

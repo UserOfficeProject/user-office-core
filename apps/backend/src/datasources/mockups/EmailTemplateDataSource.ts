@@ -1,4 +1,4 @@
-import { EmailTemplateName } from '../../eventHandlers/email/emailTemplateName';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
@@ -34,7 +34,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.PROPOSAL_CREATED,
+        EmailTemplateId.PROPOSAL_CREATED,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -43,7 +43,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.ACCEPTED_PROPOSAL,
+        EmailTemplateId.ACCEPTED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -52,7 +52,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.REJECTED_PROPOSAL,
+        EmailTemplateId.REJECTED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -61,7 +61,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.RESERVED_PROPOSAL,
+        EmailTemplateId.RESERVED_PROPOSAL,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -70,7 +70,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.REVIEW_REMINDER,
+        EmailTemplateId.REVIEW_REMINDER,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -79,7 +79,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.INTERNAL_REVIEW_CREATED,
+        EmailTemplateId.INTERNAL_REVIEW_CREATED,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -88,7 +88,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.INTERNAL_REVIEW_DELETED,
+        EmailTemplateId.INTERNAL_REVIEW_DELETED,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -97,7 +97,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
       new EmailTemplate(
         1,
         2,
-        EmailTemplateName.INTERNAL_REVIEW_UPDATED,
+        EmailTemplateId.INTERNAL_REVIEW_UPDATED,
         'This is a dummy email template for testing purposes.',
         false,
         'Welcome to Our Service',
@@ -130,8 +130,8 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     name: string,
     description: string,
     use_template_file: boolean,
-    subject: string,
-    body: string
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate> {
     return dummyEmailTemplate;
   }
@@ -141,8 +141,8 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     name: string,
     description: string,
     use_template_file: boolean,
-    subject: string,
-    body: string
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate> {
     return dummyEmailTemplate;
   }

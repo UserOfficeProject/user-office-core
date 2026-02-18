@@ -17,7 +17,7 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateName } from './emailTemplateName';
+import { EmailTemplateId } from './emailTemplateId';
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -105,7 +105,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         mailService
           .sendMail({
             content: {
-              template: EmailTemplateName.CO_PROPOSER_INVITE_ACCEPTED,
+              template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
@@ -149,7 +149,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const options: EmailSettings = {
         content: {
-          template: EmailTemplateName.PROPOSAL_SUBMITTED,
+          template: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -203,11 +203,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const { finalStatus } = event.proposal;
       let templateId = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = EmailTemplateName.ACCEPTED_PROPOSAL;
+        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = EmailTemplateName.REJECTED_PROPOSAL;
+        templateId = EmailTemplateId.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = EmailTemplateName.RESERVED_PROPOSAL;
+        templateId = EmailTemplateId.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -276,7 +276,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         await sendInviteEmail(
           invite,
           inviter,
-          EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
         ).then(async () => {
           await eventBus.publish({
             ...event,
@@ -312,7 +312,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         await sendInviteEmail(
           invite,
           inviter,
-          EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
         ).then(async () => {
           await eventBus.publish({
             ...event,
@@ -338,7 +338,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template: EmailTemplateName.REVIEW_REMINDER,
+            template: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -413,8 +413,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const templateId =
         event.type === Event.VISIT_REGISTRATION_APPROVED
-          ? EmailTemplateName.VISIT_REGISTRATION_APPROVED
-          : EmailTemplateName.VISIT_REGISTRATION_CANCELLED;
+          ? EmailTemplateId.VISIT_REGISTRATION_APPROVED
+          : EmailTemplateId.VISIT_REGISTRATION_CANCELLED;
 
       mailService
         .sendMail({
@@ -465,7 +465,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
-  templateId: EmailTemplateName
+  templateId: EmailTemplateId
 ) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(

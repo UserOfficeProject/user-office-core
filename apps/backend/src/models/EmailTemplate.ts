@@ -5,7 +5,7 @@ export class EmailTemplate {
     public name: string,
     public description: string,
     public useTemplateFile: boolean,
-    public subject: string,
-    public body: string
+    public subject?: string | null,
+    public body?: string | null
   ) {}
 }

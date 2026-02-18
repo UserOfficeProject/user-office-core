@@ -43,7 +43,6 @@ context('Status actions tests', () => {
     cy.getAndStoreFeaturesEnabled();
 
     cy.createEmailTemplate({
-      createdByUserId: 0,
       name: 'my-first-email',
       description: 'My First Email',
       useTemplateFile: false,
@@ -52,7 +51,6 @@ context('Status actions tests', () => {
     });
 
     cy.createEmailTemplate({
-      createdByUserId: 0,
       name: 'my-second-email',
       description: 'My Second Email',
       useTemplateFile: false,

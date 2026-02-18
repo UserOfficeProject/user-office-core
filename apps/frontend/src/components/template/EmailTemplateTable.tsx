@@ -65,33 +65,31 @@ const EmailTemplatesTable = () => {
   );
 
   return (
-    <>
-      <div data-cy="email-templates-table">
-        <SuperMaterialTable
-          delete={onEmailTemplateDelete}
-          setData={setEmailTemplates}
-          title={
-            <Typography variant="h6" component="h2">
-              Email Templates
-            </Typography>
-          }
-          hasAccess={{
-            create: isUserOfficer,
-            update: isUserOfficer,
-            remove: isUserOfficer,
-          }}
-          columns={columns}
-          data={emailTemplates}
-          isLoading={loadingEmailTemplates}
-          options={{
-            search: true,
-            debounceInterval: 400,
-          }}
-          createModal={createModal}
-          persistUrlQueryParams={true}
-        ></SuperMaterialTable>
-      </div>
-    </>
+    <div data-cy="email-templates-table">
+      <SuperMaterialTable
+        delete={onEmailTemplateDelete}
+        setData={setEmailTemplates}
+        title={
+          <Typography variant="h6" component="h2">
+            Email Templates
+          </Typography>
+        }
+        hasAccess={{
+          create: isUserOfficer,
+          update: isUserOfficer,
+          remove: isUserOfficer,
+        }}
+        columns={columns}
+        data={emailTemplates}
+        isLoading={loadingEmailTemplates}
+        options={{
+          search: true,
+          debounceInterval: 400,
+        }}
+        createModal={createModal}
+        persistUrlQueryParams={true}
+      ></SuperMaterialTable>
+    </div>
   );
 };
 

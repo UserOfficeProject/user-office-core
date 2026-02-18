@@ -71,7 +71,7 @@ export default class StatusActionQueries {
         return new EmailActionDefaultConfig(
           allEmailRecipients,
           emailTemplatesResult.results.map((e) => ({
-            id: e.name,
+            id: e.id,
             name: e.name,
           }))
         );

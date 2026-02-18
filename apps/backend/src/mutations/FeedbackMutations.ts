@@ -9,7 +9,7 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
-import { EmailTemplateName } from '../eventHandlers/email/emailTemplateName';
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ExperimentStatus } from '../models/Experiment';
 import { Feedback, FeedbackStatus } from '../models/Feedback';
@@ -327,7 +327,7 @@ export default class FeedbackMutations {
     try {
       const { results } = await this.mailService.sendMail({
         content: {
-          template: EmailTemplateName.FEEDBACK_REQUEST,
+          template: EmailTemplateId.FEEDBACK_REQUEST,
         },
         substitution_data: {
           teamleadPreferredname: teamLead.preferredname,

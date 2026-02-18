@@ -14,7 +14,7 @@ export interface StatusActionsDataSource {
     statusActionId: number
   ): Promise<ConnectionHasStatusAction>;
   hasEmailTemplateIdConnectionStatusAction(
-    emailTemplateName: string
+    emailTemplateId: number
   ): Promise<boolean>;
 
   updateConnectionStatusAction(

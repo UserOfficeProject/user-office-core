@@ -70,8 +70,8 @@ export default class PostgresEmailTemplateDataSource
     name: string,
     description: string,
     useTemplateFile: boolean,
-    subject: string,
-    body: string
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate> {
     return database
       .insert(
@@ -100,8 +100,8 @@ export default class PostgresEmailTemplateDataSource
     name: string,
     description: string,
     useTemplateFile: boolean,
-    subject: string,
-    body: string
+    subject?: string,
+    body?: string
   ): Promise<EmailTemplate> {
     return database
       .update(

@@ -15,10 +15,10 @@ import { Event } from '../../events/event.enum';
 import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { BasicUserDetails, UserRole } from '../../models/User';
+import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateName } from './emailTemplateName';
+import { EmailTemplateId } from './emailTemplateId';
 
 export async function eliEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -105,14 +105,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateName = EmailTemplateName.PROPOSAL_CREATED;
+      const template = EmailTemplateId.PROPOSAL_CREATED;
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateName);
+        await emailTemplateDataSource.getEmailTemplateByName(template);
 
       const options: EmailSettings = {
         content: {
-          template: emailTemplate?.name || templateName || '',
+          template: emailTemplate?.name || template || '',
         },
         substitution_data: {
           preferredName: principalInvestigator.preferredname,
@@ -150,13 +150,13 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
       const { finalStatus } = event.proposal;
-      let templateName = '';
+      let template = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateName = EmailTemplateName.ACCEPTED_PROPOSAL;
+        template = EmailTemplateId.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateName = EmailTemplateName.REJECTED_PROPOSAL;
+        template = EmailTemplateId.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateName = EmailTemplateName.RESERVED_PROPOSAL;
+        template = EmailTemplateId.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -164,12 +164,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       }
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateName);
+        await emailTemplateDataSource.getEmailTemplateByName(template);
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateName || '',
+            template: emailTemplate?.name || template || '',
           },
           substitution_data: {
             preferredName: principalInvestigator.preferredname,
@@ -203,7 +203,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateName = EmailTemplateName.REVIEW_REMINDER;
+      const templateName = EmailTemplateId.REVIEW_REMINDER;
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(templateName);
 
@@ -284,21 +284,21 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         }
       }
 
-      let templateName = EmailTemplateName.INTERNAL_REVIEW_CREATED;
+      let template = EmailTemplateId.INTERNAL_REVIEW_CREATED;
 
       if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
-        templateName = EmailTemplateName.INTERNAL_REVIEW_UPDATED;
+        template = EmailTemplateId.INTERNAL_REVIEW_UPDATED;
       } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
-        templateName = EmailTemplateName.INTERNAL_REVIEW_DELETED;
+        template = EmailTemplateId.INTERNAL_REVIEW_DELETED;
       }
 
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateName);
+        await emailTemplateDataSource.getEmailTemplateByName(template);
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateName || '',
+            template: emailTemplate?.name || template || '',
           },
           substitution_data: {
             assignedByPreferredName: assignedBy.preferredname,
@@ -325,17 +325,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           });
         });
     }
-  }
-}
-
-function gettemplateNameForRole(role: UserRole): string {
-  switch (role) {
-    case UserRole.USER:
-      return EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_USER;
-    case UserRole.INTERNAL_REVIEWER:
-      return EmailTemplateName.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
-    default:
-      throw new Error('No valid user role set for email invitation');
   }
 }
 

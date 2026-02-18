@@ -20,7 +20,6 @@ describe('Test Email Template Mutations', () => {
         useTemplateFile: false,
         subject: 'Welcome to Our Service',
         body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-        createdByUserId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -33,7 +32,6 @@ describe('Test Email Template Mutations', () => {
         useTemplateFile: false,
         subject: 'Welcome to Our Service',
         body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-        createdByUserId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -45,7 +43,6 @@ describe('Test Email Template Mutations', () => {
       useTemplateFile: false,
       subject: 'Welcome to Our Service',
       body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-      createdByUserId: 1,
     };
 
     return expect(
@@ -68,7 +65,6 @@ describe('Test Email Template Mutations', () => {
       useTemplateFile: false,
       subject: 'Welcome to Our Service',
       body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-      createdByUserId: 1,
     };
 
     return expect(
