@@ -20,7 +20,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import UOLoader from 'components/common/UOLoader';
@@ -63,9 +63,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-
+  const [searchParams, setSearchParams] = useSearchParams({});
+  const { currentRole } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-
+  const [callId, setCallId] = useState<number | null>(null);
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
@@ -86,35 +87,30 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       instrumentIds: [],
     },
     CallsDataQuantity.MINIMAL,
-    !techniques || techniques.length <= 1
+    currentRole === UserRole.USER_OFFICER
+      ? !techniques || techniques.length <= 0
+      : false
   );
 
-  console.log('instrumentIds', !techniques || techniques.length <= 1);
   useEffect(() => {
+    if (currentRole === UserRole.USER_OFFICER) {
+      return;
+    }
     setCallsFilter({
       proposalStatusShortCode: 'QUICK_REVIEW',
       instrumentIds,
     });
-  }, [instrumentIds, setCallsFilter]);
+  }, [currentRole, instrumentIds, setCallsFilter]);
 
-  console.log(
-    'calls ---',
-    JSON.stringify(loadingCalls),
-    JSON.stringify(techniques)
-    //JSON.stringify(calls)
-  );
   // Only show instruments in the user's techniques
   const { allInstruments, techniqueInstruments, loadingInstruments } =
     useTechniqueProposalInstrumentsData(techniques);
-
-  const [searchParams, setSearchParams] = useSearchParams({});
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
   });
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const callId = searchParams.get('call');
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
   const proposalId = searchParams.get('proposalId');
@@ -135,8 +131,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     totalCount === searchParams.getAll('selection').length;
   const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
     useState(false);
-
-  const { currentRole } = useContext(UserContext);
 
   enum StatusCode {
     DRAFT = 'DRAFT',
@@ -177,7 +171,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     .map((status) => status.id);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
-    callId: callId ? +callId : undefined,
+    callId: callId,
     instrumentFilter: {
       instrumentId: instrument ? +instrument : null,
       showAllProposals: !instrument,
@@ -197,6 +191,28 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
+
+  const lastProcessedCallId = useRef<number | null>(null);
+  useEffect(() => {
+    if (calls && calls.length > 0 && !searchParams.get('call')) {
+      const activeCall = calls.find((call) => call.isActive);
+      if (activeCall?.id && activeCall.id !== callId) {
+        setCallId(activeCall.id);
+      } else {
+        setCallId(calls[0].id);
+      }
+    }
+    if (callId && callId !== lastProcessedCallId.current) {
+      lastProcessedCallId.current = callId;
+      setSearchParams((prev) => {
+        prev.set('call', callId.toString());
+
+        return prev;
+      });
+      setProposalFilter((prev) => ({ ...prev, callId }));
+      refreshTableData();
+    }
+  }, [calls, callId, setSearchParams, searchParams]);
 
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
@@ -651,6 +667,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
     new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+      if (callId === null) {
+        resolve({
+          data: [],
+          page: tableQuery.page,
+          totalCount: 0,
+        });
+
+        return;
+      }
       const [orderBy] = tableQuery.orderByCollection;
       try {
         const {
