@@ -1,0 +1,6 @@
+query getAuthResourceMetadata($resourceType: String!) {
+  getAuthResourceMetadata(resourceType: $resourceType) {
+    attributes
+    functions
+  }
+}

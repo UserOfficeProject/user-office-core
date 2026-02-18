@@ -8,7 +8,7 @@ export class AddCasbinPolicyInput {
   subject: string;
 
   @Field(() => String)
-  object: string;
+  resource: string;
 
   @Field(() => String)
   action: string;

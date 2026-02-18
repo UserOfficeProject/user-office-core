@@ -1,12 +1,12 @@
 mutation addCasbinPolicy(
   $subject: String!
-  $object: String!
+  $resource: String!
   $action: String!
   $condition: String!
 ) {
   addCasbinPolicy(
     subject: $subject
-    object: $object
+    resource: $resource
     action: $action
     condition: $condition
     effect: "allow"

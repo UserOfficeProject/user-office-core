@@ -11,22 +11,36 @@ import {
   RuleGroupType,
 } from 'react-querybuilder';
 
+import UOLoader from 'components/common/UOLoader';
+import { useAuthResourceMetadata } from 'hooks/permission/useAuthResourceMetadata';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export function PermissionsBuilder() {
   const { api } = useDataApiWithFeedback();
 
   const [subject, setSubject] = useState('user_officer');
-  const [object, setObject] = useState('call');
+  const [resource, setResource] = useState('call');
   const [action, setAction] = useState('read');
 
+  const { attributes, functions, loading } = useAuthResourceMetadata(resource);
+
   const fields: Field[] = [
-    { name: 'call.shortCode', label: 'call.shortCode' },
-    { name: 'call.tags', label: 'call.tags' },
-    { name: 'isCallEnded', label: 'isCallEnded' },
+    ...attributes.map((attr) => ({
+      name: `${resource}.${attr}`,
+      label: `${resource}.${attr}`,
+    })),
+    ...functions.map((fn) => ({
+      name: fn,
+      label: fn,
+      operators: [
+        { name: '=', label: '=' },
+        { name: '!=', label: '!=' },
+      ],
+      defaultValue: true,
+    })),
   ];
 
-  const operators: Operator[] = [
+  const defaultOperators: Operator[] = [
     {
       name: '=',
       label: '=',
@@ -53,13 +67,15 @@ export function PermissionsBuilder() {
       toastSuccessMessage: 'Policy created successfully',
     }).addCasbinPolicy({
       subject,
-      object,
+      resource,
       action,
       condition: formattedQuery,
     });
   };
 
-  return (
+  return loading ? (
+    <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
+  ) : (
     <Stack spacing={3}>
       <Stack direction="row" spacing={2}>
         <FormControl fullWidth>
@@ -74,11 +90,11 @@ export function PermissionsBuilder() {
         </FormControl>
 
         <FormControl fullWidth>
-          <InputLabel>Object</InputLabel>
+          <InputLabel>Resource</InputLabel>
           <Select
-            value={object}
-            label="Object"
-            onChange={(e) => setObject(e.target.value)}
+            value={resource}
+            label="Resource"
+            onChange={(e) => setResource(e.target.value)}
           >
             <MenuItem value="call">call</MenuItem>
           </Select>
@@ -100,7 +116,7 @@ export function PermissionsBuilder() {
       <Box>
         <QueryBuilder
           fields={fields}
-          operators={operators}
+          operators={defaultOperators}
           query={query}
           onQueryChange={setQuery}
         />
