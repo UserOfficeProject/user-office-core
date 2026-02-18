@@ -38,6 +38,7 @@ let server: Server;
 const preProcessorOptions = {
   // send in the options from your webpack.config.js, so it works the same
   // as your app's code
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   webpackOptions: require('./webpack.config'),
   watchOptions: {},
 };
