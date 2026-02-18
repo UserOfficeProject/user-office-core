@@ -126,9 +126,18 @@ export default class ProposalQueries {
     first?: number,
     offset?: number
   ) {
+    const cleanText = filter?.text?.trim();
+    // using a ternary operator
+    const sanitizedFilter: ProposalsFilter | undefined = filter
+      ? {
+          ...filter,
+          text: cleanText && cleanText.length > 0 ? cleanText : undefined,
+        }
+      : undefined;
+
     return this.dataSource.getInstrumentScientistProposals(
       agent!,
-      filter,
+      sanitizedFilter,
       first,
       offset
     );
