@@ -196,16 +196,19 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   useEffect(() => {
     if (calls && calls.length > 0 && !searchParams.get('call')) {
       const activeCall = calls.find((call) => call.isActive);
-      if (activeCall?.id && activeCall.id !== callId) {
-        setCallId(activeCall.id);
-      } else {
-        setCallId(calls[0].id);
+      const targetCallId = activeCall?.id || calls[0].id;
+      if (targetCallId && targetCallId !== callId) {
+        setCallId(targetCallId);
       }
     }
-    if (callId && callId !== lastProcessedCallId.current) {
+    if (callId !== lastProcessedCallId.current) {
       lastProcessedCallId.current = callId;
       setSearchParams((prev) => {
-        prev.set('call', callId.toString());
+        if (callId) {
+          prev.set('call', callId.toString());
+        } else {
+          prev.delete('call');
+        }
 
         return prev;
       });
