@@ -29,6 +29,7 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
@@ -69,7 +70,7 @@ type ProposalMessageData = {
   shortCode: string;
   title: string;
   submitted: boolean;
-  samples?: { id: number; title: string }[];
+  samples?: Pick<Sample, 'id' | 'title'>[];
 };
 
 type ExperimentMessageData = {
@@ -79,7 +80,7 @@ type ExperimentMessageData = {
   endsAt: Date;
   status: string;
   proposal?: ProposalMessageData;
-  samples?: { id: number; title: string }[];
+  samples?: Pick<Sample, 'id' | 'title'>[];
   instrument?: { id: number; name: string; shortCode: string };
 };
 
