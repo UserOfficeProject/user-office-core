@@ -318,37 +318,78 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run test:backend
-  e2e:
+
+  count_self_hosted_runners:
+    needs: build
     runs-on: ubuntu-latest
-    needs: [resolve_dep, build]
+    outputs:
+      idle: ${{ steps.get.outputs.idle }}
+    steps:
+      - name: Get idle runner count
+        id: get
+        env:
+          OWNER: ${{ github.repository_owner }}
+          AUTH: ${{ secrets.GH_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          REPO="${GITHUB_REPOSITORY#*/}"
+
+          RESPONSE="$(
+            curl -sS --fail \
+              -H "Authorization: Bearer $AUTH" \
+              "https://api.github.com/repos/$OWNER/$REPO/actions/runners?per_page=100"
+          )"
+
+          IDLE="$(echo "$RESPONSE" | jq '
+            [ (.runners // [])[]?
+              | select(.status == "online" and (.busy | not))
+              | select([.labels[]?.name] | index("self-hosted") and index("Linux") and index("X64"))
+            ] | length
+          ')"
+          echo "idle=$IDLE" >> "$GITHUB_OUTPUT"
+
+  e2e:
+    needs: [resolve_dep, build, count_self_hosted_runners]
 
     strategy:
       fail-fast: false
       matrix:
         pattern:
           - id: ae
+            order: 0
             files: cypress/e2e/[a-e]*.ts
           - id: fh
+            order: 1
             files: cypress/e2e/[f-h]*.ts
           - id: io
+            order: 2
             files: cypress/e2e/[i-o]*.ts
           - id: p-am
+            order: 3
             files: cypress/e2e/p[a-m]*.ts
           - id: p-nz
+            order: 4
             files: cypress/e2e/p[n-z]!(oposals)*.ts
           - id: proposals
+            order: 5
             files: cypress/e2e/proposals*.ts
           - id: rs
+            order: 6
             files: cypress/e2e/[r-s]*.ts
           - id: t
+            order: 7
             files: cypress/e2e/t!(emplatesBasic).ts
           - id: templateDelete
+            order: 8
             files: cypress/e2e/templatesBasic*.ts
           - id: uz
+            order: 9
             files: cypress/e2e/[u-z]*.ts
           - id: AZ
+            order: 10
             files: cypress/e2e/[A-Z]*.ts
-
+    runs-on: ${{  matrix.pattern.order < needs.count_self_hosted_runners.outputs.idle && 'self-hosted' || 'ubuntu-latest'  }}
+ 
     steps:
       - uses: actions/checkout@v4
 
@@ -443,6 +484,7 @@ jobs:
       - name: Download required repositories
         run: |
           cd "$GITHUB_WORKSPACE/.."
+          rm -rf user-office-factory
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Run e2e tests stfc
