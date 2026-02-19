@@ -121,6 +121,10 @@ function QuestionaryComponentExperimentSafetyBasis(
           );
 
           if (sampleQuestions.length === 0) {
+            api().addClientLog({
+              error: `No sample declaration question found for proposal ${state.experimentSafety.proposal.primaryKey}`,
+            });
+
             enqueueSnackbar(
               'It is not possible to create a sample, because no sample declaration question was found in the proposal questionary. Please contact your User Office.',
               {
