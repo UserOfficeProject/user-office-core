@@ -2,7 +2,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -53,6 +52,7 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_submitted_at,
     record.created_by,
     record.status_id,
+    record.workflow_status_id,
     record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
@@ -379,11 +379,11 @@ export default class PostgresExperimentDataSource
 
   async updateExperimentSafetyStatus(
     experimentSafetyPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety> {
     const result = await database('experiment_safety')
       .update({
-        status_id: statusId,
+        workflow_status_id: workflowStatusId,
       })
       .where('experiment_safety_pk', experimentSafetyPk)
       .returning('*');
@@ -416,14 +416,14 @@ export default class PostgresExperimentDataSource
     experimentPk: number,
     questionaryId: number,
     creatorId: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety | Rejection> {
     return database
       .insert({
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
         created_by: creatorId,
-        status_id: statusId,
+        workflow_status_id: workflowStatusId,
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')
@@ -703,28 +703,6 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    const dataToInsert = experimentPks.map((experimentPk) => ({
-      experiment_pk: experimentPk,
-      [event.toLowerCase()]: true,
-    }));
-    const result = await database.raw(
-      `? ON CONFLICT (experiment_pk)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('experiment_safety_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return result.rows;
-    } else {
-      return null;
-    }
-  }
   async getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null> {

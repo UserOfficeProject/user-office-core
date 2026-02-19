@@ -6,7 +6,6 @@ import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSou
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
@@ -31,8 +30,6 @@ export class ProposalAuthorization {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
@@ -313,9 +310,7 @@ export class ProposalAuthorization {
       callId,
       checkIfInternalEditable
     );
-    const proposalStatus = (
-      await this.statusDataSource.getStatus(proposal.statusId)
-    )?.shortCode;
+    const proposalStatus = proposal.statusId;
     if (
       proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
       (checkIfInternalEditable &&

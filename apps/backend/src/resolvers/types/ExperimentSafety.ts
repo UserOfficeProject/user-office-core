@@ -42,8 +42,11 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Number)
   public createdBy: number;
 
+  @Field(() => String, { nullable: true })
+  public statusId: string | null;
+
   @Field(() => Number, { nullable: true })
-  public statusId: number | null;
+  public workflowStatusId: number | null;
 
   @Field(() => Number, { nullable: true })
   public safetyReviewQuestionaryId: number | null;

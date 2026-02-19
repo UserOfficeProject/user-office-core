@@ -30,9 +30,9 @@ export class ProposalSubmissionState extends QuestionarySubmissionState {
 
   getInitialStepIndex(): number {
     if (
-      this.proposal?.status?.shortCode.toString() ==
+      this.proposal?.status?.id.toString() ==
         ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
-      this.proposal?.status?.shortCode.toString() ==
+      this.proposal?.status?.id.toString() ==
         ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
     ) {
       return 0;

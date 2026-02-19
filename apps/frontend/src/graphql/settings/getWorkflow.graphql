@@ -4,26 +4,40 @@ query getWorkflow($workflowId: Int!, $entityType: WorkflowType!) {
     name
     description
     connectionLineType
-    workflowConnections {
-      id
-      sortOrder
-      workflowId
-      statusId
-      status {
-        ...status
+
+    connections {
+      ...workflowConnection
+      prevStatus {
+        ...workflowStatus
+        status {
+          ...status
+        }
       }
-      nextStatusId
-      prevStatusId
-      prevConnectionId
-      posX
-      posY
+      nextStatus {
+        ...workflowStatus
+        status {
+          ...status
+        }
+      }
       statusChangingEvents {
-        statusChangingEventId
         workflowConnectionId
         statusChangingEvent
       }
       statusActions {
         ...connectionStatusAction
+        action {
+          ...statusAction
+          defaultConfig {
+            ...statusActionDefaultConfig
+          }
+        }
+      }
+    }
+
+    statuses {
+      ...workflowStatus
+      status {
+        ...status
       }
     }
   }

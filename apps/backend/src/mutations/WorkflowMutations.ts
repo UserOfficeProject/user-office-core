@@ -1,4 +1,5 @@
 import {
+  addNextStatusEventsValidationSchema,
   addStatusActionsToConnectionValidationSchema,
   createWorkflowValidationSchema,
   deleteWorkflowStatusValidationSchema,
@@ -21,11 +22,13 @@ import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
-import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
-import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
-import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkflowStatusMutation';
+import { WorkflowStatus } from '../models/WorkflowStatus';
+import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
+import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
+import { SetStatusActionsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
+import { SetStatusChangingEventsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusChangingEventsOnConnectionMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
@@ -74,29 +77,30 @@ export default class WorkflowMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async addWorkflowStatus(
+  async addStatusToWorkflow(
     agent: UserWithRole | null,
-    args: AddWorkflowStatusInput
-  ): Promise<WorkflowConnection | Rejection> {
+    args: AddStatusToWorkflowInput
+  ): Promise<WorkflowStatus | Rejection> {
     try {
-      if (args.prevStatusId) {
-        const previousWorkflowConnection =
-          await this.dataSource.getWorkflowConnectionsById(
-            args.workflowId,
-            args.prevStatusId,
-            {}
-          );
-        if (previousWorkflowConnection.length > 0) {
-          // If there is a previous connection, we need to update its nextStatusId
-          const updatedConnection = previousWorkflowConnection[0];
-          updatedConnection.nextStatusId = args.statusId;
-          await this.dataSource.updateWorkflowStatus(updatedConnection);
-        }
-      }
-
-      return await this.dataSource.addWorkflowStatus(args);
+      return await this.dataSource.addStatusToWorkflow(args);
     } catch (error) {
       return rejection('Could not add workflow status', { agent, args }, error);
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async createWorkflowConnection(
+    agent: UserWithRole | null,
+    args: CreateWorkflowConnectionInput
+  ): Promise<WorkflowConnection | Rejection> {
+    try {
+      return await this.dataSource.createWorkflowConnection(args);
+    } catch (error) {
+      return rejection(
+        'Could not add workflow connection',
+        { agent, args },
+        error
+      );
     }
   }
 
@@ -104,31 +108,9 @@ export default class WorkflowMutations {
   async updateWorkflowStatus(
     agent: UserWithRole | null,
     args: UpdateWorkflowStatusInput
-  ): Promise<WorkflowConnection | Rejection> {
+  ): Promise<WorkflowStatus | Rejection> {
     try {
-      const connection = await this.dataSource.getWorkflowConnection(args.id);
-
-      if (!connection) {
-        return rejection(
-          'Workflow connection not found',
-          { agent, args },
-          new Error('Connection not found')
-        );
-      }
-
-      const updatedConnection = new WorkflowConnection(
-        connection.id,
-        connection.sortOrder,
-        connection.workflowId,
-        connection.statusId,
-        args.nextStatusId ?? connection.nextStatusId,
-        args.prevStatusId ?? connection.prevStatusId,
-        args.posX ?? connection.posX,
-        args.posY ?? connection.posY,
-        args.prevConnectionId ?? connection.prevConnectionId
-      );
-
-      return await this.dataSource.updateWorkflowStatus(updatedConnection);
+      return await this.dataSource.updateWorkflowStatus(args);
     } catch (error) {
       return rejection(
         'Could not update workflow status',
@@ -138,14 +120,14 @@ export default class WorkflowMutations {
     }
   }
 
-  // @ValidateArgs(addNextStatusEventsValidationSchema)
+  @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addStatusChangingEventsToConnection(
+  async setStatusChangingEventsOnConnection(
     agent: UserWithRole | null,
-    args: AddStatusChangingEventsToConnectionInput
+    args: SetStatusChangingEventsOnConnectionInput
   ): Promise<StatusChangingEvent[] | Rejection> {
     return this.dataSource
-      .addStatusChangingEventsToConnection(
+      .setStatusChangingEventsOnConnection(
         args.workflowConnectionId,
         args.statusChangingEvents
       )
@@ -165,11 +147,7 @@ export default class WorkflowMutations {
     args: DeleteWorkflowStatusInput
   ): Promise<boolean | Rejection> {
     try {
-      await this.dataSource.deleteWorkflowStatus(
-        args.statusId,
-        args.workflowId,
-        args.sortOrder
-      );
+      await this.dataSource.deleteWorkflowStatus(args.workflowStatusId);
 
       return true;
     } catch (error) {
@@ -221,12 +199,10 @@ export default class WorkflowMutations {
     )
   )
   @Authorized([Roles.USER_OFFICER])
-  async addConnectionStatusActions(
+  async setStatusActionsOnConnection(
     agent: UserWithRole | null,
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+    input: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[] | null> {
-    return this.statusActionsDataSource.addConnectionStatusActions(
-      connectionStatusActionsInput
-    );
+    return this.statusActionsDataSource.setStatusActionsOnConnection(input);
   }
 }

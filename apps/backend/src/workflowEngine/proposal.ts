@@ -1,311 +1,155 @@
 import { logger } from '@user-office-software/duo-logger';
-import { container } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
-import { StatusChangingEvent } from '../models/StatusChangingEvent';
-import { Workflow } from '../models/Workflow';
-import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
+import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
+import { createActor } from './simpleStateMachine/stateMachnine';
 
-const getProposalWorkflowByCallId = (callId: number) => {
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-
-  return callDataSource.getProposalWorkflowByCall(callId);
-};
-
-export const getProposalWorkflowConnectionByStatusId = (
-  workflowId: number,
-  statusId?: number,
-  prevStatusId?: number
-) => {
-  const workflowDataSource = container.resolve<WorkflowDataSource>(
-    Tokens.WorkflowDataSource
-  );
-
-  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
-    prevStatusId,
-  });
-};
-
-const shouldMoveToNextStatus = (
-  statusChangingEvents: StatusChangingEvent[],
-  proposalEvents: ProposalEventsRecord
-): boolean => {
-  const proposalEventsKeys = Object.keys(proposalEvents);
-  const allProposalIncompleteEvents = proposalEventsKeys.filter(
-    (proposalEventsKey) =>
-      !proposalEvents[proposalEventsKey as keyof ProposalEventsRecord]
-  );
-
-  const allNextStatusRulesFulfilled = !statusChangingEvents.some(
-    (statusChangingEvent) =>
-      allProposalIncompleteEvents.indexOf(
-        statusChangingEvent.statusChangingEvent.toLowerCase()
-      ) >= 0
-  );
-
-  return allNextStatusRulesFulfilled;
-};
-
-const checkIfConditionsForNextStatusAreMet = async ({
-  nextWorkflowConnections,
-  proposalWorkflow,
-  workflowDataSource,
-  proposalWithEvents,
-}: {
-  nextWorkflowConnections: WorkflowConnectionWithStatus[];
-  proposalWorkflow: Workflow;
-  workflowDataSource: WorkflowDataSource;
-  proposalWithEvents: {
-    proposalPk: number;
-    proposalEvents?: ProposalEventsRecord;
-    currentEvent: Event;
-  };
-}) => {
-  for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextStatusId) {
-      continue;
-    }
-
-    const nextNextWorkflowConnections =
-      await getProposalWorkflowConnectionByStatusId(
-        proposalWorkflow.id,
-        nextWorkflowConnection.nextStatusId
-      );
-    const newStatusChangingEvents =
-      await workflowDataSource.getStatusChangingEventsByConnectionIds(
-        nextNextWorkflowConnections.map((connection) => connection.id)
-      );
-
-    if (!proposalWithEvents.proposalEvents) {
-      return;
-    }
-
-    for (const sce of newStatusChangingEvents) {
-      const proposalEventsKeys = Object.keys(
-        proposalWithEvents.proposalEvents!
-      );
-      const allProposalCompleteEvents = proposalEventsKeys.filter(
-        (proposalEventsKey) =>
-          proposalWithEvents.proposalEvents![
-            proposalEventsKey as keyof ProposalEventsRecord
-          ]
-      );
-
-      const nextStatusRulesFulfilled = allProposalCompleteEvents.includes(
-        sce.statusChangingEvent.toLowerCase()
-      );
-
-      if (sce.statusChangingEvent && nextStatusRulesFulfilled)
-        await workflowEngine([
-          {
-            currentEvent: sce.statusChangingEvent as Event,
-            proposalEvents: proposalWithEvents.proposalEvents,
-            proposalPk: proposalWithEvents.proposalPk,
-          },
-        ]);
-    }
-  }
-};
+type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 
 export type WorkflowEngineProposalType = Proposal & {
-  workflowId: number;
   prevStatusId: number;
-  callShortCode: string;
+  workflowStatusConnectionId: number;
 };
 
-export const workflowEngine = async (
-  args: {
-    proposalPk: number;
-    proposalEvents?: ProposalEventsRecord;
-    currentEvent: Event;
-  }[]
-): Promise<Array<WorkflowEngineProposalType | void> | void> => {
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-  const proposalsWithChangedStatuses = (
-    await Promise.all(
-      args.map(async (proposalWithEvents) => {
-        const proposal = await proposalDataSource.get(
-          proposalWithEvents.proposalPk
-        );
+type WorkflowRunSingleInput = {
+  proposalPk: number;
+  currentEvent: Event;
+};
 
-        if (!proposal) {
-          throw new Error(
-            `Proposal with id ${proposalWithEvents.proposalPk} not found`
-          );
-        }
+type WorkflowRunBatchInput = {
+  proposalPks: number[];
+  event: Event;
+};
 
-        const proposalWorkflow = await getProposalWorkflowByCallId(
-          proposal.callId
-        );
+export type WorkflowRunInput =
+  | WorkflowRunSingleInput
+  | WorkflowRunSingleInput[]
+  | WorkflowRunBatchInput;
 
-        if (!proposalWorkflow) {
-          return;
-        }
+const isBatchWorkflowInput = (
+  input: WorkflowRunInput
+): input is WorkflowRunBatchInput => {
+  return Array.isArray((input as WorkflowRunBatchInput).proposalPks);
+};
 
-        const currentWorkflowConnections =
-          await getProposalWorkflowConnectionByStatusId(
-            proposalWorkflow.id,
-            proposal.statusId
-          );
+@injectable()
+export class ProposalWorkflowEngine {
+  constructor(
+    @inject(Tokens.ProposalDataSource)
+    private readonly proposalDataSource: ProposalDataSource,
+    @inject(Tokens.CallDataSource)
+    private readonly callDataSource: CallDataSource
+  ) {}
 
-        if (!currentWorkflowConnections.length) {
-          return;
-        }
+  async run(
+    input: WorkflowRunInput
+  ): Promise<Array<WorkflowEngineProposalType>> {
+    let normalizedInput: WorkflowRunSingleInput[];
 
-        const callDataSource = container.resolve<CallDataSource>(
-          Tokens.CallDataSource
-        );
+    if (Array.isArray(input)) {
+      normalizedInput = input;
+    } else if (isBatchWorkflowInput(input)) {
+      normalizedInput = input.proposalPks.map((proposalPk) => ({
+        proposalPk,
+        currentEvent: input.event,
+      }));
+    } else {
+      normalizedInput = [input];
+    }
 
-        const call = await callDataSource.getCall(proposal.callId);
+    const proposalsWithChangedStatuses = await Promise.all(
+      normalizedInput.map(({ proposalPk, currentEvent }) =>
+        this.runOne(proposalPk, currentEvent)
+      )
+    );
 
-        if (!call) {
-          return;
-        }
-
-        /**
-         * NOTE: We can have more than one current connection because of the multi-column workflows.
-         * This is the way how we store the connection that has multiple next connections.
-         * We have multiple separate connection records pointing to each next connection.
-         * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: FAP_SELECTION and NOT_FEASIBLE.
-         * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
-         * We go through each record and based on the currentEvent we move the proposal into the right direction
-         */
-
-        const response = await Promise.all(
-          currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            const nextWorkflowConnections =
-              await getProposalWorkflowConnectionByStatusId(
-                proposalWorkflow.id,
-                undefined,
-                currentWorkflowConnection.statusId
-              );
-
-            return Promise.all(
-              nextWorkflowConnections.map(async (nextWorkflowConnection) => {
-                if (!proposalWithEvents.proposalEvents) {
-                  return;
-                }
-                const workflowDataSource =
-                  container.resolve<WorkflowDataSource>(
-                    Tokens.WorkflowDataSource
-                  );
-
-                const statusChangingEvents =
-                  await workflowDataSource.getStatusChangingEventsByConnectionIds(
-                    [nextWorkflowConnection.id]
-                  );
-
-                if (!statusChangingEvents) {
-                  return;
-                }
-
-                const eventThatTriggeredStatusChangeIsStatusChangingEvent =
-                  statusChangingEvents.find(
-                    (statusChangingEvent) =>
-                      proposalWithEvents.currentEvent ===
-                      statusChangingEvent.statusChangingEvent
-                  );
-
-                if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
-                  return;
-                }
-
-                if (
-                  shouldMoveToNextStatus(
-                    statusChangingEvents,
-                    proposalWithEvents.proposalEvents
-                  )
-                ) {
-                  const updatedProposal =
-                    await proposalDataSource.updateProposalStatus(
-                      proposalWithEvents.proposalPk,
-                      nextWorkflowConnection.statusId
-                    );
-
-                  if (updatedProposal) {
-                    await checkIfConditionsForNextStatusAreMet({
-                      nextWorkflowConnections,
-                      proposalWorkflow,
-                      workflowDataSource,
-                      proposalWithEvents,
-                    });
-
-                    return {
-                      ...updatedProposal,
-                      workflowId: proposalWorkflow.id,
-                      prevStatusId: currentWorkflowConnection.statusId,
-                      callShortCode: call.shortCode,
-                    };
-                  }
-                }
-              })
-            );
-          })
-        ).then((results) => results.flat());
-
-        return response;
-      })
-    )
-  ).flat();
-
-  // NOTE: Filter the undefined or null items in the array.
-  const filteredProposalsWithChangedStatuses =
-    proposalsWithChangedStatuses.filter(
+    const validProposals = proposalsWithChangedStatuses.filter(
       (p): p is WorkflowEngineProposalType => !!p
     );
 
-  // NOTE: Call the actions engine here
-  if (filteredProposalsWithChangedStatuses.length) {
-    proposalStatusActionEngine(filteredProposalsWithChangedStatuses);
+    if (validProposals.length > 0) {
+      await proposalStatusActionEngine(validProposals);
+    }
+
+    return validProposals;
   }
 
-  return filteredProposalsWithChangedStatuses;
-};
+  /**
+   * Internal method to run the workflow engine for a single proposal and event.
+   */
+  private async runOne(
+    proposalPk: number,
+    event: Event
+  ): Promise<WorkflowEngineProposalType | void> {
+    if (event === Event.PROPOSAL_DELETED) {
+      return;
+    }
 
-export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
-  eventType: Event,
-  proposalPks: number[]
-) => {
-  if (eventType === Event.PROPOSAL_DELETED) {
-    logger.logInfo(
-      `${eventType} event triggered and workflow engine cannot continue because the referenced proposal/s are removed`,
-      { proposalPks }
+    const proposal = await this.proposalDataSource.get(proposalPk);
+
+    if (!proposal) {
+      logger.logError('Proposal not found', { proposalPk });
+
+      return;
+    }
+
+    const proposalWorkflowId = (
+      await this.callDataSource.getProposalWorkflowByCall(proposal.callId)
+    )?.id;
+
+    if (!proposalWorkflowId) {
+      logger.logError('Workflow not found for proposal', { proposalPk });
+
+      return;
+    }
+
+    const machine = await createWorkflowMachine(proposalWorkflowId);
+
+    const currentProposalState = Object.entries(machine.schema.states).find(
+      ([, state]) => {
+        return (
+          (state.meta as WorkflowStateMeta | undefined)?.workflowStatusId ===
+          proposal.workflowStatusId
+        );
+      }
+    )?.[0]; // find the state matching proposalWorkflowStatusId in the state machine
+
+    const actor = createActor(
+      machine,
+      { id: proposal.primaryKey },
+      currentProposalState
+    );
+    const currentWfStatus = actor.getState();
+
+    const { nextStateValue, connectionId } = await actor.event(
+      event.toUpperCase()
     );
 
-    return;
+    if (nextStateValue !== currentWfStatus) {
+      const meta = machine.schema.states[nextStateValue]?.meta as
+        | WorkflowStateMeta
+        | undefined;
+      const nextWfStatusId = meta?.workflowStatusId;
+
+      if (nextWfStatusId) {
+        const updatedProposal =
+          await this.proposalDataSource.updateProposalWfStatus(
+            proposalPk,
+            nextWfStatusId
+          );
+
+        return {
+          ...updatedProposal,
+          prevStatusId: proposal.workflowStatusId,
+          workflowStatusConnectionId: connectionId,
+        };
+      }
+    }
   }
-
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
-  const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
-    eventType,
-    proposalPks
-  );
-
-  const proposalPksWithEvents = proposalPks.map((proposalPk) => {
-    return {
-      proposalPk,
-      proposalEvents: allProposalEvents?.find(
-        (proposalEvents) => proposalEvents.proposal_pk === proposalPk
-      ),
-      currentEvent: eventType,
-    };
-  });
-
-  const updatedProposals = await workflowEngine(proposalPksWithEvents);
-
-  return updatedProposals;
-};
+}

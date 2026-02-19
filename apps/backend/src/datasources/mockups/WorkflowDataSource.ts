@@ -1,27 +1,17 @@
 import { Status } from '../../models/Status';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { Workflow, WorkflowType } from '../../models/Workflow';
-import {
-  NextAndPreviousStatuses,
-  WorkflowConnection,
-  WorkflowConnectionWithStatus,
-} from '../../models/WorkflowConnections';
-import { AddWorkflowStatusInput } from '../../resolvers/mutations/settings/AddWorkflowStatusMutation';
+import { WorkflowConnection } from '../../models/WorkflowConnections';
+import { WorkflowStatus } from '../../models/WorkflowStatus';
+import { AddStatusToWorkflowInput } from '../../resolvers/mutations/settings/AddStatusToWorkflowMutation';
+import { CreateWorkflowConnectionInput } from '../../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
+import { UpdateWorkflowStatusInput } from '../../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
+import { WorkflowStructure } from '../postgres/records';
 import { WorkflowDataSource } from '../WorkflowDataSource';
+import { dummyWorkflowStatuses } from './StatusDataSource';
 
-export const dummyStatuses = [
-  new Status(1, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
-  new Status(
-    2,
-    'FEASIBILITY_REVIEW',
-    'Feasibility review',
-    '',
-    true,
-    WorkflowType.PROPOSAL
-  ),
-];
 export const dummyWorkflow = new Workflow(
   1,
   'Test workflow',
@@ -30,53 +20,63 @@ export const dummyWorkflow = new Workflow(
   'default'
 );
 
-export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
-  1,
-  1,
-  1,
-  1,
+export const dummyStatuses = [
+  new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
   new Status(
-    1,
-    'TEST_STATUS',
-    'Test status',
-    'Test status',
-    false,
+    'FEASIBILITY_REVIEW',
+    'Feasibility review',
+    '',
+    true,
     WorkflowType.PROPOSAL
   ),
-  null,
-  null,
-  100,
-  100,
-  null
-);
+];
 
-export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
-  2,
-  2,
-  1,
-  2,
-  new Status(
-    2,
-    'TEST_STATUS_2',
-    'Test status 2',
-    'Test status 2',
-    false,
-    WorkflowType.PROPOSAL
-  ),
-  null,
-  1,
-  200,
-  150,
-  null
-);
+export const dummyWorkflowConnections = [
+  new WorkflowConnection(1, 1, 1, 2, 'bottom-source', 'top-target'),
+  new WorkflowConnection(2, 1, 2, 1, 'bottom-source', 'top-target'),
+];
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(
-  1,
   1,
   'PROPOSAL_SUBMITTED'
 );
 
 export class WorkflowDataSourceMock implements WorkflowDataSource {
+  async getWorkflowStructure(workflowId: number): Promise<WorkflowStructure> {
+    return {
+      workflowStatuses: dummyWorkflowStatuses.map((ws) => ({
+        workflowStatusId: ws.workflowStatusId,
+        statusId: ws.statusId,
+        shortCode: dummyStatuses.find((s) => s.id === ws.statusId)?.id || '',
+      })),
+      workflowConnections: dummyWorkflowConnections.map((wc) => ({
+        workflowStatusConnectionId: wc.id,
+        prevWorkflowStatusId: wc.prevWorkflowStatusId,
+        nextWorkflowStatusId: wc.nextWorkflowStatusId,
+        statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+      })),
+    };
+  }
+  async createWorkflowConnection(
+    newWorkflowConnectionInput: CreateWorkflowConnectionInput
+  ): Promise<WorkflowConnection> {
+    return dummyWorkflowConnections[0];
+  }
+  async getWorkflowStatus(
+    workflowStatusId: number
+  ): Promise<WorkflowStatus | null> {
+    return (
+      dummyWorkflowStatuses.find(
+        (ws) => ws.workflowStatusId === workflowStatusId
+      ) || null
+    );
+  }
+
+  async getInitialWorkflowStatus(
+    workflowId: number
+  ): Promise<WorkflowStatus | null> {
+    return dummyWorkflowStatuses[0];
+  }
   async createWorkflow(args: CreateWorkflowInput): Promise<Workflow> {
     return dummyWorkflow;
   }
@@ -97,71 +97,59 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return dummyWorkflow;
   }
 
+  async updateWorkflowTimestamp(workflowId: number): Promise<void> {
+    return;
+  }
+
   async deleteWorkflow(WorkflowId: number): Promise<Workflow> {
     return dummyWorkflow;
   }
 
   async getWorkflowConnections(
     workflowId: number
-  ): Promise<WorkflowConnectionWithStatus[]> {
-    return [dummyWorkflowConnection, anotherDummyWorkflowConnection];
+  ): Promise<WorkflowConnection[]> {
+    return dummyWorkflowConnections;
+  }
+
+  async getWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]> {
+    return dummyWorkflowStatuses;
   }
 
   async getWorkflowConnection(
     connectionId: number
-  ): Promise<WorkflowConnectionWithStatus | null> {
-    if (connectionId === dummyWorkflowConnection.id) {
-      return dummyWorkflowConnection;
-    }
-    if (connectionId === anotherDummyWorkflowConnection.id) {
-      return anotherDummyWorkflowConnection;
-    }
-
-    return null;
+  ): Promise<WorkflowConnection | null> {
+    return dummyWorkflowConnections.find(
+      (conn) => conn.id === connectionId
+    ) as WorkflowConnection;
   }
 
-  async getWorkflowConnectionsById(
-    workflowId: number,
-    workflowConnectionId: number,
-    { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnectionWithStatus[]> {
-    return [dummyWorkflowConnection];
-  }
-
-  async addWorkflowStatus(
-    newWorkflowStatusInput: AddWorkflowStatusInput
-  ): Promise<WorkflowConnectionWithStatus> {
-    return dummyWorkflowConnection;
+  async addStatusToWorkflow(
+    newWorkflowStatusInput: AddStatusToWorkflowInput
+  ): Promise<WorkflowStatus> {
+    return dummyWorkflowStatuses[0];
   }
 
   async updateWorkflowStatus(
-    workflowStatus: WorkflowConnection
-  ): Promise<WorkflowConnectionWithStatus> {
-    return dummyWorkflowConnection;
+    workflowStatus: UpdateWorkflowStatusInput
+  ): Promise<WorkflowStatus> {
+    return dummyWorkflowStatuses[0];
   }
 
   async deleteWorkflowStatus(
-    statusId: number,
-    workflowId: number,
-    sortOrder: number
-  ): Promise<WorkflowConnectionWithStatus> {
-    return dummyWorkflowConnection;
+    workflowStatusId: number
+  ): Promise<WorkflowStatus> {
+    return dummyWorkflowStatuses[0];
   }
 
   async deleteWorkflowConnection(
     connectionId: number
   ): Promise<WorkflowConnection | null> {
-    if (connectionId === dummyWorkflowConnection.id) {
-      return dummyWorkflowConnection;
-    }
-    if (connectionId === anotherDummyWorkflowConnection.id) {
-      return anotherDummyWorkflowConnection;
-    }
-
-    return null;
+    return dummyWorkflowConnections.find(
+      (conn) => conn.id === connectionId
+    ) as WorkflowConnection;
   }
 
-  async addStatusChangingEventsToConnection(
+  async setStatusChangingEventsOnConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]> {

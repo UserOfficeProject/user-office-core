@@ -5,10 +5,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import {
-  dummyWorkflow,
-  dummyWorkflowConnection,
-} from '../datasources/mockups/WorkflowDataSource';
+import { dummyWorkflow } from '../datasources/mockups/WorkflowDataSource';
 import { Rejection } from '../models/Rejection';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { WorkflowType } from '../models/Workflow';
@@ -21,7 +18,6 @@ const workflowMutationsInstance = container.resolve(WorkflowMutations);
 
 const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
-  1,
   'PROPOSAL_SUBMITTED'
 );
 
@@ -30,7 +26,7 @@ describe('Test Proposal settings mutations', () => {
     const result = (await statusMutationsInstance.createStatus(
       dummyUserWithRole,
       {
-        shortCode: 'NEW',
+        id: 'NEW',
         name: 'new',
         description: 'new',
         entityType: WorkflowType.PROPOSAL,
@@ -43,7 +39,7 @@ describe('Test Proposal settings mutations', () => {
   test('A userofficer can not create proposal status with bad input arguments', () => {
     return expect(
       statusMutationsInstance.createStatus(dummyUserOfficerWithRole, {
-        shortCode: 'Test',
+        id: 'Test',
         name: 'Test',
         description: 'This is some small description',
         entityType: WorkflowType.PROPOSAL,
@@ -53,7 +49,7 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can create proposal status', () => {
     const newStatus = {
-      shortCode: 'NEW',
+      id: 'NEW',
       name: 'NEW',
       description: 'NEW',
       entityType: WorkflowType.PROPOSAL as const,
@@ -68,11 +64,9 @@ describe('Test Proposal settings mutations', () => {
     const result = (await statusMutationsInstance.updateStatus(
       dummyUserWithRole,
       {
-        id: 1,
-        shortCode: 'UPDATE',
+        id: 'DRAFT',
         name: 'update',
         description: 'update',
-        isDefault: false,
       }
     )) as Rejection;
 
@@ -81,11 +75,10 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can update proposal status', () => {
     const updatedStatus = {
-      id: 1,
+      id: 'DRAFT',
       shortCode: 'UPDATE',
       name: 'update',
       description: 'update',
-      isDefault: false,
     };
 
     return expect(
@@ -100,7 +93,7 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A userofficer can remove proposal status', () => {
-    const statusId = 2;
+    const statusId = 'FEASIBILITY_REVIEW';
 
     return expect(
       statusMutationsInstance.deleteStatus(dummyUserOfficerWithRole, {
@@ -165,16 +158,26 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can create new proposal workflow connection', () => {
     return expect(
-      workflowMutationsInstance.addWorkflowStatus(
+      workflowMutationsInstance.createWorkflowConnection(
         dummyUserOfficerWithRole,
-        dummyWorkflowConnection
+        {
+          nextWorkflowStatusId: 2,
+          prevWorkflowStatusId: 1,
+          sourceHandle: 'bottom-source',
+          targetHandle: 'top-target',
+        }
       )
-    ).resolves.toStrictEqual(dummyWorkflowConnection);
+    ).resolves.toMatchObject({
+      nextWorkflowStatusId: 2,
+      prevWorkflowStatusId: 1,
+      sourceHandle: 'bottom-source',
+      targetHandle: 'top-target',
+    });
   });
 
   test('A userofficer can add next status event/s to workflow connection', () => {
     return expect(
-      workflowMutationsInstance.addStatusChangingEventsToConnection(
+      workflowMutationsInstance.setStatusChangingEventsOnConnection(
         dummyUserOfficerWithRole,
         {
           statusChangingEvents: ['PROPOSAL_SUBMITTED'],
@@ -187,9 +190,7 @@ describe('Test Proposal settings mutations', () => {
   test('A userofficer can remove proposal workflow connection', () => {
     return expect(
       workflowMutationsInstance.deleteWorkflowStatus(dummyUserOfficerWithRole, {
-        statusId: 1,
-        workflowId: 1,
-        sortOrder: 0,
+        workflowStatusId: 1,
       })
     ).resolves.toStrictEqual(true);
   });
@@ -200,6 +201,6 @@ describe('Test Proposal settings mutations', () => {
         dummyUserOfficerWithRole,
         1
       )
-    ).resolves.toStrictEqual(dummyWorkflowConnection);
+    ).resolves.toMatchObject({ id: 1 });
   });
 });

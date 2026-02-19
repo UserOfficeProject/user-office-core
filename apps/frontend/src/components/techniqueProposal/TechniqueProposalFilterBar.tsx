@@ -86,11 +86,11 @@ const TechniqueProposalFilterBar = ({
 
       <Grid item sm={3} xs={12}>
         <ProposalStatusFilter
-          statusId={filter.proposalStatusId as number}
+          statusId={filter.proposalStatusId ?? undefined}
           statuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
-          hiddenStatuses={filter.excludeProposalStatusIds as number[]}
+          hiddenStatuses={filter.excludeProposalStatusIds ?? []}
           onChange={(proposalStatusId) => {
             handleFilterChange({
               ...filter,

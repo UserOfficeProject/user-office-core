@@ -21,9 +21,9 @@ import ProposalInternalCommentsDataSource from '../datasources/postgres/Proposal
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
@@ -31,7 +31,6 @@ import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { WorkflowType } from '../models/Workflow';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
@@ -55,8 +54,6 @@ export default class ProposalMutations {
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
@@ -76,7 +73,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -547,9 +546,9 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    const { statusId, proposalPks } = args;
+    const { workflowStatusId: statusId, proposalPks } = args;
 
-    const result = await this.proposalDataSource.changeProposalsStatus(
+    const result = await this.proposalDataSource.changeProposalsWorkflowStatus(
       statusId,
       proposalPks.map((proposalPk) => proposalPk)
     );
@@ -564,12 +563,6 @@ export default class ProposalMutations {
           if (!fullProposal) {
             return null;
           }
-
-          await this.proposalDataSource.resetProposalEvents(
-            proposalPk,
-            fullProposal.callId,
-            statusId
-          );
 
           const proposalWorkflow =
             await this.callDataSource.getProposalWorkflowByCall(
@@ -588,7 +581,6 @@ export default class ProposalMutations {
 
           return {
             ...fullProposal,
-            workflowId: proposalWorkflow.id,
           };
         })
       );
@@ -656,35 +648,37 @@ export default class ProposalMutations {
       );
     }
 
-    const allStatuses = await this.statusDataSource.getAllStatuses(
-      WorkflowType.PROPOSAL
+    const newWorkflowStatus = await this.workflowDataSource.getWorkflowStatus(
+      args.workflowStatusId
     );
 
     for (const proposal of proposals) {
-      const currentStatus = allStatuses.find(
-        (ps) => ps.id === proposal.statusId
-      );
+      const currentWorkflowStatus =
+        await this.workflowDataSource.getWorkflowStatus(
+          proposal.workflowStatusId
+        );
 
-      const newStatus = allStatuses.find((ps) => ps.id === args.statusId);
-
-      const context = {
-        currentStatus: currentStatus,
-        newStatus: newStatus,
+      const logContext = {
+        currentWorkflowStatus: currentWorkflowStatus,
+        newStatus: newWorkflowStatus,
         proposalId: proposal.proposalId,
         ...requesterContext,
       };
 
-      if (!currentStatus || !newStatus) {
+      if (!currentWorkflowStatus || !newWorkflowStatus) {
         return rejection(
           'Could not change status of technique proposal(s): cannot determine statuses',
-          context
+          logContext
         );
       }
 
-      if (currentStatus.id === newStatus.id) {
+      if (
+        currentWorkflowStatus.workflowStatusId ===
+        newWorkflowStatus.workflowStatusId
+      ) {
         return rejection(
           'Could not change status of technique proposal(s): same status',
-          context
+          logContext
         );
       }
 
@@ -698,21 +692,22 @@ export default class ProposalMutations {
         EXPIRED = 'EXPIRED',
       }
 
-      if (!(newStatus.shortCode in TechniqueProposalStatus)) {
+      if (!(newWorkflowStatus.statusId in TechniqueProposalStatus)) {
         return rejection(
           'Could not change status of technique proposal(s): forbidden new status',
-          context
+          logContext
         );
       }
 
       if (
-        newStatus.shortCode === TechniqueProposalStatus.DRAFT ||
-        newStatus.shortCode === TechniqueProposalStatus.SUBMITTED_LOCKED ||
-        newStatus.shortCode === TechniqueProposalStatus.EXPIRED
+        newWorkflowStatus.statusId === TechniqueProposalStatus.DRAFT ||
+        newWorkflowStatus.statusId ===
+          TechniqueProposalStatus.SUBMITTED_LOCKED ||
+        newWorkflowStatus.statusId === TechniqueProposalStatus.EXPIRED
       ) {
         return rejection(
           'Could not change status of technique proposal(s): forbidden new status',
-          context
+          logContext
         );
       }
 
@@ -724,20 +719,21 @@ export default class ProposalMutations {
       const isInstrumentAbsent = (proposalInstruments?.length ?? 0) === 0;
 
       const isCurrentlyDraft =
-        currentStatus.shortCode === TechniqueProposalStatus.DRAFT;
+        currentWorkflowStatus.statusId === TechniqueProposalStatus.DRAFT;
       const isCurrentlySubmitted =
-        currentStatus.shortCode === TechniqueProposalStatus.SUBMITTED_LOCKED;
+        currentWorkflowStatus.statusId ===
+        TechniqueProposalStatus.SUBMITTED_LOCKED;
       const isCurrentlyUnsuccessful =
-        currentStatus.shortCode === TechniqueProposalStatus.UNSUCCESSFUL;
+        currentWorkflowStatus.statusId === TechniqueProposalStatus.UNSUCCESSFUL;
       const isCurrentlyApproved =
-        currentStatus.shortCode === TechniqueProposalStatus.APPROVED;
+        currentWorkflowStatus.statusId === TechniqueProposalStatus.APPROVED;
       const isCurrentlyFinished =
-        currentStatus.shortCode === TechniqueProposalStatus.FINISHED;
+        currentWorkflowStatus.statusId === TechniqueProposalStatus.FINISHED;
 
       if (isCurrentlyDraft || isCurrentlyFinished || isCurrentlyUnsuccessful) {
         return rejection(
           'Could not change status of technique proposal(s): unmodifiable current status',
-          context
+          logContext
         );
       }
 
@@ -751,18 +747,18 @@ export default class ProposalMutations {
       const shouldDisableFinished = !isCurrentlyApproved || isInstrumentAbsent;
 
       if (
-        (newStatus.shortCode === TechniqueProposalStatus.UNDER_REVIEW &&
+        (newWorkflowStatus.statusId === TechniqueProposalStatus.UNDER_REVIEW &&
           shouldDisableUnderReview) ||
-        (newStatus.shortCode === TechniqueProposalStatus.APPROVED &&
+        (newWorkflowStatus.statusId === TechniqueProposalStatus.APPROVED &&
           shouldDisableApproved) ||
-        (newStatus.shortCode === TechniqueProposalStatus.UNSUCCESSFUL &&
+        (newWorkflowStatus.statusId === TechniqueProposalStatus.UNSUCCESSFUL &&
           shouldDisableUnsuccessful) ||
-        (newStatus.shortCode === TechniqueProposalStatus.FINISHED &&
+        (newWorkflowStatus.statusId === TechniqueProposalStatus.FINISHED &&
           shouldDisableFinished)
       ) {
         return rejection(
           'Could not change status of technique proposal(s): forbidden status transition',
-          context
+          logContext
         );
       }
     }
@@ -844,13 +840,26 @@ export default class ProposalMutations {
         true
       );
 
+      const defaultWfStatus =
+        await this.workflowDataSource.getInitialWorkflowStatus(
+          call.proposalWorkflowId
+        );
+
+      if (!defaultWfStatus) {
+        return rejection(
+          'Could not clone the proposal because the call has misconfigured workflow statuses',
+          { call, sourceProposal }
+        );
+      }
+
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
         title: `Copy of ${clonedProposal.title}`,
         abstract: clonedProposal.abstract,
         proposerId: sourceProposal.proposerId,
-        statusId: 1,
+        statusId: 'DRAFT',
+        workflowStatusId: defaultWfStatus.workflowStatusId,
         created: new Date(),
         updated: new Date(),
         proposalId: clonedProposal.proposalId,

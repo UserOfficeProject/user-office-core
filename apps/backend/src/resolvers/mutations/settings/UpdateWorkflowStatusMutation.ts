@@ -1,40 +1,31 @@
 import {
+  Arg,
   Ctx,
-  Mutation,
-  Resolver,
   Field,
   InputType,
-  Arg,
   Int,
+  Mutation,
+  Resolver,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { WorkflowConnection } from '../../types/WorkflowConnection';
+import { WorkflowStatus } from '../../types/WorkflowStatus';
 
 @InputType()
 export class UpdateWorkflowStatusInput {
   @Field(() => Int)
-  public id: number;
+  public workflowStatusId: number;
 
   @Field(() => Int, { nullable: true })
   public posX?: number;
 
   @Field(() => Int, { nullable: true })
   public posY?: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevConnectionId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId?: number;
 }
 
 @Resolver()
 export class UpdateWorkflowStatusMutation {
-  @Mutation(() => WorkflowConnection)
+  @Mutation(() => WorkflowStatus)
   async updateWorkflowStatus(
     @Ctx() context: ResolverContext,
     @Arg('updateWorkflowStatusInput')

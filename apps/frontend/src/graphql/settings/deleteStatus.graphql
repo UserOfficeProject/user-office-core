@@ -1,4 +1,4 @@
-mutation deleteStatus($id: Int!) {
+mutation deleteStatus($id: String!) {
   deleteStatus(id: $id) {
     ...status
   }

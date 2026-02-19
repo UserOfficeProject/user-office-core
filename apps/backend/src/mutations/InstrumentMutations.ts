@@ -25,7 +25,6 @@ import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { WorkflowType } from '../models/Workflow';
 import {
   AssignProposalsToInstrumentsArgs,
   RemoveProposalsFromInstrumentArgs,
@@ -547,19 +546,13 @@ export default class InstrumentMutations {
         );
       }
 
-      const statuses = await this.statusDataSource.getAllStatuses(
-        WorkflowType.PROPOSAL
-      );
-
-      const currentStatus = statuses.find((s) => s.id === proposal.statusId);
-
-      if (currentStatus?.shortCode !== 'UNDER_REVIEW') {
+      if (proposal?.statusId !== 'UNDER_REVIEW') {
         return rejection(
           'Could not assign instrument: forbidden current status',
           {
             agent,
             args,
-            currentStatus: currentStatus,
+            currentStatus: proposal?.statusId,
           }
         );
       }

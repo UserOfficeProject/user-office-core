@@ -10,8 +10,8 @@ import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { CallDataSource } from '../CallDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
+import PostgresCallDataSource from '../postgres/CallDataSource';
 import database from '../postgres/database';
 import {
   CallRecord,
@@ -27,29 +27,15 @@ import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
-  new PostgresAdminDataSource()
+  new PostgresAdminDataSource(),
+  new PostgresCallDataSource()
 );
-
-const fieldMap: { [key: string]: string } = {
-  finalStatus: 'final_status',
-  callShortCode: 'call_short_code',
-  //'instruments.name': "instruments->0->'name'",
-  statusName: 'proposal_status_id',
-  proposalId: 'proposal_id',
-  title: 'title',
-  submitted: 'submitted',
-  notified: 'notified',
-  submittedDate: 'submitted_date',
-};
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
   protected stfcUserDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
-  protected callDataSource: CallDataSource = container.resolve(
-    Tokens.CallDataSource
-  ) as CallDataSource;
 
   async getInstrumentScientistProposals(
     user: UserWithRole,
@@ -67,7 +53,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const techniqueProposalCallIds: number[] = (
       await this.callDataSource.getCalls({
-        proposalStatusShortCode: 'QUICK_REVIEW',
+        proposalStatus: 'QUICK_REVIEW',
       })
     ).map((call) => call.id);
 

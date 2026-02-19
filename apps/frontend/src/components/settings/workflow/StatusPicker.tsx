@@ -31,7 +31,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
           status.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(
-      (status) => WORKFLOW_INITIAL_STATUSES.includes(status.shortCode) === false
+      (status) => WORKFLOW_INITIAL_STATUSES.includes(status.id) === false
     );
 
   return (
@@ -66,7 +66,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
               event.dataTransfer.effectAllowed = 'move';
               onDragStart(status);
             }}
-            data-cy={`status_${status.shortCode}`}
+            data-cy={`status_${status.id}`}
             style={{
               marginBottom: '5px',
               border: '1px solid #e0e0e0',

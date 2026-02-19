@@ -34,6 +34,13 @@ const newCall = {
   surveyComment: faker.lorem.word(10),
 };
 
+const instrument = {
+  name: `0000. ${faker.lorem.words(2)}`,
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(5),
+  managerUserId: 1,
+};
+
 let proposal1Id: string;
 let proposal2Id: string;
 
@@ -41,6 +48,17 @@ context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createInstrument(instrument).then((result) => {
+      if (result.createInstrument) {
+        const createdInstrumentId = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+        });
+      }
+    });
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
@@ -50,14 +68,13 @@ context('Status actions tests', () => {
 
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
@@ -137,14 +154,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.reload();
         cy.addConnectionStatusActions({
@@ -155,7 +171,7 @@ context('Status actions tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -227,14 +243,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -245,7 +260,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -301,14 +316,13 @@ context('Status actions tests', () => {
       const invalidEmail = 'test@test';
       const validEmail = faker.internet.email();
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -318,7 +332,7 @@ context('Status actions tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -458,14 +472,13 @@ context('Status actions tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 150,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -476,7 +489,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -583,15 +596,16 @@ context('Status actions tests', () => {
         exchanges: ['user_office_backend.fanout'],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
-        posX: 0,
-        posY: 200,
-        prevConnectionId: 1,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
       }).then((result) => {
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_INSTRUMENTS_SELECTED],
+        });
         cy.addConnectionStatusActions({
           actions: [
             {
@@ -606,7 +620,7 @@ context('Status actions tests', () => {
             },
             { actionId: 3, actionType: StatusActionType.PROPOSALDOWNLOAD },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
@@ -615,6 +629,27 @@ context('Status actions tests', () => {
       cy.visit('/');
 
       cy.finishedLoading();
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]')
+        .contains('Loading...')
+        .should('not.exist');
+
+      cy.get('#selectedInstrumentIds-input').first().click();
+
+      cy.get('[data-cy="instrument-selection-options"] li')
+        .contains(instrument.name)
+        .click();
+
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
       cy.contains(proposalTitle)
         .parent()
@@ -705,17 +740,15 @@ context('Status actions tests', () => {
         exchanges: ['user_office_backend.fanout'],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
-        posX: 0,
-        posY: 200,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
       }).then((result) => {
-        const connection = result.addWorkflowStatus;
+        const connection = result.createWorkflowConnection;
         if (connection) {
-          cy.addStatusChangingEventsToConnection({
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,
             statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
           });

@@ -133,7 +133,8 @@ export interface ProposalRecord {
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
-  readonly status_id: number;
+  readonly status_id: string;
+  readonly workflow_status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
@@ -156,7 +157,8 @@ export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
   readonly principal_investigator: number;
-  readonly proposal_status_id: number;
+  readonly proposal_workflow_status_id: number;
+  readonly proposal_status_id: string;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
@@ -585,8 +587,7 @@ export interface ShipmentRecord {
 }
 
 export interface StatusRecord {
-  readonly status_id: number;
-  readonly short_code: string;
+  readonly status_id: string;
   readonly name: string;
   readonly description: string;
   readonly is_default: boolean;
@@ -601,23 +602,44 @@ export interface WorkflowRecord {
   readonly full_count: number;
   readonly entity_type: WorkflowType;
   readonly connection_line_type: string;
+  readonly updated_at: Date;
 }
 
 export interface WorkflowConnectionRecord {
-  readonly workflow_connection_id: number;
-  readonly sort_order: number;
+  readonly workflow_status_connection_id: number;
   readonly workflow_id: number;
-  readonly status_id: number;
-  readonly next_status_id: number | null;
-  readonly prev_status_id: number | null;
+  readonly prev_workflow_status_id: number;
+  readonly next_workflow_status_id: number;
+  readonly source_handle: string;
+  readonly target_handle: string;
+}
+
+// NOTE: This is a data structure returned by getWorkflowStructure function in WorkflowDataSource,
+// and contains full information about workflow statuses and connections,
+// so we do not need to make multiple calls to database to get workflow structure
+export interface WorkflowStructure {
+  workflowStatuses: {
+    workflowStatusId: number;
+    statusId: string;
+  }[];
+  workflowConnections: {
+    workflowStatusConnectionId: number;
+    prevWorkflowStatusId: number;
+    nextWorkflowStatusId: number;
+    statusChangingEvents: string[];
+  }[];
+}
+
+export interface WorkflowStatusRecord {
+  readonly workflow_status_id: number;
+  readonly workflow_id: number;
+  readonly status_id: string;
   readonly pos_x: number;
   readonly pos_y: number;
-  readonly prev_connection_id: number | null;
 }
 
 export interface StatusChangingEventRecord {
-  readonly status_changing_event_id: number;
-  readonly workflow_connection_id: number;
+  readonly workflow_status_connection_id: number;
   readonly status_changing_event: string;
 }
 
@@ -637,44 +659,6 @@ export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
-}
-
-export interface ProposalEventsRecord {
-  readonly proposal_pk: number;
-  readonly proposal_created: boolean;
-  readonly proposal_submitted: boolean;
-  readonly proposal_feasibility_review_feasible: boolean;
-  readonly proposal_feasibility_review_unfeasible: boolean;
-  readonly call_ended: boolean;
-  readonly call_ended_internal: boolean;
-  readonly call_review_ended: boolean;
-  readonly proposal_faps_selected: boolean;
-  readonly proposal_instruments_selected: boolean;
-  readonly proposal_feasibility_review_submitted: boolean;
-  readonly proposal_sample_review_submitted: boolean;
-  readonly proposal_all_fap_reviewers_selected: boolean;
-  readonly proposal_management_decision_updated: boolean;
-  readonly proposal_management_decision_submitted: boolean;
-  readonly proposal_all_fap_reviews_submitted: boolean;
-  readonly proposal_fap_review_updated: boolean;
-  readonly proposal_feasibility_review_updated: boolean;
-  readonly proposal_sample_safe: boolean;
-  readonly proposal_fap_review_submitted: boolean;
-  readonly proposal_fap_meeting_submitted: boolean;
-  readonly proposal_all_fap_meetings_submitted: boolean;
-  readonly proposal_all_reviews_submitted_for_all_faps: boolean;
-  readonly proposal_all_fap_meeting_instrument_submitted: boolean;
-  readonly proposal_instrument_submitted: boolean;
-  readonly proposal_accepted: boolean;
-  readonly proposal_reserved: boolean;
-  readonly proposal_rejected: boolean;
-  readonly proposal_notified: boolean;
-  readonly proposal_booking_time_activated: boolean;
-  readonly proposal_booking_time_updated: boolean;
-  readonly proposal_booking_time_slot_added: boolean;
-  readonly proposal_booking_time_slots_removed: boolean;
-  readonly proposal_booking_time_completed: boolean;
-  readonly proposal_booking_time_reopened: boolean;
 }
 
 export interface FeatureRecord {
@@ -747,15 +731,15 @@ export interface QuantityRecord {
 }
 
 export interface StatusActionRecord {
-  readonly status_action_id: number;
+  readonly workflow_status_action_id: number;
   readonly name: string;
   readonly description: string;
   readonly type: StatusActionType;
 }
 
 export interface WorkflowConnectionHasActionsRecord {
-  readonly connection_id: number;
-  readonly action_id: number;
+  readonly workflow_status_connection_id: number;
+  readonly workflow_status_action_id: number;
   readonly workflow_id: number;
   readonly config: string;
 }
@@ -804,6 +788,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.abstract || '',
     proposal.proposer_id,
     proposal.status_id,
+    proposal.workflow_status_id,
     proposal.created_at,
     proposal.updated_at,
     proposal.proposal_id,
@@ -875,6 +860,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_pk,
     proposal.title || '',
     proposal.principal_investigator,
+    proposal.proposal_workflow_status_id,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
@@ -1347,6 +1333,7 @@ export const createProposalViewObjectWithTechniques = (
     proposal.proposal_pk,
     proposal.title || '',
     proposal.principal_investigator,
+    proposal.proposal_workflow_status_id,
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
@@ -1504,7 +1491,8 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_id: number;
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
-  readonly status_id: number | null;
+  readonly workflow_status_id: number | null;
+  readonly status_id: string | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;
   readonly created_at: Date;

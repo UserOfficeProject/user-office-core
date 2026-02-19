@@ -1,6 +1,5 @@
 fragment status on Status {
   id
-  shortCode
   name
   description
   isDefault

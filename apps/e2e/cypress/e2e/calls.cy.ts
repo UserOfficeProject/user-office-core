@@ -128,17 +128,16 @@ context('Calls tests', () => {
     cy.createWorkflow(proposalInternalWorkflow).then((result) => {
       const workflow = result.createWorkflow;
       if (workflow) {
-        cy.addWorkflowStatus({
+        cy.addStatusToWorkflow({
           statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
           workflowId: workflow.id,
-          sortOrder: 1,
-          prevStatusId: workflow.workflowConnections[0].id,
+          prevId: workflow.statuses[0].workflowStatusId,
           posX: 0,
           posY: 200,
         }).then((result) => {
-          if (result.addWorkflowStatus) {
-            cy.addStatusChangingEventsToConnection({
-              workflowConnectionId: result.addWorkflowStatus.id,
+          if (result.addStatusToWorkflow) {
+            cy.setStatusChangingEventsOnConnection({
+              workflowConnectionId: result.createWorkflowConnection.id,
               statusChangingEvents: ['CALL_ENDED'],
             });
           }

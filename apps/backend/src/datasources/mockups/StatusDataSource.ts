@@ -1,11 +1,11 @@
 import { Status } from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
+import { WorkflowStatus } from '../../models/WorkflowStatus';
 import { StatusDataSource } from '../StatusDataSource';
 
 export const dummyStatuses = [
-  new Status(1, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+  new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
   new Status(
-    2,
     'FEASIBILITY_REVIEW',
     'Feasibility review',
     '',
@@ -14,14 +14,24 @@ export const dummyStatuses = [
   ),
 ];
 
+export const dummyWorkflowStatuses = [
+  new WorkflowStatus(1, 1, 'DRAFT', 0, 0),
+  new WorkflowStatus(2, 1, 'FEASIBILITY_REVIEW', 0, 0),
+  new WorkflowStatus(3, 1, 'APPROVED', 0, 0),
+  new WorkflowStatus(4, 1, 'UNSUCCESSFUL', 0, 0),
+  new WorkflowStatus(5, 1, 'FINISHED', 0, 0),
+  new WorkflowStatus(6, 1, 'NON-TP', 0, 0),
+  new WorkflowStatus(7, 1, 'EXPIRED', 0, 0),
+];
+
 export class StatusDataSourceMock implements StatusDataSource {
   // TODO: This needs to be implemented
   async createStatus(
-    newStatusInput: Omit<Status, 'id' | 'is_default'>
+    newStatusInput: Omit<Status, 'is_default'>
   ): Promise<Status> {
-    return { ...newStatusInput, id: 1, isDefault: false };
+    return { ...newStatusInput, isDefault: false };
   }
-  async getStatus(statusId: number): Promise<Status | null> {
+  async getStatus(statusId: string): Promise<Status | null> {
     return dummyStatuses.find((s) => s.id === statusId) as Status;
   }
   async getAllStatuses(): Promise<Status[]> {
@@ -30,13 +40,13 @@ export class StatusDataSourceMock implements StatusDataSource {
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     return { ...status, entityType: WorkflowType.PROPOSAL };
   }
-  async deleteStatus(statusId: number): Promise<Status> {
+  async deleteStatus(statusId: string): Promise<Status> {
     return dummyStatuses.splice(
       dummyStatuses.findIndex((s) => s.id === statusId),
       1
     )[0];
   }
-  async getDefaultStatus(
+  async getInitialStatus(
     entityType: Status['entityType']
   ): Promise<Status | null> {
     return dummyStatuses[0];

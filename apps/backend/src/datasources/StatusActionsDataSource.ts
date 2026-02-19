@@ -2,12 +2,11 @@ import {
   ConnectionHasStatusAction,
   StatusAction,
 } from '../models/StatusAction';
-import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
+import { SetStatusActionsOnConnectionInput } from '../resolvers/mutations/settings/SetStatusActionsOnConnectionMutation';
 
 export interface StatusActionsDataSource {
   getConnectionStatusActions(
-    workflowConnectionId: number,
-    workflowId: number
+    workflowConnectionId: number
   ): Promise<ConnectionHasStatusAction[]>;
   getConnectionStatusAction(
     workflowConnectionId: number,
@@ -18,7 +17,7 @@ export interface StatusActionsDataSource {
   ): Promise<ConnectionHasStatusAction>;
   getStatusAction(actionId: number): Promise<StatusAction>;
   getStatusActions(): Promise<StatusAction[]>;
-  addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput
+  setStatusActionsOnConnection(
+    input: SetStatusActionsOnConnectionInput
   ): Promise<ConnectionHasStatusAction[] | null>;
 }

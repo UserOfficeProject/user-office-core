@@ -14,10 +14,10 @@ type ExperimentSafetyStatusFilterProps = {
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   statusId?: number;
-  hiddenStatuses: number[];
+  hiddenStatuses: string[];
 };
 
-function isStatusVisible(hiddenStatuses: number[], status: Status) {
+function isStatusVisible(hiddenStatuses: string[], status: Status) {
   if (hiddenStatuses != null) {
     for (let i = 0; i < hiddenStatuses.length; i++) {
       if (hiddenStatuses[i] === status.id) return false;

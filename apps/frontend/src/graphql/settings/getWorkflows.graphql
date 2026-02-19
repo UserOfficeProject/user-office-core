@@ -1,12 +1,12 @@
 query getWorkflows($entityType: WorkflowType!) {
   workflows(entityType: $entityType) {
-    id
-    name
-    description
-    workflowConnections {
-      status {
-        shortCode
-      }
+    ...workflow
+    connections {
+      ...workflowConnection
+    }
+
+    statuses {
+      ...workflowStatus
     }
   }
 }
