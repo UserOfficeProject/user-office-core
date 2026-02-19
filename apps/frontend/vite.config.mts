@@ -36,6 +36,7 @@ export default ({ mode }): UserConfig => {
       },
     },
     resolve: {
+      preserveSymlinks: true,
       alias: {
         context: '/src/context',
         hooks: '/src/hooks',
