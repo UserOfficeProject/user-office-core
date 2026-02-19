@@ -1,3 +1,4 @@
+import { Event } from './event.enum';
 import { Call } from '../models/Call';
 import { ExperimentSafety } from '../models/Experiment';
 import { Fap, FapProposal } from '../models/Fap';
@@ -14,7 +15,6 @@ import { Technique } from '../models/Technique';
 import { User } from '../models/User';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
-import { Event } from './event.enum';
 
 export interface GeneralEvent {
   type: Event;

@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 import { FieldCondition } from './FieldCondition';
+import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 
 @ObjectType()
 export class FieldDependency implements Partial<FieldDependencyOrigin> {

@@ -5,6 +5,10 @@ import { ELIUserAuthorization } from '../auth/ELIUserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { configureELIDevelopmentEnvironment } from './eli/configureELIEnvironment';
+import { configureGraylogLogger } from './ess/configureGrayLogLogger';
+import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -56,10 +60,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
-import { configureELIDevelopmentEnvironment } from './eli/configureELIEnvironment';
-import { configureGraylogLogger } from './ess/configureGrayLogLogger';
-import { Tokens } from './Tokens';
-import { mapClass, mapValue } from './utils';
 
 const isProduction = process.env.NODE_ENV === 'production';
 

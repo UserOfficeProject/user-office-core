@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import {
@@ -17,7 +18,6 @@ import {
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
-import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
 const mockMailService = {

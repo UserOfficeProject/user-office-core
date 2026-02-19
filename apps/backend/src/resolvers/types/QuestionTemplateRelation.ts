@@ -1,10 +1,10 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { DependenciesLogicOperator } from '../../models/ConditionEvaluator';
-import { QuestionTemplateRelation as QuestionTemplateRelationOrigin } from '../../models/Template';
 import { FieldConfigType } from './FieldConfig';
 import { FieldDependency } from './FieldDependency';
 import { Question } from './Question';
+import { DependenciesLogicOperator } from '../../models/ConditionEvaluator';
+import { QuestionTemplateRelation as QuestionTemplateRelationOrigin } from '../../models/Template';
 
 @ObjectType()
 export class QuestionTemplateRelation

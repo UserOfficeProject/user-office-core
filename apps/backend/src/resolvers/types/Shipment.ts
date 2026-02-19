@@ -8,15 +8,15 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Proposal } from './Proposal';
+import { Questionary } from './Questionary';
+import { Sample } from './Sample';
 import { ResolverContext } from '../../context';
 import {
   Shipment as ShipmentOrigin,
   ShipmentStatus,
 } from '../../models/Shipment';
 import { TemplateCategoryId } from '../../models/Template';
-import { Proposal } from './Proposal';
-import { Questionary } from './Questionary';
-import { Sample } from './Sample';
 
 @ObjectType()
 export class Shipment implements Partial<ShipmentOrigin> {

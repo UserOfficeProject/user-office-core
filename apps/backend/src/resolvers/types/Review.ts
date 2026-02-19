@@ -8,12 +8,12 @@ import {
   Root,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
 import { ResolverContext } from '../../context';
 import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
 import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
-import { BasicUserDetails } from './BasicUserDetails';
-import { Questionary } from './Questionary';
 
 @ObjectType()
 export class Review implements Partial<ReviewOrigin> {

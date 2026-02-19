@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import QuestionaryMutations from './QuestionaryMutations';
 import { Tokens } from '../config/Tokens';
 import {
   QuestionaryDataSourceMock,
@@ -10,7 +11,6 @@ import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
-import QuestionaryMutations from './QuestionaryMutations';
 
 const mutations = container.resolve(QuestionaryMutations);
 const queries = container.resolve(QuestionaryQueries);

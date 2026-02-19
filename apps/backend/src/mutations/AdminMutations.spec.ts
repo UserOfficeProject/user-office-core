@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import AdminMutations from './AdminMutations';
 import { dummyInstitution } from '../datasources/mockups/AdminDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -10,7 +11,6 @@ import { Page } from '../models/Admin';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { Permissions } from '../models/Permissions';
 import { SettingsId } from '../models/Settings';
-import AdminMutations from './AdminMutations';
 
 const adminMutations = container.resolve(AdminMutations);
 

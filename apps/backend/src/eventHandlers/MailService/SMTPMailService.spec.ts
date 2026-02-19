@@ -3,11 +3,11 @@ import * as path from 'path';
 import EmailTemplates from 'email-templates';
 import { container } from 'tsyringe';
 
+import EmailSettings from './EmailSettings';
+import { SMTPMailService } from './SMTPMailService';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { SettingsId } from '../../models/Settings';
-import EmailSettings from './EmailSettings';
-import { SMTPMailService } from './SMTPMailService';
 
 jest.mock('email-templates');
 const mockAdminDataSource = container.resolve(

@@ -254,10 +254,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         })
         .then(() => {
-          trx.commit;
+          trx.commit();
         })
         .catch((error) => {
-          trx.rollback;
+          trx.rollback();
           throw error; // re-throw
         });
     });

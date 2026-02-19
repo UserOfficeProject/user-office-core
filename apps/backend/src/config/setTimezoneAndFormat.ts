@@ -1,9 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { Tokens } from './Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { SettingsId } from '../models/Settings';
-import { Tokens } from './Tokens';
 
 /**
  * Sets the timezone Setting from the 'TZ' environment variable,

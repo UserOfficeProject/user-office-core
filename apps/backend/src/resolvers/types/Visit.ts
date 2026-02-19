@@ -8,13 +8,13 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { Visit as VisitOrigin } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Invite } from './Invite';
 import { Proposal } from './Proposal';
 import { Sample } from './Sample';
 import { VisitRegistration } from './VisitRegistration';
+import { ResolverContext } from '../../context';
+import { Visit as VisitOrigin } from '../../models/Visit';
 
 @ObjectType()
 export class Visit implements Partial<VisitOrigin> {

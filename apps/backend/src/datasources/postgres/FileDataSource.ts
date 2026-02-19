@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import fs from 'fs';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -128,10 +127,12 @@ export default class PostgresFileDataSource implements FileDataSource {
       throw new GraphQLError('Could not obtain connection');
     }
 
-    return new Promise<number>(async (resolve, reject) => {
+    try {
       const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
       if (transactionError) {
-        return reject(`Could not begin transaction \n${transactionError}`);
+        throw new GraphQLError(
+          `Could not begin transaction \n${transactionError}`
+        );
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
@@ -142,26 +143,24 @@ export default class PostgresFileDataSource implements FileDataSource {
       if (writeableStreamError || !response) {
         connection.emit('error', writeableStreamError);
 
-        return reject(
+        throw new GraphQLError(
           `Could not create writeable stream \n${writeableStreamError} ${response}`
         );
       }
 
-      const [oid, stream] = response;
+      return new Promise<number>((resolve) => {
+        const [oid, stream] = response;
 
-      stream.on('finish', () => {
-        connection.query('COMMIT', () => resolve(oid));
-      });
+        stream.on('finish', () => {
+          connection.query('COMMIT', () => resolve(oid));
+        });
 
-      const fileStream = fs.createReadStream(filePath);
-      fileStream.pipe(stream);
-    })
-      .then((newOid) => {
-        return newOid;
-      })
-      .finally(() => {
-        database.client.releaseConnection(connection);
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(stream);
       });
+    } finally {
+      database.client.releaseConnection(connection);
+    }
   }
 
   private async storeBlobFromStream(
@@ -178,28 +177,28 @@ export default class PostgresFileDataSource implements FileDataSource {
       throw new Error('Could not obtain database connection.');
     }
 
-    return new Promise(async (resolve, reject) => {
-      const [transactionError] = await to(connection.query('BEGIN'));
-      if (transactionError) {
-        database.client.releaseConnection(connection);
+    const [transactionError] = await to(connection.query('BEGIN'));
+    if (transactionError) {
+      database.client.releaseConnection(connection);
 
-        return reject(`Could not begin transaction: ${transactionError}`);
-      }
+      throw new Error(`Could not begin transaction: ${transactionError}`);
+    }
 
-      const blobManager = new LargeObjectManager({ pg: connection });
+    const blobManager = new LargeObjectManager({ pg: connection });
 
-      const [writeableStreamError, response] = await to(
-        blobManager.createAndWritableStreamAsync()
+    const [writeableStreamError, response] = await to(
+      blobManager.createAndWritableStreamAsync()
+    );
+
+    if (writeableStreamError || !response) {
+      database.client.releaseConnection(connection);
+
+      throw new Error(
+        `Could not create writable stream: ${writeableStreamError}`
       );
-      if (writeableStreamError || !response) {
-        connection.query('ROLLBACK', () => {
-          database.client.releaseConnection(connection);
-          reject(`Could not create writable stream: ${writeableStreamError}`);
-        });
+    }
 
-        return;
-      }
-
+    return new Promise((resolve, reject) => {
       const [oid, stream] = response;
       let sizeInBytes = 0;
 
@@ -243,39 +242,39 @@ export default class PostgresFileDataSource implements FileDataSource {
   }
 
   private async retrieveBlob(oid: number, output: string): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      if (!output) reject('Output must be specified');
+    if (!output) throw new Error('Output must be specified');
 
-      const [connectionError, connection] = await to(
-        database.client.acquireConnection() as Promise<Client | undefined>
+    const [connectionError, connection] = await to(
+      database.client.acquireConnection() as Promise<Client | undefined>
+    );
+    if (connectionError || !connection) {
+      throw new Error(
+        `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
       );
-      if (connectionError || !connection) {
-        return reject(
-          `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
-        );
-      }
+    }
 
-      const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
-      if (transactionError) {
-        database.client.releaseConnection(connection);
+    const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
+    if (transactionError) {
+      database.client.releaseConnection(connection);
 
-        return reject(`Could not begin transaction \n${transactionError}`);
-      }
+      throw new Error(`Could not begin transaction \n${transactionError}`);
+    }
 
-      const blobManager = new LargeObjectManager({ pg: connection });
-      const [streamErr, response] = await to(
-        blobManager.openAndReadableStreamAsync(oid)
+    const blobManager = new LargeObjectManager({ pg: connection });
+    const [streamErr, response] = await to(
+      blobManager.openAndReadableStreamAsync(oid)
+    );
+
+    if (streamErr || !response) {
+      connection.emit('error', streamErr);
+      database.client.releaseConnection(connection);
+
+      throw new Error(
+        `Could not create readable stream \n${streamErr} ${response}`
       );
+    }
 
-      if (streamErr || !response) {
-        connection.emit('error', streamErr);
-        database.client.releaseConnection(connection);
-
-        return reject(
-          `Could not create readable stream \n${streamErr} ${response}`
-        );
-      }
-
+    return new Promise((resolve, reject) => {
       const [, stream] = response;
 
       stream.on('end', function () {
@@ -309,37 +308,37 @@ export default class PostgresFileDataSource implements FileDataSource {
   }
 
   private async retrieveBlobData(oid: number): Promise<ReadStream | null> {
-    return new Promise(async (resolve, reject) => {
-      const [connectionError, connection] = await to(
-        database.client.acquireConnection() as Promise<Client | undefined>
+    const [connectionError, connection] = await to(
+      database.client.acquireConnection() as Promise<Client | undefined>
+    );
+    if (connectionError || !connection) {
+      throw new Error(
+        `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
       );
-      if (connectionError || !connection) {
-        return reject(
-          `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
-        );
-      }
+    }
 
-      const [transactionError] = await to(connection.query('BEGIN'));
-      if (transactionError) {
-        database.client.releaseConnection(connection);
+    const [transactionError] = await to(connection.query('BEGIN'));
+    if (transactionError) {
+      database.client.releaseConnection(connection);
 
-        return reject(`Could not begin transaction \n${transactionError}`);
-      }
+      throw new Error(`Could not begin transaction \n${transactionError}`);
+    }
 
-      const blobManager = new LargeObjectManager({ pg: connection });
-      const [streamErr, response] = await to(
-        blobManager.openAndReadableStreamAsync(oid)
+    const blobManager = new LargeObjectManager({ pg: connection });
+    const [streamErr, response] = await to(
+      blobManager.openAndReadableStreamAsync(oid)
+    );
+
+    if (streamErr || !response) {
+      await connection.query('ROLLBACK');
+      database.client.releaseConnection(connection);
+
+      throw new Error(
+        `Could not create readable stream \n${streamErr} ${response}`
       );
+    }
 
-      if (streamErr || !response) {
-        await connection.query('ROLLBACK');
-        database.client.releaseConnection(connection);
-
-        return reject(
-          `Could not create readable stream \n${streamErr} ${response}`
-        );
-      }
-
+    return new Promise((resolve, reject) => {
       const [, stream] = response;
 
       stream.on('error', async (streamError) => {

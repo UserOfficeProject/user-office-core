@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import InternalReviewQueries from './InternalReviewQueries';
 import {
   anotherDummyReview,
   dummyReview,
@@ -11,7 +12,6 @@ import {
   dummyInstrumentScientist,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import InternalReviewQueries from './InternalReviewQueries';
 
 const internalReviewQueries = container.resolve(InternalReviewQueries);
 

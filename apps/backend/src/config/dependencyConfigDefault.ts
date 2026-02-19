@@ -5,11 +5,14 @@ import {
 } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { Tokens } from './Tokens';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { configureBaseEnvironment } from './base/configureBaseEnvironment';
+import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -61,9 +64,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { configureBaseEnvironment } from './base/configureBaseEnvironment';
-import { Tokens } from './Tokens';
-import { mapClass, mapValue } from './utils';
 
 async function skipEmailHandler(event: ApplicationEvent) {
   logger.logInfo('Skip email sending', { event });

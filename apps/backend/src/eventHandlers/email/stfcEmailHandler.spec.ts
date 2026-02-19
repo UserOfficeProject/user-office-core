@@ -3,10 +3,10 @@ import { faker } from '@faker-js/faker';
 import * as Logger from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { stfcEmailHandler } from './stfcEmailHandler';
 import { Tokens } from '../../config/Tokens';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { stfcEmailHandler } from './stfcEmailHandler';
 
 const ORIGINAL_ENV = process.env;
 const spyLogError = jest

@@ -8,9 +8,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
 import { ResolverContext } from '../../context';
 import { InternalReview as InternalReviewOrigin } from '../../models/InternalReview';
-import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class InternalReview implements Partial<InternalReviewOrigin> {
