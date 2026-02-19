@@ -191,6 +191,9 @@ context('Proposal tests', () => {
         createdProposalId
       );
       cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
+      cy.get('[data-cy="data-access-users-list"]').contains(
+        initialDBData.users.user3.lastName
+      );
     });
 
     it('Copy to clipboard should work for Proposal ID', () => {
