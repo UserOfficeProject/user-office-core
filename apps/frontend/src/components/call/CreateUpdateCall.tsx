@@ -146,7 +146,6 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         startCycle: currentDayStart,
         endCycle: currentDayEnd,
         cycleComment: '',
-        surveyComment: '',
         proposalWorkflowId: null,
         templateId: null,
         esiTemplateId: null,

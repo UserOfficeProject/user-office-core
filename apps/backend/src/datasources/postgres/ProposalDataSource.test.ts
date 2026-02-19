@@ -39,7 +39,6 @@ async function createCall(format?: string): Promise<Call> {
           start_notify: new Date(),
           end_notify: new Date(),
           cycle_comment: '',
-          survey_comment: '',
           start_cycle: new Date(),
           end_cycle: new Date(),
           reference_number_format: format,
@@ -55,7 +54,6 @@ async function createCall(format?: string): Promise<Call> {
           start_notify: new Date(),
           end_notify: new Date(),
           cycle_comment: '',
-          survey_comment: '',
           start_cycle: new Date(),
           end_cycle: new Date(),
         });

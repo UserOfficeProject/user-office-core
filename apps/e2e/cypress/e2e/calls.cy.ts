@@ -219,16 +219,6 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="submit"]').should('not.exist');
 
-      cy.get('[data-cy="survey-comment"] input').should('be.focused');
-      cy.get('[data-cy="survey-comment"] input:invalid').should(
-        'have.length',
-        1
-      );
-
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
-
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy="submit"]').click();
@@ -295,7 +285,6 @@ context('Calls tests', () => {
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
       cy.contains('Calls').click();
@@ -338,8 +327,6 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
-      cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
-
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').clear().type(callCycleComment);
@@ -374,7 +361,6 @@ context('Calls tests', () => {
         .plus({ days: 40 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
-      const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
       cy.contains('Calls').click();
@@ -423,8 +409,6 @@ context('Calls tests', () => {
       ).should('have.value', callInternalEndDate);
 
       cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -536,10 +520,6 @@ context('Calls tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
-
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').type(
@@ -611,10 +591,6 @@ context('Calls tests', () => {
       });
 
       cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
 
       cy.get('[data-cy="next-step"]').click();
 
