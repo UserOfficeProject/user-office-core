@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+
+import { ValidUserInfo } from '@user-office-software/openid/lib/model/ValidUserInfo';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -32,6 +34,10 @@ export abstract class UserAuthorization {
   protected adminDataSource: AdminDataSource = container.resolve(
     Tokens.AdminDataSource
   );
+
+  protected getUniqueId(user: ValidUserInfo) {
+    return user.sub;
+  }
 
   isUserOfficer(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;

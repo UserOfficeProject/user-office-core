@@ -17,6 +17,7 @@ import {
 import {
   BasicUserDetailsFragment,
   DataType,
+  PaginationSortDirection,
   QuestionsFilter,
   TemplateCategoryId,
 } from 'generated/sdk';
@@ -30,38 +31,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import AnswerCountDetails from './AnswerCountDetails';
 import QuestionsTableFilter from './QuestionsTableFilter';
 import TemplateCountDetails from './TemplateCountDetails';
-
-const columns: Column<QuestionWithUsage>[] = [
-  { title: 'Question', field: 'question' },
-  { title: 'Key', field: 'naturalKey' },
-  { title: 'Category', field: 'categoryId' },
-  {
-    title: '# Answers',
-    field: 'answers',
-    render: (rowData: QuestionWithUsage) => (
-      <ButtonWithDialog
-        label={rowData.answers.length.toString()}
-        title="Answers to the Question"
-        data-cy="open-answer-details-btn"
-      >
-        <AnswerCountDetails question={rowData} />
-      </ButtonWithDialog>
-    ),
-  },
-  {
-    title: '# Templates',
-    field: 'templates',
-    render: (rowData: QuestionWithUsage) => (
-      <ButtonWithDialog
-        label={rowData.templates.length.toString()}
-        title="Templates using the question"
-        data-cy="open-template-details-btn"
-      >
-        <TemplateCountDetails question={rowData} />
-      </ButtonWithDialog>
-    ),
-  },
-];
 
 function QuestionsPage() {
   const [searchParams, setSearchParam] = useSearchParams();
@@ -99,7 +68,12 @@ function QuestionsPage() {
             filter,
             searchText: tableQuery.search,
             sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
           })
@@ -118,10 +92,47 @@ function QuestionsPage() {
       }
     });
 
-  const sortedColumns = setSortDirectionOnSortField(
+  const sortDirection = searchParams.get('sortDirection');
+
+  let columns: Column<QuestionWithUsage>[] = [
+    { title: 'Question', field: 'question' },
+    { title: 'Key', field: 'naturalKey' },
+    { title: 'Category', field: 'categoryId' },
+    {
+      title: '# Answers',
+      field: 'answers',
+      render: (rowData: QuestionWithUsage) => (
+        <ButtonWithDialog
+          label={rowData.answers.length.toString()}
+          title="Answers to the Question"
+          data-cy="open-answer-details-btn"
+        >
+          <AnswerCountDetails question={rowData} />
+        </ButtonWithDialog>
+      ),
+    },
+    {
+      title: '# Templates',
+      field: 'templates',
+      render: (rowData: QuestionWithUsage) => (
+        <ButtonWithDialog
+          label={rowData.templates.length.toString()}
+          title="Templates using the question"
+          data-cy="open-template-details-btn"
+        >
+          <TemplateCountDetails question={rowData} />
+        </ButtonWithDialog>
+      ),
+    },
+  ];
+  columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
-    searchParams.get('sortDirection')
+    sortDirection === PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection === PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
   );
 
   return (
@@ -201,7 +212,7 @@ function QuestionsPage() {
                 },
               },
             ]}
-            columns={sortedColumns}
+            columns={columns}
             data={fetchQuestionsData}
             onSearchChange={(searchText) => {
               setSearchParam((searchParam) => {

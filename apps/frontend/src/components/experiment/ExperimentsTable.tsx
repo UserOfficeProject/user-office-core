@@ -5,11 +5,12 @@ import MaterialTable, {
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
 import { IconButton, Tooltip, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Experiment, SettingsId } from 'generated/sdk';
+import { Experiment, PaginationSortDirection, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ExperimentReviewContent, {
@@ -58,10 +59,11 @@ export default function ExperimentsTable({
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   const selectedExperimentId = searchParams.get('experiment');
-
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
+
+  const isFirstRender = useRef(true);
 
   React.useEffect(() => {
     setSelectedExperiment(
@@ -73,15 +75,13 @@ export default function ExperimentsTable({
   }, [selectedExperimentId, tableData]);
 
   React.useEffect(() => {
-    let isMounted = true;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
 
-    if (isMounted) {
-      refreshTableData();
+      return;
     }
+    refreshTableData();
 
-    return () => {
-      isMounted = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(experimentsFilter)]);
 
@@ -112,7 +112,12 @@ export default function ExperimentsTable({
               ...(experimentEndDate ? { experimentEndDate } : {}),
             },
             sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
             searchText: tableQuery.search,
@@ -199,6 +204,17 @@ export default function ExperimentsTable({
       ...columns,
     ];
   }
+  const sortDirection = searchParams.get('sortDirection');
+
+  columns = setSortDirectionOnSortField(
+    columns,
+    searchParams.get('sortField'),
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
+  );
 
   const experimentReviewTabs = [
     EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
@@ -222,12 +238,21 @@ export default function ExperimentsTable({
         options={{
           searchText: search || undefined,
           pageSize: pageSize ? +pageSize : 10,
-          initialPage: search ? 0 : page ? +page : 0,
+          initialPage: page ? +page : 0,
+        }}
+        onRowsPerPageChange={(pageSize) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('pageSize', pageSize.toString());
+            searchParams.set('page', '0');
+
+            return searchParams;
+          });
         }}
         onSearchChange={(searchText) => {
           setSearchParams((searchParams) => {
             if (searchText) {
               searchParams.set('search', searchText);
+              searchParams.set('page', '0');
             } else {
               searchParams.delete('search');
             }
@@ -241,6 +266,25 @@ export default function ExperimentsTable({
 
             return searchParams;
           });
+        }}
+        onOrderCollectionChange={(orderByCollection) => {
+          const [orderBy] = orderByCollection;
+
+          if (!orderBy) {
+            setSearchParams((searchParams) => {
+              searchParams.delete('sortField');
+              searchParams.delete('sortDirection');
+
+              return searchParams;
+            });
+          } else {
+            setSearchParams((searchParams) => {
+              searchParams.set('sortField', orderBy.orderByField);
+              searchParams.set('sortDirection', orderBy.orderDirection);
+
+              return searchParams;
+            });
+          }
         }}
       />
 

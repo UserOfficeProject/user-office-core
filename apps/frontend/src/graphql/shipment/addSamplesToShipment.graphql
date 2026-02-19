@@ -1,6 +1,10 @@
 mutation addSamplesToShipment($shipmentId: Int!, $sampleIds: [Int!]!) {
   addSamplesToShipment(shipmentId: $shipmentId, sampleIds: $sampleIds) {
     ...shipment
+    questionary {
+      ...questionary
+      isCompleted
+    }
     samples {
       ...sample
     }
