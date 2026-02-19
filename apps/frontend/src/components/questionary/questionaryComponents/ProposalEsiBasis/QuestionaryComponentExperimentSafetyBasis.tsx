@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { Field, FieldProps } from 'formik';
+import { useSnackbar } from 'notistack';
 import React, { MouseEvent, useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
@@ -54,6 +55,7 @@ function QuestionaryComponentExperimentSafetyBasis(
   const [selectedExperimentSample, setSelectedExperimentSample] =
     useState<GetExperimentSampleQuery['experimentSample']>(null);
   const { api } = useDataApiWithFeedback();
+  const { enqueueSnackbar } = useSnackbar();
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
@@ -117,6 +119,18 @@ function QuestionaryComponentExperimentSafetyBasis(
             state.experimentSafety.proposal.questionary.steps,
             DataType.SAMPLE_DECLARATION
           );
+
+          if (sampleQuestions.length === 0) {
+            enqueueSnackbar(
+              'It is not possible to create a sample, because no sample declaration question was found in the proposal questionary. Please contact your User Office.',
+              {
+                variant: 'error',
+                className: 'snackbar-error',
+              }
+            );
+
+            return;
+          }
 
           const sampleQuestion = sampleQuestions[0];
 
