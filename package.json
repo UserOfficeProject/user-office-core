@@ -24,7 +24,7 @@
     "install:frontend": "cd apps/frontend && npm ci",
     "install:e2e": "cd apps/e2e && npm ci",
     "install:libs:shared-types": "cd libs/shared-types && npm install",
-    "install:libs:validation": "cd libs/validation && npm install",
+    "install:libs:validation": "cd validation && npm install",
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
     "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 --timeout 300000 http://127.0.0.1:4000/readiness && npm run dev:frontend\"",
     "start:e2e": "concurrently \"npm run start:backend:e2e\" \"npm run start:frontend:e2e\"",
