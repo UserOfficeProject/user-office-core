@@ -1,5 +1,16 @@
-import { Authorized, Field, Int, ObjectType } from 'type-graphql';
+import {
+  Authorized,
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
+import { InvitedProposal } from './Proposal';
+import { ResolverContext } from '../../context';
 import { Invite as InviteOrigin } from '../../models/Invite';
 import { Roles } from '../../models/Role';
 
@@ -32,4 +43,12 @@ export class Invite implements Partial<InviteOrigin> {
 
   @Field(() => Date, { nullable: true })
   public expiresAt: Date | null;
+}
+
+@Resolver(() => Invite)
+export class InviteResolver {
+  @FieldResolver(() => InvitedProposal, { nullable: true })
+  async proposal(@Root() invite: Invite, @Ctx() context: ResolverContext) {
+    return context.queries.proposal.dataSource.getInvitedProposal(invite.id);
+  }
 }

@@ -19,7 +19,11 @@ import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import {
+  InvitedProposal,
+  Proposal,
+  ProposalEndStatus,
+} from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
 import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { ProposalView } from '../../models/ProposalView';
@@ -30,7 +34,6 @@ import {
   getTransformedConfigData,
   QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
-import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { RoleClaim } from '../../models/RoleClaim';
@@ -143,6 +146,13 @@ export interface ProposalViewRecord {
   readonly techniques: ProposalViewTechnique[];
 }
 
+export interface InvitedProposalRecord {
+  readonly proposal_id: string;
+  readonly proposer_name: string;
+  readonly title: string;
+  readonly abstract: string;
+}
+
 export interface TopicRecord {
   readonly topic_id: number;
   readonly topic_title: string;
@@ -218,23 +228,16 @@ export interface UserRecord {
   readonly user_title: string;
   readonly firstname: string;
   readonly lastname: string;
-  readonly username: string;
   readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
-  readonly gender: string;
-  readonly birthdate: Date;
-  readonly department: string;
-  readonly position: string;
   readonly email: string;
-  readonly telephone: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
   readonly institution_id: number;
   readonly institution: string;
-  readonly placeholder: boolean;
 }
 
 export interface VisitRegistrationRecord {
@@ -713,15 +716,6 @@ export interface QuantityRecord {
   readonly quantity_id: string;
 }
 
-export interface RedeemCodeRecord {
-  readonly code: string;
-  readonly placeholder_user_id: number;
-  readonly created_by: number;
-  readonly created_at: Date;
-  readonly claimed_by: number | null;
-  readonly claimed_at: Date | null;
-}
-
 export interface StatusActionRecord {
   readonly status_action_id: number;
   readonly name: string;
@@ -871,6 +865,15 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   );
 };
 
+export const createInvitedProposalObject = (record: InvitedProposalRecord) => {
+  return new InvitedProposal(
+    record.proposal_id,
+    record.proposer_name,
+    record.title,
+    record.abstract
+  );
+};
+
 export const createFieldDependencyObject = (
   fieldDependency: FieldDependencyRecord & { natural_key: string }
 ) => {
@@ -938,20 +941,13 @@ export const createUserObject = (user: UserRecord) => {
     user.user_title,
     user.firstname,
     user.lastname,
-    user.username,
     user.preferredname,
     user.oidc_sub,
     user.oauth_refresh_token,
     user.oauth_issuer,
-    user.gender,
-    user.birthdate,
     user.institution_id,
     user.institution,
-    user.department,
-    user.position,
     user.email,
-    user.telephone,
-    user.placeholder,
     user.created_at.toISOString(),
     user.updated_at.toISOString()
   );
@@ -967,9 +963,7 @@ export const createBasicUserObject = (
     user.preferredname,
     user.institution,
     user.institution_id,
-    user.position,
     user.created_at,
-    user.placeholder,
     user.email,
     user.country,
     user.user_title,
@@ -1313,15 +1307,6 @@ export const createExperimentSafetyPdfTemplateObject = (
   );
 };
 
-export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
-  new RedeemCode(
-    invite.code,
-    invite.placeholder_user_id,
-    invite.created_by,
-    invite.created_at,
-    invite.claimed_by,
-    invite.claimed_at
-  );
 export const createStatusActionsLogObject = (
   statusActionLog: StatusActionsLogRecord
 ) => {

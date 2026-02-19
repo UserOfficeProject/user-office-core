@@ -13,6 +13,7 @@ import {
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 export interface ExperimentDataSource {
   create(
@@ -88,7 +89,7 @@ export interface ExperimentDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{
     totalCount: number;

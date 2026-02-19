@@ -14,6 +14,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
+import Warning from '@mui/icons-material/Warning';
 import { IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -52,6 +53,7 @@ import {
   FapInstrumentInput,
   FeatureId,
   InstrumentMinimalFragment,
+  PaginationSortDirection,
   ProposalViewInstrument,
   ProposalsFilter,
   Status,
@@ -462,6 +464,30 @@ const ProposalTableOfficer = ({
       searchParams.getAll('selection').includes(item.primaryKey.toString())
     );
 
+  const runWithMultiSelectConfirm = (action: () => void) => {
+    const selectedCount = getSelectedProposalPks().length;
+
+    if (selectedCount > 1) {
+      confirm(action, {
+        title: 'Are you sure? Multiple proposals selected!',
+        description: (
+          <Box display="flex" alignItems="center">
+            <Warning color="warning" sx={{ marginRight: 1 }} />
+            <span>
+              <b>{selectedCount}</b> proposals are selected. This action will
+              run on all of the selected proposals. Are you sure you want to
+              proceed?
+            </span>
+          </Box>
+        ),
+        confirmationText: 'Yes, proceed',
+        cancellationText: 'Cancel',
+      })();
+    } else {
+      action();
+    }
+  };
+
   const handleClose = (selectedOption: string) => {
     const firstSelectedProposalTitle = getSelectedProposalsData()[0].title;
     if (selectedOption === PdfDownloadMenuOption.PDF) {
@@ -626,10 +652,16 @@ const ProposalTableOfficer = ({
     setBulkReassignData(currentUserAssignedSelectTechReviews);
   };
 
+  const sortDirection = searchParams.get('sortDirection');
+
   columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
-    searchParams.get('sortDirection')
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
   );
 
   const reviewModal = searchParams.get('reviewModal');
@@ -679,7 +711,12 @@ const ProposalTableOfficer = ({
             text: text,
           },
           sortField: orderBy?.orderByField,
-          sortDirection: orderBy?.orderDirection,
+          sortDirection:
+            orderBy?.orderDirection == PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection == PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
           searchText: tableQuery.search,
@@ -780,9 +817,10 @@ const ProposalTableOfficer = ({
     {
       icon: FileCopy,
       tooltip: 'Clone proposals to call',
-      onClick: () => {
-        setOpenCallSelection(true);
-      },
+      onClick: () =>
+        runWithMultiSelectConfirm(() => {
+          setOpenCallSelection(true);
+        }),
       position: 'toolbarOnSelect',
     },
     {
@@ -817,8 +855,7 @@ const ProposalTableOfficer = ({
           },
           {
             title: 'Delete proposals',
-            description:
-              'This action will delete proposals and all data associated with them.',
+            description: `This action will delete ${selectedProposalsData.length} proposal(s) and all data associated with them.`,
           }
         )();
       },
@@ -911,7 +948,9 @@ const ProposalTableOfficer = ({
     tableActions.push({
       icon: ReduceCapacityIconComponent,
       tooltip: 'Reassign selected Techniqual Reviews',
-      onClick: handleBulkTechnicalReviewsReassign,
+      onClick: () => {
+        runWithMultiSelectConfirm(handleBulkTechnicalReviewsReassign);
+      },
       position: 'toolbarOnSelect',
     });
 

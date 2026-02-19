@@ -351,7 +351,6 @@ context('Fap reviews tests', () => {
     });
     initializationBeforeTests();
     cy.getAndStoreAppSettings();
-    cy.get;
   });
 
   describe('User officer role', () => {
@@ -1251,13 +1250,8 @@ context('Fap reviews tests', () => {
         cy.updateUserDetails({
           ...loggedInUserParsed,
           institutionId: 1,
-          telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
-          gender: 'male',
           nationality: 1,
-          birthdate: new Date('2000/01/01'),
-          department: 'IT',
-          position: 'Dirrector',
         } as UpdateUserMutationVariables);
       }
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
@@ -1408,12 +1402,7 @@ context('Fap reviews tests', () => {
         cy.updateUserDetails({
           ...loggedInUserParsed,
           institutionId: 1,
-          telephone: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
-          gender: 'male',
-          birthdate: new Date('2000/01/01'),
-          department: 'IT',
-          position: 'Dirrector',
         } as UpdateUserMutationVariables);
       }
 
@@ -1816,6 +1805,31 @@ context('Fap reviews tests', () => {
       cy.contains(proposal1.title);
       cy.contains(proposal3.title);
     });
+    it('Fap Reviewer should only be able to see proposals from calls with active fap review periods', () => {
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        callFapReviewEnded: true,
+      });
+      cy.reload();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title).should('not.exist');
+    });
+
     it('Fap Reviewer should not be able to submit a grade for proposals on which they are not reviewer, they should only able to view them', () => {
       cy.get('#reviewer-selection', { timeout: 5000 })
         .parent()
@@ -3836,7 +3850,6 @@ context('Fap meeting components tests', () => {
       cy.visit('/');
       cy.get('main table tbody').contains('No records to display');
     });
-
     it('Fap Reviewer should be able to give review', () => {
       cy.login(fapMembers.reviewer);
       cy.visit('/');

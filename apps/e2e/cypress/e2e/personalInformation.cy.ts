@@ -12,12 +12,9 @@ context('Personal information tests', () => {
 
   const newFirstName = faker.name.firstName();
   const newLastName = faker.name.lastName();
-  const newDepartment = faker.commerce.department();
   const otherOrg = faker.commerce.department();
   const otherInstitution = 'Other';
   const newPreferredName = faker.hacker.noun();
-  const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.number('0##########');
 
   it('Should be able to see user officer role in use', () => {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
@@ -65,12 +62,6 @@ context('Personal information tests', () => {
 
       cy.get("[name='preferredname']").clear().type(newPreferredName);
 
-      cy.get("[name='position']").clear().type(newPosition);
-
-      cy.get("[name='department']").clear().type(newDepartment);
-
-      cy.get("[name='telephone']").clear().type(newTelephone);
-
       cy.get("[name='institutionId']").clear().type(otherInstitution);
 
       cy.get('[data-cy="institution-options"] li')
@@ -92,12 +83,6 @@ context('Personal information tests', () => {
       cy.get("[name='preferredname']")
         .invoke('val')
         .should('eq', newPreferredName);
-
-      cy.get("[name='position']").invoke('val').should('eq', newPosition);
-
-      cy.get("[name='department']").invoke('val').should('eq', newDepartment);
-
-      cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
     });
 
     it('User Officer should be able to see all and change roles if there are multiple', () => {
