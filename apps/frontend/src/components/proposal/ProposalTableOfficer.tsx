@@ -713,11 +713,12 @@ const ProposalTableOfficer = ({
               text: text,
             },
             sortField: orderBy?.orderByField,
-            sortDirection: PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : sortDirection == PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
             searchText: tableQuery.search,
