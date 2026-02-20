@@ -101,7 +101,7 @@ export default class InstrumentQueries {
     }
   }
 
-  @Authorized()
+  @Authorized([Roles.FAP_REVIEWER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async getFapReviewerInstruments(agent: UserWithRole | null) {
     if (!agent || !agent.id || !agent.currentRole) {
       return [];

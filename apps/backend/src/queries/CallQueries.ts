@@ -61,7 +61,7 @@ export default class CallQueries {
     return this.dataSource.getCallByAnswerIdProposal(answerId);
   }
 
-  @Authorized()
+  @Authorized([Roles.FAP_REVIEWER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async getCallsOfReviewer(agent: UserWithRole | null) {
     if (!agent || !agent.id || !agent.currentRole) {
       return [];
