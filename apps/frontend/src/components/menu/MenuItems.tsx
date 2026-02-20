@@ -29,14 +29,15 @@ import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 import {Can} from '@casl/react'
-import { defineAbility } from '@casl/ability';
+import { createMongoAbility, defineAbility, MongoAbility } from '@casl/ability';
+import { Abilities, convertToRule } from 'utils/permissionsHelperFunctions';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
   permissionRules: PermissionRuleFragment[]
 };
 
-const MenuItems = ({ currentRole }: MenuItemsProps) => {
+const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
 
@@ -58,8 +59,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
+  const rule = convertToRule(permissionRules);
+
+  const poop = createMongoAbility<MongoAbility<Abilities>>(rule)
+
   const ability = defineAbility((can) => {
-    can('read', 'dashboard')
+    can('read', 'people')
 });
   const calls = useCallsData(
     {
@@ -113,19 +118,18 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       break;
   }
 
-  const user = (
-    <div data-cy={menuItemListCy}>
-      <Can I="read" a="dashboard" ability={ability}>
+  return <div data-cy={menuItemListCy}>
+      <Can I="read" a="dashboard" ability={poop}>
       <Tooltip title="Dashboard">
         <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
-            <DashboardIcon />
+            <DashboardOrFolderIcon />
           </ListItemIcon>
           <ListItemText primary={dashboardListItemText} />
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="create" a="proposal" ability={ability}>
+      <Can I="create" a="proposal" ability={poop}>
       <Tooltip title="New Proposal">
         <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
@@ -136,7 +140,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isSchedulerEnabled && (
-        <Can I="read" a="experiment_times" ability={ability}>
+        <Can I="read" a="experiment_times" ability={poop}>
         <Tooltip title="Experiment Times">
           <ListItemButton component={NavLink} to="/ExperimentTimes">
             <ListItemIcon>
@@ -147,7 +151,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="help" ability={ability}>
+      <Can I="read" a="help" ability={poop}>
       <Tooltip title="Help">
         <ListItemButton component={NavLink} to="/HelpPage">
           <ListItemIcon>
@@ -157,12 +161,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-    </div>
-  );
-
-  const userOfficer = (
-    <div data-cy="officer-menu-items">
-      <Can I="read" a="call" ability={ability}>
+      <Can I="read" a="call" ability={poop}>
       <Tooltip title="Calls">
         <ListItemButton component={NavLink} to="/Calls">
           <ListItemIcon>
@@ -172,7 +171,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="proposal" ability={ability}>
+      <Can I="read" a="proposal" ability={poop}>
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
@@ -182,7 +181,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="permission" ability={ability}>
+      <Can I="read" a="permission" ability={poop}>
       <Tooltip title="Permissions">
         <ListItemButton component={NavLink} to="/Permissions">
           <ListItemIcon>
@@ -193,7 +192,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isTechniqueProposalsEnabled && (
-        <Can I="read" a="technique_proposal" ability={ability}>
+        <Can I="read" a="technique_proposal" ability={poop}>
         <Tooltip title={t('Technique Proposals')}>
           <ListItemButton component={NavLink} to={techniqueProposalUrl}>
             <ListItemIcon>
@@ -205,7 +204,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Can>
       )}
       {isSchedulerEnabled && (
-        <Can I="read" an="experiment" ability={ability}>
+        <Can I="read" an="experiment" ability={poop}>
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
@@ -217,7 +216,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Can>
       )}
       {isFapEnabled && (
-        <Can I="read" a="fap" ability={ability}>
+        <Can I="read" a="fap" ability={poop}>
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
@@ -229,7 +228,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Can>
       )}
       {isInstrumentManagementEnabled && (
-        <Can I="read" an="instrument" ability={ability}>
+        <Can I="read" an="instrument" ability={poop}>
         <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
@@ -240,7 +239,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="technique" ability={ability}>
+      <Can I="read" a="technique" ability={poop}>
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
@@ -251,7 +250,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isTagsEnabled && (
-        <Can I="read" a="tag" ability={ability}>
+        <Can I="read" a="tag" ability={poop}>
         <Tooltip title="Tag">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
@@ -262,7 +261,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="proposal_workflow" ability={ability}>
+      <Can I="read" a="proposal_workflow" ability={poop}>
       <Tooltip title="Proposal workflows">
         <ListItemButton
           component={NavLink}
@@ -281,7 +280,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Can>
 
       {isUserManagementEnabled && (
-        <Can I="read" an="institution" ability={ability}>
+        <Can I="read" an="institution" ability={poop}>
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
             <ListItemIcon>
@@ -292,10 +291,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <TemplateMenuListItem />
-      <StatusActionLogsMenuListItem />
+      <Can I="read" a="template" ability={poop}>
+        <TemplateMenuListItem />
+      </Can>
+      <Can I="read" a="status_action_logs" ability={poop}>
+        <StatusActionLogsMenuListItem />
+      </Can>
       {isUserManagementEnabled && (
-        <Can I="read" a="people" ability={ability}>
+        <Can I="read" a="people" ability={poop}>
         <Tooltip title="People">
           <ListItemButton component={NavLink} to="/People">
             <ListItemIcon>
@@ -306,7 +309,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="question" ability={ability}>
+      <Can I="read" a="question" ability={poop}>
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
@@ -316,114 +319,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <SettingsMenuListItem />
+      <Can I="read" a="setting" ability={poop}>
+        <SettingsMenuListItem />
+      </Can>
     </div>
-  );
-
-  const FapRoles = (
-    <div data-cy="FapRoles-menu-items">
-      <ListItemButton component={NavLink} to="/">
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Review Proposals" />
-      </ListItemButton>
-      <ListItemButton component={NavLink} to="/Faps">
-        <ListItemIcon>
-          <GroupWorkIcon />
-        </ListItemIcon>
-        <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
-          <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
-        </Tooltip>
-      </ListItemButton>
-    </div>
-  );
-
-  const instrumentScientist = (
-    <div data-cy="instrument-scientist-menu-items">
-      <ListItemButton component={NavLink} to="/">
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Proposals" />
-      </ListItemButton>
-      {isTechniqueProposalsEnabled && (
-        <ListItemButton component={NavLink} to={techniqueProposalUrl}>
-          <ListItemIcon>
-            <Topic />
-          </ListItemIcon>
-          <ListItemText primary={t('Technique Proposals')} />
-        </ListItemButton>
-      )}
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
-      )}
-      {isInstrumentManagementEnabled && (
-        <ListItemButton component={NavLink} to="/Instruments">
-          <ListItemIcon>
-            <InstrumentsIcon />
-          </ListItemIcon>
-          <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
-        </ListItemButton>
-      )}
-    </div>
-  );
-
-  const ExperimentSafetyReviewPageReviewer = (
-    <div data-cy="reviewer-menu-items">
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
-      )}
-    </div>
-  );
-
-  const internalReviewer = (
-    <div data-cy="internal-reviewer-menu-items">
-      <Can I="read" a="dashboard" ability={ability}>
-    <Tooltip title="Review Proposals">
-      <ListItemButton component={NavLink} to="/">
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Review Proposals" />
-      </ListItemButton>
-    </Tooltip>
-    </Can>
-    </div>
-  );
-
-  switch (currentRole) {
-    case UserRole.USER:
-      return user;
-    case UserRole.USER_OFFICER:
-      return userOfficer;
-    case UserRole.INSTRUMENT_SCIENTIST:
-      return instrumentScientist;
-    case UserRole.FAP_CHAIR:
-    case UserRole.FAP_SECRETARY:
-    case UserRole.FAP_REVIEWER:
-      return FapRoles;
-    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
-      return ExperimentSafetyReviewPageReviewer;
-    case UserRole.INTERNAL_REVIEWER:
-      return internalReviewer;
-    default:
-      return null;
-  }
 };
 
 export default MenuItems;

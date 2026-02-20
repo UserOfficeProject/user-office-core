@@ -27,6 +27,7 @@ const CreateUpdatePermission = ({ close, permission }: CreateUpdatePermissionPro
     <Formik
       initialValues={initialValues}
       onSubmit={async (values) => {
+        if (values.conditions?.trim().length === 0) values.conditions = null;
         if (permission) {
           const { updatePermissionRule } = await api({
             toastSuccessMessage: 'Permission updated successfully!',

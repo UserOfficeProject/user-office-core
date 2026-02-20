@@ -33,13 +33,14 @@ export type Abilities = [
 ];
 
 export type AppAbility = MongoAbility<Abilities>;
-export const createAbility = (rules: RawRuleOf<AppAbility>[]) => createMongoAbility<AppAbility>(rules);
 
 @injectable()
 export default class PostgresPermissionDataSource implements PermissionDataSource {
-  createAbility = (rules: RawRuleOf<AppAbility>[]) => createMongoAbility<AppAbility>(rules);
+  createAbility(rules: RawRuleOf<AppAbility>[]){
+     return createMongoAbility<AppAbility>(rules);
+  }
 
-  convertToRule = (permissionRecords: PermissionRecord[], object: any): RawRuleOf<AppAbility>[] => {
+  convertToRule(permissionRecords: PermissionRecord[], object: any): RawRuleOf<AppAbility>[] {
     const rules: Rule[] = [];
 
     permissionRecords.forEach(permissionRecord => {
@@ -111,10 +112,13 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    .where('r.short_code', userRole)
+    //.where('r.short_code', userRole.replace(new RegExp('_', 'g'), ' '))
+    //.whereRaw(`UPPER(r.title) LIKE '%${userRole.replace(new RegExp('_', 'g'), ' ').toUpperCase()}%'`)
+    .whereRaw(`UPPER(r.title) LIKE '%${userRole.toUpperCase()}%'`)
+    .orWhereRaw(`UPPER(r.short_code) LIKE '%${userRole.toUpperCase()}%'`)
     .andWhere('p.action', action)
     .andWhere('p.subject', subjectType)
-    .then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object)) : false);
+    .then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object)) : false);
   }
 
   async getPermissionRule(id: number) {
@@ -138,7 +142,9 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     .join('roles as r', 'rhp.role_id', 'r.role_id')
     .modify(query => {
       if (filter?.filter?.role) {
-        query.where('r.title', 'ilike', `%${filter.filter.role}%`);
+        //query.where('r.title', 'ilike', `%${filter.filter.role}%`)
+        query.whereRaw(`UPPER(r.title) = '${filter.filter.role.toUpperCase()}'`)
+        .orWhereRaw(`UPPER(r.short_code) = '${filter.filter.role.toUpperCase()}'`);
       }
       if (filter?.filter?.action) {
         query.where('p.action', 'ilike', `%${filter.filter.action}%`);
@@ -181,7 +187,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
       .insert({
         subject: args.subject,
         action: args.action,
-        conditions: args.conditions
+        conditions: args.conditions == undefined ? null : args.conditions
       })
       .into('permissions')
       .returning('*');

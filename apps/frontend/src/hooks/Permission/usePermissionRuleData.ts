@@ -33,12 +33,6 @@ export function usePermissionRuleData(filter?: PermissionRulesFilter): {
     let unmounted = false;
 
     setLoadingPermissionRules(true);
-    if (
-      currentRole &&
-      [UserRole.USER_OFFICER].includes(
-        currentRole
-      )
-    ) {
       api()
         .getPermissionRules({filter: filter})
         .then((data) => {
@@ -50,7 +44,6 @@ export function usePermissionRuleData(filter?: PermissionRulesFilter): {
           }
           setLoadingPermissionRules(false);
         });
-    }
 
     return () => {
       // used to avoid unmounted component state update error
