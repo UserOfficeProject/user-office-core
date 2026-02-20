@@ -2,7 +2,18 @@
   "queues": [
     {
       "name": "user_office_backend.queue",
-      "vhost": "/"
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "DLX__user_office_backend.queue"
+      }
+    },
+    {
+      "name": "DL__user_office_backend.queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false
     },
     {
       "name": "user_office_scheduler_backend.queue",
@@ -12,6 +23,13 @@
   "exchanges": [
     {
       "name": "user_office_backend.fanout",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false
+    },
+    {
+      "name": "DLX__user_office_backend.queue",
       "vhost": "/",
       "type": "fanout",
       "durable": true,
@@ -30,6 +48,13 @@
       "source": "user_office_backend.fanout",
       "vhost": "/",
       "destination": "user_office_scheduler_backend.queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    },
+    {
+      "source": "DLX__user_office_backend.queue",
+      "vhost": "/",
+      "destination": "DL__user_office_backend.queue",
       "destination_type": "queue",
       "routing_key": ""
     },
