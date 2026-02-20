@@ -22,6 +22,7 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
   UpdateCallInput,
   AssignInstrumentsToCallMutation,
+  PaginationSortDirection,
 } from 'generated/sdk';
 import { InstrumentWithAvailabilityTime, UserRole, Call } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -368,7 +369,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters, isArchivedTab),
       sortField: 'sort_order',
-      sortDirection: 'asc',
+      sortDirection: PaginationSortDirection.ASC,
     }));
   };
 
