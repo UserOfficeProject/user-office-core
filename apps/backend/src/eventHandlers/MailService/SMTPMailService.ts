@@ -115,10 +115,9 @@ export class SMTPMailService extends MailService {
       return { subject: '= ``', body: '' };
     }
 
-    const emailTemplate =
-      await this.emailTemplateDataSource.getEmailTemplateByName(
-        options.content.template
-      );
+    const emailTemplate = await this.emailTemplateDataSource.getEmailTemplate(
+      +options.content.template
+    );
 
     if (!emailTemplate) {
       logger.logError('Email template not found', {
@@ -133,9 +132,9 @@ export class SMTPMailService extends MailService {
 
     if (emailTemplate.useTemplateFile) {
       const templateBodyPath =
-        this.getEmailTemplatePath('html', options.content.template) + '.pug';
+        this.getEmailTemplatePath('html', emailTemplate.name) + '.pug';
       const templateSubjectPath =
-        this.getEmailTemplatePath('subject', options.content.template) + '.pug';
+        this.getEmailTemplatePath('subject', emailTemplate.name) + '.pug';
 
       try {
         templateBody = readFileSync(templateBodyPath, 'utf-8');
@@ -152,10 +151,26 @@ export class SMTPMailService extends MailService {
       templateSubject = emailTemplate.subject || '';
     }
 
-    return {
-      subject: pug.render(templateSubject, options.substitution_data || {}),
-      body: pug.render(templateBody, options.substitution_data || {}),
-    };
+    try {
+      let compiledSubject = '';
+      let compiledBody = '';
+      compiledSubject = pug.render(
+        templateSubject,
+        options.substitution_data || {}
+      );
+      compiledBody = pug.render(templateBody, options.substitution_data || {});
+
+      return {
+        subject: compiledSubject,
+        body: compiledBody,
+      };
+    } catch (error) {
+      logger.logError('Error compiling email template', {
+        error: error,
+      });
+
+      return null;
+    }
   }
 
   private getSmtpAuthOptions() {

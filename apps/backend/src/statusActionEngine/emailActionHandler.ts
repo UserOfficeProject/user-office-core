@@ -3,7 +3,6 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
@@ -91,7 +90,7 @@ export const emailStatusActionRecipient = async (
   loggedInUserId?: number | null
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
-  const emailTemplateName = recipientWithTemplate.emailTemplate.name;
+  const emailTemplateId = recipientWithTemplate.emailTemplate.id;
   const successfulMessage = !!statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
@@ -116,7 +115,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -141,7 +140,7 @@ export const emailStatusActionRecipient = async (
           }),
           successfulMessage,
           failMessage,
-          emailTemplateName,
+          emailTemplateId,
           loggedInUserId
         ));
 
@@ -165,7 +164,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -189,7 +188,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -214,7 +213,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -251,7 +250,7 @@ export const emailStatusActionRecipient = async (
             id: recipientWithTemplate.recipient.name,
             email: userOfficeEmail,
             proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.name,
+            template: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -263,8 +262,7 @@ export const emailStatusActionRecipient = async (
           id: recipientWithTemplate.recipient.name,
           email: userOfficeEmail,
           proposals: [proposal],
-          template: recipientWithTemplate.emailTemplate.name,
-          templateId: recipientWithTemplate.emailTemplate.id,
+          template: recipientWithTemplate.emailTemplate.id,
           instruments: await instrumentDataSource.getInstrumentsByProposalPk(
             proposal.primaryKey
           ),
@@ -290,7 +288,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -315,7 +313,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -350,7 +348,7 @@ export const emailStatusActionRecipient = async (
             id: recipientWithTemplate.recipient.name,
             email: experimentSafetyEmail,
             proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.name,
+            template: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -374,7 +372,7 @@ export const emailStatusActionRecipient = async (
         }),
         successfulMessage,
         failMessage,
-        emailTemplateName,
+        emailTemplateId,
         loggedInUserId
       );
 
@@ -407,7 +405,7 @@ export const emailStatusActionRecipient = async (
           }),
           successfulMessage,
           failMessage,
-          emailTemplateName,
+          emailTemplateId,
           loggedInUserId
         );
       }
@@ -427,13 +425,10 @@ const sendMail = async (
   ) => Promise<void>,
   successfulMessage: string,
   failMessage: string,
-  emailTemplateName: string,
+  emailTemplateId: string,
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
-  const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
-    Tokens.EmailTemplateDataSource
-  );
   const loggingHandler = container.resolve<
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.LoggingHandler);
@@ -449,28 +444,13 @@ const sendMail = async (
     return;
   }
 
-  const emailTemplate =
-    await emailTemplateDataSource.getEmailTemplateByName(emailTemplateName);
-
-  if (!emailTemplate) {
-    logger.logInfo(
-      `Could not send email(s) because the email template with id ${emailTemplateName} does not exist.`,
-      { recipientsWithData }
-    );
-  }
-
-  logger.logInfo(
-    `Preparing to send email(s) using template: ${emailTemplate?.name} (${emailTemplateName}) to ${recipientsWithData.length} recipient(s).`,
-    { recipientsWithData }
-  );
-
   try {
     const mailServiceResponse = await Promise.all(
       recipientsWithData.map(async (recipientWithData) => {
         try {
           const res = await mailService.sendMail({
             content: {
-              template: emailTemplate?.name || '',
+              template: emailTemplateId,
               email_rfc822: '',
             },
             substitution_data: {
@@ -495,7 +475,7 @@ const sendMail = async (
             const evt = constructProposalStatusChangeEvent(
               proposal,
               loggedInUserId || null,
-              `${successfulMessage} template: ${emailTemplate?.name} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              `${successfulMessage} template: ${emailTemplateId} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
               undefined
             );
             emailEventHandler(evt);
@@ -512,7 +492,7 @@ const sendMail = async (
             const evt = constructProposalStatusChangeEvent(
               proposal,
               loggedInUserId || null,
-              `${failMessage} template: ${emailTemplate?.name} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              `${failMessage} template: ${emailTemplateId} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
               undefined
             );
             emailEventHandler(evt);

@@ -2001,7 +2001,7 @@ context('Template Basic tests', () => {
   });
 
   describe('Email templates tests', () => {
-    it.only('User officer can create email template', () => {
+    it('User officer can create email template', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -2036,7 +2036,7 @@ context('Template Basic tests', () => {
       });
     });
 
-    it.only('User officer can update email template', () => {
+    it('User officer can update email template', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -2054,7 +2054,7 @@ context('Template Basic tests', () => {
       cy.contains(emailTemplateDescription2);
     });
 
-    it.only('User officer can delete email template', () => {
+    it('User officer can delete email template', () => {
       cy.login('officer');
       cy.visit('/');
 

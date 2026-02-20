@@ -110,9 +110,17 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(template);
 
+      if (!emailTemplate) {
+        logger.logError('Email template not found', {
+          template,
+        });
+
+        return;
+      }
+
       const options: EmailSettings = {
         content: {
-          template: emailTemplate?.name || template || '',
+          template: emailTemplate.id.toString(),
         },
         substitution_data: {
           preferredName: principalInvestigator.preferredname,
@@ -166,10 +174,18 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(template);
 
+      if (!emailTemplate) {
+        logger.logError('Email template not found', {
+          template,
+        });
+
+        return;
+      }
+
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || template || '',
+            template: emailTemplate.id.toString(),
           },
           substitution_data: {
             preferredName: principalInvestigator.preferredname,
@@ -203,14 +219,22 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateName = EmailTemplateId.REVIEW_REMINDER;
+      const template = EmailTemplateId.REVIEW_REMINDER;
       const emailTemplate =
-        await emailTemplateDataSource.getEmailTemplateByName(templateName);
+        await emailTemplateDataSource.getEmailTemplateByName(template);
+
+      if (!emailTemplate) {
+        logger.logError('Email template not found', {
+          template,
+        });
+
+        return;
+      }
 
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || templateName || '',
+            template: emailTemplate.id.toString(),
           },
           substitution_data: {
             preferredName: fapReviewer.preferredname,
@@ -295,10 +319,18 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(template);
 
+      if (!emailTemplate) {
+        logger.logError('Email template not found', {
+          template,
+        });
+
+        return;
+      }
+
       mailService
         .sendMail({
           content: {
-            template: emailTemplate?.name || template || '',
+            template: emailTemplate.id.toString(),
           },
           substitution_data: {
             assignedByPreferredName: assignedBy.preferredname,
@@ -331,7 +363,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
-  templateName: string
+  template: string
 ) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -342,12 +374,20 @@ async function sendInviteEmail(
   );
 
   const emailTemplate =
-    await emailTemplateDataSource.getEmailTemplateByName(templateName);
+    await emailTemplateDataSource.getEmailTemplateByName(template);
+
+  if (!emailTemplate) {
+    logger.logError('Email template not found', {
+      template: template,
+    });
+
+    return;
+  }
 
   return mailService
     .sendMail({
       content: {
-        template: emailTemplate?.name || templateName || '',
+        template: emailTemplate.id.toString(),
       },
       substitution_data: {
         email: invite.email,
@@ -362,7 +402,7 @@ async function sendInviteEmail(
       await inviteDataSource.update({
         id: invite.id,
         isEmailSent: true,
-        templateId: templateName,
+        templateId: template,
       });
       logger.logInfo('Successful email transmission', { res });
     })

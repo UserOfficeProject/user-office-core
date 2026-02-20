@@ -1,5 +1,9 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import {
+  createEmailTemplateValidationSchema,
+  updateEmailTemplateValidationSchema,
+} from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
 import i18n from 'i18n';
 import React from 'react';
@@ -58,6 +62,11 @@ const CreateUpdateEmailTemplate = ({
           }
         }
       }}
+      validationSchema={
+        !!emailTemplate
+          ? updateEmailTemplateValidationSchema
+          : createEmailTemplateValidationSchema
+      }
     >
       {({ isValid, values }) => (
         <Form>

@@ -1,9 +1,13 @@
+import {
+  createEmailTemplateValidationSchema,
+  updateEmailTemplateValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
 import StatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
-import { Authorized, EventBus } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailTemplate } from '../models/EmailTemplate';
 import { Rejection, rejection } from '../models/Rejection';
@@ -21,6 +25,7 @@ export default class EmailTemplateMutations {
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
+  @ValidateArgs(createEmailTemplateValidationSchema)
   @EventBus(Event.EMAIL_TEMPLATE_CREATED)
   @Authorized([Roles.USER_OFFICER])
   async create(
@@ -50,6 +55,7 @@ export default class EmailTemplateMutations {
     }
   }
 
+  @ValidateArgs(updateEmailTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.EMAIL_TEMPLATE_UPDATED)
   async update(
