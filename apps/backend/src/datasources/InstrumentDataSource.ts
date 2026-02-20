@@ -95,4 +95,5 @@ export interface InstrumentDataSource {
     instrumentId: number,
     proposalPk: number
   ): Promise<boolean>;
+  getInstrumentsByFapIds(fapId: number[]): Promise<Instrument[]>;
 }

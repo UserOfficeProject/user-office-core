@@ -1,0 +1,5 @@
+query getReviewerInstruments {
+  getInstrumentsOfReviewer {
+    ...instrumentMinimal
+  }
+}

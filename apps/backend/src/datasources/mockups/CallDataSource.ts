@@ -221,4 +221,8 @@ export class CallDataSourceMock implements CallDataSource {
   async getExperimentWorkflowByCall(callId: number): Promise<Workflow | null> {
     return dummyWorkflow;
   }
+
+  getCallsOfFaps(fapIds: number[]): Promise<Call[]> {
+    throw new Error('Method not implemented.');
+  }
 }

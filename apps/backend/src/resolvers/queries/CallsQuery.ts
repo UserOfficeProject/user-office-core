@@ -83,4 +83,9 @@ export class CallsQuery {
       scientistId
     );
   }
+
+  @Query(() => [Call], { nullable: true })
+  callsOfReviewer(@Ctx() context: ResolverContext) {
+    return context.queries.call.getCallsOfReviewer(context.user);
+  }
 }
