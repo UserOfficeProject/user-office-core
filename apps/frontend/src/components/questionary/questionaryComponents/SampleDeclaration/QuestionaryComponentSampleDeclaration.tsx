@@ -110,6 +110,7 @@ function QuestionaryComponentSampleDeclaration(
                 const newStateItems = [...field.value, clonedSample];
 
                 updateFieldValueAndState(newStateItems);
+                setSelectedSample(clonedSample);
               }
             });
 
