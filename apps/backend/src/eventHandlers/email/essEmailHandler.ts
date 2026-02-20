@@ -17,22 +17,7 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-
-export enum EmailTemplateId {
-  CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
-  PROPOSAL_SUBMITTED = 'proposal-submitted',
-  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
-  REJECTED_PROPOSAL = 'Rejected-Proposal',
-  RESERVED_PROPOSAL = 'Reserved-Proposal',
-  REVIEW_REMINDER = 'review-reminder',
-  VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
-  VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',
-  USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
-  USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
-  USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
-  USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
-}
-
+import { EmailTemplateId } from './emailTemplateId';
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -120,7 +105,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         mailService
           .sendMail({
             content: {
-              template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+              template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
@@ -164,7 +149,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const options: EmailSettings = {
         content: {
-          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
+          template: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -232,7 +217,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             piPreferredname: principalInvestigator.preferredname,
@@ -353,7 +338,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: EmailTemplateId.REVIEW_REMINDER,
+            template: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -434,7 +419,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             preferredname: user.preferredname,
@@ -490,7 +475,7 @@ async function sendInviteEmail(
   return mailService
     .sendMail({
       content: {
-        template_id: templateId,
+        template: templateId,
       },
       substitution_data: {
         email: invite.email,

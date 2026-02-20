@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
 import {
-  Event as PROPOSAL_EVENTS,
-  EmailStatusActionRecipients,
-  StatusActionType,
   AllocationTimeUnits,
-  FeatureUpdateAction,
+  EmailStatusActionRecipients,
   FeatureId,
+  FeatureUpdateAction,
+  Event as PROPOSAL_EVENTS,
+  StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -41,6 +41,22 @@ context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createEmailTemplate({
+      name: 'my-first-email',
+      description: 'My First Email',
+      useTemplateFile: false,
+      subject: 'My First Subject',
+      body: 'My First Body',
+    });
+
+    cy.createEmailTemplate({
+      name: 'my-second-email',
+      description: 'My Second Email',
+      useTemplateFile: false,
+      subject: 'My Second Subject',
+      body: 'My Second Body',
+    });
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
@@ -131,7 +147,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: 'my-first-email',
+              name: 'my-first-email',
+            },
             combineEmails: true,
           },
         ],
@@ -222,7 +241,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: 'my-second-email',
+              name: 'my-second-email',
+            },
           },
         ],
       };
@@ -294,7 +316,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: 'my-first-email',
+              name: 'my-first-email',
+            },
           },
         ],
       };
@@ -452,7 +477,10 @@ context('Status actions tests', () => {
               description:
                 'Other email recipients manually added by their email',
             },
-            emailTemplate: { id: 'my-first-email', name: 'My First Email' },
+            emailTemplate: {
+              id: 'my-first-email',
+              name: 'my-first-email',
+            },
             otherRecipientEmails: [faker.internet.email()],
           },
         ],
@@ -571,8 +599,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: 'my-first-email',
+              name: 'my-first-email',
             },
             otherRecipientEmails: [statusActionEmail],
           },
@@ -684,7 +712,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: 'my-first-email',
+              name: 'my-first-email',
+            },
           },
           {
             recipient: {
@@ -693,8 +724,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: 'my-first-email',
+              name: 'my-first-email',
             },
             otherRecipientEmails: [faker.internet.email()],
           },

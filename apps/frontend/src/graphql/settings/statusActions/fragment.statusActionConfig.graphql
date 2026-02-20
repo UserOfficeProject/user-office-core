@@ -4,6 +4,7 @@ fragment statusActionDefaultConfig on StatusActionDefaultConfig {
       name
       description
     }
+
     emailTemplates {
       id
       name

@@ -1,0 +1,19 @@
+mutation createEmailTemplate(
+  $name: String!
+  $description: String!
+  $useTemplateFile: Boolean!
+  $subject: String
+  $body: String
+) {
+  createEmailTemplate(
+    createEmailTemplateInput: {
+      name: $name
+      description: $description
+      useTemplateFile: $useTemplateFile
+      subject: $subject
+      body: $body
+    }
+  ) {
+    ...emailTemplate
+  }
+}

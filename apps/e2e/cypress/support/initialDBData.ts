@@ -452,4 +452,22 @@ export default {
     proposalPk: 1,
     questionId: 'sample_declaration_question',
   },
+  emailTemplates: {
+    template1: {
+      id: 1,
+      createdByUserId: 0,
+      name: 'template-name-1',
+      description: 'template-description-1',
+      subject: 'template-subject-1',
+      body: 'template-body-1',
+    },
+    template2: {
+      id: 2,
+      createdByUserId: 0,
+      name: 'template-name-2',
+      description: 'template-description-2',
+      subject: 'template-subject-2',
+      body: 'template-body-2',
+    },
+  },
 };

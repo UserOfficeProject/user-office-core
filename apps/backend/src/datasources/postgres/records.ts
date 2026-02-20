@@ -1,9 +1,9 @@
 import {
-  ProposalPdfTemplateRecord,
   ExperimentSafetyPdfTemplateRecord,
+  ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -14,6 +14,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { EmailTemplate } from '../../models/EmailTemplate';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
@@ -370,6 +371,16 @@ export interface CallRecord {
   readonly is_active: boolean;
   readonly sort_order: number;
   readonly experiment_workflow_id: number;
+}
+
+export interface EmailTemplateRecord {
+  readonly email_template_id: number;
+  readonly created_by: number;
+  readonly name: string;
+  readonly description: string;
+  readonly use_template_file: boolean;
+  readonly subject?: string | null;
+  readonly body?: string | null;
 }
 
 export interface PageTextRecord {
@@ -1054,6 +1065,20 @@ export const createCallObject = (call: CallRecord) => {
   );
 };
 
+export const createEmailTemplateObject = (
+  emailTemplate: EmailTemplateRecord
+) => {
+  return new EmailTemplate(
+    emailTemplate.email_template_id,
+    emailTemplate.created_by,
+    emailTemplate.name,
+    emailTemplate.description,
+    emailTemplate.use_template_file,
+    emailTemplate.subject,
+    emailTemplate.body
+  );
+};
+
 export const createCallHasInstrumentObject = (
   callHasInstrument: CallHasInstrumentRecord
 ) => {
@@ -1400,7 +1425,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
-  readonly template_id: EmailTemplateId | null;
+  readonly template_id: number | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>

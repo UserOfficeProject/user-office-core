@@ -1,5 +1,6 @@
 import DescriptionIcon from '@mui/icons-material/Description';
 import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
+import EmailIcon from '@mui/icons-material/Email';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import FeedbackIcon from '@mui/icons-material/Feedback';
@@ -35,6 +36,7 @@ const menuMap = {
   FeedbackTemplates: '/FeedbackTemplates',
   EsiTemplates: '/EsiTemplates',
   SampleEsiTemplates: '/SampleEsiTemplates',
+  EmailTemplates: '/EmailTemplates',
 };
 
 function EsiTemplatesMenuListItem() {
@@ -236,6 +238,15 @@ export function TemplateMenuListItem() {
               <InboxIcon />
             </ListItemIcon>
             <ListItemText primary="Sample declaration" />
+          </ListItemButton>
+        </Tooltip>
+
+        <Tooltip title="Email">
+          <ListItemButton component={NavLink} to={menuMap['EmailTemplates']}>
+            <ListItemIcon>
+              <EmailIcon />
+            </ListItemIcon>
+            <ListItemText primary="Email" />
           </ListItemButton>
         </Tooltip>
 

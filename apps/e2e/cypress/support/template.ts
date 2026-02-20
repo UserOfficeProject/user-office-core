@@ -14,14 +14,14 @@ import {
   CreateTemplateMutation,
   CreateTemplateMutationVariables,
   CreateTopicMutation,
-  UpdateTopicMutation,
   CreateTopicMutationVariables,
+  SetActiveTemplateMutationVariables,
   UpdateQuestionMutation,
   UpdateQuestionMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateTopicMutation,
   UpdateTopicMutationVariables,
-  SetActiveTemplateMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';

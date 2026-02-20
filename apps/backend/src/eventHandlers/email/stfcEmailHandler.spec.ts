@@ -1,6 +1,6 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import * as Logger from '@user-office-software/duo-logger';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -69,7 +69,7 @@ describe('stfcEmailHandler', () => {
 
       expect(process.env.FBS_EMAIL).toBe(inviteEmail);
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template_id: 'call-created-email' },
+        content: { template: 'call-created-email' },
         substitution_data: {
           shortCode: 'string',
           startCall: new Date(2000, 1, 1),
@@ -109,7 +109,7 @@ describe('stfcEmailHandler', () => {
       await new Promise(setImmediate);
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template_id: 'call-created-email' },
+        content: { template: 'call-created-email' },
         substitution_data: {
           shortCode: 'error',
         },
