@@ -2,6 +2,8 @@ import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
+import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
+import ProposalTableReader from 'components/proposal/ProposalTableReader';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
@@ -55,10 +57,32 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
-    default:
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+    case UserRole.FAP_CHAIR:
+    case UserRole.FAP_REVIEWER:
+    case UserRole.FAP_SECRETARY:
       roleBasedOverView = (
         <Paper>
           <ProposalTableReviewer />
+        </Paper>
+      );
+      break;
+    case UserRole.PROPOSAL_READER:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableReader />
+        </Paper>
+      );
+      break;
+    default:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableOfficer
+            proposalFilter={{}}
+            setProposalFilter={function (): void {
+              throw new Error('Function not implemented.');
+            }}
+          />
         </Paper>
       );
       break;
@@ -66,15 +90,17 @@ export default function OverviewPage(props: { userRole: UserRole }) {
 
   return (
     <StyledContainer maxWidth={false}>
-      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
-        <Paper>
-          {loadingContent ? (
-            <div>Loading...</div>
-          ) : (
-            parse(pageContent as string)
-          )}
-        </Paper>
-      )}
+      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+        props.userRole !== UserRole.PROPOSAL_READER &&
+        Object.values(UserRole).includes(props.userRole) && (
+          <Paper>
+            {loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              parse(pageContent as string)
+            )}
+          </Paper>
+        )}
       {roleBasedOverView}
     </StyledContainer>
   );

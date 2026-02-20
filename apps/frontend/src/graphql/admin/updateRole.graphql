@@ -1,0 +1,5 @@
+mutation updateRole($args: UpdateRoleArgs!) {
+  updateRole(args: $args) {
+    success
+  }
+}

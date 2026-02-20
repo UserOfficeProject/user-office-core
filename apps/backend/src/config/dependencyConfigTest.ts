@@ -28,6 +28,7 @@ import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/Propos
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
+import { RoleDataSourceMock } from '../datasources/mockups/RoleDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
@@ -55,6 +56,7 @@ import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+mapClass(Tokens.RoleDataSource, RoleDataSourceMock);
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
 mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);

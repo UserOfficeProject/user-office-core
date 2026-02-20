@@ -21,6 +21,7 @@ import ProposalMutations from './mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import RoleTagsMutation from './mutations/RoleTagsMutation';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
@@ -50,6 +51,7 @@ import ProposalPdfTemplateQueries from './queries/ProposalPdfTemplateQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
+import RoleTagsQuery from './queries/RoleTagsQuery';
 import SampleQueries from './queries/SampleQueries';
 import SettingsQueries from './queries/SettingsQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
@@ -103,6 +105,7 @@ const context: BasicResolverContext = {
     settings: container.resolve(SettingsQueries),
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
+    roleTags: container.resolve(RoleTagsQuery),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -135,6 +138,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowMutations),
     tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
+    roleTags: container.resolve(RoleTagsMutation),
   },
   clients: {
     scheduler: async () => {
@@ -151,3 +155,5 @@ const context: BasicResolverContext = {
 };
 
 export default context;
+
+// View buildContext file

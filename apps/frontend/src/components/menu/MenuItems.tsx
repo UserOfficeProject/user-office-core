@@ -1,4 +1,4 @@
-import { Science, Topic, Apartment } from '@mui/icons-material';
+import { Science, Topic } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -12,10 +12,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
+import TagIcon from 'components/common/icons/TagIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
@@ -190,12 +192,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       {isTagsEnabled && (
-        <Tooltip title="Tag">
+        <Tooltip title="Tags">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
-              <Apartment />
+              <TagIcon />
             </ListItemIcon>
-            <ListItemText primary={'Tag'} />
+            <ListItemText primary={'Tags'} />
           </ListItemButton>
         </Tooltip>
       )}
@@ -326,6 +328,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     </div>
   );
 
+  const proposalReaderUser = (
+    <div data-cy="instrument-scientist-menu-items">
+      <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Proposals" />
+      </ListItemButton>
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -341,6 +354,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
+    case UserRole.PROPOSAL_READER:
+      return proposalReaderUser;
     default:
       return null;
   }

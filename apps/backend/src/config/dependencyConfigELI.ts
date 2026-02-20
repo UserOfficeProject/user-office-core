@@ -26,6 +26,7 @@ import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/Propo
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -63,6 +64,7 @@ import { mapClass, mapValue } from './utils';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);

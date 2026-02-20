@@ -3,7 +3,9 @@ export class Role {
     public id: number,
     public shortCode: string,
     public title: string,
-    public description: string
+    public description: string,
+    public permissions: string[], // New field for permissions
+    public isRootRole: boolean
   ) {}
 }
 
@@ -16,4 +18,5 @@ export enum Roles {
   INSTRUMENT_SCIENTIST = 'instrument_scientist',
   EXPERIMENT_SAFETY_REVIEWER = 'experiment_safety_reviewer',
   INTERNAL_REVIEWER = 'internal_reviewer',
+  PROPOSAL_READER = 'proposal_reader',
 }

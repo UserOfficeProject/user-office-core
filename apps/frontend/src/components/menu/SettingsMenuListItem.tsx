@@ -3,6 +3,7 @@ import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import FunctionsIcon from '@mui/icons-material/Functions';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
@@ -27,6 +28,7 @@ const menuMap = {
   ApiAccessTokens: '/ApiAccessTokens',
   Features: '/Features',
   Settings: '/Settings',
+  RoleManagement: '/admin/roles',
   SampleEsiTemplates: '/SampleEsiTemplates',
 };
 
@@ -124,6 +126,14 @@ const SettingsMenuListItem = () => {
               <VpnKey />
             </ListItemIcon>
             <ListItemText primary="API access tokens" />
+          </ListItemButton>
+        </Tooltip>
+        <Tooltip title="Role management">
+          <ListItemButton component={NavLink} to={menuMap['RoleManagement']}>
+            <ListItemIcon>
+              <ManageAccountsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Role management" />
           </ListItemButton>
         </Tooltip>
         <Tooltip title="Features">
