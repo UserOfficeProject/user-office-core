@@ -11,10 +11,11 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import i18n from 'i18n';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapInstrumentProposalsTable';

@@ -4,8 +4,7 @@ import {
   responsiveFontSizes,
   useTheme,
 } from '@mui/material/styles';
-import React, { useCallback, useContext } from 'react';
-import { useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';

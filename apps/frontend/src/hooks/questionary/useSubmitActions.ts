@@ -61,10 +61,9 @@ export function usePostSubmitActions() {
   return (answers: Answer[]): SubmitAction[] => {
     const actions = answers
       .flatMap((answer) => {
-        switch (
-          answer.question.dataType
-          // nothing here for now
-        ) {
+        // nothing here for now remove eslint warning if we ever fill it
+        // eslint-disable-next-line no-empty
+        switch (answer.question.dataType) {
         }
 
         return [];

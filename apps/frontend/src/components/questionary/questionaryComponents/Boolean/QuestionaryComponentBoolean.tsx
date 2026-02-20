@@ -67,7 +67,7 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
                 aria-hidden="true"
                 className="MuiFormLabel-asterisk MuiInputLabel-asterisk"
               >
-                 *
+                *
               </span>
             )}
           </>

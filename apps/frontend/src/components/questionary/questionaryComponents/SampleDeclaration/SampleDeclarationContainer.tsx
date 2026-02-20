@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { default as React, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';

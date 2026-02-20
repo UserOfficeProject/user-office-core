@@ -106,7 +106,7 @@ class App extends React.Component<Record<string, never>, AppState> {
         errorInfo: errorInfo.componentStack?.toString(),
         user: this.state.errorUserInformation,
       });
-    } catch (e) {
+    } catch {
       errorMessage = 'Exception while preparing error message';
     } finally {
       void sendClientLog(errorMessage, this.state.errorToken);

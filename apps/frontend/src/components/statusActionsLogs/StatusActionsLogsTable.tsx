@@ -158,7 +158,7 @@ const StatusActionsLogsTable = ({
     });
   };
   const fetchStatusActionsLogsData = (tableQuery: Query<StatusActionsLog>) =>
-    new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
+    new Promise<QueryResult<StatusActionsLog>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
         let filter: StatusActionsLogsFilter = {
@@ -181,35 +181,41 @@ const StatusActionsLogsTable = ({
             callIds: [+call],
           };
         }
-        const results = await api().getStatusActionsLogs({
-          filter,
-          searchText: tableQuery.search,
-          sortField: orderBy?.orderByField,
-          sortDirection:
-            orderBy?.orderDirection == PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : orderBy?.orderDirection == PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-        });
-        const data: StatusActionsLog[] =
-          results.statusActionsLogs?.statusActionsLogs.map(
-            (statusActionsLog) => {
-              return {
-                ...statusActionsLog,
-                statusActionsTstamp: toFormattedDateTime(
-                  statusActionsLog.statusActionsTstamp
-                ),
-              } as StatusActionsLog;
-            }
-          ) || [];
-        resolve({
-          data: data,
-          page: tableQuery.page,
-          totalCount: results.statusActionsLogs?.totalCount || 0,
-        });
+        api()
+          .getStatusActionsLogs({
+            filter,
+            searchText: tableQuery.search,
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+          })
+          .then((results) => {
+            const data: StatusActionsLog[] =
+              results.statusActionsLogs?.statusActionsLogs.map(
+                (statusActionsLog) => {
+                  return {
+                    ...statusActionsLog,
+                    statusActionsTstamp: toFormattedDateTime(
+                      statusActionsLog.statusActionsTstamp
+                    ),
+                  } as StatusActionsLog;
+                }
+              ) || [];
+            resolve({
+              data: data,
+              page: tableQuery.page,
+              totalCount: results.statusActionsLogs?.totalCount || 0,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       } finally {

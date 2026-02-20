@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { PaperProps, Typography } from '@mui/material';
 import { default as React, useState } from 'react';
 
