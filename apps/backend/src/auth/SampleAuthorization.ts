@@ -64,6 +64,10 @@ export class SampleAuthorization {
     agent: UserWithRole | null,
     sampleOrSampleId: Sample | number
   ): Promise<boolean> {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (isUserOfficer) {
+      return true;
+    }
     const sample = await this.resolveSample(sampleOrSampleId);
 
     if (!sample) {
