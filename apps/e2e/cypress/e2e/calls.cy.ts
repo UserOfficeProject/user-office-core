@@ -56,7 +56,6 @@ context('Calls tests', () => {
     technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
     esiTemplateName: esiTemplateName,
   };
 
@@ -78,7 +77,6 @@ context('Calls tests', () => {
     technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
   };
 
   const updatedCall = {
@@ -167,7 +165,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
-      const shortCode = faker.random.alphaNumeric(15);
+      const shortCode = faker.string.alphanumeric(15);
 
       cy.contains('Proposals');
 
@@ -217,19 +215,26 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
+      cy.get('[name="endReview"]').clear();
+
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy="submit"]').should('not.exist');
 
-      cy.get('[data-cy="survey-comment"] input').should('be.focused');
-      cy.get('[data-cy="survey-comment"] input:invalid').should(
-        'have.length',
-        1
+      cy.get('[data-cy="create-modal"]')
+        .contains('Invalid Date Format')
+        .should('exist');
+
+      cy.setDatePickerValue(
+        '[name="endReview"]',
+        DateTime.now()
+          .plus({ days: 10 })
+          .toFormat(initialDBData.getFormats().dateFormat)
       );
 
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy=cycle-comment] input').type(faker.lorem.word());
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -297,7 +302,6 @@ context('Calls tests', () => {
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
       cy.contains('Calls').click();
@@ -340,8 +344,6 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
-      cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
-
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').clear().type(callCycleComment);
@@ -376,7 +378,6 @@ context('Calls tests', () => {
         .plus({ days: 40 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
-      const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
       cy.contains('Calls').click();
@@ -425,8 +426,6 @@ context('Calls tests', () => {
       ).should('have.value', callInternalEndDate);
 
       cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -538,10 +537,6 @@ context('Calls tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
-
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').type(
@@ -613,10 +608,6 @@ context('Calls tests', () => {
       });
 
       cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy=survey-comment] input').type(
-        faker.random.word().split(' ')[0]
-      );
 
       cy.get('[data-cy="next-step"]').click();
 

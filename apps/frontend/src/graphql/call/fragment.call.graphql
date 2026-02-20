@@ -13,7 +13,6 @@ fragment call on Call {
   startCycle
   endCycle
   cycleComment
-  surveyComment
   referenceNumberFormat
   proposalWorkflowId
   experimentWorkflowId

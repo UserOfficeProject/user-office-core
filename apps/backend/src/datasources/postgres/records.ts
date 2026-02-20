@@ -349,7 +349,6 @@ export interface CallRecord {
   readonly start_cycle: Date;
   readonly end_cycle: Date;
   readonly cycle_comment: string;
-  readonly survey_comment: string;
   readonly submission_message: string;
   readonly reference_number_format: string;
   readonly proposal_sequence: number;
@@ -1030,7 +1029,6 @@ export const createCallObject = (call: CallRecord) => {
     call.start_cycle,
     call.end_cycle,
     call.cycle_comment,
-    call.survey_comment,
     call.submission_message,
     call.reference_number_format,
     call.proposal_sequence,

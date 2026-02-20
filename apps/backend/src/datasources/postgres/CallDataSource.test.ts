@@ -50,7 +50,6 @@ async function createCall(
       start_cycle: yesterday,
       end_cycle: tomorrow,
       cycle_comment: '',
-      survey_comment: '',
       ...(args.format && { reference_number_format: args.format }),
       ...(args.callEnded && { call_ended: args.callEnded }),
       ...(args.callEndedInternal && {

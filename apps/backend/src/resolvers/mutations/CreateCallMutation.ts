@@ -65,9 +65,6 @@ export class CreateCallInput {
   @Field({ nullable: true })
   public submissionMessage: string;
 
-  @Field()
-  public surveyComment: string;
-
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
 
