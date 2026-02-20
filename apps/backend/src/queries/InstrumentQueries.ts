@@ -103,11 +103,7 @@ export default class InstrumentQueries {
 
   @Authorized()
   async getFapReviewerInstruments(agent: UserWithRole | null) {
-    if (!agent || !agent.id) {
-      return [];
-    }
-
-    if (!agent.currentRole) {
+    if (!agent || !agent.id || !agent.currentRole) {
       return [];
     }
 
