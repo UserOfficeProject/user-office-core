@@ -3,6 +3,10 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  moduleNameMapper: {
+    '^@user-office-software/duo-validation/lib/(.*)$':
+      '<rootDir>/../../validation/lib/$1',
+  },
   testEnvironment: 'node',
   testRegex: '(/__tests__/.*|(\\.|/)(spec))\\.[jt]sx?$',
   collectCoverage: true,
