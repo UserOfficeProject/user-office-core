@@ -165,7 +165,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
-      const shortCode = faker.random.alphaNumeric(15);
+      const shortCode = faker.string.alphanumeric(15);
 
       cy.contains('Proposals');
 
@@ -215,9 +215,26 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
+      cy.get('[name="endReview"]').clear();
+
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy="submit"]').should('not.exist');
+
+      cy.get('[data-cy="create-modal"]')
+        .contains('Invalid Date Format')
+        .should('exist');
+
+      cy.setDatePickerValue(
+        '[name="endReview"]',
+        DateTime.now()
+          .plus({ days: 10 })
+          .toFormat(initialDBData.getFormats().dateFormat)
+      );
+
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy=cycle-comment] input').type(faker.lorem.word());
 
       cy.get('[data-cy="next-step"]').click();
 
