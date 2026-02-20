@@ -26,6 +26,11 @@ import {
   WorkflowRecord,
 } from './records';
 
+const fieldMap: { [key: string]: string } = {
+  sort_order: 'sort_order',
+  call_id: 'call_id',
+};
+
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
     return database
@@ -175,8 +180,12 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
-    if (filter?.isOrdered) {
-      query.orderBy('sort_order');
+    if (filter?.sortField && filter?.sortDirection) {
+      if (!fieldMap.hasOwnProperty(filter?.sortField)) {
+        throw new GraphQLError(`Bad sort field given: ${filter?.sortField}`);
+      }
+      filter.sortField = fieldMap[filter?.sortField];
+      query.orderBy(filter?.sortField, filter?.sortDirection);
     }
 
     return query.then((callDB: CallRecord[]) => {

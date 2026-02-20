@@ -18,7 +18,7 @@ import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, UserRole } from 'generated/sdk';
+import { FeatureId, PaginationSortDirection, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
@@ -71,6 +71,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
+      sortField: 'call_id',
+      sortDirection: PaginationSortDirection.DESC,
     },
     CallsDataQuantity.MINIMAL
   ).calls;

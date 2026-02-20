@@ -1,6 +1,7 @@
 import { Ctx, Field, InputType, Int, Query, Resolver, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { Call } from '../types/Call';
 
 @InputType()
@@ -59,8 +60,11 @@ export class CallsFilter {
   @Field(() => Boolean, { nullable: true })
   public isCallUpcoming?: boolean;
 
-  @Field(() => Boolean, { nullable: true })
-  public isOrdered?: boolean;
+  @Field(() => String, { nullable: true })
+  public sortField?: string;
+
+  @Field(() => String, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
 }
 
 @Resolver()
