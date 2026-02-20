@@ -683,6 +683,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       try {
         const {
           callId,
+          callIds,
           instrumentFilter,
           techniqueFilter,
           proposalStatusId,
@@ -699,13 +700,14 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         result.proposals = await api()
           .getTechniqueScientistProposals({
             filter: {
-              callId: callId,
-              instrumentFilter: instrumentFilter,
-              techniqueFilter: techniqueFilter,
-              proposalStatusId: proposalStatusId,
-              text: text,
-              referenceNumbers: referenceNumbers,
-              dateFilter: dateFilter,
+              callId,
+              callIds,
+              instrumentFilter,
+              techniqueFilter,
+              proposalStatusId,
+              text,
+              referenceNumbers,
+              dateFilter,
               excludeProposalStatusIds:
                 currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
@@ -796,7 +798,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleFilterChange = (filter: ProposalsFilter) => {
-    setProposalFilter(filter);
+    const updatedFilter = { ...filter };
+    if (filter.callId === 0) {
+      updatedFilter.callId = null;
+      updatedFilter.callIds = calls?.map((call) => call.id) || [];
+    } else {
+      updatedFilter.callIds = [filter.callId as number];
+    }
+
+    setProposalFilter(updatedFilter);
     refreshTableData();
   };
 
@@ -817,6 +827,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const fetchProposalCoreBasicData = async () => {
     const {
       callId,
+      callIds,
       instrumentFilter,
       techniqueFilter,
       proposalStatusId,
@@ -834,13 +845,14 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     result.proposals = await api()
       .getTechniqueScientistProposalsBasic({
         filter: {
-          callId: callId,
-          instrumentFilter: instrumentFilter,
-          techniqueFilter: techniqueFilter,
-          proposalStatusId: proposalStatusId,
-          text: text,
-          referenceNumbers: referenceNumbers,
-          dateFilter: dateFilter,
+          callId,
+          instrumentFilter,
+          callIds,
+          techniqueFilter,
+          proposalStatusId,
+          text,
+          referenceNumbers,
+          dateFilter,
           ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
           currentRole === UserRole.USER_OFFICER
             ? { excludeProposalStatusIds: excludeProposalStatusIds }
