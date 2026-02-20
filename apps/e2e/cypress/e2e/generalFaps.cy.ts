@@ -139,6 +139,7 @@ context('General facility access panel tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap1.gradeGuide,
         active: true,
+        reviewVisibility: 1,
       });
       const newCode = faker.random.words(3);
       const newDescription = faker.random.words(8);
@@ -195,6 +196,7 @@ context('General facility access panel tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap1.gradeGuide,
         active: true,
+        reviewVisibility: 1,
       }).then((response) => {
         if (response.createFap) {
           createdFapId = response.createFap.id;
@@ -495,6 +497,7 @@ context('General facility access panel tests', () => {
         gradeGuide: fap1.gradeGuide,
         numberRatingsRequired: 2,
         active: true,
+        reviewVisibility: 1,
       }).then((response) => {
         if (response.createFap) {
           createdFapId = response.createFap.id;
@@ -591,6 +594,7 @@ context('General facility access panel tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap2.gradeGuide,
         active: true,
+        reviewVisibility: 1,
       });
 
       cy.changeActiveRole(initialDBData.roles.fapChair);
@@ -621,6 +625,7 @@ context('General facility access panel tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap2.gradeGuide,
         active: true,
+        reviewVisibility: 1,
       }).then((response) => {
         if (response.createFap) {
           const createdFapId = response.createFap.id;

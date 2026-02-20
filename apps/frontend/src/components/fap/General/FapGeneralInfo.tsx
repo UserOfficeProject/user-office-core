@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
@@ -14,6 +15,21 @@ import { Fap, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+export const reviewVisibilityOptions = [
+  {
+    value: 1,
+    text: 'Once all reviews on a proposal are complete',
+  },
+  {
+    value: 2,
+    text: 'Reviews visible during the FAP',
+  },
+  {
+    value: 3,
+    text: 'Reviews visible after the FAP has ended',
+  },
+];
 
 type FapPageProps = {
   /** Fap data to be shown */
@@ -38,6 +54,8 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   };
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
+    console.log(values);
+
     await api({
       toastSuccessMessage: `${t('Fap')} updated successfully!`,
     }).updateFap(values);
@@ -158,6 +176,20 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
+              <Grid item sm={6} xs={12}>
+                <Field
+                  id="reviewVisibility"
+                  name="reviewVisibility"
+                  label="Review visibility"
+                  onChange={handleChange}
+                  component={Select}
+                  onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
+                  data-cy="fap-review-visibility-filter"
+                  options={reviewVisibilityOptions}
+                  fullWidth
+                  type="number"
+                />
+              </Grid>
               <Field
                 id="active"
                 name="active"

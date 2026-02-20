@@ -9,6 +9,7 @@ import {
   FapReviewer,
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
+  FapReviewVisibility,
 } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
@@ -84,7 +85,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    reviewVisibility: number
   ) {
     return database
       .insert(
@@ -95,6 +97,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           grade_guide: gradeGuide,
           custom_grade_guide: customGradeGuide,
           active: active,
+          review_visibility: reviewVisibility,
         },
         ['*']
       )
@@ -110,7 +113,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean,
     active: boolean,
-    files: string | null
+    files: string | null,
+    reviewVisibility: number
   ) {
     return database
       .update(
@@ -122,6 +126,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           custom_grade_guide: customGradeGuide,
           active,
           files,
+          review_visibility: reviewVisibility,
         },
         ['*']
       )
@@ -1367,5 +1372,20 @@ export default class PostgresFapDataSource implements FapDataSource {
     return incompleteProposals.map((proposal) =>
       createFapProposalObject(proposal)
     );
+  }
+
+  async getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility> {
+    const visibility = await database
+      .select('rv.visibility')
+      .from('faps as f')
+      .join(
+        'review_visibility as rv',
+        'f.review_visibility_id',
+        'rv.review_visibility_id'
+      )
+      .where('f.fap_id', fapId)
+      .first();
+
+    return visibility as FapReviewVisibility;
   }
 }

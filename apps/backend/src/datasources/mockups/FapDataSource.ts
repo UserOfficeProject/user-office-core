@@ -4,6 +4,7 @@ import {
   FapReviewer,
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
+  FapReviewVisibility,
 } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
@@ -35,7 +36,8 @@ export const dummyFap = new Fap(
   true,
   null,
   null,
-  null
+  null,
+  1
 );
 
 export const anotherDummyFap = new Fap(
@@ -48,8 +50,39 @@ export const anotherDummyFap = new Fap(
   false,
   null,
   null,
-  null
+  null,
+  1
 );
+
+const reviewVisibilityTestingFap = new Fap(
+  2,
+  'aReviewVisibilityTestingFap',
+  'aReviewVisibilityTestingFap',
+  2,
+  '',
+  true,
+  false,
+  null,
+  null,
+  null,
+  1
+);
+
+export const dummyFapProposalsComplete: Fap = {
+  ...reviewVisibilityTestingFap,
+  id: 3,
+  reviewVisibility: 1,
+};
+export const dummyFapReviewPeriodEnded: Fap = {
+  ...reviewVisibilityTestingFap,
+  id: 4,
+  reviewVisibility: 3,
+};
+export const dummyFapReviewsVisible: Fap = {
+  ...reviewVisibilityTestingFap,
+  id: 5,
+  reviewVisibility: 2,
+};
 
 export const dummyFapWithoutCode = new Fap(
   2,
@@ -61,10 +94,17 @@ export const dummyFapWithoutCode = new Fap(
   false,
   null,
   null,
-  null
+  null,
+  1
 );
 
-export const dummyFaps = [dummyFap, anotherDummyFap];
+export const dummyFaps = [
+  dummyFap,
+  anotherDummyFap,
+  dummyFapProposalsComplete,
+  dummyFapReviewPeriodEnded,
+  dummyFapReviewsVisible,
+];
 
 export const dummyFapMember = new FapReviewer(1, 1);
 export const anotherDummyFapMember = new FapReviewer(2, 1);
@@ -279,7 +319,8 @@ export class FapDataSourceMock implements FapDataSource {
       active,
       null,
       null,
-      null
+      null,
+      1
     );
   }
 
@@ -302,14 +343,17 @@ export class FapDataSourceMock implements FapDataSource {
       active,
       null,
       null,
-      null
+      null,
+      1
     );
   }
 
   async getFap(id: number) {
     if (id && id > 0) {
-      if (id == dummyFap.id) {
-        return dummyFap;
+      for (const fap of dummyFaps) {
+        if (id === fap.id) {
+          return fap;
+        }
       }
     }
 
@@ -330,15 +374,15 @@ export class FapDataSourceMock implements FapDataSource {
       );
     }
 
+    if (active) {
+      dummyFapsCopy = dummyFapsCopy.filter((fap) => fap.active);
+    }
+
     if (first || offset) {
       dummyFapsCopy = dummyFapsCopy.slice(
         offset || 0,
         first ? first + (offset || 0) : dummyFapsCopy.length
       );
-    }
-
-    if (active) {
-      dummyFapsCopy = dummyFapsCopy.filter((fap) => fap.active);
     }
 
     return { totalCount: dummyFapsCopy.length, faps: dummyFapsCopy };
@@ -574,5 +618,25 @@ export class FapDataSourceMock implements FapDataSource {
     userId?: number | undefined
   ): Promise<FapProposal[]> {
     throw new Error('Method not implemented.');
+  }
+
+  async getFapReviewVisibility(fapId: number) {
+    const reviewVisibilityMap = new Map<number, FapReviewVisibility>([
+      [1, FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE],
+      [2, FapReviewVisibility.REVIEWS_VISIBLE],
+      [3, FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED],
+    ]);
+
+    if (fapId && fapId > 0) {
+      for (const fap of dummyFaps) {
+        if (fapId === fap.id) {
+          const reviewVis = reviewVisibilityMap.get(fap.reviewVisibility);
+
+          return reviewVis ?? null;
+        }
+      }
+    }
+
+    return null;
   }
 }

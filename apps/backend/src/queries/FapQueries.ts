@@ -5,6 +5,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
+import { FapReviewVisibility } from '../models/Fap';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
@@ -182,12 +183,29 @@ export default class FapQueries {
     const proposalEvents =
       await this.proposalDataSource.getProposalEvents(proposalPk);
 
-    // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
+    const visibility = await this.dataSource.getFapReviewVisibility(fapId);
+
+    let reviewsVisibleOnFap = false;
+
+    switch (visibility) {
+      case FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE:
+        reviewsVisibleOnFap =
+          proposalEvents?.proposal_all_fap_reviews_submitted || false;
+        break;
+      case FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED:
+        reviewsVisibleOnFap = proposalEvents?.call_fap_review_ended || false;
+        break;
+      case FapReviewVisibility.REVIEWS_VISIBLE:
+        reviewsVisibleOnFap = true;
+        break;
+    }
+
+    // NOTE: If not officer, Fap Chair or Fap Secretary should return only the proposals based the review visibility setting of the fap
     if (
       agent &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
-      !proposalEvents?.proposal_all_fap_reviews_submitted
+      !reviewsVisibleOnFap
     ) {
       reviewerId = agent.id;
     }

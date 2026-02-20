@@ -36,6 +36,9 @@ export class UpdateFapArgs {
 
   @Field(() => String, { nullable: true })
   public files: string | null;
+
+  @Field(() => Int, { nullable: true })
+  public reviewVisibility: number;
 }
 
 @Resolver()

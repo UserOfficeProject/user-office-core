@@ -11,6 +11,7 @@ import {
   ExperimentStatus,
   InstrumentScientistDecisionEnum,
 } from '../models/Experiment';
+import { FapReviewVisibility } from '../models/Fap';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
@@ -102,5 +103,8 @@ export const registerEnums = () => {
   });
   registerEnumType(PaginationSortDirection, {
     name: 'PaginationSortDirection',
+  });
+  registerEnumType(FapReviewVisibility, {
+    name: 'FapReviewVisibility',
   });
 };

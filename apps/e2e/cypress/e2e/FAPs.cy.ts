@@ -284,6 +284,7 @@ function initializationBeforeTests() {
       numberRatingsRequired: 2,
       gradeGuide: fap1.gradeGuide,
       active: true,
+      reviewVisibility: 1,
     }).then((result) => {
       if (result.createFap) {
         createdFapId = result.createFap.id;
@@ -2495,6 +2496,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({
@@ -2567,6 +2569,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.updateCall({
@@ -2715,6 +2718,7 @@ context('Fap meeting components tests', () => {
         active: true,
         numberRatingsRequired: 2,
         gradeGuide: fap2.gradeGuide,
+        reviewVisibility: 1,
       }).then((fapResult) => {
         if (fapResult.createFap) {
           cy.updateCall({
@@ -3336,6 +3340,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({
