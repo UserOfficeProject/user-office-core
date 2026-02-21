@@ -15,6 +15,7 @@ import {
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -28,6 +29,7 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
@@ -68,6 +70,18 @@ type ProposalMessageData = {
   shortCode: string;
   title: string;
   submitted: boolean;
+  samples?: Pick<Sample, 'id' | 'title'>[];
+};
+
+type ExperimentMessageData = {
+  experimentId: string;
+  experimentPk: number;
+  startsAt: Date;
+  endsAt: Date;
+  status: string;
+  proposal?: ProposalMessageData;
+  samples?: Pick<Sample, 'id' | 'title'>[];
+  instrument?: { id: number; name: string; shortCode: string };
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -143,6 +157,10 @@ export const getProposalMessageData = async (proposal: Proposal) => {
   const maybeInstruments =
     await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
+  const sampleDataSource = container.resolve<SampleDataSource>(
+    Tokens.SampleDataSource
+  );
+
   const call = await callDataSource.getCall(proposal.callId);
   if (!call) {
     throw new Error('Call not found');
@@ -187,6 +205,14 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
     newStatus: proposalStatus?.shortCode,
     submitted: proposal.submitted,
+    samples: (
+      await sampleDataSource.getSamples({
+        filter: { proposalPk: proposal.primaryKey },
+      })
+    ).map((sample) => ({
+      id: sample.id,
+      title: sample.title,
+    })),
   };
 
   const proposerWithInstitution = await userDataSource.getUserWithInstitution(
@@ -197,6 +223,67 @@ export const getProposalMessageData = async (proposal: Proposal) => {
       proposerWithInstitution
     );
   }
+
+  return JSON.stringify(messageData);
+};
+
+export const getExperimentMessageData = async (experiment: Experiment) => {
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+  const sampleDataSource = container.resolve<SampleDataSource>(
+    Tokens.SampleDataSource
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+
+  const proposal = await proposalDataSource.get(experiment.proposalPk);
+  const proposalMessageDataString = proposal
+    ? await getProposalMessageData(proposal)
+    : undefined;
+  const proposalMessageData = proposalMessageDataString
+    ? JSON.parse(proposalMessageDataString)
+    : undefined;
+
+  const experimentHasSamples = await experimentDataSource.getExperimentSamples(
+    experiment.experimentPk
+  );
+
+  const samples = await Promise.all(
+    experimentHasSamples.map(async (ehs) => {
+      const sample = await sampleDataSource.getSample(ehs.sampleId);
+
+      return {
+        id: ehs.sampleId,
+        title: sample?.title || '',
+      };
+    })
+  );
+
+  const instrument = await instrumentDataSource.getInstrument(
+    experiment.instrumentId
+  );
+
+  const messageData: ExperimentMessageData = {
+    experimentId: experiment.experimentId,
+    experimentPk: experiment.experimentPk,
+    startsAt: experiment.startsAt,
+    endsAt: experiment.endsAt,
+    status: experiment.status,
+    proposal: proposalMessageData,
+    samples: samples,
+    instrument: instrument
+      ? {
+          id: instrument.id,
+          name: instrument.name,
+          shortCode: instrument.shortCode,
+        }
+      : undefined,
+  };
 
   return JSON.stringify(messageData);
 };
@@ -236,6 +323,10 @@ export async function createPostToRabbitMQHandler() {
     Tokens.UserDataSource
   );
 
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -251,6 +342,21 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_DELETED:
       case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.EXPERIMENT_ESF_SUBMITTED: {
+        const experiment = await experimentDataSource.getExperiment(
+          event.experimentsafety.experimentPk
+        );
+        if (!experiment) {
+          return;
+        }
+        const jsonMessage = await getExperimentMessageData(experiment);
         await rabbitMQ.sendMessageToExchange(
           event.exchange || EXCHANGE_NAME,
           event.type,
@@ -401,7 +507,12 @@ export async function createPostToRabbitMQHandler() {
 
         const proposal = await proposalDataSource.get(proposalPKey);
 
-        const jsonMessage = await getProposalMessageData(proposal!);
+        if (!proposal) {
+          return;
+        }
+
+        const jsonMessage = await getProposalMessageData(proposal);
+
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           Event.PROPOSAL_UPDATED,
@@ -428,7 +539,7 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const handleWorkflowEngineChange = async (
+  const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
   ) => {
@@ -489,9 +600,19 @@ export async function createListenToRabbitMQHandler() {
             'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
           >;
 
-          await experimentDataSource.create(experimentToAdd);
+          const experiment = await experimentDataSource.create(experimentToAdd);
 
-          await handleWorkflowEngineChange(type, experimentToAdd.proposalPk);
+          await handleProposalWorkflowEngineChange(
+            type,
+            experimentToAdd.proposalPk
+          );
+
+          const jsonMessage = await getExperimentMessageData(experiment);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            'EXPERIMENT_CREATED',
+            jsonMessage
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -524,7 +645,10 @@ export async function createListenToRabbitMQHandler() {
             );
           });
 
-          await handleWorkflowEngineChange(type, scheduledEvents[0].proposalPk);
+          await handleProposalWorkflowEngineChange(
+            type,
+            scheduledEvents[0].proposalPk
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -541,17 +665,28 @@ export async function createListenToRabbitMQHandler() {
             message,
           });
 
-          await experimentDataSource.updateByScheduledEventId({
-            startsAt: message.startsAt,
-            endsAt: message.endsAt,
-            status: message.status,
-            localContactId: message.localContactId,
-            scheduledEventId: message.id,
-          } as Omit<
-            Experiment,
-            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-          >);
-          await handleWorkflowEngineChange(type, message.proposalPk as number);
+          const experiment =
+            await experimentDataSource.updateByScheduledEventId({
+              startsAt: message.startsAt,
+              endsAt: message.endsAt,
+              status: message.status,
+              localContactId: message.localContactId,
+              scheduledEventId: message.id,
+            } as Omit<
+              Experiment,
+              'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+            >);
+          await handleProposalWorkflowEngineChange(
+            type,
+            message.proposalPk as number
+          );
+
+          const jsonMessage = await getExperimentMessageData(experiment);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            'EXPERIMENT_UPDATED',
+            jsonMessage
+          );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

@@ -31,7 +31,13 @@ export class SampleDataSourceMock implements SampleDataSource {
     return this.samples.find((sample) => sample.id === sampleId) || null;
   }
 
-  async getSamples(_args: SamplesArgs): Promise<Sample[]> {
+  async getSamples(args: SamplesArgs): Promise<Sample[]> {
+    if (args.filter?.proposalPk) {
+      return this.samples.filter(
+        (sample) => sample.proposalPk === args.filter?.proposalPk
+      );
+    }
+
     return this.samples;
   }
 
