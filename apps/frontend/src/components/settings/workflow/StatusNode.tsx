@@ -71,10 +71,6 @@ const StyledHandle = styled(Handle)(({ theme }) => ({
   borderRadius: '50%',
   background: theme.palette.primary.light,
   border: `2px solid ${theme.palette.primary.main}`,
-  transition: 'transform 0.2s ease',
-  '&:hover': {
-    transform: 'scale(1.5)',
-  },
 }));
 
 const FlexSpan = styled('span')({
