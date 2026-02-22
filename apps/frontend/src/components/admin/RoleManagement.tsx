@@ -72,7 +72,7 @@ const RoleManagement: React.FC = () => {
     field: keyof RoleRow;
     render?: (rowData: RoleRow) => React.ReactNode;
   }> = [
-    { title: 'Short Code', field: 'shortCode' },
+    { title: 'Root role', field: 'shortCode' },
     { title: 'Title', field: 'title' },
     { title: 'Description', field: 'description' },
     {

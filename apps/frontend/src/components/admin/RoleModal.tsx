@@ -155,7 +155,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
           margin="normal"
           disabled={isEditMode || loadingRoles}
         >
-          <InputLabel id="role-shortcode-label">Short Code</InputLabel>
+          <InputLabel id="role-shortcode-label">Root role</InputLabel>
           <Select
             labelId="role-shortcode-label"
             value={shortCode}
