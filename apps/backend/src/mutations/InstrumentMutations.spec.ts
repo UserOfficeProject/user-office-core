@@ -7,7 +7,6 @@ import {
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
-import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
   dummyInstrumentScientist,
@@ -16,16 +15,12 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import InstrumentMutations from './InstrumentMutations';
 
-let statusDataSource: StatusDataSourceMock;
 let proposalDataSource: ProposalDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
 beforeEach(() => {
-  statusDataSource = container.resolve<StatusDataSourceMock>(
-    Tokens.StatusDataSource
-  );
   techniqueDataSource = container.resolve<TechniqueDataSourceMock>(
     Tokens.TechniqueDataSource
   );
@@ -237,10 +232,11 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('A scientist can change the instrument of a technique proposal when the status is under review', () => {
+      // @ts-ignore skip type error for testing purposes
       jest.spyOn(proposalDataSource, 'get').mockResolvedValue({
-        proposalPk: 1,
+        primaryKey: 1,
         statusId: 'UNDER_REVIEW',
-      } as any);
+      });
 
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
