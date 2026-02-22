@@ -54,9 +54,7 @@ export default class StatusActionsLogsMutations {
           return null;
         }
 
-        return {
-          ...proposal,
-        };
+        return proposal;
       })
     );
 
