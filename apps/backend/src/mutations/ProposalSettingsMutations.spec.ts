@@ -157,22 +157,19 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A userofficer can create new proposal workflow connection', () => {
-    return expect(
-      workflowMutationsInstance.createWorkflowConnection(
-        dummyUserOfficerWithRole,
-        {
-          nextWorkflowStatusId: 2,
-          prevWorkflowStatusId: 1,
-          sourceHandle: 'bottom-source',
-          targetHandle: 'top-target',
-        }
-      )
-    ).resolves.toMatchObject({
+    const newConnection = {
       nextWorkflowStatusId: 2,
       prevWorkflowStatusId: 1,
       sourceHandle: 'bottom-source',
       targetHandle: 'top-target',
-    });
+    };
+
+    return expect(
+      workflowMutationsInstance.createWorkflowConnection(
+        dummyUserOfficerWithRole,
+        newConnection
+      )
+    ).resolves.toMatchObject(newConnection);
   });
 
   test('A userofficer can add next status event/s to workflow connection', () => {
