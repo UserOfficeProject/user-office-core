@@ -124,11 +124,11 @@ export default class ExperimentMutations {
       );
     }
 
-    const experimentSafetyDefaultWorkflowStatus =
+    const experimentSafetyInitialWorkflowStatus =
       await this.workflowDataSource.getInitialWorkflowStatus(
         call.experimentWorkflowId
       );
-    if (!experimentSafetyDefaultWorkflowStatus) {
+    if (!experimentSafetyInitialWorkflowStatus) {
       return rejection(
         'Can not create Experiment Safety, because system has no default status for Experiment Safety'
       );
@@ -148,7 +148,7 @@ export default class ExperimentMutations {
       experimentPk,
       newEsiQuestionary.questionaryId,
       agent!.id,
-      experimentSafetyDefaultWorkflowStatus.workflowStatusId
+      experimentSafetyInitialWorkflowStatus.workflowStatusId
     );
   }
 
