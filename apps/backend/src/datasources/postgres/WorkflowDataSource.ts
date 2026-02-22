@@ -302,26 +302,25 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     return this.createWorkflowStatusObject(updatedStatus);
   }
 
-  async createWorkflowConnection(
-    newWorkflowConnectionInput: CreateWorkflowConnectionInput
-  ): Promise<WorkflowConnection> {
-    const prevStatus = await this.getWorkflowStatus(
-      newWorkflowConnectionInput.prevWorkflowStatusId
-    );
+  async createWorkflowConnection({
+    prevWorkflowStatusId,
+    nextWorkflowStatusId,
+    sourceHandle,
+    targetHandle,
+  }: CreateWorkflowConnectionInput): Promise<WorkflowConnection> {
+    const prevStatus = await this.getWorkflowStatus(prevWorkflowStatusId);
 
     if (!prevStatus) {
       throw new GraphQLError(
-        `Could not find workflow status with id: ${newWorkflowConnectionInput.prevWorkflowStatusId}`
+        `Could not find workflow status with id: ${prevWorkflowStatusId}`
       );
     }
 
-    const nextStatus = await this.getWorkflowStatus(
-      newWorkflowConnectionInput.nextWorkflowStatusId
-    );
+    const nextStatus = await this.getWorkflowStatus(nextWorkflowStatusId);
 
     if (!nextStatus) {
       throw new GraphQLError(
-        `Could not find workflow status with id: ${newWorkflowConnectionInput.nextWorkflowStatusId}`
+        `Could not find workflow status with id: ${nextWorkflowStatusId}`
       );
     }
 
@@ -336,12 +335,10 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     )
       .insert({
         workflow_id: prevStatus.workflowId,
-        prev_workflow_status_id:
-          newWorkflowConnectionInput.prevWorkflowStatusId,
-        next_workflow_status_id:
-          newWorkflowConnectionInput.nextWorkflowStatusId,
-        source_handle: newWorkflowConnectionInput.sourceHandle,
-        target_handle: newWorkflowConnectionInput.targetHandle,
+        prev_workflow_status_id: prevWorkflowStatusId,
+        next_workflow_status_id: nextWorkflowStatusId,
+        source_handle: sourceHandle,
+        target_handle: targetHandle,
       })
       .returning('*');
 
