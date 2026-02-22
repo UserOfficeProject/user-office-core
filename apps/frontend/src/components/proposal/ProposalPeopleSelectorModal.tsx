@@ -20,7 +20,6 @@ import React, {
 
 import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { getCurrentUser } from 'context/UserContextProvider';
 import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
@@ -37,7 +36,7 @@ const keyOf = (u: UserOrEmail) =>
 const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean =>
   a.length === b.length && a.every((v, i) => keyOf(v) === keyOf(b[i]));
 
-interface ParticipantSelectorProps {
+interface ProposalPeopleSelectorModalProps {
   modalOpen: boolean;
   title?: string;
   onClose?: () => void;
@@ -63,7 +62,7 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
 
 const MIN_SEARCH_LENGTH = 3;
 
-function ParticipantSelector({
+function ProposalPeopleSelectorModal({
   modalOpen,
   title,
   onClose,
@@ -74,7 +73,7 @@ function ParticipantSelector({
   confirm,
   preset = [],
   multiple = true,
-}: ParticipantSelectorProps & WithConfirmProps) {
+}: ProposalPeopleSelectorModalProps & WithConfirmProps) {
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -103,7 +102,6 @@ function ParticipantSelector({
       ];
 
       const { previousCollaborators } = await api().getPreviousCollaborators({
-        userId: getCurrentUser()?.user.id as number,
         subtractUsers: excludedUserIds,
       });
 
@@ -221,6 +219,7 @@ function ParticipantSelector({
       proposal: null,
     };
   };
+
   const handleSubmit = () => {
     const { users, invites } = categorizeSelectedItems(selectedItems);
     setQuery('');
@@ -246,7 +245,6 @@ function ParticipantSelector({
 
       return;
     }
-
     setQuery('');
     setSelectedItems([]);
     onClose?.();
@@ -417,4 +415,4 @@ function ParticipantSelector({
   );
 }
 
-export default withConfirm(ParticipantSelector);
+export default withConfirm(ProposalPeopleSelectorModal);

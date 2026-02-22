@@ -114,7 +114,15 @@ export default class UserQueries {
     return this.dataSource.checkEmailExist(email);
   }
 
-  @Authorized()
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+    Roles.FAP_REVIEWER,
+    Roles.INTERNAL_REVIEWER,
+    Roles.USER,
+  ])
   async getAll(agent: UserWithRole | null, args: UsersArgs) {
     const userData = await this.dataSource.getUsers(args);
 
@@ -133,10 +141,9 @@ export default class UserQueries {
     };
   }
 
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER])
   async getPreviousCollaborators(
     agent: UserWithRole | null,
-    userId: number,
     first?: number,
     offset?: number,
     sortField?: string,
@@ -145,8 +152,15 @@ export default class UserQueries {
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
+    if (!agent) {
+      return {
+        totalCount: 0,
+        users: [],
+      };
+    }
+
     return this.dataSource.getPreviousCollaborators(
-      userId,
+      agent.id,
       first,
       offset,
       sortField,
