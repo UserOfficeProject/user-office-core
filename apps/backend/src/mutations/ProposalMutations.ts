@@ -660,7 +660,7 @@ export default class ProposalMutations {
 
       const logContext = {
         currentWorkflowStatus: currentWorkflowStatus,
-        newStatus: newWorkflowStatus,
+        newWorkflowStatus: newWorkflowStatus,
         proposalId: proposal.proposalId,
         ...requesterContext,
       };
