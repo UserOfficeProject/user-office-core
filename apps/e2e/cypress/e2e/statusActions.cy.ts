@@ -148,7 +148,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
             combineEmails: true,
@@ -317,7 +317,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
           },
@@ -478,7 +478,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
             otherRecipientEmails: [faker.internet.email()],
@@ -599,7 +599,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
             otherRecipientEmails: [statusActionEmail],
@@ -713,7 +713,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
           },
@@ -724,7 +724,7 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'my-first-email',
+              id: '3',
               name: 'my-first-email',
             },
             otherRecipientEmails: [faker.internet.email()],

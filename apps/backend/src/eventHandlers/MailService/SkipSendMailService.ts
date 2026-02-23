@@ -33,7 +33,7 @@ export class SkipSendMailService extends MailService {
         {
           last_use: '2023-08-21T12:23:59+00:00',
           description: 'A test message from SparkPost.com',
-          id: 'my-first-email',
+          id: '3',
           has_draft: false,
           published: true,
           name: 'my-first-email',
@@ -44,7 +44,7 @@ export class SkipSendMailService extends MailService {
         {
           last_use: '2023-08-22T12:23:59+00:00',
           description: 'A test message from SparkPost.com',
-          id: 'my-second-email',
+          id: '4',
           has_draft: false,
           published: true,
           name: 'my-second-email',
