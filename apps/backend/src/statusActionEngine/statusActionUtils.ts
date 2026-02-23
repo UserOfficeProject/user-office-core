@@ -9,6 +9,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -68,6 +69,7 @@ export type EmailReadyType = {
   coProposers?: BasicUserDetails[] | null;
   instruments?: InstrumentWithManagementTime[];
   techniques?: Technique[];
+  proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
 };
@@ -145,6 +147,13 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const usersDataSource: UserDataSource = container.resolve(
     Tokens.UserDataSource
   );
+  const questionaryDataSource: QuestionaryDataSource = container.resolve(
+    Tokens.QuestionaryDataSource
+  );
+
+  const templateDataSource: TemplateDataSource = container.resolve(
+    Tokens.TemplateDataSource
+  );
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -170,6 +179,15 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
+        let proposalTemplateName: string | undefined = '';
+
+        const questionary = await questionaryDataSource.getQuestionary(
+          proposal.questionaryId
+        );
+        const temaplteId = questionary ? questionary?.templateId : 0;
+        const template = await templateDataSource.getTemplate(temaplteId);
+        proposalTemplateName = temaplteId ? template?.name : '';
+
         const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatusShortCode: 'QUICK_REVIEW',
@@ -182,8 +200,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           techniques = await techniqueDataSource.getTechniquesByProposalPk(
             proposal.primaryKey
           );
-          const questionaryDataSource: QuestionaryDataSource =
-            container.resolve(Tokens.QuestionaryDataSource);
           const questionarySteps = questionaryDataSource.getQuestionarySteps(
             proposal.questionaryId
           );
@@ -222,6 +238,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           pi: pi,
           coProposers: coProposers,
           techniques: techniques,
+          proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
         });
