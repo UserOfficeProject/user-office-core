@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { default as React, useState } from 'react';
+import { default as React, useEffect, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -22,6 +22,7 @@ export default function ShipmentContainer(props: {
   shipment: ShipmentWithQuestionary;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
+  onDirtyStateChange?: (isDirty: boolean) => void;
   previewMode?: boolean;
 }) {
   const [initialState] = useState(new ShipmentSubmissionState(props.shipment));
@@ -42,6 +43,10 @@ export default function ShipmentContainer(props: {
     eventHandlers,
     customEventHandlers,
   ]);
+
+  useEffect(() => {
+    props.onDirtyStateChange?.(state.isDirty);
+  }, [state.isDirty, props.onDirtyStateChange]);
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
