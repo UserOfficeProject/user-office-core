@@ -27,20 +27,13 @@ export class User {
     public user_title: string,
     public firstname: string,
     public lastname: string,
-    public username: string,
     public preferredname: string | undefined,
     public oidcSub: string | null,
     public oauthRefreshToken: string | null,
     public oauthIssuer: string | null,
-    public gender: string,
-    public birthdate: Date,
     public institutionId: number,
     public institution: string,
-    public department: string,
-    public position: string,
     public email: string,
-    public telephone: string,
-    public placeholder: boolean,
     public created: string,
     public updated: string
   ) {}
@@ -86,9 +79,7 @@ export class BasicUserDetails {
     public preferredname: string,
     public institution: string,
     public institutionId: number,
-    public position: string,
     public created: Date,
-    public placeholder: boolean,
     public email: string,
     public country: string,
     public user_title: string,
@@ -105,7 +96,5 @@ export type UserJWT = Pick<
   | 'lastname'
   | 'oidcSub'
   | 'institutionId'
-  | 'placeholder'
-  | 'position'
   | 'preferredname'
 >;

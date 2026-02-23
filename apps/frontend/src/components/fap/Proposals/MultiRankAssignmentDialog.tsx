@@ -94,7 +94,7 @@ export const MultiRankAssignmentDialog = ({
                   }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.firstname}
+                    {row.preferredname ? row.preferredname : row.firstname}
                   </TableCell>
                   <TableCell align="left">{row.lastname}</TableCell>
                   <TableCell align="right">

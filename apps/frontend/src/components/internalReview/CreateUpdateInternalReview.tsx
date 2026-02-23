@@ -82,7 +82,7 @@ const CreateUpdateInternalReview = ({
 
     try {
       await api()
-        .getUsers({ filter: value, userRole: UserRole.INTERNAL_REVIEWER })
+        .getUsers({ searchText: value, userRole: UserRole.INTERNAL_REVIEWER })
         .then((data) => {
           if (data.users?.totalCount == 0) {
             setFieldError(

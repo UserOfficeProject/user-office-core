@@ -64,6 +64,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
   switch (event.type) {
     case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
       const invite: Invite = event.invite;
+      const loggedInUserId = event.loggedInUserId;
+
+      if (!loggedInUserId) return;
 
       const coProposerClaims = await coProposerDataSource.findByInviteId(
         invite.id
@@ -101,9 +104,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-        const claimer = await userDataSource.getUser(
-          invite.claimedByUserId as number
-        );
+        const claimer = await userDataSource.getUser(loggedInUserId);
         if (!claimer) {
           logger.logError(
             'No claimer found when trying to send invite accepted email',

@@ -173,9 +173,16 @@ context('Proposal tests', () => {
       cy.visit('/');
       cy.get('[data-testid="PeopleIcon"]').click();
       cy.get('[data-cy="add-participant-button"]').click();
-      cy.get('#Email-input').type(initialDBData.users.user3.email);
-      cy.get('[data-cy="findUser"]').click();
-      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user3.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user3.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
       cy.get('[data-cy="save-data-access-users-modal"]').click();
       cy.logout();
       cy.login('user3', initialDBData.roles.user);
@@ -185,6 +192,9 @@ context('Proposal tests', () => {
         createdProposalId
       );
       cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
+      cy.get('[data-cy="data-access-users-list"]').contains(
+        initialDBData.users.user3.lastName
+      );
     });
 
     it('Copy to clipboard should work for Proposal ID', () => {
@@ -233,14 +243,19 @@ context('Proposal tests', () => {
       cy.get('[data-cy=edit-proposer-button]').click();
 
       cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[data-cy="invite-user-autocomplete"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .find('.MuiAutocomplete-clearIndicator')
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user2.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user2.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
@@ -1071,27 +1086,6 @@ context('Proposal tests', () => {
       cy.getAndStoreFeaturesEnabled();
     });
 
-    it('Should be able to redeem proposal invite user information', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
-        this.skip();
-      }
-      cy.login('user2');
-      cy.visit('/');
-      cy.finishedLoading();
-      cy.get('[data-cy="proposal-table"]').should(
-        'not.contain.text',
-        initialDBData.proposal.shortCode
-      );
-      cy.get('[data-cy="join-proposal-btn"]').click();
-      cy.get('#code').clear();
-      cy.get('#code').type(initialDBData.redeemCodes.validRedeemCode.code);
-      cy.get('[data-cy="invitation-submit"]').click();
-      cy.get('[data-cy="proposal-table"]').should(
-        'contain.text',
-        initialDBData.proposal.shortCode
-      );
-    });
-
     it('User officer should reopen proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -1171,13 +1165,19 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[data-cy="invite-user-autocomplete"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .find('.MuiAutocomplete-clearIndicator')
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users.user2.email
+      );
+      cy.get('[role=presentation]')
+        .contains(initialDBData.users.user2.lastName)
+        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();

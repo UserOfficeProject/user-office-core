@@ -13,7 +13,9 @@ export const createShipmentBasisValidationSchema: QuestionaryComponentDefinition
         )
         .required('Title is required'),
       proposalPk: Yup.number().required('Proposal is required'),
-      samples: Yup.array().of(Yup.object()),
+      samples: Yup.array()
+        .of(Yup.object())
+        .min(1, 'At least one sample must be selected'),
     });
 
     return schema;

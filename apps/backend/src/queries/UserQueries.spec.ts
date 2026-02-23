@@ -48,7 +48,7 @@ describe('UserQueries', () => {
 
   test('A user officer is allowed to fetch all accounts', () => {
     return expect(
-      userQueries.getAll(dummyUserOfficerWithRole, { filter: '' })
+      userQueries.getAll(dummyUserOfficerWithRole, { searchText: '' })
     ).resolves.toStrictEqual({
       totalCount: 2,
       users: [basicDummyUser, basicDummyUserNotOnProposal],
@@ -57,7 +57,7 @@ describe('UserQueries', () => {
 
   test('A user is allowed to fetch all relevant accounts', () => {
     return expect(
-      userQueries.getAll(dummyUserWithRole, { filter: '' })
+      userQueries.getAll(dummyUserWithRole, { searchText: '' })
     ).resolves.toStrictEqual({
       totalCount: 2,
       users: [basicDummyUser, basicDummyUserNotOnProposal],
@@ -65,7 +65,9 @@ describe('UserQueries', () => {
   });
 
   test('A user that is not logged in is not allowed to fetch all accounts', () => {
-    return expect(userQueries.getAll(null, { filter: '' })).resolves.toBe(null);
+    return expect(userQueries.getAll(null, { searchText: '' })).resolves.toBe(
+      null
+    );
   });
 
   test('A user is not allowed to fetch roles', () => {

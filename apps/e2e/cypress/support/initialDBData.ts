@@ -439,13 +439,6 @@ export default {
       settingsValue: 'dd-MM-yyyy HH:mm',
     },
   },
-  redeemCodes: {
-    validRedeemCode: {
-      code: '123abc',
-      placeholderUserId: 5,
-      createdBy: 1,
-    },
-  },
   workflows: {
     defaultWorkflow: {
       id: 1,

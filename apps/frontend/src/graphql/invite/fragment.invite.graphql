@@ -8,4 +8,10 @@ fragment invite on Invite {
   claimedByUserId
   isEmailSent
   expiresAt
+  proposal {
+    proposalId
+    proposerName
+    title
+    abstract
+  }
 }

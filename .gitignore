@@ -6,3 +6,5 @@ apps/backend/node_modules
 apps/frontend/src/generated
 apps/backend/generated
 .DS_Store
+documentation/.venv
+documentation/site/

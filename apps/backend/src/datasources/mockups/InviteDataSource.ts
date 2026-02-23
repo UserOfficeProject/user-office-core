@@ -2,13 +2,19 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
-import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
+import {
+  GetCoProposerInvitesFilter,
+  GetInvitesFilter,
+  InviteDataSource,
+} from '../InviteDataSource';
 
 @injectable()
 export class InviteDataSourceMock implements InviteDataSource {
   private invites: Invite[];
+  private coProposerClaims: CoProposerClaim[];
 
   constructor(
     @inject(Tokens.CoProposerClaimDataSource)
@@ -86,6 +92,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
       ),
     ];
+
+    this.coProposerClaims = [new CoProposerClaim(2, 1)];
   }
 
   async findByCode(code: string): Promise<Invite | null> {
@@ -176,5 +184,57 @@ export class InviteDataSourceMock implements InviteDataSource {
     Object.assign(invite, { ...args });
 
     return invite;
+  }
+  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]> {
+    return new Promise((resolve) => {
+      const filteredInvites = this.invites.filter((invite) => {
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
+            return false;
+          }
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (invite.claimedAt === null && filter.isClaimed) {
+            return false;
+          }
+          if (invite.claimedAt !== null && !filter.isClaimed) {
+            return false;
+          }
+        }
+
+        if (filter.isExpired) {
+          if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return false;
+          }
+        }
+
+        if (filter.email) {
+          if (invite.email !== filter.email) {
+            return false;
+          }
+        }
+
+        if (filter.proposalPk) {
+          const inviteIds = this.coProposerClaims
+            .filter((claim) => claim.proposalPk === filter.proposalPk)
+            .map((claim) => claim.inviteId);
+
+          if (!inviteIds.includes(invite.id)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      resolve(filteredInvites);
+    });
   }
 }

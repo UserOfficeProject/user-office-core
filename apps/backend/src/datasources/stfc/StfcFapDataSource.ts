@@ -132,8 +132,14 @@ export default class StfcFapDataSource
     const role = UserRoleShortCodeMap[args.roleId];
     const faps = await this.getUserFaps(args.memberId, role);
 
+    const roles = await this.stfcUserDataSource.getUserRoles(args.memberId);
+
+    const isUserOfficer = roles.some(
+      (role) => role.shortCode === 'user_officer'
+    );
+
     // If the user has no FAP left assigned to them we revoke their role
-    if (faps.length === 1) {
+    if (faps.length === 1 && !isUserOfficer) {
       await this.stfcUserDataSource
         .removeFapRoleFromUser(
           args.memberId,

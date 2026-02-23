@@ -12,6 +12,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { StatusActionType } from '../../models/StatusAction';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { EmailStatusActionRecipients } from '../types/StatusActionConfig';
 import { StatusActionsLog } from '../types/StatusActionsLog';
 
@@ -87,8 +88,8 @@ export class StatusActionsLogsFilterArgs {
   @Field({ nullable: true })
   public sortField?: string;
 
-  @Field({ nullable: true })
-  public sortDirection?: string;
+  @Field(() => PaginationSortDirection, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
 
   @Field({ nullable: true })
   public searchText?: string;

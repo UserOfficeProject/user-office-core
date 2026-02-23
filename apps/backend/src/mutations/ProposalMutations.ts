@@ -23,7 +23,6 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -917,16 +916,21 @@ export default class ProposalMutations {
       );
       const proposalUserIds = proposalUsers.map((user) => user.id);
 
-      const hasWriteRightsOnClonedProposal =
-        await this.proposalAuth.hasWriteRights(agent, clonedProposal);
-      if (!hasWriteRightsOnClonedProposal) {
-        proposalUserIds.push(agent!.id);
-      }
-
       await this.proposalDataSource.setProposalUsers(
         clonedProposal.primaryKey,
         proposalUserIds
       );
+
+      const isUserRole = this.userAuth.isUser(agent);
+      const isAlreadyOnProposal =
+        proposalUsers.some((user) => user.id === agent?.id) ||
+        clonedProposal.proposerId === agent!.id;
+      if (isUserRole && !isAlreadyOnProposal) {
+        await this.proposalDataSource.addProposalUser(
+          clonedProposal.primaryKey,
+          agent!.id
+        );
+      }
 
       const proposalSamples = await this.sampleDataSource.getSamples({
         filter: { proposalPk: sourceProposal.primaryKey },

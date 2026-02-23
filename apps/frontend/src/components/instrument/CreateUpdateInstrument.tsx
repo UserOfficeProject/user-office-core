@@ -82,7 +82,10 @@ const CreateUpdateInstrument = ({
 
     try {
       await api()
-        .getUsers({ filter: value, userRole: UserRole.INSTRUMENT_SCIENTIST })
+        .getUsers({
+          userRole: UserRole.INSTRUMENT_SCIENTIST,
+          searchText: value,
+        })
         .then((data) => {
           if (data.users?.totalCount == 0) {
             setFieldError(

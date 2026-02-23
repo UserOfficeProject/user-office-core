@@ -12,6 +12,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @ObjectType()
@@ -25,9 +26,6 @@ class UserQueryResult {
 
 @ArgsType()
 export class UsersArgs {
-  @Field(() => String, { nullable: true })
-  filter?: string;
-
   @Field(() => Int, { nullable: true })
   first?: number;
 
@@ -40,11 +38,14 @@ export class UsersArgs {
   @Field(() => [Int], { nullable: 'itemsAndList' })
   subtractUsers?: [number];
 
-  @Field(() => String, { nullable: true })
-  orderBy?: string;
+  @Field({ nullable: true })
+  public sortField?: string;
 
-  @Field(() => String, { nullable: true })
-  orderDirection?: string;
+  @Field(() => PaginationSortDirection, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
+
+  @Field({ nullable: true })
+  public searchText?: string;
 }
 
 @ArgsType()
@@ -65,20 +66,24 @@ export class UsersQuery {
     @Args()
     {
       userId,
-      filter,
       first,
       offset,
       userRole,
       subtractUsers,
+      sortField,
+      sortDirection,
+      searchText,
     }: PreviousCollaboratorsArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.user.getPreviousCollaborators(
       context.user,
       userId,
-      filter,
       first,
       offset,
+      sortField,
+      sortDirection,
+      searchText,
       userRole,
       subtractUsers
     );
