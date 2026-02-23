@@ -53,6 +53,7 @@ describe('Test Email Template Mutations', () => {
     ).resolves.toStrictEqual({
       id: 1,
       createdAt: '',
+      createdByUserId: 1,
       ...emailTemplateToCreate,
     });
   });
@@ -74,6 +75,7 @@ describe('Test Email Template Mutations', () => {
       )
     ).resolves.toStrictEqual({
       createdAt: '',
+      createdByUserId: 1,
       ...emailTemplateToUpdate,
     });
   });
