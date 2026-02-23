@@ -42,22 +42,6 @@ context('Status actions tests', () => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
-    cy.createEmailTemplate({
-      name: 'my-first-email',
-      description: 'My First Email',
-      useTemplateFile: false,
-      subject: 'My First Subject',
-      body: 'My First Body',
-    });
-
-    cy.createEmailTemplate({
-      name: 'my-second-email',
-      description: 'My Second Email',
-      useTemplateFile: false,
-      subject: 'My Second Subject',
-      body: 'My Second Body',
-    });
-
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
       featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
@@ -242,7 +226,7 @@ context('Status actions tests', () => {
               description: '',
             },
             emailTemplate: {
-              id: 'my-second-email',
+              id: '4',
               name: 'my-second-email',
             },
           },
