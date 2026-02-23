@@ -61,11 +61,8 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
 
   const rule = convertToRule(permissionRules);
 
-  const poop = createMongoAbility<MongoAbility<Abilities>>(rule)
+  const ability = createMongoAbility<MongoAbility<Abilities>>(rule);
 
-  const ability = defineAbility((can) => {
-    can('read', 'people')
-});
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
@@ -119,7 +116,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
   }
 
   return <div data-cy={menuItemListCy}>
-      <Can I="read" a="dashboard" ability={poop}>
+      <Can I="read" a="dashboard" ability={ability}>
       <Tooltip title="Dashboard">
         <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
@@ -129,7 +126,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="create" a="proposal" ability={poop}>
+      <Can I="create" a="proposal" ability={ability}>
       <Tooltip title="New Proposal">
         <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
@@ -140,7 +137,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isSchedulerEnabled && (
-        <Can I="read" a="experiment_times" ability={poop}>
+        <Can I="read" a="experiment_times" ability={ability}>
         <Tooltip title="Experiment Times">
           <ListItemButton component={NavLink} to="/ExperimentTimes">
             <ListItemIcon>
@@ -151,7 +148,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="help" ability={poop}>
+      <Can I="read" a="help" ability={ability}>
       <Tooltip title="Help">
         <ListItemButton component={NavLink} to="/HelpPage">
           <ListItemIcon>
@@ -161,7 +158,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="call" ability={poop}>
+      <Can I="read" a="call" ability={ability}>
       <Tooltip title="Calls">
         <ListItemButton component={NavLink} to="/Calls">
           <ListItemIcon>
@@ -171,7 +168,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="proposal" ability={poop}>
+      <Can I="read" a="proposal_dashboard" ability={ability}>
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
@@ -181,7 +178,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="permission" ability={poop}>
+      <Can I="read" a="permission" ability={ability}>
       <Tooltip title="Permissions">
         <ListItemButton component={NavLink} to="/Permissions">
           <ListItemIcon>
@@ -192,7 +189,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isTechniqueProposalsEnabled && (
-        <Can I="read" a="technique_proposal" ability={poop}>
+        <Can I="read" a="technique_proposal" ability={ability}>
         <Tooltip title={t('Technique Proposals')}>
           <ListItemButton component={NavLink} to={techniqueProposalUrl}>
             <ListItemIcon>
@@ -204,7 +201,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Can>
       )}
       {isSchedulerEnabled && (
-        <Can I="read" an="experiment" ability={poop}>
+        <Can I="read" an="experiment" ability={ability}>
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
@@ -216,7 +213,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Can>
       )}
       {isFapEnabled && (
-        <Can I="read" a="fap" ability={poop}>
+        <Can I="read" a="fap" ability={ability}>
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
@@ -228,7 +225,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Can>
       )}
       {isInstrumentManagementEnabled && (
-        <Can I="read" an="instrument" ability={poop}>
+        <Can I="read" an="instrument" ability={ability}>
         <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
@@ -239,7 +236,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="technique" ability={poop}>
+      <Can I="read" a="technique" ability={ability}>
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
@@ -250,7 +247,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
       </Tooltip>
       </Can>
       {isTagsEnabled && (
-        <Can I="read" a="tag" ability={poop}>
+        <Can I="read" a="tag" ability={ability}>
         <Tooltip title="Tag">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
@@ -261,7 +258,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="proposal_workflow" ability={poop}>
+      <Can I="read" a="proposal_workflow" ability={ability}>
       <Tooltip title="Proposal workflows">
         <ListItemButton
           component={NavLink}
@@ -280,7 +277,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
       </Can>
 
       {isUserManagementEnabled && (
-        <Can I="read" an="institution" ability={poop}>
+        <Can I="read" an="institution" ability={ability}>
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
             <ListItemIcon>
@@ -291,14 +288,14 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="template" ability={poop}>
+      <Can I="read" a="template" ability={ability}>
         <TemplateMenuListItem />
       </Can>
-      <Can I="read" a="status_action_logs" ability={poop}>
+      <Can I="read" a="status_action_logs" ability={ability}>
         <StatusActionLogsMenuListItem />
       </Can>
       {isUserManagementEnabled && (
-        <Can I="read" a="people" ability={poop}>
+        <Can I="read" a="people" ability={ability}>
         <Tooltip title="People">
           <ListItemButton component={NavLink} to="/People">
             <ListItemIcon>
@@ -309,7 +306,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </Tooltip>
         </Can>
       )}
-      <Can I="read" a="question" ability={poop}>
+      <Can I="read" a="question" ability={ability}>
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
@@ -319,7 +316,7 @@ const MenuItems = ({ currentRole, permissionRules }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       </Can>
-      <Can I="read" a="setting" ability={poop}>
+      <Can I="read" a="setting" ability={ability}>
         <SettingsMenuListItem />
       </Can>
     </div>

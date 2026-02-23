@@ -7,7 +7,7 @@ BEGIN
                   permission_id serial UNIQUE,
                   action varchar(100) DEFAULT NULL,
                   subject varchar(100) DEFAULT NULL,
-                  conditions varchar(100) DEFAULT NULL
+                  conditions varchar(200) DEFAULT NULL
       );
 
       CREATE TABLE IF NOT EXISTS role_has_permission (

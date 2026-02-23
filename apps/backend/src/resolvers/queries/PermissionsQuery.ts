@@ -6,7 +6,7 @@ import { PermissionRule } from "../types/PermissionRule";
 export class PermissionRulesFilter {
   @Field(() => String, { nullable: true })
   public role?: string;
-
+  //could make this a list of subject to make the search more specific
   @Field(() => String, { nullable: true })
   public subject?: string;
 

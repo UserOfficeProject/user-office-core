@@ -262,48 +262,47 @@ export class ProposalAuthorization {
     const currentRole = agent?.currentRole?.shortCode;
 
     let hasAccess = false;
+    let permissionContext: any = {};
+    let isApiKey = false;
 
+    //I kept the switch statement with explicit reference to roles in order to avoid having to gather all the properties
+    //in a single context object, which would affect performance
     switch (currentRole) {
       case Roles.USER:
-        hasAccess =
-          (await this.isMemberOfProposal(agent, proposal)) ||
-          (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-          (await this.isDataAccessUserOfProposal(agent, proposal.primaryKey));
+        permissionContext = {
+          isMemberOfProposal: await this.isMemberOfProposal(agent, proposal),
+          isVisitorOfProposal: await this.isVisitorOfProposal(agent, proposal.primaryKey),
+          isDataAccessUserOfProposal: await this.isDataAccessUserOfProposal(agent, proposal.primaryKey)
+        };
         break;
       case Roles.INSTRUMENT_SCIENTIST:
-        hasAccess =
-          (await this.isInstrumentManagerToProposal(
-            agent,
-            proposal.primaryKey
-          )) ||
-          (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
-          (await this.isScientistToProposalTechnique(
-            agent,
-            proposal.primaryKey
-          ));
+        permissionContext = {
+          isInstrumentManagerToProposal: await this.isInstrumentManagerToProposal(agent, proposal.primaryKey),
+          isScientistToProposal: await this.isScientistToProposal(agent, proposal.primaryKey),
+          isScientistToProposalTechnique: await this.isScientistToProposalTechnique(agent, proposal.primaryKey)
+        };
         break;
       case Roles.INTERNAL_REVIEWER:
-        hasAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
+        permissionContext = {
+          isInternalReviewer: await this.isInternalReviewer(agent, proposal.primaryKey)
+        };
         break;
       case Roles.FAP_REVIEWER:
       case Roles.FAP_SECRETARY:
       case Roles.FAP_CHAIR:
-        hasAccess = await this.isMemberOfFapProposal(
-          agent,
-          proposal.primaryKey
-        );
+        permissionContext = {
+          isMemberOfFapProposal: this.isMemberOfFapProposal(agent, proposal.primaryKey)
+        };
         break;
       case Roles.USER_OFFICER:
-        hasAccess = true;
-        break;
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
-        hasAccess = true;
         break;
-
       default:
+        isApiKey = true;
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }
-
+    hasAccess = isApiKey? hasAccess : await this.permissionDataSource.hasPermission(currentRole ? currentRole : 'user', 'read', 'proposal', permissionContext); //probably need to change
+    
     return hasAccess;
   }
 
