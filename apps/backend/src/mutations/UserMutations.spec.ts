@@ -177,7 +177,7 @@ describe('upsertUserByOidcSub', () => {
         preferredName: null,
         institution: {
           rorId: 'dummy-ror-id',
-          manual: null,
+          institutionData: null,
           institutionId: null,
         },
       }
@@ -198,7 +198,7 @@ describe('upsertUserByOidcSub', () => {
         preferredName: null,
         institution: {
           rorId: '',
-          manual: null,
+          institutionData: null,
           institutionId: null,
         },
       }
@@ -224,7 +224,7 @@ describe('upsertUserByOidcSub', () => {
         preferredName: 'Johnny',
         institution: {
           rorId: existingRorId, // This should find Dummy Research Institute in our mock
-          manual: null,
+          institutionData: null,
           institutionId: null,
         },
       }
@@ -256,7 +256,7 @@ describe('upsertUserByOidcSub', () => {
         preferredName: 'Maria',
         institution: {
           rorId: newRorId, // This ROR ID doesn't exist in mock
-          manual: null,
+          institutionData: null,
           institutionId: null,
         },
       }

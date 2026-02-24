@@ -382,7 +382,7 @@ export default class UserMutations {
 
     const institution = await this.userAuth.getOrCreateUserInstitution(
       institutionInput.institutionId ??
-        institutionInput.manual ??
+        institutionInput.institutionData ??
         institutionInput.rorId
     );
 

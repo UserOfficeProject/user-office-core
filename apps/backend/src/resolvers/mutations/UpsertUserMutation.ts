@@ -29,7 +29,7 @@ export class InstitutionInput {
   public rorId: string | null;
 
   @Field(() => InstitutionManualInput, { nullable: true })
-  public manual: InstitutionManualInput | null;
+  public institutionData: InstitutionManualInput | null;
 
   @Field(() => Int, { nullable: true })
   public institutionId: number | null;
@@ -37,7 +37,7 @@ export class InstitutionInput {
 
 export type GetOrCreateInstitutionInput =
   | InstitutionInput['rorId']
-  | InstitutionInput['manual']
+  | InstitutionInput['institutionData']
   | InstitutionInput['institutionId'];
 
 @ArgsType()
