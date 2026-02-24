@@ -381,9 +381,7 @@ export default class UserMutations {
     const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
 
     const institution = await this.userAuth.getOrCreateUserInstitution(
-      institutionInput.institutionId ??
-        institutionInput.institutionData ??
-        institutionInput.rorId
+      institutionInput.institutionData ?? institutionInput.rorId
     );
 
     if (!institution) {

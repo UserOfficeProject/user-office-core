@@ -43,9 +43,6 @@ export class UserAuthorizationMock extends UserAuthorization {
     } else if (institutionInput instanceof InstitutionManualInput) {
       // Manual institution details provided
       return this.getOrCreateInstitutionByManualInput(institutionInput);
-    } else if (typeof institutionInput === 'number') {
-      // Institution ID provided
-      return this.getOrCreateInstitutionById(institutionInput);
     }
 
     return this.mockInstitutions[0];
@@ -85,12 +82,6 @@ export class UserAuthorizationMock extends UserAuthorization {
     }
 
     return institution;
-  }
-
-  private getOrCreateInstitutionById(id: number): Institution {
-    const institution = this.mockInstitutions.find((inst) => inst.id === id);
-
-    return institution || this.mockInstitutions[0];
   }
 
   async externalTokenLogin(

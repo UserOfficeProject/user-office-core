@@ -178,7 +178,6 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: 'dummy-ror-id',
           institutionData: null,
-          institutionId: null,
         },
       }
     );
@@ -199,7 +198,6 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: '',
           institutionData: null,
-          institutionId: null,
         },
       }
     );
@@ -225,7 +223,6 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: existingRorId, // This should find Dummy Research Institute in our mock
           institutionData: null,
-          institutionId: null,
         },
       }
     );
@@ -257,7 +254,6 @@ describe('upsertUserByOidcSub', () => {
         institution: {
           rorId: newRorId, // This ROR ID doesn't exist in mock
           institutionData: null,
-          institutionId: null,
         },
       }
     );

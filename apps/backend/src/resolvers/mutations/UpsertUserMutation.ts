@@ -5,7 +5,6 @@ import {
   Directive,
   Field,
   InputType,
-  Int,
   Mutation,
   Resolver,
 } from 'type-graphql';
@@ -30,15 +29,11 @@ export class InstitutionInput {
 
   @Field(() => InstitutionManualInput, { nullable: true })
   public institutionData: InstitutionManualInput | null;
-
-  @Field(() => Int, { nullable: true })
-  public institutionId: number | null;
 }
 
 export type GetOrCreateInstitutionInput =
   | InstitutionInput['rorId']
-  | InstitutionInput['institutionData']
-  | InstitutionInput['institutionId'];
+  | InstitutionInput['institutionData'];
 
 @ArgsType()
 export class UpsertUserByOidcSubArgs {

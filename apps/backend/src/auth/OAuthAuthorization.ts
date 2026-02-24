@@ -121,14 +121,6 @@ export class OAuthAuthorization extends UserAuthorization {
     return institution;
   }
 
-  private async getOrCreateInstitutionById(
-    id: number
-  ): Promise<Institution | null> {
-    const institution = await this.adminDataSource.getInstitution(id);
-
-    return institution;
-  }
-
   public async getOrCreateUserInstitution(input: GetOrCreateInstitutionInput) {
     let institution: Institution | null = null;
     if (typeof input === 'string') {
@@ -137,9 +129,6 @@ export class OAuthAuthorization extends UserAuthorization {
     } else if (input instanceof Object) {
       // Manual institution details provided
       institution = await this.getOrCreateInstitutionByManualInput(input);
-    } else if (typeof input === 'number') {
-      // Institution ID provided
-      institution = await this.getOrCreateInstitutionById(input);
     }
 
     return institution;
