@@ -53,7 +53,7 @@ context('User login tests', () => {
         firstName: 'Test',
         lastName: 'User',
         institution: {
-          manual: {
+          institutionData: {
             name: institutionName,
             country: institutionCountry,
           },
