@@ -36,6 +36,22 @@ context('Template Basic tests', () => {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
+
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template1.name,
+      description: initialDBData.emailTemplates.template1.description,
+      useTemplateFile: initialDBData.emailTemplates.template1.useTemplateFile,
+      subject: initialDBData.emailTemplates.template1.subject,
+      body: initialDBData.emailTemplates.template1.body,
+    });
+
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template2.name,
+      description: initialDBData.emailTemplates.template2.description,
+      useTemplateFile: initialDBData.emailTemplates.template2.useTemplateFile,
+      subject: initialDBData.emailTemplates.template2.subject,
+      body: initialDBData.emailTemplates.template2.body,
+    });
   });
 
   describe('Proposal templates basic tests', () => {
