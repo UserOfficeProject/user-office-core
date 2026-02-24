@@ -4,7 +4,7 @@ FROM node:22.14.0-alpine AS build-stage
 ARG ORCID_REDIRECT=
 ARG BUILD_VERSION=<unknown>
 
-COPY /validation/ /validation/
+COPY validation/ /validation/
 
 WORKDIR /app/frontend
 
