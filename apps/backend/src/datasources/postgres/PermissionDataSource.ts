@@ -40,7 +40,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
      return createMongoAbility<AppAbility>(rules);
   }
 
-  convertToRule(permissionRecords: PermissionRecord[], object: any): RawRuleOf<AppAbility>[] {
+  convertToRule(permissionRecords: PermissionRecord[], object?: any | undefined): RawRuleOf<AppAbility>[] {
     const rules: Rule[] = [];
 
     permissionRecords.forEach(permissionRecord => {
@@ -106,14 +106,12 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return result;
 }
 
-  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object: any) {
+  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
     return await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    //.where('r.short_code', userRole.replace(new RegExp('_', 'g'), ' '))
-    //.whereRaw(`UPPER(r.title) LIKE '%${userRole.replace(new RegExp('_', 'g'), ' ').toUpperCase()}%'`)
     .whereRaw(`UPPER(r.title) LIKE '%${userRole.toUpperCase()}%'`)
     .orWhereRaw(`UPPER(r.short_code) LIKE '%${userRole.toUpperCase()}%'`)
     .andWhere('p.action', action)
@@ -142,7 +140,6 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     .join('roles as r', 'rhp.role_id', 'r.role_id')
     .modify(query => {
       if (filter?.filter?.role) {
-        //query.where('r.title', 'ilike', `%${filter.filter.role}%`)
         query.whereRaw(`UPPER(r.title) = '${filter.filter.role.toUpperCase()}'`)
         .orWhereRaw(`UPPER(r.short_code) = '${filter.filter.role.toUpperCase()}'`);
       }
