@@ -13,6 +13,7 @@ import {
   CallOrderInput,
   CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
@@ -51,7 +52,11 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+  async getCalls(
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ): Promise<Call[]> {
     const query = database('call').select([
       '*',
       'call.description as description',
@@ -180,12 +185,12 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
-    if (filter?.sortField && filter?.sortDirection) {
-      if (!fieldMap.hasOwnProperty(filter?.sortField)) {
-        throw new GraphQLError(`Bad sort field given: ${filter?.sortField}`);
+    if (sortField && sortDirection) {
+      if (!fieldMap.hasOwnProperty(sortField)) {
+        throw new GraphQLError(`Bad sort field given: ${sortField}`);
       }
-      filter.sortField = fieldMap[filter?.sortField];
-      query.orderBy(filter?.sortField, filter?.sortDirection);
+      sortField = fieldMap[sortField];
+      query.orderBy(sortField, sortDirection);
     }
 
     return query.then((callDB: CallRecord[]) => {

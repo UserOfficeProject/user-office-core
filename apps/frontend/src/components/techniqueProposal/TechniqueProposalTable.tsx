@@ -76,6 +76,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
     },
+    {},
     CallsDataQuantity.MINIMAL
   );
 
