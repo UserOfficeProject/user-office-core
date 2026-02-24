@@ -5,9 +5,10 @@ import {
   updateEmailTemplateValidationSchema,
 } from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
@@ -47,7 +48,7 @@ const CreateUpdateEmailTemplate = ({
             }).updateEmailTemplate(values);
 
             close(updateEmailTemplate);
-          } catch (error) {
+          } catch {
             close(null);
           }
         } else {
@@ -57,7 +58,7 @@ const CreateUpdateEmailTemplate = ({
             }).createEmailTemplate(values);
 
             close(createEmailTemplate);
-          } catch (error) {
+          } catch {
             close(null);
           }
         }

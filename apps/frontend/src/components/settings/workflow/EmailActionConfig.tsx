@@ -9,8 +9,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { FieldArray, FieldArrayRenderProps } from 'formik';
-import { KeyboardEvent, useState } from 'react';
-import React from 'react';
+import React, { KeyboardEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import {

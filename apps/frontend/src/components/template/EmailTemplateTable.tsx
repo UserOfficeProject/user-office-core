@@ -46,7 +46,7 @@ const EmailTemplatesTable = () => {
       }).deleteEmailTemplate({ id: emailTemplateId as number });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
