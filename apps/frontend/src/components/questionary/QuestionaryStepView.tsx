@@ -213,7 +213,7 @@ function QuestionaryStepView(props: {
       });
 
       setLastSavedFormValues(initialValues);
-    } catch (error) {
+    } catch {
       return false;
     } finally {
       setIsSaving(false);

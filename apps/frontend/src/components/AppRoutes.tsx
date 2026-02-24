@@ -1,7 +1,8 @@
-import i18n from 'i18n';
 import React, { lazy, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -127,7 +128,7 @@ const PrivateOutlet = () => (
         const redirectPath = queryParams.size
           ? `${pathName}?${queryParams.toString()}`
           : pathName;
-        localStorage.redirectPath = redirectPath;
+        localStorage.setItem('redirectPath', redirectPath);
 
         return <Navigate to="/external-auth" />;
       }
