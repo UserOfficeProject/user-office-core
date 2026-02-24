@@ -2,31 +2,19 @@ mutation upsertUserByOidcSub(
   $userTitle: String
   $firstName: String!
   $lastName: String!
-  $username: String
   $preferredName: String
   $oidcSub: String!
-  $gender: String
-  $birthDate: String
   $institution: InstitutionInput!
-  $department: String
-  $position: String!
   $email: String!
-  $telephone: String
 ) {
   upsertUserByOidcSub(
     userTitle: $userTitle
     firstName: $firstName
     lastName: $lastName
-    username: $username
     preferredName: $preferredName
     oidcSub: $oidcSub
-    gender: $gender
-    birthDate: $birthDate
     institution: $institution
-    department: $department
-    position: $position
     email: $email
-    telephone: $telephone
   ) {
     id
   }

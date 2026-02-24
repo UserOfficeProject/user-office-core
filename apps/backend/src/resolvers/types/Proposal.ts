@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
+  InvitedProposal as InvitedProposalOrigin,
   ProposalEndStatus,
   ProposalPublicStatus,
 } from '../../models/Proposal';
@@ -99,6 +100,21 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => String, { nullable: true })
   public fileId?: string | null;
+}
+
+@ObjectType()
+export class InvitedProposal implements Partial<InvitedProposalOrigin> {
+  @Field(() => String)
+  public proposalId: string;
+
+  @Field(() => String)
+  public proposerName: string;
+
+  @Field(() => String)
+  public title: string;
+
+  @Field(() => String)
+  public abstract: string;
 }
 
 @Resolver(() => Proposal)
@@ -296,9 +312,20 @@ export class ProposalResolver {
   }
 
   @FieldResolver(() => ProposalAttachments, { nullable: true })
-  attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+  async attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
     return ctx.queries.questionary.getProposalAttachments(
       ctx.user,
+      proposal.primaryKey
+    );
+  }
+
+  @FieldResolver(() => [BasicUserDetails], { nullable: true })
+  async dataAccessUsers(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails[]> {
+    return await context.queries.dataAccessUsers.findByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }

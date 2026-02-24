@@ -57,4 +57,19 @@ export default class InviteQueries {
 
     return invites;
   }
+
+  @Authorized()
+  async getPendingCoProposerInvites(agent: UserWithRole | null) {
+    if (!agent) {
+      return [];
+    }
+
+    const invites = await this.dataSource.getCoProposerInvites({
+      email: agent.email,
+      isClaimed: false,
+      isExpired: false,
+    });
+
+    return invites;
+  }
 }

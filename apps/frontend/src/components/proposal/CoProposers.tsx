@@ -1,3 +1,4 @@
+import { Box } from '@mui/system';
 import React, { useContext } from 'react';
 
 import UserManagementTable, {
@@ -35,18 +36,20 @@ const CoProposers = ({
   const { proposer, users, coProposerInvites } = state.proposal;
 
   return (
-    <UserManagementTable
-      {...props}
-      title="Co-Proposers"
-      addButtonTooltip="Add a co-proposer"
-      onUserAction={handleUserAction}
-      excludeUserIds={proposer ? [proposer.id] : []}
-      // QuickFix for material table changing immutable state
-      // https://github.com/mbrn/material-table/issues/666
-      users={JSON.parse(JSON.stringify(users))}
-      invites={coProposerInvites}
-      allowInviteByEmail={true}
-    />
+    <Box data-cy="co-proposers">
+      <UserManagementTable
+        {...props}
+        title="Co-Proposers"
+        addButtonTooltip="Add a co-proposer"
+        onUserAction={handleUserAction}
+        excludeUserIds={proposer ? [proposer.id] : []}
+        // QuickFix for material table changing immutable state
+        // https://github.com/mbrn/material-table/issues/666
+        users={JSON.parse(JSON.stringify(users))}
+        invites={coProposerInvites}
+        allowInviteByEmail={true}
+      />
+    </Box>
   );
 };
 

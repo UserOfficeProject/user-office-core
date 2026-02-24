@@ -6,7 +6,6 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
@@ -14,7 +13,7 @@ import { Event } from '../../events/event.enum';
 import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { BasicUserDetails, UserRole } from '../../models/User';
+import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
@@ -32,10 +31,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
     Tokens.CallDataSource
   );
 
-  const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.RedeemCodesDataSource
-  );
-
   const technicalReviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
@@ -48,62 +43,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE_LEGACY: {
-      const user = await userDataSource.getUser(
-        event.emailinviteresponse.userId
-      );
-      const inviter = await userDataSource.getBasicUserInfo(
-        event.emailinviteresponse.inviterId
-      );
-
-      if (!user || !inviter) {
-        logger.logError('Failed email invite', { user, inviter, event });
-
-        return;
-      }
-
-      const redeemCode = await redeemCodesDataSource.getRedeemCodes({
-        placeholderUserId: user.id,
-      });
-
-      if (!redeemCode[0]?.code) {
-        logger.logError('Failed email invite. No redeem code found', {
-          user,
-          inviter,
-          event,
-        });
-
-        return;
-      }
-
-      mailService
-        .sendMail({
-          content: {
-            template_id:
-              event.emailinviteresponse.role === UserRole.USER
-                ? 'user-office-registration-invitation'
-                : 'user-office-registration-invitation-reviewer',
-          },
-          substitution_data: {
-            firstname: user.preferredname,
-            lastname: user.lastname,
-            email: user.email,
-            inviterName: inviter.firstname,
-            inviterLastname: inviter.lastname,
-            redeemCode: redeemCode[0].code,
-          },
-          recipients: [{ address: user.email }],
-        })
-        .then((res: any) => {
-          logger.logInfo('Successful email transmission', { res });
-        })
-        .catch((err: string) => {
-          logger.logException('Failed email transmission', err);
-        });
-
-      return;
-    }
-
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 

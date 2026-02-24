@@ -27,8 +27,6 @@ context('User login tests', () => {
         },
         firstName: 'Test',
         lastName: 'User',
-        position: 'Researcher',
-        username: 'testuser',
       });
 
       cy.contains('Institutions').click();
@@ -54,14 +52,12 @@ context('User login tests', () => {
         email: 'email@example.com',
         firstName: 'Test',
         lastName: 'User',
-        position: 'Researcher',
         institution: {
           manual: {
             name: institutionName,
             country: institutionCountry,
           },
         },
-        username: 'testuser',
       });
 
       cy.contains('Institutions').click();

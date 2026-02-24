@@ -1,9 +1,9 @@
 query getAllQuestions(
-  $filter: AllQuestionsFilter 
+  $filter: AllQuestionsFilter
   $first: Int
   $offset: Int
   $sortField: String
-  $sortDirection: String
+  $sortDirection: PaginationSortDirection
   $searchText: String
 ) {
   allQuestions(
@@ -14,7 +14,7 @@ query getAllQuestions(
     sortDirection: $sortDirection
     searchText: $searchText
   ) {
-    questions{
+    questions {
       id
       question
       naturalKey

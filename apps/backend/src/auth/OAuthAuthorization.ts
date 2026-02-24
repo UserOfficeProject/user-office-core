@@ -161,9 +161,9 @@ export class OAuthAuthorization extends UserAuthorization {
     }
 
     const institution = await this.getOrCreateUserInstitution(institutionInput);
-    const userWithOAuthSubMatch = await this.userDataSource.getByOIDCSub(
-      userInfo.sub
-    );
+    const userId = this.getUniqueId(userInfo);
+    const userWithOAuthSubMatch =
+      await this.userDataSource.getByOIDCSub(userId);
 
     const userWithEmailMatch = await this.userDataSource.getByEmail(
       userInfo.email
@@ -174,21 +174,14 @@ export class OAuthAuthorization extends UserAuthorization {
     if (user) {
       const updatedUser = await this.userDataSource.update({
         ...user,
-        birthdate: userInfo.birthdate
-          ? new Date(userInfo.birthdate)
-          : undefined,
-        department: userInfo.department as string,
         email: userInfo.email,
         firstname: userInfo.given_name,
-        gender: userInfo.gender,
         lastname: userInfo.family_name,
         oauthIssuer: client.issuer.metadata.issuer,
         oauthRefreshToken: tokenSet.refresh_token ?? '',
-        oidcSub: userInfo.sub,
+        oidcSub: userId,
         institutionId: institution?.id ?? user.institutionId,
-        position: userInfo.position as string,
         preferredname: userInfo.preferred_username,
-        telephone: userInfo.phone_number,
         user_title: userInfo.title as string,
       });
 
@@ -198,18 +191,12 @@ export class OAuthAuthorization extends UserAuthorization {
         (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,
         userInfo.family_name,
-        userInfo.email,
         userInfo.preferred_username ?? '',
-        userInfo.sub,
+        userId,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
-        userInfo.gender ?? 'unspecified',
-        new Date(),
         institution?.id ?? 1,
-        '',
-        (userInfo.position as string) ?? '',
-        userInfo.email,
-        ''
+        userInfo.email
       );
 
       const roleID = this.getUserRole(newUser);

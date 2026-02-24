@@ -18,10 +18,11 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
@@ -30,6 +31,7 @@ import ProposalReviewContent, {
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
 import {
+  PaginationSortDirection,
   ProposalsFilter,
   SettingsId,
   UserRole,
@@ -618,10 +620,18 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   addColumns(columns, techniquesColumns());
   addColumns(columns, statusColumn());
 
-  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
+  columns = setSortDirectionOnSortField(
+    columns,
+    sortField,
+    sortDirection == PaginationSortDirection.ASC
+      ? PaginationSortDirection.ASC
+      : sortDirection == PaginationSortDirection.DESC
+        ? PaginationSortDirection.DESC
+        : undefined
+  );
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
-    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+    new Promise<QueryResult<ProposalViewData>>((resolve, reject) => {
       const [orderBy] = tableQuery.orderByCollection;
       try {
         const {
@@ -639,7 +649,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
 
-        result.proposals = await api()
+        api()
           .getTechniqueScientistProposals({
             filter: {
               callId: callId,
@@ -653,7 +663,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
             searchText: tableQuery.search,
@@ -673,47 +688,57 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 } as ProposalViewData;
               }
             );
-          });
+          })
+          .then((proposals) => {
+            result.proposals = proposals;
 
-        if (result.proposals === undefined) {
-          return;
-        }
-        const tableData =
-          result.proposals.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
-            const proposalData = {
-              ...proposal,
-              id: proposal.proposalId,
-              status: proposal.submitted ? 'Submitted' : 'Open',
-              technicalReviews: proposal.technicalReviews?.map(
-                (technicalReview) => ({
-                  ...technicalReview,
-                  status: getTranslation(technicalReview.status as ResourceId),
-                })
-              ),
-              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-            } as ProposalViewData;
-
-            if (searchParams.getAll('selection').length > 0) {
-              return {
-                ...proposalData,
-                tableData: {
-                  checked: selection.has(proposal.primaryKey.toString()),
-                },
-              };
-            } else {
-              return proposalData;
+            if (result.proposals === undefined) {
+              return;
             }
-          }) || [];
+            const tableData =
+              result.proposals.map((proposal) => {
+                const selection = new Set(searchParams.getAll('selection'));
+                const proposalData = {
+                  ...proposal,
+                  id: proposal.proposalId,
+                  status: proposal.submitted ? 'Submitted' : 'Open',
+                  technicalReviews: proposal.technicalReviews?.map(
+                    (technicalReview) => ({
+                      ...technicalReview,
+                      status: getTranslation(
+                        technicalReview.status as ResourceId
+                      ),
+                    })
+                  ),
+                  finalStatus: getTranslation(
+                    proposal.finalStatus as ResourceId
+                  ),
+                } as ProposalViewData;
 
-        setTableData(tableData);
-        setTotalCount(result?.totalCount || 0);
+                if (searchParams.getAll('selection').length > 0) {
+                  return {
+                    ...proposalData,
+                    tableData: {
+                      checked: selection.has(proposal.primaryKey.toString()),
+                    },
+                  };
+                } else {
+                  return proposalData;
+                }
+              }) || [];
 
-        resolve({
-          data: tableData,
-          page: tableQuery.page,
-          totalCount: result.totalCount,
-        });
+            setTableData(tableData);
+            setTotalCount(result?.totalCount || 0);
+
+            resolve({
+              data: tableData,
+              page: tableQuery.page,
+              totalCount: result.totalCount,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }

@@ -5,16 +5,12 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import Email from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
-import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -30,12 +26,12 @@ import {
   Maybe,
   getSdk,
   BasicUserDetailsFragment,
+  PaginationSortDirection,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
-
-import InviteUserForm from './InviteUserForm';
 
 type InvitationButtonProps = {
   title: string;
@@ -73,12 +69,11 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   selectedUsers?: number[];
   mtOptions?: Options<T>;
   columns?: Column<T>[];
-  preserveSelf?: boolean;
-  setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   selectedParticipants?: BasicUserDetails[];
   setSelectedParticipants?: React.Dispatch<
     React.SetStateAction<BasicUserDetails[]>
   >;
+  persistUrlQueryParams?: boolean;
 };
 
 const localColumns = [
@@ -87,27 +82,6 @@ const localColumns = [
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
 ];
-
-const getTitle = ({
-  t,
-  invitationUserRole,
-}: {
-  t: TFunction<'translation', undefined>;
-  invitationUserRole?: UserRole;
-}): string => {
-  switch (invitationUserRole) {
-    case UserRole.USER_OFFICER:
-      return 'Invite User';
-    case UserRole.FAP_CHAIR:
-      return 'Invite ' + t('Fap') + ' Chair';
-    case UserRole.FAP_SECRETARY:
-      return 'Invite ' + t('Fap') + ' Secretary';
-    case UserRole.INSTRUMENT_SCIENTIST:
-      return 'Invite ' + t('instrumentSci');
-    default:
-      return 'Invite User';
-  }
-};
 
 async function getUserByEmail(
   email: string,
@@ -165,18 +139,15 @@ const PeopleTable = ({
   userRole,
   data,
   action,
-  emailInvite,
   emailSearch,
-  invitationUserRole,
   isFreeAction,
   showInvitationButtons,
   columns,
   mtOptions,
   onRemove,
-  preserveSelf,
   search,
   title,
-  setPrincipalInvestigator,
+  persistUrlQueryParams = false,
 }: PeopleTableProps) => {
   const [query, setQuery] = useState<{
     subtractUsers: number[];
@@ -186,27 +157,22 @@ const PeopleTable = ({
     userRole: userRole ? userRole : null,
   });
   const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
-    FeatureId.EMAIL_INVITE
-  )?.isEnabled;
   const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
   const api = useDataApi();
-  const [sendUserEmail, setSendUserEmail] = useState(false);
-  const [inviteUserModal, setInviteUserModal] = useState({
-    show: false,
-    title: '',
-    userRole: UserRole.USER,
-  });
+
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
+  const sortDirection = persistUrlQueryParams
+    ? searchParams.get('sortDirection')
+    : '';
   useEffect(() => {
     if (!data) {
       return;
@@ -216,23 +182,6 @@ const PeopleTable = ({
     tableRef.current && tableRef.current.onQueryChange({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.length]);
-
-  if (sendUserEmail && invitationUserRole && action) {
-    return (
-      <InviteUserForm
-        title={getTitle({ t, invitationUserRole })}
-        action={action.fn}
-        close={() => setSendUserEmail(false)}
-        userRole={invitationUserRole}
-      />
-    );
-  }
-  const EmailIcon = (): JSX.Element => <Email />;
-
-  const handleChangeCoIToPi = (user: BasicUserDetails) => {
-    onRemove?.(user);
-    setPrincipalInvestigator?.(user);
-  };
 
   const actionArray = [];
   action &&
@@ -246,64 +195,8 @@ const PeopleTable = ({
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });
-  emailInvite &&
-    isEmailInviteEnabled &&
-    actionArray.push({
-      icon: EmailIcon,
-      isFreeAction: true,
-      tooltip: 'Add by email',
-      onClick: () => setSendUserEmail(true),
-    });
-
-  setPrincipalInvestigator &&
-    onRemove &&
-    actionArray.push({
-      icon: () => (
-        <Button data-cy="assign-as-pi" component="a" href="#" variant="text">
-          Assign <br /> as PI
-        </Button>
-      ),
-      tooltip: 'Set Principal Investigator',
-      onClick: (
-        event: React.MouseEvent<JSX.Element>,
-        rowData: BasicUserDetails | BasicUserDetails[]
-      ) => {
-        event.preventDefault();
-
-        return new Promise<void>(() => {
-          const user = Array.isArray(rowData) ? rowData[0] : rowData;
-          handleChangeCoIToPi(user);
-          tableRef.current && tableRef.current.onQueryChange({});
-        });
-      },
-    });
 
   const invitationButtons: InvitationButtonProps[] = [];
-
-  if (showInvitationButtons) {
-    invitationButtons.push(
-      {
-        title: 'Invite User',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite User',
-            userRole: UserRole.USER,
-          }),
-        'data-cy': 'invite-user-button',
-      },
-      {
-        title: 'Invite Reviewer',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite Reviewer',
-            userRole: UserRole.FAP_REVIEWER,
-          }),
-        'data-cy': 'invite-reviewer-button',
-      }
-    );
-  }
 
   const handleColumnSelectionChange = (
     selectedItems: BasicUserDetailsWithRole[],
@@ -358,63 +251,71 @@ const PeopleTable = ({
   };
 
   const fetchRemoteUsersData = (tableQuery: Query<BasicUserDetailsWithRole>) =>
-    new Promise<QueryResult<BasicUserDetailsWithRole>>(
-      async (resolve, reject) => {
-        try {
-          const [orderBy] = tableQuery.orderByCollection;
-          const { users } = await api().getUsers({
-            filter: tableQuery.search,
+    new Promise<QueryResult<BasicUserDetailsWithRole>>((resolve, reject) => {
+      try {
+        const [orderBy] = tableQuery.orderByCollection;
+        api()
+          .getUsers({
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
-            orderBy: orderBy?.orderByField,
-            orderDirection: orderBy?.orderDirection,
             subtractUsers: query.subtractUsers,
             userRole: query.userRole,
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            searchText: tableQuery.search,
+          })
+          .then(({ users }) => {
+            const filteredData = data
+              ? data.filter((user) =>
+                  tableQuery.search
+                    ? user.firstname
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase()) ||
+                      user.lastname
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase()) ||
+                      user.institution
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase())
+                    : true
+                )
+              : undefined;
+
+            const paginatedFilteredData = filteredData
+              ? filteredData.slice(
+                  tableQuery.page * tableQuery.pageSize,
+                  tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
+                )
+              : undefined;
+
+            const usersTableData = getUsersTableData(
+              paginatedFilteredData || users?.users || [],
+              selectedParticipants || [],
+              invitedUsers,
+              tableQuery,
+              filteredData?.length || users?.totalCount || 0
+            );
+
+            setCurrentPageIds(usersTableData.users.map(({ id }) => id));
+
+            resolve({
+              data: usersTableData.users,
+              page: tableQuery.page,
+              totalCount: usersTableData.totalCount,
+            });
+          })
+          .catch((error) => {
+            reject(error);
           });
-
-          const filteredData = data
-            ? data.filter((user) =>
-                tableQuery.search
-                  ? user.firstname
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase()) ||
-                    user.lastname
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase()) ||
-                    user.institution
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase())
-                  : true
-              )
-            : undefined;
-
-          const paginatedFilteredData = filteredData
-            ? filteredData.slice(
-                tableQuery.page * tableQuery.pageSize,
-                tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
-              )
-            : undefined;
-
-          const usersTableData = getUsersTableData(
-            paginatedFilteredData || users?.users || [],
-            selectedParticipants || [],
-            invitedUsers,
-            tableQuery,
-            filteredData?.length || users?.totalCount || 0
-          );
-
-          setCurrentPageIds(usersTableData.users.map(({ id }) => id));
-
-          resolve({
-            data: usersTableData.users,
-            page: tableQuery.page,
-            totalCount: usersTableData.totalCount,
-          });
-        } catch (error) {
-          reject(error);
-        }
+      } catch (error) {
+        reject(error);
       }
-    );
+    });
 
   return (
     <Formik
@@ -479,36 +380,6 @@ const PeopleTable = ({
           },
         }}
       >
-        <Dialog
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-          open={inviteUserModal.show}
-          onClose={(): void =>
-            setInviteUserModal({
-              ...inviteUserModal,
-              show: false,
-            })
-          }
-          style={{ backdropFilter: 'blur(6px)' }}
-        >
-          <DialogContent>
-            <InviteUserForm
-              title={inviteUserModal.title}
-              userRole={inviteUserModal.userRole}
-              close={() =>
-                setInviteUserModal({
-                  ...inviteUserModal,
-                  show: false,
-                })
-              }
-              action={(invitedUser) => {
-                if (invitedUser) {
-                  tableRef.current && tableRef.current.onQueryChange({});
-                }
-              }}
-            />
-          </DialogContent>
-        </Dialog>
         <MaterialTable
           tableRef={tableRef}
           icons={tableIcons}
@@ -517,16 +388,86 @@ const PeopleTable = ({
               {title}
             </Typography>
           }
-          columns={columns ?? localColumns}
+          columns={setSortDirectionOnSortField(
+            columns ? columns : localColumns,
+            persistUrlQueryParams ? searchParams.get('sortField') : '',
+            sortDirection === PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : sortDirection === PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined
+          )}
           onSelectionChange={handleColumnSelectionChange}
           data={fetchRemoteUsersData}
+          onPageChange={(page) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                searchParams.set('page', page.toString());
+
+                return searchParams;
+              });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                searchParams.set('pageSize', pageSize.toString());
+                searchParams.set('page', '0');
+
+                return searchParams;
+              });
+          }}
+          onSearchChange={(searchText) => {
+            persistUrlQueryParams &&
+              setSearchParams((searchParams) => {
+                if (searchText) {
+                  searchParams.set('search', searchText);
+                  searchParams.set('page', '0');
+                } else {
+                  searchParams.delete('search');
+                }
+
+                return searchParams;
+              });
+          }}
+          onOrderCollectionChange={(orderByCollection) => {
+            const [orderBy] = orderByCollection;
+
+            if (!orderBy) {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.delete('sortField');
+                  searchParams.delete('sortDirection');
+
+                  return searchParams;
+                });
+            } else {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.set('sortField', orderBy.orderByField);
+                  searchParams.set('sortDirection', orderBy.orderDirection);
+
+                  return searchParams;
+                });
+            }
+          }}
           options={{
             search: search,
+            searchText: persistUrlQueryParams
+              ? searchParams.get('search') || undefined
+              : undefined,
             debounceInterval: 400,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
+            pageSize:
+              persistUrlQueryParams && searchParams.get('pageSize')
+                ? +searchParams.get('pageSize')!
+                : undefined,
+            initialPage:
+              persistUrlQueryParams && searchParams.get('page')
+                ? +searchParams.get('page')!
+                : 0,
             ...mtOptions,
             selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
@@ -544,9 +485,7 @@ const PeopleTable = ({
                       (onRemove as FunctionType)(oldData);
                     }),
                   isDeletable: (rowData) => {
-                    return (
-                      getCurrentUser()?.user.id !== rowData.id || !preserveSelf
-                    );
+                    return getCurrentUser()?.user.id !== rowData.id;
                   },
                 }
               : {}

@@ -1,5 +1,0 @@
-mutation redeemCode($code: String!) {
-  redeemCode(code: $code) {
-    ...redeemCode
-  }
-}

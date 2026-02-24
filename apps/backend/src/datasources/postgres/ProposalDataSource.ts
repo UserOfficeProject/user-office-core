@@ -7,7 +7,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal, Proposals } from '../../models/Proposal';
+import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
@@ -19,6 +19,7 @@ import { UserWithRole } from '../../models/User';
 import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../../resolvers/types/User';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
@@ -40,21 +41,22 @@ import {
   TechnicalReviewRecord,
   TechniqueRecord,
   createProposalViewObjectWithTechniques,
+  InvitedProposalRecord,
+  createInvitedProposalObject,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
-  'technicalReviews.status': "technical_reviews->0->'status'",
-  'technicalReviews.timeAllocation': "technical_reviews->0->'timeAllocation'",
+  'technicalReviews.status': 'technical_review_status',
+  'technicalReviews.timeAllocation': 'technical_review_time_allocation',
   // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
-  technicalReviewAssigneesFullName:
-    "technical_reviews->0->'technicalReviewAssignee'->'firstname'",
-  'faps.code': "faps->0->'code'",
+  technicalReviewAssigneesFullName: 'technical_review_assignee',
+  'faps.code': 'fap_code',
   callShortCode: 'call_short_code',
-  'instruments.name': "instruments->0->'name'",
+  'instruments.name': 'instrument_name',
   statusName: 'proposal_status_id',
   'instruments.managementTimeAllocation':
-    "instruments->0->'managementTimeAllocation'",
+    'instrument_management_time_allocation',
   proposalId: 'proposal_id',
   title: 'title',
   submitted: 'submitted',
@@ -382,7 +384,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string,
     principleInvestigator?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
@@ -391,7 +393,24 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       : [];
 
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        '*',
+        database.raw("instruments->0->'name' AS instrument_name"),
+        database.raw(
+          "instruments->0->'managementTimeAllocation' AS instrument_management_time_allocation"
+        ),
+        database.raw(
+          "technical_reviews->0->'status' AS technical_review_status"
+        ),
+        database.raw(
+          "technical_reviews->0->'timeAllocation' AS technical_review_time_allocation"
+        ),
+        database.raw(
+          "technical_reviews->0->'technicalReviewAssignee'->'firstname' AS technical_review_assignee"
+        ),
+        database.raw("faps->0->'code' AS fap_code"),
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposal_table_view')
       .join(
         'users',
@@ -459,7 +478,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
+          query.orderBy(sortField, sortDirection);
         }
 
         if (filter?.referenceNumbers) {
@@ -1067,7 +1086,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     first?: number,
     offset?: number,
     sortField?: string,
-    sortDirection?: string,
+    sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     /*
@@ -1308,5 +1327,25 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .returning('*');
 
     return proposal ? createProposalObject(proposal[0]) : null;
+  }
+
+  async getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
+    const proposals: InvitedProposalRecord[] | undefined = await database
+      .select(
+        'proposals.proposal_id',
+        'proposer.firstname as proposer_name',
+        'proposals.abstract',
+        'proposals.title'
+      )
+      .from('co_proposer_claims')
+      .join('proposals', {
+        'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
+      })
+      .join('users as proposer', {
+        'proposals.proposer_id': 'proposer.user_id',
+      })
+      .where('invite_id', inviteId);
+
+    return proposals ? createInvitedProposalObject(proposals[0]) : null;
   }
 }

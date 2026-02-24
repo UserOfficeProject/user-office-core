@@ -162,9 +162,7 @@ export default class PostgresStatusActionsLogsDataSource
         }
         if (args.sortField && args.sortDirection) {
           if (args.sortField in fieldMap) {
-            query.orderByRaw(
-              `${fieldMap[args.sortField]} ${args.sortDirection}`
-            );
+            query.orderBy(fieldMap[args.sortField], args.sortDirection);
           } else {
             throw new GraphQLError(`Bad sort field given: ${args.sortField}`);
           }

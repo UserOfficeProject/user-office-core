@@ -57,7 +57,6 @@ const createActionButton = (
   onClick: () => void | undefined
 ): Action<UserExperiment> => ({
   tooltip,
-  // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
   onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
@@ -271,7 +270,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
-        navigate(`/DeclareShipments/${event.experimentPk}`);
+        navigate(`/Experiments/${event.experimentPk}/Shipments`);
       }
     );
   };

@@ -7,8 +7,13 @@ import {
 import React from 'react';
 import * as Yup from 'yup';
 
-import { SortDirectionType } from 'components/common/SuperMaterialTable';
-import { Proposal, ProposalEndStatus, Scalars, Status } from 'generated/sdk';
+import {
+  PaginationSortDirection,
+  Proposal,
+  ProposalEndStatus,
+  Scalars,
+  Status,
+} from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
 import { FunctionType } from './utilTypes';
@@ -34,13 +39,13 @@ export const getUniqueArray = <T,>(array: (T | null)[]) =>
 export const setSortDirectionOnSortField = (
   columns: Column<any>[],
   sortField: string | null | undefined,
-  sortDirection: string | null | undefined
+  sortDirection: PaginationSortDirection | null | undefined
 ) => {
   if (sortField !== undefined && sortField !== null && sortDirection) {
     const fieldIndex = columns.findIndex(
       (column) => column.field === sortField
     );
-    columns[fieldIndex].defaultSort = sortDirection as SortDirectionType;
+    columns[fieldIndex].defaultSort = sortDirection;
   } else {
     columns.forEach((column) => (column.defaultSort = undefined));
   }
@@ -158,6 +163,7 @@ export const isCallEnded = (
 export const urlValidationSchema = () => {
   return Yup.string()
     .matches(
+      // eslint-disable-next-line no-useless-escape
       /https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63})|(localhost))\b([-a-zA-Z0-9@:%_\+.~#?&/=]*)/i,
       'Provide a valid URL that includes the HTTP or HTTPS protocol'
     )

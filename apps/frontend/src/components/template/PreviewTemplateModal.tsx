@@ -5,8 +5,9 @@ import DialogContent from '@mui/material/DialogContent';
 import React, { useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import ExperimentSafetyContainer from 'components/experimentSafety/ExperimentSafetyContainer';
-import { createExperimentSafetyStub } from 'components/experimentSafety/ExperimentSafetyContainer';
+import ExperimentSafetyContainer, {
+  createExperimentSafetyStub,
+} from 'components/experimentSafety/ExperimentSafetyContainer';
 import ExperimentSafetyReviewContainer from 'components/experimentSafetyReview/ExperimentSafetyReviewContainer';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
@@ -22,8 +23,7 @@ import TechnicalReviewQuestionary, {
 } from 'components/review/TechnicalReviewQuestionary';
 import ShipmentContainer from 'components/shipments/ShipmentContainer';
 import { UserContext } from 'context/UserContextProvider';
-import { BasicUserDetails } from 'generated/sdk';
-import { TemplateGroupId } from 'generated/sdk';
+import { BasicUserDetails, TemplateGroupId } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
 import { createShipmentStub } from 'hooks/shipment/useBlankShipment';
 

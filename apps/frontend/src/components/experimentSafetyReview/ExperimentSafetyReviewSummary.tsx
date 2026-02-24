@@ -241,7 +241,7 @@ function ExperimentSafetyReviewSummary({
             disabled={!decision}
             data-cy="button-submit-experiment-safety-review"
           >
-            {false ? '✔ Submitted' : 'Submit'}
+            {!decision ? '✔ Submitted' : 'Submit'}
           </NavigButton>
         )}
         <Button

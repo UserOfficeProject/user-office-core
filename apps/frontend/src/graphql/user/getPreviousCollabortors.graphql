@@ -1,6 +1,6 @@
 query getPreviousCollaborators(
   $userId: Int!
-  $filter: String
+  $searchText: String
   $first: Int
   $offset: Int
   $userRole: UserRole
@@ -8,7 +8,7 @@ query getPreviousCollaborators(
 ) {
   previousCollaborators(
     userId: $userId
-    filter: $filter
+    searchText: $searchText
     first: $first
     offset: $offset
     userRole: $userRole
