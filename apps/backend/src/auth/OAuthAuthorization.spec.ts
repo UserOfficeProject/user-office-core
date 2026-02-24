@@ -203,6 +203,34 @@ describe('OAuthAuthorization', () => {
     ).toBe(dummyUser.institutionId);
   });
 
+  describe('getOrCreateUserInstitution', () => {
+    it('Should create new institution if institution name matches but country does not', async () => {
+      const existingInstitution = new Institution(1, 'Existing Inst', 1);
+      const newCountry = { country: 'New Country', countryId: 2 };
+
+      jest
+        .spyOn(mockAdminDataSource, 'getInstitutionByName')
+        .mockResolvedValue(existingInstitution);
+      jest
+        .spyOn(mockAdminDataSource, 'getCountryByName')
+        .mockResolvedValue(newCountry);
+      jest
+        .spyOn(mockAdminDataSource, 'createInstitution')
+        .mockResolvedValue({ id: 2 } as Institution);
+
+      await oauthAuthorization.getOrCreateUserInstitution({
+        name: existingInstitution.name,
+        country: newCountry.country,
+      });
+
+      expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
+        name: existingInstitution.name,
+        country: newCountry.countryId,
+        rorId: undefined,
+      });
+    });
+  });
+
   describe('upsertUser->create: INITIAL_USER_OFFICER_EMAIL', () => {
     it('should assign USER_OFFICER role if the email is the INITIAL_USER_OFFICER_EMAIL', async () => {
       process.env.INITIAL_USER_OFFICER_EMAIL = dummyUser.email;

@@ -118,20 +118,26 @@ export class OAuthAuthorization extends UserAuthorization {
     name: string;
     country: string;
   }): Promise<Institution | null> {
-    let institution = await this.adminDataSource.getInstitutionByName(
-      manualInput.name
-    );
+    const institutionName = manualInput.name;
+    const countryName = manualInput.country;
+
+    let country = await this.adminDataSource.getCountryByName(countryName);
+    if (!country) {
+      // create country if it does not exist
+      country = await this.adminDataSource.createCountry(countryName);
+    }
+
+    let institution =
+      await this.adminDataSource.getInstitutionByName(institutionName);
+
+    // If the institution exists but the country does not match, we should create a new institution
+    if (institution && institution.country !== country.countryId) {
+      institution = null;
+    }
 
     if (!institution) {
-      let country = await this.adminDataSource.getCountryByName(
-        manualInput.country
-      );
-      if (!country) {
-        // create country if it does not exist
-        country = await this.adminDataSource.createCountry(manualInput.country);
-      }
       institution = await this.adminDataSource.createInstitution({
-        name: manualInput.name,
+        name: institutionName,
         country: country.countryId,
         rorId: undefined,
       });
