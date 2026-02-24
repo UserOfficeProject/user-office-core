@@ -15,6 +15,7 @@ import { Rejection } from '../models/Rejection';
 import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
+import { getInstitutionFromRor } from '../services/RorApi';
 import { UserAuthorization } from './UserAuthorization';
 
 export class OAuthAuthorization extends UserAuthorization {
@@ -85,9 +86,27 @@ export class OAuthAuthorization extends UserAuthorization {
   ): Promise<Institution | null> {
     let institution = await this.adminDataSource.getInstitutionByRorId(rorId);
     if (!institution) {
+      const rorData = await getInstitutionFromRor(rorId);
+      let name = 'Unknown institution';
+      let countryId: number | null = null;
+
+      if (rorData) {
+        name = rorData.name;
+        let country = await this.adminDataSource.getCountryByName(
+          rorData.country
+        );
+        if (!country) {
+          logger.logWarn('Country not found in database', {
+            countryName: rorData.country,
+          });
+          country = await this.adminDataSource.createCountry(rorData.country);
+        }
+        countryId = country.countryId;
+      }
+
       institution = await this.adminDataSource.createInstitution({
-        name: 'Unknown institution',
-        country: null,
+        name: name,
+        country: countryId,
         rorId: rorId,
       });
     }
