@@ -49,7 +49,7 @@ const ApiAccessTokensTable = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
