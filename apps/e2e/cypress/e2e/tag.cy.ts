@@ -19,7 +19,10 @@ const instrument1 = {
 context('Tag tests', () => {
   beforeEach(function () {
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.TAGS)) {
+      if (
+        !featureFlags.getEnabledFeatures().get(FeatureId.TAGS) ||
+        !featureFlags.getEnabledFeatures().get(FeatureId.OAUTH) // TODO implement method setUserRoles in StfcUserDataSource and remove this condition
+      ) {
         this.skip();
       }
     });
