@@ -39,7 +39,7 @@ const AddFap = ({ close }: AddFapProps) => {
           }).createFap(values);
 
           close(createFap);
-        } catch (error) {
+        } catch {
           close(null);
         }
       }}
