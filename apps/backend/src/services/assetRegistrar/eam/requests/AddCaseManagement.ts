@@ -1,6 +1,7 @@
 import { getEnvOrThrow } from '../utils/getEnvOrThrow';
 
 const getAddCaseManagementRequestPayload = (
+  proposalId: string,
   proposalTitle: string,
   containerId: string,
   dateRequested: Date,
@@ -76,6 +77,9 @@ const getAddCaseManagementRequestPayload = (
       },
       DESCRIPTION: 'Container Sample Management',
     },
+  },
+  StandardUserDefinedFields: {
+    UDFCHAR04: proposalId,
   },
 });
 

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
-import { OAuthAuthorization } from '../auth/OAuthAuthorization';
+import { ELIUserAuthorization } from '../auth/ELIUserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -117,7 +117,7 @@ mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.TagDataSource, PostgresTagDataSource);
 
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
-mapClass(Tokens.UserAuthorization, OAuthAuthorization);
+mapClass(Tokens.UserAuthorization, ELIUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
