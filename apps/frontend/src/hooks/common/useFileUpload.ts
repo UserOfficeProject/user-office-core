@@ -28,9 +28,9 @@ export function useFileUpload() {
   const abort = () => {
     try {
       xhr.abort();
-    } catch {}
-
-    reset();
+    } finally {
+      reset();
+    }
   };
 
   const uploadFile = (
@@ -63,7 +63,7 @@ export function useFileUpload() {
           } else {
             setState(UPLOAD_STATE.ERROR);
           }
-        } catch (e) {
+        } catch {
           setState(UPLOAD_STATE.ERROR);
         }
       },

@@ -7,8 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
-import { FieldProps } from 'formik';
-import { Field } from 'formik';
+import { FieldProps, Field } from 'formik';
 import React, { useState } from 'react';
 import invariant from 'tiny-warning';
 

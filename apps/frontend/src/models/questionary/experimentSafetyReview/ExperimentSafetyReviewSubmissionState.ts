@@ -1,9 +1,8 @@
 import { immerable } from 'immer';
 
-import { Questionary, UserRole } from 'generated/sdk';
+import { Questionary, UserRole, TemplateGroupId } from 'generated/sdk';
 
 import { ExperimentSafetyReviewWithQuestionary } from './ExperimentSafetyReviewWithQuestionary';
-import { TemplateGroupId } from '../../../generated/sdk';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmissionState {
