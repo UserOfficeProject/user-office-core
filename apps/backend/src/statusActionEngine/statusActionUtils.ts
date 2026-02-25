@@ -185,8 +185,8 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         const questionary = await questionaryDataSource.getQuestionary(
           proposal.questionaryId
         );
-        const templateId = questionary ? questionary?.templateId : 0;
-        if (templateId == 0) {
+        const templateId = questionary ? questionary?.templateId : -1;
+        if (templateId == -1) {
           logger.logError('Could not fetch proposal templateId for email', {
             questionary: questionary,
           });
