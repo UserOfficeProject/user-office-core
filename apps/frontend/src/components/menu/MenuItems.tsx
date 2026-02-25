@@ -17,6 +17,7 @@ import { NavLink } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import TagIcon from 'components/common/icons/TagIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
@@ -29,7 +30,6 @@ import { TemplateMenuListItem } from './TemplateMenuListItem';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
-import TagIcon from 'components/common/icons/TagIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;

@@ -100,7 +100,7 @@ const RoleManagement: React.FC = () => {
       setRoles(newObjectsArray);
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
