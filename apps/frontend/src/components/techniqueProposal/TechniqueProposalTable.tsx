@@ -66,7 +66,11 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const [searchParams, setSearchParams] = useSearchParams({});
   const { currentRole } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-  const [callId, setCallId] = useState<number | null>(null);
+  const [callId, setCallId] = useState<number | null>(() => {
+    const callParam = searchParams.get('call');
+
+    return callParam ? Number(callParam) : null;
+  });
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
