@@ -1380,7 +1380,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .from('faps as f')
       .join(
         'review_visibility as rv',
-        'f.review_visibility_id',
+        'f.review_visibility',
         'rv.review_visibility_id'
       )
       .where('f.fap_id', fapId)
