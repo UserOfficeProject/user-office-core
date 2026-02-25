@@ -84,6 +84,7 @@ BEGIN
      , comment_for_user
      , notified
      , submitted
+     , management_decision_submitted
     )
     VALUES 
     (
@@ -101,10 +102,11 @@ BEGIN
      , NULL              
      , NULL              
      , true              
-     , true              
+     , true
+     , true             
     );
 
-  INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
+  INSERT INTO instrument_has_proposals(instrument_id, proposal_pk, management_time_allocation) VALUES (1, 1, 100);
 
   INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
   VALUES (1, 1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
@@ -127,6 +129,7 @@ BEGIN
      , comment_for_user
      , notified
      , submitted
+     , management_decision_submitted
     )
     VALUES 
     (
@@ -144,11 +147,12 @@ BEGIN
      , NULL              
      , NULL              
      , true              
-     , true              
+     , true  
+     , true            
     );
   PERFORM setval('public.proposals_proposal_id_seq', 3, false); -- Reset sequence to avoid conflicts
 
-  INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (2, 2);
+  INSERT INTO instrument_has_proposals(instrument_id, proposal_pk, management_time_allocation) VALUES (2, 2, 100);
 
 END;
 $DO$
