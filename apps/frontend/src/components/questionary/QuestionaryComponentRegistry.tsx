@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { FormikProps } from 'formik';
 import React, { ReactElement, ReactNode } from 'react';
 import * as Yup from 'yup';
