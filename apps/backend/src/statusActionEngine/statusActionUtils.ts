@@ -1,4 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -184,9 +185,15 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         const questionary = await questionaryDataSource.getQuestionary(
           proposal.questionaryId
         );
-        const temaplteId = questionary ? questionary?.templateId : 0;
-        const template = await templateDataSource.getTemplate(temaplteId);
-        proposalTemplateName = temaplteId ? template?.name : '';
+        const templateId = questionary ? questionary?.templateId : 0;
+        if (templateId == 0) {
+          logger.logError('Could not fetch proposal templateId for email', {
+            questionary: questionary,
+          });
+          throw new GraphQLError('Failed to find proposal template for emails');
+        }
+        const template = await templateDataSource.getTemplate(templateId);
+        proposalTemplateName = templateId ? template?.name : '';
 
         const quickReviewCalls = await callDataSource
           .getCalls({
