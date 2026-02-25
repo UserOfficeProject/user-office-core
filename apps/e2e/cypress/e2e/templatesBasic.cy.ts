@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import {
+  EmailStatusActionRecipients,
   FeatureId,
+  StatusActionType,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -26,6 +28,7 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const scientist1 = initialDBData.users.user1;
+let testEmailTemplate1Id: string;
 
 context('Template Basic tests', () => {
   const emailTemplateName1 = faker.lorem.words(3);
@@ -43,6 +46,8 @@ context('Template Basic tests', () => {
       useTemplateFile: initialDBData.emailTemplates.template1.useTemplateFile,
       subject: initialDBData.emailTemplates.template1.subject,
       body: initialDBData.emailTemplates.template1.body,
+    }).then((result) => {
+      testEmailTemplate1Id = result.createEmailTemplate.id.toString();
     });
 
     cy.createEmailTemplate({
@@ -2088,6 +2093,64 @@ context('Template Basic tests', () => {
       cy.contains(initialDBData.emailTemplates.template1.name).should(
         'not.exist'
       );
+    });
+
+    it.only('User officer cannot delete referenced email template', () => {
+      const statusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.PI,
+              description: '',
+            },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            combineEmails: true,
+          },
+        ],
+      };
+
+      cy.addWorkflowStatus({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        sortOrder: 1,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
+      }).then((result) => {
+        cy.reload();
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(statusActionConfig),
+            },
+          ],
+          connectionId: result.addWorkflowStatus.id,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.notification({
+        variant: 'error',
+        text: 'Could not delete email template',
+      });
     });
   });
 });
