@@ -1,5 +1,9 @@
-query getCalls($filter: CallsFilter) {
-  calls(filter: $filter) {
+query getCalls(
+  $filter: CallsFilter
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+) {
+  calls(filter: $filter, sortField: $sortField, sortDirection: $sortDirection) {
     ...call
   }
 }

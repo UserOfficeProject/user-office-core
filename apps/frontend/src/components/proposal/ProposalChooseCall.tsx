@@ -29,11 +29,12 @@ const ProposalChooseCall = () => {
       isActive: true,
       isEnded: false,
       isActiveInternal: isInternalUser,
-      sortField: 'sort_order',
-      sortDirection: PaginationSortDirection.ASC,
     };
   }
-  const { calls } = useCallsData(getDashBoardCallFilter());
+  const { calls } = useCallsData(getDashBoardCallFilter(), {
+    sortField: 'sort_order',
+    sortDirection: PaginationSortDirection.ASC,
+  });
 
   return (
     <StyledContainer>

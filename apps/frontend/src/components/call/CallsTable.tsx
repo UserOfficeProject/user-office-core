@@ -116,6 +116,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     calls,
     setCallsWithLoading: setCalls,
     setCallsFilter,
+    setCallsQueryParams,
   } = useCallsData(
     {
       ...getFilterStatus(
@@ -123,6 +124,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
         isArchivedTab
       ),
     },
+    {},
     CallsDataQuantity.EXTENDED
   );
 
@@ -369,6 +371,10 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
   const getCallOrder = (): void => {
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters, isArchivedTab),
+    }));
+
+    setCallsQueryParams((prevQueryParams) => ({
+      ...prevQueryParams,
       sortField: 'sort_order',
       sortDirection: PaginationSortDirection.ASC,
     }));
