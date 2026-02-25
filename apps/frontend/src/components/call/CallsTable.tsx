@@ -25,7 +25,7 @@ import {
   PaginationSortDirection,
   InstrumentWithAvailabilityTime,
   UserRole,
-  Call
+  Call,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
