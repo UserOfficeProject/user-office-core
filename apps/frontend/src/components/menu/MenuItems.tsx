@@ -11,13 +11,12 @@ import People from '@mui/icons-material/People';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import i18n from 'i18n';
-import { useContext } from 'react';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
-import TagIcon from 'components/common/icons/TagIcon';
+import i18n from 'i18n';
+
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
@@ -30,6 +29,7 @@ import { TemplateMenuListItem } from './TemplateMenuListItem';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
+import TagIcon from 'components/common/icons/TagIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
