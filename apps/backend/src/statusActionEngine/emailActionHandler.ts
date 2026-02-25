@@ -462,6 +462,7 @@ const sendMail = async (
               lastName: recipientWithData.lastName,
               preferredName: recipientWithData.preferredName,
               techniques: recipientWithData.techniques,
+              proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
             },
