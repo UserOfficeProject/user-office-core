@@ -783,13 +783,14 @@ context('Technique Proposal tests', () => {
         proposalWorkflowId: callWorkflowId,
       });
 
+      cy.login('user1');
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
 
       cy.contains('Technique Proposals').click();
 
-      cy.get('[data-cy="call-filter"]').contains('call2');
+      cy.get('[data-cy="call-filter"]').contains('call 2');
     });
 
     it('Technique proposals can be filtered by status', function () {
