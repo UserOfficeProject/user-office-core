@@ -193,6 +193,7 @@ const login = (
           );
         window.localStorage.setItem('expToken', `${exp}`);
         window.localStorage.setItem('user', JSON.stringify(user));
+        window.localStorage.setItem('currentRoleId', `${currentRole.id}`);
 
         return resp;
       });
