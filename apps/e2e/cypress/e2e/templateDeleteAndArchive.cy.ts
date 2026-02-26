@@ -258,7 +258,7 @@ context('Template Delete, Archive, Unarchive', () => {
     });
   });
 
-  describe.only('ExperimentSafety PDF Templates Delete, Archive, Unarchive', () => {
+  describe('ExperimentSafety PDF Templates Delete, Archive, Unarchive', () => {
     it('ExperimentSafety PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
@@ -268,7 +268,7 @@ context('Template Delete, Archive, Unarchive', () => {
       shouldDeleteTemplate(templateName, '/PDFTemplates/ExperimentSafety');
     });
 
-    it.only('ExperimentSafety PDF Template can not be deleted if it is associated with a call', () => {
+    it('ExperimentSafety PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
         groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
