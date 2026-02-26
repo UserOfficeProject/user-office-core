@@ -7,6 +7,7 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CallsFilter } from '../resolvers/queries/CallsQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class CallQueries {
@@ -23,11 +24,20 @@ export default class CallQueries {
   }
 
   @Authorized()
-  async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
+  async getAll(
+    agent: UserWithRole | null,
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ) {
     if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
-    const calls = await this.dataSource.getCalls(filter);
+    const calls = await this.dataSource.getCalls(
+      filter,
+      sortField,
+      sortDirection
+    );
 
     return calls;
   }
