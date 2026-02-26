@@ -1,9 +1,10 @@
 import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
-import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -59,7 +60,7 @@ const InstrumentTable = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
