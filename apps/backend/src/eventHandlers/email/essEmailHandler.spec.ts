@@ -4,6 +4,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { AdminDataSourceMock } from '../../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import {
   ProposalDataSourceMock,
@@ -14,9 +15,11 @@ import {
   dummyUser,
   UserDataSourceMock,
 } from '../../datasources/mockups/UserDataSource';
+import { VisitDataSourceMock } from '../../datasources/mockups/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
+import { Settings, SettingsId } from '../../models/Settings';
 import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
@@ -342,6 +345,106 @@ describe('essEmailHandler co-proposer invites', () => {
           },
         },
       ]);
+    });
+  });
+
+  describe('handling VISIT_REGISTRATION_APPROVED and VISIT_REGISTRATION_CANCELLED events', () => {
+    // Matches dates formatted as "dd-MM-yyyy HH:mm" followed by the timezone abbreviation like "CET".
+    const FORMATTED_DATE_WITH_TZ = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} [A-Z]+$/;
+
+    let visitDataSourceMock: VisitDataSourceMock;
+    let adminDataSourceMock: AdminDataSourceMock;
+
+    beforeEach(() => {
+      visitDataSourceMock = container.resolve<VisitDataSourceMock>(
+        Tokens.VisitDataSource
+      );
+      adminDataSourceMock = container.resolve<AdminDataSourceMock>(
+        Tokens.AdminDataSource
+      );
+      visitDataSourceMock.init();
+
+      jest
+        .spyOn(adminDataSourceMock, 'getSetting')
+        .mockImplementation(async (id) => {
+          if (id === SettingsId.DATE_TIME_FORMAT) {
+            return new Settings(
+              SettingsId.DATE_TIME_FORMAT,
+              'dd-MM-yyyy HH:mm',
+              ''
+            );
+          }
+
+          return new Settings(SettingsId.TIMEZONE, 'Europe/Stockholm', '');
+        });
+    });
+
+    it('should send email with correct template when visit registration is approved', async () => {
+      const mockEvent = {
+        type: Event.VISIT_REGISTRATION_APPROVED,
+        visitregistration: { userId: 1, visitId: 1 },
+        isRejection: false,
+      } as ApplicationEvent;
+
+      await essEmailHandler(mockEvent);
+
+      expect(mockMailService.sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: { template_id: EmailTemplateId.VISIT_REGISTRATION_APPROVED },
+          substitution_data: expect.objectContaining({
+            preferredname: dummyUser.preferredname,
+            startsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
+            endsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
+            proposalTitle: 'title',
+            proposalId: 'shortCode',
+            oidcSub: dummyUser.oidcSub,
+          }),
+          recipients: expect.arrayContaining([
+            { address: dummyUser.email },
+            {
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: dummyUser.email,
+              },
+            },
+          ]),
+        })
+      );
+    });
+
+    it('should send email with correct template when visit registration is cancelled', async () => {
+      const mockEvent = {
+        type: Event.VISIT_REGISTRATION_CANCELLED,
+        visitregistration: { userId: 1, visitId: 1 },
+        isRejection: false,
+      } as ApplicationEvent;
+
+      await essEmailHandler(mockEvent);
+
+      expect(mockMailService.sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: {
+            template_id: EmailTemplateId.VISIT_REGISTRATION_CANCELLED,
+          },
+          substitution_data: expect.objectContaining({
+            preferredname: dummyUser.preferredname,
+            startsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
+            endsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
+            proposalTitle: 'title',
+            proposalId: 'shortCode',
+            oidcSub: dummyUser.oidcSub,
+          }),
+          recipients: expect.arrayContaining([
+            { address: dummyUser.email },
+            {
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: dummyUser.email,
+              },
+            },
+          ]),
+        })
+      );
     });
   });
 });

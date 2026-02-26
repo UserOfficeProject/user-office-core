@@ -77,10 +77,12 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
 };
 
 const localColumns = [
-  { title: 'Firstname', field: 'firstname' },
-  { title: 'Lastname', field: 'lastname' },
-  { title: 'Preferred name', field: 'preferredname' },
+  { title: 'First Name', field: 'firstname' },
+  { title: 'Last Name', field: 'lastname' },
+  { title: 'Preferred Name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
+  { title: 'Email', field: 'email' },
+  { title: 'User Name', field: 'oidc_sub' },
 ];
 
 async function getUserByEmail(
@@ -156,6 +158,7 @@ const PeopleTable = ({
     subtractUsers: selectedUsers ? selectedUsers : [],
     userRole: userRole ? userRole : null,
   });
+
   const featureContext = useContext(FeatureContext);
   const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH

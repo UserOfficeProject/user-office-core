@@ -14,7 +14,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 
-import ParticipantSelector from '../proposal/ParticipantSelector';
+import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */
@@ -76,7 +76,7 @@ const UserManagementTable = ({
   };
 
   const InviteComponent = (
-    <ParticipantSelector
+    <ProposalPeopleSelectorModal
       modalOpen={modalOpen}
       title="Add co-proposers"
       onClose={() => setOpen(false)}
