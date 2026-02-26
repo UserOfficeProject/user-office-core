@@ -4,8 +4,8 @@ import { inject, injectable } from 'tsyringe';
 
 import {
   CallContextData,
-  CallContextFetcher,
-} from '../auth/authContexts/CallContext';
+  CallAuthContext,
+} from '../auth/authContexts/CallAuthContext';
 import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
@@ -24,8 +24,8 @@ export function createEmptyCallUiPermissions(): CallUiPermissions {
 @injectable()
 export default class CallPermissionsLoader {
   constructor(
-    @inject(Tokens.CallContextFetcher)
-    private contextFetcher: CallContextFetcher,
+    @inject(Tokens.CallAuthContext)
+    private authContext: CallAuthContext,
     @inject(Tokens.CasbinService) private casbinService: CasbinService
   ) {}
 
@@ -43,7 +43,7 @@ export default class CallPermissionsLoader {
         const uniqueCallIds = [...new Set(callIds)];
 
         const contextMap =
-          await this.contextFetcher.fetchContextForCalls(uniqueCallIds);
+          await this.authContext.fetchContextForCalls(uniqueCallIds);
 
         const actions = Object.entries(CALL_ACTIONS);
         const enforcementRequests: EnforcementRequest<CallContextData>[] = [];

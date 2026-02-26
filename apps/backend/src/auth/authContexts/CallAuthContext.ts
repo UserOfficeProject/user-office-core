@@ -7,17 +7,19 @@ import { AuthContext } from '../AuthRegistry';
 
 export interface CallContextData extends AuthContext {
   type: 'call';
+  id: number;
   shortCode: string;
   tags: string[];
 }
 
 export const CALL_CONTEXT_ATTRIBUTES: Array<keyof CallContextData> = [
+  'id',
   'shortCode',
   'tags',
 ];
 
 @injectable()
-export class CallContextFetcher {
+export class CallAuthContext {
   constructor(
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.TagDataSource) private tagDataSource: TagDataSource
@@ -35,8 +37,9 @@ export class CallContextFetcher {
 
     for (const call of calls) {
       const callCtx: CallContextData = {
-        shortCode: call.shortCode,
         type: 'call',
+        id: call.id,
+        shortCode: call.shortCode,
         tags: tags.get(call.id)?.map((tag) => tag.shortCode) || [],
       };
 

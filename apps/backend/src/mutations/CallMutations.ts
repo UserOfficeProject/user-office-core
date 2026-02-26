@@ -5,7 +5,7 @@ import {
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
-import { CallContextFetcher } from '../auth/authContexts/CallContext';
+import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -38,8 +38,8 @@ export default class CallMutations {
     private tagDataSource: TagDataSource,
     @inject(Tokens.CasbinAuthorization)
     private casbinAuth: CasbinAuthorization,
-    @inject(Tokens.CallContextFetcher)
-    private authContextFetcher: CallContextFetcher
+    @inject(Tokens.CallAuthContext)
+    private authContext: CallAuthContext
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -115,7 +115,7 @@ export default class CallMutations {
       return rejection('Existing call not found', { callId: args.id });
     }
 
-    const authContext = await this.authContextFetcher.fetchContextForCalls([
+    const authContext = await this.authContext.fetchContextForCalls([
       existingCall.id,
     ]);
 

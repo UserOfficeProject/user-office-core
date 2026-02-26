@@ -1,7 +1,10 @@
-import { CALL_CONTEXT_ATTRIBUTES } from './authContexts/CallContext';
-import { callAuthFunctions } from './authFunctions/CallFunctions';
+import { inject, injectable } from 'tsyringe';
 
-type AuthFunction<TObj> = (user: string, obj: TObj) => boolean;
+import { Tokens } from '../config/Tokens';
+import { CALL_CONTEXT_ATTRIBUTES } from './authContexts/CallAuthContext';
+import { CallAuthFunctions } from './authFunctions/CallAuthFunctions';
+
+type AuthFunction<TObj> = (role: string, obj: TObj) => Promise<boolean>;
 
 export type AuthFunctionRegistry<TObj> = Record<string, AuthFunction<TObj>>;
 
@@ -9,10 +12,17 @@ export type AuthContext = {
   type: string;
 };
 
-export const contextAttributeRegistry = new Map<string, string[]>([
-  ['call', CALL_CONTEXT_ATTRIBUTES],
-]);
+@injectable()
+export class AuthRegistry {
+  public readonly contextAttributes = new Map<string, string[]>([
+    ['call', CALL_CONTEXT_ATTRIBUTES],
+  ]);
 
-export const functionRegistry = new Map<string, AuthFunctionRegistry<any>>([
-  ['call', callAuthFunctions],
-]);
+  public readonly functions: Map<string, AuthFunctionRegistry<any>>;
+
+  constructor(
+    @inject(Tokens.CallAuthFunctions) callAuthFunctions: CallAuthFunctions
+  ) {
+    this.functions = new Map([['call', callAuthFunctions.registry()]]);
+  }
+}

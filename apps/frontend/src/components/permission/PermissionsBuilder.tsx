@@ -36,7 +36,7 @@ export function PermissionsBuilder() {
         { name: '=', label: '=' },
         { name: '!=', label: '!=' },
       ],
-      defaultValue: true,
+      defaultValue: 'true',
     })),
   ];
 

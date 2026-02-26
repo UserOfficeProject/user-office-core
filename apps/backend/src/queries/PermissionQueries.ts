@@ -1,10 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { Authorized } from 'type-graphql';
 
-import {
-  contextAttributeRegistry,
-  functionRegistry,
-} from '../auth/AuthRegistry';
+import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { Roles } from '../models/Role';
@@ -14,7 +11,9 @@ import { UserWithRole } from '../models/User';
 export default class PermissionQueries {
   constructor(
     @inject(Tokens.CasbinService)
-    public casbinService: CasbinService
+    public casbinService: CasbinService,
+    @inject(Tokens.AuthRegistry)
+    public authRegistry: AuthRegistry
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -22,8 +21,11 @@ export default class PermissionQueries {
     agent: UserWithRole | null,
     resourceType: string
   ) {
-    const attributes = contextAttributeRegistry.get(resourceType) ?? [];
-    const functions = Object.keys(functionRegistry.get(resourceType) ?? {});
+    const attributes =
+      this.authRegistry.contextAttributes.get(resourceType) ?? [];
+    const functions = Object.keys(
+      this.authRegistry.functions.get(resourceType) ?? {}
+    );
 
     return {
       attributes,

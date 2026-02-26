@@ -1,9 +1,11 @@
 import 'reflect-metadata';
 
-import { CallContextFetcher } from '../auth/authContexts/CallContext';
+import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
+import { CallAuthFunctions } from '../auth/authFunctions/CallAuthFunctions';
+import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
-import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
+import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
@@ -146,6 +148,8 @@ mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 
 mapClass(Tokens.CasbinConditionDataSource, PostgresCasbinConditionDataSource);
 mapClass(Tokens.CasbinService, CasbinService);
-mapClass(Tokens.CallContextFetcher, CallContextFetcher);
 mapClass(Tokens.CasbinAuthorization, CasbinAuthorization);
-mapClass(Tokens.CallAuthFilterBuilder, CallAuthFilterBuilder);
+mapClass(Tokens.CallAuthContext, CallAuthContext);
+mapClass(Tokens.CallAuthFunctions, CallAuthFunctions);
+mapClass(Tokens.CallAuthFilters, CallAuthFilters);
+mapClass(Tokens.AuthRegistry, AuthRegistry);

@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
-import { CallContextFetcher } from '../auth/authContexts/CallContext';
+import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
+import { CallAuthFunctions } from '../auth/authFunctions/CallAuthFunctions';
+import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
-import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
+import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
@@ -153,6 +155,8 @@ mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.CasbinConditionDataSource, PostgresCasbinConditionDataSource);
 mapClass(Tokens.CasbinService, CasbinService);
-mapClass(Tokens.CallContextFetcher, CallContextFetcher);
 mapClass(Tokens.CasbinAuthorization, CasbinAuthorization);
-mapClass(Tokens.CallAuthFilterBuilder, CallAuthFilterBuilder);
+mapClass(Tokens.CallAuthContext, CallAuthContext);
+mapClass(Tokens.CallAuthFunctions, CallAuthFunctions);
+mapClass(Tokens.CallAuthFilters, CallAuthFilters);
+mapClass(Tokens.AuthRegistry, AuthRegistry);

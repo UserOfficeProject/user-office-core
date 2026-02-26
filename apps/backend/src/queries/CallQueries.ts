@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CallContextFetcher } from '../auth/authContexts/CallContext';
+import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
-import { CallAuthFilterBuilder } from '../auth/filters/CallAuthFilterBuilder';
+import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -16,10 +16,10 @@ export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
     @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization,
-    @inject(Tokens.CallAuthFilterBuilder)
-    private authFilterBuilder: CallAuthFilterBuilder,
-    @inject(Tokens.CallContextFetcher)
-    private authContextFetcher: CallContextFetcher,
+    @inject(Tokens.CallAuthFilters)
+    private authFilters: CallAuthFilters,
+    @inject(Tokens.CallAuthContext)
+    private authContext: CallAuthContext,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -43,7 +43,7 @@ export default class CallQueries {
     }
 
     // Optional optimisation
-    const authFilters = await this.authFilterBuilder.buildDbFilters(
+    const authFilters = await this.authFilters.buildDbFilters(
       role,
       'call',
       'read'
@@ -53,7 +53,7 @@ export default class CallQueries {
 
     const calls = await this.dataSource.getCalls(filter);
 
-    const authContexts = await this.authContextFetcher.fetchContextForCalls(
+    const authContexts = await this.authContext.fetchContextForCalls(
       calls.map((c) => c.id)
     );
 

@@ -5,10 +5,12 @@ import { walkAst } from '../../casbin/conditionParser';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 
-type CallAuthFilter = Partial<Pick<CallsFilter, 'hasTag' | 'isEnded'>>;
+type CallAuthFilter = Partial<
+  Pick<CallsFilter, 'shortCode' | 'hasTag' | 'isEnded' | 'isEndedInternal'>
+>;
 
 @injectable()
-export class CallAuthFilterBuilder {
+export class CallAuthFilters {
   constructor(
     @inject(Tokens.CasbinService)
     private casbinService: CasbinService
@@ -37,6 +39,12 @@ export class CallAuthFilterBuilder {
       const { field, operator, value } = rule;
 
       switch (field) {
+        case 'call.shortCode':
+          if (operator === '=') {
+            filters.shortCode = value;
+          }
+          break;
+
         case 'call.tags':
           if (operator === 'contains') {
             filters.hasTag = value;
@@ -45,8 +53,13 @@ export class CallAuthFilterBuilder {
 
         case 'isCallEnded':
           if (operator === '=' && value === 'true') {
-            // Forced example
             filters.isEnded = true;
+          }
+          break;
+
+        case 'isCallEndedInternal':
+          if (operator === '=' && value === 'true') {
+            filters.isEndedInternal = true;
           }
           break;
       }
