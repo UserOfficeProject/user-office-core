@@ -17,7 +17,6 @@ import { UserDataSource } from '../UserDataSource';
 import { createUOWSClient } from './UOWSClient';
 
 const postgresUserDataSource = new PostgresUserDataSource();
-const token = process.env.EXTERNAL_AUTH_TOKEN;
 
 const UOWSClient = createUOWSClient();
 

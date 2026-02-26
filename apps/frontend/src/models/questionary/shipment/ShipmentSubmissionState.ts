@@ -1,8 +1,7 @@
 import { immerable } from 'immer';
 
-import { Questionary, SampleFragment } from 'generated/sdk';
+import { Questionary, SampleFragment, TemplateGroupId } from 'generated/sdk';
 
-import { TemplateGroupId } from './../../../generated/sdk';
 import { ShipmentWithQuestionary } from './ShipmentWithQuestionary';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 

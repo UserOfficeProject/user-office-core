@@ -192,6 +192,9 @@ const apolloServer = async (app: Express) => {
         },
       })
     );
+  }
+
+  if (process.env.INCLUDE_USER_NUMBER_IN_METRICS) {
     app.use((req, res, next) => {
       const clientName = req.headers['apollographql-client-name'];
       if (
