@@ -754,7 +754,7 @@ context('Technique Proposal tests', () => {
       cy.contains(proposal3.title);
     });
 
-    it.only('Technique proposals management page should default to most recent active call in call filter', function () {
+    it('Technique proposals management page should default to most recent active call in call filter', function () {
       const esiTemplateName = faker.lorem.words(2);
       const currentDayStart = DateTime.now().startOf('day');
 
