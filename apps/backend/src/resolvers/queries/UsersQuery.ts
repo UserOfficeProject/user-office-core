@@ -65,7 +65,6 @@ export class UsersQuery {
   previousCollaborators(
     @Args()
     {
-      userId,
       first,
       offset,
       userRole,
@@ -73,12 +72,11 @@ export class UsersQuery {
       sortField,
       sortDirection,
       searchText,
-    }: PreviousCollaboratorsArgs,
+    }: UsersArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.user.getPreviousCollaborators(
       context.user,
-      userId,
       first,
       offset,
       sortField,

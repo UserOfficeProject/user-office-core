@@ -1,5 +1,4 @@
 query getPreviousCollaborators(
-  $userId: Int!
   $searchText: String
   $first: Int
   $offset: Int
@@ -7,7 +6,6 @@ query getPreviousCollaborators(
   $subtractUsers: [Int!]
 ) {
   previousCollaborators(
-    userId: $userId
     searchText: $searchText
     first: $first
     offset: $offset
