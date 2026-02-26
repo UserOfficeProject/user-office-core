@@ -9,7 +9,7 @@ import i18n from 'i18n';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import ParticipantModal from 'components/proposal/ParticipantModal';
+import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer } from 'styles/StyledComponents';
@@ -253,21 +253,23 @@ const TechniqueTable = () => {
 
   return (
     <>
-      <ParticipantModal
-        show={!!assigningTechniqueScientistsId}
-        close={(): void => {
-          setSelectedTechnique(null);
-          setAssigningTechniqueScientistsId(null);
-        }}
-        addParticipants={assignScientistsToTechnique}
-        selectedUsers={selectedTechnique?.scientists.map(
-          (scientist) => scientist.id
-        )}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
+      {isUserOfficer && (
+        <PeopleSelectorModal
+          show={!!assigningTechniqueScientistsId}
+          close={(): void => {
+            setSelectedTechnique(null);
+            setAssigningTechniqueScientistsId(null);
+          }}
+          addParticipants={assignScientistsToTechnique}
+          selectedUsers={selectedTechnique?.scientists.map(
+            (scientist) => scientist.id
+          )}
+          selection={true}
+          userRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={t('instrumentSci')}
+          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+        />
+      )}
       <Dialog
         aria-labelledby="instrument-select-title"
         aria-describedby="instrument-select-description"

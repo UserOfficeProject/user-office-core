@@ -91,6 +91,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       proposalStatusShortCode: 'QUICK_REVIEW',
       instrumentIds: [],
     },
+    {},
     CallsDataQuantity.MINIMAL,
     currentRole !== UserRole.USER_OFFICER
       ? !techniques || techniques.length <= 0

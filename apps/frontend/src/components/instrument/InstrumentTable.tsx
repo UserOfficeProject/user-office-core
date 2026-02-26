@@ -19,7 +19,7 @@ import {
   InstrumentFragment,
   UserRole,
 } from '../../generated/sdk';
-import ParticipantModal from '../proposal/ParticipantModal';
+import PeopleSelectorModal from '../proposal/PeopleSelectorModal';
 
 const columns: Column<InstrumentFragment>[] = [
   {
@@ -151,18 +151,20 @@ const InstrumentTable = () => {
 
   return (
     <>
-      <ParticipantModal
-        show={!!assigningInstrumentId}
-        close={(): void => setAssigningInstrumentId(null)}
-        addParticipants={assignScientistsToInstrument}
-        selectedUsers={instrumentAssignments?.scientists.map(
-          (scientist) => scientist.id
-        )}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
+      {isUserOfficer && (
+        <PeopleSelectorModal
+          show={!!assigningInstrumentId}
+          close={(): void => setAssigningInstrumentId(null)}
+          addParticipants={assignScientistsToInstrument}
+          selectedUsers={instrumentAssignments?.scientists.map(
+            (scientist) => scientist.id
+          )}
+          selection={true}
+          userRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={t('instrumentSci')}
+          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+        />
+      )}
       <div data-cy="instruments-table">
         <SuperMaterialTable
           delete={onInstrumentDelete}

@@ -4,6 +4,8 @@ FROM cypress/included:15.4.0
 WORKDIR /e2e
 COPY apps/frontend/src/generated frontend/src/generated
 COPY apps/frontend/package* frontend/
+COPY validation ./validation
+RUN ln -sfn /e2e/validation /validation
 
 WORKDIR /e2e/frontend
 RUN npm ci --silent
