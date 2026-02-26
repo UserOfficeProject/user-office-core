@@ -104,8 +104,11 @@ export class ExperimentSafetyAuthorization {
     if (experiment === null || experiment.proposalPk === null) {
       return false;
     }
+    console.log('===========================');
+    console.log(experimentSafety);
     if (
       experimentSafety.esiQuestionarySubmittedAt !== null &&
+      experimentSafety.statusId !== 'AWAITING_ESF' &&
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;

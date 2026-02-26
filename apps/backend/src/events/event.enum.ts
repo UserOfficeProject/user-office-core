@@ -1,33 +1,40 @@
-import { isCallEndedGuard } from '../workflowEngine/guards/isCallEndedGuard';
-import { isCallEndedInternalGuard } from '../workflowEngine/guards/isCallEndedInternalGuard';
-import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapReviewEndedGuard';
-import { isCallReviewEndedGuard } from '../workflowEngine/guards/isCallReviewEndedGuard';
-import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
-import { isProposalAllFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingInstrumentSubmittedGuard';
-import { isProposalAllFapMeetingsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingsSubmittedGuard';
-import { isProposalAllFapReviewersSelectedGuard } from '../workflowEngine/guards/isProposalAllFapReviewersSelectedGuard';
-import { isProposalAllFapReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapReviewsSubmittedGuard';
-import { isProposalAllFeasibilityReviewsFeasibleGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsFeasibleGuard';
-import { isProposalAllFeasibilityReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsSubmittedGuard';
-import { isProposalAllReviewsSubmittedForAllFapsGuard } from '../workflowEngine/guards/isProposalAllReviewsSubmittedForAllFapsGuard';
-import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
-import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
-import { isProposalBookingTimeCompletedGuard } from '../workflowEngine/guards/isProposalBookingTimeCompletedGuard';
-import { isProposalFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentSubmittedGuard';
-import { isProposalFapMeetingInstrumentUnsubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentUnsubmittedGuard';
-import { isProposalFapReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFapReviewSubmittedGuard';
-import { isProposalFapsSelectedGuard } from '../workflowEngine/guards/isProposalFapsSelectedGuard';
-import { isProposalFeasibilityReviewFeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewFeasibleGuard';
-import { isProposalFeasibilityReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewSubmittedGuard';
-import { isProposalFeasibilityReviewUnfeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewUnfeasibleGuard';
-import { isProposalInstrumentsSelectedGuard } from '../workflowEngine/guards/isProposalInstrumentsSelectedGuard';
-import { isProposalManagementDecisionSubmittedGuard } from '../workflowEngine/guards/isProposalManagementDecisionSubmittedGuard';
-import { isProposalNotifiedGuard } from '../workflowEngine/guards/isProposalNotifiedGuard';
-import { isProposalRejectedGuard } from '../workflowEngine/guards/isProposalRejectedGuard';
-import { isProposalReservedGuard } from '../workflowEngine/guards/isProposalReservedGuard';
-import { isProposalSampleReviewSubmittedGuard } from '../workflowEngine/guards/isProposalSampleReviewSubmittedGuard';
-import { isProposalSampleSafeGuard } from '../workflowEngine/guards/isProposalSampleSafeGuard';
-import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
+import {
+  isCallEndedGuard,
+  isCallEndedInternalGuard,
+  isCallFapReviewEndedGuard,
+  isCallReviewEndedGuard,
+  isExperimentESFApprovedByESR,
+  isExperimentESFApprovedByIS,
+  isExperimentESFRejectedByESR,
+  isExperimentESFRejectedByIS,
+  isExperimentESFSubmitted,
+  isProposalAcceptedGuard,
+  isProposalAllFapMeetingInstrumentSubmittedGuard,
+  isProposalAllFapMeetingsSubmittedGuard,
+  isProposalAllFapReviewersSelectedGuard,
+  isProposalAllFapReviewsSubmittedGuard,
+  isProposalAllFeasibilityReviewsFeasibleGuard,
+  isProposalAllFeasibilityReviewsSubmittedGuard,
+  isProposalAllReviewsSubmittedForAllFapsGuard,
+  isProposalAssignedToTechniquesGuard,
+  isProposalBookingTimeActivatedGuard,
+  isProposalBookingTimeCompletedGuard,
+  isProposalFapMeetingInstrumentSubmittedGuard,
+  isProposalFapMeetingInstrumentUnsubmittedGuard,
+  isProposalFapReviewSubmittedGuard,
+  isProposalFapsSelectedGuard,
+  isProposalFeasibilityReviewFeasibleGuard,
+  isProposalFeasibilityReviewSubmittedGuard,
+  isProposalFeasibilityReviewUnfeasibleGuard,
+  isProposalInstrumentsSelectedGuard,
+  isProposalManagementDecisionSubmittedGuard,
+  isProposalNotifiedGuard,
+  isProposalRejectedGuard,
+  isProposalReservedGuard,
+  isProposalSampleReviewSubmittedGuard,
+  isProposalSampleSafeGuard,
+  isProposalSubmittedGuard,
+} from '../workflowEngine/guards';
 import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachnine';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
@@ -626,23 +633,38 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   ],
   [
     Event.EXPERIMENT_ESF_SUBMITTED,
-    { label: 'Event occurs when experiment ESF is submitted' },
+    {
+      label: 'Event occurs when experiment ESF is submitted',
+      guard: isExperimentESFSubmitted,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_IS,
-    { label: 'Event occurs when experiment ESF is approved by IS' },
+    {
+      label: 'Event occurs when experiment ESF is approved by IS',
+      guard: isExperimentESFApprovedByIS,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_IS,
-    { label: 'Event occurs when experiment ESF is rejected by IS' },
+    {
+      label: 'Event occurs when experiment ESF is rejected by IS',
+      guard: isExperimentESFRejectedByIS,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_ESR,
-    { label: 'Event occurs when experiment ESF is approved by ESR' },
+    {
+      label: 'Event occurs when experiment ESF is approved by ESR',
+      guard: isExperimentESFApprovedByESR,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
-    { label: 'Event occurs when experiment ESF is rejected by ESR' },
+    {
+      label: 'Event occurs when experiment ESF is rejected by ESR',
+      guard: isExperimentESFRejectedByESR,
+    },
   ],
   [
     Event.DATA_ACCESS_USERS_UPDATED,

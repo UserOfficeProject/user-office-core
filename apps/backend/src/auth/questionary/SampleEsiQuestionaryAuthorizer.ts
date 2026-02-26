@@ -10,6 +10,8 @@ export class SampleEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
     return true;
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    console.log('============hasWriteRights=============');
+
     //  TODO implement this
     return true;
   }

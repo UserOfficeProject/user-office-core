@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import NotFound from 'components/common/NotFound';
-import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer } from 'styles/StyledComponents';
 
 import ExperimentSafety from './ExperimentSafety';
 
@@ -15,9 +15,7 @@ function ExperimentSafetyPage() {
 
   return (
     <StyledContainer>
-      <StyledPaper data-cy="create-proposal-esi-table">
-        <ExperimentSafety experimentSafetyPk={+experimentSafetyPk} />
-      </StyledPaper>
+      <ExperimentSafety experimentSafetyPk={+experimentSafetyPk} />
     </StyledContainer>
   );
 }

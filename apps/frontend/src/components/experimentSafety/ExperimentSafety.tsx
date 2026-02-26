@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { GetExperimentSafetyQuery } from 'generated/sdk';
+import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ExperimentSafetyContainer from './ExperimentSafetyContainer';
+import ExperimentSafetyNotification from './ExperimentSafetyNotification';
 
 interface ExperimentSafetyProps {
   experimentSafetyPk: number;
@@ -36,7 +38,14 @@ function ExperimentSafety({ experimentSafetyPk }: ExperimentSafetyProps) {
     return <UOLoader />;
   }
 
-  return <ExperimentSafetyContainer experimentSafety={experimentSafety} />;
+  return (
+    <>
+      <ExperimentSafetyNotification experimentSafety={experimentSafety} />
+      <StyledPaper data-cy="experiment-safety-container" margin={[2, 0]}>
+        <ExperimentSafetyContainer experimentSafety={experimentSafety} />
+      </StyledPaper>
+    </>
+  );
 }
 
 export default ExperimentSafety;
