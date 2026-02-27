@@ -685,7 +685,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
     new Promise<QueryResult<ProposalViewData>>((resolve, reject) => {
-      if (callId === null) {
+      const selectedCallId = callId ?? proposalFilter.callId;
+      if (!selectedCallId) {
         resolve({
           data: [],
           page: tableQuery.page,
@@ -824,11 +825,13 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const handleFilterChange = (filter: ProposalsFilter) => {
     const updatedFilter = { ...filter };
-    if (filter.callId === 0) {
-      updatedFilter.callId = null;
-      updatedFilter.callIds = calls?.map((call) => call.id) || [];
-    } else {
-      updatedFilter.callIds = [filter.callId as number];
+    if (filter.callId) {
+      if (filter.callId === 0) {
+        updatedFilter.callId = null;
+        updatedFilter.callIds = calls?.map((call) => call.id) || [];
+      } else {
+        updatedFilter.callIds = [filter.callId as number];
+      }
     }
 
     setProposalFilter(updatedFilter);
