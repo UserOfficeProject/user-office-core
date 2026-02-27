@@ -83,7 +83,7 @@ export class BasicUserDetails {
     public email: string,
     public country: string,
     public user_title: string,
-    public oidc_sub: string | null
+    public oidcSub: string | null
   ) {}
 }
 
