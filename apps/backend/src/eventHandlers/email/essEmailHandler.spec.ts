@@ -19,9 +19,9 @@ import { VisitDataSourceMock } from '../../datasources/mockups/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
+import { Settings, SettingsId } from '../../models/Settings';
 import { EmailTemplateId } from './emailTemplateId';
 import { essEmailHandler } from './essEmailHandler';
-import { Settings, SettingsId } from '../../models/Settings';
 
 // Mock MailService
 const mockMailService = {
