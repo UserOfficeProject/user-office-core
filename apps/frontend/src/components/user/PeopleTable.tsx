@@ -82,7 +82,7 @@ const localColumns = [
   { title: 'Preferred Name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
   { title: 'Email', field: 'email' },
-  { title: 'User Name', field: 'oidc_sub' },
+  { title: 'User Name', field: 'oidcSub' },
 ];
 
 async function getUserByEmail(
