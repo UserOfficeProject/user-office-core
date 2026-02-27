@@ -1,7 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
+import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
@@ -14,6 +16,7 @@ import { Event } from '../../events/event.enum';
 import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
+import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
@@ -31,6 +34,24 @@ export enum EmailTemplateId {
   USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
   USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
   USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
+}
+
+function formatEmailDate(
+  value: Date | null,
+  format = 'dd-MM-yyyy HH:mm',
+  timezone = process.env.TZ ?? 'Europe/Stockholm'
+) {
+  if (!value) {
+    return '';
+  }
+
+  const dateTime = DateTime.fromJSDate(value, { zone: timezone });
+
+  if (!dateTime.isValid) {
+    return String(value);
+  }
+
+  return `${dateTime.toFormat(format)} ${dateTime.setLocale('en-GB').toFormat('ZZZZ')}`;
 }
 
 export async function essEmailHandler(event: ApplicationEvent) {
@@ -396,6 +417,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
     case Event.VISIT_REGISTRATION_APPROVED:
     case Event.VISIT_REGISTRATION_CANCELLED: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const [formatSetting, timezoneSetting] = await Promise.all([
+        adminDataSource.getSetting(SettingsId.DATE_TIME_FORMAT),
+        adminDataSource.getSetting(SettingsId.TIMEZONE),
+      ]);
+
       const visitRegistration = await visitDataSource.getRegistration(
         event.visitregistration.userId,
         event.visitregistration.visitId
@@ -421,11 +451,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const call = await callDataSource.getCall(proposal.callId);
-      if (!call) {
-        return;
-      }
-
       const templateId =
         event.type === Event.VISIT_REGISTRATION_APPROVED
           ? EmailTemplateId.VISIT_REGISTRATION_APPROVED
@@ -438,10 +463,19 @@ export async function essEmailHandler(event: ApplicationEvent) {
           },
           substitution_data: {
             preferredname: user.preferredname,
-            startsAt: visitRegistration.startsAt,
-            endsAt: visitRegistration.endsAt,
+            startsAt: formatEmailDate(
+              visitRegistration.startsAt,
+              formatSetting?.settingsValue,
+              timezoneSetting?.settingsValue
+            ),
+            endsAt: formatEmailDate(
+              visitRegistration.endsAt,
+              formatSetting?.settingsValue,
+              timezoneSetting?.settingsValue
+            ),
             proposalTitle: proposal.title,
-            callShortCode: call.shortCode,
+            proposalId: proposal.proposalId,
+            oidcSub: user.oidcSub,
           },
           recipients: [
             { address: user.email },

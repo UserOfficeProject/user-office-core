@@ -11,14 +11,15 @@ import People from '@mui/icons-material/People';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import i18n from 'i18n';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
+import i18n from 'i18n';
+
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, UserRole } from 'generated/sdk';
+import { FeatureId, PaginationSortDirection, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
@@ -71,6 +72,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    {
+      sortField: 'call_id',
+      sortDirection: PaginationSortDirection.DESC,
     },
     CallsDataQuantity.MINIMAL
   ).calls;

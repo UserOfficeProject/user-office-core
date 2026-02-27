@@ -1,9 +1,10 @@
 import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
-import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -18,7 +19,7 @@ import {
   InstrumentFragment,
   UserRole,
 } from '../../generated/sdk';
-import ParticipantModal from '../proposal/ParticipantModal';
+import PeopleSelectorModal from '../proposal/PeopleSelectorModal';
 
 const columns: Column<InstrumentFragment>[] = [
   {
@@ -59,7 +60,7 @@ const InstrumentTable = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -150,18 +151,20 @@ const InstrumentTable = () => {
 
   return (
     <>
-      <ParticipantModal
-        show={!!assigningInstrumentId}
-        close={(): void => setAssigningInstrumentId(null)}
-        addParticipants={assignScientistsToInstrument}
-        selectedUsers={instrumentAssignments?.scientists.map(
-          (scientist) => scientist.id
-        )}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
+      {isUserOfficer && (
+        <PeopleSelectorModal
+          show={!!assigningInstrumentId}
+          close={(): void => setAssigningInstrumentId(null)}
+          addParticipants={assignScientistsToInstrument}
+          selectedUsers={instrumentAssignments?.scientists.map(
+            (scientist) => scientist.id
+          )}
+          selection={true}
+          userRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={t('instrumentSci')}
+          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+        />
+      )}
       <div data-cy="instruments-table">
         <SuperMaterialTable
           delete={onInstrumentDelete}

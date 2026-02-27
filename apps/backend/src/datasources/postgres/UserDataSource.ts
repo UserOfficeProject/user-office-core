@@ -403,7 +403,9 @@ export default class PostgresUserDataSource implements UserDataSource {
             qb.whereILikeEscaped('institution', '%?%', searchText)
               .orWhereILikeEscaped('firstname', '%?%', searchText)
               .orWhereILikeEscaped('preferredname', '%?%', searchText)
-              .orWhereILikeEscaped('lastname', '%?%', searchText);
+              .orWhereILikeEscaped('lastname', '%?%', searchText)
+              .orWhereILikeEscaped('email', '%?%', searchText)
+              .orWhereILikeEscaped('oidc_sub', '%?%', searchText);
           });
         }
         if (first) {
