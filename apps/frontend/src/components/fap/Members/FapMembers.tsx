@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
-import ParticipantModal from 'components/proposal/ParticipantModal';
+import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -334,7 +334,7 @@ const FapMembers = ({
 
   return (
     <>
-      <ParticipantModal
+      <PeopleSelectorModal
         show={modalOpen}
         close={(): void => setOpen(false)}
         addParticipants={addMember}
@@ -344,7 +344,7 @@ const FapMembers = ({
         invitationUserRole={UserRole.FAP_REVIEWER}
         userRole={UserRole.FAP_REVIEWER}
       />
-      <ParticipantModal
+      <PeopleSelectorModal
         show={fapChairModalOpen}
         close={(): void => setFapChairModalOpen(false)}
         addParticipants={sendFapChairUpdate}
@@ -353,7 +353,7 @@ const FapMembers = ({
         invitationUserRole={UserRole.FAP_CHAIR}
         userRole={UserRole.FAP_REVIEWER}
       />
-      <ParticipantModal
+      <PeopleSelectorModal
         show={fapSecretaryModalOpen}
         close={(): void => setFapSecretaryModalOpen(false)}
         addParticipants={sendFapSecretaryUpdate}

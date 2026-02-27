@@ -1,6 +1,6 @@
 import { useEffect, useState, SetStateAction } from 'react';
 
-import { Call, CallsFilter } from 'generated/sdk';
+import { Call, CallsFilter, PaginationSortDirection } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export enum CallsDataQuantity {
@@ -8,11 +8,18 @@ export enum CallsDataQuantity {
   MINIMAL,
 }
 
+type QueryParameters = {
+  sortField?: string | undefined;
+  sortDirection?: PaginationSortDirection | undefined;
+};
+
 export function useCallsData(
   filter?: CallsFilter,
+  queryParameters?: QueryParameters,
   dataQuantity: CallsDataQuantity = CallsDataQuantity.MINIMAL
 ) {
   const [callsFilter, setCallsFilter] = useState(filter);
+  const [callsQueryParams, setCallsQueryParams] = useState(queryParameters);
   const [calls, setCalls] = useState<Call[]>([]);
   const [loadingCalls, setLoadingCalls] = useState(true);
 
@@ -39,7 +46,7 @@ export function useCallsData(
         break;
     }
 
-    getCalls({ filter: callsFilter }).then((data) => {
+    getCalls({ filter: callsFilter, ...callsQueryParams }).then((data) => {
       if (unmounted) {
         return;
       }
@@ -53,7 +60,13 @@ export function useCallsData(
     return () => {
       unmounted = true;
     };
-  }, [api, callsFilter, dataQuantity]);
+  }, [api, callsFilter, dataQuantity, callsQueryParams]);
 
-  return { loadingCalls, calls, setCallsWithLoading, setCallsFilter };
+  return {
+    loadingCalls,
+    calls,
+    setCallsWithLoading,
+    setCallsFilter,
+    setCallsQueryParams,
+  };
 }

@@ -9,11 +9,16 @@ import {
   UpdateFapToCallInstrumentInput,
   CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
+import { PaginationSortDirection } from '../utils/pagination';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
 export interface CallDataSource {
   getCall(id: number): Promise<Call | null>;
-  getCalls(filter?: CallsFilter): Promise<Call[]>;
+  getCalls(
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ): Promise<Call[]>;
   getCallHasInstrumentsByInstrumentIds(
     instrumentIds: number[]
   ): Promise<CallHasInstrument[]>;
