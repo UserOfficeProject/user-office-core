@@ -247,4 +247,9 @@ export default class FapQueries {
   async getProposalsFaps(agent: UserWithRole | null, proposalPks: number[]) {
     return await this.dataSource.getFapsByProposalPks(proposalPks);
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getFapReviewVisibilityOptions(agent: UserWithRole | null) {
+    return await this.dataSource.getFapReviewVisibilityOptions();
+  }
 }

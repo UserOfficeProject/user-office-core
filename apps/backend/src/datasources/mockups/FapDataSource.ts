@@ -5,6 +5,7 @@ import {
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
   FapReviewVisibility,
+  ReviewVisibility,
 } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
@@ -638,5 +639,9 @@ export class FapDataSourceMock implements FapDataSource {
     }
 
     return null;
+  }
+
+  getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]> {
+    throw new Error('Method not implemented.');
   }
 }

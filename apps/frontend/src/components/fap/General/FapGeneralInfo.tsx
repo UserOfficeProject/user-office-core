@@ -13,23 +13,9 @@ import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useFapReviewVisibilityOptions } from 'hooks/fap/useFapReviewVisibilityOptions';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-export const reviewVisibilityOptions = [
-  {
-    value: 1,
-    text: 'Once all reviews on a proposal are complete',
-  },
-  {
-    value: 2,
-    text: 'Reviews visible during the FAP',
-  },
-  {
-    value: 3,
-    text: 'Reviews visible after the FAP has ended',
-  },
-];
 
 type FapPageProps = {
   /** Fap data to be shown */
@@ -43,6 +29,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
+
+  const { isLoadingVisibilityOptions, reviewVisibilityOptions } =
+    useFapReviewVisibilityOptions();
 
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     fap.customGradeGuide
@@ -176,7 +165,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
-              <Grid item sm={6} xs={12}>
+              <Grid item>
                 <Field
                   id="reviewVisibility"
                   name="reviewVisibility"
@@ -185,7 +174,14 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   component={Select}
                   onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
                   data-cy="fap-review-visibility-filter"
-                  options={reviewVisibilityOptions}
+                  options={
+                    isLoadingVisibilityOptions
+                      ? []
+                      : reviewVisibilityOptions.map((option) => ({
+                          value: option.reviewVisibilityId,
+                          text: option.description,
+                        }))
+                  }
                   fullWidth
                   type="number"
                 />

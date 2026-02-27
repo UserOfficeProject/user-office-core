@@ -10,6 +10,7 @@ import {
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
   FapReviewVisibility,
+  ReviewVisibility,
 } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
@@ -53,6 +54,8 @@ import {
   AssignProposalsToFapsInput,
   CountryRecord,
   FapReviewsRecord,
+  createFapReviewVisibilityObject,
+  ReviewVisibilityRecord,
 } from './records';
 
 @injectable()
@@ -1387,5 +1390,14 @@ export default class PostgresFapDataSource implements FapDataSource {
       .first();
 
     return visibility as FapReviewVisibility;
+  }
+
+  async getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]> {
+    return await database
+      .select('*')
+      .from('review_visibility')
+      .then((records: ReviewVisibilityRecord[]) => {
+        return records.map((record) => createFapReviewVisibilityObject(record));
+      });
   }
 }

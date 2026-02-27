@@ -5,6 +5,7 @@ import {
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
   FapReviewVisibility,
+  ReviewVisibility,
 } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
@@ -175,4 +176,5 @@ export interface FapDataSource {
     userId?: number
   ): Promise<FapProposal[]>;
   getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
+  getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]>;
 }

@@ -21,6 +21,14 @@ export class Fap {
   ) {}
 }
 
+export class ReviewVisibility {
+  constructor(
+    public reviewVisibilityId: number,
+    public visibility: FapReviewVisibility,
+    public description: string
+  ) {}
+}
+
 export enum FapReviewVisibility {
   PROPOSAL_REVIEWS_COMPLETE = 'proposal_reviews_complete',
   REVIEWS_VISIBLE = 'reviews_visible',

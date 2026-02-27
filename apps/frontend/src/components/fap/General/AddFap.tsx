@@ -11,9 +11,8 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
+import { useFapReviewVisibilityOptions } from 'hooks/fap/useFapReviewVisibilityOptions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-import { reviewVisibilityOptions } from './FapGeneralInfo';
 
 type AddFapProps = {
   close: (fapAdded: Fap | null) => void;
@@ -22,6 +21,8 @@ type AddFapProps = {
 const AddFap = ({ close }: AddFapProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const { isLoadingVisibilityOptions, reviewVisibilityOptions } =
+    useFapReviewVisibilityOptions();
 
   return (
     <Formik
@@ -105,7 +106,14 @@ const AddFap = ({ close }: AddFapProps) => {
             component={Select}
             onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
             data-cy="fap-review-visibility-filter"
-            options={reviewVisibilityOptions}
+            options={
+              isLoadingVisibilityOptions
+                ? []
+                : reviewVisibilityOptions.map((option) => ({
+                    value: option.reviewVisibilityId,
+                    text: option.description,
+                  }))
+            }
             required
             fullWidth
           />

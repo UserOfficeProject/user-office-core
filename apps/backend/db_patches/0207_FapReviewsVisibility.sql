@@ -10,12 +10,13 @@ BEGIN
 
         CREATE TABLE IF NOT EXISTS review_visibility (
             review_visibility_id  serial PRIMARY KEY,
-            visibility VARCHAR(100) NOT NULL
+            visibility VARCHAR(100) NOT NULL,
+            description TEXT
         );
 
-        INSERT INTO review_visibility(visibility) VALUES('proposal_reviews_complete');
-        INSERT INTO review_visibility(visibility) VALUES('reviews_visible');
-        INSERT INTO review_visibility(visibility) VALUES('reviews_visible_fap_ended');
+        INSERT INTO review_visibility(visibility, description) VALUES('proposal_reviews_complete', 'Reviews are visible once all proposal reviews are complete');
+        INSERT INTO review_visibility(visibility, description) VALUES('reviews_visible', 'Reviews are visible during the FAP review period');
+        INSERT INTO review_visibility(visibility, description) VALUES('reviews_visible_fap_ended', 'Reviews are visible after the FAP review period has ended');
 
         ALTER TABLE faps
             ADD COLUMN IF NOT exists review_visibility INT NOT NULL REFERENCES review_visibility(review_visibility_id) DEFAULT 1;
