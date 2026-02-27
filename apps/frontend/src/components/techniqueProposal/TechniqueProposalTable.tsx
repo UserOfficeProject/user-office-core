@@ -19,7 +19,14 @@ import {
   ResourceId,
 } from '@user-office-software/duo-localisation';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
@@ -61,17 +68,13 @@ import { useTechniqueProposalInstrumentsData } from './useTechniqueProposalInstr
 
 const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
-  const refreshTableData = () => {
+  const refreshTableData = useCallback(() => {
     tableRef.current?.onQueryChange({});
-  };
+  }, []);
   const [searchParams, setSearchParams] = useSearchParams({});
   const { currentRole } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-  const [callId, setCallId] = useState<number | null>(() => {
-    const callParam = searchParams.get('call');
 
-    return callParam ? Number(callParam) : null;
-  });
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
@@ -89,23 +92,36 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { calls, loadingCalls, setCallsFilter } = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
-      instrumentIds: [],
+      instrumentIds,
     },
-    {},
+    {
+      sortField: 'call_id',
+      sortDirection: PaginationSortDirection.DESC,
+    },
     CallsDataQuantity.MINIMAL,
     currentRole !== UserRole.USER_OFFICER
       ? !techniques || techniques.length <= 0
       : false
   );
 
+  const callId = useMemo(() => {
+    const callParam = searchParams.get('call');
+    if (callParam) return Number(callParam);
+    if (calls && calls.length > 0) return calls[0].id;
+
+    return null;
+  }, [calls, searchParams]);
+
   useEffect(() => {
     if (currentRole === UserRole.USER_OFFICER) {
       return;
     }
-    setCallsFilter({
-      proposalStatusShortCode: 'QUICK_REVIEW',
-      instrumentIds,
-    });
+    if (instrumentIds.length > 0) {
+      setCallsFilter({
+        proposalStatusShortCode: 'QUICK_REVIEW',
+        instrumentIds,
+      });
+    }
   }, [currentRole, instrumentIds, setCallsFilter]);
 
   // Only show instruments in the user's techniques
@@ -116,7 +132,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   });
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
   const proposalId = searchParams.get('proposalId');
@@ -177,7 +192,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     .map((status) => status.id);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
-    callId: callId,
+    callId,
     instrumentFilter: {
       instrumentId: instrument ? +instrument : null,
       showAllProposals: !instrument,
@@ -200,15 +215,9 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const lastProcessedCallId = useRef<number | null>(null);
   useEffect(() => {
-    if (calls && calls.length > 0 && !searchParams.get('call')) {
-      const activeCall = calls.find((call) => call.isActive);
-      const targetCallId = activeCall?.id || calls[0].id;
-      if (targetCallId && targetCallId !== callId) {
-        setCallId(targetCallId);
-      }
-    }
     if (callId !== lastProcessedCallId.current) {
       lastProcessedCallId.current = callId;
+
       setSearchParams((prev) => {
         if (callId) {
           prev.set('call', callId.toString());
@@ -221,7 +230,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       setProposalFilter((prev) => ({ ...prev, callId }));
       refreshTableData();
     }
-  }, [calls, callId, setSearchParams, searchParams]);
+  }, [callId, setSearchParams, setProposalFilter, refreshTableData]);
 
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
