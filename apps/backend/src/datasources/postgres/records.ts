@@ -1552,5 +1552,5 @@ export interface PermissionRecord {
   readonly role: string;
   readonly action: typeof actions[number];
   readonly subject: typeof subjects[number];
-  readonly conditions: string;
+  readonly conditions: string | null;
 }

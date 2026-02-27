@@ -4,6 +4,6 @@ export class PermissionRule {
     public role: string,
     public subject: string,
     public action: string,
-    public conditions: string
+    public conditions: string | null
   ) {}
 }

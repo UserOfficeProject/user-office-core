@@ -8,8 +8,7 @@ import {
 } from './records';
 import { CreatePermissionRuleArgs } from '../../resolvers/mutations/CreatePermissionRuleMutation';
 import { UpdatePermissionRuleArgs } from '../../resolvers/mutations/UpdatePermissionRuleMutation';
-import { PermissionRulesArgs, PermissionRulesFilter } from '../../resolvers/queries/PermissionsQuery';
-import { Role } from '../../models/Role';
+import { PermissionRulesArgs } from '../../resolvers/queries/PermissionsQuery';
 
 export const actions = ['update', 'read', 'delete'] as const;
 export const subjects = ['fap', 'proposal'] as const;
@@ -56,7 +55,11 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return rules;
   }
 
-  substituteConditionsValues(conditions: any, object: any) {
+  substituteConditionsValues(conditions: any, object?: any | undefined) {
+    if (object == null) {
+      return object;
+    }
+
     const result: any = {};
 
     function recurse (cur: any, prop: any, parent: any | null) {
@@ -83,7 +86,11 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return conditions;
   }
 
-  flatten(object: any) {
+  flatten(object?: any | undefined) {
+    if (object == null) {
+      return object;
+    }
+
     const result: any = {}; //accumulator
     function recurse (cur: any, prop: any) {
         if (Object(cur) !== cur) { //is this a literal?
@@ -107,16 +114,38 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
 }
 
   async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
-    return await database
+    /*return database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    .whereRaw(`UPPER(r.title) LIKE '%${userRole.toUpperCase()}%'`)
-    .orWhereRaw(`UPPER(r.short_code) LIKE '%${userRole.toUpperCase()}%'`)
+    .whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`)
+    .orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
     .andWhere('p.action', action)
     .andWhere('p.subject', subjectType)
-    .then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object)) : false);
+    //.then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object)) : false);
+    .then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subjectType, object) : false);*/
+
+    const permissionRecords: PermissionRecord[] | null = await database
+    .select('p.action', 'p.subject', 'p.conditions')
+    .from('permissions as p')
+    .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
+    .join('roles as r', 'rhp.role_id', 'r.role_id')
+    .where(function() {
+  this.whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`).orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
+})
+    .andWhere('p.action', action)
+    .andWhere('p.subject', subjectType);
+
+    if (permissionRecords == null)
+      {
+        return false;
+      }
+      else if(object == null) {
+        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subjectType, object)
+      } else {
+        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object))
+      }
   }
 
   async getPermissionRule(id: number) {
@@ -184,7 +213,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
       .insert({
         subject: args.subject,
         action: args.action,
-        conditions: args.conditions == undefined ? null : args.conditions
+        conditions: args.conditions == null ? null : args.conditions
       })
       .into('permissions')
       .returning('*');

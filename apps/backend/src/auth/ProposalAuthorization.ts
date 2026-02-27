@@ -261,8 +261,7 @@ export class ProposalAuthorization {
 
     const currentRole = agent?.currentRole?.shortCode;
 
-    let hasAccess = false;
-    let permissionContext: any = {};
+    let permissionContext: any = null;
     let isApiKey = false;
 
     //I kept the switch statement with explicit reference to roles in order to avoid having to gather all the properties
@@ -299,11 +298,8 @@ export class ProposalAuthorization {
         break;
       default:
         isApiKey = true;
-        hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }
-    hasAccess = isApiKey? hasAccess : await this.permissionDataSource.hasPermission(currentRole ? currentRole : 'user', 'read', 'proposal', permissionContext); //probably need to change
-    
-    return hasAccess;
+    return isApiKey? this.userAuth.hasGetAccessByToken(agent) : await this.permissionDataSource.hasPermission(currentRole ? currentRole : 'user', 'read', 'proposal', permissionContext); //probably need to change
   }
 
   private async isProposalEditable(
