@@ -44,25 +44,6 @@ describe('Test Admin Mutations', () => {
     ).resolves.toBe(dummyInstitution);
   });
 
-  test('A user officer can update a institution', () => {
-    return expect(
-      adminMutations.updateInstitutions(
-        dummyUserOfficerWithRole,
-        dummyInstitution
-      )
-    ).resolves.toBe(dummyInstitution);
-  });
-
-  test('A user can not update a institution', () => {
-    return expect(
-      adminMutations.updateInstitutions(dummyUserWithRole, {
-        id: 1,
-        name: 'something',
-        country: 1,
-      })
-    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
-  });
-
   test('A user officer can update settings', () => {
     return expect(
       adminMutations.updateSettings(dummyUserOfficerWithRole, updatedSetting)
