@@ -31,7 +31,8 @@ jobs:
             with:
               github_token: ${{ secrets.GITHUB_TOKEN }}
               openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-              jira_base_url: 'https://jira.esss.lu.se'
+              jira_base_url: ${{ vars.JIRA_BASE_URL }}
               jira_api_token: ${{ secrets.JIRA_API_TOKEN }}
               jira_issue_key: ${{ steps.extract-issue-key.outputs.issue_key }}
-              openai_model: gpt-4
+              openai_model: ${{ vars.PR_DESCRIPTION_MODEL }}
+
