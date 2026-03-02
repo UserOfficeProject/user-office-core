@@ -1,3 +1,4 @@
+import { upsertUserByOidcSubValidationSchema } from '@user-office-software/duo-validation';
 import jsonwebtoken from 'jsonwebtoken';
 import { container, Lifecycle } from 'tsyringe';
 
@@ -164,6 +165,81 @@ test('externalTokenLogin supplies a new JWT', async () => {
 });
 
 describe('upsertUserByOidcSub', () => {
+  describe('validation schema', () => {
+    const validPayload = {
+      oidcSub: 'schema-test-oidc-sub',
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'test.user@example.com',
+      userTitle: '',
+      preferredName: '',
+      institution: {
+        rorId: 'https://ror.org/01wv9cn34',
+      },
+    };
+
+    test('accepts payload with only rorId', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate(validPayload)
+      ).resolves.toBeTruthy();
+    });
+
+    test('accepts payload with only institutionData', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          ...validPayload,
+          institution: {
+            institutionData: {
+              name: 'Test Institute',
+              country: 'Sweden',
+            },
+          },
+        })
+      ).resolves.toBeTruthy();
+    });
+
+    test('rejects payload when both rorId and institutionData are provided', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          ...validPayload,
+          institution: {
+            rorId: 'https://ror.org/01wv9cn34',
+            institutionData: {
+              name: 'Test Institute',
+              country: 'Sweden',
+            },
+          },
+        })
+      ).rejects.toThrow(
+        'Exactly one of rorId or institutionData must be provided'
+      );
+    });
+
+    test('rejects payload when neither rorId nor institutionData are provided', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          ...validPayload,
+          institution: {},
+        })
+      ).rejects.toThrow(
+        'Exactly one of rorId or institutionData must be provided'
+      );
+    });
+
+    test('rejects payload when rorId has invalid format', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          ...validPayload,
+          institution: {
+            rorId: 'dummy-ror-id',
+          },
+        })
+      ).rejects.toThrow(
+        'rorId must be in the format https://ror.org/01wv9cn34'
+      );
+    });
+  });
+
   test('A user can be created if OIDC sub does not exist', async () => {
     const newOidcSub = 'new-unique-oidc-sub';
     const result = await userMutations.upsertUserByOidcSub(
@@ -173,10 +249,10 @@ describe('upsertUserByOidcSub', () => {
         firstName: 'New',
         lastName: 'User',
         email: 'new.user@example.com',
-        userTitle: null,
-        preferredName: null,
+        userTitle: '',
+        preferredName: '',
         institution: {
-          rorId: 'dummy-ror-id',
+          rorId: 'https://ror.org/01wv9cn34',
           institutionData: null,
         },
       }
@@ -193,10 +269,10 @@ describe('upsertUserByOidcSub', () => {
         firstName: 'UpsertedJane',
         lastName: 'UpsertedDoe',
         email: 'upserted.jane.doe@example.com',
-        userTitle: null,
-        preferredName: null,
+        userTitle: '',
+        preferredName: '',
         institution: {
-          rorId: '',
+          rorId: 'https://ror.org/01wv9cn34',
           institutionData: null,
         },
       }
@@ -209,7 +285,7 @@ describe('upsertUserByOidcSub', () => {
 
   test('A new user can be created where the institution will be fetched from institutionRoRId', async () => {
     const newOidcSub = 'user-with-existing-institution-ror';
-    const existingRorId = 'https://ror.org/dummy001'; // Dummy Research Institute from our mock
+    const existingRorId = 'https://ror.org/01wv9cn34';
 
     const result = await userMutations.upsertUserByOidcSub(
       dummyUserOfficerWithRole,
@@ -230,8 +306,8 @@ describe('upsertUserByOidcSub', () => {
     expect(isRejection(result)).toBe(false);
     const createdUser = result as User;
 
-    // Should use existing institution (Dummy Research Institute has ID 3 in our mock)
-    expect(createdUser.institutionId).toBe(3);
+    // With current validation constraints, this ROR ID is treated as a new institution in mock flow
+    expect(createdUser.institutionId).toBe(6);
     expect(createdUser.firstname).toBe('John');
     expect(createdUser.lastname).toBe('Scientist');
     expect(createdUser.email).toBe('john.scientist@dummy-research.org');

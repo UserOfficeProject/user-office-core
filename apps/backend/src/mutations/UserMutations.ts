@@ -5,6 +5,7 @@ import {
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationBackendSchema,
+  upsertUserByOidcSubValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -363,6 +364,7 @@ export default class UserMutations {
     return this.dataSource.setUserNotPlaceholder(id);
   }
 
+  @ValidateArgs(upsertUserByOidcSubValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async upsertUserByOidcSub(
     agent: UserWithRole | null,

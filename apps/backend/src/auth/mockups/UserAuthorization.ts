@@ -36,7 +36,7 @@ export class UserAuthorizationMock extends UserAuthorization {
 
   async getOrCreateUserInstitution(
     institutionInput: GetOrCreateInstitutionInput
-  ): Promise<Institution> {
+  ): Promise<Institution | null> {
     if (typeof institutionInput === 'string') {
       // ROR ID provided
       return this.getOrCreateInstitutionByRorId(institutionInput);
