@@ -70,7 +70,7 @@ context('User administration tests', () => {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserDetails({
         id: 4,
-        user_title: 'Mr.',
+        userTitle: 'Mr.',
         firstname: 'Benjamin',
         lastname: 'Beckley',
         preferredname: 'Ben',
@@ -114,7 +114,7 @@ context('User administration tests', () => {
     if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
       cy.updateUserDetails({
         id: 6,
-        user_title: 'Mr.',
+        userTitle: 'Mr.',
         firstname: 'David',
         lastname: 'Dawson',
         preferredname: '',
