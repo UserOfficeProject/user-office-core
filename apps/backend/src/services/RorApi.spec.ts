@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { getInstitutionFromRor } from '../RorApi';
+import { getInstitutionFromRor } from './RorApi';
 
 jest.mock('@user-office-software/duo-logger', () => ({
   logger: {
