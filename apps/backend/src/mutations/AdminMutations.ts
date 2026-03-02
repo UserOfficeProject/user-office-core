@@ -22,8 +22,10 @@ import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutions
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
+import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId, isProduction } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
+import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
 const IS_BACKEND_VALIDATION = true;
 @injectable()
@@ -74,6 +76,25 @@ export default class AdminMutations {
       .catch((error) => {
         return rejection('Could not set page text', { agent, id }, error);
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateInstitutions(
+    agent: UserWithRole | null,
+    args: UpdateInstitutionsArgs
+  ) {
+    const institution = await this.dataSource.getInstitution(args.id);
+    if (!institution) {
+      return rejection('Could not retrieve institution', {
+        agent,
+        code: ApolloServerErrorCodeExtended.NOT_FOUND,
+      });
+    }
+
+    institution.name = args.name ?? institution.name;
+    institution.country = args.country ?? institution.country;
+
+    return await this.dataSource.updateInstitution(institution);
   }
 
   @Authorized([Roles.USER_OFFICER])
