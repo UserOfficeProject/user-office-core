@@ -151,7 +151,7 @@ export class OAuthAuthorization extends UserAuthorization {
     if (typeof input === 'string') {
       // ROR ID provided
       institution = await this.getOrCreateInstitutionByRorId(input);
-    } else if (input instanceof Object) {
+    } else if (input !== null && typeof input === 'object') {
       // Manual institution details provided
       institution = await this.getOrCreateInstitutionByManualInput(input);
     }
