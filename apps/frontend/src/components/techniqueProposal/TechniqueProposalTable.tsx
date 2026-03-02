@@ -825,7 +825,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const handleFilterChange = (filter: ProposalsFilter) => {
     const updatedFilter = { ...filter };
-    if (filter.callId) {
+    if (filter.callId != null) {
       if (filter.callId === 0) {
         updatedFilter.callId = null;
         updatedFilter.callIds = calls?.map((call) => call.id) || [];
