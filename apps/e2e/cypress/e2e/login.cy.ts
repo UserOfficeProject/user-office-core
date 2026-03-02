@@ -17,12 +17,12 @@ context('User login tests', () => {
         this.skip();
       }
 
-      const institutionRorId = 'https://ror.org/not-in-db';
+      const institutionRorId = 'https://ror.org/not0in0db';
 
       cy.upsertUserByOidc({
         oidcSub: 'some-unique-sub',
         email: 'email@example.com',
-        institution: {
+        institutionData: {
           rorId: institutionRorId,
         },
         firstName: 'Test',
