@@ -391,7 +391,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: { template_id: EmailTemplateId.VISIT_REGISTRATION_APPROVED },
+          content: { template: EmailTemplateId.VISIT_REGISTRATION_APPROVED },
           substitution_data: expect.objectContaining({
             preferredname: dummyUser.preferredname,
             startsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
@@ -425,7 +425,7 @@ describe('essEmailHandler co-proposer invites', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: EmailTemplateId.VISIT_REGISTRATION_CANCELLED,
+            template: EmailTemplateId.VISIT_REGISTRATION_CANCELLED,
           },
           substitution_data: expect.objectContaining({
             preferredname: dummyUser.preferredname,
