@@ -29,13 +29,7 @@ export function useInstrumentsMinimalData(callIds?: number[]): {
     setLoadingInstruments(true);
     if (
       currentRole &&
-      [
-        UserRole.USER_OFFICER,
-        UserRole.FAP_REVIEWER,
-        UserRole.FAP_CHAIR,
-        UserRole.FAP_SECRETARY,
-        UserRole.USER,
-      ].includes(currentRole)
+      [UserRole.USER_OFFICER, UserRole.USER].includes(currentRole)
     ) {
       api()
         .getInstrumentsMinimal({ callIds })
