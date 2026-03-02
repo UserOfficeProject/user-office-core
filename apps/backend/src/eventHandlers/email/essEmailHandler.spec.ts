@@ -362,7 +362,7 @@ describe('essEmailHandler co-proposer invites', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id:
+            template:
               EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
           },
           substitution_data: expect.objectContaining({
