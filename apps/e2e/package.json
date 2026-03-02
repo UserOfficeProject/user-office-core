@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "proxy": "http://localhost:4000",
+  "type": "module",
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "adm-zip": "^0.4.13",
