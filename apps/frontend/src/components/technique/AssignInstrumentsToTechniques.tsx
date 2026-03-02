@@ -4,9 +4,10 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
