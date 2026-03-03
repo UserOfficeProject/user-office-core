@@ -2083,6 +2083,16 @@ context('Fap reviews tests', () => {
         }
       });
 
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 1,
+      });
+
       // Reviewer should see the reviews of proposals with a completed set of reviews
 
       cy.visit(`/FapPage/${createdFapId}`);
