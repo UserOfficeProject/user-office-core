@@ -291,7 +291,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
     case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
       const invites = event.array;
-
       for (const invite of invites) {
         if (invite.isEmailSent) {
           continue;
@@ -328,6 +327,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
       for (const invite of invites) {
         if (invite.isEmailSent) {
           continue;
@@ -348,7 +356,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
         await sendInviteEmail(
           invite,
           inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
         ).then(async () => {
           await eventBus.publish({
             ...event,
@@ -514,7 +523,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
-  templateId: EmailTemplateId
+  templateId: EmailTemplateId,
+  additionalSubstitutionData?: Record<string, unknown>
 ) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -532,6 +542,7 @@ async function sendInviteEmail(
         inviterLastname: inviter.lastname,
         inviterOrg: inviter.institution,
         redeemCode: invite.code,
+        ...additionalSubstitutionData,
       },
       recipients: [{ address: invite.email }],
     })
