@@ -22,7 +22,7 @@ context('User login tests', () => {
       cy.upsertUserByOidc({
         oidcSub: 'some-unique-sub',
         email: 'email@example.com',
-        institutionData: {
+        institution: {
           rorId: institutionRorId,
         },
         firstName: 'Test',
