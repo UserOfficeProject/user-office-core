@@ -1,5 +1,9 @@
-query getCallsMinimal($filter: CallsFilter) {
-  calls(filter: $filter) {
+query getCallsMinimal(
+  $filter: CallsFilter
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+) {
+  calls(filter: $filter, sortField: $sortField, sortDirection: $sortDirection) {
     id
     shortCode
     startCall

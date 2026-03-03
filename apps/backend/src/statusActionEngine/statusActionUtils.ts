@@ -1,3 +1,5 @@
+import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -8,6 +10,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -66,6 +69,7 @@ export type EmailReadyType = {
   coProposers?: BasicUserDetails[] | null;
   instruments?: InstrumentWithManagementTime[];
   techniques?: Technique[];
+  proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
 };
@@ -143,6 +147,13 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const usersDataSource: UserDataSource = container.resolve(
     Tokens.UserDataSource
   );
+  const questionaryDataSource: QuestionaryDataSource = container.resolve(
+    Tokens.QuestionaryDataSource
+  );
+
+  const templateDataSource: TemplateDataSource = container.resolve(
+    Tokens.TemplateDataSource
+  );
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -168,6 +179,21 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
+        let proposalTemplateName: string | undefined = '';
+
+        const questionary = await questionaryDataSource.getQuestionary(
+          proposal.questionaryId
+        );
+        const templateId = questionary ? questionary?.templateId : -1;
+        if (templateId == -1) {
+          logger.logError('Could not fetch proposal templateId for email', {
+            questionary: questionary,
+          });
+          throw new GraphQLError('Failed to find proposal template for emails');
+        }
+        const template = await templateDataSource.getTemplate(templateId);
+        proposalTemplateName = templateId ? template?.name : '';
+
         const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatus: 'QUICK_REVIEW',
@@ -180,8 +206,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           techniques = await techniqueDataSource.getTechniquesByProposalPk(
             proposal.primaryKey
           );
-          const questionaryDataSource: QuestionaryDataSource =
-            container.resolve(Tokens.QuestionaryDataSource);
           const questionarySteps = questionaryDataSource.getQuestionarySteps(
             proposal.questionaryId
           );
@@ -220,6 +244,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           pi: pi,
           coProposers: coProposers,
           techniques: techniques,
+          proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
         });

@@ -29,6 +29,7 @@ export function ProposalMenuListItem() {
     {
       proposalStatus: 'QUICK_REVIEW',
     },
+    {},
     CallsDataQuantity.MINIMAL
   ).calls;
   const openCall = calls?.find((call) => call.isActive);
