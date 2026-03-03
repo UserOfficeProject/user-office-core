@@ -43,8 +43,6 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   };
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
-    console.log(values);
-
     await api({
       toastSuccessMessage: `${t('Fap')} updated successfully!`,
     }).updateFap(values);

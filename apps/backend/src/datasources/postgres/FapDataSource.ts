@@ -1388,7 +1388,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .where('f.fap_id', fapId)
       .first();
 
-    return visibility as FapReviewVisibility;
+    return visibility.visibility as FapReviewVisibility;
   }
 
   async getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]> {
