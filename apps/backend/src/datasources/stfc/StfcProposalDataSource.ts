@@ -151,8 +151,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             );
           });
         }
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
