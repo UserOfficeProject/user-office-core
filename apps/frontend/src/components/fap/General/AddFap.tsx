@@ -7,9 +7,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
+import { useFapReviewVisibilityOptions } from 'hooks/fap/useFapReviewVisibilityOptions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type AddFapProps = {
@@ -19,6 +21,8 @@ type AddFapProps = {
 const AddFap = ({ close }: AddFapProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const { isLoadingVisibilityOptions, reviewVisibilityOptions } =
+    useFapReviewVisibilityOptions();
 
   return (
     <Formik
@@ -27,6 +31,7 @@ const AddFap = ({ close }: AddFapProps) => {
         description: '',
         numberRatingsRequired: 2,
         active: true,
+        reviewVisibility: 1,
       }}
       onSubmit={async (values): Promise<void> => {
         try {
@@ -93,6 +98,24 @@ const AddFap = ({ close }: AddFapProps) => {
               label: 'Active',
             }}
             data-cy="fapActive"
+          />
+          <Field
+            id="reviewVisibility"
+            name="reviewVisibility"
+            label="Review visibility"
+            component={Select}
+            onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
+            data-cy="fap-review-visibility-filter"
+            options={
+              isLoadingVisibilityOptions
+                ? []
+                : reviewVisibilityOptions.map((option) => ({
+                    value: option.reviewVisibilityId,
+                    text: option.description,
+                  }))
+            }
+            required
+            fullWidth
           />
 
           <Button
