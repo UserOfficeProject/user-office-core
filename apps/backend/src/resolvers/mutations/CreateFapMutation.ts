@@ -30,6 +30,9 @@ export class CreateFapArgs {
 
   @Field(() => Boolean)
   public active: boolean;
+
+  @Field(() => Int)
+  public reviewVisibility: number;
 }
 
 @Resolver()
