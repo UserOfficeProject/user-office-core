@@ -1,6 +1,9 @@
 import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
+import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -28,7 +31,12 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.UserAuthContext)
+    public userContext: UserAuthContext,
+    @inject(Tokens.ProposalAuthContext)
+    public proposalContext: ProposalAuthContext,
+    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization
   ) {}
 
   @Authorized()
@@ -203,5 +211,34 @@ export default class ProposalQueries {
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async getInvitedProposal(agent: UserWithRole | null, inviteId: number) {
     return this.dataSource.getInvitedProposal(inviteId);
+  }
+
+  // Implemented for demonstration purposes
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  async getUserProposals(
+    agent: UserWithRole | null,
+    userId: number,
+    filter?: ProposalsFilter
+  ) {
+    const userContext = await this.userContext.toContextData(agent);
+
+    if (!userContext) {
+      return false;
+    }
+
+    const proposals = await this.dataSource.getUserProposals(userId, filter);
+
+    const proposalContexts =
+      await this.proposalContext.fetchContextForProposals(
+        proposals.map((p) => p.primaryKey)
+      );
+
+    const results = await this.casbinAuth.canMany(
+      userContext,
+      proposalContexts,
+      'read'
+    );
+
+    return proposals.filter((proposal) => results.get(proposal.primaryKey));
   }
 }

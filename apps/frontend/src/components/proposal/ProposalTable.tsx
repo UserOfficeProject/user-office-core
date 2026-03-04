@@ -306,18 +306,12 @@ const ProposalTable = ({
             };
           },
           (rowData) => {
-            const isPI = rowData.proposerId === userContext.user.id;
-            const isSubmitted = rowData.submitted;
-            const canDelete = isPI && !isSubmitted;
+            const canDelete = rowData.proposalUiPermissions?.canDelete;
 
             return {
               icon: DeleteIcon,
-              tooltip: isSubmitted
-                ? 'Only draft proposals can be deleted'
-                : !isPI
-                  ? 'Only PI can delete proposal'
-                  : 'Delete proposal',
-              hidden: !canDelete,
+              tooltip: 'Delete proposal',
+              disabled: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {

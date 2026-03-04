@@ -2,7 +2,10 @@
 import 'reflect-metadata';
 
 import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
+import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { CallAuthFunctions } from '../auth/authFunctions/CallAuthFunctions';
+import { ProposalAuthFunctions } from '../auth/authFunctions/ProposalAuthFunctions';
 import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
@@ -160,3 +163,6 @@ mapClass(Tokens.CallAuthContext, CallAuthContext);
 mapClass(Tokens.CallAuthFunctions, CallAuthFunctions);
 mapClass(Tokens.CallAuthFilters, CallAuthFilters);
 mapClass(Tokens.AuthRegistry, AuthRegistry);
+mapClass(Tokens.ProposalAuthFunctions, ProposalAuthFunctions);
+mapClass(Tokens.ProposalAuthContext, ProposalAuthContext);
+mapClass(Tokens.UserAuthContext, UserAuthContext);

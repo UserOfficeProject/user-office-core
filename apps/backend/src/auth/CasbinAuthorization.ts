@@ -2,9 +2,10 @@ import { injectable, inject } from 'tsyringe';
 
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
+import { UserContextData } from './authContexts/UserAuthContext';
 
 export type EnforcementRequest<TContext = unknown> = [
-  role: string,
+  user: UserContextData,
   context: TContext,
   action: string,
 ];
@@ -13,18 +14,22 @@ export type EnforcementRequest<TContext = unknown> = [
 export class CasbinAuthorization {
   constructor(@inject(Tokens.CasbinService) private casbin: CasbinService) {}
 
-  async can(role: string, context: unknown, action: string): Promise<boolean> {
-    return this.casbin.enforce([role, context, action]);
+  async can(
+    user: UserContextData,
+    context: unknown,
+    action: string
+  ): Promise<boolean> {
+    return this.casbin.enforce([user, context, action]);
   }
 
-  async canBulk(
-    role: string,
+  async canMany(
+    user: UserContextData,
     contexts: Map<number, unknown>,
     action: string
   ): Promise<Map<number, boolean>> {
     const contextEntries = Array.from(contexts.entries());
     const enforcementRequests = contextEntries.map(
-      ([_, context]) => [role, context, action] as EnforcementRequest
+      ([_, context]) => [user, context, action] as EnforcementRequest
     );
 
     const results = await this.casbin.batchEnforce(enforcementRequests);

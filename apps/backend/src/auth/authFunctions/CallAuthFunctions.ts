@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { CallContextData } from '../authContexts/CallAuthContext';
+import { UserContextData } from '../authContexts/UserAuthContext';
 import { AuthFunctionRegistry } from '../AuthRegistry';
 
 /*
@@ -20,10 +21,10 @@ export class CallAuthFunctions {
   registry(): AuthFunctionRegistry<CallContextData> {
     return {
       // Forced examples that don't demonstrate this well
-      isCallEnded: async (role, obj) => {
+      isCallEnded: async (user: UserContextData, obj) => {
         return await this.callDataSource.isCallEnded(obj.id);
       },
-      isCallEndedInternal: async (role, obj) => {
+      isCallEndedInternal: async (user: UserContextData, obj) => {
         return await this.callDataSource.isCallEnded(obj.id, true);
       },
     };

@@ -1,5 +1,6 @@
 import { registerEnumType } from 'type-graphql';
 
+import { ResourceType } from '../auth/AuthRegistry';
 import { Event } from '../events/event.enum';
 import { AllocationTimeUnits } from '../models/Call';
 import {
@@ -102,5 +103,8 @@ export const registerEnums = () => {
   });
   registerEnumType(PaginationSortDirection, {
     name: 'PaginationSortDirection',
+  });
+  registerEnumType(ResourceType, {
+    name: 'ResourceType',
   });
 };

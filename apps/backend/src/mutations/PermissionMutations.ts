@@ -20,7 +20,7 @@ export default class PermissionMutations {
   ) {
     const addedPolicy = await this.casbinService.addPolicyWithCondition(
       args.subject,
-      args.resource,
+      args.resource.toLowerCase(),
       args.action,
       args.condition,
       args.effect

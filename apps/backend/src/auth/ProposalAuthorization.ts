@@ -14,6 +14,9 @@ import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { UserJWT } from './../models/User';
+import { ProposalAuthContext } from './authContexts/ProposalAuthContext';
+import { UserAuthContext } from './authContexts/UserAuthContext';
+import { CasbinAuthorization } from './CasbinAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
@@ -35,7 +38,12 @@ export class ProposalAuthorization {
     private statusDataSource: StatusDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
-    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization,
+    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization,
+    @inject(Tokens.ProposalAuthContext)
+    private authContext: ProposalAuthContext,
+    @inject(Tokens.UserAuthContext)
+    private userContext: UserAuthContext
   ) {}
 
   private async resolveProposal(
@@ -262,10 +270,21 @@ export class ProposalAuthorization {
 
     switch (currentRole) {
       case Roles.USER:
-        hasAccess =
-          (await this.isMemberOfProposal(agent, proposal)) ||
-          (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-          (await this.isDataAccessUserOfProposal(agent, proposal.primaryKey));
+        const userContext = await this.userContext.toContextData(agent);
+
+        if (!userContext) {
+          return false;
+        }
+
+        const proposalContext = (
+          await this.authContext.fetchContextForProposals([proposal.primaryKey])
+        ).get(proposal.primaryKey);
+
+        hasAccess = await this.casbinAuth.can(
+          userContext,
+          proposalContext,
+          'read'
+        );
         break;
       case Roles.INSTRUMENT_SCIENTIST:
         hasAccess =

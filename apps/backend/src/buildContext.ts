@@ -5,6 +5,7 @@ import { CasbinService } from './casbin/casbinService';
 import { BasicResolverContext } from './context';
 import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
 import CallPermissionsLoader from './loaders/CallPermissionsLoader';
+import ProposalPermissionsLoader from './loaders/ProposalPermissionsLoader';
 import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
@@ -155,6 +156,7 @@ const context: BasicResolverContext = {
     user: container.resolve(UsersLoader),
     basicUser: container.resolve(BasicUserDetailsLoader),
     callPermissions: container.resolve(CallPermissionsLoader),
+    proposalPermissions: container.resolve(ProposalPermissionsLoader),
   },
   auth: {
     proposalAuthorization: container.resolve(ProposalAuthorization),

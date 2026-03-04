@@ -12,7 +12,7 @@ export interface CallContextData extends AuthContext {
   tags: string[];
 }
 
-export const CALL_CONTEXT_ATTRIBUTES: Array<keyof CallContextData> = [
+export const CALL_AUTH_UI_ATTRIBUTES: Array<keyof CallContextData> = [
   'id',
   'shortCode',
   'tags',

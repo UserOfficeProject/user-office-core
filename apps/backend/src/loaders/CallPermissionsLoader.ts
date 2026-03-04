@@ -1,4 +1,3 @@
-// callPermissionsLoader.ts
 import DataLoader from 'dataloader';
 import { inject, injectable } from 'tsyringe';
 
@@ -6,6 +5,7 @@ import {
   CallContextData,
   CallAuthContext,
 } from '../auth/authContexts/CallAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
@@ -24,6 +24,8 @@ export function createEmptyCallUiPermissions(): CallUiPermissions {
 @injectable()
 export default class CallPermissionsLoader {
   constructor(
+    @inject(Tokens.UserAuthContext)
+    private userAuthContext: UserAuthContext,
     @inject(Tokens.CallAuthContext)
     private authContext: CallAuthContext,
     @inject(Tokens.CasbinService) private casbinService: CasbinService
@@ -34,9 +36,9 @@ export default class CallPermissionsLoader {
   ): DataLoader<number, CallUiPermissions> {
     return new DataLoader(
       async (callIds: readonly number[]) => {
-        const userRole = user?.currentRole?.shortCode;
+        const userCtx = await this.userAuthContext.toContextData(user);
 
-        if (!userRole) {
+        if (!userCtx) {
           return callIds.map(() => createEmptyCallUiPermissions());
         }
 
@@ -49,11 +51,11 @@ export default class CallPermissionsLoader {
         const enforcementRequests: EnforcementRequest<CallContextData>[] = [];
 
         for (const callId of uniqueCallIds) {
-          const context = contextMap.get(callId);
-          if (!context) continue;
+          const callCtx = contextMap.get(callId);
+          if (!callCtx) continue;
 
           for (const [_, action] of actions) {
-            enforcementRequests.push([userRole, context, action]);
+            enforcementRequests.push([userCtx, callCtx, action]);
           }
         }
 

@@ -28,6 +28,7 @@ import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
 import { Invite } from './Invite';
 import { ProposalAttachments } from './ProposalAttachments';
+import { ProposalUiPermissions } from './ProposalUiPermissions';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
@@ -315,6 +316,21 @@ export class ProposalResolver {
   attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
     return ctx.queries.questionary.getProposalAttachments(
       ctx.user,
+      proposal.primaryKey
+    );
+  }
+
+  @FieldResolver(() => ProposalUiPermissions)
+  async proposalUiPermissions(
+    @Root() proposal: Proposal,
+    @Ctx() ctx: ResolverContext
+  ): Promise<ProposalUiPermissions> {
+    if (!(ctx as any)._proposalPermissionsLoader) {
+      (ctx as any)._proposalPermissionsLoader =
+        ctx.loaders.proposalPermissions.createLoader(ctx.user);
+    }
+
+    return await (ctx as any)._proposalPermissionsLoader.load(
       proposal.primaryKey
     );
   }

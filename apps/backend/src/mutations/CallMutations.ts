@@ -6,6 +6,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -39,7 +40,9 @@ export default class CallMutations {
     @inject(Tokens.CasbinAuthorization)
     private casbinAuth: CasbinAuthorization,
     @inject(Tokens.CallAuthContext)
-    private authContext: CallAuthContext
+    private authContext: CallAuthContext,
+    @inject(Tokens.UserAuthContext)
+    private userContext: UserAuthContext
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -115,17 +118,18 @@ export default class CallMutations {
       return rejection('Existing call not found', { callId: args.id });
     }
 
-    const authContext = await this.authContext.fetchContextForCalls([
+    const authCtx = await this.authContext.fetchContextForCalls([
       existingCall.id,
     ]);
 
     // Since this update() function is used for everything, check whether the call is being archived/unarchived
     if (existingCall.isActive != args.isActive) {
-      const canArchive = await this.casbinAuth.can(
-        role,
-        authContext,
-        'archive'
-      );
+      const userCtx = await this.userContext.toContextData(agent);
+      if (!userCtx) {
+        return rejection('User context not found', { agent });
+      }
+
+      const canArchive = await this.casbinAuth.can(userCtx, authCtx, 'archive');
       if (!canArchive) {
         return rejection(
           'User does not have permission to archive/unarchive this call',

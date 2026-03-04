@@ -66,6 +66,9 @@ export class DateFilterInput {
 
 @InputType()
 export class ProposalsFilter {
+  @Field(() => [Int], { nullable: true })
+  public proposalPks?: number[];
+
   @Field(() => String, { nullable: true })
   public text?: string;
 

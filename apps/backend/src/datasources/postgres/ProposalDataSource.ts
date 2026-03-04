@@ -583,6 +583,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
         }
 
+        if (filter?.proposalPks) {
+          query.whereIn('proposals.proposal_pk', filter.proposalPks);
+        }
+
         if (first) {
           query.limit(first);
         }

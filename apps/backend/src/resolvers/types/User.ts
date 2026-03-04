@@ -139,7 +139,8 @@ export class UserResolver {
     @Arg('filter', () => UserProposalsFilter, { nullable: true })
     filter: UserProposalsFilter
   ) {
-    return context.queries.proposal.dataSource.getUserProposals(
+    return context.queries.proposal.getUserProposals(
+      context.user,
       user.id,
       filter
     );

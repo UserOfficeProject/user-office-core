@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -20,6 +21,8 @@ export default class CallQueries {
     private authFilters: CallAuthFilters,
     @inject(Tokens.CallAuthContext)
     private authContext: CallAuthContext,
+    @inject(Tokens.UserAuthContext)
+    private userContext: UserAuthContext,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -32,9 +35,9 @@ export default class CallQueries {
 
   @Authorized()
   async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
-    // Role check would move to decorator
-    const role = agent?.currentRole?.shortCode;
-    if (!role) {
+    const userContext = await this.userContext.toContextData(agent);
+
+    if (!userContext) {
       return [];
     }
 
@@ -44,7 +47,7 @@ export default class CallQueries {
 
     // Optional optimisation
     const authFilters = await this.authFilters.buildDbFilters(
-      role,
+      userContext,
       'call',
       'read'
     );
@@ -53,11 +56,15 @@ export default class CallQueries {
 
     const calls = await this.dataSource.getCalls(filter);
 
-    const authContexts = await this.authContext.fetchContextForCalls(
+    const callContexts = await this.authContext.fetchContextForCalls(
       calls.map((c) => c.id)
     );
 
-    const results = await this.casbinAuth.canBulk(role, authContexts, 'read');
+    const results = await this.casbinAuth.canMany(
+      userContext,
+      callContexts,
+      'read'
+    );
 
     return calls.filter((call) => results.get(call.id));
   }

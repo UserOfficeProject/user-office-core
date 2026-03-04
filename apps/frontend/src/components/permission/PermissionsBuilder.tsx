@@ -12,6 +12,7 @@ import {
 } from 'react-querybuilder';
 
 import UOLoader from 'components/common/UOLoader';
+import { ResourceType } from 'generated/sdk';
 import { useAuthResourceMetadata } from 'hooks/permission/useAuthResourceMetadata';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -19,17 +20,22 @@ export function PermissionsBuilder() {
   const { api } = useDataApiWithFeedback();
 
   const [subject, setSubject] = useState('user_officer');
-  const [resource, setResource] = useState('call');
+  const [resource, setResource] = useState<ResourceType>(ResourceType.CALL);
   const [action, setAction] = useState('read');
 
-  const { attributes, functions, loading } = useAuthResourceMetadata(resource);
+  const { userAttributes, resourceAttributes, resourceFunctions, loading } =
+    useAuthResourceMetadata(resource);
 
   const fields: Field[] = [
-    ...attributes.map((attr) => ({
-      name: `${resource}.${attr}`,
-      label: `${resource}.${attr}`,
+    ...userAttributes.map((attr) => ({
+      name: `user.${attr}`,
+      label: `user.${attr}`,
     })),
-    ...functions.map((fn) => ({
+    ...resourceAttributes.map((attr) => ({
+      name: `${resource.toLowerCase()}.${attr}`,
+      label: `${resource.toLowerCase()}.${attr}`,
+    })),
+    ...resourceFunctions.map((fn) => ({
       name: fn,
       label: fn,
       operators: [
@@ -85,6 +91,7 @@ export function PermissionsBuilder() {
             label="Subject"
             onChange={(e) => setSubject(e.target.value)}
           >
+            <MenuItem value="user">user</MenuItem>
             <MenuItem value="user_officer">user_officer</MenuItem>
           </Select>
         </FormControl>
@@ -94,9 +101,10 @@ export function PermissionsBuilder() {
           <Select
             value={resource}
             label="Resource"
-            onChange={(e) => setResource(e.target.value)}
+            onChange={(e) => setResource(e.target.value as ResourceType)}
           >
-            <MenuItem value="call">call</MenuItem>
+            <MenuItem value={ResourceType.CALL}>call</MenuItem>
+            <MenuItem value={ResourceType.PROPOSAL}>proposal</MenuItem>
           </Select>
         </FormControl>
 
@@ -109,6 +117,8 @@ export function PermissionsBuilder() {
           >
             <MenuItem value="read">read</MenuItem>
             <MenuItem value="archive">archive</MenuItem>
+            <MenuItem value="delete">delete</MenuItem>
+            <MenuItem value="edit">edit</MenuItem>
           </Select>
         </FormControl>
       </Stack>

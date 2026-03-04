@@ -1,11 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 import { Authorized } from 'type-graphql';
 
-import { AuthRegistry } from '../auth/AuthRegistry';
+import { AuthRegistry, ResourceType } from '../auth/AuthRegistry';
 import { CasbinService } from '../casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { AuthResourceMetadata } from '../resolvers/queries/PermissionsQuery';
 
 @injectable()
 export default class PermissionQueries {
@@ -19,17 +20,20 @@ export default class PermissionQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAuthResourceMetadata(
     agent: UserWithRole | null,
-    resourceType: string
-  ) {
-    const attributes =
-      this.authRegistry.contextAttributes.get(resourceType) ?? [];
-    const functions = Object.keys(
-      this.authRegistry.functions.get(resourceType) ?? {}
+    resourceType: ResourceType
+  ): Promise<AuthResourceMetadata> {
+    const userAttributes =
+      this.authRegistry.uiContextAttributes.get(ResourceType.USER) ?? [];
+    const resourceAttributes =
+      this.authRegistry.uiContextAttributes.get(resourceType) ?? [];
+    const resourceFunctions = Object.keys(
+      this.authRegistry.functions[resourceType] ?? {}
     );
 
     return {
-      attributes,
-      functions,
+      userAttributes,
+      resourceAttributes,
+      resourceFunctions,
     };
   }
 }

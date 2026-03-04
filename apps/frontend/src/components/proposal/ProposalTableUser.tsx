@@ -1,7 +1,13 @@
 import React, { useCallback, useState } from 'react';
 
 import ProposalInviteNotification from 'components/proposal/ProposalInviteNotification';
-import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
+import {
+  Call,
+  Maybe,
+  ProposalPublicStatus,
+  ProposalUiPermissions,
+  Status,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTable from './ProposalTable';
@@ -30,6 +36,7 @@ export type PartialProposalsDataType = {
     >
   >;
   proposerId?: number;
+  proposalUiPermissions?: ProposalUiPermissions;
 };
 
 export type UserProposalDataType = {
@@ -77,6 +84,7 @@ const ProposalTableUser = () => {
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
+                proposalUiPermissions: proposal.proposalUiPermissions,
               };
             }),
         };

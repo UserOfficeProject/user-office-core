@@ -1,11 +1,12 @@
 import { container } from 'tsyringe';
 
-import { AuthRegistry } from '../auth/AuthRegistry';
+import { UserContextData } from '../auth/authContexts/UserAuthContext';
+import { AuthRegistry, ResourceType } from '../auth/AuthRegistry';
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
 
 export async function evalCondition(
-  sub: string,
+  sub: UserContextData,
   obj: any,
   con: any
 ): Promise<boolean> {
@@ -18,14 +19,14 @@ export async function evalCondition(
   if (!conditionRecord) return false;
 
   const conditionJson = conditionRecord.condition;
-  const ctx = { role: sub, obj };
+  const ctx = { user: sub, obj };
 
   return evalNode(conditionJson, ctx);
 }
 
 async function evalNode(
   node: any,
-  ctx: { role: string; obj: any }
+  ctx: { user: UserContextData; obj: any }
 ): Promise<boolean> {
   if (node.combinator && Array.isArray(node.rules)) {
     const results = await Promise.all(
@@ -40,38 +41,38 @@ async function evalNode(
   return evalRule(node, ctx);
 }
 
-function resolveValue(field: string, ctx: { role: string; obj: any }) {
+function resolveValue(field: string, ctx: { user: UserContextData; obj: any }) {
   const authRegistry = container.resolve<AuthRegistry>(Tokens.AuthRegistry);
-  const fnRegistry = authRegistry.functions.get(ctx.obj?.type);
+  const fnRegistry = authRegistry.functions[ctx.obj?.type as ResourceType];
 
   if (fnRegistry?.[field]) {
     return fnRegistry[field];
   }
 
-  const [_, ...path] = field.split('.');
-  const base = ctx.obj;
+  const [root, ...path] = field.split('.');
+
+  const base = root === 'user' ? ctx.user : ctx.obj;
 
   return path.reduce((acc, key) => acc?.[key], base);
 }
 
 async function evalRule(
   rule: any,
-  ctx: { role: string; obj: any }
+  ctx: { user: UserContextData; obj: any }
 ): Promise<boolean> {
-  const { field, operator, value: rightValue } = rule;
+  const { field, operator, value } = rule;
 
   let leftValue = resolveValue(field, ctx) ?? null;
 
   if (typeof leftValue === 'function') {
-    leftValue = await leftValue(ctx.role, ctx.obj);
+    leftValue = await leftValue(ctx.user, ctx.obj);
   }
+
+  leftValue = String(leftValue);
+  const rightValue = String(value);
 
   switch (operator) {
     case '=':
-      if (typeof leftValue === 'boolean') {
-        return leftValue === (rightValue === 'true');
-      }
-
       return leftValue === rightValue;
 
     case '!=':

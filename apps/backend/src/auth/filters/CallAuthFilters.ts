@@ -4,6 +4,7 @@ import { CasbinService } from '../../casbin/casbinService';
 import { walkAst } from '../../casbin/conditionParser';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
+import { UserContextData } from '../authContexts/UserAuthContext';
 
 type CallAuthFilter = Partial<
   Pick<CallsFilter, 'shortCode' | 'hasTag' | 'isEnded' | 'isEndedInternal'>
@@ -17,14 +18,14 @@ export class CallAuthFilters {
   ) {}
 
   async buildDbFilters(
-    sub: string | undefined,
+    user: UserContextData,
     obj: string,
     act: string
   ): Promise<CallAuthFilter | null> {
-    if (!sub) return null;
+    if (!user) return null;
 
     const conditionJson = await this.casbinService.getPolicyCondition(
-      sub,
+      user.currentRole,
       obj,
       act
     );
