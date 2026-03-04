@@ -100,7 +100,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     },
     CallsDataQuantity.MINIMAL,
     currentRole !== UserRole.USER_OFFICER
-      ? !techniques || techniques.length <= 0
+      ? !instrumentIds || instrumentIds.length <= 0
       : false
   );
 
