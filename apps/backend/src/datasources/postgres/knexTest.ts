@@ -1,4 +1,4 @@
-import { AnyAbility, ForbiddenError, Generics, Normalize } from '@casl/ability';
+import { AnyAbility, ForbiddenError } from '@casl/ability';
 import { Rule } from '@casl/ability/dist/types/Rule';
 import { rulesToQuery } from '@casl/ability/extra';
 import { CompoundCondition } from '@ucast/core';
@@ -23,19 +23,9 @@ const OPS_INVERTED = {
   nin: 'in',
 };
 
-export const toKnexRawQuery = (
-  ability: any,
-  action: string,
-  subject: string,
-): [string, ...any[]] => {
-  ForbiddenError.from(ability).throwUnlessCan(action, subject);
-
-  const { $and = [], $or = [] } = rulesToQuery(
-    ability,
-    action,
-    subject as never,
-    (rule: Rule<any, any>) => {
-      if (!rule.ast) {
+const callBack = (rule: Rule<any, any>) => {
+  console.log("BWAAAAAAAAAH")
+  if (!rule.ast) {
         throw new Error('Unable to create knex query without AST');
       }
 
@@ -47,13 +37,35 @@ export const toKnexRawQuery = (
       }
 
       return rule.ast;
-    },
-  ) as { $and: Condition[]; $or: Condition[] };
+}
 
-  const condition = new CompoundCondition('and', [
+export const toKnexRawQuery = (
+  ability: AnyAbility,
+  action: string,
+  subject: string,
+): [string, ...any[]] => {
+  ForbiddenError.from(ability).throwUnlessCan(action, subject);
+
+  //if there are no conditions on the rules, rulesToQuery will return undefined objects
+  const { $and, $or } = rulesToQuery(
+    ability,
+    action,
+    subject,
+    callBack,
+  ) as { $and: Condition[]; $or: Condition[] };
+  
+  let condition: CompoundCondition<Condition<unknown>>;
+
+  if (!!$and) {
+    condition = new CompoundCondition('and', [
     ...$and,
     new CompoundCondition('or', $or),
   ]);
+  } else if (!!$or) {
+    condition = new CompoundCondition('or', $or);
+  } else {
+    return ['()', []];
+  }
 
   const [sql, replacements] = interpret(condition, {
     ...(pg as unknown as SqlQueryOptions),

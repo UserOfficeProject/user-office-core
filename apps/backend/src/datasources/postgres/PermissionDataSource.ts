@@ -11,7 +11,7 @@ import { UpdatePermissionRuleArgs } from '../../resolvers/mutations/UpdatePermis
 import { PermissionRulesArgs } from '../../resolvers/queries/PermissionsQuery';
 
 export const actions = ['update', 'read', 'delete'] as const;
-export const subjects = ['fap', 'proposal'] as const;
+export const subjects = ['fap', 'proposal', 'fap_proposal_assignment'] as const;
 
 type Rule = {
   action: typeof actions[number],
@@ -113,19 +113,30 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return result;
 }
 
-  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
-    /*return database
+  async getAbility(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
+    const permissionRecords: PermissionRecord[] | null = await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    .whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`)
-    .orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
+    .where(function() {
+  this.whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`).orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
+})
     .andWhere('p.action', action)
-    .andWhere('p.subject', subjectType)
-    //.then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object)) : false);
-    .then((permissionRecords: PermissionRecord[] | null) => permissionRecords ? this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subjectType, object) : false);*/
+    .andWhere('p.subject', subjectType);
 
+    if (permissionRecords == null)
+      {
+        return null;
+      }
+      else if(object == null) {
+        return this.createAbility(this.convertToRule(permissionRecords, object));
+      } else {
+        return this.createAbility(this.convertToRule(permissionRecords, object));
+      }
+  }
+
+  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
     const permissionRecords: PermissionRecord[] | null = await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
@@ -142,9 +153,9 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
         return false;
       }
       else if(object == null) {
-        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subjectType, object)
+        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subjectType, object);
       } else {
-        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object))
+        return this.createAbility(this.convertToRule(permissionRecords, object)).can(action, subject(subjectType, object));
       }
   }
 

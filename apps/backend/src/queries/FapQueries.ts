@@ -8,6 +8,7 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { PermissionDataSource } from '../datasources/PermissionDataSource';
 
 @injectable()
 export default class FapQueries {
@@ -15,7 +16,9 @@ export default class FapQueries {
     @inject(Tokens.FapDataSource) public dataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.PermissionDataSource)
+    private permissionDataSource: PermissionDataSource
   ) {}
 
   @Authorized([
@@ -182,6 +185,11 @@ export default class FapQueries {
     const proposalEvents =
       await this.proposalDataSource.getProposalEvents(proposalPk);
 
+    const abilities = await this.permissionDataSource.getAbility(agent?.currentRole?.shortCode ?? 'user', 'read', 'fap_proposal_assignment', {userId: agent!.id});
+
+    if (abilities == null) {
+      return [];
+    }
     // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
     if (
       agent &&
@@ -195,7 +203,8 @@ export default class FapQueries {
     return this.dataSource.getFapProposalAssignments(
       fapId,
       proposalPk,
-      reviewerId
+      reviewerId,
+      abilities
     );
   }
 

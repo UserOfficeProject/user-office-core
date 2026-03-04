@@ -18,6 +18,7 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { AppAbility } from './postgres/PermissionDataSource';
 import {
   FapReviewsRecord,
   AssignProposalsToFapsInput,
@@ -59,7 +60,8 @@ export interface FapDataSource {
   getFapProposalAssignments(
     fapId: number,
     proposalPk: number,
-    reviewerId: number | null
+    reviewerId: number | null,
+    abilities: AppAbility
   ): Promise<FapAssignment[]>;
   getAllFapProposalAssignments(proposalPk: number): Promise<FapAssignment[]>;
   getFapReviewsByCallAndStatus(

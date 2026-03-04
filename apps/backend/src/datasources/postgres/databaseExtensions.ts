@@ -51,7 +51,7 @@ const addExtensions = () => {
       'casl',
       function (
         ability: AnyAbility,
-        action: Normalize<Generics<AnyAbility>['abilities']>[0],
+        action: string,
         subject: string,
       ) {
         const [sql, replacements] = toKnexRawQuery(ability, action, subject);

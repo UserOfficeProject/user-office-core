@@ -53,6 +53,7 @@ import {
   CountryRecord,
   FapReviewsRecord,
 } from './records';
+import { AppAbility } from './PermissionDataSource';
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
@@ -276,9 +277,10 @@ export default class PostgresFapDataSource implements FapDataSource {
   async getFapProposalAssignments(
     fapId: number,
     proposalPk: number,
-    reviewerId: number | null
+    reviewerId: number | null,
+    abilities: AppAbility
   ): Promise<FapAssignment[]> {
-    const fapAssignments: ReviewRecord[] = await database
+    /*const fapAssignments: ReviewRecord[] = await database
       .from('fap_reviews')
       .modify((query) => {
         if (reviewerId !== null) {
@@ -286,7 +288,19 @@ export default class PostgresFapDataSource implements FapDataSource {
         }
       })
       .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk);
+      .andWhere('proposal_pk', proposalPk);*/
+
+    const test = await database
+      .from('fap_reviews')
+      .where('fap_id', fapId)
+      .andWhere('proposal_pk', proposalPk)
+      .casl(abilities, 'read', 'fap_proposal_assignment').toSQL().toNative();
+
+    const fapAssignments: ReviewRecord[] = await database
+      .from('fap_reviews')
+      .where('fap_id', fapId)
+      .andWhere('proposal_pk', proposalPk)
+      .casl(abilities, 'read', 'fap_proposal_assignment');
 
     return fapAssignments.map((fapAssignment) =>
       createFapAssignmentObject(fapAssignment)
