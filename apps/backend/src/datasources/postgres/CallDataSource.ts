@@ -29,7 +29,7 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   sort_order: 'sort_order',
-  call_id: 'call_id',
+  call_id: 'call.call_id',
 };
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -637,5 +637,16 @@ export default class PostgresCallDataSource implements CallDataSource {
           ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
+  }
+
+  async getCallsOfFaps(fapIds: number[]): Promise<Call[]> {
+    return database
+      .distinct('call.*')
+      .from('call')
+      .join('call_has_faps as chf', 'chf.call_id', 'call.call_id')
+      .whereIn('chf.fap_id', fapIds)
+      .then((calls: CallRecord[]) => {
+        return calls.map((call) => createCallObject(call));
+      });
   }
 }

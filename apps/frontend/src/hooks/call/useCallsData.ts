@@ -16,7 +16,8 @@ type QueryParameters = {
 export function useCallsData(
   filter?: CallsFilter,
   queryParameters?: QueryParameters,
-  dataQuantity: CallsDataQuantity = CallsDataQuantity.MINIMAL
+  dataQuantity: CallsDataQuantity = CallsDataQuantity.MINIMAL,
+  skip: boolean = false
 ) {
   const [callsFilter, setCallsFilter] = useState(filter);
   const [callsQueryParams, setCallsQueryParams] = useState(queryParameters);
@@ -32,6 +33,11 @@ export function useCallsData(
   };
 
   useEffect(() => {
+    if (skip) {
+      setLoadingCalls(false);
+
+      return;
+    }
     let unmounted = false;
 
     setLoadingCalls(true);
@@ -60,7 +66,7 @@ export function useCallsData(
     return () => {
       unmounted = true;
     };
-  }, [api, callsFilter, dataQuantity, callsQueryParams]);
+  }, [api, callsFilter, dataQuantity, callsQueryParams, skip]);
 
   return {
     loadingCalls,
