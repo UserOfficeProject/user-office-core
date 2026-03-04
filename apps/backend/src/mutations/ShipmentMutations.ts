@@ -144,6 +144,7 @@ export default class ShipmentMutations {
         })
         .then((shipment) => shipment);
     } catch (error) {
+      const errorMessage = (error as Error).message;
       logger.logException(
         'Error occurred while registering asset into EAM',
         error as Error,
@@ -151,7 +152,8 @@ export default class ShipmentMutations {
       );
 
       return rejection(
-        'Could not submit shipment because an error occurred. Please try again later.',
+        errorMessage ||
+          'Could not submit shipment because an error occurred. Please try again later.',
         { args },
         error
       );
@@ -242,6 +244,10 @@ export default class ShipmentMutations {
         'Can not add samples because user does not have permissions to change samples',
         { args, agent }
       );
+    }
+
+    if (args.sampleIds.length === 0) {
+      return rejection('At least one sample must be selected', { args });
     }
 
     // TODO check if samplesIds provided belongs to the proposal

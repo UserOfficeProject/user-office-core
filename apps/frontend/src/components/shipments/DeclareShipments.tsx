@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Typography,
   Alert,
@@ -6,6 +7,8 @@ import {
   DialogContent,
   Divider,
   Paper,
+  DialogTitle,
+  IconButton,
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -40,6 +43,7 @@ const shipmentToListRow = (
 function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const { shipments, setShipments } = useShipments({
     experimentPk: experimentPk,
@@ -99,6 +103,26 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
 
   const hasLocalContact = experiment.localContactId !== null;
 
+  const handleClose = () => {
+    if (isDirty) {
+      confirm(
+        () => {
+          setIsModalOpen(false);
+          setSelectedShipment(null);
+          setIsDirty(false);
+        },
+        {
+          title: 'Close shipment declaration',
+          description:
+            'Are you sure you want to close? Any unsaved changes will be lost.',
+        }
+      )();
+    } else {
+      setIsModalOpen(false);
+      setSelectedShipment(null);
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" component="h2" sx={{ marginBottom: 3 }}>
@@ -143,17 +167,35 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
         aria-labelledby="shipment-declaration"
         aria-describedby="shipment-declaration-description"
         open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedShipment(null);
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') {
+            return;
+          }
+          handleClose();
         }}
         maxWidth="sm"
         fullWidth
       >
-        <DialogContent>
+        <DialogTitle sx={{ m: 0, p: 2 }}>
+          {selectedShipment ? 'Update Shipment' : 'Add Shipment Declaration'}
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
           <CreateUpdateShipment
             onShipmentSubmitted={handleSubmitted}
             onShipmentCreated={handleCreated}
+            onDirtyStateChange={setIsDirty}
             experimentPk={experimentPk}
             shipment={selectedShipment}
           />

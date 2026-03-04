@@ -91,7 +91,7 @@ export default function ExperimentsTable({
   });
 
   const fetchExperimentsData = (tableQuery: Query<Experiment>) =>
-    new Promise<QueryResult<Experiment>>(async (resolve, reject) => {
+    new Promise<QueryResult<Experiment>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
         const {
@@ -101,53 +101,60 @@ export default function ExperimentsTable({
           experimentStartDate,
           experimentEndDate,
         } = experimentsFilter;
-        const { allExperiments } = await api().getExperiments({
-          filter: {
-            callId,
-            instrumentId,
-            experimentSafetyStatusId,
-            // Type assertion to tell TypeScript these fields are valid
-            ...(experimentStartDate ? { experimentStartDate } : {}),
-            ...(experimentEndDate ? { experimentEndDate } : {}),
-          },
-          sortField: orderBy?.orderByField,
-          sortDirection:
-            orderBy?.orderDirection == PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : orderBy?.orderDirection == PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-          searchText: tableQuery.search,
-        });
+        api()
+          .getExperiments({
+            filter: {
+              callId,
+              instrumentId,
+              experimentSafetyStatusId,
+              // Type assertion to tell TypeScript these fields are valid
+              ...(experimentStartDate ? { experimentStartDate } : {}),
+              ...(experimentEndDate ? { experimentEndDate } : {}),
+            },
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            searchText: tableQuery.search,
+          })
+          .then(({ allExperiments }) => {
+            const tableData =
+              allExperiments?.experiments.map((experiment) => {
+                const selection = new Set(searchParams.getAll('selection'));
+                const experimentData = {
+                  ...experiment,
+                } as Experiment;
 
-        const tableData =
-          allExperiments?.experiments.map((experiment) => {
-            const selection = new Set(searchParams.getAll('selection'));
-            const experimentData = {
-              ...experiment,
-            } as Experiment;
+                if (searchParams.getAll('selection').length > 0) {
+                  return {
+                    ...experimentData,
+                    tableData: {
+                      checked: selection.has(
+                        experiment.experimentPk.toString()
+                      ),
+                    },
+                  };
+                } else {
+                  return experimentData;
+                }
+              }) || [];
 
-            if (searchParams.getAll('selection').length > 0) {
-              return {
-                ...experimentData,
-                tableData: {
-                  checked: selection.has(experiment.experimentPk.toString()),
-                },
-              };
-            } else {
-              return experimentData;
-            }
-          }) || [];
+            setTableData(tableData);
 
-        setTableData(tableData);
-
-        resolve({
-          data: tableData,
-          page: tableQuery.page,
-          totalCount: allExperiments?.totalCount || 0,
-        });
+            resolve({
+              data: tableData,
+              page: tableQuery.page,
+              totalCount: allExperiments?.totalCount || 0,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }

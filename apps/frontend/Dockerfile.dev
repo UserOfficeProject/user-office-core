@@ -3,6 +3,6 @@ FROM node:22.14.0-alpine
 USER node
 
 # The Git repo should be mounted from the host into this directory
-WORKDIR /app
+WORKDIR /app/frontend
 
 CMD ["npm", "run", "dev:docker"]

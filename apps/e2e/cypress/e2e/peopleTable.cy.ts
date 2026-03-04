@@ -108,7 +108,7 @@ context('PageTable component tests', () => {
       });
 
       cy.get('[data-cy="people-table"] thead')
-        .contains('Firstname')
+        .contains('First Name')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
@@ -126,7 +126,7 @@ context('PageTable component tests', () => {
         });
 
       cy.get('[data-cy="people-table"] thead')
-        .contains('Firstname')
+        .contains('First Name')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();

@@ -17,6 +17,8 @@ import {
   UpdateReviewMutationVariables,
   ReorderFapMeetingDecisionProposalsMutation,
   ReorderFapMeetingDecisionProposalsMutationVariables,
+  UpdateFapMutation,
+  UpdateFapMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -27,6 +29,14 @@ const createFap = (
   newFapInput: CreateFapMutationVariables
 ): Cypress.Chainable<CreateFapMutation> => {
   const request = api.createFap(newFapInput);
+
+  return cy.wrap(request);
+};
+
+const updateFap = (
+  updatedFapInput: UpdateFapMutationVariables
+): Cypress.Chainable<UpdateFapMutation> => {
+  const request = api.updateFap(updatedFapInput);
 
   return cy.wrap(request);
 };
@@ -100,6 +110,7 @@ const reorderFapMeetingDecisionProposals = (
 };
 
 Cypress.Commands.add('createFap', createFap);
+Cypress.Commands.add('updateFap', updateFap);
 Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToFap', assignReviewersToFap);
 Cypress.Commands.add('assignProposalsToFaps', assignProposalsToFaps);

@@ -13,6 +13,7 @@ import {
   CallOrderInput,
   CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
@@ -25,6 +26,11 @@ import {
   ProposalRecord,
   WorkflowRecord,
 } from './records';
+
+const fieldMap: { [key: string]: string } = {
+  sort_order: 'sort_order',
+  call_id: 'call_id',
+};
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -46,7 +52,11 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+  async getCalls(
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ): Promise<Call[]> {
     const query = database('call').select([
       '*',
       'call.description as description',
@@ -174,6 +184,13 @@ export default class PostgresCallDataSource implements CallDataSource {
         .leftJoin('statuses as s', 'w.status_id', 's.status_id')
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
+    }
+    if (sortField && sortDirection) {
+      if (!fieldMap.hasOwnProperty(sortField)) {
+        throw new GraphQLError(`Bad sort field given: ${sortField}`);
+      }
+      sortField = fieldMap[sortField];
+      query.orderBy(sortField, sortDirection);
     }
 
     return query.then((callDB: CallRecord[]) => {
@@ -439,7 +456,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
   async setNewSortOrder(data: CallOrderArray): Promise<number> {
     return await database
-      .update({ sort_order: data.sort_order })
+      .update({ sort_order: data.sort_order + 1 })
       .from('call')
       .where({ call_id: data.callId });
   }
@@ -622,5 +639,16 @@ export default class PostgresCallDataSource implements CallDataSource {
           ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
+  }
+
+  async getCallsOfFaps(fapIds: number[]): Promise<Call[]> {
+    return database
+      .distinct('call.*')
+      .from('call')
+      .join('call_has_faps as chf', 'chf.call_id', 'call.call_id')
+      .whereIn('chf.fap_id', fapIds)
+      .then((calls: CallRecord[]) => {
+        return calls.map((call) => createCallObject(call));
+      });
   }
 }
