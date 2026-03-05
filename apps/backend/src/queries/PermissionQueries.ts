@@ -36,4 +36,24 @@ export default class PermissionQueries {
       resourceFunctions,
     };
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getPolicyCondition(
+    agent: UserWithRole | null,
+    subject: string,
+    resourceType: ResourceType,
+    action: string
+  ): Promise<string | null> {
+    const condition = await this.casbinService.getPolicyCondition(
+      subject,
+      resourceType.toLowerCase(),
+      action
+    );
+
+    if (!condition) return null;
+
+    const test = JSON.stringify(condition);
+
+    return test;
+  }
 }

@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem } from '@mui/material';
 import { Button } from '@mui/material';
 import { Select } from '@mui/material';
 import { Stack, Box } from '@mui/system';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Field,
   formatQuery,
@@ -14,17 +14,48 @@ import {
 import UOLoader from 'components/common/UOLoader';
 import { ResourceType } from 'generated/sdk';
 import { useAuthResourceMetadata } from 'hooks/permission/useAuthResourceMetadata';
+import { usePolicyCondition } from 'hooks/permission/usePolicyCondition';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export function PermissionsBuilder() {
   const { api } = useDataApiWithFeedback();
 
-  const [subject, setSubject] = useState('user_officer');
+  const [subject, setSubject] = useState<string>('user');
   const [resource, setResource] = useState<ResourceType>(ResourceType.CALL);
   const [action, setAction] = useState('read');
 
-  const { userAttributes, resourceAttributes, resourceFunctions, loading } =
-    useAuthResourceMetadata(resource);
+  const emptyQuery = useMemo<RuleGroupType>(
+    () => ({
+      combinator: 'and',
+      rules: [],
+    }),
+    []
+  );
+
+  const [query, setQuery] = useState<RuleGroupType>(emptyQuery);
+
+  const {
+    userAttributes,
+    resourceAttributes,
+    resourceFunctions,
+    loadingMetaData,
+  } = useAuthResourceMetadata(resource);
+
+  const { condition, loadingCondition } = usePolicyCondition(
+    subject,
+    resource,
+    action
+  );
+
+  useEffect(() => {
+    if (loadingCondition) return;
+
+    if (condition) {
+      setQuery(JSON.parse(condition));
+    } else {
+      setQuery(emptyQuery);
+    }
+  }, [condition, loadingCondition, emptyQuery]);
 
   const fields: Field[] = [
     ...userAttributes.map((attr) => ({
@@ -61,11 +92,6 @@ export function PermissionsBuilder() {
     },
   ];
 
-  const [query, setQuery] = useState<RuleGroupType>({
-    combinator: 'and',
-    rules: [{ field: 'call.tags', operator: 'contains', value: 'ISIS' }],
-  });
-
   const handleCreatePolicy = async () => {
     const formattedQuery = formatQuery(query, 'json');
 
@@ -79,7 +105,7 @@ export function PermissionsBuilder() {
     });
   };
 
-  return loading ? (
+  return loadingMetaData ? (
     <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
   ) : (
     <Stack spacing={3}>
@@ -116,29 +142,33 @@ export function PermissionsBuilder() {
             onChange={(e) => setAction(e.target.value)}
           >
             <MenuItem value="read">read</MenuItem>
+            <MenuItem value="edit">edit</MenuItem>
             <MenuItem value="archive">archive</MenuItem>
             <MenuItem value="delete">delete</MenuItem>
-            <MenuItem value="edit">edit</MenuItem>
           </Select>
         </FormControl>
       </Stack>
 
       <Box>
-        <QueryBuilder
-          fields={fields}
-          operators={defaultOperators}
-          query={query}
-          onQueryChange={setQuery}
-        />
+        {loadingCondition ? (
+          <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />
+        ) : (
+          <QueryBuilder
+            fields={fields}
+            operators={defaultOperators}
+            query={query}
+            onQueryChange={setQuery}
+          />
+        )}
       </Box>
 
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"
           onClick={handleCreatePolicy}
-          disabled={query.rules.length === 0}
+          disabled={loadingCondition || loadingMetaData}
         >
-          Create Policy
+          Create/update
         </Button>
       </Box>
     </Stack>

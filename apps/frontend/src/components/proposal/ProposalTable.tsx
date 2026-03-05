@@ -306,7 +306,7 @@ const ProposalTable = ({
             };
           },
           (rowData) => {
-            const canDelete = rowData.proposalUiPermissions?.canDelete;
+            const canDelete = rowData.uiPermissions?.canDelete;
 
             return {
               icon: DeleteIcon,

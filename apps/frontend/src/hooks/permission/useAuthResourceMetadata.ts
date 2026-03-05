@@ -1,4 +1,3 @@
-// hooks/useResourceMetadata.ts
 import { useEffect, useState } from 'react';
 
 import { GetAuthResourceMetadataQuery, ResourceType } from 'generated/sdk';
@@ -10,14 +9,13 @@ export type ResourceMetadata = NonNullable<
 
 export function useAuthResourceMetadata(resourceType: ResourceType) {
   const [metadata, setMetadata] = useState<ResourceMetadata | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  const [loadingMetaData, setLoadingMetaData] = useState(true);
   const api = useDataApi();
 
   useEffect(() => {
     let unmounted = false;
 
-    setLoading(true);
+    setLoadingMetaData(true);
     api()
       .getAuthResourceMetadata({ resourceType })
       .then((data) => {
@@ -25,18 +23,18 @@ export function useAuthResourceMetadata(resourceType: ResourceType) {
           return;
         }
         setMetadata(data.getAuthResourceMetadata);
-        setLoading(false);
+        setLoadingMetaData(false);
       });
 
     return () => {
       unmounted = true;
     };
-  }, [resourceType, api]);
+  }, [api, resourceType]);
 
   return {
     userAttributes: metadata?.userAttributes ?? [],
     resourceAttributes: metadata?.resourceAttributes ?? [],
     resourceFunctions: metadata?.resourceFunctions ?? [],
-    loading,
+    loadingMetaData,
   };
 }

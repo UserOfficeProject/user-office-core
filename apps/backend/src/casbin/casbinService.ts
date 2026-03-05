@@ -40,8 +40,12 @@ export class CasbinService {
     conditionJson: string,
     allowOrDeny: string
   ): Promise<boolean> {
-    const conditionRecord =
-      await this.casbinConditionDataSource.create(conditionJson);
+    let conditionRecord = null;
+
+    if (conditionJson) {
+      conditionRecord =
+        await this.casbinConditionDataSource.create(conditionJson);
+    }
 
     const enforcer = await this.getEnforcer();
 
@@ -49,11 +53,23 @@ export class CasbinService {
       role,
       obj,
       act,
-      String(conditionRecord.id),
+      conditionRecord ? String(conditionRecord.id) : '',
       allowOrDeny
     );
 
     return addedPolicy;
+  }
+
+  async getPolicy(
+    role: string,
+    obj: string,
+    act: string
+  ): Promise<string[][] | null> {
+    const enforcer = await this.getEnforcer();
+
+    const policies = await enforcer.getFilteredPolicy(0, role, obj, act);
+
+    return policies.length > 0 ? policies : null;
   }
 
   async getPolicyCondition(
@@ -61,9 +77,9 @@ export class CasbinService {
     obj: string,
     act: string
   ): Promise<string | null> {
-    const enforcer = await this.getEnforcer();
+    const policies = await this.getPolicy(role, obj, act);
 
-    const policies = await enforcer.getFilteredPolicy(0, role, obj, act);
+    if (!policies) return null;
 
     const conditionId = (policies.length && Number(policies[0][3])) || null;
 
@@ -75,5 +91,11 @@ export class CasbinService {
       await this.casbinConditionDataSource.get(conditionId);
 
     return conditionRecord?.condition || null;
+  }
+
+  async removePolicy(role: string, obj: string, act: string): Promise<boolean> {
+    const enforcer = await this.getEnforcer();
+
+    return await enforcer.removeFilteredPolicy(0, role, obj, act);
   }
 }

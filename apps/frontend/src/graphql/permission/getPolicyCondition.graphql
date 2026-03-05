@@ -1,0 +1,3 @@
+query getPolicyCondition($subject: String!, $resourceType: ResourceType!, $action: String!) {
+  getPolicyCondition(subject: $subject, resourceType: $resourceType, action: $action)
+}

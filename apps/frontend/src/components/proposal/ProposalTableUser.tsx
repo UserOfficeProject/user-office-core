@@ -36,7 +36,7 @@ export type PartialProposalsDataType = {
     >
   >;
   proposerId?: number;
-  proposalUiPermissions?: ProposalUiPermissions;
+  uiPermissions?: ProposalUiPermissions;
 };
 
 export type UserProposalDataType = {
@@ -84,7 +84,7 @@ const ProposalTableUser = () => {
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
-                proposalUiPermissions: proposal.proposalUiPermissions,
+                uiPermissions: proposal.uiPermissions,
               };
             }),
         };

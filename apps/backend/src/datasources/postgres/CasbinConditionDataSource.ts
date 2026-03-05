@@ -38,4 +38,14 @@ export default class PostgresCasbinConditionDataSource
       condition: record.condition,
     };
   }
+
+  async delete(id: number): Promise<boolean> {
+    const deleted = await database
+      .delete()
+      .from('casbin_condition')
+      .where('id', id)
+      .returning('*');
+
+    return !!deleted;
+  }
 }

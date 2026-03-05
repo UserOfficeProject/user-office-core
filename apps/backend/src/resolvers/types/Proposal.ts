@@ -321,7 +321,7 @@ export class ProposalResolver {
   }
 
   @FieldResolver(() => ProposalUiPermissions)
-  async proposalUiPermissions(
+  async uiPermissions(
     @Root() proposal: Proposal,
     @Ctx() ctx: ResolverContext
   ): Promise<ProposalUiPermissions> {

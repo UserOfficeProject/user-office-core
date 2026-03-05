@@ -29,3 +29,21 @@ export class GetAuthResourceMetadataQuery {
     );
   }
 }
+
+@Resolver()
+export class GetPolicyConditionQuery {
+  @Query(() => String, { nullable: true })
+  async getPolicyCondition(
+    @Arg('subject', () => String) subject: string,
+    @Arg('resourceType', () => ResourceType) resourceType: ResourceType,
+    @Arg('action', () => String) action: string,
+    @Ctx() ctx: ResolverContext
+  ): Promise<string | null> {
+    return ctx.queries.permission.getPolicyCondition(
+      ctx.user,
+      subject,
+      resourceType,
+      action
+    );
+  }
+}
