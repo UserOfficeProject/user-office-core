@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CasbinService } from '../../casbin/casbinService';
-import { walkAst } from '../../casbin/conditionParser';
+import { CasbinService } from '../casbin/casbinService';
+import { walkAst } from '../casbin/conditionParser';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 import { UserContextData } from '../authContexts/UserAuthContext';

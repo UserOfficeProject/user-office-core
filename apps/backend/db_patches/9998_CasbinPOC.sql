@@ -25,6 +25,13 @@ BEGIN
         CREATE INDEX idx_casbin_rule_condition_id
         ON casbin_rule(v3);
 
+        /* Default policies with no conditions so that everything works initially until overwritten in UI */
+        INSERT INTO casbin_rule (ptype, v0, v1, v2, v4)
+        VALUES ('p', 'user', 'proposal', 'read', 'allow');
+
+        INSERT INTO casbin_rule (ptype, v0, v1, v2, v4)
+        VALUES ('p', 'user', 'proposal', 'delete', 'allow');
+
         /* Creating ISIS tag and assigning latest 10 calls to it */
         INSERT INTO tag (name, short_code)
         VALUES ('ISIS', 'ISIS')

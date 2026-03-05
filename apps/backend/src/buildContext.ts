@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 
 import { ProposalAuthorization } from './auth/ProposalAuthorization';
-import { CasbinService } from './casbin/casbinService';
+import { CasbinService } from './auth/casbin/casbinService';
 import { BasicResolverContext } from './context';
 import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
 import CallPermissionsLoader from './loaders/CallPermissionsLoader';

@@ -1,9 +1,9 @@
 import { container } from 'tsyringe';
 
-import { UserContextData } from '../auth/authContexts/UserAuthContext';
-import { AuthRegistry, ResourceType } from '../auth/AuthRegistry';
-import { Tokens } from '../config/Tokens';
-import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
+import { Tokens } from '../../config/Tokens';
+import { CasbinConditionDataSource } from '../../datasources/CasbinConditionDataSource';
+import { UserContextData } from '../authContexts/UserAuthContext';
+import { AuthRegistry, ResourceType } from '../AuthRegistry';
 
 export async function evalCondition(
   sub: UserContextData,

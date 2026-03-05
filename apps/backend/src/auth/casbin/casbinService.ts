@@ -3,9 +3,9 @@
 import { Enforcer } from 'casbin';
 import { inject, injectable } from 'tsyringe';
 
-import { EnforcementRequest } from '../auth/CasbinAuthorization';
-import { Tokens } from '../config/Tokens';
-import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
+import { Tokens } from '../../config/Tokens';
+import { CasbinConditionDataSource } from '../../datasources/CasbinConditionDataSource';
+import { EnforcementRequest } from '../CasbinAuthorization';
 import { getCasbinEnforcer } from './casbinEnforcer';
 
 @injectable()

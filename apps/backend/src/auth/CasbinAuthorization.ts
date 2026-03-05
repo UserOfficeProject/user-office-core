@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 
-import { CasbinService } from '../casbin/casbinService';
+import { CasbinService } from './casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { UserContextData } from './authContexts/UserAuthContext';
 

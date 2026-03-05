@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { Authorized } from 'type-graphql';
 
 import { AuthRegistry, ResourceType } from '../auth/AuthRegistry';
-import { CasbinService } from '../casbin/casbinService';
+import { CasbinService } from '../auth/casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';

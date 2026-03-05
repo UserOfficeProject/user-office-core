@@ -7,7 +7,7 @@ import {
 } from '../auth/authContexts/CallAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { EnforcementRequest } from '../auth/CasbinAuthorization';
-import { CasbinService } from '../casbin/casbinService';
+import { CasbinService } from '../auth/casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { UserWithRole } from '../models/User';
 import {
