@@ -38,7 +38,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
         }
       );
       onAccept();
-    } catch (error) {
+    } catch {
       enqueueSnackbar(
         `Failed to accept the invitation for the proposal "${proposalInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}". Please try again later.`,
         {

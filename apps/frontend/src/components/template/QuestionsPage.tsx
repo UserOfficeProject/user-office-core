@@ -32,38 +32,6 @@ import AnswerCountDetails from './AnswerCountDetails';
 import QuestionsTableFilter from './QuestionsTableFilter';
 import TemplateCountDetails from './TemplateCountDetails';
 
-let columns: Column<QuestionWithUsage>[] = [
-  { title: 'Question', field: 'question' },
-  { title: 'Key', field: 'naturalKey' },
-  { title: 'Category', field: 'categoryId' },
-  {
-    title: '# Answers',
-    field: 'answers',
-    render: (rowData: QuestionWithUsage) => (
-      <ButtonWithDialog
-        label={rowData.answers.length.toString()}
-        title="Answers to the Question"
-        data-cy="open-answer-details-btn"
-      >
-        <AnswerCountDetails question={rowData} />
-      </ButtonWithDialog>
-    ),
-  },
-  {
-    title: '# Templates',
-    field: 'templates',
-    render: (rowData: QuestionWithUsage) => (
-      <ButtonWithDialog
-        label={rowData.templates.length.toString()}
-        title="Templates using the question"
-        data-cy="open-template-details-btn"
-      >
-        <TemplateCountDetails question={rowData} />
-      </ButtonWithDialog>
-    ),
-  },
-];
-
 function QuestionsPage() {
   const [searchParams, setSearchParam] = useSearchParams();
   const category = searchParams.get('category') as TemplateCategoryId;
@@ -91,35 +59,72 @@ function QuestionsPage() {
   const { api } = useDataApiWithFeedback();
 
   const fetchQuestionsData = (tableQuery: Query<QuestionWithUsage>) =>
-    new Promise<QueryResult<QuestionWithUsage>>(async (resolve, reject) => {
+    new Promise<QueryResult<QuestionWithUsage>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
 
-        const results = await api().getAllQuestions({
-          filter,
-          searchText: tableQuery.search,
-          sortField: orderBy?.orderByField,
-          sortDirection:
-            orderBy?.orderDirection == PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : orderBy?.orderDirection == PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-        });
-
-        resolve({
-          data: results.allQuestions?.questions,
-          page: tableQuery.page,
-          totalCount: results.allQuestions?.totalCount || 0,
-        });
+        api()
+          .getAllQuestions({
+            filter,
+            searchText: tableQuery.search,
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+          })
+          .then((results) => {
+            resolve({
+              data: results.allQuestions?.questions,
+              page: tableQuery.page,
+              totalCount: results.allQuestions?.totalCount || 0,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }
     });
 
   const sortDirection = searchParams.get('sortDirection');
+
+  let columns: Column<QuestionWithUsage>[] = [
+    { title: 'Question', field: 'question' },
+    { title: 'Key', field: 'naturalKey' },
+    { title: 'Category', field: 'categoryId' },
+    {
+      title: '# Answers',
+      field: 'answers',
+      render: (rowData: QuestionWithUsage) => (
+        <ButtonWithDialog
+          label={rowData.answers.length.toString()}
+          title="Answers to the Question"
+          data-cy="open-answer-details-btn"
+        >
+          <AnswerCountDetails question={rowData} />
+        </ButtonWithDialog>
+      ),
+    },
+    {
+      title: '# Templates',
+      field: 'templates',
+      render: (rowData: QuestionWithUsage) => (
+        <ButtonWithDialog
+          label={rowData.templates.length.toString()}
+          title="Templates using the question"
+          data-cy="open-template-details-btn"
+        >
+          <TemplateCountDetails question={rowData} />
+        </ButtonWithDialog>
+      ),
+    },
+  ];
   columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
@@ -143,21 +148,25 @@ function QuestionsPage() {
           <DialogContent>
             {selectedQuestion && (
               <>
-                {createQuestionForm({
-                  question: selectedQuestion,
-                  rolesData,
-                  onUpdated: () => {
-                    setIsEditQuestionModalOpen(false);
-                    tableRef.current && tableRef.current.onQueryChange({});
-                  },
-                  onDeleted: () => {
-                    setIsEditQuestionModalOpen(false);
-                    tableRef.current && tableRef.current.onQueryChange({});
-                  },
-                  closeMe: () => {
-                    setIsEditQuestionModalOpen(false);
-                  },
-                })}
+                {
+                  // refs should not be used in rendering but these are used in event handlers only but eslint cannot detect that
+                  // eslint-disable-next-line react-hooks/refs
+                  createQuestionForm({
+                    question: selectedQuestion,
+                    rolesData,
+                    onUpdated: () => {
+                      setIsEditQuestionModalOpen(false);
+                      tableRef.current && tableRef.current.onQueryChange({});
+                    },
+                    onDeleted: () => {
+                      setIsEditQuestionModalOpen(false);
+                      tableRef.current && tableRef.current.onQueryChange({});
+                    },
+                    closeMe: () => {
+                      setIsEditQuestionModalOpen(false);
+                    },
+                  })
+                }
               </>
             )}
           </DialogContent>

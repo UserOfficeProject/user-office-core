@@ -11,11 +11,9 @@ import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
-import ProposalPeopleTable from 'components/user/ProposalsPeopleTable';
 import { UserRole, BasicUserDetails } from 'generated/sdk';
-import { useCheckAccess } from 'hooks/common/useCheckAccess';
 
-type ParticipantModalProps = {
+type PeopleSelectorModalProps = {
   title: string;
   addParticipants: (data: BasicUserDetails[]) => void;
   show: boolean;
@@ -24,27 +22,24 @@ type ParticipantModalProps = {
   selectedUsers?: number[];
   userRole?: UserRole;
   invitationUserRole?: UserRole;
-  participant?: boolean;
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
 };
 
-const ParticipantModal = ({
+const PeopleSelectorModal = ({
   addParticipants,
   close,
   show,
   title,
   invitationUserRole,
-  participant,
   selectedUsers,
   selection,
   userRole,
   setPrincipalInvestigator,
-}: ParticipantModalProps) => {
+}: PeopleSelectorModalProps) => {
   const theme = useTheme();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const addUser = (rowData: BasicUserDetails | BasicUserDetails[]) => {
     const addedUserDetails = rowData as BasicUserDetails;
@@ -81,9 +76,6 @@ const ParticipantModal = ({
     ...userTableProps,
   };
 
-  const peopleTable = <PeopleTable {...peopleTablesProps} />;
-  const proposalPeopleTable = <ProposalPeopleTable {...peopleTablesProps} />;
-
   return (
     <Dialog
       aria-labelledby="simple-modal-title"
@@ -115,7 +107,7 @@ const ParticipantModal = ({
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        {participant && !isUserOfficer ? proposalPeopleTable : peopleTable}
+        <PeopleTable {...peopleTablesProps} />
       </DialogContent>
       {selection && (
         <DialogActions>
@@ -140,4 +132,4 @@ const ParticipantModal = ({
   );
 };
 
-export default ParticipantModal;
+export default PeopleSelectorModal;
