@@ -1,10 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CasbinService } from '../casbin/casbinService';
-import { walkAst } from '../casbin/conditionParser';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 import { UserContextData } from '../authContexts/UserAuthContext';
+import { CasbinService } from '../casbin/casbinService';
+import { walkAst } from '../casbin/conditionParser';
 
 type CallAuthFilter = Partial<
   Pick<CallsFilter, 'shortCode' | 'hasTag' | 'isEnded' | 'isEndedInternal'>

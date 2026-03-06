@@ -2,8 +2,8 @@ import { inject, injectable } from 'tsyringe';
 
 import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
+import { CallAuthFilters } from '../auth/authFilters/CallAuthFilters';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
-import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';

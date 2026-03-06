@@ -1,22 +1,32 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { CasbinConditionDataSource } from '../../datasources/CasbinConditionDataSource';
+import {
+  CasbinCondition,
+  CasbinConditionDataSource,
+} from '../../datasources/CasbinConditionDataSource';
 import { UserContextData } from '../authContexts/UserAuthContext';
 import { AuthRegistry, ResourceType } from '../AuthRegistry';
+
+const casbinConditionDataSource = container.resolve<CasbinConditionDataSource>(
+  Tokens.CasbinConditionDataSource
+);
+const conditionCache = new Map<string, CasbinCondition>();
 
 export async function evalCondition(
   sub: UserContextData,
   obj: any,
   con: any
 ): Promise<boolean> {
-  const casbinConditionDataSource =
-    container.resolve<CasbinConditionDataSource>(
-      Tokens.CasbinConditionDataSource
-    );
+  let conditionRecord = conditionCache.get(con) ?? null;
 
-  const conditionRecord = await casbinConditionDataSource.get(con);
-  if (!conditionRecord) return false;
+  if (!conditionRecord) {
+    conditionRecord = await casbinConditionDataSource.get(con);
+
+    if (!conditionRecord) return false;
+
+    conditionCache.set(con, conditionRecord);
+  }
 
   const conditionJson = conditionRecord.condition;
   const ctx = { user: sub, obj };

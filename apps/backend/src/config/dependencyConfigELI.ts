@@ -9,7 +9,7 @@ import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { ELIUserAuthorization } from '../auth/ELIUserAuthorization';
-import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
+import { CallAuthFilters } from '../auth/authFilters/CallAuthFilters';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';

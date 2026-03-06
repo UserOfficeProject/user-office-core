@@ -8,7 +8,7 @@ import { ProposalAuthFunctions } from '../auth/authFunctions/ProposalAuthFunctio
 import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
-import { CallAuthFilters } from '../auth/filters/CallAuthFilters';
+import { CallAuthFilters } from '../auth/authFilters/CallAuthFilters';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
