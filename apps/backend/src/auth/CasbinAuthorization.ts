@@ -1,8 +1,8 @@
 import { injectable, inject } from 'tsyringe';
 
-import { CasbinService } from './casbin/casbinService';
 import { Tokens } from '../config/Tokens';
 import { UserContextData } from './authContexts/UserAuthContext';
+import { CasbinService } from './casbin/CasbinService';
 
 export type EnforcementRequest<TContext = unknown> = [
   user: UserContextData,

@@ -63,6 +63,8 @@ export const Tokens = {
   CasbinAuthorization: Symbol('CasbinAuthorization'),
   CasbinService: Symbol('CasbinService'),
   CasbinConditionDataSource: Symbol('CasbinConditionDataSource'),
+  CasbinConditionEvaluator: Symbol('CasbinConditionEvaluator'),
+  CasbinEnforcerProvider: Symbol('CasbinEnforcerProvider'),
   AuthRegistry: Symbol('AuthRegistry'),
   ProposalAuthContext: Symbol('ProposalAuthContext'),
   CallAuthContext: Symbol('CallAuthContext'),

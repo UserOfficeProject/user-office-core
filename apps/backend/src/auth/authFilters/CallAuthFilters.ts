@@ -3,8 +3,8 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallsFilter } from '../../resolvers/queries/CallsQuery';
 import { UserContextData } from '../authContexts/UserAuthContext';
-import { CasbinService } from '../casbin/casbinService';
-import { walkAst } from '../casbin/conditionParser';
+import { CasbinConditionEvaluator } from '../casbin/CasbinConditionEvaluator';
+import { CasbinService } from '../casbin/CasbinService';
 
 type CallAuthFilter = Partial<
   Pick<CallsFilter, 'shortCode' | 'hasTag' | 'isEnded' | 'isEndedInternal'>
@@ -14,7 +14,9 @@ type CallAuthFilter = Partial<
 export class CallAuthFilters {
   constructor(
     @inject(Tokens.CasbinService)
-    private casbinService: CasbinService
+    private casbinService: CasbinService,
+    @inject(Tokens.CasbinConditionEvaluator)
+    private conditionEvaluator: CasbinConditionEvaluator
   ) {}
 
   async buildDbFilters(
@@ -36,7 +38,7 @@ export class CallAuthFilters {
 
     const filters: CallAuthFilter = {};
 
-    walkAst(conditionJson, (rule) => {
+    this.conditionEvaluator.walkAst(conditionJson, (rule) => {
       const { field, operator, value } = rule;
 
       switch (field) {

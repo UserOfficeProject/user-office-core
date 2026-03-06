@@ -5,8 +5,8 @@ import { StatusDataSource } from '../../datasources/StatusDataSource';
 import { WorkflowType } from '../../models/Workflow';
 import { ProposalsFilter } from '../../resolvers/queries/ProposalsQuery';
 import { UserContextData } from '../authContexts/UserAuthContext';
-import { CasbinService } from '../casbin/casbinService';
-import { walkAst } from '../casbin/conditionParser';
+import { CasbinConditionEvaluator } from '../casbin/CasbinConditionEvaluator';
+import { CasbinService } from '../casbin/CasbinService';
 
 type ProposalAuthFilter = Partial<
   Pick<ProposalsFilter, 'text' | 'proposalStatusId'>
@@ -18,7 +18,9 @@ export class ProposalAuthFilters {
     @inject(Tokens.CasbinService)
     private casbinService: CasbinService,
     @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource
+    private statusDataSource: StatusDataSource,
+    @inject(Tokens.CasbinConditionEvaluator)
+    private conditionEvaluator: CasbinConditionEvaluator
   ) {}
 
   async buildDbFilters(
@@ -40,7 +42,7 @@ export class ProposalAuthFilters {
 
     const filters: ProposalAuthFilter = {};
 
-    walkAst(conditionJson, async (rule) => {
+    this.conditionEvaluator.walkAst(conditionJson, async (rule) => {
       const { field, operator, value } = rule;
 
       switch (field) {

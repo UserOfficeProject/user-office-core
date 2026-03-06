@@ -6,17 +6,22 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CasbinConditionDataSource } from '../../datasources/CasbinConditionDataSource';
 import { EnforcementRequest } from '../CasbinAuthorization';
-import { getCasbinEnforcer } from './casbinEnforcer';
+import { CasbinConditionEvaluator } from './CasbinConditionEvaluator';
+import { CasbinEnforcerProvider } from './CasbinEnforcerProvider';
 
 @injectable()
 export class CasbinService {
   constructor(
+    @inject(Tokens.CasbinEnforcerProvider)
+    private enforcerProvider: CasbinEnforcerProvider,
     @inject(Tokens.CasbinConditionDataSource)
-    private casbinConditionDataSource: CasbinConditionDataSource
+    private casbinConditionDataSource: CasbinConditionDataSource,
+    @inject(Tokens.CasbinConditionEvaluator)
+    private conditionEvaluator: CasbinConditionEvaluator
   ) {}
 
   private getEnforcer(): Promise<Enforcer> {
-    return getCasbinEnforcer();
+    return this.enforcerProvider.getEnforcer(this.conditionEvaluator);
   }
 
   async enforce(req: EnforcementRequest): Promise<boolean> {

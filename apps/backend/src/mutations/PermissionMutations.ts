@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CasbinService } from '../auth/casbin/casbinService';
+import { CasbinService } from '../auth/casbin/CasbinService';
 import { Tokens } from '../config/Tokens';
 import { CasbinConditionDataSource } from '../datasources/CasbinConditionDataSource';
 import { Authorized } from '../decorators';

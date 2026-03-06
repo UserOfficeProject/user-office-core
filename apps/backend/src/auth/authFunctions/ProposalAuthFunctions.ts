@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ProposalContextData } from '../authContexts/ProposalAuthContext';
@@ -8,10 +8,11 @@ import { ProposalAuthorization } from '../ProposalAuthorization';
 
 @injectable()
 export class ProposalAuthFunctions {
-  constructor(
-    @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
-  ) {}
+  private get proposalAuth(): ProposalAuthorization {
+    return container.resolve<ProposalAuthorization>(
+      Tokens.ProposalAuthorization
+    );
+  }
 
   registry(): AuthFunctionRegistry<ProposalContextData> {
     return {

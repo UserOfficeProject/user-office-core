@@ -1,5 +1,5 @@
+import { CasbinService } from '../auth/casbin/CasbinService';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { CasbinService } from '../auth/casbin/casbinService';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import CallPermissionsLoader from '../loaders/CallPermissionsLoader';
 import ProposalPermissionsLoader from '../loaders/ProposalPermissionsLoader';

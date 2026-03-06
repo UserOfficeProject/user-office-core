@@ -49,6 +49,10 @@ export class AuthRegistry {
 
   public readonly functions: {
     [K in ResourceType]: AuthFunctionRegistry<ContextMap[K]>;
+  } = {
+    [ResourceType.USER]: {},
+    [ResourceType.CALL]: {},
+    [ResourceType.PROPOSAL]: {},
   };
 
   constructor(
@@ -56,10 +60,7 @@ export class AuthRegistry {
     @inject(Tokens.ProposalAuthFunctions)
     proposalAuthFunctions: ProposalAuthFunctions
   ) {
-    this.functions = {
-      [ResourceType.USER]: {},
-      [ResourceType.CALL]: callAuthFunctions.registry(),
-      [ResourceType.PROPOSAL]: proposalAuthFunctions.registry(),
-    };
+    this.functions[ResourceType.CALL] = callAuthFunctions.registry();
+    this.functions[ResourceType.PROPOSAL] = proposalAuthFunctions.registry();
   }
 }

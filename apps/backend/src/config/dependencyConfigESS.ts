@@ -14,7 +14,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
-import { CasbinService } from '../auth/casbin/casbinService';
+import { CasbinService } from '../auth/casbin/CasbinService';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCasbinConditionDataSource from '../datasources/postgres/CasbinConditionDataSource';
