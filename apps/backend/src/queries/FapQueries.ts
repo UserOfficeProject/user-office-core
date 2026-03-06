@@ -185,9 +185,9 @@ export default class FapQueries {
     const proposalEvents =
       await this.proposalDataSource.getProposalEvents(proposalPk);
 
-    const abilities = await this.permissionDataSource.getAbility(agent?.currentRole?.shortCode ?? 'user', 'read', 'fap_proposal_assignment', {userId: agent!.id});
+    let ability = await this.permissionDataSource.getAbility(agent?.currentRole?.shortCode ?? 'user', 'read', 'fap_proposal_assignment', false, {userId: agent!.id});
 
-    if (abilities == null) {
+    if (ability == null) {
       return [];
     }
     // NOTE: If not officer, Fap Chair or Fap Secretary should return all proposal assignments only if everything is submitted. Otherwise for Fap Reviewer return only it's own proposal reviews.
@@ -197,14 +197,13 @@ export default class FapQueries {
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
       !proposalEvents?.proposal_all_fap_reviews_submitted
     ) {
-      reviewerId = agent.id;
+      ability = await this.permissionDataSource.getAbility(agent?.currentRole?.shortCode ?? 'user', 'read', 'fap_proposal_assignment', true, {userId: agent!.id});
     }
 
     return this.dataSource.getFapProposalAssignments(
       fapId,
       proposalPk,
-      reviewerId,
-      abilities
+      ability
     );
   }
 

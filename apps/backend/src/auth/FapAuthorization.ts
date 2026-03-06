@@ -22,6 +22,6 @@ export class FapAuthorization {
     };
 
     const ctx = {fap, user}
-    return this.permissionDataSource.hasPermission(user.role ? user.role : 'user', 'update', 'fap', ctx);
+    return this.permissionDataSource.hasPermission(user.role ? user.role : 'user', 'update', 'fap', false, ctx);
   }
 }

@@ -24,7 +24,6 @@ const OPS_INVERTED = {
 };
 
 const callBack = (rule: Rule<any, any>) => {
-  console.log("BWAAAAAAAAAH")
   if (!rule.ast) {
         throw new Error('Unable to create knex query without AST');
       }

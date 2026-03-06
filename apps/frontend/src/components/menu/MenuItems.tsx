@@ -29,7 +29,7 @@ import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 import {Can} from '@casl/react'
-import { createMongoAbility, defineAbility, MongoAbility } from '@casl/ability';
+import { createMongoAbility, MongoAbility } from '@casl/ability';
 import { Abilities, convertToRule } from 'utils/permissionsHelperFunctions';
 
 type MenuItemsProps = {

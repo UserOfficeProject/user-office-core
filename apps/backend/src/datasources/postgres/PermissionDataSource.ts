@@ -113,13 +113,14 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return result;
 }
 
-  async getAbility(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
+  async getAbility(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], isDbPermission: boolean, object?: any | undefined) {
     const permissionRecords: PermissionRecord[] | null = await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    .where(function() {
+    .where('p.is_db_permission', isDbPermission)
+    .andWhere(function() {
   this.whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`).orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
 })
     .andWhere('p.action', action)
@@ -136,13 +137,14 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
       }
   }
 
-  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], object?: any | undefined) {
+  async hasPermission(userRole: string, action: typeof actions[number], subjectType: typeof subjects[number], isDbPermission: boolean, object?: any | undefined) {
     const permissionRecords: PermissionRecord[] | null = await database
     .select('p.action', 'p.subject', 'p.conditions')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
-    .where(function() {
+    .where('p.is_db_permission', isDbPermission)
+    .andWhere(function() {
   this.whereRaw(`UPPER(r.title) = '${userRole.toUpperCase()}'`).orWhereRaw(`UPPER(r.short_code) = '${userRole.toUpperCase()}'`)
 })
     .andWhere('p.action', action)

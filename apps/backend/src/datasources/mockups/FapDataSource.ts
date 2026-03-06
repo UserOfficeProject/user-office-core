@@ -19,6 +19,7 @@ import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignPro
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
+import { AppAbility } from '../postgres/PermissionDataSource';
 import {
   FapReviewsRecord,
   AssignProposalsToFapsInput,
@@ -409,13 +410,12 @@ export class FapDataSourceMock implements FapDataSource {
   async getFapProposalAssignments(
     fapId: number,
     proposalPk: number,
-    reviewerId: number | null
+    ability: AppAbility | null
   ) {
     return dummyFapAssignments.filter(
       (assignment) =>
         assignment.fapId === fapId &&
-        assignment.proposalPk === proposalPk &&
-        (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
+        assignment.proposalPk === proposalPk
     );
   }
 

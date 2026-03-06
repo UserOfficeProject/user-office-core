@@ -60,8 +60,7 @@ export interface FapDataSource {
   getFapProposalAssignments(
     fapId: number,
     proposalPk: number,
-    reviewerId: number | null,
-    abilities: AppAbility
+    ability: AppAbility | null
   ): Promise<FapAssignment[]>;
   getAllFapProposalAssignments(proposalPk: number): Promise<FapAssignment[]>;
   getFapReviewsByCallAndStatus(

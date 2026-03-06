@@ -277,30 +277,17 @@ export default class PostgresFapDataSource implements FapDataSource {
   async getFapProposalAssignments(
     fapId: number,
     proposalPk: number,
-    reviewerId: number | null,
-    abilities: AppAbility
+    ability: AppAbility | null
   ): Promise<FapAssignment[]> {
-    /*const fapAssignments: ReviewRecord[] = await database
-      .from('fap_reviews')
-      .modify((query) => {
-        if (reviewerId !== null) {
-          query.where('user_id', reviewerId);
-        }
-      })
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk);*/
-
-    const test = await database
-      .from('fap_reviews')
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk)
-      .casl(abilities, 'read', 'fap_proposal_assignment').toSQL().toNative();
-
     const fapAssignments: ReviewRecord[] = await database
       .from('fap_reviews')
       .where('fap_id', fapId)
       .andWhere('proposal_pk', proposalPk)
-      .casl(abilities, 'read', 'fap_proposal_assignment');
+      .modify((query) => {
+        if (ability !== null) {
+          query.casl(ability, 'read', 'fap_proposal_assignment');
+        }
+      });
 
     return fapAssignments.map((fapAssignment) =>
       createFapAssignmentObject(fapAssignment)

@@ -299,7 +299,7 @@ export class ProposalAuthorization {
       default:
         isApiKey = true;
     }
-    return isApiKey? this.userAuth.hasGetAccessByToken(agent) : await this.permissionDataSource.hasPermission(currentRole ? currentRole : 'user', 'read', 'proposal', permissionContext); //probably need to change
+    return isApiKey? this.userAuth.hasGetAccessByToken(agent) : await this.permissionDataSource.hasPermission(currentRole ? currentRole : 'user', 'read', 'proposal', false, permissionContext); //probably need to change
   }
 
   private async isProposalEditable(
@@ -374,6 +374,6 @@ export class ProposalAuthorization {
     };
 
     const ctx = {proposal, user}
-    return this.permissionDataSource.hasPermission(user.role ? user.role : 'user', 'delete', 'proposal', ctx);
+    return this.permissionDataSource.hasPermission(user.role ? user.role : 'user', 'delete', 'proposal', false, ctx);
   }
 }
