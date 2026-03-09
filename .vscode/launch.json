@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}/apps/frontend",
+            "webRoot": "${workspaceFolder}/apps",
         },
         {
             "name": "Attach to Docker container",
@@ -17,7 +17,7 @@
             "request": "attach",
             "port": 9229,
             "protocol": "inspector",
-            "localRoot": "${workspaceFolder}/apps/backend",
+            "localRoot": "${workspaceFolder}/apps",
             "remoteRoot": "/app"
         }
     ]

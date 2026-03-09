@@ -36,7 +36,9 @@ ________________________________________________________________________________
 
     - **Number of ratings required:** 
 
-    - **Active:** Checking this box will set the FAP as active. This means that it can be assigned to calls and proposals. 
+    - **Active:** Checking this box will set the FAP as active. This means that it can be assigned to calls and proposals.
+
+    - **Review Visibility** Chose when reviewers will be able to other reviewers scores and reviews.
 
 * This will open the FAP page in which settings can be changed. 
 
