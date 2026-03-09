@@ -1,4 +1,5 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { Column } from '@material-table/core';
 import { RequestDocument, Variables } from 'graphql-request';
 /**
  * This unpacks an array let you infer the type of a single elem
@@ -36,3 +37,10 @@ export interface Option {
 export type RequestQuery<T, V extends Variables> =
   | RequestDocument
   | TypedDocumentNode<T, V>;
+
+/**
+ * This type is used to make sure that the field in the column is actually a key of the object you are using in the table`
+ */
+export type StrictColumn<T extends object> = Omit<Column<T>, 'field'> & {
+  field: Extract<keyof T, string>;
+};

@@ -47,7 +47,7 @@ export default function UpdateUserInformation(
     institutionId: userData.institutionId,
     oldEmail: userData.email,
     email: userData.email,
-    user_title: userData.user_title,
+    userTitle: userData.userTitle,
     oidcSub: userData.oidcSub,
   };
 
@@ -105,10 +105,10 @@ export default function UpdateUserInformation(
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
                 <Field
-                  name="user_title"
+                  name="userTitle"
                   options={userTitleOptions}
                   component={Select}
-                  inputLabel={{ htmlFor: 'user_title', required: true }}
+                  inputLabel={{ htmlFor: 'userTitle', required: true }}
                   label="Title"
                   data-cy="title"
                   required
