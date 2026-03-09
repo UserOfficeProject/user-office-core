@@ -66,7 +66,7 @@ context('Event log tests', () => {
       cy.updateUserDetails({
         id: user.id,
         firstname: newFirstName,
-        user_title: 'Dr.',
+        userTitle: 'Dr.',
         lastname: 'Doe',
         institutionId: 1,
         email: faker.internet.email(),

@@ -419,8 +419,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposal_table_view.principal_investigator'
       )
       .modify((query) => {
-        if (filter?.callId) {
-          query.where('call_id', filter?.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
@@ -522,8 +529,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.questionaryIds) {
           query.whereIn('proposals.questionary_id', filter.questionaryIds);
         }
-        if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('proposals.call_id', callIdsToFilter);
         }
 
         if (filter?.instrumentId) {
@@ -653,8 +667,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               )
           );
         }
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
@@ -1150,8 +1171,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
 
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
 
         if (filter?.proposalStatusId) {
