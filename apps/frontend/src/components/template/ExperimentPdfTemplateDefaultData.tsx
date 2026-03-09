@@ -2,8 +2,10 @@ export const experimentBody = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <base href="{{#if factoryBaseUrl}}{{factoryBaseUrl}}{{else}}http://localhost:4500{{/if}}/">
+
     <title>Experiment Risk Assessment</title>
-    <link href="http://localhost:4500/static/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -78,11 +80,11 @@ export const experimentBody = `<!DOCTYPE html>
       <div class="section-title">Information by Safety Review Team</div>
       <div class="mb-3">
         {{#if ($eq this.safetyReviewQuestionary.answers.hazard_type_selection "Radioactive")}}
-          <img src="http://localhost:4500/static/images/Radioactive.jpg" style="height: 100px;" />
+          <img src="/static/images/Radioactive.jpg" style="height: 100px;" />
         {{else if ($eq this.safetyReviewQuestionary.answers.hazard_type_selection "Hot")}}
-          <img src="http://localhost:4500/static/images/Hot.jpg" style="height: 100px;" />
+          <img src="/static/images/Hot.jpg" style="height: 100px;" />
         {{else if ($eq this.safetyReviewQuestionary.answers.hazard_type_selection "Explosive")}}
-          <img src="http://localhost:4500/static/images/Explosive.jpg" style="height: 100px;" />
+          <img src="/static/images/Explosive.jpg" style="height: 100px;" />
         {{/if}}
         <h5 class="mt-2">{{ this.safetyReviewQuestionary.answers.hazard_type_selection }}</h5>
       </div>

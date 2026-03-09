@@ -609,6 +609,16 @@ context('Technique Proposal tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]', { timeout: 5000 }).should(
+        'contain',
+        technique1.name
+      );
+
+      cy.get('body').click(0, 0);
+
+      cy.finishedLoading();
+
       cy.get('[data-cy="instrument-filter"]').click();
 
       // Wait for instruments to load
@@ -752,6 +762,51 @@ context('Technique Proposal tests', () => {
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
       cy.contains(proposal3.title);
+    });
+
+    it('Technique proposals management page should default to most recent active call in call filter', function () {
+      const esiTemplateName = faker.lorem.words(2);
+      const currentDayStart = DateTime.now().startOf('day');
+
+      const newCall = {
+        shortCode: 'call 2',
+        startCall: DateTime.fromJSDate(faker.date.past()),
+        endCall: DateTime.fromJSDate(faker.date.future()),
+        startReview: currentDayStart,
+        endReview: currentDayStart,
+        startFapReview: currentDayStart,
+        endFapReview: currentDayStart,
+        startNotify: currentDayStart,
+        endNotify: currentDayStart,
+        startCycle: currentDayStart,
+        endCycle: currentDayStart,
+        templateName: initialDBData.template.name,
+        templateId: initialDBData.template.id,
+        allocationTimeUnit: AllocationTimeUnits.DAY,
+        cycleComment: faker.lorem.word(10),
+        surveyComment: faker.lorem.word(10),
+        esiTemplateName: esiTemplateName,
+      };
+
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: callWorkflowId,
+      }).then((results) => {
+        cy.login('officer');
+        cy.visit('/');
+        cy.finishedLoading();
+
+        cy.contains('Technique Proposals').click();
+
+        cy.get('[data-cy="call-filter"]').click();
+
+        cy.finishedLoading();
+
+        cy.get('[role="listbox"]', { timeout: 5000 }).should(
+          'contain',
+          results.createCall.shortCode
+        );
+      });
     });
 
     it('Technique proposals can be filtered by status', function () {

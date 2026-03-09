@@ -7,11 +7,13 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useFapReviewVisibilityOptions } from 'hooks/fap/useFapReviewVisibilityOptions';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -27,6 +29,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
+
+  const { isLoadingVisibilityOptions, reviewVisibilityOptions } =
+    useFapReviewVisibilityOptions();
 
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     fap.customGradeGuide
@@ -158,6 +163,27 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
+              <Grid item>
+                <Field
+                  id="reviewVisibility"
+                  name="reviewVisibility"
+                  label="Review visibility"
+                  onChange={handleChange}
+                  component={Select}
+                  onClose={() => {}} // Override FormikUISelect.tsx custom on close as it is not needed and is chang the int to string
+                  data-cy="fap-review-visibility-filter"
+                  options={
+                    isLoadingVisibilityOptions
+                      ? []
+                      : reviewVisibilityOptions.map((option) => ({
+                          value: option.reviewVisibilityId,
+                          text: option.description,
+                        }))
+                  }
+                  fullWidth
+                  type="number"
+                />
+              </Grid>
               <Field
                 id="active"
                 name="active"
