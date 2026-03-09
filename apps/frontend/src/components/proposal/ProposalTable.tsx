@@ -22,7 +22,6 @@ import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { isCallEnded } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -32,7 +31,6 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import AcceptInviteWithCode from './AcceptInviteWithCode';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import DataAccessUsersModal from './DataAccessUsersModal';
-import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
@@ -132,7 +130,6 @@ const ProposalTable = ({
   }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);
-  const { isInternalUser } = useContext(UserContext);
   if (editProposalPk) {
     return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
   }
@@ -145,26 +142,6 @@ const ProposalTable = ({
     });
   };
 
-  const getProposalReadonlyStatus = (
-    proposalData: PartialProposalsDataType
-  ) => {
-    if (!proposalData) {
-      return true;
-    }
-
-    const readonly =
-      proposalData.submitted &&
-      proposalData.status?.shortCode !==
-        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED;
-    if (readonly && isInternalUser) {
-      return (
-        proposalData.status?.shortCode !==
-        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-      );
-    }
-
-    return readonly;
-  };
   const cloneProposalsToCall = async (call: Call) => {
     setProposalToClone(null);
 
@@ -239,13 +216,7 @@ const ProposalTable = ({
         }}
         actions={[
           (rowData) => {
-            const callHasEnded = isCallEnded(
-              rowData.call?.startCall,
-              isInternalUser
-                ? rowData.call?.endCallInternal
-                : rowData.call?.endCall
-            );
-            const readOnly = callHasEnded || getProposalReadonlyStatus(rowData);
+            const readOnly = !rowData.uiPermissions?.canEdit;
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,

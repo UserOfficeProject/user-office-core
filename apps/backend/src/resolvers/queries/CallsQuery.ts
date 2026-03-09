@@ -67,6 +67,9 @@ export class CallsFilter {
 
   @Field(() => [Int], { nullable: true })
   public callIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
+  public proposalPks?: number[];
 }
 
 @Resolver()

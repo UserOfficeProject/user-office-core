@@ -21,7 +21,7 @@ export function PermissionsBuilder() {
   const { api } = useDataApiWithFeedback();
 
   const [subject, setSubject] = useState<string>('user');
-  const [resource, setResource] = useState<ResourceType>(ResourceType.CALL);
+  const [resource, setResource] = useState<ResourceType>(ResourceType.PROPOSAL);
   const [action, setAction] = useState('read');
 
   const emptyQuery = useMemo<RuleGroupType>(
@@ -57,40 +57,46 @@ export function PermissionsBuilder() {
     }
   }, [condition, loadingCondition, emptyQuery]);
 
-  const fields: Field[] = [
-    ...userAttributes.map((attr) => ({
-      name: `user.${attr}`,
-      label: `user.${attr}`,
-    })),
-    ...resourceAttributes.map((attr) => ({
-      name: `${resource.toLowerCase()}.${attr}`,
-      label: `${resource.toLowerCase()}.${attr}`,
-    })),
-    ...resourceFunctions.map((fn) => ({
-      name: fn,
-      label: fn,
-      operators: [
-        { name: '=', label: '=' },
-        { name: '!=', label: '!=' },
-      ],
-      defaultValue: 'true',
-    })),
-  ];
+  const fields: Field[] = useMemo(
+    () => [
+      ...userAttributes.map((attr) => ({
+        name: `user.${attr}`,
+        label: `user.${attr}`,
+      })),
+      ...resourceAttributes.map((attr) => ({
+        name: `${resource.toLowerCase()}.${attr}`,
+        label: `${resource.toLowerCase()}.${attr}`,
+      })),
+      ...resourceFunctions.map((fn) => ({
+        name: fn,
+        label: `${fn}()`,
+        operators: [
+          { name: '=', label: '=' },
+          { name: '!=', label: '!=' },
+        ],
+        defaultValue: 'true',
+      })),
+    ],
+    [userAttributes, resourceAttributes, resourceFunctions, resource]
+  );
 
-  const defaultOperators: Operator[] = [
-    {
-      name: '=',
-      label: '=',
-    },
-    {
-      name: '!=',
-      label: '!=',
-    },
-    {
-      name: 'contains',
-      label: 'contains',
-    },
-  ];
+  const defaultOperators: Operator[] = useMemo(
+    () => [
+      {
+        name: '=',
+        label: '=',
+      },
+      {
+        name: '!=',
+        label: '!=',
+      },
+      {
+        name: 'contains',
+        label: 'contains',
+      },
+    ],
+    []
+  );
 
   const handleCreatePolicy = async () => {
     const formattedQuery = formatQuery(query, 'json');
@@ -143,12 +149,10 @@ export function PermissionsBuilder() {
           >
             <MenuItem value="read">read</MenuItem>
             <MenuItem value="edit">edit</MenuItem>
-            <MenuItem value="archive">archive</MenuItem>
             <MenuItem value="delete">delete</MenuItem>
           </Select>
         </FormControl>
       </Stack>
-
       <Box>
         {loadingCondition ? (
           <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />
@@ -161,7 +165,6 @@ export function PermissionsBuilder() {
           />
         )}
       </Box>
-
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"

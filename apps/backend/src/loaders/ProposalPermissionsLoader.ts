@@ -6,8 +6,8 @@ import {
   ProposalContextData,
 } from '../auth/authContexts/ProposalAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
-import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { CasbinService } from '../auth/casbin/CasbinService';
+import { EnforcementRequest } from '../auth/CasbinAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserWithRole } from '../models/User';
 import {
@@ -18,6 +18,7 @@ import {
 export function createEmptyProposalUiPermissions(): ProposalUiPermissions {
   return {
     canDelete: false,
+    canEdit: false,
   };
 }
 
@@ -69,6 +70,7 @@ export default class ProposalPermissionsLoader {
           const baseIndex = proposalIndex * actions.length;
           permissionsMap.set(proposalPk, {
             canDelete: results[baseIndex],
+            canEdit: results[baseIndex + 1],
           });
         });
 

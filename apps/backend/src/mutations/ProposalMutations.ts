@@ -12,6 +12,9 @@ import {
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
+import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
+import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
@@ -76,7 +79,12 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.UserAuthContext)
+    public userContext: UserAuthContext,
+    @inject(Tokens.ProposalAuthContext)
+    public proposalContext: ProposalAuthContext,
+    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -329,27 +337,27 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     { proposalPk }: { proposalPk: number }
   ): Promise<Proposal | Rejection> {
-    const proposal = await this.proposalDataSource.get(proposalPk);
+    const userContext = await this.userContext.toContextData(agent);
 
-    if (!proposal) {
-      return rejection('Can not delete proposal because proposal not found', {
-        agent,
-        proposalPk,
-      });
+    if (!userContext) {
+      return rejection('Failed to delete proposal', { proposalPk, agent });
     }
 
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isApiToken(agent)
-    ) {
-      if (
-        proposal.submitted ||
-        !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
-      )
-        return rejection(
-          'Can not delete proposal because proposal is submitted',
-          { agent, proposalPk }
-        );
+    const authContext = this.proposalContext.fetchContextForProposals([
+      proposalPk,
+    ]);
+
+    const hasAccess = await this.casbinAuth.can(
+      userContext,
+      authContext,
+      'delete'
+    );
+
+    if (!hasAccess) {
+      return rejection('Unauthorised to delete proposal', {
+        proposalPk,
+        agent,
+      });
     }
 
     try {
@@ -361,7 +369,7 @@ export default class ProposalMutations {
       if ((error as { code: string }).code === '23503') {
         return rejection(
           'Failed to delete proposal because, it has dependencies which need to be deleted first',
-          { proposal },
+          { proposalPk },
           error
         );
       }

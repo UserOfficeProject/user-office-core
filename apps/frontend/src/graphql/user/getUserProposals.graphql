@@ -28,6 +28,7 @@ query getUserProposals {
       }
       uiPermissions {
         canDelete
+        canEdit
       }
     }
   }

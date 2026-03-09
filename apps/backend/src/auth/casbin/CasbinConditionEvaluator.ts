@@ -10,7 +10,10 @@ import { AuthRegistry, ResourceType } from '../AuthRegistry';
 
 @injectable()
 export class CasbinConditionEvaluator {
-  private readonly conditionCache = new Map<number, CasbinCondition>();
+  private readonly conditionCache = new Map<
+    number,
+    Promise<CasbinCondition | null>
+  >();
 
   constructor(
     @inject(Tokens.CasbinConditionDataSource)
@@ -24,15 +27,12 @@ export class CasbinConditionEvaluator {
     obj: any,
     con: number
   ): Promise<boolean> {
-    let conditionRecord = this.conditionCache.get(con) ?? null;
-
-    if (!conditionRecord) {
-      const record = await this.conditionDataSource.get(con);
-      if (!record) return false;
-
-      this.conditionCache.set(con, record);
-      conditionRecord = record;
+    if (!this.conditionCache.has(con)) {
+      this.conditionCache.set(con, this.conditionDataSource.get(con));
     }
+
+    const conditionRecord = await this.conditionCache.get(con)!;
+    if (!conditionRecord) return false;
 
     const ctx = { user: sub, obj };
 
@@ -87,14 +87,23 @@ export class CasbinConditionEvaluator {
   ): Promise<boolean> {
     const { field, operator, value } = rule;
 
-    let leftValue: any = this.resolveValue(field, ctx);
+    let leftValue = this.resolveValue(field, ctx);
+    let rightValue = value;
 
     if (typeof leftValue === 'function') {
       leftValue = await leftValue(ctx.user, ctx.obj);
     }
 
-    leftValue = String(leftValue);
-    const rightValue = String(value);
+    const rightReference = value.match(/^\{(.+)\}$/);
+    if (rightReference) {
+      rightValue = this.resolveValue(rightReference[1], ctx);
+      if (typeof rightValue === 'function') {
+        return false;
+      }
+    }
+
+    leftValue = String(leftValue).toLowerCase();
+    rightValue = String(rightValue).toLowerCase();
 
     switch (operator) {
       case '=':

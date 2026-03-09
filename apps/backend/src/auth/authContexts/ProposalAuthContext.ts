@@ -7,20 +7,24 @@ import { Proposal } from '../../models/Proposal';
 import { WorkflowType } from '../../models/Workflow';
 
 export interface ProposalContextData
-  extends Partial<Pick<Proposal, 'title' | 'submitted'>> {
+  extends Partial<
+    Pick<Proposal, 'title' | 'submitted' | 'callId' | 'proposerId'>
+  > {
   type: 'proposal';
   primaryKey: number;
   title: string;
   proposalId: string;
   submitted: boolean;
+  callId: number;
+  proposerId: number;
   statusShortCode: string;
 }
 
 export const PROPOSAL_AUTH_UI_ATTRIBUTES: Array<keyof ProposalContextData> = [
   'title',
-  'proposalId',
   'submitted',
   'statusShortCode',
+  'proposerId',
 ];
 
 @injectable()
@@ -51,6 +55,8 @@ export class ProposalAuthContext {
         proposalId: proposal.proposalId,
         title: proposal.title,
         submitted: proposal.submitted,
+        callId: proposal.callId,
+        proposerId: proposal.proposerId,
         statusShortCode:
           allStatuses.find((status) => status.id === proposal.statusId)
             ?.shortCode || '',

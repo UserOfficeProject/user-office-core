@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
+import { ProposalAuthFilters } from '../auth/authFilters/ProposalAuthFilters';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -36,7 +37,9 @@ export default class ProposalQueries {
     public userContext: UserAuthContext,
     @inject(Tokens.ProposalAuthContext)
     public proposalContext: ProposalAuthContext,
-    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization
+    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization,
+    @inject(Tokens.ProposalAuthFilters)
+    private proposalAuthFilters: ProposalAuthFilters
   ) {}
 
   @Authorized()
@@ -225,6 +228,15 @@ export default class ProposalQueries {
     if (!userContext) {
       return false;
     }
+
+    // Optional optimisation
+    const authFilters = await this.proposalAuthFilters.buildDbFilters(
+      userContext,
+      'proposal',
+      'read'
+    );
+
+    filter = { ...filter, ...authFilters };
 
     const proposals = await this.dataSource.getUserProposals(userId, filter);
 

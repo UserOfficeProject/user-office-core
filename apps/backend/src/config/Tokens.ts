@@ -72,6 +72,7 @@ export const Tokens = {
   ProposalAuthFunctions: Symbol('ProposalAuthFunctions'),
   CallAuthorization: Symbol('CallAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
+  ProposalAuthFilters: Symbol('ProposalAuthFilters'),
   CallAuthFilters: Symbol('CallAuthFilters'),
   CallAuthFunctions: Symbol('CallAuthFunctions'),
 };

@@ -190,6 +190,13 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('call.call_id', filter.callIds);
     }
 
+    if (filter?.proposalPks?.length) {
+      query
+        .join('proposals as p', 'p.call_id', 'call.call_id')
+        .whereIn('p.primary_key', filter.proposalPks)
+        .distinctOn('call.call_id');
+    }
+
     return query.then((callDB: CallRecord[]) => {
       return callDB.map((call) => createCallObject(call));
     });
