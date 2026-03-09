@@ -604,6 +604,10 @@ context('GenericTemplates tests', () => {
 
       cy.contains('button', 'Clone').click();
 
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
@@ -1485,6 +1489,10 @@ context('GenericTemplates tests', () => {
 
       cy.contains('button', 'Clone').click();
 
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.contains('Reset').click();
@@ -1559,11 +1567,19 @@ context('GenericTemplates tests', () => {
 
       cy.contains('button', 'Clone').click();
 
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
       cy.contains('button', 'Clone').click();
+
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 3);
 
