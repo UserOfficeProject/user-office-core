@@ -1758,6 +1758,10 @@ context('GenericTemplates tests', () => {
 
       cy.contains('button', 'Clone').click();
 
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
       cy.get('[data-cy="delete"]').eq(0).click();
 
       cy.contains('OK').click();
@@ -1812,6 +1816,10 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="clone"]').eq(0).click();
 
       cy.contains('button', 'Clone').click();
+
+      cy.get('#customized-dialog-title').contains('Copy of');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
