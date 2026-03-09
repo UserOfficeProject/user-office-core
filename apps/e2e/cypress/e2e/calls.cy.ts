@@ -234,10 +234,6 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
-      cy.get('[data-cy=cycle-comment] input').type(faker.lorem.word());
-
-      cy.get('[data-cy="next-step"]').click();
-
       cy.get('[data-cy="submit"]').click();
 
       cy.get('[data-cy="cycle-comment"] input').should('be.focused');
