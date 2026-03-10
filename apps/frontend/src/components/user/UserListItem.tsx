@@ -12,7 +12,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user }) => {
   return (
     <ListItemText
       primary={getFullUserNameWithEmail(user)}
-      secondary={user?.institution || ''}
+      secondary={`${user?.institution || ''} , ${user?.country || ''}`}
       primaryTypographyProps={{ variant: 'body2' }}
       secondaryTypographyProps={{ variant: 'caption' }}
     />

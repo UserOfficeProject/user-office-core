@@ -9,6 +9,7 @@ import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { StrictColumn } from 'utils/utilTypes';
 
 type AssignedScientistsTableProps = {
   instrument: Pick<Instrument, 'id' | 'scientists' | 'instrumentContact'>;
@@ -31,7 +32,8 @@ const assignmentColumns = [
     title: 'Institution',
     field: 'institution',
   },
-];
+] satisfies StrictColumn<BasicUserDetails>[];
+
 const instrumentContactColumns = [
   {
     title: 'Name',
@@ -49,7 +51,8 @@ const instrumentContactColumns = [
     title: 'Institution',
     field: 'institution',
   },
-];
+] satisfies StrictColumn<BasicUserDetails>[];
+
 const AssignedScientistsTable = ({
   instrument,
   removeAssignedScientistFromInstrument,

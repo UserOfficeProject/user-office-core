@@ -52,7 +52,7 @@ export class User implements Partial<UserOrigin> {
   public id: number;
 
   @Field(() => String)
-  public user_title: string;
+  public userTitle: string;
 
   @Field()
   public firstname: string;

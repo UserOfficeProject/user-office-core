@@ -402,7 +402,7 @@ export default class UserMutations {
         oidcSub: oidcSub,
         institutionId: institution.id,
         preferredname: preferredName ?? undefined,
-        user_title: userTitle ?? undefined,
+        userTitle: userTitle ?? undefined,
       });
 
       return updatedUser;
