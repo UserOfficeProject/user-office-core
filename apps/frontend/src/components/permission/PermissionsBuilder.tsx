@@ -148,7 +148,7 @@ export function PermissionsBuilder() {
             onChange={(e) => setAction(e.target.value)}
           >
             <MenuItem value="read">read</MenuItem>
-            <MenuItem value="edit">edit</MenuItem>
+            <MenuItem value="update">update</MenuItem>
             <MenuItem value="delete">delete</MenuItem>
           </Select>
         </FormControl>

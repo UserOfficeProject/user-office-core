@@ -18,7 +18,7 @@ import {
 export function createEmptyProposalUiPermissions(): ProposalUiPermissions {
   return {
     canDelete: false,
-    canEdit: false,
+    canUpdate: false,
   };
 }
 
@@ -70,7 +70,7 @@ export default class ProposalPermissionsLoader {
           const baseIndex = proposalIndex * actions.length;
           permissionsMap.set(proposalPk, {
             canDelete: results[baseIndex],
-            canEdit: results[baseIndex + 1],
+            canUpdate: results[baseIndex + 1],
           });
         });
 

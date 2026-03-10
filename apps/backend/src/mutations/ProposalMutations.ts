@@ -150,19 +150,45 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const { proposalPk } = args;
 
-    // Get proposal information
-    const proposal = await this.proposalDataSource.get(proposalPk); //Hacky
+    const proposal = await this.proposalDataSource.get(proposalPk);
 
     if (!proposal) {
       return rejection('Proposal not found', { args });
     }
 
-    if (
-      !this.userAuth.isApiToken(agent) &&
-      !(await this.proposalAuth.hasWriteRights(agent, proposal))
-    ) {
-      return rejection('You do not have rights to update this proposal', {
-        args,
+    const userContext = await this.userContext.toContextData(agent);
+
+    if (!userContext) {
+      return rejection('Failed to update proposal', { args });
+    }
+
+    const proposalContext = this.proposalContext.fetchContextForProposals([
+      proposalPk,
+    ]);
+
+    const hasReadAccess = await this.casbinAuth.can(
+      userContext,
+      proposalContext,
+      'read'
+    );
+
+    if (!hasReadAccess) {
+      return rejection('Unauthorised to read proposal', {
+        proposalPk,
+        agent,
+      });
+    }
+
+    const hasUpdateAccess = await this.casbinAuth.can(
+      userContext,
+      proposalContext,
+      'update'
+    );
+
+    if (!hasUpdateAccess) {
+      return rejection('Unauthorised to update proposal', {
+        proposalPk,
+        agent,
       });
     }
 
@@ -343,13 +369,13 @@ export default class ProposalMutations {
       return rejection('Failed to delete proposal', { proposalPk, agent });
     }
 
-    const authContext = this.proposalContext.fetchContextForProposals([
+    const proposalContext = this.proposalContext.fetchContextForProposals([
       proposalPk,
     ]);
 
     const hasAccess = await this.casbinAuth.can(
       userContext,
-      authContext,
+      proposalContext,
       'delete'
     );
 

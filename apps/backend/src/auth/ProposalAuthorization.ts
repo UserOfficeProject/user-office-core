@@ -1,15 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { CallDataSource } from '../datasources/CallDataSource';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
-import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { UserDataSource } from './../datasources/UserDataSource';
@@ -32,10 +29,6 @@ export class ProposalAuthorization {
     private fapDataSource: FapDataSource,
     @inject(Tokens.VisitDataSource)
     private visitDataSource: VisitDataSource,
-    @inject(Tokens.CallDataSource)
-    private callDataSource: CallDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
     @inject(Tokens.DataAccessUsersDataSource)
     private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization,
@@ -321,68 +314,5 @@ export class ProposalAuthorization {
     }
 
     return hasAccess;
-  }
-
-  private async isProposalEditable(
-    proposal: Proposal,
-    checkIfInternalEditable: boolean = false
-  ): Promise<boolean> {
-    const callId = proposal.callId;
-    const isCallEnded = await this.callDataSource.isCallEnded(
-      callId,
-      checkIfInternalEditable
-    );
-    const proposalStatus = (
-      await this.statusDataSource.getStatus(proposal.statusId)
-    )?.shortCode;
-    if (
-      proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
-      (checkIfInternalEditable &&
-        proposalStatus ===
-          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL)
-    ) {
-      return true;
-    }
-
-    if (isCallEnded) {
-      return false;
-    } else {
-      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
-    }
-  }
-
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    proposalOrProposalId: Proposal | number
-  ): Promise<boolean> {
-    if (!agent) {
-      return false;
-    }
-
-    const proposal = await this.resolveProposal(proposalOrProposalId);
-
-    if (!proposal) {
-      return false;
-    }
-
-    if (
-      this.userAuth.isUserOfficer(agent) ||
-      this.userAuth.hasGetAccessByToken(agent)
-    ) {
-      return true;
-    }
-
-    const checkIfInternalEditable = agent.isInternalUser || false;
-    const isMemberOfProposal = await this.isMemberOfProposal(agent, proposal);
-    const isProposalEditable = await this.isProposalEditable(
-      proposal,
-      checkIfInternalEditable
-    );
-
-    if (isMemberOfProposal && isProposalEditable) {
-      return true;
-    }
-
-    return false;
   }
 }

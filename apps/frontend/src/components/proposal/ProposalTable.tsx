@@ -216,7 +216,7 @@ const ProposalTable = ({
         }}
         actions={[
           (rowData) => {
-            const readOnly = !rowData.uiPermissions?.canEdit;
+            const readOnly = !rowData.uiPermissions?.canUpdate;
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,

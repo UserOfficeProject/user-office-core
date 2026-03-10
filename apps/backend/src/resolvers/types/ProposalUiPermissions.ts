@@ -6,11 +6,11 @@ export class ProposalUiPermissions {
   public canDelete: boolean;
 
   @Field(() => Boolean)
-  public canEdit: boolean;
+  public canUpdate: boolean;
 }
 
 // Map of UI permissions to Casbin actions
 export const PROPOSAL_ACTIONS: Record<keyof ProposalUiPermissions, string> = {
   canDelete: 'delete',
-  canEdit: 'edit',
+  canUpdate: 'update',
 };
