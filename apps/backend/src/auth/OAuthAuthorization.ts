@@ -149,7 +149,7 @@ export class OAuthAuthorization extends UserAuthorization {
         oidcSub: userId,
         institutionId: institution?.id ?? user.institutionId,
         preferredname: userInfo.preferred_username,
-        user_title: userInfo.title as string,
+        userTitle: userInfo.title as string,
       });
 
       return updatedUser;

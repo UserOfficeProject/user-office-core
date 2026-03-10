@@ -47,7 +47,7 @@ export const updateUserValidationSchema = Yup.object().shape({
   firstname: Yup.string().min(2).max(50).required(),
   preferredname: Yup.string().notRequired().max(50),
   lastname: Yup.string().min(2).max(50).required(),
-  user_title: Yup.string().required(),
+  userTitle: Yup.string().required(),
   email: Yup.string().email().required(),
   institutionId: Yup.number().required(),
 });
@@ -57,7 +57,7 @@ export const updateUserValidationBackendSchema = Yup.object().shape({
   firstname: Yup.string().min(2).max(50).notRequired(),
   preferredname: Yup.string().notRequired().max(50),
   lastname: Yup.string().min(2).max(50).notRequired(),
-  user_title: Yup.string().notRequired(),
+  userTitle: Yup.string().notRequired(),
   email: Yup.string().email().notRequired(),
   institutionId: Yup.number().notRequired(),
 });
