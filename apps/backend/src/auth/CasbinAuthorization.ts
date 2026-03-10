@@ -19,7 +19,7 @@ export class CasbinAuthorization {
     context: unknown,
     action: string
   ): Promise<boolean> {
-    return this.casbin.enforce([user, context, action]);
+    return this.casbin.enforce([user, context, action] as EnforcementRequest);
   }
 
   async canMany(

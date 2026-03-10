@@ -369,17 +369,17 @@ export default class ProposalMutations {
       return rejection('Failed to delete proposal', { proposalPk, agent });
     }
 
-    const proposalContext = this.proposalContext.fetchContextForProposals([
-      proposalPk,
-    ]);
+    const proposalContext = (
+      await this.proposalContext.fetchContextForProposals([proposalPk])
+    ).get(proposalPk);
 
-    const hasAccess = await this.casbinAuth.can(
+    const canDelete = await this.casbinAuth.can(
       userContext,
       proposalContext,
       'delete'
     );
 
-    if (!hasAccess) {
+    if (!canDelete) {
       return rejection('Unauthorised to delete proposal', {
         proposalPk,
         agent,
