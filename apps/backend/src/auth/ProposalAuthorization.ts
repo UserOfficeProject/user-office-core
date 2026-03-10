@@ -310,6 +310,11 @@ export class ProposalAuthorization {
           await this.roleDataSource.getTagsByRoleId(agent!.currentRole!.id)
         ).map((tag) => tag.id);
 
+        if (userTags.length === 0) {
+          hasAccess = true;
+          break;
+        }
+
         const userInstruments = (
           await this.tagDataSource.getTagInstruments(userTags)
         ).map((instrument) => instrument.id);
