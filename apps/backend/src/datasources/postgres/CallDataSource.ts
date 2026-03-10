@@ -29,7 +29,7 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   sort_order: 'sort_order',
-  call_id: 'call_id',
+  call_id: 'call.call_id',
 };
 
 export default class PostgresCallDataSource implements CallDataSource {
