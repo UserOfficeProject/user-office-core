@@ -1,11 +1,8 @@
 import 'reflect-metadata';
 
-import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
 import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
-import { CallAuthFilters } from '../auth/authFilters/CallAuthFilters';
 import { ProposalAuthFilters } from '../auth/authFilters/ProposalAuthFilters';
-import { CallAuthFunctions } from '../auth/authFunctions/CallAuthFunctions';
 import { ProposalAuthFunctions } from '../auth/authFunctions/ProposalAuthFunctions';
 import { AuthRegistry } from '../auth/AuthRegistry';
 import { CasbinConditionEvaluator } from '../auth/casbin/CasbinConditionEvaluator';
@@ -164,9 +161,6 @@ mapClass(Tokens.CasbinService, CasbinService);
 mapClass(Tokens.CasbinConditionEvaluator, CasbinConditionEvaluator);
 mapClass(Tokens.CasbinEnforcerProvider, CasbinEnforcerProvider);
 mapClass(Tokens.CasbinAuthorization, CasbinAuthorization);
-mapClass(Tokens.CallAuthContext, CallAuthContext);
-mapClass(Tokens.CallAuthFunctions, CallAuthFunctions);
-mapClass(Tokens.CallAuthFilters, CallAuthFilters);
 mapClass(Tokens.AuthRegistry, AuthRegistry);
 mapClass(Tokens.ProposalAuthFunctions, ProposalAuthFunctions);
 mapClass(Tokens.ProposalAuthContext, ProposalAuthContext);

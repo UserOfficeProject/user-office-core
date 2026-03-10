@@ -124,7 +124,6 @@ export function PermissionsBuilder() {
             onChange={(e) => setSubject(e.target.value)}
           >
             <MenuItem value="user">user</MenuItem>
-            <MenuItem value="user_officer">user_officer</MenuItem>
           </Select>
         </FormControl>
 
@@ -135,7 +134,6 @@ export function PermissionsBuilder() {
             label="Resource"
             onChange={(e) => setResource(e.target.value as ResourceType)}
           >
-            <MenuItem value={ResourceType.CALL}>call</MenuItem>
             <MenuItem value={ResourceType.PROPOSAL}>proposal</MenuItem>
           </Select>
         </FormControl>

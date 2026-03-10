@@ -1,29 +1,22 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
-import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
-import { CallAuthFilters } from '../auth/authFilters/CallAuthFilters';
-import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CallsFilter } from '../resolvers/queries/CallsQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
-    @inject(Tokens.CasbinAuthorization) private casbinAuth: CasbinAuthorization,
-    @inject(Tokens.CallAuthFilters)
-    private authFilters: CallAuthFilters,
-    @inject(Tokens.CallAuthContext)
-    private authContext: CallAuthContext,
-    @inject(Tokens.UserAuthContext)
-    private userContext: UserAuthContext,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.FapDataSource)
+    public fapDataSource: FapDataSource
   ) {}
 
   @Authorized()
@@ -34,39 +27,22 @@ export default class CallQueries {
   }
 
   @Authorized()
-  async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
-    const userContext = await this.userContext.toContextData(agent);
-
-    if (!userContext) {
-      return [];
-    }
-
+  async getAll(
+    agent: UserWithRole | null,
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ) {
     if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
-
-    // Optional optimisation
-    const authFilters = await this.authFilters.buildDbFilters(
-      userContext,
-      'call',
-      'read'
+    const calls = await this.dataSource.getCalls(
+      filter,
+      sortField,
+      sortDirection
     );
 
-    filter = { ...filter, ...authFilters };
-
-    const calls = await this.dataSource.getCalls(filter);
-
-    const callContexts = await this.authContext.fetchContextForCalls(
-      calls.map((c) => c.id)
-    );
-
-    const results = await this.casbinAuth.canMany(
-      userContext,
-      callContexts,
-      'read'
-    );
-
-    return calls.filter((call) => results.get(call.id));
+    return calls;
   }
 
   // TODO: figure out the role parts
@@ -93,5 +69,19 @@ export default class CallQueries {
   @Authorized()
   async getCallOfAnswersProposal(user: UserWithRole | null, answerId: number) {
     return this.dataSource.getCallByAnswerIdProposal(answerId);
+  }
+
+  @Authorized([Roles.FAP_REVIEWER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getCallsOfReviewer(agent: UserWithRole | null) {
+    if (!agent || !agent.id || !agent.currentRole) {
+      return [];
+    }
+
+    const faps = await this.fapDataSource.getUserFapsByRoleAndFapId(
+      agent.id,
+      agent.currentRole
+    );
+
+    return this.dataSource.getCallsOfFaps(faps.map((fap) => fap.id));
   }
 }

@@ -1,7 +1,6 @@
 import { CasbinService } from '../auth/casbin/CasbinService';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import CallPermissionsLoader from '../loaders/CallPermissionsLoader';
 import ProposalPermissionsLoader from '../loaders/ProposalPermissionsLoader';
 import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
@@ -147,7 +146,6 @@ interface ResolverContextServices {
 interface ResolverContextLoader {
   user: UsersLoader;
   basicUser: BasicUserDetailsLoader;
-  callPermissions: CallPermissionsLoader;
   proposalPermissions: ProposalPermissionsLoader;
 }
 

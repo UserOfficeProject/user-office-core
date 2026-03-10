@@ -13,7 +13,6 @@ import {
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
-import { CallUiPermissions } from './CallUiPermissions';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { Tag } from './Tag';
@@ -173,36 +172,9 @@ export class CallInstrumentsResolver {
     return startCall <= now && endCallInternal >= now;
   }
 
-  @FieldResolver(() => [Tag], { nullable: true })
-  async tags(
-    @Root() call: Call,
-    @Ctx() context: ResolverContext
-  ): Promise<Tag[]> {
-    const tags = await context.queries.tag.dataSource.getTagsForCalls([
-      call.id,
-    ]);
-
-    return tags.get(call.id) ?? [];
-  }
-
-  @FieldResolver(() => CallUiPermissions)
-  async callUiPermissions(
-    @Root() call: Call,
-    @Ctx() ctx: ResolverContext
-  ): Promise<CallUiPermissions> {
-    /*
-     * Workaround for a limitation in buildContext.ts DI setup.
-     * It doesn't allow injecting the user context at loader creation.
-     * This workaround passes the user into the loader, but checks if the
-     * loader already exists on the context to avoid creating multiple
-     * loaders per request, which would make the DataLoader pointless.
-     */
-    if (!(ctx as any)._callPermissionsLoader) {
-      (ctx as any)._callPermissionsLoader =
-        ctx.loaders.callPermissions.createLoader(ctx.user);
-    }
-
-    return await (ctx as any)._callPermissionsLoader.load(call.id);
+  @FieldResolver(() => Tag)
+  async tags(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getCallsTags(call.id);
   }
 }
 

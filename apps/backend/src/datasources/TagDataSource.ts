@@ -17,6 +17,6 @@ export interface TagDataSource {
   getTagInstruments(tagId: number): Promise<Instrument[]>;
   getTagCalls(tagId: number): Promise<Call[]>;
   getTagsByNames(tagNames: string[]): Promise<Tag[]>;
-  getTagsForCalls(callIds: number[]): Promise<Map<number, Tag[]>>;
+  getCallsTags(callId: number | null): Promise<Tag[]>;
   getInstrumentsTags(instrumentId: number | null): Promise<Tag[]>;
 }

@@ -126,27 +126,13 @@ class PostgresTagDataSource implements TagDataSource {
     return tags.map(createTagObject);
   }
 
-  // Changed to enable bulk fetching for call auth context
-  async getTagsForCalls(callIds: number[]): Promise<Map<number, Tag[]>> {
-    const records: (TagRecord & { call_id: number })[] =
-      await database<TagRecord>('tag_call as tc')
-        .select('t.*', 'tc.call_id')
-        .join('tag as t', 't.tag_id', 'tc.tag_id')
-        .whereIn('tc.call_id', callIds);
+  async getCallsTags(callId: number | null): Promise<Tag[]> {
+    const tags: TagRecord[] = await database<TagRecord>('tag_call as fc')
+      .join('tag as f', 'fc.tag_id', 'f.tag_id')
+      .where('fc.call_id', callId)
+      .select('f.*');
 
-    const result = new Map<number, Tag[]>();
-
-    for (const row of records) {
-      const tag = createTagObject(row);
-
-      if (!result.has(row.call_id)) {
-        result.set(row.call_id, []);
-      }
-
-      result.get(row.call_id)!.push(tag);
-    }
-
-    return result;
+    return tags.map(createTagObject);
   }
 
   async getInstrumentsTags(instrumentId: number | null): Promise<Tag[]> {

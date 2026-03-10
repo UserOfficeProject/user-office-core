@@ -5,9 +5,6 @@ import {
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
-import { CallAuthContext } from '../auth/authContexts/CallAuthContext';
-import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
-import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { TagDataSource } from '../datasources/TagDataSource';
@@ -36,13 +33,7 @@ export default class CallMutations {
   constructor(
     @inject(Tokens.CallDataSource) private dataSource: CallDataSource,
     @inject(Tokens.TagDataSource)
-    private tagDataSource: TagDataSource,
-    @inject(Tokens.CasbinAuthorization)
-    private casbinAuth: CasbinAuthorization,
-    @inject(Tokens.CallAuthContext)
-    private authContext: CallAuthContext,
-    @inject(Tokens.UserAuthContext)
-    private userContext: UserAuthContext
+    private tagDataSource: TagDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -106,41 +97,6 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: UpdateCallInput
   ): Promise<Call | Rejection> {
-    // Role check would move to decorator
-    const role = agent?.currentRole?.shortCode;
-    if (!role) {
-      return rejection('User does not have a role', { agent });
-    }
-
-    const existingCall = await this.dataSource.getCall(args.id);
-
-    if (!existingCall) {
-      return rejection('Existing call not found', { callId: args.id });
-    }
-
-    const authCtx = await this.authContext.fetchContextForCalls([
-      existingCall.id,
-    ]);
-
-    // Since this update() function is used for everything, check whether the call is being archived/unarchived
-    if (existingCall.isActive != args.isActive) {
-      const userCtx = await this.userContext.toContextData(agent);
-      if (!userCtx) {
-        return rejection('User context not found', { agent });
-      }
-
-      const canArchive = await this.casbinAuth.can(userCtx, authCtx, 'archive');
-      if (!canArchive) {
-        return rejection(
-          'User does not have permission to archive/unarchive this call',
-          {
-            agent,
-            callId: args.id,
-          }
-        );
-      }
-    }
-
     try {
       const updatedCall = await this.dataSource.update(args);
 
@@ -171,10 +127,9 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToCallInput
   ): Promise<Call | Rejection> {
-    const callTagsMap = await this.tagDataSource.getTagsForCalls([args.callId]);
-    const callTags = callTagsMap.get(args.callId) ?? [];
+    const callTags = await this.tagDataSource.getCallsTags(args.callId);
 
-    if (callTags.length === 0) {
+    if (callTags.length > 0) {
       let shareTag = true;
 
       await Promise.all(

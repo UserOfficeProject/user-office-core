@@ -67,12 +67,8 @@ export const Tokens = {
   CasbinEnforcerProvider: Symbol('CasbinEnforcerProvider'),
   AuthRegistry: Symbol('AuthRegistry'),
   ProposalAuthContext: Symbol('ProposalAuthContext'),
-  CallAuthContext: Symbol('CallAuthContext'),
   UserAuthContext: Symbol('UserAuthContext'),
   ProposalAuthFunctions: Symbol('ProposalAuthFunctions'),
-  CallAuthorization: Symbol('CallAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
   ProposalAuthFilters: Symbol('ProposalAuthFilters'),
-  CallAuthFilters: Symbol('CallAuthFilters'),
-  CallAuthFunctions: Symbol('CallAuthFunctions'),
 };
