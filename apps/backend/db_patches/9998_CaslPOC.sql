@@ -52,10 +52,11 @@ BEGIN
         ('read', 'proposal', '{"isScientistToProposalTechnique": true}', false),
         ('read', 'proposal', '{"isScientistToProposal": true}', false),
         ('read', 'fap_proposal_assignment', NULL, false),
-        ('read', 'fap_proposal_assignment', '{"user_id": "userId"}', true);
+        ('read', 'fap_proposal_assignment', '{"user_id": "userId"}', true),
+        ('update', 'fap', NULL, false);
 
     INSERT INTO role_has_permission(role_id, permission_id) VALUES
-        (2,1),
+        (4,1),
         (2,7),
         (1,3),
         (2,2),
@@ -106,7 +107,8 @@ BEGIN
         (4,33),
         (5,33),
         (6,33),
-        (6,34);
+        (6,34),
+        (2,35);
 
     END;
   END IF;
