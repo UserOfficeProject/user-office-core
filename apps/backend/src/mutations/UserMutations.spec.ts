@@ -283,7 +283,7 @@ describe('upsertUserByOidcSub', () => {
     expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
   });
 
-  test('A new user can be created where the institution will be fetched from institutionRoRId', async () => {
+  test('A new user can be created with a ROR ID that creates a new mock institution', async () => {
     const newOidcSub = 'user-with-existing-institution-ror';
     const existingRorId = 'https://ror.org/01wv9cn34';
 
