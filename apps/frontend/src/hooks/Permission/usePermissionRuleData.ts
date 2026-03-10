@@ -7,7 +7,7 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { PermissionRuleFragment, PermissionRulesFilter, UserRole } from 'generated/sdk';
+import { PermissionRuleFragment, PermissionRulesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function usePermissionRuleData(filter?: PermissionRulesFilter): {
@@ -41,6 +41,7 @@ export function usePermissionRuleData(filter?: PermissionRulesFilter): {
           }
           if (data.permissionRules) {
             setPermissionRules(data.permissionRules.permissionRule);
+            console.log(data.permissionRules.permissionRule)
           }
           setLoadingPermissionRules(false);
         });

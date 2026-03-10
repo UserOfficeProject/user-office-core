@@ -1148,7 +1148,8 @@ export const createPermissionRuleObject = (record: PermissionRecord) => {
     record.role,
     record.subject,
     record.action,
-    record.conditions
+    record.conditions,
+    record.is_db_permission
   );
 };
 
@@ -1553,4 +1554,5 @@ export interface PermissionRecord {
   readonly action: typeof actions[number];
   readonly subject: typeof subjects[number];
   readonly conditions: string | null;
+  readonly is_db_permission: boolean;
 }

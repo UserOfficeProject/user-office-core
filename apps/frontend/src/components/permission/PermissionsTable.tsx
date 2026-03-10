@@ -69,6 +69,11 @@ const PermissionsTable = () => {
       title: 'Conditions',
       field: 'conditions',
     },
+    {
+      title: 'Is DB Permission',
+      field: 'isDbPermission',
+      lookup: { true: 'Yes', false: 'No' },
+    }
   ];
 
   return (

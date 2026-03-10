@@ -3,17 +3,20 @@ mutation createPermissionRule(
   $subject: String!
   $action: String!
   $conditions: String
+  $isDbPermission: Boolean!
 ) {
   createPermissionRule(
     role: $role
     subject: $subject
     action: $action
     conditions: $conditions
+    isDbPermission: $isDbPermission
   ) {
     role
     id
     subject
     action
     conditions
+    isDbPermission
   }
 }

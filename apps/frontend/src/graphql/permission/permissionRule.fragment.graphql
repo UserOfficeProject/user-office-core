@@ -4,4 +4,5 @@ fragment permissionRule on PermissionRule {
   subject
   action
   conditions
+  isDbPermission
 }

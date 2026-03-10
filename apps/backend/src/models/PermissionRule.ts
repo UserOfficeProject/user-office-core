@@ -4,6 +4,7 @@ export class PermissionRule {
     public role: string,
     public subject: string,
     public action: string,
-    public conditions: string | null
+    public conditions: string | null,
+    public isDbPermission: boolean
   ) {}
 }

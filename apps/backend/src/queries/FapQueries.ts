@@ -180,8 +180,6 @@ export default class FapQueries {
       proposalPk: number;
     }
   ) {
-    let reviewerId = null;
-
     const proposalEvents =
       await this.proposalDataSource.getProposalEvents(proposalPk);
 

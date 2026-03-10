@@ -4,6 +4,7 @@ mutation updatePermissionRule(
   $subject: String!
   $action: String!
   $conditions: String
+  $isDbPermission: Boolean!
 ) {
   updatePermissionRule(
     role: $role
@@ -11,11 +12,13 @@ mutation updatePermissionRule(
     subject: $subject
     action: $action
     conditions: $conditions
+    isDbPermission: $isDbPermission
   ) {
     role
     id
     subject
     action
     conditions
+    isDbPermission
   }
 }

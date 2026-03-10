@@ -1,10 +1,11 @@
-import Button from '@mui/material/Button';
+import { Button, Checkbox } from '@mui/material';
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import { PermissionRule } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 
 type CreateUpdatePermissionProps = {
   close: (permissionRule: PermissionRule | null) => void;
@@ -20,7 +21,8 @@ const CreateUpdatePermission = ({ close, permission }: CreateUpdatePermissionPro
         role: '',
         subject: '',
         action: '',
-        conditions: '',
+        conditions: null,
+        isDbPermission: false
       };
 
   return (
@@ -78,6 +80,14 @@ const CreateUpdatePermission = ({ close, permission }: CreateUpdatePermissionPro
             type="text"
             component={TextField}
             fullWidth
+          />
+          <Field
+            name="isDbPermission"
+            component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Is DB Permission',
+            }}
           />
           <Button
             type="submit"

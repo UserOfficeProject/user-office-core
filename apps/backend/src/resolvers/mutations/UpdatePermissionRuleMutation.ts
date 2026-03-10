@@ -19,6 +19,9 @@ export class UpdatePermissionRuleArgs {
 
   @Field(() => String, { nullable: true })
   public conditions?: string;
+
+  @Field(() => Boolean)
+  public isDbPermission: boolean;
 }
 
 export class UpdatePermissionRuleMutation {

@@ -23,7 +23,8 @@ type Permission = {
   permission_id: number,
   subject: typeof subjects[number],
   action: typeof actions[number],
-  conditions: string
+  conditions: string,
+  is_db_permission: boolean
 }
 
 export type Abilities = [
@@ -163,7 +164,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
 
   async getPermissionRule(id: number) {
     return database
-    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'rhp.role_id', 'r.title as role')
+    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'p.is_db_permission', 'rhp.role_id', 'r.title as role')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
@@ -176,7 +177,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
 
   async getPermissionRules(filter?: PermissionRulesArgs) {
     return database
-    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'rhp.role_id', 'r.title as role')
+    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'p.is_db_permission', 'rhp.role_id', 'r.title as role')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
@@ -203,7 +204,7 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
 
   async deletePermissionRule(id: number) {
     const permission = database
-    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'rhp.role_id', 'r.title as role')
+    .select('p.permission_id', 'p.action', 'p.subject', 'p.conditions', 'p.is_db_permission', 'rhp.role_id', 'r.title as role')
     .from('permissions as p')
     .join('role_has_permission as rhp', 'p.permission_id', 'rhp.permission_id')
     .join('roles as r', 'rhp.role_id', 'r.role_id')
@@ -221,12 +222,14 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
     return permission;
   }
 
+  //could check if a matching entry in permissions exists before creating a new one
   async createPermissionRule(args: CreatePermissionRuleArgs) {
     const permission: Permission[] = await database
       .insert({
         subject: args.subject,
         action: args.action,
-        conditions: args.conditions == null ? null : args.conditions
+        conditions: args.conditions == null ? null : args.conditions,
+        is_db_permission: args.isDbPermission
       })
       .into('permissions')
       .returning('*');
@@ -253,7 +256,8 @@ export default class PostgresPermissionDataSource implements PermissionDataSourc
       .update({
         action: args.action,
         subject: args.subject,
-        conditions: args.conditions
+        conditions: args.conditions,
+        is_db_permission: args.isDbPermission
       },
       ['*']
     )

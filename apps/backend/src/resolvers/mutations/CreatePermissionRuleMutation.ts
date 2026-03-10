@@ -16,6 +16,9 @@ export class CreatePermissionRuleArgs {
 
   @Field(() => String, { nullable: true })
   public conditions?: string;
+
+  @Field(() => Boolean)
+  public isDbPermission: boolean;
 }
 
 @Resolver()

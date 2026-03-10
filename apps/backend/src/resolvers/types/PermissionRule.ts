@@ -16,4 +16,7 @@ export class PermissionRule {
 
   @Field({ nullable: true })
   public conditions: string;
+
+  @Field(() => Boolean)
+  public isDbPermission: boolean;
 }
