@@ -1,14 +1,15 @@
 import { Column } from '@material-table/core';
 import { AssignmentInd } from '@mui/icons-material';
 import { Dialog, DialogContent, Typography } from '@mui/material';
-import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import ParticipantModal from 'components/proposal/ParticipantModal';
+import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer } from 'styles/StyledComponents';
@@ -72,7 +73,7 @@ const TechniqueTable = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -80,7 +81,6 @@ const TechniqueTable = () => {
   const AssignmentInstrumentIcon = (): JSX.Element => <ScienceIcon />;
   const AssignmentScientistIcon = (): JSX.Element => <AssignmentInd />;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
     setSelectedTechnique(technique);
     setOpenTechniqueAssignment(true);
@@ -253,21 +253,23 @@ const TechniqueTable = () => {
 
   return (
     <>
-      <ParticipantModal
-        show={!!assigningTechniqueScientistsId}
-        close={(): void => {
-          setSelectedTechnique(null);
-          setAssigningTechniqueScientistsId(null);
-        }}
-        addParticipants={assignScientistsToTechnique}
-        selectedUsers={selectedTechnique?.scientists.map(
-          (scientist) => scientist.id
-        )}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
+      {isUserOfficer && (
+        <PeopleSelectorModal
+          show={!!assigningTechniqueScientistsId}
+          close={(): void => {
+            setSelectedTechnique(null);
+            setAssigningTechniqueScientistsId(null);
+          }}
+          addParticipants={assignScientistsToTechnique}
+          selectedUsers={selectedTechnique?.scientists.map(
+            (scientist) => scientist.id
+          )}
+          selection={true}
+          userRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={t('instrumentSci')}
+          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+        />
+      )}
       <Dialog
         aria-labelledby="instrument-select-title"
         aria-describedby="instrument-select-description"

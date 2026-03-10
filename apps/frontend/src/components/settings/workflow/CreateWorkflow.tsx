@@ -36,7 +36,7 @@ const CreateWorkflow = ({ close, entityType, title }: CreateWorkflowProps) => {
           }).createWorkflow({ ...values, entityType: entityType });
 
           close(data.createWorkflow as Workflow);
-        } catch (error) {
+        } catch {
           close(null);
         }
       }}

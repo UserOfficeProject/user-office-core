@@ -4,6 +4,8 @@ import {
   FapReviewer,
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
+  FapReviewVisibility,
+  ReviewVisibility,
 } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
@@ -31,7 +33,8 @@ export interface FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    reviewVisibility: number
   ): Promise<Fap>;
   update(
     id: number,
@@ -41,7 +44,8 @@ export interface FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    files: string | null
+    files: string | null,
+    reviewVisibility: number
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
@@ -172,4 +176,6 @@ export interface FapDataSource {
     fapId: number,
     userId?: number
   ): Promise<FapProposal[]>;
+  getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
+  getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]>;
 }

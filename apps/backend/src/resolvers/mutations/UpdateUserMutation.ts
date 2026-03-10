@@ -15,7 +15,7 @@ import { User } from '../types/User';
 @ArgsType()
 class UpdateUserArgs {
   @Field(() => String, { nullable: true })
-  public user_title?: string;
+  public userTitle?: string;
 
   @Field(() => String, { nullable: true })
   public firstname?: string;
