@@ -1,14 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import 'dotenv/config'; // same as require('dotenv').config()
 
-require('dotenv').config();
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const path = require('path');
+import { generate, loadContext } from '@graphql-codegen/cli';
 
-const { generate, loadContext } = require('@graphql-codegen/cli');
+// recreate __dirname in ESM
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 async function generateSdk() {
   const ctx = await loadContext(
-    path.join(__dirname, '..', 'codegen_template.yml')
+    path.join(dirname, '..', 'codegen_template.yml')
   );
 
   await generate(ctx);

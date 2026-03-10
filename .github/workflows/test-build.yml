@@ -21,7 +21,7 @@ jobs:
       - name: Resolve required repositories
         id: resolve_rep
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # this assumes the result is an array, and .name property is used
           check_feature() {
@@ -117,6 +117,28 @@ jobs:
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
+      - name: Cache validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Install validation dependencies
+        if: steps.cached-node-modules-validation.outputs.cache-hit != 'true'
+        run: npm --prefix validation ci
+
+      - name: Cache validation build
+        id: cached-validation-build
+        uses: actions/cache@v4
+        with:
+          path: validation/lib
+          key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Build validation
+        if: steps.cached-validation-build.outputs.cache-hit != 'true'
+        run: npm --prefix validation run build
+
       - name: Cache UOWS
         id: cached-UOWS
         uses: actions/cache@v4
@@ -181,6 +203,20 @@ jobs:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore validation build
+        id: cached-validation-build
+        uses: actions/cache@v4
+        with:
+          path: validation/lib
+          key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
+
       - name: Restore backend UOWS
         id: cached-UOWS
         uses: actions/cache@v4
@@ -206,7 +242,7 @@ jobs:
             sdk-frontend-
 
       - run: npm ci
-      
+
       - run: npm run build
         env:
           NODE_ENV: development
@@ -244,7 +280,21 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-      
+
+      - name: Restore validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore validation build
+        id: cached-validation-build
+        uses: actions/cache@v4
+        with:
+          path: validation/lib
+          key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
+
       - name: Restore backend UOWS
         id: cached-UOWS
         uses: actions/cache@v4
@@ -320,7 +370,7 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-      
+
       - name: Restore backend UOWS
         id: cached-UOWS
         uses: actions/cache@v4
@@ -334,6 +384,20 @@ jobs:
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore validation node_modules
+        id: cached-node-modules-validation
+        uses: actions/cache@v4
+        with:
+          path: validation/node_modules
+          key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      - name: Restore validation build
+        id: cached-validation-build
+        uses: actions/cache@v4
+        with:
+          path: validation/lib
+          key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend

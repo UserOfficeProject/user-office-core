@@ -114,6 +114,11 @@ export function createTechnicalReviewStub(
       experiments: null,
       experimentSequence: null,
       fileId: null,
+      dataAccessUsers: [],
+      uiPermissions: {
+        canUpdate: false,
+        canDelete: false,
+      },
     },
   };
 }

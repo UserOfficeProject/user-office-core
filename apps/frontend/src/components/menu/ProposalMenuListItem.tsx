@@ -13,7 +13,6 @@ import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
 import { UserRole } from 'generated/sdk';
-import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 export function ProposalMenuListItem() {
@@ -24,18 +23,6 @@ export function ProposalMenuListItem() {
 
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const calls = useCallsData(
-    {
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.MINIMAL
-  ).calls;
-  const openCall = calls?.find((call) => call.isActive);
-  const techniqueProposalUrl =
-    openCall && openCall.id
-      ? `/TechniqueProposals?call=${openCall?.id}`
-      : '/TechniqueProposals';
 
   function toggleExpand() {
     setIsExpanded(!isExpanded);
@@ -70,7 +57,7 @@ export function ProposalMenuListItem() {
         </Tooltip>
         {isTechniqueProposalsEnabled && (
           <Tooltip title={t('Technique Proposals')}>
-            <ListItemButton component={NavLink} to={techniqueProposalUrl}>
+            <ListItemButton component={NavLink} to="/TechniqueProposals">
               <ListItemIcon>
                 <Topic />
               </ListItemIcon>
