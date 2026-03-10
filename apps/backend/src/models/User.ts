@@ -24,7 +24,7 @@ export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
 export class User {
   constructor(
     public id: number,
-    public user_title: string,
+    public userTitle: string,
     public firstname: string,
     public lastname: string,
     public preferredname: string | undefined,
@@ -82,8 +82,8 @@ export class BasicUserDetails {
     public created: Date,
     public email: string,
     public country: string,
-    public user_title: string,
-    public oidc_sub: string | null
+    public userTitle: string,
+    public oidcSub: string | null
   ) {}
 }
 
