@@ -1397,6 +1397,9 @@ export interface PermissionRecord {
   readonly instrument_ids: string[];
   readonly instrument_operator: string;
   readonly custom_filter: string;
+  readonly pi: string;
+  readonly proposal_status: string;
+  readonly effect: string;
 }
 
 export interface TechniqueHasInstrumentsRecord {

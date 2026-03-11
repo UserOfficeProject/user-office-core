@@ -8,6 +8,9 @@ export class Permission {
     public instrument_ids: string[],
     public facility: string,
     public instrument_operator: string,
-    public custom_filter: string
+    public custom_filter: string,
+    public pi: string,
+    public proposal_status: string,
+    public effect: string
   ) {}
 }

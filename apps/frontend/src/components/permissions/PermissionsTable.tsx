@@ -66,8 +66,20 @@ const PermissionsTable = () => {
       field: 'instrument_operator',
     },
     {
+      title: 'Principal Investigator',
+      field: 'pi',
+    },
+    {
+      title: 'Proposal Status',
+      field: 'proposal_status',
+    },
+    {
       title: 'Custom Filter',
       field: 'custom_filter',
+    },
+    {
+      title: 'Effect',
+      field: 'effect',
     },
   ];
 

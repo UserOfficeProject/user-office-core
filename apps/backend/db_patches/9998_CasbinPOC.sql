@@ -15,12 +15,29 @@ BEGIN
             "call"                VARCHAR(128) NOT NULL DEFAULT '',
             instrument_ids        TEXT[] NOT NULL DEFAULT '{}',
             instrument_operator   VARCHAR(128) NOT NULL DEFAULT '',
+            proposal_status       VARCHAR(128) NOT NULL DEFAULT '',
+            pi                    VARCHAR(128) NOT NULL DEFAULT '',
             custom_filter         VARCHAR(128) NOT NULL DEFAULT '',
             effect                VARCHAR(128) NOT NULL DEFAULT ''  -- e.g., 'allow' or 'deny'
           );
 
         INSERT INTO policies (ptype, role, "object", action, facility, "call", instrument_ids, instrument_operator, custom_filter, effect)
-        VALUES ('p', 'user_officer', 'call', 'read', 'ISIS', '2026', ARRAY['1','2'], 'AND', 'r.obj.instrument_id != null', 'allow');
+        VALUES ('p', 'user_officer', 'call', 'read', 'ISIS', '2026', ARRAY['1','2'], 'OR', 'r.obj.instrument_id != null', 'allow');
+
+
+        INSERT INTO policies (
+            ptype, role, "object", action, facility, "call",
+            instrument_ids, instrument_operator,
+            proposal_status, pi,
+            custom_filter, effect
+        )
+        VALUES (
+            'p', 'user_officer', 'proposal', 'read', '', '',
+            ARRAY['1','2'], 'OR',
+            'draft', 'SELF',
+            '',
+            'allow'
+        );
 
 
         DROP TABLE IF EXISTS casbin_rule CASCADE;
@@ -80,6 +97,17 @@ BEGIN
                                 ) || ')'
                             END
                         END,
+                        
+                        -- proposal_status
+                        CASE WHEN NULLIF(proposal_status, '') IS NOT NULL
+                          THEN format('r.obj.proposal_status == %L', proposal_status)
+                        END,
+
+                        -- PI
+                        CASE WHEN NULLIF(pi, '') IS NOT NULL
+                          THEN format('r.obj.pi == %L', pi)
+                        END,
+
 
                         -- custom_filter → appended as-is if provided
                         CASE
@@ -97,6 +125,10 @@ BEGIN
 
         INSERT INTO tag (name, short_code)
         VALUES ('ISIS', 'ISIS')
+        RETURNING tag_id INTO tag_id_var;
+
+        INSERT INTO tag (name, short_code)
+        VALUES ('CLF', 'CLF')
         RETURNING tag_id INTO tag_id_var;
 
         INSERT INTO tag_call (tag_id, call_id)

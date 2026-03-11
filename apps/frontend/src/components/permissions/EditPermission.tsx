@@ -5,9 +5,10 @@ import React from 'react';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { Permission } from 'generated/sdk';
+import { Permission, WorkflowType } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { useTagsData } from 'hooks/tag/useTagsData';
 import { useRolesData } from 'hooks/user/useRolesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -24,6 +25,7 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
   const { tags, loadingTags } = useTagsData();
   const { rolesData, loading } = useRolesData();
+  const { statuses, loadingStatuses } = useStatusesData(WorkflowType.PROPOSAL);
 
   const initialValues = permission
     ? permission
@@ -35,6 +37,9 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
         instrument_ids: '',
         instrument_operator: '',
         facility: '',
+        pi: '',
+        proposal_status: '',
+        effect: '',
         custom_filter: '',
       };
 
@@ -83,7 +88,7 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
             name="call"
             label="Calls"
             loading={loadingCalls}
-            noOptionsText="No templates"
+            noOptionsText="No calls"
             items={calls.map((op) => ({ text: op.shortCode, value: op.id }))}
             required
           />
@@ -91,7 +96,7 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
             name="instrument_ids"
             label="Instruments"
             loading={loadingInstruments}
-            noOptionsText="No templates"
+            noOptionsText="No instruments"
             items={instruments.map((op) => ({
               text: op.shortCode,
               value: op.id,
@@ -101,7 +106,7 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
           <FormikUIAutocomplete
             name="instrument_operator"
             label="Instruments operator"
-            noOptionsText="No templates"
+            noOptionsText="No operators"
             items={operatorOptions.map((op) => ({ text: op, value: op }))}
             required
           />
@@ -109,8 +114,37 @@ const EditPermission = ({ close, permission }: EditPermissionProps) => {
             name="facility"
             label="Facility"
             loading={loadingTags}
-            noOptionsText="No templates"
+            noOptionsText="No facilities"
             items={tags.map((op) => ({ text: op.name, value: op.id }))}
+            required
+          />
+          <Field
+            name="pi"
+            label="PI"
+            type="text"
+            component={TextField}
+            fullWidth
+            disabled={isExecutingCall}
+            required
+          />
+          <FormikUIAutocomplete
+            name="proposal_status"
+            label="Proposal Status"
+            loading={loadingStatuses}
+            noOptionsText="No proposal statuses"
+            items={statuses.map((op) => ({
+              text: op.name,
+              value: op.id,
+            }))}
+            required
+          />
+          <Field
+            name="effect"
+            label="Effect"
+            type="text"
+            component={TextField}
+            fullWidth
+            disabled={isExecutingCall}
             required
           />
           <Field
