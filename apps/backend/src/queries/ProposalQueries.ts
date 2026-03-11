@@ -109,7 +109,7 @@ export default class ProposalQueries {
         offset,
         sortField,
         sortDirection,
-        searchText
+        searchText?.trim()
       );
     } catch (e) {
       logger.logException('Method getAllView failed', e as Error, { filter });

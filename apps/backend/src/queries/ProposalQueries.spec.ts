@@ -96,3 +96,37 @@ test('A scientist can get proposal scientist comment', () => {
     )
   ).resolves.toBe(dummyProposalInternalCommentOne);
 });
+
+test('Whitespace does not stop user-officer role viewing proposal', () => {
+  const proposalDataSourceMock = container.resolve<ProposalDataSourceMock>(
+    Tokens.ProposalDataSource
+  );
+
+  const spy = jest
+    .spyOn(proposalDataSourceMock, 'getProposalsFromView')
+    .mockResolvedValue({ totalCount: 0, proposalViews: [] });
+
+  return expect(
+    proposalQueries.getAllView(
+      dummyUserOfficerWithRole,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      ' shortCode '
+    )
+  )
+    .resolves.toEqual({ totalCount: 0, proposalViews: [] })
+
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'shortCode'
+      );
+    });
+});
