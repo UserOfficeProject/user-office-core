@@ -1,8 +1,8 @@
-import { logger } from '@user-office-software/duo-logger';
-import { Field, InputType, ObjectType } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 import { Resolver, Mutation, Arg, Ctx } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { Rejection } from '../types/Rejection';
 import { Role } from '../types/Role'; // Adjust the path as necessary
 
 @InputType()
@@ -20,38 +20,15 @@ export class CreateRoleArgs {
   permissions: string[];
 }
 
-@ObjectType()
-export class CreateRoleResponse {
-  @Field()
-  success: boolean;
-
-  @Field(() => Role, { nullable: true })
-  role?: Role;
-}
-
 @Resolver()
 export class CreateRoleMutation {
-  @Mutation(() => CreateRoleResponse)
+  @Mutation(() => Role)
   async createRole(
     @Arg('args') args: CreateRoleArgs,
     @Ctx() context: ResolverContext
-  ): Promise<CreateRoleResponse> {
-    const role = (await context.mutations.user.createRole(
-      context.user,
-      args
-    )) as Role | Error;
-    if (role instanceof Error) {
-      logger.logException('Failed to create role', role, { args });
+  ): Promise<Role | Rejection> {
+    const role = await context.mutations.user.createRole(context.user, args);
 
-      return {
-        success: false,
-        role: undefined,
-      };
-    }
-
-    return {
-      success: true,
-      role,
-    };
+    return role;
   }
 }

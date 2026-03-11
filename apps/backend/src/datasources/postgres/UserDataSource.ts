@@ -801,7 +801,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         is_root_role: false,
       })
       .into('roles')
-      .returning('*');
+      .returning<RoleRecord[]>('*');
 
     return new Role(
       roleRecord.role_id,
@@ -809,7 +809,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       roleRecord.title,
       roleRecord.description,
       roleRecord.permissions,
-      roleRecord.isRootRole
+      roleRecord.is_root_role
     );
   }
 
@@ -840,14 +840,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     );
   }
 
-  async deleteRole(id: number): Promise<Role | null> {
+  async deleteRole(id: number): Promise<Role> {
     const [deletedRole] = await database('roles')
       .where('role_id', id)
       .del()
       .returning('*');
 
     if (!deletedRole) {
-      return null;
+      throw new GraphQLError(`Role with id ${id} not found`);
     }
 
     return new Role(

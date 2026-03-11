@@ -124,18 +124,9 @@ const RoleModal: React.FC<RoleModalProps> = ({
           },
         });
 
-    try {
-      await apiCall;
-      onSubmit();
-      onClose();
-    } catch (error) {
-      console.error(error);
-      alert(
-        `An error occurred while ${
-          isEditMode ? 'updating' : 'creating'
-        } the role.`
-      );
-    }
+    await apiCall;
+    onSubmit();
+    onClose();
   };
 
   return (

@@ -394,13 +394,16 @@ export default class UserMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async deleteRole(_: UserWithRole | null, id: number): Promise<Role | null> {
+  async deleteRole(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<Role | Rejection> {
     try {
       const role = await this.dataSource.deleteRole(id);
 
       return role;
     } catch (err) {
-      return null;
+      return rejection('Could not delete role', { id }, err);
     }
   }
 

@@ -1,5 +1,6 @@
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
+import { Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
@@ -91,9 +92,9 @@ export interface UserDataSource {
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
-  createRole(args: CreateRoleArgs): Promise<Role>;
-  updateRole(args: CreateRoleArgs): Promise<Role>;
-  deleteRole(id: number): Promise<Role | null>;
+  createRole(args: CreateRoleArgs): Promise<Role | Rejection>;
+  updateRole(args: CreateRoleArgs): Promise<Role | Rejection>;
+  deleteRole(id: number): Promise<Role | Rejection>;
   getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
     {
       user: User;

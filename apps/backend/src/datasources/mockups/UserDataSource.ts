@@ -1,5 +1,6 @@
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
+import { Rejection } from '../../models/Rejection';
 import { Role, Roles } from '../../models/Role';
 import {
   BasicUserDetails,
@@ -252,13 +253,13 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
-  createRole(args: CreateRoleArgs): Promise<Role> {
+  createRole(args: CreateRoleArgs): Promise<Role | Rejection> {
     throw new Error('Method not implemented.');
   }
-  updateRole(args: CreateRoleArgs): Promise<Role> {
+  updateRole(args: CreateRoleArgs): Promise<Role | Rejection> {
     throw new Error('Method not implemented.');
   }
-  deleteRole(id: number): Promise<Role | null> {
+  deleteRole(id: number): Promise<Role | Rejection> {
     throw new Error('Method not implemented.');
   }
   async delete(id: number): Promise<User | null> {

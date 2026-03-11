@@ -9,6 +9,7 @@ import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User, UserRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
+import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
@@ -124,14 +125,14 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
 }
 
 export class StfcUserDataSource implements UserDataSource {
-  createRole(args: CreateRoleArgs): Promise<Role> {
-    throw new Error('Method not implemented.');
+  async createRole(args: CreateRoleArgs): Promise<Role> {
+    return postgresUserDataSource.createRole(args);
   }
-  updateRole(args: CreateRoleArgs): Promise<Role> {
-    throw new Error('Method not implemented.');
+  async updateRole(args: UpdateRoleArgs): Promise<Role> {
+    return postgresUserDataSource.updateRole(args);
   }
-  deleteRole(id: number): Promise<Role | null> {
-    throw new Error('Method not implemented.');
+  async deleteRole(id: number): Promise<Role> {
+    return postgresUserDataSource.deleteRole(id);
   }
   private static readonly userDetailsCacheMaxElements = 1000;
   private static readonly userDetailsCacheSecondsToLive = 600; // 10 minutes
