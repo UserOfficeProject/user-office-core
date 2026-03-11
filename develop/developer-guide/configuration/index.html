@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -2210,12 +2210,12 @@
 
 <h1 id="configuration">Configuration</h1>
 <hr />
-<p>This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. </p>
-<p>The configuration is managed through a <code>.env</code> file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your <code>.env</code> file. </p>
+<p>This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly.</p>
+<p>The configuration is managed through a <code>.env</code> file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your <code>.env</code> file.</p>
 <blockquote>
 <p><strong><em>NOTE:</em></strong> The <code>DEPENDENCY_CONFIG</code> variable is crucial for the User Office application. It enables, disables, or modifies various features based on the specified configuration. You can find the different configuration files in the <code>apps/backend/src/config</code> directory.</p>
 </blockquote>
-<p>The <code>.env</code> file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. </p>
+<p>The <code>.env</code> file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used.</p>
 <p>For more detailed information, refer to the <a href="https://www.npmjs.com/package/dotenv">dotenv documentation</a>.</p>
 <hr />
 <h2 id="environment-variables">Environment Variables</h2>
@@ -2275,6 +2275,7 @@ AUTH_CLIENT_SECRET=ABCDEF-0123456789
 <li><strong>TZ</strong>: The timezone setting (e.g., Europe/Stockholm).</li>
 <li><strong>DATE_FORMAT</strong>: The format for displaying dates.</li>
 <li><strong>DATE_TIME_FORMAT</strong>: The format for displaying date and time.</li>
+<li><strong>ROR_API_URL</strong>: The API URL used for fetching organization information based on ROR IDs.</li>
 </ul>
 <h3 id="initial-user-configuration">Initial User Configuration</h3>
 <p>This setting specifies the email address of the initial user officer:</p>
