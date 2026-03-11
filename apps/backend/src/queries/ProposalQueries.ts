@@ -18,6 +18,7 @@ import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
+import { UserProposalsFilter } from '../resolvers/types/User';
 import { omit } from '../utils/helperFunctions';
 import { PaginationSortDirection } from '../utils/pagination';
 
@@ -221,7 +222,7 @@ export default class ProposalQueries {
   async getUserProposals(
     agent: UserWithRole | null,
     userId: number,
-    filter?: ProposalsFilter
+    filter?: UserProposalsFilter
   ) {
     const userContext = await this.userContext.toContextData(agent);
 
@@ -230,11 +231,12 @@ export default class ProposalQueries {
     }
 
     // Optional optimisation
-    const authFilters = await this.proposalAuthFilters.buildDbFilters(
-      userContext,
-      'proposal',
-      'read'
-    );
+    const authFilters =
+      await this.proposalAuthFilters.buildUserProposalsDbFilters(
+        userContext,
+        'proposal',
+        'read'
+      );
 
     filter = { ...filter, ...authFilters };
 

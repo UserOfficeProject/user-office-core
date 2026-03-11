@@ -127,17 +127,29 @@ export class CasbinConditionEvaluator {
     }
   }
 
-  walkAst(node: any, fn: (rule: any) => void): void {
+  async walkAst(node: any, fn: (rule: any) => Promise<void>): Promise<void> {
     if (!node) return;
 
     if (node.combinator && Array.isArray(node.rules)) {
       for (const child of node.rules) {
-        this.walkAst(child, fn);
+        await this.walkAst(child, fn);
       }
 
       return;
     }
 
-    fn(node);
+    await fn(node);
+  }
+
+  hasOrCombinator(node: any): boolean {
+    if (!node) return false;
+
+    if (node.combinator && Array.isArray(node.rules)) {
+      if (node.combinator.toLowerCase() === 'or') return true;
+
+      return node.rules.some((child: any) => this.hasOrCombinator(child));
+    }
+
+    return false;
   }
 }

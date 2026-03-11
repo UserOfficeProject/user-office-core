@@ -3,13 +3,13 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { StatusDataSource } from '../../datasources/StatusDataSource';
 import { WorkflowType } from '../../models/Workflow';
-import { ProposalsFilter } from '../../resolvers/queries/ProposalsQuery';
+import { UserProposalsFilter } from '../../resolvers/types/User';
 import { UserContextData } from '../authContexts/UserAuthContext';
 import { CasbinConditionEvaluator } from '../casbin/CasbinConditionEvaluator';
 import { CasbinService } from '../casbin/CasbinService';
 
-type ProposalAuthFilter = Partial<
-  Pick<ProposalsFilter, 'text' | 'proposalStatusId'>
+type UserProposalsAuthFilter = Partial<
+  Pick<UserProposalsFilter, 'proposalStatusId' | 'managementDecisionSubmitted'>
 >;
 
 @injectable()
@@ -23,11 +23,11 @@ export class ProposalAuthFilters {
     private conditionEvaluator: CasbinConditionEvaluator
   ) {}
 
-  async buildDbFilters(
+  async buildUserProposalsDbFilters(
     user: UserContextData,
     obj: string,
     act: string
-  ): Promise<ProposalAuthFilter | null> {
+  ): Promise<UserProposalsAuthFilter | null> {
     if (!user.currentRole) return null;
 
     const conditionJson = await this.casbinService.getPolicyCondition(
@@ -36,22 +36,19 @@ export class ProposalAuthFilters {
       act
     );
 
-    if (!conditionJson) return null;
+    if (
+      !conditionJson ||
+      this.conditionEvaluator.hasOrCombinator(conditionJson)
+    ) {
+      return null;
+    }
 
-    // TODO: abort filtering when policy contains OR conditions
+    const filters: UserProposalsAuthFilter = {};
 
-    const filters: ProposalAuthFilter = {};
-
-    this.conditionEvaluator.walkAst(conditionJson, async (rule) => {
+    await this.conditionEvaluator.walkAst(conditionJson, async (rule: any) => {
       const { field, operator, value } = rule;
 
       switch (field) {
-        case 'proposal.title':
-          if (operator === '=') {
-            filters.text = value;
-          }
-          break;
-
         case 'proposal.statusShortCode':
           if (operator === '=') {
             const statuses = await this.statusDataSource.getAllStatuses(
@@ -61,6 +58,12 @@ export class ProposalAuthFilters {
               (status) => status.shortCode === value
             )?.id;
             filters.proposalStatusId = statusId;
+          }
+          break;
+
+        case 'proposal.managementDecisionSubmitted':
+          if (operator === '=' && value === 'true') {
+            filters.managementDecisionSubmitted = true;
           }
           break;
       }

@@ -325,6 +325,12 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() ctx: ResolverContext
   ): Promise<ProposalUiPermissions> {
+    /*
+     * Workaround for a limitation in buildContext.ts DI setup, which
+     * doesn't allow injecting the user context at loader creation.
+     * This workaround passes the user into the loader, but checks if the loader
+     * already exists on the context to avoid creating multiple loaders per request.
+     */
     if (!(ctx as any)._proposalPermissionsLoader) {
       (ctx as any)._proposalPermissionsLoader =
         ctx.loaders.proposalPermissions.createLoader(ctx.user);

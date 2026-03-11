@@ -36,6 +36,9 @@ export class UserProposalsFilter {
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
+
+  @Field(() => Int, { nullable: true })
+  public proposalStatusId?: number;
 }
 
 @ArgsType()
