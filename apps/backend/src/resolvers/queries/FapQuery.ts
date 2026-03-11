@@ -4,6 +4,7 @@ import { ResolverContext } from '../../context';
 import { Fap } from '../types/Fap';
 import { FapProposal } from '../types/FapProposal';
 import { FapReviewer } from '../types/FapReviewers';
+import { ReviewVisibility } from '../types/ReviewVisibility';
 
 @Resolver()
 export class FapQuery {
@@ -72,5 +73,12 @@ export class FapQuery {
       callId,
       fapId,
     });
+  }
+
+  @Query(() => [ReviewVisibility], { nullable: true })
+  async fapReviewVisibilityOptions(
+    @Ctx() context: ResolverContext
+  ): Promise<ReviewVisibility[] | null> {
+    return context.queries.fap.getFapReviewVisibilityOptions(context.user);
   }
 }

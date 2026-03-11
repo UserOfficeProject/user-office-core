@@ -83,9 +83,6 @@ export class UpdateCallInput {
   @Field(() => String, { nullable: true })
   public submissionMessage?: string;
 
-  @Field(() => String, { nullable: true })
-  public surveyComment?: string;
-
   @Field(() => AllocationTimeUnits, { nullable: true })
   public allocationTimeUnit?: AllocationTimeUnits;
 

@@ -121,7 +121,7 @@ export default class ProposalQueries {
         offset,
         sortField,
         sortDirection,
-        searchText,
+        searchText?.trim(),
         undefined,
         tags
       );

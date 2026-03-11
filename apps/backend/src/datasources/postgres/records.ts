@@ -16,7 +16,14 @@ import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
-import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
+import {
+  Fap,
+  FapAssignment,
+  FapProposal,
+  FapReviewer,
+  FapReviewVisibility,
+  ReviewVisibility,
+} from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
 import { GenericTemplate } from '../../models/GenericTemplate';
@@ -351,7 +358,6 @@ export interface CallRecord {
   readonly start_cycle: Date;
   readonly end_cycle: Date;
   readonly cycle_comment: string;
-  readonly survey_comment: string;
   readonly submission_message: string;
   readonly reference_number_format: string;
   readonly proposal_sequence: number;
@@ -436,6 +442,13 @@ export interface FapRecord {
   readonly active: boolean;
   readonly full_count: number;
   readonly files: string | null;
+  readonly review_visibility: number;
+}
+
+export interface ReviewVisibilityRecord {
+  readonly review_visibility_id: number;
+  readonly visibility: string;
+  readonly description: string;
 }
 
 export interface FapSecretariesRecord {
@@ -650,6 +663,7 @@ export interface ProposalEventsRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
+  readonly call_fap_review_ended: boolean;
   readonly proposal_faps_selected: boolean;
   readonly proposal_instruments_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
@@ -1032,7 +1046,6 @@ export const createCallObject = (call: CallRecord) => {
     call.start_cycle,
     call.end_cycle,
     call.cycle_comment,
-    call.survey_comment,
     call.submission_message,
     call.reference_number_format,
     call.proposal_sequence,
@@ -1153,7 +1166,18 @@ export const createFapObject = (fap: FapRecord) => {
     fap.active,
     [],
     [],
-    fap.files ? JSON.stringify(fap.files) : null
+    fap.files ? JSON.stringify(fap.files) : null,
+    fap.review_visibility
+  );
+};
+
+export const createFapReviewVisibilityObject = (
+  fapReviewVisibility: ReviewVisibilityRecord
+) => {
+  return new ReviewVisibility(
+    fapReviewVisibility.review_visibility_id,
+    fapReviewVisibility.visibility as FapReviewVisibility,
+    fapReviewVisibility.description
   );
 };
 
