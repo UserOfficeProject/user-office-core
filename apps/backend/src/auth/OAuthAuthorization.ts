@@ -150,6 +150,9 @@ export class OAuthAuthorization extends UserAuthorization {
     let institution: Institution | null = null;
     if (typeof input === 'string') {
       // ROR ID provided
+      if (!input || input.trim() === '') {
+        return null;
+      }
       institution = await this.getOrCreateInstitutionByRorId(input);
     } else if (input !== null && typeof input === 'object') {
       // Manual institution details provided
