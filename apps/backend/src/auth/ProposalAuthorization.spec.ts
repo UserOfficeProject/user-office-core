@@ -316,7 +316,6 @@ test('A proposal reader has access to proposal matching their call', async () =>
       startCycle: new Date(),
       endCycle: new Date(),
       cycleComment: '',
-      surveyComment: '',
       proposalSequence: 1,
       isActive: true,
       referenceNumberFormat: '',

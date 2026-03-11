@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { Field, InputType, ObjectType } from 'type-graphql';
 import { Resolver, Mutation, Arg, Ctx } from 'type-graphql';
 
@@ -40,6 +41,8 @@ export class CreateRoleMutation {
       args
     )) as Role | Error;
     if (role instanceof Error) {
+      logger.logException('Failed to create role', role, { args });
+
       return {
         success: false,
         role: undefined,

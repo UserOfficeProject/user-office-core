@@ -155,5 +155,3 @@ const context: BasicResolverContext = {
 };
 
 export default context;
-
-// View buildContext file
