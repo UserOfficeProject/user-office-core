@@ -790,19 +790,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           qb.where('ihp.instrument_id', filter.instrumentId);
         }
 
+        if (filter?.managementDecisionSubmitted) {
+          qb.where(
+            'p.management_decision_submitted',
+            filter.managementDecisionSubmitted
+          );
+        }
+
         if (filter?.finalStatus) {
           qb.where('p.final_status', filter.finalStatus);
         }
 
         if (filter?.proposalStatusId) {
           qb.where('p.status_id', filter?.proposalStatusId);
-        }
-
-        if (filter?.managementDecisionSubmitted) {
-          qb.where(
-            'p.management_decision_submitted',
-            filter.managementDecisionSubmitted
-          );
         }
       })
       .groupBy('p.proposal_pk')

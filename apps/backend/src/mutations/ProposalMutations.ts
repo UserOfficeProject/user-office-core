@@ -150,7 +150,8 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const { proposalPk } = args;
 
-    const proposal = await this.proposalDataSource.get(proposalPk);
+    // Get proposal information
+    const proposal = await this.proposalDataSource.get(proposalPk); //Hacky
 
     if (!proposal) {
       return rejection('Proposal not found', { args });
@@ -162,9 +163,9 @@ export default class ProposalMutations {
       return rejection('Failed to update proposal', { args });
     }
 
-    const proposalContext = this.proposalContext.fetchContextForProposals([
-      proposalPk,
-    ]);
+    const proposalContext = (
+      await this.proposalContext.fetchProposalsContext([proposalPk])
+    ).get(proposalPk);
 
     const hasReadAccess = await this.casbinAuth.can(
       userContext,
@@ -370,7 +371,7 @@ export default class ProposalMutations {
     }
 
     const proposalContext = (
-      await this.proposalContext.fetchContextForProposals([proposalPk])
+      await this.proposalContext.fetchProposalsContext([proposalPk])
     ).get(proposalPk);
 
     const canDelete = await this.casbinAuth.can(

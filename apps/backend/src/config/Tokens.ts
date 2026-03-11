@@ -40,6 +40,7 @@ export const Tokens = {
   TemplateDataSource: Symbol('TemplateDataSource'),
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
+  ProposalAuthorization: Symbol('ProposalAuthorization'),
   VisitAuthorization: Symbol('VisitAuthorization'),
   VisitRegistrationAuthorization: Symbol('VisitRegistrationAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
@@ -69,6 +70,5 @@ export const Tokens = {
   ProposalAuthContext: Symbol('ProposalAuthContext'),
   UserAuthContext: Symbol('UserAuthContext'),
   ProposalAuthFunctions: Symbol('ProposalAuthFunctions'),
-  ProposalAuthorization: Symbol('ProposalAuthorization'),
   ProposalAuthFilters: Symbol('ProposalAuthFilters'),
 };

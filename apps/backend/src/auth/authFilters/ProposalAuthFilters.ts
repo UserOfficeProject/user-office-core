@@ -23,7 +23,7 @@ export class ProposalAuthFilters {
     private conditionEvaluator: CasbinConditionEvaluator
   ) {}
 
-  async buildUserProposalsDbFilters(
+  async buildUserProposalsDbFilter(
     user: UserContextData,
     obj: string,
     act: string

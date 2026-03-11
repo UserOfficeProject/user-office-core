@@ -217,7 +217,7 @@ export default class ProposalQueries {
     return this.dataSource.getInvitedProposal(inviteId);
   }
 
-  // Implemented for demonstration purposes
+  // Implemented for demonstration purposes - previously went direct to datasource
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async getUserProposals(
     agent: UserWithRole | null,
@@ -231,21 +231,20 @@ export default class ProposalQueries {
     }
 
     // Optional optimisation
-    const authFilters =
-      await this.proposalAuthFilters.buildUserProposalsDbFilters(
+    const authFilter =
+      await this.proposalAuthFilters.buildUserProposalsDbFilter(
         userContext,
         'proposal',
         'read'
       );
 
-    filter = { ...filter, ...authFilters };
+    filter = { ...filter, ...authFilter };
 
     const proposals = await this.dataSource.getUserProposals(userId, filter);
 
-    const proposalContexts =
-      await this.proposalContext.fetchContextForProposals(
-        proposals.map((p) => p.primaryKey)
-      );
+    const proposalContexts = await this.proposalContext.fetchProposalsContext(
+      proposals.map((p) => p.primaryKey)
+    );
 
     const results = await this.casbinAuth.canMany(
       userContext,

@@ -46,7 +46,7 @@ export default class ProposalPermissionsLoader {
         const uniqueProposalPks = [...new Set(proposalPks.map(Number))];
 
         const contextMap =
-          await this.authContext.fetchContextForProposals(uniqueProposalPks);
+          await this.authContext.fetchProposalsContext(uniqueProposalPks);
 
         const actions = Object.entries(PROPOSAL_ACTIONS);
         const enforcementRequests: EnforcementRequest<ProposalContextData>[] =

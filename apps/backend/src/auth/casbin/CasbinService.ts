@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import { Enforcer } from 'casbin';
 import { inject, injectable } from 'tsyringe';
 

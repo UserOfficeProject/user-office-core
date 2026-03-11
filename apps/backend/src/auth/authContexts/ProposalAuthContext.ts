@@ -36,7 +36,7 @@ export class ProposalAuthContext {
     private statusDataSource: StatusDataSource
   ) {}
 
-  async fetchContextForProposals(
+  async fetchProposalsContext(
     proposalPks: number[]
   ): Promise<Map<number, ProposalContextData>> {
     const [proposals, allStatuses] = await Promise.all([

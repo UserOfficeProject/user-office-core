@@ -277,7 +277,7 @@ export class ProposalAuthorization {
         }
 
         const proposalContext = (
-          await this.authContext.fetchContextForProposals([proposal.primaryKey])
+          await this.authContext.fetchProposalsContext([proposal.primaryKey])
         ).get(proposal.primaryKey);
 
         hasAccess = await this.casbinAuth.can(
