@@ -253,14 +253,35 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
-  createRole(args: CreateRoleArgs): Promise<Role | Rejection> {
-    throw new Error('Method not implemented.');
+  async createRole(args: CreateRoleArgs): Promise<Role | Rejection> {
+    return {
+      id: 1,
+      title: args.title,
+      shortCode: args.shortCode,
+      description: args.description,
+      permissions: [],
+      isRootRole: false,
+    } as Role;
   }
-  updateRole(args: CreateRoleArgs): Promise<Role | Rejection> {
-    throw new Error('Method not implemented.');
+  async updateRole(args: any): Promise<Role | Rejection> {
+    return {
+      id: args.roleID || 1,
+      title: args.title,
+      shortCode: args.shortCode,
+      description: args.description,
+      permissions: [],
+      isRootRole: false,
+    } as Role;
   }
-  deleteRole(id: number): Promise<Role | Rejection> {
-    throw new Error('Method not implemented.');
+  async deleteRole(id: number): Promise<Role | Rejection> {
+    return {
+      id,
+      title: 'deleted',
+      shortCode: 'deleted',
+      description: 'deleted',
+      permissions: [],
+      isRootRole: false,
+    } as Role;
   }
   async delete(id: number): Promise<User | null> {
     return dummyUser;

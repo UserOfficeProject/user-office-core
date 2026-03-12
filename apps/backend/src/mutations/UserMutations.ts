@@ -366,7 +366,6 @@ export default class UserMutations {
     return this.dataSource.setUserNotPlaceholder(id);
   }
 
-  @ValidateArgs(upsertUserByOidcSubValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createRole(
     _: UserWithRole | null,
@@ -409,6 +408,7 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(upsertUserByOidcSubValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async upsertUserByOidcSub(
     agent: UserWithRole | null,
