@@ -23,7 +23,10 @@ export async function buildFederatedSchema(
   });
 
   const federatedSchema = buildSubgraphSchema({
-    typeDefs: gql(printSchemaWithDirectives(schema)),
+    typeDefs: gql(`
+      directive @oneOf on INPUT_OBJECT
+      ${printSchemaWithDirectives(schema)}
+    `),
     // merge schema's resolvers with reference resolvers
     resolvers: deepMerge(
       createResolversMap(schema) as GraphQLResolverMap<unknown>,
