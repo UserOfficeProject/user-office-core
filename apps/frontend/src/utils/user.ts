@@ -6,10 +6,7 @@ export const getFullUserName = (
 ): string => (user ? `${user.firstname} ${user.lastname}` : 'None');
 
 export const getFullUserNameWithEmail = (
-  user?: Pick<
-    BasicUserDetails,
-    'preferredname' | 'lastname' | 'email'
-  > | null
+  user?: Pick<BasicUserDetails, 'preferredname' | 'lastname' | 'email'> | null
 ): string =>
   user
     ? `${user.preferredname} ${user.lastname} ${
