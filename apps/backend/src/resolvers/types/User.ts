@@ -60,8 +60,8 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public lastname: string;
 
-  @Field(() => String, { nullable: true })
-  public preferredname: string | undefined;
+  @Field(() => String)
+  public preferredname: string;
 
   @Field(() => String, { nullable: true })
   public oidcSub: string | null;
