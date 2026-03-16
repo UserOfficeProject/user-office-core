@@ -27,7 +27,7 @@ export class User {
     public userTitle: string,
     public firstname: string,
     public lastname: string,
-    public preferredname: string | undefined,
+    public preferredname: string,
     public oidcSub: string | null,
     public oauthRefreshToken: string | null,
     public oauthIssuer: string | null,
