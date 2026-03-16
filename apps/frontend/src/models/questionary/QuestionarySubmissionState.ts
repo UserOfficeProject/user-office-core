@@ -89,6 +89,7 @@ export type Event =
   | {
       type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED';
       id: string;
+      questionId: string;
       newItems: Maybe<
         (SampleFragment & {
           questionary: Pick<Questionary, 'isCompleted'>;
