@@ -8,7 +8,11 @@ export type ResourceMetadata = NonNullable<
 >;
 
 export function useAuthResourceMetadata(resourceType: ResourceType) {
-  const [metadata, setMetadata] = useState<ResourceMetadata | null>(null);
+  const [metadata, setMetadata] = useState<ResourceMetadata>({
+    userAttributes: [],
+    resourceAttributes: [],
+    resourceFunctions: [],
+  });
   const [loadingMetaData, setLoadingMetaData] = useState(true);
   const api = useDataApi();
 
@@ -32,9 +36,9 @@ export function useAuthResourceMetadata(resourceType: ResourceType) {
   }, [api, resourceType]);
 
   return {
-    userAttributes: metadata?.userAttributes ?? [],
-    resourceAttributes: metadata?.resourceAttributes ?? [],
-    resourceFunctions: metadata?.resourceFunctions ?? [],
+    userAttributes: metadata?.userAttributes,
+    resourceAttributes: metadata?.resourceAttributes,
+    resourceFunctions: metadata?.resourceFunctions,
     loadingMetaData,
   };
 }
