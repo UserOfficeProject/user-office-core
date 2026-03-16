@@ -463,19 +463,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
+          const trimmedSearchText = searchText.trim();
           query.andWhere((qb) =>
             qb
-              .orWhereRaw('proposal_id ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('title ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('proposal_status_name ILIKE ?', [`%${searchText}%`])
-              .orWhere('users.email', 'ilike', `%${searchText}%`)
-              .orWhere('users.firstname', 'ilike', `%${searchText}%`)
-              .orWhere('users.lastname', 'ilike', `%${searchText}%`)
+              .orWhereRaw('proposal_id ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('title ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('proposal_status_name ILIKE ?', [
+                `%${trimmedSearchText}%`,
+              ])
+              .orWhere('users.email', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.firstname', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.lastname', 'ilike', `%${trimmedSearchText}%`)
               .orWhere('principal_investigator', 'in', principalInvestigator)
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `${searchText}`
+                `${trimmedSearchText}`
               )
           );
         }

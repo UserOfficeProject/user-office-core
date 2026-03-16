@@ -1,13 +1,15 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
+import { EmailTemplateDataSourceMock } from '../../datasources/mockups/EmailTemplateDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { eliEmailHandler } from './eliEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
 
 // Mock MailService
 const mockMailService = {
@@ -17,6 +19,7 @@ const mockMailService = {
 describe('eliEmailHandler', () => {
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
   let roleClaimDataSourceMock: RoleClaimDataSourceMock;
+  let emailTemplateDataSourceMock: EmailTemplateDataSourceMock;
 
   beforeAll(() => {
     container.registerInstance(Tokens.MailService, mockMailService);
@@ -30,6 +33,10 @@ describe('eliEmailHandler', () => {
     roleClaimDataSourceMock = container.resolve<RoleClaimDataSourceMock>(
       Tokens.RoleClaimDataSource
     );
+    emailTemplateDataSourceMock =
+      container.resolve<EmailTemplateDataSourceMock>(
+        Tokens.EmailTemplateDataSource
+      );
 
     coProposerDataSourceMock.init();
     roleClaimDataSourceMock.init();
@@ -54,6 +61,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.PROPOSAL_CREATED
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -61,7 +73,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'proposal-created',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -83,6 +95,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.ACCEPTED_PROPOSAL
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -90,7 +107,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Accepted-Proposal',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -112,6 +129,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.REJECTED_PROPOSAL
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -119,7 +141,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Rejected-Proposal',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -141,6 +163,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.RESERVED_PROPOSAL
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -148,13 +175,13 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Reserved-Proposal',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
     });
 
-    test('should use template review-reminder', async () => {
+    test('should use template reviewer-reminder', async () => {
       // Create a mock event for FAP_REVIEWER_NOTIFIED
       const mockEvent: ApplicationEvent = {
         type: Event.FAP_REVIEWER_NOTIFIED,
@@ -166,6 +193,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.REVIEW_REMINDER
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -173,7 +205,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'review-reminder',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -199,6 +231,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.INTERNAL_REVIEW_CREATED
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -206,7 +243,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-created',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -232,6 +269,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.INTERNAL_REVIEW_UPDATED
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -239,7 +281,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-updated',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
@@ -265,6 +307,11 @@ describe('eliEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
 
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.INTERNAL_REVIEW_DELETED
+        );
+
       // Call the eliEmailHandler with the mock event
       await eliEmailHandler(mockEvent);
 
@@ -272,7 +319,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-deleted',
+            template: expectedEmailTemplate?.id.toString(),
           },
         })
       );
