@@ -40,7 +40,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public country: string;
 
   @Field(() => String, { nullable: true })
-  public oidc_sub?: string | null;
+  public oidcSub?: string | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

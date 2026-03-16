@@ -16,18 +16,19 @@
 // Import commands.js using ES2015 syntax:
 import './admin';
 import './call';
+import './emailTemplate';
+import './fap';
 import './instrument';
 import './internalReview';
 import './invite';
+import './predefinedMessages';
 import './proposal';
+import './settings';
+import './statusActionLogs';
+import './tag';
+import './technique';
 import './template';
 import './user';
 import './utils';
 import './visits';
 import './workflow';
-import './fap';
-import './predefinedMessages';
-import './settings';
-import './technique';
-import './statusActionLogs';
-import './tag';

@@ -45,6 +45,12 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return [dummyConnectionHasStatusAction];
   }
 
+  async hasEmailTemplateIdConnectionStatusAction(
+    emailTemplateId: number
+  ): Promise<boolean> {
+    return false;
+  }
+
   async updateConnectionStatusAction(
     statusAction: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction> {

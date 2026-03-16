@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
 import {
-  Event as PROPOSAL_EVENTS,
-  EmailStatusActionRecipients,
-  StatusActionType,
   AllocationTimeUnits,
-  FeatureUpdateAction,
+  EmailStatusActionRecipients,
   FeatureId,
+  FeatureUpdateAction,
+  Event as PROPOSAL_EVENTS,
+  StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -31,7 +31,6 @@ const newCall = {
   technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
   allocationTimeUnit: AllocationTimeUnits.DAY,
   cycleComment: faker.lorem.word(10),
-  surveyComment: faker.lorem.word(10),
 };
 
 const instrument = {
@@ -43,21 +42,32 @@ const instrument = {
 
 let proposal1Id: string;
 let proposal2Id: string;
+let testEmailTemplate1Id: string;
+let testEmailTemplate2Id: string;
 
 context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
-    cy.createInstrument(instrument).then((result) => {
-      if (result.createInstrument) {
-        const createdInstrumentId = result.createInstrument.id;
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template1.name,
+      description: initialDBData.emailTemplates.template1.description,
+      useTemplateFile: initialDBData.emailTemplates.template1.useTemplateFile,
+      subject: initialDBData.emailTemplates.template1.subject,
+      body: initialDBData.emailTemplates.template1.body,
+    }).then((result) => {
+      testEmailTemplate1Id = result.createEmailTemplate.id.toString();
+    });
 
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId }],
-        });
-      }
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template2.name,
+      description: initialDBData.emailTemplates.template2.description,
+      useTemplateFile: initialDBData.emailTemplates.template2.useTemplateFile,
+      subject: initialDBData.emailTemplates.template2.subject,
+      body: initialDBData.emailTemplates.template2.body,
+    }).then((result) => {
+      testEmailTemplate2Id = result.createEmailTemplate.id.toString();
     });
 
     cy.updateFeature({
@@ -148,7 +158,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
             combineEmails: true,
           },
         ],
@@ -238,7 +251,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: testEmailTemplate2Id,
+              name: initialDBData.emailTemplates.template2.name,
+            },
           },
         ],
       };
@@ -309,7 +325,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
           },
         ],
       };
@@ -466,7 +485,10 @@ context('Status actions tests', () => {
               description:
                 'Other email recipients manually added by their email',
             },
-            emailTemplate: { id: 'my-first-email', name: 'My First Email' },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
             otherRecipientEmails: [faker.internet.email()],
           },
         ],
@@ -584,8 +606,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
             },
             otherRecipientEmails: [statusActionEmail],
           },
@@ -719,7 +741,10 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
           },
           {
             recipient: {
@@ -728,8 +753,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: testEmailTemplate2Id,
+              name: initialDBData.emailTemplates.template2.name,
             },
             otherRecipientEmails: [faker.internet.email()],
           },

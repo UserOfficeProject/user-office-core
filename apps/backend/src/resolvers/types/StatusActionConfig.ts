@@ -59,7 +59,7 @@ export class EmailStatusActionEmailTemplate {
   public id: string;
 
   @Field(() => String)
-  public name?: string;
+  public name: string;
 }
 
 @ObjectType()

@@ -98,6 +98,7 @@ const dummyProposalEvents = {
   call_ended: false,
   call_ended_internal: false,
   call_review_ended: false,
+  call_fap_review_ended: false,
   proposal_faps_selected: false,
   proposal_instruments_selected: false,
   proposal_feasibility_review_submitted: false,

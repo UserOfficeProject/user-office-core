@@ -1,14 +1,14 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
 import { logger } from '@user-office-software/duo-logger';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSourceMock } from '../../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import {
-  ProposalDataSourceMock,
   dummyProposal,
+  ProposalDataSourceMock,
 } from '../../datasources/mockups/ProposalDataSource';
 import {
   basicDummyUser,
@@ -20,7 +20,8 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
 import { Settings, SettingsId } from '../../models/Settings';
-import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
+import { essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
 const mockMailService = {
@@ -87,7 +88,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+        template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
       },
       substitution_data: {
         piPreferredname: expect.any(String),
@@ -138,7 +139,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
     expect(mockMailService.sendMail).toHaveBeenCalledWith({
       content: {
-        template_id:
+        template:
           EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
       },
       substitution_data: {
@@ -361,7 +362,7 @@ describe('essEmailHandler co-proposer invites', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id:
+            template:
               EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
           },
           substitution_data: expect.objectContaining({
@@ -433,7 +434,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
       expect(sendMailsSpy).toHaveBeenCalledTimes(1);
       const arg = sendMailsSpy.mock.calls[0][0];
-      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
+      expect(arg.content.template).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
 
       // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
       expect(arg.recipients).toEqual([
@@ -490,7 +491,7 @@ describe('essEmailHandler co-proposer invites', () => {
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: { template_id: EmailTemplateId.VISIT_REGISTRATION_APPROVED },
+          content: { template: EmailTemplateId.VISIT_REGISTRATION_APPROVED },
           substitution_data: expect.objectContaining({
             preferredname: dummyUser.preferredname,
             startsAt: expect.stringMatching(FORMATTED_DATE_WITH_TZ),
@@ -524,7 +525,7 @@ describe('essEmailHandler co-proposer invites', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: EmailTemplateId.VISIT_REGISTRATION_CANCELLED,
+            template: EmailTemplateId.VISIT_REGISTRATION_CANCELLED,
           },
           substitution_data: expect.objectContaining({
             preferredname: dummyUser.preferredname,

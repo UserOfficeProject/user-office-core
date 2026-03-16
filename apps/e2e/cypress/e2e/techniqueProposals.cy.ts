@@ -678,6 +678,16 @@ context('Technique Proposal tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]', { timeout: 5000 }).should(
+        'contain',
+        technique1.name
+      );
+
+      cy.get('body').click(0, 0);
+
+      cy.finishedLoading();
+
       cy.get('[data-cy="instrument-filter"]').click();
 
       // Wait for instruments to load
@@ -757,7 +767,6 @@ context('Technique Proposal tests', () => {
         templateId: initialDBData.template.id,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         cycleComment: faker.lorem.word(10),
-        surveyComment: faker.lorem.word(10),
         esiTemplateName: esiTemplateName,
       };
 

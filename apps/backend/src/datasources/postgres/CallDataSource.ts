@@ -29,7 +29,7 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   sort_order: 'sort_order',
-  call_id: 'call_id',
+  call_id: 'call.call_id',
 };
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -233,7 +233,6 @@ export default class PostgresCallDataSource implements CallDataSource {
             end_cycle: args.endCycle,
             cycle_comment: args.cycleComment,
             submission_message: args.submissionMessage,
-            survey_comment: args.surveyComment,
             reference_number_format: args.referenceNumberFormat,
             proposal_sequence: args.proposalSequence,
             proposal_workflow_id: args.proposalWorkflowId,
@@ -406,7 +405,6 @@ export default class PostgresCallDataSource implements CallDataSource {
               end_cycle: args.endCycle,
               cycle_comment: args.cycleComment,
               submission_message: args.submissionMessage,
-              survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               experiment_workflow_id: args.experimentWorkflowId,
               call_ended: determineCallEndedFlag(

@@ -41,9 +41,9 @@ describe('OAuthAuthorization', () => {
     country = 'testCountry',
   }: {
     user: User;
-    rorId?: string;
-    name?: string;
-    country?: string;
+    rorId?: string | null;
+    name?: string | null;
+    country?: string | null;
   }) =>
     (mockOpenIdClient.login = jest.fn().mockResolvedValue({
       userProfile: {
@@ -128,8 +128,8 @@ describe('OAuthAuthorization', () => {
 
     expect(mockAdminDataSource.createCountry).not.toHaveBeenCalled();
     expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
-      name: 'testName',
-      country: testCountry.countryId,
+      name: 'Unknown institution',
+      country: null,
       rorId: 'testRorId',
     });
     expect(
@@ -161,7 +161,8 @@ describe('OAuthAuthorization', () => {
       .spyOn(mockAdminDataSource, 'createInstitution')
       .mockResolvedValue({ id: expectedInstitutionId } as Institution);
 
-    mockOpenIdLoginResponse({ user: dummyUser });
+    // make dummyUser without ror_id
+    mockOpenIdLoginResponse({ user: dummyUser, rorId: null });
     await oauthAuthorization.externalTokenLogin('valid', '', null);
 
     expect(mockAdminDataSource.createCountry).toHaveBeenCalledWith(
@@ -170,7 +171,7 @@ describe('OAuthAuthorization', () => {
     expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
       name: 'testName',
       country: testCountry.countryId,
-      rorId: 'testRorId',
+      rorId: undefined,
     });
 
     expect(
@@ -200,6 +201,34 @@ describe('OAuthAuthorization', () => {
     expect(
       (mockUserDataSource.update as jest.Mock).mock.calls[0][0].institutionId
     ).toBe(dummyUser.institutionId);
+  });
+
+  describe('getOrCreateUserInstitution', () => {
+    it('Should create new institution if institution name matches but country does not', async () => {
+      const existingInstitution = new Institution(1, 'Existing Inst', 1);
+      const newCountry = { country: 'New Country', countryId: 2 };
+
+      jest
+        .spyOn(mockAdminDataSource, 'getInstitutionByName')
+        .mockResolvedValue(existingInstitution);
+      jest
+        .spyOn(mockAdminDataSource, 'getCountryByName')
+        .mockResolvedValue(newCountry);
+      jest
+        .spyOn(mockAdminDataSource, 'createInstitution')
+        .mockResolvedValue({ id: 2 } as Institution);
+
+      await oauthAuthorization.getOrCreateUserInstitution({
+        name: existingInstitution.name,
+        country: newCountry.country,
+      });
+
+      expect(mockAdminDataSource.createInstitution).toHaveBeenCalledWith({
+        name: existingInstitution.name,
+        country: newCountry.countryId,
+        rorId: undefined,
+      });
+    });
   });
 
   describe('upsertUser->create: INITIAL_USER_OFFICER_EMAIL', () => {

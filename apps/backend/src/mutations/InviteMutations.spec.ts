@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -16,7 +16,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
@@ -238,7 +238,7 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id:
+          template:
             EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
         },
       })
@@ -310,7 +310,7 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id:
+          template:
             EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
         },
       })
