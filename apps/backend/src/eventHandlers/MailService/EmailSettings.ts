@@ -148,14 +148,22 @@ export interface CreateTransmission {
   /** Content that will be used to construct a message */
   content:
     | InlineContent
-    | { template_id: string; use_draft_template?: boolean }
-    | { email_rfc822: string };
+    | {
+        template?: string;
+        email_rfc822?: string;
+        use_draft_template?: boolean;
+      };
 }
 
 export default interface EmailSettings extends CreateTransmission {
-  content: {
-    template_id: string;
-  };
+  content:
+    | {
+        template: string;
+      }
+    | {
+        template: string;
+        email_rfc822: string;
+      };
   recipients: (
     | {
         address: string;

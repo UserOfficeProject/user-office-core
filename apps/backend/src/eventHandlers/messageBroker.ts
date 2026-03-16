@@ -293,6 +293,18 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.EMAIL_TEMPLATE_CREATED:
+      case Event.EMAIL_TEMPLATE_UPDATED:
+      case Event.EMAIL_TEMPLATE_DELETED: {
+        const jsonMessage = JSON.stringify(event.emailtemplate);
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
       case Event.TOPIC_ANSWERED: {
         const proposal = await proposalDataSource.getProposals({
           questionaryIds: event.array.map((a) => a.questionaryId),
