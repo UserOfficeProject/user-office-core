@@ -1,6 +1,10 @@
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
+import {
+  StfcUserDataSource,
+  StfcBasicPersonDetails,
+  toEssBasicUserDetails,
+} from './StfcUserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');
@@ -300,5 +304,44 @@ describe('Searchable user tests', () => {
       [String(nonSearchableUser)]
     );
     expect(result).toBe(false);
+  });
+});
+
+describe('toEssBasicUserDetails preferredname fallback', () => {
+  const baseStfcUser: StfcBasicPersonDetails = {
+    userNumber: 'fake',
+    givenName: 'fake',
+    familyName: 'fake',
+    firstNameKnownAs: 'fake',
+    email: 'fake',
+    country: 'fake',
+    orgName: 'fake',
+    orgId: 1,
+    title: 'fake',
+    deptName: 'fake',
+    displayName: 'fake',
+    establishmentId: 'fake',
+    fullName: 'fake',
+    initials: 'fake',
+  };
+
+  test('uses firstNameKnownAs when set', () => {
+    const user = toEssBasicUserDetails({
+      ...baseStfcUser,
+      firstNameKnownAs: 'fake',
+      givenName: 'fake2',
+    });
+
+    expect(user.preferredname).toBe('fake');
+  });
+
+  test('falls back to givenName when firstNameKnownAs is empty', () => {
+    const user = toEssBasicUserDetails({
+      ...baseStfcUser,
+      firstNameKnownAs: '',
+      givenName: 'fake',
+    });
+
+    expect(user.preferredname).toBe('fake');
   });
 });
