@@ -8,53 +8,34 @@ export const getFullUserName = (
 export const getFullUserNameWithEmail = (
   user?: Pick<
     BasicUserDetails,
-    'preferredname' | 'lastname' | 'email' | 'firstname'
+    'preferredname' | 'lastname' | 'email'
   > | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        }`
-      : `${user.firstname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        }`
+    ? `${user.preferredname} ${user.lastname} ${
+        user.email ? `(${user.email})` : ''
+      }`
     : 'None';
 
 export const getFullUserNameWithInstitution = (
   user?: BasicUserData | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname}; ${
-          user.institution ? `${user.institution}` : ''
-        }`
-      : `${user.firstname} ${user.lastname}; ${
-          user.institution ? `${user.institution}` : ''
-        }`
+    ? `${user.preferredname} ${user.lastname}; ${
+        user.institution ? `${user.institution}` : ''
+      }`
     : 'None';
 
 export const getFullUserNameWithBasicDetails = (
   user?: Pick<
     BasicUserDetails,
-    | 'preferredname'
-    | 'lastname'
-    | 'email'
-    | 'firstname'
-    | 'institution'
-    | 'country'
+    'preferredname' | 'lastname' | 'email' | 'institution' | 'country'
   > | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        } ${user.institution ? `(${user.institution})` : ''} ${
-          user.country ? `(${user.country})` : ''
-        }`
-      : `${user.firstname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        } ${user.institution ? `(${user.institution})` : ''} ${
-          user.country ? `(${user.country})` : ''
-        }`
+    ? `${user.preferredname} ${user.lastname} ${
+        user.email ? `(${user.email})` : ''
+      } ${user.institution ? `(${user.institution})` : ''} ${
+        user.country ? `(${user.country})` : ''
+      }`
     : 'None';
