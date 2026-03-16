@@ -270,7 +270,7 @@ export default class FapQueries {
     isApiToken: boolean,
     isUserOfficer: boolean,
     isChairOrSecretary: boolean
-  ): Promise<boolean> {
+  ) {
     const canSeeAllAssignments =
       isApiToken || isUserOfficer || isChairOrSecretary;
 
@@ -289,13 +289,13 @@ export default class FapQueries {
     );
   }
 
-  private isReviewsVisibleOnFapEnded(call: any): boolean {
+  private isReviewsVisibleOnFapEnded(call: any) {
     const currentDate = DateTime.now();
 
     return call.endFapReview?.getTime() <= currentDate.toMillis();
   }
 
-  private isReviewsAlwaysVisible(): boolean {
+  private isReviewsAlwaysVisible() {
     return true;
   }
 }
