@@ -30,7 +30,7 @@ const columns = [
   {
     title: 'Name',
     render: (rowData: FapAssignedMember) =>
-      rowData.preferredname ? rowData.preferredname : rowData.firstname,
+      rowData.preferredname,
   },
   { title: 'Surname', field: 'lastname' },
   { title: 'Proposal Count', field: 'proposalsCountByCall' },
