@@ -265,7 +265,7 @@ export interface UserRecord {
   readonly user_title: string;
   readonly firstname: string;
   readonly lastname: string;
-  readonly preferredname: string;
+  readonly preferredname: string | null;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
@@ -985,7 +985,7 @@ export const createUserObject = (user: UserRecord) => {
     user.user_title,
     user.firstname,
     user.lastname,
-    user.preferredname,
+    user.preferredname || user.firstname,
     user.oidc_sub,
     user.oauth_refresh_token,
     user.oauth_issuer,
@@ -1004,7 +1004,7 @@ export const createBasicUserObject = (
     user.user_id,
     user.firstname,
     user.lastname,
-    user.preferredname,
+    user.preferredname || user.firstname,
     user.institution,
     user.institution_id,
     user.created_at,
