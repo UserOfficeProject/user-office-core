@@ -16,8 +16,8 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field()
   public lastname: string;
 
-  @Field(() => String, { nullable: true })
-  public preferredname: string | undefined;
+  @Field(() => String)
+  public preferredname: string;
 
   @Field()
   public institution: string;
