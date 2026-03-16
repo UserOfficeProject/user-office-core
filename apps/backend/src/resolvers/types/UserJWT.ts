@@ -13,8 +13,8 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   @Field()
   public lastname: string;
 
-  @Field(() => String, { nullable: true })
-  public preferredname: string | undefined;
+  @Field(() => String)
+  public preferredname: string;
 
   @Field()
   public email: string;
