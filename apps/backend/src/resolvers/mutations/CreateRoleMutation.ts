@@ -27,7 +27,7 @@ export class CreateRoleMutation {
     @Arg('args') args: CreateRoleArgs,
     @Ctx() context: ResolverContext
   ): Promise<Role | Rejection> {
-    const role = await context.mutations.user.createRole(context.user, args);
+    const role = await context.mutations.role.createRole(context.user, args);
 
     return role;
   }

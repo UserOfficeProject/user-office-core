@@ -1,10 +1,8 @@
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
-import { Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails, User, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
 import { UpdateUserByIdArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../utils/pagination';
@@ -92,9 +90,6 @@ export interface UserDataSource {
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
-  createRole(args: CreateRoleArgs): Promise<Role | Rejection>;
-  updateRole(args: CreateRoleArgs): Promise<Role | Rejection>;
-  deleteRole(id: number): Promise<Role | Rejection>;
   getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<
     {
       user: User;

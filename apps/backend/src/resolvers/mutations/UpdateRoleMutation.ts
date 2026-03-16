@@ -38,7 +38,7 @@ export class UpdateRoleMutation {
     @Arg('args') args: UpdateRoleArgs,
     @Ctx() context: ResolverContext
   ): Promise<UpdateRoleResponse> {
-    const role = (await context.mutations.user.updateRole(
+    const role = (await context.mutations.role.updateRole(
       context.user,
       args
     )) as Role | Error;

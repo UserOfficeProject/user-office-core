@@ -19,8 +19,6 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserRole, UserWithRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
-import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
-import { UpdateRoleArgs } from '../resolvers/mutations/UpdateRoleMutation';
 import {
   UpdateUserRolesArgs,
   UpdateUserByIdArgs,
@@ -364,48 +362,6 @@ export default class UserMutations {
     id: number
   ): Promise<User | null> {
     return this.dataSource.setUserNotPlaceholder(id);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async createRole(
-    _: UserWithRole | null,
-    args: CreateRoleArgs
-  ): Promise<Role | Rejection> {
-    try {
-      const role = await this.dataSource.createRole(args);
-
-      return role;
-    } catch (err) {
-      return rejection('Could not create role', { args }, err);
-    }
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async updateRole(
-    _: UserWithRole | null,
-    args: UpdateRoleArgs
-  ): Promise<Role | Rejection> {
-    try {
-      const role = await this.dataSource.updateRole(args);
-
-      return role;
-    } catch (err) {
-      return rejection('Could not update role', { args }, err);
-    }
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async deleteRole(
-    _: UserWithRole | null,
-    id: number
-  ): Promise<Role | Rejection> {
-    try {
-      const role = await this.dataSource.deleteRole(id);
-
-      return role;
-    } catch (err) {
-      return rejection('Could not delete role', { id }, err);
-    }
   }
 
   @ValidateArgs(upsertUserByOidcSubValidationSchema)

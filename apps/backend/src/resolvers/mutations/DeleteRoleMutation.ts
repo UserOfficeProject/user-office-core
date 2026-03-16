@@ -10,6 +10,6 @@ export class DeleteRoleMutation {
     @Arg('roleId', () => Int) roleId: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.user.deleteRole(context.user, roleId);
+    return context.mutations.role.deleteRole(context.user, roleId);
   }
 }

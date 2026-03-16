@@ -1,4 +1,6 @@
 import { Role } from '../../models/Role';
+import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
+import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource, Tag } from '../RoleDataSource';
 
 const dummyRole: Role = {
@@ -16,6 +18,39 @@ export class RoleDataSourceMock implements RoleDataSource {
     [2, 'reviewer'],
     [3, 'moderator'],
   ]);
+
+  async createRole(args: CreateRoleArgs): Promise<Role> {
+    return {
+      id: 1,
+      title: args.title,
+      shortCode: args.shortCode,
+      description: args.description,
+      permissions: [],
+      isRootRole: false,
+    } as Role;
+  }
+
+  async updateRole(args: UpdateRoleArgs): Promise<Role> {
+    return {
+      id: args.roleID || 1,
+      title: args.title,
+      shortCode: args.shortCode,
+      description: args.description,
+      permissions: [],
+      isRootRole: false,
+    } as Role;
+  }
+
+  async deleteRole(id: number): Promise<Role> {
+    return {
+      id,
+      title: 'deleted',
+      shortCode: 'deleted',
+      description: 'deleted',
+      permissions: [],
+      isRootRole: false,
+    } as Role;
+  }
 
   async updateRoleTags(roleId: number, tagIds: number[]): Promise<Role> {
     const validTagIds = tagIds.filter((tagId) => this.tags.has(tagId));

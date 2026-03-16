@@ -21,6 +21,7 @@ import ProposalMutations from './mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import RoleMutations from './mutations/RoleMutations';
 import RoleTagsMutation from './mutations/RoleTagsMutation';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
@@ -139,6 +140,7 @@ const context: BasicResolverContext = {
     tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
     roleTags: container.resolve(RoleTagsMutation),
+    role: container.resolve(RoleMutations),
   },
   clients: {
     scheduler: async () => {

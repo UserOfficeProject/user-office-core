@@ -20,6 +20,7 @@ import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from '../mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
+import RoleMutations from '../mutations/RoleMutations';
 import RoleTagsMutation from '../mutations/RoleTagsMutation';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
@@ -134,6 +135,7 @@ interface ResolverContextMutations {
   tag: TagMutations;
   experiment: ExperimentMutations;
   roleTags: RoleTagsMutation;
+  role: RoleMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

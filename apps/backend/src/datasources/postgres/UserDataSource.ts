@@ -13,8 +13,6 @@ import {
   UserRoleShortCodeMap,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
-import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
@@ -781,85 +779,6 @@ export default class PostgresUserDataSource implements UserDataSource {
           return createUserObject(user);
         });
       });
-  }
-
-  private toPostgresArray(array: string[]): string {
-    return `{${array.map((item) => `"${item}"`).join(',')}}`;
-  }
-
-  async createRole(args: CreateRoleArgs): Promise<Role> {
-    const { shortCode, title, description, permissions } = args;
-
-    const postgresPermissions = Array.isArray(permissions)
-      ? this.toPostgresArray(permissions)
-      : permissions;
-
-    const [roleRecord] = await database
-      .insert({
-        short_code: shortCode,
-        title,
-        description,
-        permissions: postgresPermissions,
-        is_root_role: false,
-      })
-      .into('roles')
-      .returning<RoleRecord[]>('*');
-
-    return new Role(
-      roleRecord.role_id,
-      roleRecord.short_code,
-      roleRecord.title,
-      roleRecord.description,
-      roleRecord.permissions,
-      roleRecord.is_root_role
-    );
-  }
-
-  async updateRole(args: UpdateRoleArgs): Promise<Role> {
-    const { roleID, title, description, permissions } = args;
-
-    const postgresPermissions = Array.isArray(permissions)
-      ? this.toPostgresArray(permissions)
-      : permissions;
-
-    const [roleRecord] = await database
-      .update({
-        title,
-        description,
-        permissions: postgresPermissions,
-      })
-      .from('roles')
-      .where('role_id', roleID)
-      .returning('*');
-
-    return new Role(
-      roleRecord.role_id,
-      roleRecord.short_code,
-      roleRecord.title,
-      roleRecord.description,
-      roleRecord.permissions,
-      roleRecord.isRootRole
-    );
-  }
-
-  async deleteRole(id: number): Promise<Role> {
-    const [deletedRole] = await database('roles')
-      .where('role_id', id)
-      .del()
-      .returning('*');
-
-    if (!deletedRole) {
-      throw new GraphQLError(`Role with id ${id} not found`);
-    }
-
-    return new Role(
-      deletedRole.role_id,
-      deletedRole.short_code,
-      deletedRole.title,
-      deletedRole.description,
-      deletedRole.permissions,
-      deletedRole.data_access
-    );
   }
 
   async getApprovedProposalVisitorsWithInstitution(proposalPk: number): Promise<

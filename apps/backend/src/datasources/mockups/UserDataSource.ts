@@ -1,6 +1,5 @@
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
-import { Rejection } from '../../models/Rejection';
 import { Role, Roles } from '../../models/Role';
 import {
   BasicUserDetails,
@@ -9,7 +8,6 @@ import {
   UserWithRole,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
-import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
@@ -253,36 +251,6 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
 };
 
 export class UserDataSourceMock implements UserDataSource {
-  async createRole(args: CreateRoleArgs): Promise<Role | Rejection> {
-    return {
-      id: 1,
-      title: args.title,
-      shortCode: args.shortCode,
-      description: args.description,
-      permissions: [],
-      isRootRole: false,
-    } as Role;
-  }
-  async updateRole(args: any): Promise<Role | Rejection> {
-    return {
-      id: args.roleID || 1,
-      title: args.title,
-      shortCode: args.shortCode,
-      description: args.description,
-      permissions: [],
-      isRootRole: false,
-    } as Role;
-  }
-  async deleteRole(id: number): Promise<Role | Rejection> {
-    return {
-      id,
-      title: 'deleted',
-      shortCode: 'deleted',
-      description: 'deleted',
-      permissions: [],
-      isRootRole: false,
-    } as Role;
-  }
   async delete(id: number): Promise<User | null> {
     return dummyUser;
   }
