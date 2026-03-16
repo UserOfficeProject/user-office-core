@@ -1,22 +1,23 @@
 # Configuration
 
-_________________________________________________________________________________________________________
+---
 
-This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. 
+This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly.
 
-The configuration is managed through a `.env` file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your `.env` file. 
+The configuration is managed through a `.env` file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your `.env` file.
 
 > **_NOTE:_** The `DEPENDENCY_CONFIG` variable is crucial for the User Office application. It enables, disables, or modifies various features based on the specified configuration. You can find the different configuration files in the `apps/backend/src/config` directory.
 
-The `.env` file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. 
+The `.env` file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used.
 
 For more detailed information, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).
 
-_________________________________________________________________________________________________________
+---
 
 ## Environment Variables
 
 ### EAM Configuration (ESS-specific)
+
 The EAM (Enterprise Asset Management) section includes variables that configure API access and authentication.
 
 - **EAM_API_URL**: Specifies the API URL for EAM services.
@@ -28,12 +29,14 @@ The EAM (Enterprise Asset Management) section includes variables that configure 
 - **EAM_PART_CODE**: The part code used in EAM operations.
 
 ### Logging Configuration (Graylog)
+
 To enable local logging via Graylog, uncomment and configure the following variables:
 
 - **GRAYLOG_SERVER**: The address of the Graylog server.
 - **GRAYLOG_PORT**: The port for the Graylog server.
 
 ### ORCID Configuration
+
 The ORCID section can be used for integrating with the ORCID API for user identification and authentication.
 
 - **ORCID_TOKEN_URL**: The URL for obtaining ORCID tokens.
@@ -42,11 +45,13 @@ The ORCID section can be used for integrating with the ORCID API for user identi
 - **ORCID_CLIENT_SECRET**: The client secret for ORCID API access.
 
 ### User Office Factory Configuration
+
 The User Office Factory configuration includes an endpoint for generating user office data.
 
 - **USER_OFFICE_FACTORY_ENDPOINT**: The endpoint URL for the User Office Factory.
 
 ### OAuth Configuration
+
 OAuth settings allow the application to authenticate users via an OAuth provider.
 
 - **AUTH_DISCOVERY_URL**: The URL for OAuth discovery.
@@ -54,6 +59,7 @@ OAuth settings allow the application to authenticate users via an OAuth provider
 - **AUTH_CLIENT_SECRET**: The client secret for OAuth.
 
 #### Example OAuth Configuration (Google)
+
 To use Google OAuth, you can set the following:
 
 ```plaintext
@@ -63,6 +69,7 @@ AUTH_CLIENT_SECRET=ABCDEF-0123456789
 ```
 
 ### General Application Settings
+
 These settings cover the general configuration of the application environment.
 
 - **NODE_ENV**: Specifies the environment (e.g., development, production).
@@ -75,13 +82,16 @@ These settings cover the general configuration of the application environment.
 - **TZ**: The timezone setting (e.g., Europe/Stockholm).
 - **DATE_FORMAT**: The format for displaying dates.
 - **DATE_TIME_FORMAT**: The format for displaying date and time.
+- **ROR_API_URL**: The API URL used for fetching organization information based on ROR IDs.
 
 ### Initial User Configuration
+
 This setting specifies the email address of the initial user officer:
 
 - **INITIAL_USER_OFFICER_EMAIL**: The email address of the initial user officer.
 
 ### RabbitMQ Configuration
+
 RabbitMQ is used for messaging and queueing. Uncomment and configure the following variables to enable RabbitMQ:
 
 - **RABBITMQ_HOSTNAME**: The hostname for RabbitMQ.
@@ -91,13 +101,15 @@ RabbitMQ is used for messaging and queueing. Uncomment and configure the followi
 - **RABBITMQ_CORE_EXCHANGE_NAME**: The core exchange name for RabbitMQ.
 
 ### Scheduler Configuration
+
 The scheduler endpoint is used for managing scheduled tasks:
 
 - **SCHEDULER_ENDPOINT**: The endpoint URL for the scheduler.
 
 ### Email Configuration
+
 The email configuration includes a sink email address for testing purposes:
 
 - **SINK_EMAIL**: The email address to receive sink emails.
 
-_________________________________________________________________________________________________________
+---
