@@ -1,0 +1,8 @@
+query getEmailTemplates($filter: EmailTemplatesFilter) {
+  emailTemplates(filter: $filter) {
+    emailTemplates {
+      ...emailTemplate
+    }
+    totalCount
+  }
+}
