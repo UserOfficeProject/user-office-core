@@ -15,8 +15,8 @@ import {
 } from '../../models/StatusAction';
 import {
   EmailActionDefaultConfig,
-  StatusActionDefaultConfig,
   RabbitMQActionDefaultConfig,
+  StatusActionDefaultConfig,
 } from './StatusActionConfig';
 
 @ObjectType()

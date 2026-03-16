@@ -6,6 +6,7 @@ import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
 import DataAccessUsersMutations from '../mutations/DataAccessUsersMutations';
+import EmailTemplateMutations from '../mutations/EmailTemplateMutations';
 import ExperimentMutations from '../mutations/ExperimentMutation';
 import ExperimentSafetyPdfTemplateMutations from '../mutations/ExperimentSafetyPdfTemplateMutations';
 import FapMutations from '../mutations/FapMutations';
@@ -36,6 +37,7 @@ import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import DataAccessUsersQueries from '../queries/DataAccessUsersQueries';
+import EmailTemplateQueries from '../queries/EmailTemplateQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import ExperimentQueries from '../queries/ExperimentQueries';
 import ExperimentSafetyPdfTemplateQueries from '../queries/ExperimentSafetyPdfTemplateQueries';
@@ -103,6 +105,7 @@ interface ResolverContextQueries {
   tag: TagQueries;
   experiment: ExperimentQueries;
   roleTags: RoleTagsQuery;
+  emailTemplate: EmailTemplateQueries;
 }
 
 interface ResolverContextMutations {
@@ -136,6 +139,7 @@ interface ResolverContextMutations {
   experiment: ExperimentMutations;
   roleTags: RoleTagsMutation;
   role: RoleMutations;
+  emailTemplate: EmailTemplateMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;
