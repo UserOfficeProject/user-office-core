@@ -1,37 +1,62 @@
 import { faker } from '@faker-js/faker';
 import {
+  EmailStatusActionRecipients,
   FeatureId,
+  StatusActionType,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
 import {
   booleanQuestion,
-  intervalQuestion,
-  numberQuestion,
-  textQuestion,
-  multipleChoiceQuestion,
-  dateQuestion,
-  timeQuestion,
-  fileQuestion,
-  richTextInputQuestion,
-  proposal,
-  templateDependencies,
   createTopicWithQuestionsAndRelations,
+  dateQuestion,
   dynamicMultipleChoiceQuestion,
+  fileQuestion,
+  intervalQuestion,
+  multipleChoiceQuestion,
   newCall,
+  numberQuestion,
+  proposal,
+  richTextInputQuestion,
+  templateDependencies,
   templateSearch,
+  textQuestion,
+  timeQuestion,
 } from './templateContext';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const scientist1 = initialDBData.users.user1;
+let testEmailTemplate1Id: string;
 
 context('Template Basic tests', () => {
+  const emailTemplateName1 = faker.lorem.words(3);
+  const emailTemplateDescription1 = faker.lorem.words(3);
+  const emailTemplateName2 = faker.lorem.words(3);
+  const emailTemplateDescription2 = faker.lorem.words(3);
   beforeEach(() => {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
+
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template1.name,
+      description: initialDBData.emailTemplates.template1.description,
+      useTemplateFile: initialDBData.emailTemplates.template1.useTemplateFile,
+      subject: initialDBData.emailTemplates.template1.subject,
+      body: initialDBData.emailTemplates.template1.body,
+    }).then((result) => {
+      testEmailTemplate1Id = result.createEmailTemplate.id.toString();
+    });
+
+    cy.createEmailTemplate({
+      name: initialDBData.emailTemplates.template2.name,
+      description: initialDBData.emailTemplates.template2.description,
+      useTemplateFile: initialDBData.emailTemplates.template2.useTemplateFile,
+      subject: initialDBData.emailTemplates.template2.subject,
+      body: initialDBData.emailTemplates.template2.body,
+    });
   });
 
   describe('Proposal templates basic tests', () => {
@@ -1993,6 +2018,139 @@ context('Template Basic tests', () => {
         .parent()
         .find('[data-cy=mark-as-inactive]')
         .should('exist');
+    });
+  });
+
+  describe('Email templates tests', () => {
+    it('User officer can create email template', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.get('[data-cy=create-new-entry]').click();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="name"]').type(emailTemplateName1);
+      cy.get('[data-cy="description"]').first().type(emailTemplateDescription1);
+      cy.get('[data-cy=use-template-file]')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked')
+        .click();
+      cy.get('[data-cy="submit"]').click();
+      cy.notification({ variant: 'success', text: 'created successfully' });
+      cy.contains(emailTemplateName1);
+      cy.contains(emailTemplateDescription1);
+
+      cy.get('[data-cy=create-new-entry]').click();
+      cy.get('[data-cy="name"]').type(emailTemplateName1);
+      cy.get('[data-cy="description"]').first().type(emailTemplateDescription2);
+      cy.get('[data-cy=use-template-file]')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked')
+        .click();
+      cy.get('[data-cy="submit"]').click();
+      cy.notification({
+        variant: 'error',
+        text: 'Could not create email template',
+      });
+    });
+
+    it('User officer can update email template', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+      cy.get('[data-cy="name"]').type(emailTemplateName2);
+      cy.get('[data-cy="description"]').first().type(emailTemplateDescription2);
+      cy.get('[data-cy="submit"]').click();
+      cy.notification({ variant: 'success', text: 'updated successfully' });
+      cy.contains(emailTemplateName2);
+      cy.contains(emailTemplateDescription2);
+    });
+
+    it('User officer can delete email template', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.notification({ variant: 'success', text: 'Email template deleted' });
+
+      cy.contains(initialDBData.emailTemplates.template1.name).should(
+        'not.exist'
+      );
+    });
+
+    it.only('User officer cannot delete referenced email template', () => {
+      const statusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.PI,
+              description: '',
+            },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            combineEmails: true,
+          },
+        ],
+      };
+
+      cy.addWorkflowStatus({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        sortOrder: 1,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+        prevConnectionId: 1,
+      }).then((result) => {
+        cy.reload();
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(statusActionConfig),
+            },
+          ],
+          connectionId: result.addWorkflowStatus.id,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.notification({
+        variant: 'error',
+        text: 'Could not delete email template',
+      });
     });
   });
 });

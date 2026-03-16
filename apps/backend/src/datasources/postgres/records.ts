@@ -1,9 +1,9 @@
 import {
-  ProposalPdfTemplateRecord,
   ExperimentSafetyPdfTemplateRecord,
+  ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -14,6 +14,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { EmailTemplate } from '../../models/EmailTemplate';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import {
@@ -356,7 +357,6 @@ export interface CallRecord {
   readonly start_cycle: Date;
   readonly end_cycle: Date;
   readonly cycle_comment: string;
-  readonly survey_comment: string;
   readonly submission_message: string;
   readonly reference_number_format: string;
   readonly proposal_sequence: number;
@@ -377,6 +377,16 @@ export interface CallRecord {
   readonly is_active: boolean;
   readonly sort_order: number;
   readonly experiment_workflow_id: number;
+}
+
+export interface EmailTemplateRecord {
+  readonly email_template_id: number;
+  readonly created_by: number;
+  readonly name: string;
+  readonly description: string;
+  readonly use_template_file: boolean;
+  readonly subject?: string | null;
+  readonly body?: string | null;
 }
 
 export interface PageTextRecord {
@@ -1045,7 +1055,6 @@ export const createCallObject = (call: CallRecord) => {
     call.start_cycle,
     call.end_cycle,
     call.cycle_comment,
-    call.survey_comment,
     call.submission_message,
     call.reference_number_format,
     call.proposal_sequence,
@@ -1066,6 +1075,20 @@ export const createCallObject = (call: CallRecord) => {
     call.is_active,
     call.sort_order,
     call.experiment_workflow_id
+  );
+};
+
+export const createEmailTemplateObject = (
+  emailTemplate: EmailTemplateRecord
+) => {
+  return new EmailTemplate(
+    emailTemplate.email_template_id,
+    emailTemplate.created_by,
+    emailTemplate.name,
+    emailTemplate.description,
+    emailTemplate.use_template_file,
+    emailTemplate.subject,
+    emailTemplate.body
   );
 };
 
@@ -1426,7 +1449,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
-  readonly template_id: EmailTemplateId | null;
+  readonly template_id: number | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>

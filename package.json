@@ -53,6 +53,7 @@
     "wait-on": "^9.0.1"
   },
   "devDependencies": {
+    "@types/react-dom": "^19.2.2",
     "husky": "^9.0.10",
     "lint-staged": "^16.0.0"
   }

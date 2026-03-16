@@ -81,7 +81,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   async update(user: UpdateUserByIdArgs): Promise<User> {
     const {
       firstname,
-      user_title,
+      userTitle,
       lastname,
       preferredname,
       institutionId,
@@ -94,7 +94,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     const [userRecord]: UserRecord[] = await database
       .update({
         firstname,
-        user_title,
+        user_title: userTitle,
         lastname,
         preferredname,
         institution_id: institutionId,
@@ -323,7 +323,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .catch((error) => {
         if (isUniqueConstraintError(error)) {
-          throw new GraphQLError('User already exists');
+          throw new GraphQLError('User already exists', {
+            originalError: error,
+          });
         }
         throw new GraphQLError('Could not update user. Check your Inputs.');
       });
