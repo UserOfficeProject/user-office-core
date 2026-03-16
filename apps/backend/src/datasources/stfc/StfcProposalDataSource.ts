@@ -248,7 +248,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     sortField?: string,
     sortDirection?: PaginationSortDirection,
     searchText?: string,
-    principleInvestigator?: number[],
+    _principleInvestigator?: number[],
     tags?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     const stfcUserIds: number[] = searchText
