@@ -70,7 +70,10 @@ export default class StatusActionQueries {
 
         return new EmailActionDefaultConfig(
           allEmailRecipients,
-          emailTemplatesResult.results
+          emailTemplatesResult.results.map((e) => ({
+            id: e.id,
+            name: e.name,
+          }))
         );
 
       case StatusActionType.RABBITMQ:

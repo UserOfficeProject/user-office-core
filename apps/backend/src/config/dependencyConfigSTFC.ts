@@ -43,7 +43,7 @@ import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
+import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
   createPostToRabbitMQHandler,
   createSkipListeningHandler,

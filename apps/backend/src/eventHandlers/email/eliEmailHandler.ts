@@ -8,6 +8,7 @@ import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
+import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -15,6 +16,7 @@ import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
+import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 import { EmailTemplateId } from './emailTemplateId';
 
@@ -26,6 +28,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
+  );
+
+  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+
+  const inviteDataSource = container.resolve<InviteDataSource>(
+    Tokens.InviteDataSource
   );
 
   const callDataSource = container.resolve<CallDataSource>(
@@ -108,7 +118,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const options = {
+      const options: EmailSettings = {
         content: {
           template: emailTemplate.id.toString(),
         },

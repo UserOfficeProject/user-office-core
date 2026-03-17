@@ -1,10 +1,12 @@
+import * as path from 'path';
+
 import EmailTemplates from 'email-templates';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../../config/Tokens';
-import { AdminDataSource } from '../../../datasources/AdminDataSource';
-import { SettingsId } from '../../../models/Settings';
-import SendMailOptions from '../MailService';
+import { Tokens } from '../../config/Tokens';
+import { AdminDataSource } from '../../datasources/AdminDataSource';
+import { SettingsId } from '../../models/Settings';
+import EmailSettings from './EmailSettings';
 import { SMTPMailService } from './SMTPMailService';
 
 jest.mock('email-templates');
@@ -17,9 +19,9 @@ const mockGetSetting = jest.spyOn(mockAdminDataSource, 'getSetting');
 test('Return result should indicate all emails were successfully sent', async () => {
   mockGetSetting.mockResolvedValue(null);
 
-  const options: SendMailOptions = {
+  const options: EmailSettings = {
     content: {
-      template: '1',
+      template: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
     },
     substitution_data: {
       piPreferredname: 'John',
@@ -71,9 +73,9 @@ test('All emails with bcc were successfully sent', async () => {
     })
   );
 
-  const options: SendMailOptions = {
+  const options: EmailSettings = {
     content: {
-      template: '1',
+      template: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
     },
     substitution_data: substitutionData,
     recipients: [
