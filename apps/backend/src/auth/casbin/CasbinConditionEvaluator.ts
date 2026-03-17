@@ -22,6 +22,7 @@ export class CasbinConditionEvaluator {
     private readonly authRegistry: AuthRegistry
   ) {}
 
+  // Called directly by Casbin
   async evaluate(
     sub: UserContextData,
     obj: any,
@@ -39,6 +40,7 @@ export class CasbinConditionEvaluator {
     return this.evalNode(conditionRecord.condition, ctx);
   }
 
+  // Recursively evaluate every rule/section of the condition
   private async evalNode(
     node: any,
     ctx: { user: UserContextData; obj: any }
@@ -52,6 +54,7 @@ export class CasbinConditionEvaluator {
         return true;
       }
 
+      // Early exit in OR conditions
       if (node.combinator === 'or') {
         for (const rule of node.rules) {
           if (await this.evalNode(rule, ctx)) return true;
@@ -64,6 +67,12 @@ export class CasbinConditionEvaluator {
     return this.evalRule(node, ctx);
   }
 
+  /*
+   * Resolves the field (left) and value (right) to determine whether it's a:
+   * a) user attribute (e.g. 'user.id')
+   * b) resource attribute (e.g. 'proposal.title')
+   * c) resource function (e.g. 'isCallEnded' on a proposal resource)
+   */
   private resolveValue(
     field: string,
     ctx: { user: UserContextData; obj: any }
@@ -81,6 +90,7 @@ export class CasbinConditionEvaluator {
     return path.reduce((acc, key) => acc?.[key], base);
   }
 
+  // Evaluate and compare the condition
   private async evalRule(
     rule: any,
     ctx: { user: UserContextData; obj: any }
@@ -94,6 +104,7 @@ export class CasbinConditionEvaluator {
       leftValue = await leftValue(ctx.user, ctx.obj);
     }
 
+    // Allows referencing a user or resource attribute on the right side using {} syntax, e.g. '{user.id}'
     const rightReference = value.match(/^\{(.+)\}$/);
     if (rightReference) {
       rightValue = this.resolveValue(rightReference[1], ctx);
@@ -112,6 +123,7 @@ export class CasbinConditionEvaluator {
       case '!=':
         return leftValue !== rightValue;
 
+      // An array example - for now the left side is always a string
       case 'contains':
         if (!Array.isArray(leftValue)) return false;
 
@@ -127,6 +139,7 @@ export class CasbinConditionEvaluator {
     }
   }
 
+  // Used for DB filtering to recursively walk through the JSON
   async walkAst(node: any, fn: (rule: any) => Promise<void>): Promise<void> {
     if (!node) return;
 
@@ -141,6 +154,7 @@ export class CasbinConditionEvaluator {
     await fn(node);
   }
 
+  // Used in DB filtering to abort early if JSON uses OR conditions
   hasOrCombinator(node: any): boolean {
     if (!node) return false;
 

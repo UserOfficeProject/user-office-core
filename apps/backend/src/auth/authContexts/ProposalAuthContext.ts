@@ -20,6 +20,7 @@ export interface ProposalContextData
   statusShortCode: string;
 }
 
+// Which of the context fields should be shown and selectable in the UI
 export const PROPOSAL_AUTH_UI_ATTRIBUTES: Array<keyof ProposalContextData> = [
   'title',
   'submitted',

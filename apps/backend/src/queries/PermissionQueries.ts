@@ -52,8 +52,6 @@ export default class PermissionQueries {
 
     if (!condition) return null;
 
-    const test = JSON.stringify(condition);
-
-    return test;
+    return JSON.stringify(condition);
   }
 }

@@ -5,6 +5,7 @@ import { StatusDataSource } from '../../datasources/StatusDataSource';
 import { WorkflowType } from '../../models/Workflow';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { UserContextData } from '../authContexts/UserAuthContext';
+import { ResourceType } from '../AuthRegistry';
 import { CasbinConditionEvaluator } from '../casbin/CasbinConditionEvaluator';
 import { CasbinService } from '../casbin/CasbinService';
 
@@ -25,7 +26,7 @@ export class ProposalAuthFilters {
 
   async buildUserProposalsDbFilter(
     user: UserContextData,
-    obj: string,
+    obj: ResourceType,
     act: string
   ): Promise<UserProposalsAuthFilter | null> {
     if (!user.currentRole) return null;

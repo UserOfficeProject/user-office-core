@@ -4,6 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { ProposalAuthContext } from '../auth/authContexts/ProposalAuthContext';
 import { UserAuthContext } from '../auth/authContexts/UserAuthContext';
 import { ProposalAuthFilters } from '../auth/authFilters/ProposalAuthFilters';
+import { ResourceType } from '../auth/AuthRegistry';
 import { CasbinAuthorization } from '../auth/CasbinAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -217,7 +218,7 @@ export default class ProposalQueries {
     return this.dataSource.getInvitedProposal(inviteId);
   }
 
-  // Implemented for demonstration purposes - previously went direct to datasource
+  // Implemented for demonstration purposes - previously went directly to datasource
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async getUserProposals(
     agent: UserWithRole | null,
@@ -234,7 +235,7 @@ export default class ProposalQueries {
     const authFilter =
       await this.proposalAuthFilters.buildUserProposalsDbFilter(
         userContext,
-        'proposal',
+        ResourceType.PROPOSAL,
         'read'
       );
 
