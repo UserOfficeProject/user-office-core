@@ -1463,7 +1463,7 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_by,
     invite.is_email_sent,
     invite.expires_at,
-    invite.template_id as EmailTemplateId | null
+    invite.template_id as EmailTemplateId | null // TODO: This should be resolved as per the new implementation
   );
 
 export interface RoleClaimRecord {

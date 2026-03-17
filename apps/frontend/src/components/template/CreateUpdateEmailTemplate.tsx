@@ -28,14 +28,15 @@ const CreateUpdateEmailTemplate = ({
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
-  const initialValues = {
-    id: emailTemplate?.id || 0,
-    name: emailTemplate?.name || '',
-    description: emailTemplate?.description || '',
-    useTemplateFile: emailTemplate?.useTemplateFile || false,
-    subject: emailTemplate?.subject || '',
-    body: emailTemplate?.body || '',
-  };
+  const initialValues = emailTemplate
+    ? emailTemplate
+    : {
+        name: '',
+        description: '',
+        useTemplateFile: false,
+        subject: '',
+        body: '',
+      };
 
   return (
     <Formik
@@ -45,7 +46,7 @@ const CreateUpdateEmailTemplate = ({
           try {
             const { updateEmailTemplate } = await api({
               toastSuccessMessage: 'Email template updated successfully!',
-            }).updateEmailTemplate(values);
+            }).updateEmailTemplate({ id: emailTemplate.id, ...values });
 
             close(updateEmailTemplate);
           } catch {
