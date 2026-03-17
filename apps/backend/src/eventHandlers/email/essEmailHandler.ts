@@ -18,6 +18,7 @@ import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
+import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 import { EmailTemplateId } from './emailTemplateId';
 
@@ -168,7 +169,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const options = {
+      const options: EmailSettings = {
         content: {
           template: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
@@ -186,8 +187,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
           { address: principalInvestigator.email },
           ...participants.map((partipant) => {
             return {
-              address: partipant.email,
-              header_to: principalInvestigator.email,
+              address: {
+                email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
             };
           }),
         ],
@@ -249,8 +252,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: principalInvestigator.email },
             {
-              address: 'useroffice@esss.se',
-              header_to: principalInvestigator.email,
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: principalInvestigator.email,
+              },
             },
           ],
         })
@@ -377,8 +382,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: fapReviewer.email },
             {
-              address: 'useroffice@esss.se',
-              header_to: fapReviewer.email,
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: fapReviewer.email,
+              },
             },
           ],
         })
@@ -468,8 +475,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: user.email },
             {
-              address: 'useroffice@esss.se',
-              header_to: user.email,
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: user.email,
+              },
             },
           ],
         })

@@ -451,6 +451,7 @@ const sendMail = async (
           const res = await mailService.sendMail({
             content: {
               template: emailTemplateId,
+              email_rfc822: '',
             },
             substitution_data: {
               proposals: recipientWithData.proposals,

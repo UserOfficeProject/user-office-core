@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
 import { Authorized } from '../decorators';
@@ -11,7 +12,8 @@ import { EmailTemplatesFilter } from '../resolvers/queries/EmailTemplatesQuery';
 export default class EmailTemplateQueries {
   constructor(
     @inject(Tokens.EmailTemplateDataSource)
-    public dataSource: EmailTemplateDataSource
+    public dataSource: EmailTemplateDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized([Roles.USER_OFFICER])

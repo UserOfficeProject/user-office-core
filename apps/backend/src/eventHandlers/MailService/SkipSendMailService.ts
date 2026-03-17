@@ -1,6 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import SendMailOptions, { MailService } from './MailService';
+import EmailSettings from './EmailSettings';
+import { MailService, SendMailResults, SparkPostTemplate } from './MailService';
+import { ResultsPromise } from './SparkPost';
 
 export class SkipSendMailService extends MailService {
   constructor() {
@@ -9,7 +11,7 @@ export class SkipSendMailService extends MailService {
     logger.logInfo('Initializing SkipSendMailService', {});
   }
 
-  async sendMail(options: SendMailOptions) {
+  async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
     logger.logInfo('Pretending to send an email', { ...options });
 
     return {
@@ -21,8 +23,10 @@ export class SkipSendMailService extends MailService {
     };
   }
 
-  async getEmailTemplates() {
-    logger.logInfo('Pretending to get email templates', {});
+  async getEmailTemplates(
+    includeDraft: boolean
+  ): ResultsPromise<SparkPostTemplate[]> {
+    logger.logInfo('Pretending to get email templates', { includeDraft });
 
     return {
       results: [

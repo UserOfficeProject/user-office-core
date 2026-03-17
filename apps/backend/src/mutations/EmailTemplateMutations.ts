@@ -94,12 +94,12 @@ export default class EmailTemplateMutations {
       return rejection('Email template not found', { emailTemplateId });
     }
 
-    const hasEmailTemplateIdConnectionStatusAction =
+    const has =
       await this.statusActionsDataSource.hasEmailTemplateIdConnectionStatusAction(
         emailTemplate.id
       );
 
-    if (hasEmailTemplateIdConnectionStatusAction) {
+    if (has) {
       return rejection(
         'Could not delete email template (used in status actions)',
         { emailTemplateId }

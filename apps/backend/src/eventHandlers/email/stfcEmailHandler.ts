@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 import { EmailTemplateId } from './emailTemplateId';
 
@@ -33,14 +34,14 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           startCall,
           endCall,
         }))(event.call);
-        const sendMailOptions = callCreationEmail(
+        const emailSettings = callCreationEmail<typeof eventCallPartial>(
           eventCallPartial,
           EmailTemplateId.CALL_CREATED_EMAIL,
           notificationEmailAddress
         );
 
         mailService
-          .sendMail(sendMailOptions)
+          .sendMail(emailSettings)
           .then((res: any) => {
             logger.logInfo('Emails sent on call creation:', {
               result: res,
@@ -60,12 +61,12 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   }
 }
 
-const callCreationEmail = function createNotificationEmail(
-  notificationInput: Record<string, unknown>,
+const callCreationEmail = function createNotificationEmail<T>(
+  notificationInput: T,
   templateID: string,
   notificationEmailAddress: string
-) {
-  const sendMailOptions = {
+): EmailSettings {
+  const emailSettings: EmailSettings = {
     content: {
       template: templateID,
     },
@@ -79,5 +80,5 @@ const callCreationEmail = function createNotificationEmail(
     ],
   };
 
-  return sendMailOptions;
+  return emailSettings;
 };
