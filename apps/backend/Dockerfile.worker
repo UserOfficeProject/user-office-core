@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy the entire app (needed for build step)
+COPY . .
+
+# Build the TypeScript to JavaScript
+RUN npm run build
+
+# Use node as entrypoint so Argo can pass the job name as argument
+ENTRYPOINT ["node"]
+
+# Default command (can be overridden by Argo)
+CMD ["build/src/asyncJobs/runJob.js"]
