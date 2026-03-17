@@ -9,6 +9,7 @@ export const Tokens = {
   DataAccessUsersDataSource: Symbol('DataAccessUsersDataSource'),
   DataAccessUsersAuthorization: Symbol('DataAccessUsersAuthorization'),
   EmailEventHandler: Symbol('EmailEventHandler'),
+  EmailTemplateDataSource: Symbol('EmailTemplateDataSource'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
   FeedbackDataSource: Symbol('FeedbackDataSource'),

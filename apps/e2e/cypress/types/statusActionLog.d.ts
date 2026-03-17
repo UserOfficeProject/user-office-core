@@ -1,3 +1,5 @@
+import { GetEmailTemplateQuery } from '@user-office-software-libs/shared-types';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -10,6 +12,18 @@ declare global {
        *    cy.expandStatusActionLogsSubmenu()
        */
       navigateToStatusActionLogsSubmenu: (submenuName: string) => void;
+
+      /**
+       * Gets email template
+       *
+       * @returns {typeof getEmailTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.getProposals(getProposalsInput: GetProposalsQueryVariables)
+       */
+      getEmailTemplate: (
+        getEmailTemplatesInput: GetEmailTemplateQueryVariables
+      ) => Cypress.Chainable<GetEmailTemplateQuery>;
     }
   }
 }
