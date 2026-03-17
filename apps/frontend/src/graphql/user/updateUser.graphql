@@ -1,6 +1,6 @@
 mutation updateUser(
   $id: Int!
-  $user_title: String
+  $userTitle: String
   $firstname: String
   $lastname: String
   $preferredname: String
@@ -9,7 +9,7 @@ mutation updateUser(
 ) {
   updateUser(
     id: $id
-    user_title: $user_title
+    userTitle: $userTitle
     firstname: $firstname
     lastname: $lastname
     preferredname: $preferredname

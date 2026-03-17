@@ -419,8 +419,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposal_table_view.principal_investigator'
       )
       .modify((query) => {
-        if (filter?.callId) {
-          query.where('call_id', filter?.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
@@ -456,19 +463,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
+          const trimmedSearchText = searchText.trim();
           query.andWhere((qb) =>
             qb
-              .orWhereRaw('proposal_id ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('title ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('proposal_status_name ILIKE ?', [`%${searchText}%`])
-              .orWhere('users.email', 'ilike', `%${searchText}%`)
-              .orWhere('users.firstname', 'ilike', `%${searchText}%`)
-              .orWhere('users.lastname', 'ilike', `%${searchText}%`)
+              .orWhereRaw('proposal_id ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('title ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('proposal_status_name ILIKE ?', [
+                `%${trimmedSearchText}%`,
+              ])
+              .orWhere('users.email', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.firstname', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.lastname', 'ilike', `%${trimmedSearchText}%`)
               .orWhere('principal_investigator', 'in', principalInvestigator)
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `${searchText}`
+                `${trimmedSearchText}`
               )
           );
         }
@@ -522,8 +532,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.questionaryIds) {
           query.whereIn('proposals.questionary_id', filter.questionaryIds);
         }
-        if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('proposals.call_id', callIdsToFilter);
         }
 
         if (filter?.instrumentId) {
@@ -653,8 +670,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               )
           );
         }
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
@@ -1150,8 +1174,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
 
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
 
         if (filter?.proposalStatusId) {

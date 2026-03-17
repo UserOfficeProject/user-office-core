@@ -121,19 +121,30 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
-        if (filter?.text) {
+        const cleanText = filter?.text?.trim();
+        const sanitizedFilter: ProposalsFilter | undefined = filter
+          ? {
+              ...filter,
+              text: cleanText && cleanText.length > 0 ? cleanText : undefined,
+            }
+          : undefined;
+        if (sanitizedFilter?.text) {
           query.where(function () {
-            this.where('title', 'ilike', `%${filter.text}%`)
-              .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-              .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-              .orWhere('users.email', 'ilike', `%${filter.text}%`)
-              .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
-              .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
+            this.where('title', 'ilike', `%${sanitizedFilter.text}%`)
+              .orWhere('proposal_id', 'ilike', `%${sanitizedFilter.text}%`)
+              .orWhere(
+                'proposal_status_name',
+                'ilike',
+                `%${sanitizedFilter.text}%`
+              )
+              .orWhere('users.email', 'ilike', `%${sanitizedFilter.text}%`)
+              .orWhere('users.firstname', 'ilike', `%${sanitizedFilter.text}%`)
+              .orWhere('users.lastname', 'ilike', `%${sanitizedFilter.text}%`)
               .orWhere('principal_investigator', 'in', stfcUserIds)
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `${filter.text}`
+                `${sanitizedFilter.text}`
               );
           });
         }
@@ -151,8 +162,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             );
           });
         }
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
