@@ -28,7 +28,10 @@
     "lint:fix": "npm run generate:uows && tsc --noEmit && eslint . --ext .js,.ts --fix --quiet",
     "start": "npm run dev",
     "debug": "ts-node-dev --inspect --respawn -T ./index.ts",
-    "generate:uows": "openapi --output ./generated --name UOWS --input ./openapi.yaml"
+    "generate:uows": "openapi --output ./generated --name UOWS --input ./openapi.yaml",
+    "test:job:local": "npm run build && node ./build/src/asyncJobs/runJob.js",
+    "test:job:dev": "ts-node-dev -r tsconfig-paths/register ./src/asyncJobs/runJob.ts checkAllCallsEnded",
+    "run:job": "ts-node-dev -r tsconfig-paths/register ./src/asyncJobs/runJob.ts"
   },
   "author": "",
   "license": "ISC",
