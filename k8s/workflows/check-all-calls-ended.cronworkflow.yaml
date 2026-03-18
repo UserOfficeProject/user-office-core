@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: check-all-calls-ended
+  namespace: argo
+spec:
+  schedule: "*/5 * * * *"
+  timezone: "Europe/London"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  workflowSpec:
+    entrypoint: run-job
+    templates:
+      - name: run-job
+        container:
+          image: core-backend-worker:local
+          imagePullPolicy: Never
+          command: ["node", "build/src/asyncJobs/runJob.js", "checkAllCallsEnded"]
+          envFrom:
+            - secretRef:
+                name: backend-worker-env
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
