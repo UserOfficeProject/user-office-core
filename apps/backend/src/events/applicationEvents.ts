@@ -452,6 +452,10 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   experimentsafety: ExperimentSafety;
 }
 
+interface ExperimentESFSubmittedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_SUBMITTED;
+  experimentsafety: ExperimentSafety;
+}
 interface EmailTemplateCreatedEvent extends GeneralEvent {
   type: Event.EMAIL_TEMPLATE_CREATED;
   emailtemplate: EmailTemplate;
@@ -552,6 +556,7 @@ export type ApplicationEvent =
   | ExperimentSafetyManagementDecisionSubmittedByESREvent
   | ExperimentSafetyStatusChangedByWorkflowEvent
   | ExperimentSafetyStatusChangedByUserEvent
+  | ExperimentESFSubmittedEvent
   | EmailTemplateCreatedEvent
   | EmailTemplateUpdatedEvent
   | EmailTemplateDeletedEvent;

@@ -419,6 +419,7 @@ export const EventLabel = new Map<Event, string>([
     Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
     'Event occurs when experiment safety status is changed by workflow',
   ],
+  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
   [Event.EMAIL_TEMPLATE_CREATED, 'Event occurs when email template is created'],
   [Event.EMAIL_TEMPLATE_UPDATED, 'Event occurs when email template is updated'],
   [Event.EMAIL_TEMPLATE_DELETED, 'Event occurs when email template is deleted'],
