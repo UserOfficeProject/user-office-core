@@ -126,7 +126,9 @@ test('Whitespace does not stop user-officer role viewing proposal', () => {
         undefined,
         undefined,
         undefined,
-        'shortCode'
+        'shortCode',
+        undefined,
+        undefined
       );
     });
 });
