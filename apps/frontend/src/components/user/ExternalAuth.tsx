@@ -35,6 +35,7 @@ function ExternalAuth() {
   const code = searchParams.get('code');
   const token = searchParams.get('token');
   const errorDescription = searchParams.get('error_description');
+  const error = searchParams.get('error');
 
   const unauthorizedApi = useUnauthorizedApi();
   const navigate = useNavigate();
@@ -163,6 +164,8 @@ function ExternalAuth() {
 
     if (errorDescription) {
       handleError(errorDescription);
+    } else if (error) {
+      handleError(error);
     } else if (authorizationCode) {
       handleAuthorizationCode(authorizationCode);
     } else {
@@ -170,6 +173,7 @@ function ExternalAuth() {
     }
   }, [
     code,
+    error,
     errorDescription,
     handleLogin,
     navigate,
