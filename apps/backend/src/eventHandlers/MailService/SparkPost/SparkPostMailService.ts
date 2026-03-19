@@ -55,6 +55,7 @@ export class SparkPostMailService extends MailService {
               },
             }
       ),
+      substitution_data: options.substitution_data,
     };
   }
 
