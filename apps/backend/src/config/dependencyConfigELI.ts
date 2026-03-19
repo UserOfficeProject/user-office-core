@@ -44,7 +44,7 @@ import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/Vi
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { eliEmailHandler } from '../eventHandlers/email/eliEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
+import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
 import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,

@@ -440,10 +440,8 @@ describe('essEmailHandler co-proposer invites', () => {
       expect(arg.recipients).toEqual([
         { address: dummyUser.email },
         {
-          address: {
-            email: basicDummyUser.email,
-            header_to: dummyUser.email,
-          },
+          address: basicDummyUser.email,
+          header_to: dummyUser.email,
         },
       ]);
     });
@@ -503,10 +501,8 @@ describe('essEmailHandler co-proposer invites', () => {
           recipients: expect.arrayContaining([
             { address: dummyUser.email },
             {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: dummyUser.email,
-              },
+              address: 'useroffice@esss.se',
+              header_to: dummyUser.email,
             },
           ]),
         })
@@ -538,10 +534,8 @@ describe('essEmailHandler co-proposer invites', () => {
           recipients: expect.arrayContaining([
             { address: dummyUser.email },
             {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: dummyUser.email,
-              },
+              address: 'useroffice@esss.se',
+              header_to: dummyUser.email,
             },
           ]),
         })
