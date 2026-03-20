@@ -50,6 +50,16 @@ context('Status actions tests', () => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
+    cy.createInstrument(instrument).then((result) => {
+      if (result.createInstrument) {
+        const createdInstrumentId = result.createInstrument.id;
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId }],
+        });
+      }
+    });
+
     cy.createEmailTemplate({
       name: initialDBData.emailTemplates.template1.name,
       description: initialDBData.emailTemplates.template1.description,

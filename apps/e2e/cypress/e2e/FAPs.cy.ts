@@ -2078,17 +2078,21 @@ context('Fap reviews tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap1.gradeGuide,
         active: true,
-        reviewVisibility: 1,
+        reviewVisibility: 3,
       });
 
-      cy.updateFap({
-        id: createdFapId,
-        code: fap1.code,
-        description: fap1.description,
-        numberRatingsRequired: 2,
-        gradeGuide: fap1.gradeGuide,
-        active: true,
-        reviewVisibility: 3,
+      cy.updateCall({
+        id: initialDBData.call.id,
+        endFapReview: new Date(
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        ).toISOString(),
+      });
+
+      cy.updateCall({
+        id: createdCallId,
+        endFapReview: new Date(
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        ).toISOString(),
       });
 
       // Reviewer should not see any reviews when review visibility is set to 3 (reviews_visible_fap_ended)
