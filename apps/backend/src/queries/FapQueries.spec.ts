@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { dummyCall } from '../datasources/mockups/CallDataSource';
 import {
   anotherDummyFap,
   dummyFap,
@@ -108,7 +109,7 @@ describe('Test FapQueries', () => {
 
     test('A userofficer can get proposal assignments no matter the review visibility', async () => {
       const fapId = 3;
-      const proposalPk = 100;
+      const proposalPk = 1;
 
       await FapQueriesInstance.getFapProposalAssignments(
         dummyUserOfficerWithRole,
@@ -120,7 +121,7 @@ describe('Test FapQueries', () => {
 
     test('A reviewer gets filtered assignments when PROPOSAL_REVIEWS_COMPLETE and not all reviews are in', async () => {
       const fapId = 3;
-      const proposalPk = 100;
+      const proposalPk = 1;
 
       await FapQueriesInstance.getFapProposalAssignments(
         dummyFapReviewerWithRole,
@@ -136,7 +137,22 @@ describe('Test FapQueries', () => {
 
     test('A reviewer gets filtered assignments when REVIEWS_VISIBLE_FAP_ENDED and fap is still in review', async () => {
       const fapId = 4;
-      const proposalPk = 100;
+      const proposalPk = 1;
+
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 1);
+
+      const callWithFutureEndFapReview = {
+        ...dummyCall,
+        id: 1,
+        endFapReview: futureDate,
+      };
+
+      const callDataSourceSpy = jest.spyOn(
+        FapQueriesInstance['callDataSource'],
+        'getCall'
+      );
+      callDataSourceSpy.mockResolvedValue(callWithFutureEndFapReview);
 
       await FapQueriesInstance.getFapProposalAssignments(
         dummyFapReviewerWithRole,
@@ -148,11 +164,28 @@ describe('Test FapQueries', () => {
         proposalPk,
         dummyFapReviewerWithRole.id
       );
+
+      callDataSourceSpy.mockRestore();
     });
 
     test('A reviewer gets unfiltered assignments when REVIEWS_VISIBLE_FAP_ENDED and fap review is finished', async () => {
       const fapId = 4;
-      const proposalPk = 101;
+      const proposalPk = 1;
+
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() - 1);
+
+      const callWithFutureEndFapReview = {
+        ...dummyCall,
+        id: 1,
+        endFapReview: futureDate,
+      };
+
+      const callDataSourceSpy = jest.spyOn(
+        FapQueriesInstance['callDataSource'],
+        'getCall'
+      );
+      callDataSourceSpy.mockResolvedValue(callWithFutureEndFapReview);
 
       await FapQueriesInstance.getFapProposalAssignments(
         dummyFapReviewerWithRole,
@@ -164,7 +197,7 @@ describe('Test FapQueries', () => {
 
     test('A reviewer gets unfiltered assignments when REVIEWS_VISIBLE', async () => {
       const fapId = 5;
-      const proposalPk = 100;
+      const proposalPk = 1;
 
       await FapQueriesInstance.getFapProposalAssignments(
         dummyFapReviewerWithRole,

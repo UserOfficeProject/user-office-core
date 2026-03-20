@@ -8,6 +8,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
+import { Call } from '../models/Call';
 import { FapReviewVisibility } from '../models/Fap';
 import { ReviewStatus } from '../models/Review';
 import { Roles } from '../models/Role';
@@ -186,36 +187,38 @@ export default class FapQueries {
       fapId
     );
 
-    const visibility = await this.dataSource.getFapReviewVisibility(fapId);
+    if (isUserOfficer || isChairOrSecretary) {
+      // Applying no restrictions for user officers, fap chairs and fap secretaries
+      return this.dataSource.getFapProposalAssignments(fapId, proposalPk, null);
+    }
 
-    let reviewsVisibleOnFap = false;
+    const visibility = await this.dataSource.getFapReviewVisibility(fapId);
+    let fapAccessRestrictions = true;
+
     switch (visibility) {
       case FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE:
-        reviewsVisibleOnFap = await this.isReviewsCompleteVisible(
+        const allFapReviewsComplete = await this.allFapReviewsComplete(
           fapId,
           proposalPk,
           !!isApiToken,
           isUserOfficer,
           isChairOrSecretary
         );
+        if (allFapReviewsComplete) fapAccessRestrictions = false;
         break;
       case FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED:
-        reviewsVisibleOnFap = this.isReviewsVisibleOnFapEnded(call);
+        const hasFapEnded = this.hasFapEnded(call);
+        if (hasFapEnded) fapAccessRestrictions = false;
         break;
       case FapReviewVisibility.REVIEWS_VISIBLE:
-        reviewsVisibleOnFap = this.isReviewsAlwaysVisible();
+        fapAccessRestrictions = false;
         break;
     }
-
-    const shouldRestrictToReviewerId =
-      !isUserOfficer && !isChairOrSecretary && !reviewsVisibleOnFap;
-
-    const reviewerId = shouldRestrictToReviewerId ? agent.id : null;
 
     return this.dataSource.getFapProposalAssignments(
       fapId,
       proposalPk,
-      reviewerId
+      fapAccessRestrictions ? agent.id : null
     );
   }
 
@@ -264,7 +267,7 @@ export default class FapQueries {
     );
   }
 
-  private async isReviewsCompleteVisible(
+  private async allFapReviewsComplete(
     fapId: number,
     proposalPk: number,
     isApiToken: boolean,
@@ -289,13 +292,9 @@ export default class FapQueries {
     );
   }
 
-  private isReviewsVisibleOnFapEnded(call: any) {
+  private hasFapEnded(call: Call) {
     const currentDate = DateTime.now();
 
     return call.endFapReview?.getTime() <= currentDate.toMillis();
-  }
-
-  private isReviewsAlwaysVisible() {
-    return true;
   }
 }
