@@ -21,6 +21,7 @@ export const getCurrentUrlValues = () => {
   queryParams.delete('code');
   queryParams.delete('token');
   queryParams.delete('error_description');
+  queryParams.delete('error');
 
   return {
     currentUrlWithoutParams,
@@ -34,8 +35,7 @@ function ExternalAuth() {
   const sessionid = searchParams.get('sessionid');
   const code = searchParams.get('code');
   const token = searchParams.get('token');
-  const errorDescription = searchParams.get('error_description');
-  const error = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description') ?? searchParams.get('error');
 
   const unauthorizedApi = useUnauthorizedApi();
   const navigate = useNavigate();
@@ -161,11 +161,9 @@ function ExternalAuth() {
     setView(<LoadingMessage />);
 
     const authorizationCode = sessionid ?? code ?? token;
-
+    
     if (errorDescription) {
       handleError(errorDescription);
-    } else if (error) {
-      handleError(error);
     } else if (authorizationCode) {
       handleAuthorizationCode(authorizationCode);
     } else {
