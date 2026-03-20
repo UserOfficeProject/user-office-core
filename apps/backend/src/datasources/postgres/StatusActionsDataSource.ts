@@ -133,7 +133,7 @@ export default class PostgresStatusActionsDataSource
     const fromClause = "config->'recipientsWithEmailTemplate'";
     const pattern = `\'[{"emailTemplate": {"id": "${emailTemplateId}"}}]\'`;
     const countResult = await database.raw(
-      `select count(*) from workflow_connection_has_actions where ${fromClause} @> ${pattern}`
+      `select count(*) from workflow_status_connection_has_workflow_status_actions where ${fromClause} @> ${pattern}`
     );
 
     return Number(countResult.rows[0].count) > 0;

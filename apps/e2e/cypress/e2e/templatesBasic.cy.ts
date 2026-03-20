@@ -2115,6 +2115,8 @@ context('Template Basic tests', () => {
       cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
       }).then((result) => {
