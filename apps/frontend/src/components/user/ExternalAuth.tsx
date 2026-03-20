@@ -35,7 +35,8 @@ function ExternalAuth() {
   const sessionid = searchParams.get('sessionid');
   const code = searchParams.get('code');
   const token = searchParams.get('token');
-  const errorDescription = searchParams.get('error_description') ?? searchParams.get('error');
+  const errorDescription =
+    searchParams.get('error_description') ?? searchParams.get('error');
 
   const unauthorizedApi = useUnauthorizedApi();
   const navigate = useNavigate();
@@ -161,7 +162,7 @@ function ExternalAuth() {
     setView(<LoadingMessage />);
 
     const authorizationCode = sessionid ?? code ?? token;
-    
+
     if (errorDescription) {
       handleError(errorDescription);
     } else if (authorizationCode) {
