@@ -127,7 +127,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -147,7 +149,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -738,7 +742,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title, role.description)
+          new Role(
+            role.role_id,
+            role.short_code,
+            role.title,
+            role.description,
+            role.permissions,
+            role.is_root_role
+          )
       );
   }
 

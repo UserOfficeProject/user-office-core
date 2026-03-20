@@ -13,7 +13,7 @@ export class EmailTemplate implements EmailTemplateOrigin {
   @Field(() => String)
   public name: string;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public description: string;
 
   @Field(() => Boolean)

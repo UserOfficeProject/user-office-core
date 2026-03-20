@@ -4,5 +4,11 @@ query getRoles {
     shortCode
     title
     description
+    isRootRole
+    permissions
+    tags {
+      id
+      name
+    }
   }
 }

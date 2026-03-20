@@ -20,6 +20,8 @@ import {
   ProposalViewRecord,
 } from '../postgres/records';
 import PostgresStatusDataSource from '../postgres/StatusDataSource';
+import PostgresTagDataSource from '../postgres/TagDataSource';
+import PostgresUserDataSource from '../postgres/UserDataSource';
 import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
@@ -28,7 +30,8 @@ import { StfcUserDataSource } from './StfcUserDataSource';
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
   new PostgresAdminDataSource(),
-  new PostgresCallDataSource()
+  new PostgresCallDataSource(),
+  new PostgresTagDataSource(new PostgresUserDataSource())
 );
 
 @injectable()
@@ -230,7 +233,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     offset?: number,
     sortField?: string,
     sortDirection?: PaginationSortDirection,
-    searchText?: string
+    searchText?: string,
+    _principleInvestigator?: number[],
+    tags?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
     const stfcUserIds: number[] = searchText
       ? [
@@ -246,7 +251,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       sortField,
       sortDirection,
       searchText,
-      stfcUserIds
+      stfcUserIds,
+      tags
     );
 
     const propsWithTechReviewerDetails = await this.getTechReviewersDetails(
