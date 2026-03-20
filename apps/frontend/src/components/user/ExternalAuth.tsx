@@ -171,7 +171,6 @@ function ExternalAuth() {
     }
   }, [
     code,
-    error,
     errorDescription,
     handleLogin,
     navigate,
