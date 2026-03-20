@@ -20,6 +20,7 @@ import { User as UserOrigin } from '../../models/User';
 import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
 import { Fap } from './Fap';
+import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { Invite } from './Invite';
 import { Proposal } from './Proposal';
@@ -51,7 +52,7 @@ export class User implements Partial<UserOrigin> {
   public id: number;
 
   @Field(() => String)
-  public user_title: string;
+  public userTitle: string;
 
   @Field()
   public firstname: string;
@@ -178,6 +179,11 @@ export class UserResolver {
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.instrument.dataSource.getUserInstruments(user.id);
+  }
+
+  @FieldResolver(() => Institution)
+  async institution(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.admin.getInstitution(user.institutionId);
   }
 }
 

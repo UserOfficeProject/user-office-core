@@ -8,6 +8,7 @@ import i18n from 'i18n';
 import { BasicUserDetails, TechniqueFragment, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
+import { StrictColumn } from 'utils/utilTypes';
 type AssignedScientistsTableProps = {
   technique: TechniqueFragment;
   removeScientistFromTechnique: (
@@ -29,7 +30,7 @@ const assignmentScientistColumns = [
     title: 'Institution',
     field: 'institution',
   },
-];
+] satisfies StrictColumn<BasicUserDetails>[];
 
 const AssignedScientistsTable = ({
   technique,

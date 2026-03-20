@@ -14,7 +14,6 @@ export class Call {
     public startCycle: Date,
     public endCycle: Date,
     public cycleComment: string,
-    public surveyComment: string,
     public submissionMessage: string,
     public referenceNumberFormat: string,
     public proposalSequence: number,

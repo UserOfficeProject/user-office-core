@@ -7,6 +7,8 @@ import { ResultsPromise } from './SparkPost';
 export class SkipSendMailService extends MailService {
   constructor() {
     super();
+
+    logger.logInfo('Initializing SkipSendMailService', {});
   }
 
   async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
@@ -31,10 +33,10 @@ export class SkipSendMailService extends MailService {
         {
           last_use: '2023-08-21T12:23:59+00:00',
           description: 'A test message from SparkPost.com',
-          id: 'my-first-email',
+          id: '1',
           has_draft: false,
           published: true,
-          name: 'My First Email',
+          name: 'test-name-1',
           shared_with_subaccounts: false,
           has_published: true,
           last_update_time: '2022-08-14T08:42:50+00:00',
@@ -42,10 +44,10 @@ export class SkipSendMailService extends MailService {
         {
           last_use: '2023-08-22T12:23:59+00:00',
           description: 'A test message from SparkPost.com',
-          id: 'my-second-email',
+          id: '2',
           has_draft: false,
           published: true,
-          name: 'My Second Email',
+          name: 'test-name-2',
           shared_with_subaccounts: false,
           has_published: true,
           last_update_time: '2023-08-14T08:42:50+00:00',

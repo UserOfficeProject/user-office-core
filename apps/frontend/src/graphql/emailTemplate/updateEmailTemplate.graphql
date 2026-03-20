@@ -1,0 +1,21 @@
+mutation updateEmailTemplate(
+  $id: Int!
+  $name: String!
+  $description: String!
+  $useTemplateFile: Boolean!
+  $subject: String
+  $body: String
+) {
+  updateEmailTemplate(
+    updateEmailTemplateInput: {
+      id: $id
+      name: $name
+      description: $description
+      useTemplateFile: $useTemplateFile
+      subject: $subject
+      body: $body
+    }
+  ) {
+    ...emailTemplate
+  }
+}
