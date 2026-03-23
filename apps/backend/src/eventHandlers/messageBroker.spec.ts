@@ -26,7 +26,10 @@ import {
   dummyUser,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { getExperimentMessageData, getProposalMessageData } from './messageBroker';
+import {
+  getExperimentMessageData,
+  getProposalMessageData,
+} from './messageBroker';
 
 describe('messageBroker', () => {
   describe('getProposalMessageData', () => {
