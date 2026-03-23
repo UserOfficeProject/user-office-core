@@ -13,6 +13,9 @@ import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
 
+export const dummyInstitution = { id: 1, name: 'Test Institution', country: 1 };
+export const dummyCountry = { countryId: 1, country: 'Test Country' };
+
 export const basicDummyUser = new BasicUserDetails(
   2,
   'john',
@@ -379,8 +382,8 @@ export class UserDataSourceMock implements UserDataSource {
   } | null> {
     return {
       user: dummyUser,
-      institution: { id: 1, name: 'Test Institution', country: 1 },
-      country: { countryId: 1, country: 'Test Country' },
+      institution: dummyInstitution,
+      country: dummyCountry,
     };
   }
 
@@ -423,8 +426,8 @@ export class UserDataSourceMock implements UserDataSource {
     return [
       {
         user: dummyUser,
-        institution: { id: 1, name: 'Test Institution', country: 1 },
-        country: { countryId: 1, country: 'Test Country' },
+        institution: dummyInstitution,
+        country: dummyCountry,
       },
     ];
   }
@@ -581,8 +584,8 @@ export class UserDataSourceMock implements UserDataSource {
     return [
       {
         user: dummyUser,
-        institution: { id: 1, name: 'Test Institution', country: 1 },
-        country: { countryId: 1, country: 'Test Country' },
+        institution: dummyInstitution,
+        country: dummyCountry,
       },
     ];
   }
