@@ -1,3 +1,4 @@
+import { OpenTelemetryTransportV3 } from '@opentelemetry/winston-transport';
 import {
   Winston,
   WinstonLogger,
@@ -35,6 +36,11 @@ function maskSensitiveFields(
 }
 
 export function configureSTFCWinstonLogger() {
+  const transports: Winston.transport[] = [new Winston.transports.Console()];
+  if (!!process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
+    transports.push(new OpenTelemetryTransportV3());
+  }
+
   setLogger(
     new WinstonLogger({
       level: 'info',
@@ -48,7 +54,7 @@ export function configureSTFCWinstonLogger() {
           return `[${maskedArgs.timestamp}] ${maskedArgs.level.toUpperCase()} - ${maskedArgs.message} \n ${JSON.stringify(maskedArgs)}`;
         })
       ),
-      transports: [new Winston.transports.Console()],
+      transports,
     })
   );
 }
