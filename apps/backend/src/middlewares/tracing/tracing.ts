@@ -217,10 +217,13 @@ export default async function startTracing(): Promise<void> {
   }
 
   try {
-    const tracingConfig = {
-      tracesEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-      logsEndpoint: process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT,
-    };
+    const tracingConfig: Record<string, string> = {};
+    if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+      tracingConfig.tracesEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+    }
+    if (process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
+      tracingConfig.logsEndpoint = process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
+    }
 
     console.log('Starting OpenTelemetry tracing with configuration:', {
       ...tracingConfig,
