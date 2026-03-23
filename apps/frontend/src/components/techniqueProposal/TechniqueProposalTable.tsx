@@ -137,7 +137,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const proposalId = searchParams.get('proposalId');
   const to = searchParams.get('to');
   const from = searchParams.get('from');
-  const proposalStatusId = searchParams.get('proposalStatusId');
+  const proposalStatusId = searchParams.get('status');
   const search = searchParams.get('search');
   const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
@@ -174,7 +174,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   ];
 
   const techPropStatuses = proposalStatuses.filter((ps) =>
-    techPropStatusCodes.includes(ps.name as StatusCode)
+    techPropStatusCodes.includes(ps.id as StatusCode)
   );
 
   // Use a consistent order representing the technique proposal flow
@@ -188,7 +188,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const excludedStatusIds = proposalStatuses
     .filter((status) => !techPropStatusCodes.includes(status.id as StatusCode))
     .map((status) => status.id);
-
+  console.log({ proposalStatusId });
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
     instrumentFilter: {
@@ -206,7 +206,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       from: from ? from : null,
     },
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    proposalStatusId: proposalStatusId,
+    proposalStatusId:
+      !proposalStatusId || proposalStatusId == 'ALL' ? null : proposalStatusId,
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
@@ -846,6 +847,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         updatedFilter.callIds = calls?.map((call) => call.id) || [];
       } else {
         updatedFilter.callIds = [filter.callId as number];
+      }
+
+      if (filter.proposalStatusId === 'ALL') {
+        updatedFilter.proposalStatusId = null;
       }
     }
 
