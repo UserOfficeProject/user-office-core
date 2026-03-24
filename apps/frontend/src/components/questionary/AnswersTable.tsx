@@ -22,7 +22,9 @@ export function AnswersTable(props: AnswersTableProps) {
         },
       })}
     >
-      <TableCell width={'20%'} padding={'normal'}>{rowData.label}</TableCell>
+      <TableCell width={'20%'} padding={'normal'}>
+        {rowData.label}
+      </TableCell>
       <TableCell>{rowData.value}</TableCell>
     </TableRow>
   );
