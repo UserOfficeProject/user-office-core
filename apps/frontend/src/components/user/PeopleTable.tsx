@@ -455,6 +455,7 @@ const PeopleTable = ({
           }}
           options={{
             search: search,
+            searchDebounceDelay: 1500,
             searchText: persistUrlQueryParams
               ? searchParams.get('search') || undefined
               : undefined,
