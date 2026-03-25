@@ -1,17 +1,29 @@
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
+
 export type Entity = { id: number };
 
 export type GuardFn = (entity: Entity) => boolean | Promise<boolean>;
-export type ActionFn = (entity: Entity) => void | Promise<void>;
+export type ActionFn = (
+  statusAction: ConnectionHasStatusAction,
+  entity: [Entity]
+) => void | Promise<void>;
+
+export type StatusActionExecutor = (
+  previousStatusId: number,
+  connectionId: number,
+  statusAction: ConnectionHasStatusAction,
+  entity: Entity
+) => void | Promise<void>;
 
 export type TransitionConfig = {
   connectionId: number;
   target: string;
   guards: GuardFn[];
+  actions?: ConnectionHasStatusAction[];
 };
 
 export type StateConfig = {
   on?: Record<string, TransitionConfig>;
-  action?: ActionFn;
   meta?: Record<string, unknown>;
 };
 
@@ -44,10 +56,11 @@ export type Actor = {
   ) => Promise<{ nextStateValue: string; connectionId: number }>;
 };
 
-export const createActor = (
+export const createActor = <T extends Entity>(
   machine: Machine,
-  entity: Entity,
-  startingState?: string
+  entity: T,
+  startingState?: string,
+  executeStatusAction?: StatusActionExecutor
 ): Actor => {
   if (entity === undefined || entity === null) {
     throw new Error('entity is required');
@@ -59,15 +72,6 @@ export const createActor = (
   if (!schema.states[currentState]) {
     throw new Error(`Unknown state "${currentState}"`);
   }
-
-  const runAction = async (stateName: string) => {
-    const action = schema.states[stateName]?.action;
-    if (action) {
-      await action(entity);
-    }
-  };
-
-  void runAction(currentState);
 
   const getState = () => currentState;
 
@@ -99,7 +103,10 @@ export const createActor = (
       throw new Error(`Unknown target state "${transition.target}"`);
     }
 
-    await runAction(transition.target);
+    for (const action of transition.actions ?? []) {
+      await executeStatusAction?.(1, transition.connectionId, action, entity); // FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX
+    }
+
     currentState = transition.target;
 
     return {

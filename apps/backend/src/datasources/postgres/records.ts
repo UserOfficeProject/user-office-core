@@ -53,7 +53,10 @@ import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
-import { StatusActionType } from '../../models/StatusAction';
+import {
+  ConnectionHasStatusAction,
+  StatusActionType,
+} from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
 import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
@@ -653,6 +656,7 @@ export interface WorkflowStructure {
     prevWorkflowStatusId: number;
     nextWorkflowStatusId: number;
     statusChangingEvents: string[];
+    statusActions: ConnectionHasStatusAction[];
   }[];
 }
 
@@ -765,9 +769,10 @@ export interface StatusActionRecord {
 
 export interface WorkflowConnectionHasActionsRecord {
   readonly workflow_status_connection_id: number;
-  readonly workflow_status_action_id: number;
   readonly workflow_id: number;
+  readonly workflow_status_action_id: number;
   readonly config: string;
+  readonly type: string;
 }
 
 export interface ProposalInternalCommentRecord {
@@ -1369,6 +1374,19 @@ export const createStatusActionsLogObject = (
     statusActionLog.status_actions_tstamp
   );
 };
+
+export const createWorkflowConnectionAction = (
+  connectionAction: WorkflowConnectionHasActionsRecord
+) => {
+  return new ConnectionHasStatusAction(
+    connectionAction.workflow_status_connection_id,
+    connectionAction.workflow_id,
+    connectionAction.workflow_status_action_id,
+    connectionAction.type as StatusActionType,
+    connectionAction.config ? JSON.parse(connectionAction.config) : null
+  );
+};
+
 export interface TechniqueRecord {
   readonly technique_id: number;
   readonly name: string;

@@ -10,36 +10,31 @@ describe('simpleStateMachine', () => {
     ).toThrow('Unknown initial state "missing"');
   });
 
-  it('runs entry actions for the initial and target states', async () => {
-    const initialAction = jest.fn().mockResolvedValue(undefined);
-    const approvedAction = jest.fn().mockResolvedValue(undefined);
+  it('runs transition actions when a transition fires', async () => {
+    const transitionAction = jest.fn().mockResolvedValue(undefined);
     const machine = createMachine({
       initial: 'pending',
       states: {
         pending: {
-          action: initialAction,
           on: {
             APPROVE: {
               target: 'approved',
               guards: [],
               connectionId: 0,
+              actions: [transitionAction],
             },
           },
         },
-        approved: {
-          action: approvedAction,
-        },
+        approved: {},
       },
     });
 
     const actor = createActor(machine, { id: 1 });
-    await Promise.resolve();
-    expect(initialAction).toHaveBeenCalledWith({ id: 1 });
 
     const nextState = await actor.event('APPROVE');
     expect(nextState.nextStateValue).toBe('approved');
     expect(actor.getState()).toBe('approved');
-    expect(approvedAction).toHaveBeenCalledWith({ id: 1 });
+    expect(transitionAction).toHaveBeenCalledWith({ id: 1 });
   });
 
   it('prevents transitions when the guard resolves to false', async () => {

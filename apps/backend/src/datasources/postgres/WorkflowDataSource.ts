@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { Workflow } from '../../models/Workflow';
 import { WorkflowConnection } from '../../models/WorkflowConnections';
@@ -14,7 +15,9 @@ import { StatusDataSource } from '../StatusDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
+  createWorkflowConnectionAction,
   StatusChangingEventRecord,
+  WorkflowConnectionHasActionsRecord,
   WorkflowConnectionRecord,
   WorkflowRecord,
   WorkflowStatusRecord,
@@ -556,19 +559,63 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       normalizedWorkflowConnectionsMap.values()
     );
 
+    const connectionIds = normalizedWorkflowConnections.map(
+      (c) => c.workflowStatusConnectionId
+    );
+
+    const statusActionsRows: WorkflowConnectionHasActionsRecord[] =
+      connectionIds.length > 0
+        ? await database
+            .select(
+              'wca.workflow_status_connection_id ',
+              'wsa.workflow_status_action_id',
+              'wsa.type',
+              'wca.config'
+            )
+            .from(
+              'workflow_status_connection_has_workflow_status_actions as wca'
+            )
+            .join('workflow_status_actions as wsa', {
+              'wsa.workflow_status_action_id': 'wca.workflow_status_action_id',
+            })
+            .whereIn('wca.workflow_status_connection_id', connectionIds)
+        : [];
+
+    const statusActions = statusActionsRows.map(createWorkflowConnectionAction);
+
+    const statusActionsByConnectionId = new Map<
+      number,
+      ConnectionHasStatusAction[]
+    >();
+    statusActions.forEach((row) => {
+      if (!statusActionsByConnectionId.has(row.connectionId)) {
+        statusActionsByConnectionId.set(row.connectionId, []);
+      }
+      statusActionsByConnectionId.get(row.connectionId)!.push(row);
+    });
+
+    const connectionsWithActions = normalizedWorkflowConnections.map(
+      (conn) => ({
+        ...conn,
+        statusActions:
+          statusActionsByConnectionId.get(conn.workflowStatusConnectionId) ??
+          [],
+      })
+    );
+
     if (workflow.updated_at) {
       this.workflowStructureCache.set(workflowId, {
         updatedAt: new Date(workflow.updated_at).getTime(),
         structure: {
           workflowStatuses,
-          workflowConnections: normalizedWorkflowConnections,
+          workflowConnections: connectionsWithActions,
         },
       });
     }
 
     return {
       workflowStatuses,
-      workflowConnections: normalizedWorkflowConnections,
+      workflowConnections: connectionsWithActions,
     };
   }
 }

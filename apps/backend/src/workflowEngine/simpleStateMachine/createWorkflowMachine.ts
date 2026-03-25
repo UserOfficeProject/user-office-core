@@ -65,11 +65,13 @@ export const createWorkflowMachine = async (workflowId: number) => {
       }
 
       const guards = getEventsGuards(conn.statusChangingEvents);
+      const actions = conn.statusActions;
       wfStatuses[sourceStatus].on = wfStatuses[sourceStatus].on || {};
       wfStatuses[sourceStatus].on![event] = {
         connectionId: conn.workflowStatusConnectionId,
         target: targetStatus,
         guards,
+        actions,
       };
     });
   });

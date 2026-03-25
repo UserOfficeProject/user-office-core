@@ -55,7 +55,7 @@ export default class PostgresStatusActionsDataSource
   private createConnectionStatusActionObject(
     actionStatusRecord: WorkflowConnectionHasActionsRecord & {
       workflow_status_action_id: number;
-      type: StatusActionType;
+      type: string;
       config: typeof StatusActionConfig;
     }
   ) {
@@ -63,9 +63,9 @@ export default class PostgresStatusActionsDataSource
       actionStatusRecord.workflow_status_connection_id,
       actionStatusRecord.workflow_status_action_id,
       actionStatusRecord.workflow_id,
-      actionStatusRecord.type,
+      actionStatusRecord.type as StatusActionType,
       this.createStatusActionConfig(
-        actionStatusRecord.type,
+        actionStatusRecord.type as StatusActionType,
         actionStatusRecord.config
       )
     );
@@ -159,10 +159,7 @@ export default class PostgresStatusActionsDataSource
       throw new GraphQLError(`StatusAction not found ${statusAction.actionId}`);
     }
 
-    return this.createConnectionStatusActionObject({
-      type: statusAction.type,
-      ...updatedStatusAction,
-    });
+    return this.createConnectionStatusActionObject(updatedStatusAction);
   }
 
   async getStatusAction(actionId: number): Promise<StatusAction> {

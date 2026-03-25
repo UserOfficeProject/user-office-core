@@ -7,6 +7,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
+import { executeProposalStatusAction } from './actions/executeProposalStatusAction';
 import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
 import { createActor } from './simpleStateMachine/stateMachnine';
 
@@ -123,7 +124,15 @@ export class ProposalWorkflowEngine {
     const actor = createActor(
       machine,
       { id: proposal.primaryKey },
-      currentProposalState
+      currentProposalState,
+      (entityId, connectionId, statusAction, _entity) =>
+        executeProposalStatusAction(statusAction, [
+          {
+            prevStatusId: entityId,
+            workflowStatusConnectionId: connectionId,
+            ...proposal,
+          },
+        ])
     );
     const currentWfStatus = actor.getState();
 

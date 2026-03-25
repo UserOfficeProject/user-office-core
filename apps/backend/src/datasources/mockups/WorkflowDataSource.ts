@@ -54,6 +54,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
         prevWorkflowStatusId: wc.prevWorkflowStatusId,
         nextWorkflowStatusId: wc.nextWorkflowStatusId,
         statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+        statusActions: [],
       })),
     };
   }
