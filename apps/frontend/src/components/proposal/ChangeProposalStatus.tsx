@@ -192,11 +192,11 @@ const ChangeProposalStatus = ({
                         status.workflowStatusId ===
                         values.selectedWorkflowStatusId
                     )?.statusId === 'DRAFT' && (
-                        <Alert severity="warning">
-                          Be aware that changing status to &quot;DRAFT&quot; will
-                          reopen proposal for changes and submission.
-                        </Alert>
-                      )}
+                      <Alert severity="warning">
+                        Be aware that changing status to &quot;DRAFT&quot; will
+                        reopen proposal for changes and submission.
+                      </Alert>
+                    )}
                     {proposalStatuses.find(
                       (status) =>
                         status.workflowStatusId ===
