@@ -1,0 +1,8 @@
+fragment role on Role {
+  id
+  shortCode
+  title
+  description
+  permissions
+  isRootRole
+}

@@ -58,7 +58,9 @@ import {
   ProposalViewInstrument,
   ProposalsFilter,
   Status,
+  UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
@@ -356,6 +358,7 @@ const ProposalTableOfficer = ({
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
+  const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -1211,7 +1214,7 @@ const ProposalTableOfficer = ({
         options={{
           search: true,
           searchText: search || undefined,
-          selection: true,
+          selection: isReadOnly ? false : true,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },
