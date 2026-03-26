@@ -125,13 +125,11 @@ export class ProposalWorkflowEngine {
       { id: proposal.primaryKey },
       currentProposalState
     );
-    const currentWfStatus = actor.getState();
 
-    const { nextStateValue, connectionId } = await actor.event(
-      event.toUpperCase()
-    );
+    const { nextStateValue, connectionId, transitionPerformed } =
+      await actor.event(event.toUpperCase());
 
-    if (nextStateValue !== currentWfStatus) {
+    if (transitionPerformed) {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta
         | undefined;
