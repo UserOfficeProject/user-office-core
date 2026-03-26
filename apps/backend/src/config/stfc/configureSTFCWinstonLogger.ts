@@ -1,9 +1,10 @@
-import { OpenTelemetryTransportV3 } from '@opentelemetry/winston-transport';
 import {
   Winston,
   WinstonLogger,
   setLogger,
 } from '@user-office-software/duo-logger';
+
+import OpentelemetryLogTransport from './opentelemetryLogTransport';
 
 function maskToken(token: string): string {
   const visibleChars = 6;
@@ -38,7 +39,7 @@ function maskSensitiveFields(
 export function configureSTFCWinstonLogger() {
   const transports: Winston.transport[] = [new Winston.transports.Console()];
   if (!!process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
-    transports.push(new OpenTelemetryTransportV3());
+    transports.push(new OpentelemetryLogTransport());
   }
 
   setLogger(
