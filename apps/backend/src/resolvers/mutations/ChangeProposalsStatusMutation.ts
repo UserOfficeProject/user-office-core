@@ -18,6 +18,9 @@ export class ChangeProposalsStatusInput {
 
   @Field(() => [Int])
   public proposalPks: number[];
+
+  @Field(() => Int, { nullable: true })
+  public workflowConnectionId?: number;
 }
 
 @Resolver()
