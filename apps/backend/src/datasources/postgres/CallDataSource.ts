@@ -13,6 +13,7 @@ import {
   CallOrderInput,
   CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
@@ -25,6 +26,11 @@ import {
   ProposalRecord,
   WorkflowRecord,
 } from './records';
+
+const fieldMap: { [key: string]: string } = {
+  sort_order: 'sort_order',
+  call_id: 'call.call_id',
+};
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -46,7 +52,11 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+  async getCalls(
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ): Promise<Call[]> {
     const query = database('call').select([
       '*',
       'call.description as description',
@@ -175,8 +185,12 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
-    if (filter?.isOrdered) {
-      query.orderBy('sort_order');
+    if (sortField && sortDirection) {
+      if (!fieldMap.hasOwnProperty(sortField)) {
+        throw new GraphQLError(`Bad sort field given: ${sortField}`);
+      }
+      sortField = fieldMap[sortField];
+      query.orderBy(sortField, sortDirection);
     }
 
     return query.then((callDB: CallRecord[]) => {
@@ -220,7 +234,6 @@ export default class PostgresCallDataSource implements CallDataSource {
             end_cycle: args.endCycle,
             cycle_comment: args.cycleComment,
             submission_message: args.submissionMessage,
-            survey_comment: args.surveyComment,
             reference_number_format: args.referenceNumberFormat,
             proposal_sequence: args.proposalSequence,
             proposal_workflow_id: args.proposalWorkflowId,
@@ -393,7 +406,6 @@ export default class PostgresCallDataSource implements CallDataSource {
               end_cycle: args.endCycle,
               cycle_comment: args.cycleComment,
               submission_message: args.submissionMessage,
-              survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               experiment_workflow_id: args.experimentWorkflowId,
               call_ended: determineCallEndedFlag(
@@ -625,5 +637,16 @@ export default class PostgresCallDataSource implements CallDataSource {
           ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
+  }
+
+  async getCallsOfFaps(fapIds: number[]): Promise<Call[]> {
+    return database
+      .distinct('call.*')
+      .from('call')
+      .join('call_has_faps as chf', 'chf.call_id', 'call.call_id')
+      .whereIn('chf.fap_id', fapIds)
+      .then((calls: CallRecord[]) => {
+        return calls.map((call) => createCallObject(call));
+      });
   }
 }

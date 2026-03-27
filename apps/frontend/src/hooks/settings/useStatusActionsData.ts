@@ -1,9 +1,9 @@
 import {
+  Dispatch,
+  SetStateAction,
+  useContext,
   useEffect,
   useState,
-  SetStateAction,
-  Dispatch,
-  useContext,
 } from 'react';
 
 import { FeatureContext } from 'context/FeatureContextProvider';

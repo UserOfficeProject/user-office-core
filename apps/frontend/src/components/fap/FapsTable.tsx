@@ -99,7 +99,7 @@ const FapsTable = () => {
       setFaps(newObjectsArray);
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

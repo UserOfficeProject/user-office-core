@@ -82,3 +82,20 @@ export const createQuestionTemplateRelationValidationSchema =
     sortOrder: Yup.number().required(),
     topicId: Yup.number().required(),
   });
+
+export const createEmailTemplateValidationSchema = Yup.object().shape({
+  name: Yup.string().required(),
+  description: Yup.string().required(),
+  useTemplateFile: Yup.bool().required(),
+  subject: Yup.string().notRequired(),
+  body: Yup.string().notRequired(),
+});
+
+export const updateEmailTemplateValidationSchema = Yup.object().shape({
+  id: Yup.number().required(),
+  name: Yup.string().required(),
+  description: Yup.string().required(),
+  useTemplateFile: Yup.bool().required(),
+  subject: Yup.string().notRequired(),
+  body: Yup.string().notRequired(),
+});

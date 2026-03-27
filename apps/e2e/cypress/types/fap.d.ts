@@ -17,6 +17,7 @@ import {
   GetProposalReviewsQuery,
   ReorderFapMeetingDecisionProposalsMutationVariables,
   ReorderFapMeetingDecisionProposalsMutation,
+  UpdateFapMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -33,6 +34,18 @@ declare global {
       createFap: (
         newFapInput: CreateFapMutationVariables
       ) => Cypress.Chainable<CreateFapMutation>;
+
+      /**
+       * Updates fap with values passed.
+       *
+       * @returns {typeof createFap}
+       * @memberof Chainable
+       * @example
+       *    cy.createFap(updatedFapInput: UpdateFapMutationVariables)
+       */
+      updateFap: (
+        updatedFapInput: UpdateFapMutationVariables
+      ) => Cypress.Chainable<UpdateFapMutation>;
 
       /**
        * Assign chair or secretary to existing fap.

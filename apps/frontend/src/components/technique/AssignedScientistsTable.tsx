@@ -1,12 +1,14 @@
 import MaterialTable from '@material-table/core';
 import { Box } from '@mui/material';
-import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import { BasicUserDetails, TechniqueFragment, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
+import { StrictColumn } from 'utils/utilTypes';
 type AssignedScientistsTableProps = {
   technique: TechniqueFragment;
   removeScientistFromTechnique: (
@@ -28,7 +30,7 @@ const assignmentScientistColumns = [
     title: 'Institution',
     field: 'institution',
   },
-];
+] satisfies StrictColumn<BasicUserDetails>[];
 
 const AssignedScientistsTable = ({
   technique,

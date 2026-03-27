@@ -1,0 +1,105 @@
+import EmailTemplates from 'email-templates';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { SettingsId } from '../../../models/Settings';
+import SendMailOptions from '../MailService';
+import { SMTPMailService } from './SMTPMailService';
+
+jest.mock('email-templates');
+const mockAdminDataSource = container.resolve(
+  Tokens.AdminDataSource
+) as AdminDataSource;
+
+const mockGetSetting = jest.spyOn(mockAdminDataSource, 'getSetting');
+
+test('Return result should indicate all emails were successfully sent', async () => {
+  mockGetSetting.mockResolvedValue(null);
+
+  const options: SendMailOptions = {
+    content: {
+      template: '1',
+    },
+    substitution_data: {
+      piPreferredname: 'John',
+      piLastname: 'Doe',
+      proposalNumber: '1',
+      proposalTitle: 'Title',
+      coProposers: ['Jane Doe'],
+      call: '',
+    },
+    recipients: [
+      {
+        address: 'john.doe@email.com',
+      },
+    ],
+  };
+
+  const smtpMailService: SMTPMailService = new SMTPMailService();
+  const result = await smtpMailService.sendMail(options);
+
+  return expect(result).toStrictEqual({
+    results: {
+      id: 'test',
+      total_accepted_recipients: 1,
+      total_rejected_recipients: 0,
+    },
+  });
+});
+
+test('All emails with bcc were successfully sent', async () => {
+  mockGetSetting.mockClear();
+  const emailInfo = jest.spyOn(EmailTemplates.prototype, 'send');
+
+  const bccEmail = 'testmail@test.co';
+
+  const substitutionData = {
+    piPreferredname: 'John',
+    piLastname: 'Doe',
+    proposalNumber: '1',
+    proposalTitle: 'Title',
+    coProposers: ['Jane Doe'],
+    call: '',
+  };
+
+  mockGetSetting.mockImplementation(() =>
+    Promise.resolve({
+      settingsValue: bccEmail,
+      description: 'bcc mail',
+      id: SettingsId.SMTP_BCC_EMAIL,
+    })
+  );
+
+  const options: SendMailOptions = {
+    content: {
+      template: '1',
+    },
+    substitution_data: substitutionData,
+    recipients: [
+      {
+        address: 'john.doe@email.com',
+      },
+    ],
+  };
+
+  const smtpMailService: SMTPMailService = new SMTPMailService();
+  const result = await smtpMailService.sendMail(options);
+
+  expect(emailInfo).toHaveBeenCalledWith({
+    message: {
+      to: process.env.SINK_EMAIL,
+      bcc: bccEmail,
+      subject: '= ``',
+      html: '',
+    },
+  });
+
+  return expect(result).toStrictEqual({
+    results: {
+      id: 'test',
+      total_accepted_recipients: 1,
+      total_rejected_recipients: 0,
+    },
+  });
+});

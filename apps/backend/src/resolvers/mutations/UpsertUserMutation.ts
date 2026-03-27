@@ -1,7 +1,40 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Directive,
+  Field,
+  InputType,
+  Mutation,
+  Resolver,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { User } from '../types/User';
+
+@InputType()
+export class InstitutionManualInput {
+  @Field(() => String)
+  public name: string;
+
+  @Field(() => String)
+  public country: string;
+}
+
+@InputType()
+@Directive('@oneOf')
+export class InstitutionInput {
+  @Field(() => String, { nullable: true })
+  public rorId: string | null;
+
+  @Field(() => InstitutionManualInput, { nullable: true })
+  public institutionData: InstitutionManualInput | null;
+}
+
+export type GetOrCreateInstitutionInput =
+  | InstitutionInput['rorId']
+  | InstitutionInput['institutionData'];
+
 @ArgsType()
 export class UpsertUserByOidcSubArgs {
   @Field(() => String, { nullable: true })
@@ -19,14 +52,8 @@ export class UpsertUserByOidcSubArgs {
   @Field(() => String)
   public oidcSub: string;
 
-  @Field(() => String)
-  public institutionRoRId: string;
-
-  @Field(() => String)
-  public institutionName: string;
-
-  @Field(() => String)
-  public institutionCountry: string;
+  @Field(() => InstitutionInput)
+  public institution: InstitutionInput;
 
   @Field(() => String)
   public email: string;

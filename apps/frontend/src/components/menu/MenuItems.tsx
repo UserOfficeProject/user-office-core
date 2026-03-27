@@ -1,4 +1,4 @@
-import { Science, Topic, Apartment } from '@mui/icons-material';
+import { Science, Topic } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -11,15 +11,16 @@ import People from '@mui/icons-material/People';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import i18n from 'i18n';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
+import i18n from 'i18n';
+
+import TagIcon from 'components/common/icons/TagIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
-import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
@@ -67,20 +68,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   ]);
 
   const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
-
-  const calls = useCallsData(
-    {
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.MINIMAL
-  ).calls;
-
-  const openCall = calls?.find((call) => call.isActive);
-
-  const techniqueProposalUrl =
-    openCall && openCall.id
-      ? `/TechniqueProposals?call=${openCall?.id}`
-      : '/TechniqueProposals';
 
   const user = (
     <div data-cy="user-menu-items">
@@ -142,7 +129,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       {isTechniqueProposalsEnabled && (
         <Tooltip title={t('Technique Proposals')}>
-          <ListItemButton component={NavLink} to={techniqueProposalUrl}>
+          <ListItemButton component={NavLink} to={`/TechniqueProposals`}>
             <ListItemIcon>
               <Topic />
             </ListItemIcon>
@@ -190,12 +177,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       {isTagsEnabled && (
-        <Tooltip title="Tag">
+        <Tooltip title="Tags">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
-              <Apartment />
+              <TagIcon />
             </ListItemIcon>
-            <ListItemText primary={'Tag'} />
+            <ListItemText primary={'Tags'} />
           </ListItemButton>
         </Tooltip>
       )}
@@ -277,7 +264,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <ListItemText primary="Proposals" />
       </ListItemButton>
       {isTechniqueProposalsEnabled && (
-        <ListItemButton component={NavLink} to={techniqueProposalUrl}>
+        <ListItemButton component={NavLink} to={`/TechniqueProposals`}>
           <ListItemIcon>
             <Topic />
           </ListItemIcon>
@@ -326,6 +313,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     </div>
   );
 
+  const proposalReaderUser = (
+    <div data-cy="instrument-scientist-menu-items">
+      <ListItemButton component={NavLink} to="/">
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Proposals" />
+      </ListItemButton>
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -341,6 +339,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
+    case UserRole.PROPOSAL_READER:
+      return proposalReaderUser;
     default:
       return null;
   }

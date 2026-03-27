@@ -18,10 +18,18 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
@@ -60,10 +68,11 @@ import { useTechniqueProposalInstrumentsData } from './useTechniqueProposalInstr
 
 const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
-  const refreshTableData = () => {
+  const refreshTableData = useCallback(() => {
     tableRef.current?.onQueryChange({});
-  };
-
+  }, []);
+  const [searchParams, setSearchParams] = useSearchParams({});
+  const { currentRole } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   const {
@@ -71,30 +80,58 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     loadingStatuses: loadingProposalStatuses,
   } = useStatusesData(WorkflowType.PROPOSAL);
 
-  // Only show calls that use the quick review workflow status
-  const { calls, loadingCalls } = useCallsData(
-    {
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.MINIMAL
-  );
-
-  // Only show techniques that the user is assigned to
   const { techniques, loadingTechniques } =
     useTechniqueProposalsTechniquesData();
+
+  const instrumentIds = useMemo(() => {
+    if (loadingTechniques || !techniques) return [];
+
+    return techniques.flatMap((t) => t.instruments.map((i) => i.id));
+  }, [loadingTechniques, techniques]);
+
+  const { calls, loadingCalls, setCallsFilter } = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+      instrumentIds,
+    },
+    {
+      sortField: 'call_id',
+      sortDirection: PaginationSortDirection.DESC,
+    },
+    CallsDataQuantity.MINIMAL,
+    currentRole !== UserRole.USER_OFFICER
+      ? !instrumentIds || instrumentIds.length <= 0
+      : false
+  );
+
+  const callId = useMemo(() => {
+    const callParam = searchParams.get('call');
+    if (callParam) return Number(callParam);
+    if (calls && calls.length > 0) return calls[0].id;
+
+    return null;
+  }, [calls, searchParams]);
+
+  useEffect(() => {
+    if (currentRole === UserRole.USER_OFFICER) {
+      return;
+    }
+    if (instrumentIds.length > 0) {
+      setCallsFilter({
+        proposalStatusShortCode: 'QUICK_REVIEW',
+        instrumentIds,
+      });
+    }
+  }, [currentRole, instrumentIds, setCallsFilter]);
 
   // Only show instruments in the user's techniques
   const { allInstruments, techniqueInstruments, loadingInstruments } =
     useTechniqueProposalInstrumentsData(techniques);
-
-  const [searchParams, setSearchParams] = useSearchParams({});
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
   });
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
-  const callId = searchParams.get('call');
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
   const proposalId = searchParams.get('proposalId');
@@ -115,8 +152,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     totalCount === searchParams.getAll('selection').length;
   const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
     useState(false);
-
-  const { currentRole } = useContext(UserContext);
 
   enum StatusCode {
     DRAFT = 'DRAFT',
@@ -157,7 +192,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     .map((status) => status.id);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
-    callId: callId ? +callId : undefined,
+    callId,
     instrumentFilter: {
       instrumentId: instrument ? +instrument : null,
       showAllProposals: !instrument,
@@ -177,6 +212,25 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
+
+  const lastProcessedCallId = useRef<number | null>(null);
+  useEffect(() => {
+    if (callId !== lastProcessedCallId.current) {
+      lastProcessedCallId.current = callId;
+
+      setSearchParams((prev) => {
+        if (callId) {
+          prev.set('call', callId.toString());
+        } else {
+          prev.delete('call');
+        }
+
+        return prev;
+      });
+      setProposalFilter((prev) => ({ ...prev, callId }));
+      refreshTableData();
+    }
+  }, [callId, setSearchParams, setProposalFilter, refreshTableData]);
 
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
@@ -630,11 +684,22 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   );
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
-    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+    new Promise<QueryResult<ProposalViewData>>((resolve, reject) => {
+      const selectedCallId = callId ?? proposalFilter.callId;
+      if (!selectedCallId) {
+        resolve({
+          data: [],
+          page: tableQuery.page,
+          totalCount: 0,
+        });
+
+        return;
+      }
       const [orderBy] = tableQuery.orderByCollection;
       try {
         const {
           callId,
+          callIds,
           instrumentFilter,
           techniqueFilter,
           proposalStatusId,
@@ -648,16 +713,17 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
 
-        result.proposals = await api()
+        api()
           .getTechniqueScientistProposals({
             filter: {
-              callId: callId,
-              instrumentFilter: instrumentFilter,
-              techniqueFilter: techniqueFilter,
-              proposalStatusId: proposalStatusId,
-              text: text,
-              referenceNumbers: referenceNumbers,
-              dateFilter: dateFilter,
+              callId,
+              callIds,
+              instrumentFilter,
+              techniqueFilter,
+              proposalStatusId,
+              text,
+              referenceNumbers,
+              dateFilter,
               excludeProposalStatusIds:
                 currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
@@ -687,47 +753,57 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 } as ProposalViewData;
               }
             );
-          });
+          })
+          .then((proposals) => {
+            result.proposals = proposals;
 
-        if (result.proposals === undefined) {
-          return;
-        }
-        const tableData =
-          result.proposals.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
-            const proposalData = {
-              ...proposal,
-              id: proposal.proposalId,
-              status: proposal.submitted ? 'Submitted' : 'Open',
-              technicalReviews: proposal.technicalReviews?.map(
-                (technicalReview) => ({
-                  ...technicalReview,
-                  status: getTranslation(technicalReview.status as ResourceId),
-                })
-              ),
-              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-            } as ProposalViewData;
-
-            if (searchParams.getAll('selection').length > 0) {
-              return {
-                ...proposalData,
-                tableData: {
-                  checked: selection.has(proposal.primaryKey.toString()),
-                },
-              };
-            } else {
-              return proposalData;
+            if (result.proposals === undefined) {
+              return;
             }
-          }) || [];
+            const tableData =
+              result.proposals.map((proposal) => {
+                const selection = new Set(searchParams.getAll('selection'));
+                const proposalData = {
+                  ...proposal,
+                  id: proposal.proposalId,
+                  status: proposal.submitted ? 'Submitted' : 'Open',
+                  technicalReviews: proposal.technicalReviews?.map(
+                    (technicalReview) => ({
+                      ...technicalReview,
+                      status: getTranslation(
+                        technicalReview.status as ResourceId
+                      ),
+                    })
+                  ),
+                  finalStatus: getTranslation(
+                    proposal.finalStatus as ResourceId
+                  ),
+                } as ProposalViewData;
 
-        setTableData(tableData);
-        setTotalCount(result?.totalCount || 0);
+                if (searchParams.getAll('selection').length > 0) {
+                  return {
+                    ...proposalData,
+                    tableData: {
+                      checked: selection.has(proposal.primaryKey.toString()),
+                    },
+                  };
+                } else {
+                  return proposalData;
+                }
+              }) || [];
 
-        resolve({
-          data: tableData,
-          page: tableQuery.page,
-          totalCount: result.totalCount,
-        });
+            setTableData(tableData);
+            setTotalCount(result?.totalCount || 0);
+
+            resolve({
+              data: tableData,
+              page: tableQuery.page,
+              totalCount: result.totalCount,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } catch (error) {
         reject(error);
       }
@@ -748,7 +824,17 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleFilterChange = (filter: ProposalsFilter) => {
-    setProposalFilter(filter);
+    const updatedFilter = { ...filter };
+    if (filter.callId != null) {
+      if (filter.callId === 0) {
+        updatedFilter.callId = null;
+        updatedFilter.callIds = calls?.map((call) => call.id) || [];
+      } else {
+        updatedFilter.callIds = [filter.callId as number];
+      }
+    }
+
+    setProposalFilter(updatedFilter);
     refreshTableData();
   };
 
@@ -769,6 +855,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const fetchProposalCoreBasicData = async () => {
     const {
       callId,
+      callIds,
       instrumentFilter,
       techniqueFilter,
       proposalStatusId,
@@ -786,13 +873,14 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     result.proposals = await api()
       .getTechniqueScientistProposalsBasic({
         filter: {
-          callId: callId,
-          instrumentFilter: instrumentFilter,
-          techniqueFilter: techniqueFilter,
-          proposalStatusId: proposalStatusId,
-          text: text,
-          referenceNumbers: referenceNumbers,
-          dateFilter: dateFilter,
+          callId,
+          instrumentFilter,
+          callIds,
+          techniqueFilter,
+          proposalStatusId,
+          text,
+          referenceNumbers,
+          dateFilter,
           ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
           currentRole === UserRole.USER_OFFICER
             ? { excludeProposalStatusIds: excludeProposalStatusIds }

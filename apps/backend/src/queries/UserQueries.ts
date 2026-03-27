@@ -72,8 +72,8 @@ export default class UserQueries {
         user.created,
         user.email,
         user.country,
-        user.user_title,
-        user.oidc_sub
+        user.userTitle,
+        user.oidcSub
       );
     } else {
       return null;
@@ -105,8 +105,8 @@ export default class UserQueries {
       user.created,
       user.email,
       user.country,
-      user.user_title,
-      user.oidc_sub
+      user.userTitle,
+      user.oidcSub
     );
   }
 
@@ -133,10 +133,9 @@ export default class UserQueries {
     };
   }
 
-  @Authorized()
+  @Authorized([Roles.USER, Roles.USER_OFFICER])
   async getPreviousCollaborators(
     agent: UserWithRole | null,
-    userId: number,
     first?: number,
     offset?: number,
     sortField?: string,
@@ -145,8 +144,15 @@ export default class UserQueries {
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
+    if (!agent) {
+      return {
+        totalCount: 0,
+        users: [],
+      };
+    }
+
     return this.dataSource.getPreviousCollaborators(
-      userId,
+      agent.id,
       first,
       offset,
       sortField,
