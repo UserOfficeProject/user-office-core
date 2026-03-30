@@ -2,6 +2,7 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
+import { stripHtml } from 'string-strip-html';
 
 import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
@@ -86,7 +87,11 @@ export const collectProposalXLSXData = async (
           .join(', ')
       : '<missing>',
     technicalReviews
-      ?.map((technicalReview) => technicalReview?.publicComment || '<missing>')
+      ?.map(
+        (technicalReview) =>
+          stripHtml(technicalReview.publicComment ?? '').result.trim() ||
+          '<missing>'
+      )
       .join(', ') || '<missing>',
     technicalReviews
       ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
