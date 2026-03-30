@@ -5,25 +5,20 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 COPY package-lock.json* ./
-
-# Copy the entire app (needed for build step)
-COPY apps ./apps
+# Copy the only backend app (needed for build step)
+COPY apps/backend ./apps/backend
 COPY validation ./validation
 
 # Install production dependencies only
-RUN npm install
+RUN npm install --workspace=@user-office-software/duo-validation --workspace=apps/backend
 
 # Build the backend
-RUN cd apps/backend && npm run build:validation && npm run generate:uows
-
-# Build the backend
-RUN cd apps/backend && npm run build
+RUN cd apps/backend && npm run build:validation && npm run generate:uows && npm run build
 
 # Set working directory to backend
 WORKDIR /app/apps/backend
 
 # Use node as entrypoint so Argo can pass the job name as argument
 ENTRYPOINT ["node"]
-
 # Default command (can be overridden by Argo)
 CMD ["build/src/asyncJobs/runJob.js"]
