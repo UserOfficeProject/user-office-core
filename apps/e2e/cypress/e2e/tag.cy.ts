@@ -201,6 +201,7 @@ context('Tag tests', () => {
 
       cy.login('officer');
       cy.visit('/admin/roles');
+      cy.finishedLoading();
       cy.get('[aria-label="Assign Tag"]').click();
 
       cy.get('[role="dialog"]').contains(tagName).click();
