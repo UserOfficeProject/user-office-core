@@ -1,3 +1,5 @@
+//TODO: Call Ended workflow must be achievable through Guards
+
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -11,7 +13,7 @@ import { searchObjectByKey } from '../utils/helperFunctions';
 import {
   ProposalWorkflowEngine,
   WorkflowEngineProposalType,
-} from '../workflowEngine/proposal';
+} from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -101,7 +103,9 @@ export const handleWorkflowEngineChange = async (
   ) {
     // publish PROPOSAL_STATUS_CHANGED_BY_WORKFLOW event to the EventBus
     await publishProposalStatusChange(updatedProposals);
+
     if (event.type === Event.PROPOSAL_SUBMITTED) {
+      // todo: This should be possible with the guards
       await handleSubmittedProposalsAfterCallEnded(updatedProposals);
     }
   }

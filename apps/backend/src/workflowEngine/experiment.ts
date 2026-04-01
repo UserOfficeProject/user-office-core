@@ -123,7 +123,7 @@ export class ExperimentWorkflowEngine {
     }
 
     const currentWorkflowStatusId = experimentSafety.workflowStatusId;
-    console.log({ currentWorkflowStatusId });
+
     if (!currentWorkflowStatusId) {
       logger.logError('Experiment safety does not have a workflow status id', {
         experimentSafetyPk: experimentSafety.experimentSafetyPk,
@@ -153,7 +153,7 @@ export class ExperimentWorkflowEngine {
     const { nextStateValue, connectionId } = await actor.event(
       event.toUpperCase()
     );
-    console.log({ nextStateValue, currentWfStatus });
+
     if (nextStateValue !== currentWfStatus) {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta

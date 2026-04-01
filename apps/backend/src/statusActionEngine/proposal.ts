@@ -4,7 +4,7 @@ import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { StatusActionType } from '../models/StatusAction';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import { emailActionHandler } from './emailActionHandler';
 import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';

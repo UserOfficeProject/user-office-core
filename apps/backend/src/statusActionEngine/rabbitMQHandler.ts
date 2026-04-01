@@ -4,7 +4,7 @@ import { Tokens } from '../config/Tokens';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { RabbitMQActionConfig } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import { constructProposalStatusChangeEvent } from './statusActionUtils';
 
 export const rabbitMQActionHandler = async (

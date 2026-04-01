@@ -134,7 +134,7 @@ export interface ProposalRecord {
   readonly abstract: string;
   readonly proposer_id: number;
   readonly status_id: string;
-  readonly workflow_status_id: number;
+  readonly workflow_status_id: number | null;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;

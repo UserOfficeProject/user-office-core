@@ -48,6 +48,7 @@ export const checkAllReviewsSubmittedOnProposal = (
   return allOtherReviewsSubmitted;
 };
 
+//todo: this needs improvement
 export const searchObjectByKey = (
   object: object,
   originalKey: string

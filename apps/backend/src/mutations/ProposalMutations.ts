@@ -41,7 +41,7 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
