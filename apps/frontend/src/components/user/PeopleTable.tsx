@@ -455,11 +455,10 @@ const PeopleTable = ({
           }}
           options={{
             search: search,
-            searchDebounceDelay: 1500, //1500ms delay on search
             searchText: persistUrlQueryParams
               ? searchParams.get('search') || undefined
               : undefined,
-            debounceInterval: 400,
+            debounceInterval: 750,
             selection: selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
