@@ -165,6 +165,7 @@ function QuestionaryComponentGenericTemplate(
                   newStateItems,
                   GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
                 );
+                setSelectedGenericTemplate(clonedGenericTemplate);
               }
             });
 
