@@ -77,7 +77,7 @@
     "muhammara": "^6.0.0",
     "multer": "^2.1.1",
     "openapi-typescript-codegen": "^0.29.0",
-    "openid-client": "^5.6.4",
+    "openid-client": "^6.8.2",
     "pg": "^8.11.5",
     "pg-large-object": "^2.0.0",
     "prom-client": "^15.1.3",
