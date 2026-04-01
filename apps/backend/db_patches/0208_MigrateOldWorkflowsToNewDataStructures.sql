@@ -144,7 +144,7 @@ BEGIN
           SET workflow_status_connection_id = EXCLUDED.workflow_status_connection_id;
         END LOOP;
 
-        INSERT INTO workflow_status_connection_has_workflow_status_actions (
+        INSERT INTO workflow_status_connection_has_actions (
           workflow_status_connection_id,
           workflow_status_action_id,
           workflow_id,
@@ -170,7 +170,7 @@ BEGIN
           RAISE WARNING USING MESSAGE = format('%s workflow actions could not be migrated because their connection does not reference a previous node.', v_unmapped_actions);
         END IF;
 
-        INSERT INTO workflow_status_connection_has_workflow_status_changing_events (
+        INSERT INTO workflow_status_connection_has_events (
           workflow_status_connection_id,
           status_changing_event
         )

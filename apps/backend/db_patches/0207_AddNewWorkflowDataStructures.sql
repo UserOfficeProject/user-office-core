@@ -70,20 +70,10 @@ BEGIN
             ADD CONSTRAINT uq_wsc_edge UNIQUE (workflow_id, prev_workflow_status_id, next_workflow_status_id);
 
 
-
-          -- ============================================
-          -- 3) workflow_status_changing_events (catalog)
-          -- ============================================
-          -- REMOVED: workflow_status_changing_events table is removed.
-          -- Events are now stored as strings in the code (apps/backend/src/events/event.enum.ts).
-
-
-
-
           -- =====================================================================
-          -- 4) workflow_status_connection_has_workflow_status_changing_events (edge→events)
+          -- 4) workflow_status_connection_has_events (edge→events)
           -- =====================================================================
-          CREATE TABLE workflow_status_connection_has_workflow_status_changing_events (
+          CREATE TABLE workflow_status_connection_has_events (
             workflow_status_connection_id BIGINT NOT NULL,
             status_changing_event         TEXT NOT NULL,
 
@@ -105,9 +95,9 @@ BEGIN
             RENAME COLUMN status_action_id TO workflow_status_action_id;
 
           -- ==========================================================
-          -- 5) workflow_status_connection_has_workflow_status_actions (edge→actions)
+          -- 5) workflow_status_connection_has_actions (edge→actions)
           -- ==========================================================
-          CREATE TABLE workflow_status_connection_has_workflow_status_actions (
+          CREATE TABLE workflow_status_connection_has_actions (
             workflow_status_connection_id INT NOT NULL,
             workflow_status_action_id     INT NOT NULL,
             workflow_id                   INT NOT NULL,
