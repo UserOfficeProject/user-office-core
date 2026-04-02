@@ -16,8 +16,23 @@ export class Fap {
     public active: boolean,
     public fapChairUserIds: number[] | null,
     public fapSecretariesUserIds: number[] | null,
-    public files: string | null
+    public files: string | null,
+    public reviewVisibility: number
   ) {}
+}
+
+export class ReviewVisibility {
+  constructor(
+    public reviewVisibilityId: number,
+    public visibility: FapReviewVisibility,
+    public description: string
+  ) {}
+}
+
+export enum FapReviewVisibility {
+  PROPOSAL_REVIEWS_COMPLETE = 'proposal_reviews_complete',
+  REVIEWS_VISIBLE = 'reviews_visible',
+  REVIEWS_VISIBLE_FAP_ENDED = 'reviews_visible_fap_ended',
 }
 
 export class FapReviewer {

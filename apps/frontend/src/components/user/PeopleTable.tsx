@@ -31,7 +31,7 @@ import {
 import { useDataApi } from 'hooks/common/useDataApi';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import { FunctionType } from 'utils/utilTypes';
+import { FunctionType, StrictColumn } from 'utils/utilTypes';
 
 type InvitationButtonProps = {
   title: string;
@@ -82,8 +82,8 @@ const localColumns = [
   { title: 'Preferred Name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
   { title: 'Email', field: 'email' },
-  { title: 'User Name', field: 'oidc_sub' },
-];
+  { title: 'User Name', field: 'oidcSub' },
+] satisfies StrictColumn<BasicUserDetails>[];
 
 async function getUserByEmail(
   email: string,

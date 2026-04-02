@@ -10,6 +10,7 @@ import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
+import PostgresEmailTemplateDataSource from '../datasources/postgres/EmailTemplateDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresExperimentSafetyPdfTemplateDataSource from '../datasources/postgres/ExperimentSafetyPdfTemplateDataSource';
@@ -27,6 +28,7 @@ import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/Propo
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -43,7 +45,7 @@ import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/Vi
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
+import { SparkPostMailService } from '../eventHandlers/MailService/SparkPost/SparkPostMailService';
 import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
@@ -63,6 +65,7 @@ import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);
@@ -116,6 +119,7 @@ mapClass(Tokens.TagDataSource, PostgresTagDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
+mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);

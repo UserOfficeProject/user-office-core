@@ -98,6 +98,7 @@ const dummyProposalEvents = {
   call_ended: false,
   call_ended_internal: false,
   call_review_ended: false,
+  call_fap_review_ended: false,
   proposal_faps_selected: false,
   proposal_instruments_selected: false,
   proposal_feasibility_review_submitted: false,
@@ -345,7 +346,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getProposals(
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    tags?: number[]
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return { totalCount: allProposals.length, proposals: allProposals };
   }
@@ -383,6 +385,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getProposalEvents(
     proposalPk: number
   ): Promise<ProposalEventsRecord | null> {
+    if (proposalPk === 101) {
+      return {
+        ...dummyProposalEvents,
+        call_fap_review_ended: true,
+        proposal_all_fap_reviews_submitted: true,
+      };
+    }
+
     return dummyProposalEvents;
   }
 

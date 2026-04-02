@@ -5,6 +5,7 @@ import {
   getTokenForUserValidationSchema,
   updateUserRolesValidationSchema,
   updateUserValidationBackendSchema,
+  upsertUserByOidcSubValidationSchema,
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
@@ -363,6 +364,7 @@ export default class UserMutations {
     return this.dataSource.setUserNotPlaceholder(id);
   }
 
+  @ValidateArgs(upsertUserByOidcSubValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async upsertUserByOidcSub(
     agent: UserWithRole | null,
@@ -374,23 +376,19 @@ export default class UserMutations {
       lastName,
       preferredName,
       oidcSub,
-      institutionRoRId,
-      institutionName,
-      institutionCountry,
+      institution: institutionInput,
       email,
     } = args;
 
     const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
 
-    const institution = await this.userAuth.getOrCreateUserInstitution({
-      institution_ror_id: institutionRoRId,
-      institution_name: institutionName,
-      institution_country: institutionCountry,
-    });
+    const institution = await this.userAuth.getOrCreateUserInstitution(
+      institutionInput.institutionData ?? institutionInput.rorId
+    );
 
     if (!institution) {
       return rejection('Invalid Input for the Institution', {
-        institutionRoRId,
+        institutionInput,
         args,
       });
     }
@@ -404,7 +402,7 @@ export default class UserMutations {
         oidcSub: oidcSub,
         institutionId: institution.id,
         preferredname: preferredName ?? undefined,
-        user_title: userTitle ?? undefined,
+        userTitle: userTitle ?? undefined,
       });
 
       return updatedUser;

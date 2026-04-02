@@ -1,9 +1,20 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import EmailSettings from './EmailSettings';
-import { MailService } from './MailService';
+import { isProduction, isStaging } from '../../../utils/helperFunctions';
+import SendMailOptions, { MailService } from '../MailService';
 import { SparkPost } from './SparkPost';
-import { isProduction, isStaging } from '../../utils/helperFunctions';
+
+export type SparkPostTemplate = {
+  last_use: string;
+  description: string;
+  id: string;
+  has_draft: boolean;
+  published: boolean;
+  name: string;
+  shared_with_subaccounts: boolean;
+  has_published: boolean;
+  last_update_time: string;
+};
 
 export class SparkPostMailService extends MailService {
   private client: SparkPost;
@@ -24,30 +35,31 @@ export class SparkPostMailService extends MailService {
     this.sinkEmail = process.env.SINK_EMAIL;
   }
 
-  private getEnvOptions(options: EmailSettings) {
+  private getEnvOptions(options: SendMailOptions) {
     return {
-      ...options,
+      content: {
+        template_id: options.content.template,
+      },
       recipients: options.recipients.map((recipient) =>
         isProduction || isStaging
-          ? recipient
-          : typeof recipient.address === 'string'
-            ? {
-                address: {
-                  email: <string>this.sinkEmail,
-                  header_to: recipient.address,
-                },
-              }
-            : {
-                address: {
-                  email: <string>this.sinkEmail,
-                  header_to: `${recipient.address.email}; original_header_to_${recipient.address.header_to}`,
-                },
-              }
+          ? {
+              address: {
+                email: recipient.address,
+                header_to: recipient.header_to,
+              },
+            }
+          : {
+              address: {
+                email: <string>this.sinkEmail,
+                header_to: `${recipient.address}${recipient.header_to ? `; original_header_to_${recipient.header_to}` : ''}`,
+              },
+            }
       ),
+      substitution_data: options.substitution_data,
     };
   }
 
-  sendMail = (options: EmailSettings) => {
+  sendMail = (options: SendMailOptions) => {
     // NOTE: If it is not production and there is no sinkEmail we are not sending emails.
     if (!isProduction && !isStaging && !this.sinkEmail) {
       logger.logInfo('Pretending to send an email', { ...options });
@@ -66,7 +78,7 @@ export class SparkPostMailService extends MailService {
     return this.client.send(envOptions);
   };
 
-  getEmailTemplates = (includeDraft = false) => {
-    return this.client.getTemplates(includeDraft); // The returning type for get request is wrong because the package is not well maintained;
+  getEmailTemplates = () => {
+    return this.client.getTemplates(false);
   };
 }

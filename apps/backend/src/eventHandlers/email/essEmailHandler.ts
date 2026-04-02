@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { CallDataSource } from '../../datasources/CallDataSource';
@@ -18,23 +19,7 @@ import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
-import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
-
-export enum EmailTemplateId {
-  CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
-  PROPOSAL_SUBMITTED = 'proposal-submitted',
-  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
-  REJECTED_PROPOSAL = 'Rejected-Proposal',
-  RESERVED_PROPOSAL = 'Reserved-Proposal',
-  REVIEW_REMINDER = 'review-reminder',
-  VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
-  VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',
-  USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
-  USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
-  USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
-  USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
-}
 
 function formatEmailDate(
   value: Date | null,
@@ -141,7 +126,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         mailService
           .sendMail({
             content: {
-              template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+              template: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
@@ -183,9 +168,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const call = await callDataSource.getCall(event.proposal.callId);
 
-      const options: EmailSettings = {
+      const options = {
         content: {
-          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
+          template: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -201,10 +186,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
           { address: principalInvestigator.email },
           ...participants.map((partipant) => {
             return {
-              address: {
-                email: partipant.email,
-                header_to: principalInvestigator.email,
-              },
+              address: partipant.email,
+              header_to: principalInvestigator.email,
             };
           }),
         ],
@@ -253,7 +236,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             piPreferredname: principalInvestigator.preferredname,
@@ -266,10 +249,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: principalInvestigator.email },
             {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: principalInvestigator.email,
-              },
+              address: 'useroffice@esss.se',
+              header_to: principalInvestigator.email,
             },
           ],
         })
@@ -291,7 +272,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
     case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
       const invites = event.array;
-
       for (const invite of invites) {
         if (invite.isEmailSent) {
           continue;
@@ -328,6 +308,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
       for (const invite of invites) {
         if (invite.isEmailSent) {
           continue;
@@ -348,7 +337,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
         await sendInviteEmail(
           invite,
           inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
         ).then(async () => {
           await eventBus.publish({
             ...event,
@@ -374,7 +364,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: EmailTemplateId.REVIEW_REMINDER,
+            template: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -387,10 +377,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: fapReviewer.email },
             {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: fapReviewer.email,
-              },
+              address: 'useroffice@esss.se',
+              header_to: fapReviewer.email,
             },
           ],
         })
@@ -459,7 +447,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: templateId,
+            template: templateId,
           },
           substitution_data: {
             preferredname: user.preferredname,
@@ -480,10 +468,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [
             { address: user.email },
             {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: user.email,
-              },
+              address: 'useroffice@esss.se',
+              header_to: user.email,
             },
           ],
         })
@@ -514,7 +500,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
-  templateId: EmailTemplateId
+  templateId: EmailTemplateId,
+  additionalSubstitutionData?: Record<string, unknown>
 ) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -524,7 +511,7 @@ async function sendInviteEmail(
   return mailService
     .sendMail({
       content: {
-        template_id: templateId,
+        template: templateId,
       },
       substitution_data: {
         email: invite.email,
@@ -532,6 +519,7 @@ async function sendInviteEmail(
         inviterLastname: inviter.lastname,
         inviterOrg: inviter.institution,
         redeemCode: invite.code,
+        ...additionalSubstitutionData,
       },
       recipients: [{ address: invite.email }],
     })

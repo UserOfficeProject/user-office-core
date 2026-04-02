@@ -1,13 +1,11 @@
-import * as path from 'path';
-
 import EmailTemplates from 'email-templates';
 import { container } from 'tsyringe';
 
-import EmailSettings from './EmailSettings';
+import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { SettingsId } from '../../../models/Settings';
+import SendMailOptions from '../MailService';
 import { SMTPMailService } from './SMTPMailService';
-import { Tokens } from '../../config/Tokens';
-import { AdminDataSource } from '../../datasources/AdminDataSource';
-import { SettingsId } from '../../models/Settings';
 
 jest.mock('email-templates');
 const mockAdminDataSource = container.resolve(
@@ -19,9 +17,9 @@ const mockGetSetting = jest.spyOn(mockAdminDataSource, 'getSetting');
 test('Return result should indicate all emails were successfully sent', async () => {
   mockGetSetting.mockResolvedValue(null);
 
-  const options: EmailSettings = {
+  const options: SendMailOptions = {
     content: {
-      template_id: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
+      template: '1',
     },
     substitution_data: {
       piPreferredname: 'John',
@@ -73,9 +71,9 @@ test('All emails with bcc were successfully sent', async () => {
     })
   );
 
-  const options: EmailSettings = {
+  const options: SendMailOptions = {
     content: {
-      template_id: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
+      template: '1',
     },
     substitution_data: substitutionData,
     recipients: [
@@ -89,12 +87,12 @@ test('All emails with bcc were successfully sent', async () => {
   const result = await smtpMailService.sendMail(options);
 
   expect(emailInfo).toHaveBeenCalledWith({
-    template: expect.any(String),
     message: {
       to: process.env.SINK_EMAIL,
       bcc: bccEmail,
+      subject: '= ``',
+      html: '',
     },
-    locals: substitutionData,
   });
 
   return expect(result).toStrictEqual({

@@ -70,9 +70,6 @@ export class Call implements Partial<CallOrigin> {
   @Field()
   public cycleComment: string;
 
-  @Field()
-  public surveyComment: string;
-
   @Field({ nullable: true })
   public submissionMessage: string;
 

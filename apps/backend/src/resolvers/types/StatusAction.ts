@@ -10,8 +10,8 @@ import {
 
 import {
   EmailActionDefaultConfig,
-  StatusActionDefaultConfig,
   RabbitMQActionDefaultConfig,
+  StatusActionDefaultConfig,
 } from './StatusActionConfig';
 import { ResolverContext } from '../../context';
 import {

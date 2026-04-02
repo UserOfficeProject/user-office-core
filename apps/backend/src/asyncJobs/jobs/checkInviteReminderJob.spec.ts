@@ -1,11 +1,11 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import sinon from 'sinon';
 import { container } from 'tsyringe';
 
 import checkInviteReminderJob from './checkInviteReminderJob';
 import { Tokens } from '../../config/Tokens';
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Invite } from '../../models/Invite';
 import { RoleClaim } from '../../models/RoleClaim';
 import { SettingsId } from '../../models/Settings';

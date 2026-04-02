@@ -1,0 +1,7 @@
+query getFapReviewVisibilityOptions {
+  fapReviewVisibilityOptions {
+    reviewVisibilityId
+    description
+    visibility
+  }
+}

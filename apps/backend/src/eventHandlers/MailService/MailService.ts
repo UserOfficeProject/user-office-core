@@ -1,36 +1,23 @@
-import EmailSettings from './EmailSettings';
-import { ResultsPromise } from './SparkPost';
-
-export abstract class MailService {
-  abstract sendMail(options: EmailSettings): ResultsPromise<SendMailResults>;
-  abstract getEmailTemplates(
-    includeDraft?: boolean
-  ): ResultsPromise<
-    (SparkPostTemplate | STFCEmailTemplate | ELIEmailTemplate)[]
-  >;
+export default interface SendMailOptions {
+  content: {
+    template: string;
+  };
+  recipients: {
+    address: string;
+    header_to?: string;
+  }[];
+  substitution_data?: Record<string, unknown>;
+  // eslint-disable-next-line semi
 }
 
-export type SparkPostTemplate = {
-  last_use: string;
-  description: string;
-  id: string;
-  has_draft: boolean;
-  published: boolean;
-  name: string;
-  shared_with_subaccounts: boolean;
-  has_published: boolean;
-  last_update_time: string;
-};
-
-export type STFCEmailTemplate = {
-  id: string;
-  name: string;
-};
-
-export type ELIEmailTemplate = {
-  id: string;
-  name: string;
-};
+export abstract class MailService {
+  abstract sendMail(
+    options: SendMailOptions
+  ): Promise<{ results: SendMailResults }>;
+  abstract getEmailTemplates(): Promise<{
+    results: { id: string; name: string }[];
+  }>;
+}
 
 export type SendMailResults = {
   total_rejected_recipients: number;

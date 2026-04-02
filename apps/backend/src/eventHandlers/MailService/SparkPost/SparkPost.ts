@@ -1,7 +1,6 @@
-import { CreateTransmission } from './EmailSettings';
-import { SendMailResults, SparkPostTemplate } from './MailService';
-
-export type ResultsPromise<T> = Promise<{ results: T }>;
+import { SendMailResults } from '../MailService';
+import { SparkPostTemplate } from './SparkPostMailService';
+import { CreateTransmission } from './SparkPostSettings';
 
 const defaults = {
   endpoint: 'https://api.sparkpost.com:443',
@@ -30,7 +29,7 @@ export class SparkPost {
   async request<TResponse>(
     apiPath: string,
     config: RequestInit
-  ): ResultsPromise<TResponse> {
+  ): Promise<{ results: TResponse }> {
     const url = `${this.endpoint}/api/${this.apiVersion}${apiPath}`;
 
     config.headers = { ...config.headers, Authorization: this.apiKey };

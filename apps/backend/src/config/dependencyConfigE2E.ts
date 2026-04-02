@@ -13,6 +13,7 @@ import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
+import PostgresEmailTemplateDataSource from '../datasources/postgres/EmailTemplateDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresExperimentSafetyPdfTemplateDataSource from '../datasources/postgres/ExperimentSafetyPdfTemplateDataSource';
@@ -30,6 +31,7 @@ import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/Propo
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -61,6 +63,7 @@ import {
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);
@@ -112,6 +115,7 @@ mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);

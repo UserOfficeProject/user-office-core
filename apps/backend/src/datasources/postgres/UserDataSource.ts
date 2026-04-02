@@ -81,7 +81,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   async update(user: UpdateUserByIdArgs): Promise<User> {
     const {
       firstname,
-      user_title,
+      userTitle,
       lastname,
       preferredname,
       institutionId,
@@ -94,7 +94,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     const [userRecord]: UserRecord[] = await database
       .update({
         firstname,
-        user_title,
+        user_title: userTitle,
         lastname,
         preferredname,
         institution_id: institutionId,
@@ -127,7 +127,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -147,7 +149,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -323,7 +327,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .catch((error) => {
         if (isUniqueConstraintError(error)) {
-          throw new GraphQLError('User already exists');
+          throw new GraphQLError('User already exists', {
+            originalError: error,
+          });
         }
         throw new GraphQLError('Could not update user. Check your Inputs.');
       });
@@ -736,7 +742,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title, role.description)
+          new Role(
+            role.role_id,
+            role.short_code,
+            role.title,
+            role.description,
+            role.permissions,
+            role.is_root_role
+          )
       );
   }
 
