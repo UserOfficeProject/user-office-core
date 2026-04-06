@@ -1,66 +1,19 @@
 import Box from '@mui/material/Box';
-import {
-  Viewer,
-  Worker,
-  Plugin,
-  SpecialZoomLevel,
-  createStore,
-  PluginFunctions,
-} from '@react-pdf-viewer/core';
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
-
-import '@react-pdf-viewer/core/lib/styles/index.css';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import { pdfjs, Document, Page } from 'react-pdf';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalPdfTemplate } from 'generated/sdk';
 
-interface CustomZoomPlugin extends Plugin {
-  zoomTo(scale: number | SpecialZoomLevel): void;
-}
-
-interface StoreProps {
-  zoom?(scale: number | SpecialZoomLevel): void;
-}
-
-const CustomZoomPlugin = (): CustomZoomPlugin => {
-  const store = React.useMemo(() => createStore<StoreProps>({}), []);
-
-  return {
-    install: (pluginFunctions: PluginFunctions) => {
-      store.update('zoom', pluginFunctions.zoom);
-    },
-    zoomTo: (scale: number | SpecialZoomLevel) => {
-      const zoom = store.get('zoom');
-      if (zoom) {
-        zoom(scale);
-      }
-    },
-  };
-};
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  '/scripts/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
-  const customZoomPluginInstance = CustomZoomPlugin();
-  const { zoomTo } = customZoomPluginInstance;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [pageNumber, setPageNumber] = useState<number>(1);
   const pdfViewerContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (entries[0]) {
-        zoomTo(SpecialZoomLevel.PageWidth);
-      }
-    });
-
-    const pdfViewerContainerRefCurrent = pdfViewerContainerRef.current;
-    if (pdfViewerContainerRefCurrent) {
-      resizeObserver.observe(pdfViewerContainerRefCurrent);
-    }
-
-    return () => {
-      if (pdfViewerContainerRefCurrent) {
-        resizeObserver.unobserve(pdfViewerContainerRefCurrent);
-      }
-    };
-  }, [zoomTo]);
 
   return (
     <Box
@@ -69,7 +22,9 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
       }}
       ref={pdfViewerContainerRef}
     >
-      <Viewer fileUrl={fileUrl} plugins={[customZoomPluginInstance]} />
+      <Document file={fileUrl}>
+        <Page pageNumber={pageNumber} />
+      </Document>
     </Box>
   );
 };
@@ -105,13 +60,11 @@ function PdfTemplateEditorViewer({
     });
   }, [fetchGeneratedPdfPreviewData]);
 
-  return (
-    <Worker workerUrl={'/scripts/pdf.worker.min.js'}>
-      {generatedPdfPreviewBlob && (
-        <PDFViewer fileUrl={URL.createObjectURL(generatedPdfPreviewBlob)} />
-      )}
-    </Worker>
-  );
+  if (generatedPdfPreviewBlob) {
+    return <PDFViewer fileUrl={URL.createObjectURL(generatedPdfPreviewBlob)} />;
+  } else {
+    return <div></div>;
+  }
 }
 
 export default React.memo(
