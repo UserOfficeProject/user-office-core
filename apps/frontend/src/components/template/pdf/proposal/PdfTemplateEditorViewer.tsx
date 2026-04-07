@@ -1,4 +1,7 @@
 import Box from '@mui/material/Box';
+import { PDFDocumentProxy } from 'pdfjs-dist';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { pdfjs, Document, Page } from 'react-pdf';
 
@@ -11,9 +14,14 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [numPages, setNumPages] = useState<number>();
   const pdfViewerContainerRef = useRef<HTMLDivElement>(null);
+
+  function onDocumentLoadSuccess({
+    numPages: nextNumPages,
+  }: PDFDocumentProxy): void {
+    setNumPages(nextNumPages);
+  }
 
   return (
     <Box
@@ -22,8 +30,10 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
       }}
       ref={pdfViewerContainerRef}
     >
-      <Document file={fileUrl}>
-        <Page pageNumber={pageNumber} />
+      <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>
+        {Array.from(new Array(numPages), (_el, index) => (
+          <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+        ))}
       </Document>
     </Box>
   );
