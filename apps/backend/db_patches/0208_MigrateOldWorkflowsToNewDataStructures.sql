@@ -77,6 +77,69 @@ BEGIN
           RAISE EXCEPTION 'call table must expose either workflow_id or proposal_workflow_id to migrate proposals.';
         END IF;
 
+
+        -- Pre-migration validation: abort if any proposal has a status_id that
+        -- is not present as a node in the workflow the proposal belongs to.
+        -- Such proposals would end up with workflow_status_id = NULL, which is invalid.
+        DECLARE
+          v_validation_rec RECORD;
+          v_abort_msg      TEXT := '';
+        BEGIN
+          CREATE TEMP TABLE tmp_pre_val_call_workflow (
+            call_id     INT PRIMARY KEY,
+            workflow_id INT
+          ) ON COMMIT DROP;
+
+          IF call_has_proposal_workflow_id THEN
+            INSERT INTO tmp_pre_val_call_workflow (call_id, workflow_id)
+            SELECT call_id, proposal_workflow_id
+            FROM call
+            WHERE proposal_workflow_id IS NOT NULL;
+          END IF;
+
+          IF call_has_workflow_id THEN
+            INSERT INTO tmp_pre_val_call_workflow (call_id, workflow_id)
+            SELECT call_id, workflow_id
+            FROM call
+            WHERE workflow_id IS NOT NULL
+            ON CONFLICT (call_id) DO UPDATE
+              SET workflow_id = COALESCE(EXCLUDED.workflow_id, tmp_pre_val_call_workflow.workflow_id);
+          END IF;
+
+          FOR v_validation_rec IN
+            SELECT array_agg(p.proposal_pk ORDER BY p.proposal_pk) AS proposal_pks,
+                   p.status_id,
+                   cw.workflow_id,
+                   w.name AS workflow_name
+            FROM proposals p
+            JOIN tmp_pre_val_call_workflow cw ON cw.call_id = p.call_id
+            JOIN workflows w ON w.workflow_id = cw.workflow_id
+            WHERE p.status_id IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1
+                FROM workflow_connections wc
+                WHERE wc.workflow_id = cw.workflow_id
+                  AND wc.status_id   = p.status_id
+              )
+            GROUP BY p.status_id, cw.workflow_id, w.name
+          LOOP
+            v_abort_msg := v_abort_msg || format(
+              E'\n  Proposal(s) %s have status_id=%s which is not part of workflow (id=%s, name=''%s'').',
+              v_validation_rec.proposal_pks::TEXT,
+              v_validation_rec.status_id,
+              v_validation_rec.workflow_id,
+              v_validation_rec.workflow_name
+            );
+          END LOOP;
+
+          IF v_abort_msg <> '' THEN
+            RAISE EXCEPTION E'Migration aborted:%\nPlease ensure that each proposal''s status_id exists as a node in its assigned workflow before running this migration.',
+              v_abort_msg;
+          END IF;
+
+          DROP TABLE IF EXISTS tmp_pre_val_call_workflow;
+        END;
+
         CREATE TEMP TABLE tmp_workflow_status_map (
           workflow_connection_id INT PRIMARY KEY,
           workflow_status_id INT NOT NULL
@@ -298,6 +361,8 @@ BEGIN
         IF v_unmapped_proposals > 0 THEN
           RAISE WARNING USING MESSAGE = format('%s proposals could not be mapped to workflow_status_id during migration.', v_unmapped_proposals);
         END IF;
+
+        ALTER TABLE proposals ALTER COLUMN workflow_status_id SET NOT NULL;
 
         DROP TABLE IF EXISTS workflow_connection_has_actions;
         DROP TABLE IF EXISTS status_changing_events;
