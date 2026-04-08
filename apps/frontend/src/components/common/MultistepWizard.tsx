@@ -11,7 +11,7 @@ import {
   FormikValues,
 } from 'formik';
 import React, { ReactNode, useState } from 'react';
-import * as Yup from 'yup';
+import type { AnyObjectSchema } from 'yup';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
 import UOLoader from './UOLoader';
@@ -159,6 +159,6 @@ export const WizardStep = ({
   children,
 }: {
   title: string;
-  validationSchema: Yup.AnyObjectSchema;
+  validationSchema: AnyObjectSchema;
   children: React.ReactNode;
 }) => <>{children}</>;

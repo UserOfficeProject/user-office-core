@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sanitizeHtml from 'sanitize-html';
-import * as Yup from 'yup';
+import type { AnyObjectSchema } from 'yup';
 
 import { sanitizerConfig } from '../models/questionTypes/RichTextInput';
 import { Rejection, rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 
 const schemaValidation = async (
-  schema: Yup.AnyObjectSchema,
+  schema: AnyObjectSchema,
   inputArgs: unknown
 ): Promise<any> => {
   try {
@@ -19,10 +19,7 @@ const schemaValidation = async (
   return null;
 };
 
-const ValidateArgs = (
-  schema: Yup.AnyObjectSchema,
-  sanitizeInput?: string[]
-) => {
+const ValidateArgs = (schema: AnyObjectSchema, sanitizeInput?: string[]) => {
   return (
     target: unknown,
     name: string,
