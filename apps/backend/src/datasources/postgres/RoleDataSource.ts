@@ -163,13 +163,20 @@ export default class PostgresRoleDataSource implements RoleDataSource {
   async getCallsbyRoleId(agent: number): Promise<Call[]> {
     try {
       const tags = await this.getTagsByRoleId(agent);
-      const tagIds = tags.map((tag) => tag.id);
-      const calls = await database<CallRecord>('call as c')
-        .join('tag_call as tc', 'c.call_id', 'tc.call_id')
-        .whereIn('tc.tag_id', tagIds)
-        .select('c.*');
 
-      return calls.map(createCallObject);
+      const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const calls = await database<CallRecord>('call as c')
+          .join('tag_call as tc', 'c.call_id', 'tc.call_id')
+          .whereIn('tc.tag_id', tagIds)
+          .select('c.*');
+
+        return calls.map(createCallObject);
+      } else {
+        const calls = await database<CallRecord>('call as c').select('c.*');
+
+        return calls.map(createCallObject);
+      }
     } catch (error) {
       logger.logError('Failed to get calls by role id', {
         agent,
@@ -182,15 +189,21 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     try {
       const tags = await this.getTagsByRoleId(agent);
       const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const instruments = await database<InstrumentRecord>(
+          'tag_instrument as fi'
+        )
+          .join('instruments as i', 'fi.instrument_id', 'i.instrument_id')
+          .whereIn('tag_id', tagIds)
+          .select('i.*');
 
-      const instruments = await database<InstrumentRecord>(
-        'tag_instrument as fi'
-      )
-        .join('instruments as i', 'fi.instrument_id', 'i.instrument_id')
-        .whereIn('tag_id', tagIds)
-        .select('i.*');
+        return instruments.map(createInstrumentObject);
+      } else {
+        const instruments =
+          await database<InstrumentRecord>('instruments as i').select('i.*');
 
-      return instruments.map(createInstrumentObject);
+        return instruments.map(createInstrumentObject);
+      }
     } catch (error) {
       logger.logError('Failed to get instruments by role id', {
         agent,
