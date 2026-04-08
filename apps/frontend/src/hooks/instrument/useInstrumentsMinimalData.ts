@@ -43,6 +43,19 @@ export function useInstrumentsMinimalData(callIds?: number[]): {
           }
           setLoadingInstruments(false);
         });
+    } else if (currentRole === UserRole.PROPOSAL_READER) {
+      api()
+        .getInstrumentsByRole()
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
+
+          if (data.instrumentByRole) {
+            setInstruments(data.instrumentByRole);
+          }
+          setLoadingInstruments(false);
+        });
     } else {
       api()
         .getMyInstrumentsMinimal()

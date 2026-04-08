@@ -110,4 +110,11 @@ export class CallsQuery {
   callsOfReviewer(@Ctx() context: ResolverContext) {
     return context.queries.call.getCallsOfReviewer(context.user);
   }
+
+  @Query(() => [Call])
+  callsByRole(@Ctx() context: ResolverContext) {
+    const t = context.queries.call.getTagCallsByRoleId(context.user);
+
+    return t;
+  }
 }

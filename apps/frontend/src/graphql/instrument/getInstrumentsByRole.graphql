@@ -1,0 +1,6 @@
+query getInstrumentsByRole {
+  instrumentByRole {
+    ...instrument
+    
+  }
+}

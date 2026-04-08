@@ -1,0 +1,6 @@
+query getCallsByRole {
+  callsByRole {
+    ...call
+    
+  }
+}

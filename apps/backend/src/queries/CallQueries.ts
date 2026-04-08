@@ -4,7 +4,9 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
+import { Call } from '../models/Call';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CallsFilter } from '../resolvers/queries/CallsQuery';
@@ -15,6 +17,7 @@ export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.RoleDataSource) public roleDataSource: RoleDataSource,
     @inject(Tokens.FapDataSource)
     public fapDataSource: FapDataSource
   ) {}
@@ -83,5 +86,12 @@ export default class CallQueries {
     );
 
     return this.dataSource.getCallsOfFaps(faps.map((fap) => fap.id));
+  }
+
+  @Authorized()
+  async getTagCallsByRoleId(user: UserWithRole | null): Promise<Call[]> {
+    const userId = user?.currentRole?.id;
+
+    return this.roleDataSource.getCallsbyRoleId(userId!);
   }
 }

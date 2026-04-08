@@ -4,6 +4,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
 import { Instrument, InstrumentWithManagementTime } from '../models/Instrument';
 import { Roles } from '../models/Role';
@@ -17,7 +18,9 @@ export default class InstrumentQueries {
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.FapDataSource)
-    public fapDataSource: FapDataSource
+    public fapDataSource: FapDataSource,
+    @inject(Tokens.RoleDataSource)
+    public roleDataSource: RoleDataSource
   ) {}
 
   @Authorized()
@@ -136,5 +139,13 @@ export default class InstrumentQueries {
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.getInstrument(id);
+  }
+  @Authorized()
+  async getTagInstrumentsByRoleId(
+    user: UserWithRole | null
+  ): Promise<Instrument[]> {
+    const userId = user?.currentRole?.id;
+
+    return this.roleDataSource.getInstrumentsbyRoleId(userId!);
   }
 }

@@ -1,3 +1,5 @@
+import { Call } from '../models/Call';
+import { Instrument } from '../models/Instrument';
 import { Role } from '../models/Role';
 import { Tag } from '../models/Tag';
 import { CreateRoleArgs } from '../resolvers/mutations/CreateRoleMutation';
@@ -9,6 +11,8 @@ export interface RoleDataSource {
   deleteRole(id: number): Promise<Role>;
   updateRoleTags(roleId: number, tagIds: number[]): Promise<Role>;
   getTagsByRoleId(roleId: number): Promise<Tag[]>;
+  getCallsbyRoleId(agent: number): Promise<Call[]>;
+  getInstrumentsbyRoleId(agent: number): Promise<Instrument[]>;
 }
 
 export { Tag };

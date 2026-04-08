@@ -1,17 +1,33 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
+import { Call } from '../../models/Call';
+import { Instrument } from '../../models/Instrument';
 import { Role } from '../../models/Role';
 import { Tag } from '../../models/Tag';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource } from '../RoleDataSource';
+import { TagDataSource } from '../TagDataSource';
 import database from './database';
-import { RoleRecord, createRoleObject, createTagObject } from './records';
+import {
+  RoleRecord,
+  createRoleObject,
+  createTagObject,
+  InstrumentRecord,
+  createInstrumentObject,
+  CallRecord,
+  createCallObject,
+} from './records';
 
 @injectable()
 export default class PostgresRoleDataSource implements RoleDataSource {
+  constructor(
+    @inject(Tokens.CallDataSource)
+    private tagDataSource: TagDataSource
+  ) {}
   private toPostgresArray(array: string[]): string {
     return `{${array.map((item) => `"${item}"`).join(',')}}`;
   }
@@ -139,6 +155,45 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     } catch (error) {
       logger.logError('Failed to get tags by role id', {
         roleId,
+      });
+      throw error;
+    }
+  }
+
+  async getCallsbyRoleId(agent: number): Promise<Call[]> {
+    try {
+      const tags = await this.getTagsByRoleId(agent);
+      const tagIds = tags.map((tag) => tag.id);
+      const calls = await database<CallRecord>('call as c')
+        .join('tag_call as tc', 'c.call_id', 'tc.call_id')
+        .whereIn('tc.tag_id', tagIds)
+        .select('c.*');
+
+      return calls.map(createCallObject);
+    } catch (error) {
+      logger.logError('Failed to get calls by role id', {
+        agent,
+      });
+      throw error;
+    }
+  }
+
+  async getInstrumentsbyRoleId(agent: number): Promise<Instrument[]> {
+    try {
+      const tags = await this.getTagsByRoleId(agent);
+      const tagIds = tags.map((tag) => tag.id);
+
+      const instruments = await database<InstrumentRecord>(
+        'tag_instrument as fi'
+      )
+        .join('instruments as i', 'fi.instrument_id', 'i.instrument_id')
+        .whereIn('tag_id', tagIds)
+        .select('i.*');
+
+      return instruments.map(createInstrumentObject);
+    } catch (error) {
+      logger.logError('Failed to get instruments by role id', {
+        agent,
       });
       throw error;
     }
