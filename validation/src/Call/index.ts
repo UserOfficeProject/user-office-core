@@ -10,7 +10,7 @@ const firstStepCreateCallValidationSchemaFields = {
   endCall: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE_TIME)
     .required('End call date is required')
-    .when('startCall', ([startCall], schema) => {
+    .when('startCall', ([startCall]: [Date], schema) => {
       if (!isValidDate(startCall)) {
         return schema;
       }
@@ -19,7 +19,7 @@ const firstStepCreateCallValidationSchemaFields = {
     }),
   endCallInternal: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE_TIME)
-    .when('endCall', ([endCall], schema) => {
+    .when('endCall', ([endCall]: [Date], schema) => {
       if (!isValidDate(endCall)) {
         return schema;
       }
@@ -52,7 +52,7 @@ const secondStepCallValidationSchemaFields = {
   endReview: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
     .required('End review date is required')
-    .when('startReview', ([startReview], schema) => {
+    .when('startReview', ([startReview]: [Date], schema) => {
       if (!isValidDate(startReview)) {
         return schema;
       }
@@ -64,7 +64,7 @@ const secondStepCallValidationSchemaFields = {
     .typeError(TYPE_ERR_INVALID_DATE)
     .nullable()
     .notRequired()
-    .when('startFapReview', ([startFapReview], schema) => {
+    .when('startFapReview', ([startFapReview]: [Date], schema) => {
       if (!isValidDate(startFapReview)) {
         return schema;
       }
@@ -85,7 +85,7 @@ const thirdStepCallValidationSchemaFields = {
   endNotify: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
     .required('End notify date is required')
-    .when('startNotify', ([startNotify], schema) => {
+    .when('startNotify', ([startNotify]: [Date], schema) => {
       if (!isValidDate(startNotify)) {
         return schema;
       }
@@ -96,7 +96,7 @@ const thirdStepCallValidationSchemaFields = {
   endCycle: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
     .required('End cycle date is required')
-    .when('startCycle', ([startCycle], schema) => {
+    .when('startCycle', ([startCycle]: [Date], schema) => {
       if (!isValidDate(startCycle)) {
         return schema;
       }

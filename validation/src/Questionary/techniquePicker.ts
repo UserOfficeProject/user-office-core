@@ -3,7 +3,9 @@ import * as Yup from 'yup';
 export const techniquePickerValidationSchema = (field: any) => {
   const config = field.config;
 
-  let schema;
+  let schema:
+    | Yup.ArraySchema<number[], Yup.AnyObject, '', ''>
+    | Yup.NumberSchema<number | null | undefined>;
 
   if (config.isMultipleSelect) {
     schema = Yup.array().of(Yup.number()).nullable();

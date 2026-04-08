@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-import type { AnyObjectSchema } from 'yup';
+import { AnyObjectSchema } from 'yup';
 
 import { BasicResolverContext } from '../context';
 import { Review, ReviewStatus } from '../models/Review';

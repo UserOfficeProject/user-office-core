@@ -13,7 +13,7 @@ export const bulkUpsertLostTimeValidationSchema = Yup.object().shape({
 
         endsAt: Yup.date()
           .typeError(TYPE_ERR_INVALID_DATE)
-          .when('startsAt', ([startsAt]) => {
+          .when('startsAt', ([startsAt]: [Date]) => {
             const min = DateTime.fromJSDate(startsAt).plus({ minute: 1 });
 
             return Yup.date().min(

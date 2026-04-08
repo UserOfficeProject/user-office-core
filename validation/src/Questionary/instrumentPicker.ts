@@ -1,9 +1,16 @@
 import * as Yup from 'yup';
 
+interface ValidationSchema {
+  instrumentId?: string;
+  timeRequested?: string;
+}
+
 export const instrumentPickerValidationSchema = (field: any) => {
   const config = field.config;
 
-  let schema;
+  let schema:
+    | Yup.ArraySchema<{}[], ValidationSchema, '', ''>
+    | Yup.ObjectSchema<{}, ValidationSchema>;
 
   if (config.isMultipleSelect) {
     schema = Yup.array().of(

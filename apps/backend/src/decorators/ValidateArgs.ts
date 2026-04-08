@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sanitizeHtml from 'sanitize-html';
-import type { AnyObjectSchema } from 'yup';
+import { AnyObjectSchema } from 'yup';
 
 import { sanitizerConfig } from '../models/questionTypes/RichTextInput';
 import { Rejection, rejection } from '../models/Rejection';
