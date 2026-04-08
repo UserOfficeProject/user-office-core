@@ -6,7 +6,12 @@ import initialDBData from '../support/initialDBData';
 
 const tagName = faker.word.words(2);
 const tagShortCode = faker.word.words(1);
-
+const dynamicRoleDetails = {
+  id: 11,
+  title: 'Dynamic Proposal Reader',
+  description: 'Role that can only see calls and proposals with specific tags',
+  shortCode: 'proposal_reader',
+};
 const scientist1 = initialDBData.users.user1;
 
 const instrument1 = {
@@ -19,10 +24,7 @@ const instrument1 = {
 context('Tag tests', () => {
   beforeEach(function () {
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (
-        !featureFlags.getEnabledFeatures().get(FeatureId.TAGS) ||
-        !featureFlags.getEnabledFeatures().get(FeatureId.OAUTH) // TODO implement method setUserRoles in StfcUserDataSource and remove this condition
-      ) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TAGS)) {
         this.skip();
       }
     });
@@ -181,17 +183,17 @@ context('Tag tests', () => {
 
       cy.get('[data-cy="create-new-entry"]').click();
 
-      cy.get('[data-cy="role-title-input"]').type('Dynamic Proposal Reader');
+      cy.get('[data-cy="role-title-input"]').type(dynamicRoleDetails.title);
       cy.get('[data-cy="role-description-input"]').type(
-        'Role that can only see calls and proposals with specific tags'
+        dynamicRoleDetails.description
       );
       cy.get('[data-cy="role-shortcode-select"]').click();
-      cy.get('[role="listbox"]').contains('proposal_reader').click();
+      cy.get('[role="listbox"]').contains(dynamicRoleDetails.shortCode).click();
       cy.get('[data-cy="submit-role-button"]').click();
 
       cy.updateUserRoles({
         id: initialDBData.users.user1.id,
-        roles: [11], // newly created role
+        roles: [dynamicRoleDetails.id], // newly created role
       });
 
       cy.login('user1');
@@ -204,13 +206,21 @@ context('Tag tests', () => {
 
       cy.login('officer');
       cy.visit('/admin/roles');
-      cy.get('[aria-label="Assign Tag"]').click();
+      cy.finishedLoading();
 
-      cy.get('[role="dialog"]').contains(tagName).click();
+      cy.contains('tr', dynamicRoleDetails.title)
+        .find('[aria-label="Assign Tags"]')
+        .click();
+
+      cy.get('[role="dialog"] input[placeholder="Select tags"]')
+        .should('be.visible')
+        .click()
+        .type(tagName);
+
+      cy.get('[role="option"]').contains(tagName).should('be.visible').click();
 
       cy.get('[role="dialog"] [data-cy="assign-selected-tags"]').click();
-
-      cy.login('user1');
+      cy.login('user1', dynamicRoleDetails.id);
       cy.visit('/Proposals');
 
       cy.contains(title).should('exist');
