@@ -1,8 +1,3 @@
-import {
-  ExperimentSafetyPdfTemplateRecord,
-  ProposalPdfTemplateRecord,
-} from 'knex/types/tables';
-
 import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
@@ -88,42 +83,7 @@ import {
 } from '../../resolvers/types/ProposalView';
 import { FeedbackStatus } from './../../models/Feedback';
 
-// Adds types to datasources: https://knexjs.org/guide/#typescript
-declare module 'knex/types/tables' {
-  export interface ProposalPdfTemplateRecord {
-    readonly proposal_pdf_template_id: number;
-    readonly template_id: number;
-    readonly template_data: string;
-    readonly template_header: string;
-    readonly template_footer: string;
-    readonly template_sample_declaration: string;
-    readonly dummy_data: string;
-    readonly creator_id: number;
-    readonly created_at: Date;
-  }
-
-  export interface ExperimentSafetyPdfTemplateRecord {
-    readonly experiment_safety_pdf_template_id: number;
-    readonly template_id: number;
-    readonly template_data: string;
-    readonly template_header: string;
-    readonly template_footer: string;
-    readonly template_sample_declaration: string;
-    readonly dummy_data: string;
-    readonly creator_id: number;
-    readonly created_at: Date;
-  }
-
-  interface Tables {
-    proposal_pdf_templates: ProposalPdfTemplateRecord;
-    experiment_safety_pdf_templates: ExperimentSafetyPdfTemplateRecord;
-    techniques: TechniqueRecord;
-    technique_has_instruments: TechniqueHasInstrumentsRecord;
-  }
-}
-
 // Interfaces corresponding exactly to database tables
-
 export interface ProposalUserRecord {
   readonly proposal_pk: number;
   readonly user_id: number;
@@ -1339,6 +1299,18 @@ export const createPredefinedMessageObject = (
 export const createQuantityObject = (quantity: QuantityRecord) =>
   new Quantity(quantity.quantity_id);
 
+export interface ProposalPdfTemplateRecord {
+  readonly proposal_pdf_template_id: number;
+  readonly template_id: number;
+  readonly template_data: string;
+  readonly template_header: string;
+  readonly template_footer: string;
+  readonly template_sample_declaration: string;
+  readonly dummy_data: string;
+  readonly creator_id: number;
+  readonly created_at: Date;
+}
+
 export const createProposalPdfTemplateObject = (
   pdfTemplate: ProposalPdfTemplateRecord
 ) => {
@@ -1354,6 +1326,18 @@ export const createProposalPdfTemplateObject = (
     pdfTemplate.created_at
   );
 };
+
+export interface ExperimentSafetyPdfTemplateRecord {
+  readonly experiment_safety_pdf_template_id: number;
+  readonly template_id: number;
+  readonly template_data: string;
+  readonly template_header: string;
+  readonly template_footer: string;
+  readonly template_sample_declaration: string;
+  readonly dummy_data: string;
+  readonly creator_id: number;
+  readonly created_at: Date;
+}
 
 export const createExperimentSafetyPdfTemplateObject = (
   pdfTemplate: ExperimentSafetyPdfTemplateRecord
