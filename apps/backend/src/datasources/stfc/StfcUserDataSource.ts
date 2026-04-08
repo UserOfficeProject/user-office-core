@@ -25,7 +25,7 @@ type StfcRolesToEssRole = { [key: string]: Roles[] };
 /*
  * Must not contain user role, this is appended at the very last step.
  */
-const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
+const stfcRolesToSystemRoleDefinitions: StfcRolesToEssRole = {
   'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
@@ -395,7 +395,40 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    throw new Error('Method not implemented.');
+    try {
+      const roleDefinitions = await this.getRoles();
+      if (!roleDefinitions) {
+        throw new Error('Role definitions not set up in the system');
+      }
+      const userRole: Role | undefined = roleDefinitions.find(
+        (role) => role.shortCode == Roles.USER
+      );
+      const stfcRoles = await this.getRolesForUser(id);
+
+      const assignedRoleIds = new Set(
+        this.mapStfcRolesToSystemRoleDefinitions(
+          stfcRoles,
+          roleDefinitions
+        ).map((r) => r.id)
+      );
+      const newRolesToAssign = Array.from(new Set(roles)).filter(
+        (roleId) => !assignedRoleIds.has(roleId) && roleId !== userRole?.id
+      );
+
+      if (newRolesToAssign.length > 0) {
+        await postgresUserDataSource.setUserRoles(id, newRolesToAssign);
+        this.stfcRolesCache.remove(String(id));
+        this.uopRolesCache.remove(String(id));
+      }
+
+      return;
+    } catch (error) {
+      logger.logError('Error setting user roles in', {
+        error,
+        userId: id,
+      });
+      throw error;
+    }
   }
   async getRolesForUser(id: number): Promise<RoleDTO[]> {
     const cachedRoles = this.stfcRolesCache.get(String(id));
@@ -417,63 +450,68 @@ export class StfcUserDataSource implements UserDataSource {
 
     return stfcRawRolesRequest!;
   }
-
   async getUserRoles(id: number): Promise<Role[]> {
     const cachedRoles = this.uopRolesCache.get(String(id));
     if (cachedRoles) {
       return cachedRoles;
     }
 
-    const stfcRawRolesRequest = this.getRolesForUser(id);
+    const roleDefinitions = await this.getRoles();
+    if (!roleDefinitions) {
+      return [];
+    }
 
-    const stfcRolesRequest = stfcRawRolesRequest.then((stfcRoles) => {
-      return this.getRoles().then((roleDefinitions) => {
-        const userRole: Role | undefined = roleDefinitions.find(
-          (role) => role.shortCode == Roles.USER
-        );
-        if (!userRole) {
-          return [];
-        }
+    const [assignedSystemUserRoles, stfcRoles] = await Promise.all([
+      postgresUserDataSource.getUserRoles(id),
+      this.getRolesForUser(id),
+    ]);
 
-        if (!stfcRoles || stfcRoles.length == 0) {
-          return [userRole];
-        }
+    const userRole: Role | undefined = roleDefinitions.find(
+      (role) => role.shortCode == Roles.USER
+    );
+    if (!userRole) {
+      return [];
+    }
 
-        /*
-         * Convert the STFC roles to the Roles enums which refers to roles
-         * by short code. We will use the short code to filter relevant
-         * roles.
-         */
-        const userRolesAsEnum: Roles[] = stfcRoles
-          .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name!])
-          .filter((r) => r !== undefined) as Roles[];
+    if (!stfcRoles || stfcRoles.length == 0) {
+      return [userRole];
+    }
 
-        /*
-         * Filter relevant roles by short code.
-         */
-        const userRolesAsRole: Role[] = userRolesAsEnum
-          .map((r) => roleDefinitions.find((d) => d.shortCode === r))
-          .filter((r) => r !== undefined) as Role[];
+    const externalRoles = this.mapStfcRolesToSystemRoleDefinitions(
+      stfcRoles,
+      roleDefinitions
+    );
 
-        /*
-         * We can't return non-unique roles.
-         */
-        const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
+    const combinedUserRoles = [...externalRoles, ...assignedSystemUserRoles];
 
-        uniqueRoles.sort((a, b) => a.id - b.id);
+    const uniqueRoles: Role[] = [...new Set(combinedUserRoles)];
 
-        /*
-         * Prepend the user role as it must be first.
-         */
-        const userRoles = [userRole, ...uniqueRoles];
+    uniqueRoles.sort((a, b) => a.id - b.id);
 
-        return userRoles;
-      });
-    });
+    const userRoles = [userRole, ...uniqueRoles];
 
-    this.uopRolesCache.put(String(id), stfcRolesRequest);
+    this.uopRolesCache.put(String(id), Promise.resolve(userRoles));
 
-    return stfcRolesRequest;
+    return userRoles;
+  }
+
+  private mapStfcRolesToSystemRoleDefinitions(
+    stfcRoles: RoleDTO[] | undefined,
+    roleDefinitions: Role[]
+  ): Role[] {
+    if (!stfcRoles?.length) {
+      return [];
+    }
+
+    const userRolesAsEnum: Roles[] = stfcRoles
+      .flatMap((stfcRole) => stfcRolesToSystemRoleDefinitions[stfcRole.name!])
+      .filter((r) => r !== undefined) as Roles[];
+
+    const mappedRoles: Role[] = userRolesAsEnum
+      .map((r) => roleDefinitions.find((d) => d.shortCode === r))
+      .filter((r) => r !== undefined) as Role[];
+
+    return mappedRoles;
   }
 
   async getRoles(): Promise<Role[]> {
