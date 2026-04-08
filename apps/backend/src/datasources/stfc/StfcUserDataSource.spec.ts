@@ -1,5 +1,6 @@
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
+import PostgresUserDataSource from '../postgres/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
@@ -157,6 +158,12 @@ describe('Role tests', () => {
       ])
     );
 
+    const mockGetUserRoles = jest.spyOn(
+      PostgresUserDataSource.prototype,
+      'getUserRoles'
+    );
+    mockGetUserRoles.mockImplementation(() => Promise.resolve([]));
+
     const mockEnsureDummyUserExists = jest.spyOn(
       StfcUserDataSource.prototype,
       'ensureDummyUserExists'
@@ -181,7 +188,7 @@ describe('Role tests', () => {
     );
   });
 
-  test('When getting roles for a user, STFC roles are translated into ESS roles', async () => {
+  test('When getting roles for a user, STFC roles are translated into UO system roles', async () => {
     const userdataSource = new StfcUserDataSource();
 
     return expect(
