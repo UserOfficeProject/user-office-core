@@ -11,8 +11,8 @@ export interface RoleDataSource {
   deleteRole(id: number): Promise<Role>;
   updateRoleTags(roleId: number, tagIds: number[]): Promise<Role>;
   getTagsByRoleId(roleId: number): Promise<Tag[]>;
-  getCallsbyRoleId(agent: number): Promise<Call[]>;
-  getInstrumentsbyRoleId(agent: number): Promise<Instrument[]>;
+  getCallsByRoleId(agent: number): Promise<Call[]>;
+  getInstrumentsByRoleId(agent: number): Promise<Instrument[]>;
 }
 
 export { Tag };

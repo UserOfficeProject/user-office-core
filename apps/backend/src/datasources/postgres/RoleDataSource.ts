@@ -160,9 +160,9 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     }
   }
 
-  async getCallsbyRoleId(agent: number): Promise<Call[]> {
+  async getCallsByRoleId(agent: number): Promise<Call[]> {
     try {
-      const tags = await this.getTagsByRoleId(agent);
+      const tags = (await this.getTagsByRoleId(agent)) ?? [];
 
       const tagIds = tags.map((tag) => tag.id);
       if (tagIds.length != 0) {
@@ -185,15 +185,15 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     }
   }
 
-  async getInstrumentsbyRoleId(agent: number): Promise<Instrument[]> {
+  async getInstrumentsByRoleId(agent: number): Promise<Instrument[]> {
     try {
-      const tags = await this.getTagsByRoleId(agent);
+      const tags = (await this.getTagsByRoleId(agent)) ?? [];
       const tagIds = tags.map((tag) => tag.id);
       if (tagIds.length != 0) {
         const instruments = await database<InstrumentRecord>(
-          'tag_instrument as fi'
+          'tag_instrument as ti'
         )
-          .join('instruments as i', 'fi.instrument_id', 'i.instrument_id')
+          .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
           .whereIn('tag_id', tagIds)
           .select('i.*');
 

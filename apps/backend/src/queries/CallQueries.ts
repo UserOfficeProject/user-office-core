@@ -92,6 +92,6 @@ export default class CallQueries {
   async getTagCallsByRoleId(user: UserWithRole | null): Promise<Call[]> {
     const userId = user?.currentRole?.id;
 
-    return this.roleDataSource.getCallsbyRoleId(userId!);
+    return this.roleDataSource.getCallsByRoleId(userId!);
   }
 }

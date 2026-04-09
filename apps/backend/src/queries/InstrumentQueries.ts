@@ -146,6 +146,6 @@ export default class InstrumentQueries {
   ): Promise<Instrument[]> {
     const userId = user?.currentRole?.id;
 
-    return this.roleDataSource.getInstrumentsbyRoleId(userId!);
+    return this.roleDataSource.getInstrumentsByRoleId(userId!);
   }
 }

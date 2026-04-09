@@ -55,10 +55,10 @@ export class RoleDataSourceMock implements RoleDataSource {
       isRootRole: false,
     } as Role;
   }
-  async getCallsbyRoleId(agent: number): Promise<Call[]> {
+  async getCallsByRoleId(agent: number): Promise<Call[]> {
     return dummyCalls;
   }
-  async getInstrumentsbyRoleId(agent: number): Promise<Instrument[]> {
+  async getInstrumentsByRoleId(agent: number): Promise<Instrument[]> {
     return dummyInstruments;
   }
 

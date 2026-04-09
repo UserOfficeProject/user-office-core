@@ -113,8 +113,6 @@ export class CallsQuery {
 
   @Query(() => [Call])
   callsByRole(@Ctx() context: ResolverContext) {
-    const t = context.queries.call.getTagCallsByRoleId(context.user);
-
-    return t;
+    return context.queries.call.getTagCallsByRoleId(context.user);
   }
 }
