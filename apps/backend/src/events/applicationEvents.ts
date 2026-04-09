@@ -1,3 +1,4 @@
+import { Event } from './event.enum';
 import { Call } from '../models/Call';
 import { EmailTemplate } from '../models/EmailTemplate';
 import { ExperimentSafety } from '../models/Experiment';
@@ -15,7 +16,6 @@ import { Technique } from '../models/Technique';
 import { User } from '../models/User';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
-import { Event } from './event.enum';
 
 export interface GeneralEvent {
   type: Event;

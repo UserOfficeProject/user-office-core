@@ -1,5 +1,6 @@
 import { container, Lifecycle } from 'tsyringe';
 
+import RoleMutations from './RoleMutations';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import {
@@ -7,7 +8,6 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { isRejection } from '../models/Rejection';
-import RoleMutations from './RoleMutations';
 
 let roleMutations: RoleMutations;
 

@@ -9,9 +9,9 @@ import {
   Resolver,
 } from 'type-graphql';
 
+import { Tag } from './Tag';
 import { ResolverContext } from '../../context';
 import { Role as RoleOrigin } from '../../models/Role';
-import { Tag } from './Tag';
 
 @ObjectType()
 export class Role implements Partial<RoleOrigin> {

@@ -1,11 +1,11 @@
 import { ObjectType, Field } from 'type-graphql';
 
+import { Unit } from './Unit';
 import {
   ComparisonStatus,
   ConflictResolutionStrategy,
 } from '../../models/Template';
 import { UnitComparison as UnitComparisonOrigin } from '../../models/Unit';
-import { Unit } from './Unit';
 
 @ObjectType()
 export class UnitComparison implements Partial<UnitComparisonOrigin> {
