@@ -1,5 +1,6 @@
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
+import PostgresUserDataSource from '../postgres/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
@@ -144,11 +145,24 @@ describe('Role tests', () => {
     const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
     mockGetRoles.mockImplementation(() =>
       Promise.resolve([
-        new Role(1, Roles.USER, 'User', ''),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', ''),
-        new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist', ''),
+        new Role(1, Roles.USER, 'User', '', [], true),
+        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
+        new Role(
+          3,
+          Roles.INSTRUMENT_SCIENTIST,
+          'Instrument Scientist',
+          '',
+          [],
+          true
+        ),
       ])
     );
+
+    const mockGetUserRoles = jest.spyOn(
+      PostgresUserDataSource.prototype,
+      'getUserRoles'
+    );
+    mockGetUserRoles.mockImplementation(() => Promise.resolve([]));
 
     const mockEnsureDummyUserExists = jest.spyOn(
       StfcUserDataSource.prototype,
@@ -169,21 +183,28 @@ describe('Role tests', () => {
 
     return expect(roles[0]).toEqual(
       expect.objectContaining(
-        new Role(expect.any(Number), Roles.USER, 'User', '')
+        new Role(expect.any(Number), Roles.USER, 'User', '', [], true)
       )
     );
   });
 
-  test('When getting roles for a user, STFC roles are translated into ESS roles', async () => {
+  test('When getting roles for a user, STFC roles are translated into UO system roles', async () => {
     const userdataSource = new StfcUserDataSource();
 
     return expect(
       userdataSource.getUserRoles(dummyUserNumber)
     ).resolves.toEqual(
       expect.arrayContaining([
-        new Role(1, Roles.USER, 'User', ''),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', ''),
-        new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist', ''),
+        new Role(1, Roles.USER, 'User', '', [], true),
+        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
+        new Role(
+          3,
+          Roles.INSTRUMENT_SCIENTIST,
+          'Instrument Scientist',
+          '',
+          [],
+          true
+        ),
       ])
     );
   });

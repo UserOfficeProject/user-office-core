@@ -65,7 +65,15 @@ export default function ProposalContainer(props: ProposalContainerProps) {
   ) => {
     switch (action.type) {
       case 'SAMPLE_DECLARATION_ITEMS_MODIFIED':
-        draftState.proposal.samples = action.newItems;
+        const newSamples = [
+          ...(action.newItems || []),
+          ...(draftState.proposal.samples?.filter(
+            (sample) => sample.questionId !== action.questionId
+          ) || []),
+        ];
+
+        draftState.proposal.samples = newSamples;
+
         draftState.isDirty = true;
         break;
       case GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED:

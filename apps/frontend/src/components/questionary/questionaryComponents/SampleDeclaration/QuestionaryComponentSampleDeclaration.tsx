@@ -97,6 +97,7 @@ function QuestionaryComponentSampleDeclaration(
           dispatch({
             type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED',
             id: answerId,
+            questionId: answer.question.id,
             newItems: updatedItems,
           });
         };
@@ -110,6 +111,7 @@ function QuestionaryComponentSampleDeclaration(
                 const newStateItems = [...field.value, clonedSample];
 
                 updateFieldValueAndState(newStateItems);
+                setSelectedSample(clonedSample);
               }
             });
 
