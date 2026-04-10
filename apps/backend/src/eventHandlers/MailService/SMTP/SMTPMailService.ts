@@ -232,7 +232,7 @@ export class SMTPMailService extends MailService {
       emailPromises.push(
         this.emailTemplate.send({
           message: {
-            ...(!!participant.header_to
+            ...(participant.header_to
               ? {
                   to: {
                     address: isProduction

@@ -2,14 +2,14 @@ import { faker } from '@faker-js/faker';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { eliEmailHandler } from './eliEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import { EmailTemplateDataSourceMock } from '../../datasources/mockups/EmailTemplateDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { eliEmailHandler } from './eliEmailHandler';
-import { EmailTemplateId } from './emailTemplateId';
 
 // Mock MailService
 const mockMailService = {

@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
@@ -16,7 +17,6 @@ import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId } from './emailTemplateId';
 
 export async function eliEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
