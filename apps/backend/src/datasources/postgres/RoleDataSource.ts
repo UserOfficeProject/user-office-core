@@ -1,23 +1,17 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { Role } from '../../models/Role';
 import { Tag } from '../../models/Tag';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource } from '../RoleDataSource';
-import { TagDataSource } from '../TagDataSource';
 import database from './database';
 import { RoleRecord, createRoleObject, createTagObject } from './records';
 
 @injectable()
 export default class PostgresRoleDataSource implements RoleDataSource {
-  constructor(
-    @inject(Tokens.CallDataSource)
-    private tagDataSource: TagDataSource
-  ) {}
   private toPostgresArray(array: string[]): string {
     return `{${array.map((item) => `"${item}"`).join(',')}}`;
   }
