@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { Instrument } from '../../models/Instrument';
 import { Role } from '../../models/Role';
 import { Tag } from '../../models/Tag';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
@@ -11,13 +10,7 @@ import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource } from '../RoleDataSource';
 import { TagDataSource } from '../TagDataSource';
 import database from './database';
-import {
-  RoleRecord,
-  createRoleObject,
-  createTagObject,
-  InstrumentRecord,
-  createInstrumentObject,
-} from './records';
+import { RoleRecord, createRoleObject, createTagObject } from './records';
 
 @injectable()
 export default class PostgresRoleDataSource implements RoleDataSource {
@@ -152,33 +145,6 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     } catch (error) {
       logger.logError('Failed to get tags by role id', {
         roleId,
-      });
-      throw error;
-    }
-  }
-
-  async getInstrumentsByRoleId(agent: number): Promise<Instrument[]> {
-    try {
-      const tags = (await this.getTagsByRoleId(agent)) ?? [];
-      const tagIds = tags.map((tag) => tag.id);
-      if (tagIds.length != 0) {
-        const instruments = await database<InstrumentRecord>(
-          'tag_instrument as ti'
-        )
-          .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
-          .whereIn('tag_id', tagIds)
-          .select('i.*');
-
-        return instruments.map(createInstrumentObject);
-      } else {
-        const instruments =
-          await database<InstrumentRecord>('instruments as i').select('i.*');
-
-        return instruments.map(createInstrumentObject);
-      }
-    } catch (error) {
-      logger.logError('Failed to get instruments by role id', {
-        agent,
       });
       throw error;
     }

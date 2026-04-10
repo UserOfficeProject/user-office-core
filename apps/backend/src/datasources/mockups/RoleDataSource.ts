@@ -1,9 +1,7 @@
-import { Instrument } from '../../models/Instrument';
 import { Role } from '../../models/Role';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource, Tag } from '../RoleDataSource';
-import { dummyInstruments } from './InstrumentDataSource';
 
 const dummyRole: Role = {
   id: 1,
@@ -52,9 +50,6 @@ export class RoleDataSourceMock implements RoleDataSource {
       permissions: [],
       isRootRole: false,
     } as Role;
-  }
-  async getInstrumentsByRoleId(agent: number): Promise<Instrument[]> {
-    return dummyInstruments;
   }
 
   async updateRoleTags(roleId: number, tagIds: number[]): Promise<Role> {

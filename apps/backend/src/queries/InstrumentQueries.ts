@@ -140,12 +140,4 @@ export default class InstrumentQueries {
   async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.getInstrument(id);
   }
-  @Authorized()
-  async getTagInstrumentsByRoleId(
-    user: UserWithRole | null
-  ): Promise<Instrument[]> {
-    const userId = user?.currentRole?.id;
-
-    return this.roleDataSource.getInstrumentsByRoleId(userId!);
-  }
 }

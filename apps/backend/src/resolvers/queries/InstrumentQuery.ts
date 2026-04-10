@@ -97,9 +97,4 @@ export class InstrumentQuery {
   ): Promise<Instrument[]> {
     return context.queries.instrument.getFapReviewerInstruments(context.user);
   }
-
-  @Query(() => [Instrument], { nullable: true })
-  instrumentByRole(@Ctx() context: ResolverContext) {
-    return context.queries.instrument.getTagInstrumentsByRoleId(context.user);
-  }
 }
