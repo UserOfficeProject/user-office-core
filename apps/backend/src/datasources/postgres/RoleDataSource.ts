@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { Call } from '../../models/Call';
 import { Instrument } from '../../models/Instrument';
 import { Role } from '../../models/Role';
 import { Tag } from '../../models/Tag';
@@ -18,8 +17,6 @@ import {
   createTagObject,
   InstrumentRecord,
   createInstrumentObject,
-  CallRecord,
-  createCallObject,
 } from './records';
 
 @injectable()
@@ -155,31 +152,6 @@ export default class PostgresRoleDataSource implements RoleDataSource {
     } catch (error) {
       logger.logError('Failed to get tags by role id', {
         roleId,
-      });
-      throw error;
-    }
-  }
-
-  async getCallsByRoleId(agent: number): Promise<Call[]> {
-    try {
-      const tags = (await this.getTagsByRoleId(agent)) ?? [];
-
-      const tagIds = tags.map((tag) => tag.id);
-      if (tagIds.length != 0) {
-        const calls = await database<CallRecord>('call as c')
-          .join('tag_call as tc', 'c.call_id', 'tc.call_id')
-          .whereIn('tc.tag_id', tagIds)
-          .select('c.*');
-
-        return calls.map(createCallObject);
-      } else {
-        const calls = await database<CallRecord>('call as c').select('c.*');
-
-        return calls.map(createCallObject);
-      }
-    } catch (error) {
-      logger.logError('Failed to get calls by role id', {
-        agent,
       });
       throw error;
     }

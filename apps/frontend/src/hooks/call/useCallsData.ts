@@ -1,12 +1,6 @@
-import { useEffect, useState, SetStateAction, useContext } from 'react';
+import { useEffect, useState, SetStateAction } from 'react';
 
-import { UserContext } from 'context/UserContextProvider';
-import {
-  Call,
-  CallsFilter,
-  PaginationSortDirection,
-  UserRole,
-} from 'generated/sdk';
+import { Call, CallsFilter, PaginationSortDirection } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export enum CallsDataQuantity {
@@ -29,7 +23,7 @@ export function useCallsData(
   const [callsQueryParams, setCallsQueryParams] = useState(queryParameters);
   const [calls, setCalls] = useState<Call[]>([]);
   const [loadingCalls, setLoadingCalls] = useState(true);
-  const { currentRole } = useContext(UserContext);
+
   const api = useDataApi();
 
   const setCallsWithLoading = (data: SetStateAction<Call[]>) => {
@@ -49,8 +43,6 @@ export function useCallsData(
     setLoadingCalls(true);
 
     let getCalls;
-
-    const getCallsByRole = api().getCallsByRole;
     switch (dataQuantity) {
       case CallsDataQuantity.EXTENDED:
         getCalls = api().getCalls;
@@ -59,28 +51,17 @@ export function useCallsData(
         getCalls = api().getCallsMinimal;
         break;
     }
-    if (currentRole === UserRole.PROPOSAL_READER) {
-      getCallsByRole({}).then((data) => {
-        if (unmounted) {
-          return;
-        }
-        if (data.callsByRole) {
-          setCalls(data.callsByRole as Call[]);
-          setLoadingCalls(false);
-        }
-      });
-    } else {
-      getCalls({ filter: callsFilter, ...callsQueryParams }).then((data) => {
-        if (unmounted) {
-          return;
-        }
 
-        if (data.calls) {
-          setCalls(data.calls as Call[]);
-        }
-        setLoadingCalls(false);
-      });
-    }
+    getCalls({ filter: callsFilter, ...callsQueryParams }).then((data) => {
+      if (unmounted) {
+        return;
+      }
+
+      if (data.calls) {
+        setCalls(data.calls as Call[]);
+      }
+      setLoadingCalls(false);
+    });
 
     return () => {
       unmounted = true;

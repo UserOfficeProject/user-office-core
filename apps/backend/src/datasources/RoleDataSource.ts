@@ -1,4 +1,3 @@
-import { Call } from '../models/Call';
 import { Instrument } from '../models/Instrument';
 import { Role } from '../models/Role';
 import { Tag } from '../models/Tag';
@@ -11,7 +10,6 @@ export interface RoleDataSource {
   deleteRole(id: number): Promise<Role>;
   updateRoleTags(roleId: number, tagIds: number[]): Promise<Role>;
   getTagsByRoleId(roleId: number): Promise<Tag[]>;
-  getCallsByRoleId(agent: number): Promise<Call[]>;
   getInstrumentsByRoleId(agent: number): Promise<Instrument[]>;
 }
 

@@ -6,7 +6,6 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
-import { Call } from '../models/Call';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CallsFilter } from '../resolvers/queries/CallsQuery';
@@ -39,10 +38,12 @@ export default class CallQueries {
     if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
+    const userId = agent?.currentRole?.id;
     const calls = await this.dataSource.getCalls(
       filter,
       sortField,
-      sortDirection
+      sortDirection,
+      userId!
     );
 
     return calls;
@@ -86,12 +87,5 @@ export default class CallQueries {
     );
 
     return this.dataSource.getCallsOfFaps(faps.map((fap) => fap.id));
-  }
-
-  @Authorized()
-  async getTagCallsByRoleId(user: UserWithRole | null): Promise<Call[]> {
-    const userId = user?.currentRole?.id;
-
-    return this.roleDataSource.getCallsByRoleId(userId!);
   }
 }
