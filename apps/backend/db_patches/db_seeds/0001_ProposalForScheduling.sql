@@ -21,15 +21,13 @@ BEGIN
     (1, 10, 580, 'EDITABLE_SUBMITTED_INTERNAL'),
     (1, 10, 640, 'EDITABLE_SUBMITTED');
 
-  INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
-  INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (2, 'Instrument 2', 'INSTR2', 'Test instrument 2', 0);
-  INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (3, 'Instrument 3', 'INSTR3', 'Test instrument 3', 0);
-  PERFORM setval('public.instruments_instrument_id_seq', 4, false); -- Reset sequence to avoid conflicts
+  INSERT INTO instruments (name, short_code, description, manager_user_id) VALUES ('Instrument 1', 'INSTR1', 'Test instrument 1', 0);
+  INSERT INTO instruments (name, short_code, description, manager_user_id) VALUES ('Instrument 2', 'INSTR2', 'Test instrument 2', 0);
+  INSERT INTO instruments (name, short_code, description, manager_user_id) VALUES ('Instrument 3', 'INSTR3', 'Test instrument 3', 0);
 
-  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (1, 'Technique 1', 'TECH1', 'Test technique 1');
-  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (2, 'Technique 2', 'TECH2', 'Test technique 2');
-  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (3, 'Technique 3', 'TECH3', 'Test technique 3');
-  PERFORM setval('public.techniques_technique_id_seq', 4, false);
+  INSERT INTO techniques (name, short_code, description) VALUES ('Technique 1', 'TECH1', 'Test technique 1');
+  INSERT INTO techniques (name, short_code, description) VALUES ('Technique 2', 'TECH2', 'Test technique 2');
+  INSERT INTO techniques (name, short_code, description) VALUES ('Technique 3', 'TECH3', 'Test technique 3');
 
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 1, NULL);
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 3, NULL);
@@ -106,9 +104,8 @@ BEGIN
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
 
-  INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
-  VALUES (1, 1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
-  PERFORM setval('public.technical_review_technical_review_id_seq', 2, false); -- Reset sequence to avoid conflicts
+  INSERT INTO technical_review(proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
+  VALUES (1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
 
   INSERT INTO proposals 
     (
@@ -146,7 +143,6 @@ BEGIN
      , true              
      , true              
     );
-  PERFORM setval('public.proposals_proposal_id_seq', 3, false); -- Reset sequence to avoid conflicts
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (2, 2);
 
