@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isCallFapReviewEndedGuard } from './isCallFapReviewEndedGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isCallFapReviewEndedGuard', () => {
   const mockProposalDataSource = {

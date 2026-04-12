@@ -10,15 +10,6 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import {
-  Proposal as ProposalOrigin,
-  InvitedProposal as InvitedProposalOrigin,
-  ProposalEndStatus,
-  ProposalPublicStatus,
-} from '../../models/Proposal';
-import { isRejection } from '../../models/Rejection';
-import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Experiment } from './Experiment';
@@ -35,6 +26,15 @@ import { Status } from './Status';
 import { TechnicalReview } from './TechnicalReview';
 import { Technique } from './Technique';
 import { Visit } from './Visit';
+import { ResolverContext } from '../../context';
+import {
+  Proposal as ProposalOrigin,
+  InvitedProposal as InvitedProposalOrigin,
+  ProposalEndStatus,
+  ProposalPublicStatus,
+} from '../../models/Proposal';
+import { isRejection } from '../../models/Rejection';
+import { TemplateCategoryId } from '../../models/Template';
 
 const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
 statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);

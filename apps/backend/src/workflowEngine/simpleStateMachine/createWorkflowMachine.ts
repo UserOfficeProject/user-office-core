@@ -1,9 +1,9 @@
 import { container } from 'tsyringe';
 
+import { createMachine, GuardFn, StateConfig } from './stateMachnine';
 import { Tokens } from '../../config/Tokens';
 import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
 import { Event, EventMetadataByEvent } from '../../events/event.enum';
-import { createMachine, GuardFn, StateConfig } from './stateMachnine';
 
 const createWfStatusName = (statusId: string, workflowStatusId: number) =>
   `${statusId}-${workflowStatusId}`;

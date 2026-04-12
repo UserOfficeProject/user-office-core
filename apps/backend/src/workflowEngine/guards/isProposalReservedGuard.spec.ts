@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalReservedGuard } from './isProposalReservedGuard';
 import { Tokens } from '../../config/Tokens';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { isProposalReservedGuard } from './isProposalReservedGuard';
 
 describe('isProposalReservedGuard', () => {
   const mockProposalDataSource = {

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isCallEndedInternalGuard } from './isCallEndedInternalGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isCallEndedInternalGuard', () => {
   const mockProposalDataSource = {

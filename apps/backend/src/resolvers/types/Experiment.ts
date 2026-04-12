@@ -10,13 +10,6 @@ import {
   Root,
 } from 'type-graphql';
 
-import { Tokens } from '../../config/Tokens';
-import { ResolverContext } from '../../context';
-import { FeedbackDataSource } from '../../datasources/FeedbackDataSource';
-import {
-  Experiment as ExperimentOrigin,
-  ExperimentStatus,
-} from '../../models/Experiment';
 import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafety } from './ExperimentSafety';
 import { Feedback } from './Feedback';
@@ -25,6 +18,13 @@ import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Shipment } from './Shipment';
 import { Visit } from './Visit';
+import { Tokens } from '../../config/Tokens';
+import { ResolverContext } from '../../context';
+import { FeedbackDataSource } from '../../datasources/FeedbackDataSource';
+import {
+  Experiment as ExperimentOrigin,
+  ExperimentStatus,
+} from '../../models/Experiment';
 
 @ObjectType()
 @Directive('@key(fields: "experimentPk")')

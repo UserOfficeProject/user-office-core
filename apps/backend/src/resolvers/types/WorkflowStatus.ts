@@ -8,9 +8,9 @@ import {
   Ctx,
 } from 'type-graphql';
 
+import { Status } from './Status';
 import { ResolverContext } from '../../context';
 import { WorkflowStatus as WorkflowStatusOrigin } from '../../models/WorkflowStatus';
-import { Status } from './Status';
 
 @ObjectType()
 export class WorkflowStatus implements Partial<WorkflowStatusOrigin> {

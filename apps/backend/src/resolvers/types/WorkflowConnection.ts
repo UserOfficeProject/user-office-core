@@ -1,19 +1,19 @@
 import {
-  ObjectType,
-  Field,
-  Int,
-  Resolver,
-  FieldResolver,
-  Root,
   Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
-import { WorkflowConnection as WorkflowConnectionOrigin } from '../../models/WorkflowConnections';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { WorkflowStatus } from './WorkflowStatus';
+import { ResolverContext } from '../../context';
+import { isRejection } from '../../models/Rejection';
+import { WorkflowConnection as WorkflowConnectionOrigin } from '../../models/WorkflowConnections';
 
 @ObjectType()
 export class WorkflowConnection implements Partial<WorkflowConnectionOrigin> {

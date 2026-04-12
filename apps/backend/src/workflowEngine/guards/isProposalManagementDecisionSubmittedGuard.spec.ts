@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isProposalManagementDecisionSubmittedGuard } from './isProposalManagementDecisionSubmittedGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isProposalManagementDecisionSubmittedGuard', () => {
   const mockProposalDataSource = {
