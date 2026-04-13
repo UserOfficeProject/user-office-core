@@ -17,7 +17,8 @@ export interface CallDataSource {
   getCalls(
     filter?: CallsFilter,
     sortField?: string,
-    sortDirection?: PaginationSortDirection
+    sortDirection?: PaginationSortDirection,
+    agentId?: number
   ): Promise<Call[]>;
   getCallHasInstrumentsByInstrumentIds(
     instrumentIds: number[]

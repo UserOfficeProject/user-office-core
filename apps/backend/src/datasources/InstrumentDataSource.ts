@@ -17,7 +17,7 @@ export interface InstrumentDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
-  getUserInstruments(userId: number): Promise<Instrument[]>;
+  getUserInstruments(userId: number, agentId?: number): Promise<Instrument[]>;
   getInstrumentsByCallId(
     callIds: number[],
     selectableOnly?: boolean
