@@ -5,6 +5,8 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import SearchIcon from '@mui/icons-material/Search';
+import { Grid, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -405,32 +407,41 @@ const PeopleTable = ({
             },
           }}
         >
-          <Box
+          <Grid
+            container
+            direction={'row'}
             sx={{
               display: 'flex',
-              flexDirection: 'row-reverse',
-              p: 1,
-              m: 1,
-              bgcolor: 'background.paper',
-              borderRadius: 1,
+              justifyContent: 'flex-end',
             }}
           >
+            <Tooltip title="Filter Found Users">
+              <SearchIcon
+                sx={(theme) => ({
+                  marginRight: theme.spacing(1),
+                  alignSelf: 'center',
+                  fontSize: 'large',
+                  color: theme.palette.primary.main,
+                })}
+              ></SearchIcon>
+            </Tooltip>
             <TextField
               id="standard-search"
-              label="Search users"
+              label="Filter found users"
               type="search"
               variant="standard"
               onKeyDown={handleKeyDown}
               value={searchName}
+              helperText={'Press Enter to search'}
               onChange={(e) => setSearchName(e.target.value)}
-              sx={{
-                display: 'flex',
-                alignSelf: 'right',
-                alignItems: 'right',
-                maxWidth: '15%',
-              }}
+              sx={(theme) => ({
+                flex: 1,
+                alignSelf: 'center',
+                maxWidth: 260,
+                marginRight: theme.spacing(3),
+              })}
             />
-          </Box>
+          </Grid>
           <MaterialTable
             tableRef={tableRef}
             icons={tableIcons}
