@@ -413,6 +413,8 @@ const PeopleTable = ({
             sx={{
               display: 'flex',
               justifyContent: 'flex-end',
+              marginTop: '-30px',
+              marginBottom: '-10px',
             }}
           >
             <Tooltip title="Filter Found Users">
