@@ -18,7 +18,6 @@ import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
-import { handleWorkflowEngineChange } from './proposalWorkflow';
 
 export default function createCustomHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -380,7 +379,7 @@ export default function createCustomHandler() {
             const proposalPks = allProposalsOnCall.proposalViews.map(
               (proposal) => proposal.primaryKey
             );
-            handleWorkflowEngineChange(event, proposalPks);
+            // handleWorkflowEngineChange(event, proposalPks);
           }
         } catch (error) {
           logger.logException(

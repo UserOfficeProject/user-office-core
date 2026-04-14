@@ -34,7 +34,7 @@ export class Proposal {
     public abstract: string,
     public proposerId: number,
     public statusId: string, // proposal status id while it moving though proposal workflow
-    public workflowStatusId: number | null, // current workflow status id
+    public workflowStatusId: number, // current workflow status id
     public created: Date,
     public updated: Date,
     public proposalId: string,

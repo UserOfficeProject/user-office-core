@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DatePicker from 'components/common/FormikUIDatePicker';
-import TextField from 'components/common/FormikUITextField';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -115,17 +114,6 @@ const CallReviewAndNotification = () => {
         noOptionsText="No Faps"
         data-cy="call-faps"
         items={fapOptions}
-      />
-      <Field
-        name="surveyComment"
-        label="Survey Comment"
-        id="survey-comment-input"
-        type="text"
-        component={TextField}
-        fullWidth
-        required
-        inputProps={{ maxLength: '100' }}
-        data-cy="survey-comment"
       />
     </>
   );

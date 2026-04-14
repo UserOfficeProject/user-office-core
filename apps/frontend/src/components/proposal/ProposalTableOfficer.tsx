@@ -25,12 +25,13 @@ import {
   ResourceId,
   getTranslation,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -57,7 +58,9 @@ import {
   ProposalViewInstrument,
   ProposalsFilter,
   WorkflowStatus,
+  UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
@@ -355,6 +358,7 @@ const ProposalTableOfficer = ({
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
+  const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -708,7 +712,7 @@ const ProposalTableOfficer = ({
   ];
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
-    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+    new Promise<QueryResult<ProposalViewData>>((resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
         const {
@@ -720,67 +724,74 @@ const ProposalTableOfficer = ({
           questionFilter,
           referenceNumbers,
         } = proposalFilter;
-        const { proposalsView } = await api().getProposalsCore({
-          filter: {
-            callId: callId,
-            instrumentFilter: instrumentFilter,
-            proposalStatusId: proposalStatusId,
-            questionaryIds: questionaryIds,
-            referenceNumbers: referenceNumbers,
-            questionFilter: questionFilter && {
-              ...questionFilter,
-              value:
-                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
-            }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
-            text: text,
-          },
-          sortField: orderBy?.orderByField,
-          sortDirection:
-            orderBy?.orderDirection == PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : orderBy?.orderDirection == PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined,
-          first: tableQuery.pageSize,
-          offset: tableQuery.page * tableQuery.pageSize,
-          searchText: tableQuery.search,
-        });
+        api()
+          .getProposalsCore({
+            filter: {
+              callId: callId,
+              instrumentFilter: instrumentFilter,
+              proposalStatusId: proposalStatusId,
+              questionaryIds: questionaryIds,
+              referenceNumbers: referenceNumbers,
+              questionFilter: questionFilter && {
+                ...questionFilter,
+                value:
+                  JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+              }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+              text: text,
+            },
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            searchText: tableQuery.search,
+          })
+          .then(({ proposalsView }) => {
+            const tableData =
+              proposalsView?.proposalViews.map((proposal) => {
+                const selection = new Set(searchParams.getAll('selection'));
+                const proposalData = {
+                  ...proposal,
+                  status: proposal.submitted ? 'Submitted' : 'Open',
+                  technicalReviews: proposal.technicalReviews?.map(
+                    (technicalReview) => ({
+                      ...technicalReview,
+                      status: getTranslation(
+                        technicalReview.status as ResourceId
+                      ),
+                    })
+                  ),
+                  finalStatus: getTranslation(
+                    proposal.finalStatus as ResourceId
+                  ),
+                } as ProposalViewData;
 
-        const tableData =
-          proposalsView?.proposalViews.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
-            const proposalData = {
-              ...proposal,
-              status: proposal.submitted ? 'Submitted' : 'Open',
-              technicalReviews: proposal.technicalReviews?.map(
-                (technicalReview) => ({
-                  ...technicalReview,
-                  status: getTranslation(technicalReview.status as ResourceId),
-                })
-              ),
-              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-            } as ProposalViewData;
+                if (searchParams.getAll('selection').length > 0) {
+                  return {
+                    ...proposalData,
+                    tableData: {
+                      checked: selection.has(proposal.primaryKey.toString()),
+                    },
+                  };
+                } else {
+                  return proposalData;
+                }
+              }) || [];
 
-            if (searchParams.getAll('selection').length > 0) {
-              return {
-                ...proposalData,
-                tableData: {
-                  checked: selection.has(proposal.primaryKey.toString()),
-                },
-              };
-            } else {
-              return proposalData;
-            }
-          }) || [];
+            setTableData(tableData);
+            setTotalCount(proposalsView?.totalCount || 0);
 
-        setTableData(tableData);
-        setTotalCount(proposalsView?.totalCount || 0);
-
-        resolve({
-          data: tableData,
-          page: tableQuery.page,
-          totalCount: proposalsView?.totalCount || 0,
-        });
+            resolve({
+              data: tableData,
+              page: tableQuery.page,
+              totalCount: proposalsView?.totalCount || 0,
+            });
+          })
+          .catch((error) => reject(error));
       } catch (error) {
         reject(error);
       }
@@ -1059,15 +1070,7 @@ const ProposalTableOfficer = ({
           <ChangeProposalStatus
             changeStatusOnProposals={changeStatusOnProposals}
             close={(): void => setOpenChangeProposalStatus(false)}
-            selectedProposalStatuses={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.workflowStatusId
-            )}
-            allSelectedProposalsHaveInstrument={selectedProposalsData.every(
-              (selectedProposal) => selectedProposal.instruments?.length
-            )}
-            selectedProposalsWorkflowIds={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.workflowId
-            )}
+            selectedProposals={selectedProposalsData}
           />
         </DialogContent>
       </Dialog>
@@ -1230,7 +1233,7 @@ const ProposalTableOfficer = ({
         options={{
           search: true,
           searchText: search || undefined,
-          selection: true,
+          selection: isReadOnly ? false : true,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },

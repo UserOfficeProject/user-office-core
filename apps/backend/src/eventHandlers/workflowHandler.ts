@@ -110,9 +110,9 @@ export default function workflowHandler() {
         const { entity: extractedEntityObject, entityKey: extractedEntityKey } =
           extractedEntity;
 
-        const extractedEntityValue = (
-          extractedEntityObject as Record<string, unknown>
-        )[extractedEntityKey as keyof object];
+        const extractedEntityValue =
+          extractedEntityObject[extractedEntityKey as keyof object];
+
         if (isValidWorkflowEntityValue(extractedEntityValue)) {
           await startWorkflow(event, extractedEntityValue, entity);
         }

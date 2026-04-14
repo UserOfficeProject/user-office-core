@@ -6,6 +6,7 @@ import {
   UpdateUserMutation,
   UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
+  UpsertUserByOidcSubMutationVariables,
   User,
 } from '@user-office-software-libs/shared-types';
 import { jwtDecode } from 'jwt-decode';
@@ -74,6 +75,21 @@ function changeActiveRole(selectedRoleId: number) {
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.isInternalUser = isInternalUser;
+  });
+
+  cy.wrap(request);
+}
+
+function upsertUserByOidc(args: UpsertUserByOidcSubMutationVariables) {
+  const token = window.localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('No logged in user');
+  }
+
+  const api = getE2EApi();
+  const request = api.upsertUserByOidcSub(args).then((resp) => {
+    return resp;
   });
 
   cy.wrap(request);
@@ -193,6 +209,7 @@ const login = (
           );
         window.localStorage.setItem('expToken', `${exp}`);
         window.localStorage.setItem('user', JSON.stringify(user));
+        window.localStorage.setItem('currentRoleId', `${currentRole.id}`);
 
         return resp;
       });
@@ -237,3 +254,4 @@ Cypress.Commands.add('updateUserDetails', updateUserDetails);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
 Cypress.Commands.add('getAndStoreFeaturesEnabled', getAndStoreFeaturesEnabled);
+Cypress.Commands.add('upsertUserByOidc', upsertUserByOidc);

@@ -10,14 +10,11 @@ describe('simpleStateMachine', () => {
     ).toThrow('Unknown initial state "missing"');
   });
 
-  it('runs entry actions for the initial and target states', async () => {
-    const initialAction = jest.fn().mockResolvedValue(undefined);
-    const approvedAction = jest.fn().mockResolvedValue(undefined);
+  it('transitions to the target state on event', async () => {
     const machine = createMachine({
       initial: 'pending',
       states: {
         pending: {
-          action: initialAction,
           on: {
             APPROVE: {
               target: 'approved',
@@ -26,20 +23,17 @@ describe('simpleStateMachine', () => {
             },
           },
         },
-        approved: {
-          action: approvedAction,
-        },
+        approved: {},
       },
     });
 
     const actor = createActor(machine, { id: 1 });
-    await Promise.resolve();
-    expect(initialAction).toHaveBeenCalledWith({ id: 1 });
+    expect(actor.getState()).toBe('pending');
 
     const nextState = await actor.event('APPROVE');
     expect(nextState.nextStateValue).toBe('approved');
+    expect(nextState.transitionPerformed).toBe(true);
     expect(actor.getState()).toBe('approved');
-    expect(approvedAction).toHaveBeenCalledWith({ id: 1 });
   });
 
   it('prevents transitions when the guard resolves to false', async () => {
@@ -74,6 +68,32 @@ describe('simpleStateMachine', () => {
     expect(actor.getState()).toBe('submitted');
     expect(guard).toHaveBeenCalledTimes(2);
     expect(guard).toHaveBeenLastCalledWith({ id: 2 });
+  });
+
+  it('returns transitionPerformed false when guards do not allow the transition', async () => {
+    const guard = jest.fn().mockResolvedValue(false);
+    const machine = createMachine({
+      initial: 'draft',
+      states: {
+        draft: {
+          on: {
+            SUBMIT: {
+              target: 'submitted',
+              guards: [guard],
+              connectionId: 0,
+            },
+          },
+        },
+        submitted: {},
+      },
+    });
+
+    const actor = createActor(machine, { id: 3 });
+
+    const result = await actor.event('SUBMIT');
+    expect(result.transitionPerformed).toBe(false);
+    expect(result.nextStateValue).toBe('draft');
+    expect(actor.getState()).toBe('draft');
   });
 
   it('throws when a transition targets an unknown state', async () => {

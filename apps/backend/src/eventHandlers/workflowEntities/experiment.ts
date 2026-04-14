@@ -15,45 +15,16 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
   exemptedEvents: [],
   extractionEntityKeys: ['experimentsafety'],
   resolveWorkflowId: async (entityId: number) => {
-    // For now, we are assuming that there is only one workflow for experiment safety. In future, if there are multiple workflows for experiment safety, we can use the event type to determine the workflow id.
     const experimentSafety =
       await experimentDataSource.getExperimentSafetyByExperimentPk(entityId);
 
-    if (!experimentSafety) {
-      logger.logError('Experiment not found', { entityId });
-
-      return;
-    }
-
-    const { workflowStatusId } = experimentSafety;
-
-    if (!workflowStatusId) {
-      logger.logError('Workflow not found for experiment safety', { entityId });
-
-      return;
-    }
-
-    return workflowStatusId;
+    return experimentSafety?.workflowStatusId;
   },
   resolveCurrentStatusId: async (entityId: number) => {
     const experimentSafety =
       await experimentDataSource.getExperimentSafetyByExperimentPk(entityId);
 
-    if (!experimentSafety) {
-      logger.logError('Experiment not found', { entityId });
-
-      return;
-    }
-
-    if (!experimentSafety.workflowStatusId) {
-      logger.logError('Workflow status id not found for experiment safety', {
-        entityId,
-      });
-
-      return;
-    }
-
-    return experimentSafety.workflowStatusId;
+    return experimentSafety?.workflowStatusId;
   },
   updateWorkflowStatus: async (entityId: number, workflowStatusId: number) => {
     await experimentDataSource.updateExperimentSafetyStatus(

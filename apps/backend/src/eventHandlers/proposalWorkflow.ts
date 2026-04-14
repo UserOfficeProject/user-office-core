@@ -1,19 +1,11 @@
 //TODO: Call Ended workflow must be achievable through Guards
 
-import { container } from 'tsyringe';
-
-import { Tokens } from '../config/Tokens';
-import { CallDataSource } from '../datasources/CallDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
-import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
-import { Event } from '../events/event.enum';
-import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import {
-  ProposalWorkflowEngine,
-  WorkflowEngineProposalType,
-} from '../workflowEngine';
+// import {
+//   ProposalWorkflowEngine,
+//   WorkflowEngineType,
+// } from '../workflowEngine';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',
@@ -21,95 +13,95 @@ enum ProposalInformationKeys {
   ProposalPKs = 'proposalPks',
 }
 
-const publishProposalStatusChange = async (
-  updatedProposals: WorkflowEngineProposalType[]
-) => {
-  const eventBus = resolveApplicationEventBus();
+// const publishProposalStatusChange = async (
+//   updatedProposals: WorkflowEngineType[]
+// ) => {
+//   const eventBus = resolveApplicationEventBus();
 
-  const workflowDataSource = container.resolve<WorkflowDataSource>(
-    Tokens.WorkflowDataSource
-  );
-  updatedProposals.map(async (updatedProposal) => {
-    if (updatedProposal) {
-      const proposalStatus = await workflowDataSource.getWorkflowStatus(
-        updatedProposal.workflowStatusId
-      );
-      const previousProposalStatus = await workflowDataSource.getWorkflowStatus(
-        updatedProposal.prevStatusId
-      );
+//   const workflowDataSource = container.resolve<WorkflowDataSource>(
+//     Tokens.WorkflowDataSource
+//   );
+//   updatedProposals.map(async (updatedProposal) => {
+//     if (updatedProposal) {
+//       const proposalStatus = await workflowDataSource.getWorkflowStatus(
+//         updatedProposal.workflowStatusId
+//       );
+//       const previousProposalStatus = await workflowDataSource.getWorkflowStatus(
+//         updatedProposal.prevStatusId
+//       );
 
-      return eventBus.publish({
-        type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
-        proposal: updatedProposal,
-        isRejection: false,
-        key: 'proposal',
-        loggedInUserId: null,
-        description: `From "${previousProposalStatus?.statusId}" to "${proposalStatus?.statusId}"`,
-      });
-    }
-  });
-};
+//       return eventBus.publish({
+//         type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+//         proposal: updatedProposal,
+//         isRejection: false,
+//         key: 'proposal',
+//         loggedInUserId: null,
+//         description: `From "${previousProposalStatus?.statusId}" to "${proposalStatus?.statusId}"`,
+//       });
+//     }
+//   });
+// };
 
-const handleSubmittedProposalsAfterCallEnded = async (
-  updatedProposals: WorkflowEngineProposalType[]
-) => {
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
+// const handleSubmittedProposalsAfterCallEnded = async (
+//   updatedProposals: WorkflowEngineType[]
+// ) => {
+//   const callDataSource = container.resolve<CallDataSource>(
+//     Tokens.CallDataSource
+//   );
 
-  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+//   const workflowEngine = container.resolve(ProposalWorkflowEngine);
 
-  const notEndedInternalCalls = await callDataSource
-    .getCalls({
-      isEnded: true,
-      isEndedInternal: false,
-    })
-    .then((calls) => calls.map((call) => call.id));
+//   const notEndedInternalCalls = await callDataSource
+//     .getCalls({
+//       isEnded: true,
+//       isEndedInternal: false,
+//     })
+//     .then((calls) => calls.map((call) => call.id));
 
-  const proposalPks = updatedProposals
-    .filter(
-      (proposal) => proposal && notEndedInternalCalls.includes(proposal.callId)
-    )
-    .map((proposal) => proposal && proposal.primaryKey) as number[];
+//   const proposalPks = updatedProposals
+//     .filter(
+//       (proposal) => proposal && notEndedInternalCalls.includes(proposal.callId)
+//     )
+//     .map((proposal) => proposal && proposal.primaryKey) as number[];
 
-  if (proposalPks.length <= 0) {
-    return;
-  }
+//   if (proposalPks.length <= 0) {
+//     return;
+//   }
 
-  const updatedSubmittedProposals = await workflowEngine.run({
-    event: Event.CALL_ENDED,
-    proposalPks,
-  });
-  if (updatedSubmittedProposals) {
-    await publishProposalStatusChange(updatedSubmittedProposals);
-  }
-};
+//   const updatedSubmittedProposals = await workflowEngine.run({
+//     event: Event.CALL_ENDED,
+//     proposalPks,
+//   });
+//   if (updatedSubmittedProposals) {
+//     await publishProposalStatusChange(updatedSubmittedProposals);
+//   }
+// };
 
-export const handleWorkflowEngineChange = async (
-  event: ApplicationEvent,
-  proposalPks: number[] | number
-) => {
-  const isArray = Array.isArray(proposalPks);
+// export const handleWorkflowEngineChange = async (
+//   event: ApplicationEvent,
+//   proposalPks: number[] | number
+// ) => {
+//   const isArray = Array.isArray(proposalPks);
 
-  const workflowEngine = container.resolve(ProposalWorkflowEngine);
-  const updatedProposals = await workflowEngine.run({
-    event: event.type,
-    proposalPks: isArray ? proposalPks : [proposalPks],
-  });
+//   const workflowEngine = container.resolve(ProposalWorkflowEngine);
+//   const updatedProposals = await workflowEngine.run({
+//     event: event.type,
+//     proposalPks: isArray ? proposalPks : [proposalPks],
+//   });
 
-  if (
-    event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
-    updatedProposals?.length
-  ) {
-    // publish PROPOSAL_STATUS_CHANGED_BY_WORKFLOW event to the EventBus
-    await publishProposalStatusChange(updatedProposals);
+//   if (
+//     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
+//     updatedProposals?.length
+//   ) {
+//     // publish PROPOSAL_STATUS_CHANGED_BY_WORKFLOW event to the EventBus
+//     await publishProposalStatusChange(updatedProposals);
 
-    if (event.type === Event.PROPOSAL_SUBMITTED) {
-      // todo: This should be possible with the guards
-      await handleSubmittedProposalsAfterCallEnded(updatedProposals);
-    }
-  }
-};
+//     if (event.type === Event.PROPOSAL_SUBMITTED) {
+//       // todo: This should be possible with the guards
+//       await handleSubmittedProposalsAfterCallEnded(updatedProposals);
+//     }
+//   }
+// };
 
 const extractProposalInformationFromEvent = (event: ApplicationEvent) => {
   let proposalInformationObject, proposalInformationKey;
@@ -155,17 +147,17 @@ export default function createHandler() {
     if (proposalInformationValue) {
       switch (proposalInformationKey) {
         case ProposalInformationKeys.ProposalPKs:
-        case ProposalInformationKeys.ProposalPk:
-          handleWorkflowEngineChange(event, proposalInformationValue);
+        // case ProposalInformationKeys.ProposalPk:
+        //   handleWorkflowEngineChange(event, proposalInformationValue);
 
-          break;
-        case ProposalInformationKeys.Proposal:
-          handleWorkflowEngineChange(
-            event,
-            (proposalInformationValue as Proposal).primaryKey
-          );
+        //   break;
+        // case ProposalInformationKeys.Proposal:
+        //   handleWorkflowEngineChange(
+        //     event,
+        //     (proposalInformationValue as Proposal).primaryKey
+        //   );
 
-          break;
+        //   break;
         default:
           break;
       }

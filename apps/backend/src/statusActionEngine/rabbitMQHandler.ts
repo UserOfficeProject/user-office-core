@@ -4,12 +4,12 @@ import { Tokens } from '../config/Tokens';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { RabbitMQActionConfig } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineType } from '../workflowEngine';
 import { constructProposalStatusChangeEvent } from './statusActionUtils';
 
 export const rabbitMQActionHandler = async (
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineProposalType[]
+  proposals: WorkflowEngineType[]
 ) => {
   const postToMessageQueue = await container.resolve<
     Promise<(event: ApplicationEvent) => Promise<void>>

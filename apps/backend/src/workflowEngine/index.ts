@@ -3,7 +3,6 @@ import { injectable } from 'tsyringe';
 
 import { WorkFlowEntity } from '../eventHandlers/workflowHandler';
 import { Event } from '../events/event.enum';
-import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
 import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
 import { createActor } from './simpleStateMachine/stateMachnine';
 
@@ -87,7 +86,7 @@ export class WorkflowEngine {
     );
 
     if (validEntities.length > 0) {
-      await proposalStatusActionEngine(validEntities);
+      // await proposalStatusActionEngine(validEntities);
     }
 
     return validEntities;
@@ -115,13 +114,11 @@ export class WorkflowEngine {
     )?.[0];
 
     const actor = createActor(machine, { id: entityId }, currentEntityState);
-    const currentWfStatus = actor.getState();
 
-    const { nextStateValue, connectionId } = await actor.event(
-      event.toUpperCase()
-    );
+    const { nextStateValue, connectionId, transitionPerformed } =
+      await actor.event(event.toUpperCase());
 
-    if (nextStateValue !== currentWfStatus) {
+    if (transitionPerformed) {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta
         | undefined;

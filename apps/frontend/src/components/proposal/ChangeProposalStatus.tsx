@@ -4,14 +4,16 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
+import i18n from 'i18n';
+
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import WorkflowView from 'components/settings/workflow/WorkflowView';
 import { WorkflowStatus, WorkflowType } from 'generated/sdk';
+import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useWorkflowStatusesData } from 'hooks/settings/useWorkflowStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
@@ -23,18 +25,23 @@ const changeProposalStatusValidationSchema = yup.object().shape({
 type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (workflowStatus: WorkflowStatus) => Promise<void>;
-  allSelectedProposalsHaveInstrument: boolean;
-  selectedProposalStatuses: number[];
-  selectedProposalsWorkflowIds: number[];
+  selectedProposals: ProposalViewData[];
 };
 
 const ChangeProposalStatus = ({
   close,
   changeStatusOnProposals,
-  allSelectedProposalsHaveInstrument,
-  selectedProposalStatuses,
-  selectedProposalsWorkflowIds,
+  selectedProposals,
 }: ChangeProposalStatusProps) => {
+  const selectedProposalStatuses = selectedProposals.map(
+    (p) => p.workflowStatusId
+  );
+  const allSelectedProposalsHaveInstrument = selectedProposals.every(
+    (p) => p.instruments?.length
+  );
+  const selectedProposalsWorkflowIds = selectedProposals.map(
+    (p) => p.workflowId
+  );
   const { t } = useTranslation();
   const {
     statuses: proposalStatuses,
@@ -56,20 +63,17 @@ const ChangeProposalStatus = ({
       : null;
 
   const highlightedNodes = useMemo(() => {
-    // We don't have proposal IDs passed down, only statuses.
-    // So we just group by status ID and put a dummy entity count.
-    // In a real scenario, we would map actual proposal IDs here.
-    const counts = selectedProposalStatuses.reduce(
-      (acc, statusId) => {
+    const counts = selectedProposals.reduce(
+      (acc, proposal) => {
         const workflowStatus = proposalStatuses.find(
-          (ws) => ws.workflowStatusId === statusId
+          (ws) => ws.workflowStatusId === proposal.workflowStatusId
         );
         if (workflowStatus) {
           const id = workflowStatus.status.id;
           if (!acc[id]) {
             acc[id] = [];
           }
-          acc[id].push('Proposal ' + acc[id].length); // Placeholder ID
+          acc[id].push(proposal.proposalId);
         }
 
         return acc;
@@ -81,7 +85,7 @@ const ChangeProposalStatus = ({
       statusId,
       entities,
     }));
-  }, [selectedProposalStatuses, proposalStatuses]);
+  }, [selectedProposals, proposalStatuses]);
 
   if (!allProposalsHaveSameWorkflow) {
     return (

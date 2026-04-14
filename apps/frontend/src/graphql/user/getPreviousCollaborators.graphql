@@ -1,0 +1,20 @@
+query getPreviousCollaborators(
+  $searchText: String
+  $first: Int
+  $offset: Int
+  $userRole: UserRole
+  $subtractUsers: [Int!]
+) {
+  previousCollaborators(
+    searchText: $searchText
+    first: $first
+    offset: $offset
+    userRole: $userRole
+    subtractUsers: $subtractUsers
+  ) {
+    users {
+      ...basicUserDetails
+    }
+    totalCount
+  }
+}

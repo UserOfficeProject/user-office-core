@@ -1,3 +1,5 @@
+import { logger } from '@user-office-software/duo-logger';
+import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -8,10 +10,12 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { InstrumentWithManagementTime } from '../models/Instrument';
+import { Proposal } from '../models/Proposal';
 import { Answer } from '../models/Questionary';
 import { Technique } from '../models/Technique';
 import { DataType } from '../models/Template';
@@ -21,20 +25,19 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
 
 interface GroupedObjectType {
-  [key: string]: WorkflowEngineProposalType[];
+  [key: string]: Proposal[];
 }
 
 export const groupProposalsByProperties = (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   props: string[]
 ) => {
-  const getProposalGroups = (item: WorkflowEngineProposalType) => {
+  const getProposalGroups = (item: Proposal) => {
     const groupItemsArray = [];
     for (let i = 0; i < props.length; i++) {
-      groupItemsArray.push(item[props[i] as keyof WorkflowEngineProposalType]);
+      groupItemsArray.push(item[props[i] as keyof Proposal]);
     }
 
     return groupItemsArray;
@@ -56,7 +59,7 @@ export const groupProposalsByProperties = (
 
 export type EmailReadyType = {
   id: EmailStatusActionRecipients;
-  proposals: WorkflowEngineProposalType[];
+  proposals: Proposal[];
   template: string;
   email: string;
   firstName?: string;
@@ -66,6 +69,7 @@ export type EmailReadyType = {
   coProposers?: BasicUserDetails[] | null;
   instruments?: InstrumentWithManagementTime[];
   techniques?: Technique[];
+  proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
 };
@@ -137,11 +141,18 @@ async function stepAnswers(
 export const getEmailReadyArrayOfUsersAndProposals = async (
   emailReadyUsersWithProposals: EmailReadyType[],
   recipientUsers: BasicUserDetails[] | User[],
-  proposal: WorkflowEngineProposalType,
+  proposal: Proposal,
   recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const usersDataSource: UserDataSource = container.resolve(
     Tokens.UserDataSource
+  );
+  const questionaryDataSource: QuestionaryDataSource = container.resolve(
+    Tokens.QuestionaryDataSource
+  );
+
+  const templateDataSource: TemplateDataSource = container.resolve(
+    Tokens.TemplateDataSource
   );
 
   await Promise.all(
@@ -168,6 +179,21 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
+        let proposalTemplateName: string | undefined = '';
+
+        const questionary = await questionaryDataSource.getQuestionary(
+          proposal.questionaryId
+        );
+        const templateId = questionary ? questionary?.templateId : -1;
+        if (templateId == -1) {
+          logger.logError('Could not fetch proposal templateId for email', {
+            questionary: questionary,
+          });
+          throw new GraphQLError('Failed to find proposal template for emails');
+        }
+        const template = await templateDataSource.getTemplate(templateId);
+        proposalTemplateName = templateId ? template?.name : '';
+
         const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatus: 'QUICK_REVIEW',
@@ -180,8 +206,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           techniques = await techniqueDataSource.getTechniquesByProposalPk(
             proposal.primaryKey
           );
-          const questionaryDataSource: QuestionaryDataSource =
-            container.resolve(Tokens.QuestionaryDataSource);
           const questionarySteps = questionaryDataSource.getQuestionarySteps(
             proposal.questionaryId
           );
@@ -220,6 +244,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           pi: pi,
           coProposers: coProposers,
           techniques: techniques,
+          proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
         });
@@ -229,7 +254,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
 };
 
 export const getPIAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const usersDataSource: UserDataSource = container.resolve(
@@ -254,7 +279,7 @@ export const getPIAndFormatOutputForEmailSending = async (
 };
 
 export const getCoProposersAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const usersDataSource: UserDataSource = container.resolve(
@@ -278,13 +303,15 @@ export const getCoProposersAndFormatOutputForEmailSending = async (
 };
 
 export const getFapReviewersAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
   const FRs: EmailReadyType[] = [];
   for (const proposal of proposals) {
+    if (!proposal) continue;
+
     const allFapReviewers =
       await fapDataSource.getFapUsersByProposalPkAndCallId(
         proposal.primaryKey,
@@ -303,7 +330,7 @@ export const getFapReviewersAndFormatOutputForEmailSending = async (
 };
 
 export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
@@ -336,7 +363,7 @@ export const getFapChairSecretariesAndFormatOutputForEmailSending = async (
 };
 
 export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const instrumentDataSource: InstrumentDataSource = container.resolve(
@@ -395,7 +422,7 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
 };
 
 export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
 ) => {
   const techniqueDataSource: TechniqueDataSource = container.resolve(
@@ -443,7 +470,7 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
 };
 
 export const getOtherAndFormatOutputForEmailSending = async (
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
   otherEmail: string
 ) => {
@@ -475,7 +502,7 @@ export const getOtherAndFormatOutputForEmailSending = async (
 };
 
 export const constructProposalStatusChangeEvent = (
-  proposal: WorkflowEngineProposalType,
+  proposal: Proposal,
   loggedInUserId: number | null,
   messageDescription: string,
   exchange?: string

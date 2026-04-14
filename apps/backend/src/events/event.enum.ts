@@ -135,6 +135,9 @@ export enum Event {
   EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR',
   EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER',
   EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW',
+  EMAIL_TEMPLATE_CREATED = 'EMAIL_TEMPLATE_CREATED',
+  EMAIL_TEMPLATE_UPDATED = 'EMAIL_TEMPLATE_UPDATED',
+  EMAIL_TEMPLATE_DELETED = 'EMAIL_TEMPLATE_DELETED',
   VISIT_CREATED = 'VISIT_CREATED',
 }
 
@@ -694,5 +697,30 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
       label:
         'Event occurs when experiment safety status is changed by workflow',
     },
+  ],
+  [
+    Event.EMAIL_TEMPLATE_CREATED,
+    { label: 'Event occurs when email template is created' },
+  ],
+  [
+    Event.EMAIL_TEMPLATE_UPDATED,
+    { label: 'Event occurs when email template is updated' },
+  ],
+  [
+    Event.EMAIL_TEMPLATE_DELETED,
+    { label: 'Event occurs when email template is deleted' },
+  ],
+  [Event.VISIT_CREATED, { label: 'Event occurs when visit is created' }],
+  [
+    Event.EMAIL_TEMPLATE_CREATED,
+    { label: 'Event occurs when email template is created' },
+  ],
+  [
+    Event.EMAIL_TEMPLATE_UPDATED,
+    { label: 'Event occurs when email template is updated' },
+  ],
+  [
+    Event.EMAIL_TEMPLATE_DELETED,
+    { label: 'Event occurs when email template is deleted' },
   ],
 ]);

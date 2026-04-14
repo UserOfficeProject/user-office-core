@@ -21,7 +21,6 @@ const proposalWorkflowEntity: WorkFlowEntity = {
       Tokens.CallDataSource
     );
 
-    // For now, we are assuming that there is only one workflow for proposal. In future, if there are multiple workflows for proposal, we can use the event type to determine the workflow id.
     const proposal = await proposalDataSource.get(entityId);
 
     if (!proposal) {
@@ -34,12 +33,6 @@ const proposalWorkflowEntity: WorkFlowEntity = {
       await callDataSource.getProposalWorkflowByCall(proposal.callId)
     )?.id;
 
-    if (!workflowId) {
-      logger.logError('Workflow not found for proposal', { entityId });
-
-      return;
-    }
-
     return workflowId;
   },
   resolveCurrentStatusId: async (entityId: number) => {
@@ -48,27 +41,19 @@ const proposalWorkflowEntity: WorkFlowEntity = {
     );
     const proposal = await proposalDataSource.get(entityId);
 
-    if (!proposal) {
-      logger.logError('Proposal not found', { entityId });
-
-      return;
-    }
-
-    if (!proposal.workflowStatusId) {
-      logger.logError('Workflow status id not found for proposal', {
-        entityId,
-      });
-
-      return;
-    }
-
-    return proposal.workflowStatusId;
+    return proposal?.workflowStatusId;
   },
-  updateWorkflowStatus: async (entityId: number, workflowStatusId: number) => {
+  updateWorkflowStatus: async (
+    entityId: number,
+    newWorkflowStatusId: number
+  ) => {
     const proposalDataSource = container.resolve<ProposalDataSource>(
       Tokens.ProposalDataSource
     );
-    await proposalDataSource.updateProposalWfStatus(entityId, workflowStatusId);
+    await proposalDataSource.updateProposalWfStatus(
+      entityId,
+      newWorkflowStatusId
+    );
   },
   onWorkflowStatusChange: async (
     entityId: number,

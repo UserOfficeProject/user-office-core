@@ -58,7 +58,7 @@ export class ExperimentSafety {
     public esiQuestionarySubmittedAt: Date | null,
     public createdBy: number,
     public statusId: string | null,
-    public workflowStatusId: number | null,
+    public workflowStatusId: number,
     public safetyReviewQuestionaryId: number | null,
     public reviewedBy: number | null,
     public createdAt: Date,

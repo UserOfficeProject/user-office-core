@@ -39,3 +39,4 @@ export { isExperimentESFApprovedByESR } from './isExperimentESFApprovedByESR';
 export { isExperimentESFApprovedByIS } from './isExperimentESFApprovedByIS';
 export { isExperimentESFRejectedByESR } from './isExperimentESFRejectedByESR';
 export { isExperimentESFRejectedByIS } from './isExperimentESFRejectedByIS ';
+export { isExperimentESFSubmitted } from './isExperimentESFSubmitted';

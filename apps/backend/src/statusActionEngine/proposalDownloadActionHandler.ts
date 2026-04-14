@@ -9,8 +9,8 @@ import { FileDataSource } from '../datasources/FileDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import type { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
+import { Proposal } from '../models/Proposal';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
-import { WorkflowEngineProposalType } from '../workflowEngine';
 import {
   constructProposalStatusChangeEvent,
   statusActionLogger,
@@ -20,7 +20,7 @@ const FACTORY_ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
 export const proposalDownloadActionHandler = async (
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   options?: {
     statusActionsLogId?: number;
     loggedInUserId?: number;

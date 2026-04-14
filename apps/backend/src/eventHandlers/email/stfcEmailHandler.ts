@@ -4,8 +4,8 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+import { EmailTemplateId } from './emailTemplateId';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
@@ -26,21 +26,21 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
           return;
         }
-        const templateID = 'call-created-email';
+
         const notificationEmailAddress = process.env.FBS_EMAIL;
         const eventCallPartial = (({ shortCode, startCall, endCall }) => ({
           shortCode,
           startCall,
           endCall,
         }))(event.call);
-        const emailSettings = callCreationEmail<typeof eventCallPartial>(
+        const sendMailOptions = callCreationEmail(
           eventCallPartial,
-          templateID,
+          EmailTemplateId.CALL_CREATED_EMAIL,
           notificationEmailAddress
         );
 
         mailService
-          .sendMail(emailSettings)
+          .sendMail(sendMailOptions)
           .then((res: any) => {
             logger.logInfo('Emails sent on call creation:', {
               result: res,
@@ -60,14 +60,14 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   }
 }
 
-const callCreationEmail = function createNotificationEmail<T>(
-  notificationInput: T,
+const callCreationEmail = function createNotificationEmail(
+  notificationInput: Record<string, unknown>,
   templateID: string,
   notificationEmailAddress: string
-): EmailSettings {
-  const emailSettings: EmailSettings = {
+) {
+  const sendMailOptions = {
     content: {
-      template_id: templateID,
+      template: templateID,
     },
     substitution_data: {
       ...notificationInput,
@@ -79,5 +79,5 @@ const callCreationEmail = function createNotificationEmail<T>(
     ],
   };
 
-  return emailSettings;
+  return sendMailOptions;
 };

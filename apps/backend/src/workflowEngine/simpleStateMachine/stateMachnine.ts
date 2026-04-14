@@ -39,9 +39,11 @@ export const createMachine = (schema: MachineSchema): Machine => {
 
 export type Actor = {
   getState: () => string;
-  event: (
-    eventName: string
-  ) => Promise<{ nextStateValue: string; connectionId: number }>;
+  event: (eventName: string) => Promise<{
+    nextStateValue: string;
+    connectionId: number;
+    transitionPerformed: boolean;
+  }>;
 };
 
 export const createActor = (
@@ -60,20 +62,18 @@ export const createActor = (
     throw new Error(`Unknown state "${currentState}"`);
   }
 
-  const runAction = async (stateName: string) => {
-    const action = schema.states[stateName]?.action;
-    if (action) {
-      await action(entity);
-    }
-  };
-
-  void runAction(currentState);
+  // Status actions (e.g. emails, RabbitMQ, downloads) are handled by the
+  // statusActionEngine, not here. See statusActionEngine/proposal.ts.
 
   const getState = () => currentState;
 
   const event = async (
     eventName: string
-  ): Promise<{ nextStateValue: string; connectionId: number }> => {
+  ): Promise<{
+    nextStateValue: string;
+    connectionId: number;
+    transitionPerformed: boolean;
+  }> => {
     const stateConfig = schema.states[currentState];
     const transition = stateConfig?.on?.[eventName];
 
@@ -81,6 +81,7 @@ export const createActor = (
       return {
         nextStateValue: currentState,
         connectionId: -1,
+        transitionPerformed: false,
       };
     }
 
@@ -91,6 +92,7 @@ export const createActor = (
         return {
           nextStateValue: currentState,
           connectionId: transition.connectionId,
+          transitionPerformed: false,
         };
       }
     }
@@ -99,12 +101,12 @@ export const createActor = (
       throw new Error(`Unknown target state "${transition.target}"`);
     }
 
-    await runAction(transition.target);
     currentState = transition.target;
 
     return {
       nextStateValue: transition.target,
       connectionId: transition.connectionId,
+      transitionPerformed: true,
     };
   };
 

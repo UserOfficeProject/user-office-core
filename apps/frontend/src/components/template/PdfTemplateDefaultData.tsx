@@ -1,14 +1,15 @@
 export const body = `<html lang="en">
 <head>
   <meta charset="utf-8" />
+  <base href="{{#if factoryBaseUrl}}{{factoryBaseUrl}}{{else}}http://localhost:4500{{/if}}/">
 
   <!-- Bootstrap CSS -->
   <link
-    href="http://localhost:4500/static/css/bootstrap.min.css"
+    href="/static/css/bootstrap.min.css"
     rel="stylesheet"
   />
 
-  <link href="http://localhost:4500/fonts/segoeui" rel="stylesheet">
+  <link href="/fonts/segoeui" rel="stylesheet">
 
   <style>
     body {
@@ -350,14 +351,15 @@ export const header = `<style>
 export const sampleDeclaration = `<html lang='en'>
   <head>
     <meta charset='utf-8' />
+    <base href="{{#if factoryBaseUrl}}{{factoryBaseUrl}}{{else}}http://localhost:4500{{/if}}/">
 
     <!-- Bootstrap CSS -->
     <link
-      href='http://localhost:4500/static/css/bootstrap.min.css'
+      href='/static/css/bootstrap.min.css'
       rel='stylesheet'
     />
 
-    <link href='http://localhost:4500/fonts/segoeui' rel='stylesheet' />
+    <link href='/fonts/segoeui' rel='stylesheet' />
 
     <style>
       body { font-size: 16px; line-height: 2; font-family: SegoeUI; } td, td h6

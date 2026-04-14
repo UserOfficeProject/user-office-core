@@ -41,7 +41,6 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
@@ -586,7 +585,7 @@ export default class ProposalMutations {
       );
 
       const statusEngineReadyProposals = fullProposals.filter(
-        (item): item is WorkflowEngineProposalType => !!item
+        (item): item is Proposal => !!item
       );
 
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.

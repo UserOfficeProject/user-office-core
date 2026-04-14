@@ -46,7 +46,7 @@ const CreateUpdateProposalStatus = ({
             });
 
             close(updateStatus);
-          } catch (error) {
+          } catch {
             close(null);
           }
         } else {
@@ -56,7 +56,7 @@ const CreateUpdateProposalStatus = ({
             }).createStatus(values);
 
             close(createStatus);
-          } catch (error) {
+          } catch {
             close(null);
           }
         }

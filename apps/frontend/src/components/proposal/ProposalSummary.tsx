@@ -35,7 +35,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isUser = useCheckAccess([UserRole.USER]);
   const { isInternalUser } = useContext(UserContext);
   const callHasEnded = isCallEnded(
     state.proposal.call?.startCall,
@@ -193,9 +192,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
-          disabled={
-            !allStepsComplete || isSubmitting || (!proposal.submitted && isUser)
-          }
+          disabled={!allStepsComplete || isSubmitting}
           color="secondary"
         >
           Download PDF

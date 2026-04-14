@@ -3,7 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position, ReactFlowState, useStore } from 'reactflow';
 
 import { WorkflowStatus } from 'generated/sdk';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
@@ -65,13 +65,22 @@ const Description = styled('div', {
   opacity: expanded ? 1 : 0,
 }));
 
-const StyledHandle = styled(Handle)(({ theme }) => ({
+const StyledHandle = styled(Handle, {
+  shouldForwardProp: (prop) => prop !== 'visible',
+})<{ visible?: boolean }>(({ theme, visible = true }) => ({
   width: '8px',
   height: '8px',
   borderRadius: '50%',
   background: theme.palette.primary.light,
   border: `2px solid ${theme.palette.primary.main}`,
+  opacity: visible ? 1 : 0,
+  transition: 'opacity 0.2s',
+  pointerEvents: visible ? 'auto' : 'none',
+  zIndex: visible ? 10 : 0,
 }));
+
+const connectionNodeIdSelector = (state: ReactFlowState) =>
+  state.connectionNodeId;
 
 const FlexSpan = styled('span')({
   flex: 1,
@@ -131,6 +140,8 @@ const StatusNode: React.FC<StatusNodeProps> = ({
   selected,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const connectionNodeId = useStore(connectionNodeIdSelector);
+  const isConnecting = !!connectionNodeId;
 
   const handleToggleExpand = (e: React.MouseEvent) => {
     if (!data.isReadOnly) {
@@ -141,18 +152,25 @@ const StatusNode: React.FC<StatusNodeProps> = ({
 
   return (
     <div data-cy={`workflow_status_${data.workflowStatus.statusId}`}>
-      <StyledHandle type="target" position={Position.Top} id="top-target" />
+      <StyledHandle
+        type="target"
+        position={Position.Top}
+        id="top-target"
+        visible={isConnecting}
+      />
       <StyledHandle
         type="target"
         position={Position.Right}
         id="right-target"
-        style={{ top: '30%' }}
+        style={{ top: '50%' }}
+        visible={isConnecting}
       />
       <StyledHandle
         type="source"
         position={Position.Right}
         id="right-source"
-        style={{ top: '70%' }}
+        style={{ top: '50%' }}
+        visible={!isConnecting}
       />
       <Container selected={selected && data.isReadOnly}>
         <Title>
@@ -236,6 +254,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({
           type="source"
           position={Position.Bottom}
           id="bottom-source"
+          visible={!isConnecting}
         />
       </Container>
     </div>

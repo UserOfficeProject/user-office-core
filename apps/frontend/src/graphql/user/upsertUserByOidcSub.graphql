@@ -4,9 +4,7 @@ mutation upsertUserByOidcSub(
   $lastName: String!
   $preferredName: String
   $oidcSub: String!
-  $institutionRoRId: String!
-  $institutionName: String!
-  $institutionCountry: String!
+  $institution: InstitutionInput!
   $email: String!
 ) {
   upsertUserByOidcSub(
@@ -15,9 +13,7 @@ mutation upsertUserByOidcSub(
     lastName: $lastName
     preferredName: $preferredName
     oidcSub: $oidcSub
-    institutionRoRId: $institutionRoRId
-    institutionName: $institutionName
-    institutionCountry: $institutionCountry
+    institution: $institution
     email: $email
   ) {
     id

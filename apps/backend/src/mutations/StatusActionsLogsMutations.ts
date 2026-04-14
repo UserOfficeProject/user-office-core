@@ -20,7 +20,6 @@ import {
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
 import { proposalDownloadActionHandler } from '../statusActionEngine/proposalDownloadActionHandler';
-import { WorkflowEngineProposalType } from '../workflowEngine';
 
 @injectable()
 export default class StatusActionsLogsMutations {
@@ -37,7 +36,7 @@ export default class StatusActionsLogsMutations {
 
   private async getStatusEngineReadyProposals(
     proposals: Proposal[]
-  ): Promise<WorkflowEngineProposalType[]> {
+  ): Promise<Proposal[]> {
     if (proposals.length < 1) {
       return [];
     }
@@ -58,9 +57,9 @@ export default class StatusActionsLogsMutations {
       })
     );
 
-    return fullProposals.filter(
-      (item): item is WorkflowEngineProposalType => !!item
-    );
+    const filteredProposals = fullProposals.filter((item) => item !== null);
+
+    return filteredProposals as Proposal[];
   }
   private async executeStatusActionsLog(
     statusActionsLog: StatusActionsLog,

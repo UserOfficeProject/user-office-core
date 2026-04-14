@@ -22,9 +22,7 @@ export default function createEventHandlers() {
     emailHandler,
     loggingHandler,
     postToQueueHandler,
-    // createProposalWorkflowHandler(),
     workflowHandler(),
-    // createExperimentSafetyWorkflowHandler(),
     createCustomHandler(),
   ];
 }

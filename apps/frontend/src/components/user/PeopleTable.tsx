@@ -31,7 +31,7 @@ import {
 import { useDataApi } from 'hooks/common/useDataApi';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import { FunctionType } from 'utils/utilTypes';
+import { FunctionType, StrictColumn } from 'utils/utilTypes';
 
 type InvitationButtonProps = {
   title: string;
@@ -77,11 +77,13 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
 };
 
 const localColumns = [
-  { title: 'Firstname', field: 'firstname' },
-  { title: 'Lastname', field: 'lastname' },
-  { title: 'Preferred name', field: 'preferredname' },
+  { title: 'First Name', field: 'firstname' },
+  { title: 'Last Name', field: 'lastname' },
+  { title: 'Preferred Name', field: 'preferredname' },
   { title: 'Institution', field: 'institution' },
-];
+  { title: 'Email', field: 'email' },
+  { title: 'User Name', field: 'oidcSub' },
+] satisfies StrictColumn<BasicUserDetails>[];
 
 async function getUserByEmail(
   email: string,
@@ -156,6 +158,7 @@ const PeopleTable = ({
     subtractUsers: selectedUsers ? selectedUsers : [],
     userRole: userRole ? userRole : null,
   });
+
   const featureContext = useContext(FeatureContext);
   const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
@@ -251,11 +254,11 @@ const PeopleTable = ({
   };
 
   const fetchRemoteUsersData = (tableQuery: Query<BasicUserDetailsWithRole>) =>
-    new Promise<QueryResult<BasicUserDetailsWithRole>>(
-      async (resolve, reject) => {
-        try {
-          const [orderBy] = tableQuery.orderByCollection;
-          const { users } = await api().getUsers({
+    new Promise<QueryResult<BasicUserDetailsWithRole>>((resolve, reject) => {
+      try {
+        const [orderBy] = tableQuery.orderByCollection;
+        api()
+          .getUsers({
             first: tableQuery.pageSize,
             offset: tableQuery.page * tableQuery.pageSize,
             subtractUsers: query.subtractUsers,
@@ -268,51 +271,54 @@ const PeopleTable = ({
                   ? PaginationSortDirection.DESC
                   : undefined,
             searchText: tableQuery.search,
+          })
+          .then(({ users }) => {
+            const filteredData = data
+              ? data.filter((user) =>
+                  tableQuery.search
+                    ? user.firstname
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase()) ||
+                      user.lastname
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase()) ||
+                      user.institution
+                        .toLowerCase()
+                        .includes(tableQuery.search.toLowerCase())
+                    : true
+                )
+              : undefined;
+
+            const paginatedFilteredData = filteredData
+              ? filteredData.slice(
+                  tableQuery.page * tableQuery.pageSize,
+                  tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
+                )
+              : undefined;
+
+            const usersTableData = getUsersTableData(
+              paginatedFilteredData || users?.users || [],
+              selectedParticipants || [],
+              invitedUsers,
+              tableQuery,
+              filteredData?.length || users?.totalCount || 0
+            );
+
+            setCurrentPageIds(usersTableData.users.map(({ id }) => id));
+
+            resolve({
+              data: usersTableData.users,
+              page: tableQuery.page,
+              totalCount: usersTableData.totalCount,
+            });
+          })
+          .catch((error) => {
+            reject(error);
           });
-
-          const filteredData = data
-            ? data.filter((user) =>
-                tableQuery.search
-                  ? user.firstname
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase()) ||
-                    user.lastname
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase()) ||
-                    user.institution
-                      .toLowerCase()
-                      .includes(tableQuery.search.toLowerCase())
-                  : true
-              )
-            : undefined;
-
-          const paginatedFilteredData = filteredData
-            ? filteredData.slice(
-                tableQuery.page * tableQuery.pageSize,
-                tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
-              )
-            : undefined;
-
-          const usersTableData = getUsersTableData(
-            paginatedFilteredData || users?.users || [],
-            selectedParticipants || [],
-            invitedUsers,
-            tableQuery,
-            filteredData?.length || users?.totalCount || 0
-          );
-
-          setCurrentPageIds(usersTableData.users.map(({ id }) => id));
-
-          resolve({
-            data: usersTableData.users,
-            page: tableQuery.page,
-            totalCount: usersTableData.totalCount,
-          });
-        } catch (error) {
-          reject(error);
-        }
+      } catch (error) {
+        reject(error);
       }
-    );
+    });
 
   return (
     <Formik

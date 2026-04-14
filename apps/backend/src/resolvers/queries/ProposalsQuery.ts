@@ -78,6 +78,9 @@ export class ProposalsFilter {
   @Field(() => Int, { nullable: true })
   public callId?: number;
 
+  @Field(() => [Int], { nullable: true })
+  public callIds?: number[];
+
   @Field(() => Int, { nullable: true })
   public instrumentId?: number;
 

@@ -421,18 +421,14 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       );
     }
 
-    await database(
-      'workflow_status_connection_has_workflow_status_changing_events'
-    )
+    await database('workflow_status_connection_has_events')
       .where('workflow_status_connection_id', workflowConnectionId)
       .del();
 
     const eventsToReturn: StatusChangingEvent[] = [];
 
     for (const eventName of statusChangingEvents) {
-      await database(
-        'workflow_status_connection_has_workflow_status_changing_events'
-      ).insert({
+      await database('workflow_status_connection_has_events').insert({
         workflow_status_connection_id: workflowConnectionId,
         status_changing_event: eventName,
       });
@@ -454,7 +450,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   ): Promise<StatusChangingEvent[]> {
     return database
       .select('workflow_status_connection_id', 'status_changing_event')
-      .from('workflow_status_connection_has_workflow_status_changing_events')
+      .from('workflow_status_connection_has_events')
       .whereIn('workflow_status_connection_id', workflowConnectionIds)
       .then((statusChangingEvents: StatusChangingEventRecord[]) => {
         return statusChangingEvents.map((statusChangingEvent) =>
@@ -511,13 +507,13 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         'workflow_status_connections.workflow_status_connection_id as workflowStatusConnectionId',
         'workflow_status_connections.prev_workflow_status_id as prevWorkflowStatusId',
         'workflow_status_connections.next_workflow_status_id as nextWorkflowStatusId',
-        'workflow_status_connection_has_workflow_status_changing_events.status_changing_event as statusChangingEvent'
+        'workflow_status_connection_has_events.status_changing_event as statusChangingEvent'
       )
       .from('workflow_status_connections')
       .leftJoin(
-        'workflow_status_connection_has_workflow_status_changing_events',
+        'workflow_status_connection_has_events',
         'workflow_status_connections.workflow_status_connection_id',
-        'workflow_status_connection_has_workflow_status_changing_events.workflow_status_connection_id'
+        'workflow_status_connection_has_events.workflow_status_connection_id'
       )
       .where('workflow_status_connections.workflow_id', workflowId);
 
