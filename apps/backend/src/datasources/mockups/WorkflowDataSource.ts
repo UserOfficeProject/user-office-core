@@ -111,6 +111,12 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return dummyWorkflowConnections;
   }
 
+  async getWorkflowConnectionByNextStatusId(
+    nextWorkflowStatusId: number
+  ): Promise<WorkflowConnection | null> {
+    return dummyWorkflowConnections[0];
+  }
+
   async getWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]> {
     return dummyWorkflowStatuses;
   }

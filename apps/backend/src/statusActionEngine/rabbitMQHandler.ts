@@ -2,14 +2,14 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ApplicationEvent } from '../events/applicationEvents';
+import { Proposal } from '../models/Proposal';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { RabbitMQActionConfig } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineType } from '../workflowEngine';
 import { constructProposalStatusChangeEvent } from './statusActionUtils';
 
 export const rabbitMQActionHandler = async (
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineType[]
+  proposals: Proposal[]
 ) => {
   const postToMessageQueue = await container.resolve<
     Promise<(event: ApplicationEvent) => Promise<void>>

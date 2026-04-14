@@ -247,6 +247,20 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       ? this.createWorkflowConnectionObject(workflowConnection)
       : null;
   }
+
+  async getWorkflowConnectionByNextStatusId(
+    nextWorkflowStatusId: number
+  ): Promise<WorkflowConnection | null> {
+    const workflowConnections: WorkflowConnectionRecord[] = await database
+      .select('*')
+      .from('workflow_status_connections')
+      .where('next_workflow_status_id', nextWorkflowStatusId);
+
+    return workflowConnections.length > 0
+      ? this.createWorkflowConnectionObject(workflowConnections[0])
+      : null;
+  }
+
   async addStatusToWorkflow(newWorkflowStatusInput: {
     workflowId: number;
     statusId: string;

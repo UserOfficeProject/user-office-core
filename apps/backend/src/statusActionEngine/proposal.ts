@@ -23,25 +23,22 @@ export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
   const groupByProperties = ['workflowId', 'statusId'];
   // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
   const groupResult = groupProposalsByProperties(proposals, groupByProperties);
-
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
-      const [{ workflowStatusConnectionId }] = groupedProposals;
-
-      const currentConnection = await workflowDataSource.getWorkflowConnection(
-        workflowStatusConnectionId
-      );
+      const [{ workflowStatusId }] = groupedProposals;
+      const currentConnection =
+        await workflowDataSource.getWorkflowConnectionByNextStatusId(
+          workflowStatusId
+        );
 
       if (!currentConnection) {
         return;
       }
-
       const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id
         );
-
       if (!statusActions?.length) {
         return;
       }
