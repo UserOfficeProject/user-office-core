@@ -15,7 +15,7 @@ enum ExperimentInformationKeys {
   ExperimentPk = 'experimentPk',
 }
 
-const publishExperimentSafetyStatusChange = async (
+export const publishExperimentSafetyStatusChange = async (
   updatedExperimentSafeties: WorkflowEngineExperimentType[]
 ) => {
   const eventBus = resolveApplicationEventBus();
@@ -45,6 +45,10 @@ const publishExperimentSafetyStatusChange = async (
   });
 };
 
+export const experimentSafetyWorkflowHelpers = {
+  publishExperimentSafetyStatusChange,
+};
+
 export const handleWorkflowEngineChange = async (
   event: ApplicationEvent,
   experimentPks: number[] | number
@@ -62,7 +66,9 @@ export const handleWorkflowEngineChange = async (
     updatedExperimentSafeties?.length
   ) {
     // publish event EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW to the EventBus
-    await publishExperimentSafetyStatusChange(updatedExperimentSafeties);
+    await experimentSafetyWorkflowHelpers.publishExperimentSafetyStatusChange(
+      updatedExperimentSafeties
+    );
   }
 };
 

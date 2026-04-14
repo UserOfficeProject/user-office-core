@@ -1,9 +1,9 @@
 import { container } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
-import { ApplicationEvent } from '../events/applicationEvents';
 import createCustomHandler from './customHandler';
 import workflowHandler from './workflowHandler';
+import { Tokens } from '../config/Tokens';
+import { ApplicationEvent } from '../events/applicationEvents';
 
 export default function createEventHandlers() {
   const emailHandler = container.resolve<

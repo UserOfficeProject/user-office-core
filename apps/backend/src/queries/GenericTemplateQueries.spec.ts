@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import GenericTemplateQueries from './GenericTemplateQueries';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
 import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
-import GenericTemplateQueries from './GenericTemplateQueries';
 
 const genericTemplateQueries = container.resolve(GenericTemplateQueries);
 

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isCallReviewEndedGuard } from './isCallReviewEndedGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isCallReviewEndedGuard', () => {
   const mockProposalDataSource = {

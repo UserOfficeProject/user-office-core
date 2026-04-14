@@ -2,11 +2,11 @@ import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { WorkflowStatus } from '../models/WorkflowStatus';
+import { WorkflowStructure } from './postgres/records';
 import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
-import { WorkflowStructure } from './postgres/records';
 
 export interface WorkflowDataSource {
   createWorkflow(newWorkflowInput: CreateWorkflowInput): Promise<Workflow>;

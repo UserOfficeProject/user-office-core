@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { UserWithRole } from '../models/User';
@@ -7,7 +8,6 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import { UserAuthorization } from './UserAuthorization';
 
 type VisitRegistrationPrimaryKey = Pick<
   VisitRegistration,

@@ -147,17 +147,17 @@ export default function createHandler() {
     if (proposalInformationValue) {
       switch (proposalInformationKey) {
         case ProposalInformationKeys.ProposalPKs:
-        // case ProposalInformationKeys.ProposalPk:
-        //   handleWorkflowEngineChange(event, proposalInformationValue);
+          // case ProposalInformationKeys.ProposalPk:
+          //   handleWorkflowEngineChange(event, proposalInformationValue);
 
-        //   break;
-        // case ProposalInformationKeys.Proposal:
-        //   handleWorkflowEngineChange(
-        //     event,
-        //     (proposalInformationValue as Proposal).primaryKey
-        //   );
+          //   break;
+          // case ProposalInformationKeys.Proposal:
+          //   handleWorkflowEngineChange(
+          //     event,
+          //     (proposalInformationValue as Proposal).primaryKey
+          //   );
 
-        //   break;
+          break;
         default:
           break;
       }

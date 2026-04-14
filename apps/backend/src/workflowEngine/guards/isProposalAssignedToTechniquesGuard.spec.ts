@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isProposalAssignedToTechniquesGuard } from './isProposalAssignedToTechniquesGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isProposalAssignedToTechniquesGuard', () => {
   const mockTechniqueDataSource = {

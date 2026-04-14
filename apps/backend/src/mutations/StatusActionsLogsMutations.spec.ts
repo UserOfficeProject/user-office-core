@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import StatusActionsLogsMutations from './StatusActionsLogsMutations';
 import { dummyStatusActionsLog } from '../datasources/mockups/StatusActionsLogsDataSource';
 import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
-import StatusActionsLogsMutations from './StatusActionsLogsMutations';
 
 const statusActionsLogsMutations = container.resolve(
   StatusActionsLogsMutations

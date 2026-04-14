@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ProposalMutations from './ProposalMutations';
 import { Tokens } from '../config/Tokens';
 import {
   dummyProposal,
@@ -23,7 +24,6 @@ import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
 import { WorkflowType } from '../models/Workflow';
 import { WorkflowStatus } from '../models/WorkflowStatus';
-import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
 

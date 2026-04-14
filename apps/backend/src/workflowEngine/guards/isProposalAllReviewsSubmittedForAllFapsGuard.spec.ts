@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalAllReviewsSubmittedForAllFapsGuard } from './isProposalAllReviewsSubmittedForAllFapsGuard';
 import { Tokens } from '../../config/Tokens';
 import { ReviewStatus } from '../../models/Review';
-import { isProposalAllReviewsSubmittedForAllFapsGuard } from './isProposalAllReviewsSubmittedForAllFapsGuard';
 
 describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
   const mockFapDataSource = {

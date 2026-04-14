@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isProposalFapMeetingInstrumentUnsubmittedGuard } from './isProposalFapMeetingInstrumentUnsubmittedGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isProposalFapMeetingInstrumentUnsubmittedGuard', () => {
   const mockFapDataSource = {

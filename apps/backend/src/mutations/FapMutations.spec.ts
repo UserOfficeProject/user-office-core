@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { container } from 'tsyringe';
 
+import FapMutations from './FapMutations';
 import {
   anotherDummyFap,
   dummyFap,
@@ -15,7 +16,6 @@ import {
 import { ProposalPks } from '../models/Proposal';
 import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
-import FapMutations from './FapMutations';
 
 const FapMutationsInstance = container.resolve(FapMutations);
 
