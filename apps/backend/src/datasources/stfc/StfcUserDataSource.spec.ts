@@ -1,6 +1,7 @@
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
+import PostgresUserDataSource from '../postgres/UserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');
@@ -157,6 +158,12 @@ describe('Role tests', () => {
       ])
     );
 
+    const mockGetUserRoles = jest.spyOn(
+      PostgresUserDataSource.prototype,
+      'getUserRoles'
+    );
+    mockGetUserRoles.mockImplementation(() => Promise.resolve([]));
+
     const mockEnsureDummyUserExists = jest.spyOn(
       StfcUserDataSource.prototype,
       'ensureDummyUserExists'
@@ -181,7 +188,7 @@ describe('Role tests', () => {
     );
   });
 
-  test('When getting roles for a user, STFC roles are translated into ESS roles', async () => {
+  test('When getting roles for a user, STFC roles are translated into UO system roles', async () => {
     const userdataSource = new StfcUserDataSource();
 
     return expect(
@@ -216,7 +223,7 @@ describe('Role tests', () => {
 describe('Email search tests', () => {
   const userdataSource = new StfcUserDataSource();
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPersonDetailsFromEmail = jest.spyOn(
@@ -276,7 +283,7 @@ describe('Email search tests', () => {
 describe('Searchable user tests', () => {
   const userDataSource = new StfcUserDataSource();
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPeople = jest.spyOn(
