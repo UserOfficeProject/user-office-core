@@ -1,6 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { ExperimentSafetyPdfTemplateRecord } from 'knex/types/tables';
 
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { UpdateExperimentSafetyPdfTemplateArgs } from '../../resolvers/mutations/UpdateExperimentSafetyPdfTemplateMutation';
@@ -10,7 +9,10 @@ import {
   ExperimentSafetyPdfTemplateDataSource,
 } from '../ExperimentSafetyPdfTemplateDataSource';
 import database from './database';
-import { createExperimentSafetyPdfTemplateObject } from './records';
+import {
+  createExperimentSafetyPdfTemplateObject,
+  ExperimentSafetyPdfTemplateRecord,
+} from './records';
 
 export default class PostgresExperimentSafetyPdfTemplateDataSource
   implements ExperimentSafetyPdfTemplateDataSource
