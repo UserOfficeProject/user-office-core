@@ -12,8 +12,12 @@ import {
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import FapMutations from './FapMutations';
+import InstrumentMutations from './InstrumentMutations';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -25,6 +29,7 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { proposalStatusActionEngine } from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
@@ -40,12 +45,7 @@ import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
-import { CallDataSource } from './../datasources/CallDataSource';
-import { CloneUtils } from './../utils/CloneUtils';
-import FapMutations from './FapMutations';
-import InstrumentMutations from './InstrumentMutations';
+import { CloneUtils } from '../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {

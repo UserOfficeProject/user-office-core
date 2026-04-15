@@ -1,11 +1,11 @@
 import { container } from 'tsyringe';
 
-import { constructProposalStatusChangeEvent } from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { Proposal } from '../models/Proposal';
-import { ConnectionHasStatusAction } from '../models/StatusAction';
-import { RabbitMQActionConfig } from '../resolvers/types/StatusActionConfig';
+import { constructProposalStatusChangeEvent } from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { ApplicationEvent } from '../../../events/applicationEvents';
+import { Proposal } from '../../../models/Proposal';
+import { ConnectionHasStatusAction } from '../../../models/StatusAction';
+import { RabbitMQActionConfig } from '../../../resolvers/types/StatusActionConfig';
 
 export const rabbitMQActionHandler = async (
   statusAction: ConnectionHasStatusAction,

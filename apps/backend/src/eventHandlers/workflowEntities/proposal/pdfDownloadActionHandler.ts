@@ -7,18 +7,18 @@ import { container } from 'tsyringe';
 import {
   constructProposalStatusChangeEvent,
   statusActionLogger,
-} from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { FileDataSource } from '../datasources/FileDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import type { ProposalPDFData } from '../factory/pdf/proposal';
-import { FileMetadata } from '../models/Blob';
-import { Proposal } from '../models/Proposal';
-import { ConnectionHasStatusAction } from '../models/StatusAction';
+} from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { FileDataSource } from '../../../datasources/FileDataSource';
+import { ApplicationEvent } from '../../../events/applicationEvents';
+import type { ProposalPDFData } from '../../../factory/pdf/proposal';
+import { FileMetadata } from '../../../models/Blob';
+import { Proposal } from '../../../models/Proposal';
+import { ConnectionHasStatusAction } from '../../../models/StatusAction';
 
 const FACTORY_ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
-export const proposalDownloadActionHandler = async (
+export const pdfDownloadActionHandler = async (
   statusAction: ConnectionHasStatusAction,
   proposals: Proposal[],
   options?: {
@@ -67,7 +67,7 @@ export const proposalDownloadActionHandler = async (
     );
 
     const { collectProposalPDFDataTokenAccess } = await import(
-      '../factory/pdf/proposal'
+      '../../../factory/pdf/proposal'
     );
 
     let proposalPDFData: ProposalPDFData;

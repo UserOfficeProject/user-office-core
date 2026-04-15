@@ -85,10 +85,6 @@ export class WorkflowEngine {
       (p): p is WorkflowEngineType => !!p
     );
 
-    if (validEntities.length > 0) {
-      // await proposalStatusActionEngine(validEntities);
-    }
-
     return validEntities;
   }
 

@@ -3,8 +3,8 @@ import { container } from 'tsyringe';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { searchObjectByKey } from '../utils/helperFunctions';
-import { WorkflowEngine } from '../workflowEngine';
-import experimentSafetyWorkflowEntity from './workflowEntities/experiment';
+import { WorkflowEngine, WorkflowEngineType } from '../workflowEngine';
+import experimentSafetyWorkflowEntity from './workflowEntities/experiment/experiment';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 
 type EntityKey = string;
@@ -20,9 +20,7 @@ export interface WorkFlowEntity {
     workflowStatusId: number
   ) => Promise<void>;
   onWorkflowStatusChange: (
-    entityId: number,
-    prevStatusId: number,
-    nextStatusId: number
+    updatedEntities: WorkflowEngineType[]
   ) => Promise<void>;
 }
 
@@ -32,18 +30,16 @@ const extractEntityFromEvent = (
 ) => {
   let entity, entityKey;
 
-  // NOTE: Go through the event object and try to find some of the ProposalInformationKeys.
   for (const key of entityKeys) {
     entity = searchObjectByKey(event, key);
-
     if (entity && entity[key as keyof object]) {
       entityKey = key;
 
       return { entity, entityKey };
-    } else {
-      return null;
     }
   }
+
+  return null;
 };
 
 const startWorkflow = async (
@@ -54,7 +50,6 @@ const startWorkflow = async (
   const isArray = Array.isArray(entityIdentifier);
 
   const workflowEngine = container.resolve(WorkflowEngine);
-
   const updatedEntities = await workflowEngine.run(
     {
       event: event.type,
@@ -63,15 +58,7 @@ const startWorkflow = async (
     workflowEntity
   );
 
-  await Promise.all(
-    updatedEntities.map(async (updatedEntity) => {
-      await workflowEntity.onWorkflowStatusChange(
-        updatedEntity.entityId,
-        updatedEntity.prevStatusId,
-        updatedEntity.nextStatusId
-      );
-    })
-  );
+  await workflowEntity.onWorkflowStatusChange(updatedEntities);
 
   return updatedEntities;
 };
@@ -97,10 +84,8 @@ export default function workflowHandler() {
     if (event.isRejection) {
       return;
     }
-
     for (const entity of entities) {
       const { extractionEntityKeys } = entity;
-
       const extractedEntity = extractEntityFromEvent(
         event,
         extractionEntityKeys
@@ -110,10 +95,11 @@ export default function workflowHandler() {
         const { entity: extractedEntityObject, entityKey: extractedEntityKey } =
           extractedEntity;
 
-        const extractedEntityValue =
-          extractedEntityObject[extractedEntityKey as keyof object];
-
-        if (isValidWorkflowEntityValue(extractedEntityValue)) {
+        const extractedEntityValue = extractedEntityObject[extractedEntityKey];
+        if (
+          extractedEntityValue &&
+          isValidWorkflowEntityValue(extractedEntityValue)
+        ) {
           await startWorkflow(event, extractedEntityValue, entity);
         }
       }

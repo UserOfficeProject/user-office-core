@@ -12,21 +12,21 @@ import {
   getPIAndFormatOutputForEmailSending,
   getTechniqueScientistsAndFormatOutputForEmailSending,
   statusActionLogger,
-} from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { AdminDataSource } from '../datasources/AdminDataSource';
-import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { UserDataSource } from '../datasources/UserDataSource';
-import { MailService } from '../eventHandlers/MailService/MailService';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { Proposal } from '../models/Proposal';
-import { SettingsId } from '../models/Settings';
-import { ConnectionHasStatusAction } from '../models/StatusAction';
+} from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
+import { UserDataSource } from '../../../datasources/UserDataSource';
+import { ApplicationEvent } from '../../../events/applicationEvents';
+import { Proposal } from '../../../models/Proposal';
+import { SettingsId } from '../../../models/Settings';
+import { ConnectionHasStatusAction } from '../../../models/StatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/StatusActionConfig';
+} from '../../../resolvers/types/StatusActionConfig';
+import { MailService } from '../../MailService/MailService';
 
 export const emailActionHandler = async (
   statusAction: ConnectionHasStatusAction,

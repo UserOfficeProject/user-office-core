@@ -48,7 +48,6 @@ export const createWorkflowMachine = async (workflowId: number) => {
       },
     };
   });
-
   workflowConnections.forEach((conn) => {
     const sourceStatus = wfStatusIdToNameMap.get(conn.prevWorkflowStatusId);
     const targetStatus = wfStatusIdToNameMap.get(conn.nextWorkflowStatusId);

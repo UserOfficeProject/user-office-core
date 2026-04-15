@@ -2,29 +2,29 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
-import { CallDataSource } from '../datasources/CallDataSource';
-import { FapDataSource } from '../datasources/FapDataSource';
-import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
-import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
-import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { UserDataSource } from '../datasources/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { Event } from '../events/event.enum';
-import { InstrumentWithManagementTime } from '../models/Instrument';
-import { Proposal } from '../models/Proposal';
-import { Answer } from '../models/Questionary';
-import { Technique } from '../models/Technique';
-import { DataType } from '../models/Template';
-import { BasicUserDetails, User } from '../models/User';
-import { StatusActionsLogsArgs } from '../resolvers/queries/StatusActionsLogsQuery';
+import { Tokens } from '../../../config/Tokens';
+import { CallDataSource } from '../../../datasources/CallDataSource';
+import { FapDataSource } from '../../../datasources/FapDataSource';
+import { GenericTemplateDataSource } from '../../../datasources/GenericTemplateDataSource';
+import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
+import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
+import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
+import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
+import { UserDataSource } from '../../../datasources/UserDataSource';
+import { ApplicationEvent } from '../../../events/applicationEvents';
+import { Event } from '../../../events/event.enum';
+import { InstrumentWithManagementTime } from '../../../models/Instrument';
+import { Proposal } from '../../../models/Proposal';
+import { Answer } from '../../../models/Questionary';
+import { Technique } from '../../../models/Technique';
+import { DataType } from '../../../models/Template';
+import { BasicUserDetails, User } from '../../../models/User';
+import { StatusActionsLogsArgs } from '../../../resolvers/queries/StatusActionsLogsQuery';
 import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/StatusActionConfig';
+} from '../../../resolvers/types/StatusActionConfig';
 
 interface GroupedObjectType {
   [key: string]: Proposal[];

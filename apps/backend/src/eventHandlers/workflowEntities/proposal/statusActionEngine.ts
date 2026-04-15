@@ -1,14 +1,14 @@
 import { container } from 'tsyringe';
 
 import { emailActionHandler } from './emailActionHandler';
-import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
+import { pdfDownloadActionHandler } from './pdfDownloadActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
-import { groupProposalsByProperties } from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
-import { Proposal } from '../models/Proposal';
-import { StatusActionType } from '../models/StatusAction';
+import { groupProposalsByProperties } from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { StatusActionsDataSource } from '../../../datasources/StatusActionsDataSource';
+import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
+import { Proposal } from '../../../models/Proposal';
+import { StatusActionType } from '../../../models/StatusAction';
 
 export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
@@ -59,7 +59,7 @@ export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
               break;
 
             case StatusActionType.PROPOSALDOWNLOAD:
-              proposalDownloadActionHandler(statusAction, groupedProposals);
+              pdfDownloadActionHandler(statusAction, groupedProposals);
               break;
 
             default:

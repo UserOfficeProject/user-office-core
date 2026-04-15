@@ -497,7 +497,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     if (!workflow) {
       throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
     }
-
     const cacheEntry = this.workflowStructureCache.get(workflowId);
     if (
       cacheEntry &&
@@ -540,7 +539,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         statusChangingEvents: string[];
       }
     >();
-
     workflowConnections.forEach((wc) => {
       const existingConnection = normalizedWorkflowConnectionsMap.get(
         wc.workflowStatusConnectionId
