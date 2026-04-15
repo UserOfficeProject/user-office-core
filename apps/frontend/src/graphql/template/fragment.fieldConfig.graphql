@@ -47,6 +47,10 @@ fragment fieldConfig on FieldConfig {
     units {
       ...unit
     }
+    numberMin
+    numberMinInclusive
+    numberMax
+    numberMaxInclusive
     numberValueConstraint
     small_label
     required
