@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { UnitsImportWithValidation as UnitsImportWithValidationOrigin } from '../../models/Unit';
 import { UnitComparison } from './UnitComparison';
+import { UnitsImportWithValidation as UnitsImportWithValidationOrigin } from '../../models/Unit';
 
 @ObjectType()
 export class UnitsImportWithValidation

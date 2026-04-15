@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import FapQueries from './FapQueries';
 import {
   anotherDummyFap,
   dummyFap,
@@ -14,7 +15,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import FapQueries from './FapQueries';
 
 const FapQueriesInstance = container.resolve(FapQueries);
 

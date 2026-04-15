@@ -1,9 +1,9 @@
 import { Ctx, FieldResolver, ObjectType, Resolver, Root } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
 import { AnswerBasic } from './AnswerBasic';
 import { Question } from './Question';
 import { Template } from './Template';
+import { ResolverContext } from '../../context';
 
 @ObjectType()
 export class QuestionWithUsage extends Question {}
