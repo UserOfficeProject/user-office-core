@@ -460,6 +460,12 @@ const FapProposalsAndAssignmentsTable = ({
           };
         }),
     });
+
+    setSearchParams((searchParams) => {
+      searchParams.delete('selection');
+
+      return searchParams;
+    });
   };
 
   const handleMemberAssignmentToFapProposals = (
