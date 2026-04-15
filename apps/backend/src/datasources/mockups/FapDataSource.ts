@@ -1,3 +1,4 @@
+import { basicDummyUser } from './UserDataSource';
 import {
   Fap,
   FapAssignment,
@@ -25,7 +26,6 @@ import {
   FapReviewsRecord,
   AssignProposalsToFapsInput,
 } from '../postgres/records';
-import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
   1,

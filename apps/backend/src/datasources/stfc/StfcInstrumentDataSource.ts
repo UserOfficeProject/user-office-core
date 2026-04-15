@@ -1,5 +1,9 @@
 import { container, injectable } from 'tsyringe';
 
+import {
+  StfcUserDataSource,
+  toEssBasicUserDetails,
+} from './StfcUserDataSource';
 import { Tokens } from '../../config/Tokens';
 import { BasicUserDetails } from '../../models/User';
 import database from '../postgres/database';
@@ -10,10 +14,6 @@ import {
   UserRecord,
   createBasicUserObject,
 } from '../postgres/records';
-import {
-  StfcUserDataSource,
-  toEssBasicUserDetails,
-} from './StfcUserDataSource';
 
 @injectable()
 export default class StfcInstrumentDataSource extends PostgresInstrumentDataSource {
