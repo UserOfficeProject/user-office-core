@@ -8,10 +8,10 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ExperimentHasSample as ExperimentHasSampleOrigin } from '../../models/Experiment';
 import { Questionary } from './Questionary';
 import { Sample } from './Sample';
+import { ResolverContext } from '../../context';
+import { ExperimentHasSample as ExperimentHasSampleOrigin } from '../../models/Experiment';
 
 @ObjectType()
 export class ExperimentHasSample implements ExperimentHasSampleOrigin {
