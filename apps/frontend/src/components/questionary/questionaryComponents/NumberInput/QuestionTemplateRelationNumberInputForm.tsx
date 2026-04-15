@@ -38,6 +38,21 @@ export const QuestionTemplateRelationNumberForm = (
               unit: Yup.string(),
             })
           ),
+          numberMin: Yup.number()
+            .typeError('Minimum score must be a number')
+            .nullable(),
+          numberMax: Yup.number()
+            .typeError('Maximum score must be a number')
+            .nullable()
+            // We cannot do the same for numberMin because it would create a circular dependency
+            .when('numberMin', (numberMin, schema) => {
+              return numberMin !== null
+                ? schema.moreThan(
+                    numberMin,
+                    'Maximum must be strictly greater than Minimum'
+                  )
+                : schema;
+            }),
         }),
       })}
     >
@@ -116,6 +131,62 @@ export const QuestionTemplateRelationNumberForm = (
                   },
                 ]}
               />
+              <Field
+                name="config.numberMin"
+                label="Minimum"
+                id="config.numberMin"
+                type="number"
+                component={TextField}
+                fullWidth
+                inputProps={{ 'data-cy': 'numberMin' }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value =
+                    e.target.value === '' ? null : Number(e.target.value);
+                  formikProps.setFieldValue('config.numberMin', value);
+                  //Trigger validation for numberMax when numberMin changes
+                  formikProps.setFieldTouched('config.numberMax', true, true);
+                }}
+              />
+              {(formikProps.values.config as NumberInputConfig).numberMin !==
+                null && (
+                <Field
+                  name="config.numberMinInclusive"
+                  id="config.numberMinInclusive"
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  Label={{
+                    label: 'Minimum is inclusive',
+                  }}
+                  inputProps={{ 'data-cy': 'numberMinInclusive' }}
+                />
+              )}
+              <Field
+                name="config.numberMax"
+                label="Maximum"
+                id="config.numberMax"
+                type="number"
+                component={TextField}
+                fullWidth
+                inputProps={{ 'data-cy': 'numberMax' }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value =
+                    e.target.value === '' ? null : Number(e.target.value);
+                  formikProps.setFieldValue('config.numberMax', value);
+                }}
+              />
+              {(formikProps.values.config as NumberInputConfig).numberMax !==
+                null && (
+                <Field
+                  name="config.numberMaxInclusive"
+                  id="config.numberMaxInclusive"
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  Label={{
+                    label: 'Maximum is inclusive',
+                  }}
+                  inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+                />
+              )}
             </TitledContainer>
             <TitledContainer label="Dependencies">
               <QuestionDependencyList

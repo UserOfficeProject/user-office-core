@@ -66,10 +66,25 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               unit: Yup.string(),
             })
           ),
+          numberMin: Yup.number()
+            .typeError('Minimum score must be a number')
+            .nullable(),
+          numberMax: Yup.number()
+            .typeError('Maximum score must be a number')
+            .nullable()
+            // We cannot do the same for numberMin because it would create a circular dependency
+            .when('numberMin', (numberMin, schema) => {
+              return numberMin !== undefined
+                ? schema.moreThan(
+                    numberMin,
+                    'Maximum must be strictly greater than Minimum'
+                  )
+                : schema;
+            }),
         }),
       })}
     >
-      {({ setFieldValue }) => (
+      {({ setFieldValue, setFieldTouched, values }) => (
         <>
           <Field
             name="naturalKey"
@@ -186,6 +201,60 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 },
               ]}
             />
+            <Field
+              name="config.numberMin"
+              label="Minimum"
+              id="config.numberMin"
+              type="number"
+              component={TextField}
+              fullWidth
+              inputProps={{ 'data-cy': 'numberMin' }}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const value =
+                  e.target.value === '' ? null : Number(e.target.value);
+                setFieldValue('config.numberMin', value);
+                //Trigger validation for numberMax when numberMin changes
+                setFieldTouched('config.numberMax', true, true);
+              }}
+            />
+            {(values.config as NumberInputConfig).numberMin !== null && (
+              <Field
+                name="config.numberMinInclusive"
+                id="config.numberMinInclusive"
+                type="checkbox"
+                component={CheckboxWithLabel}
+                Label={{
+                  label: 'Minimum is inclusive',
+                }}
+                inputProps={{ 'data-cy': 'numberMinInclusive' }}
+              />
+            )}
+            <Field
+              name="config.numberMax"
+              label="Maximum"
+              id="config.numberMax"
+              type="number"
+              component={TextField}
+              fullWidth
+              inputProps={{ 'data-cy': 'numberMax' }}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const value =
+                  e.target.value === '' ? null : Number(e.target.value);
+                setFieldValue('config.numberMax', value);
+              }}
+            />
+            {(values.config as NumberInputConfig).numberMax !== null && (
+              <Field
+                name="config.numberMaxInclusive"
+                id="config.numberMaxInclusive"
+                type="checkbox"
+                component={CheckboxWithLabel}
+                Label={{
+                  label: 'Maximum is inclusive',
+                }}
+                inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+              />
+            )}
           </TitledContainer>
           <StyledDialog
             aria-labelledby="simple-modal-title"
