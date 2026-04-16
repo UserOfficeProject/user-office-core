@@ -17,8 +17,10 @@ export type FapAssignedMember = BasicUserDetails & {
 };
 
 type AssignFapMemberToProposalModalProps = {
-  proposalPks: number[];
-  setProposalPks: React.Dispatch<React.SetStateAction<number[]>>;
+  proposalPks: { proposalPk: number; proposalId: string }[];
+  setProposalPks: React.Dispatch<
+    React.SetStateAction<{ proposalPk: number; proposalId: string }[]>
+  >;
   fapId: number;
   assignMembersToFapProposals: (assignedMembers: FapAssignedMember[]) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
@@ -78,7 +80,7 @@ const AssignFapMemberToProposalModal = ({
     >
       <DialogContent>
         <PeopleTable
-          title="Select reviewers"
+          title={`Select reviewers for proposals: ${proposalPks.map((pk) => pk.proposalId).join(', ')}`}
           selection={true}
           data={members}
           emailSearch={false}

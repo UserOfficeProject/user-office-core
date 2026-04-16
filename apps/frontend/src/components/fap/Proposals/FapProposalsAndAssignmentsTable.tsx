@@ -183,7 +183,9 @@ const FapProposalsAndAssignmentsTable = ({
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     fapProposals;
   const { api } = useDataApiWithFeedback();
-  const [proposalPks, setProposalPks] = useState<number[]>([]);
+  const [proposalPks, setProposalPks] = useState<
+    { proposalPk: number; proposalId: string }[]
+  >([]);
   const downloadPDFProposal = useDownloadPDFProposal();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -281,9 +283,10 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
 
-    const proposalPksToAssign = proposalsToAssign.map(
-      (proposalToAssign) => proposalToAssign.proposalPk
-    );
+    const proposalPksToAssign = proposalsToAssign.map((proposalToAssign) => ({
+      proposalPk: proposalToAssign.proposalPk,
+      proposalId: proposalToAssign.proposal.proposalId,
+    }));
     setProposalPks(proposalPksToAssign);
   };
 
@@ -323,12 +326,12 @@ const FapProposalsAndAssignmentsTable = ({
         const isExistingAssignment = !!existingProposalAssignments.find(
           (existingProposalAssignment) =>
             assignedMember.id === existingProposalAssignment?.user?.id &&
-            proposalPk === existingProposalAssignment.proposalPk
+            proposalPk.proposalPk === existingProposalAssignment.proposalPk
         );
         if (!isExistingAssignment) {
           proposalAssignments.push({
             memberId: assignedMember.id,
-            proposalPk,
+            proposalPk: proposalPk.proposalPk,
             rank: assignedMember.rank ?? null,
           });
           updatedMembers.add(assignedMember);
@@ -370,7 +373,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     for (const proposalPk of proposalPks) {
       const { proposalReviews } = await api().getProposalReviews({
-        proposalPk,
+        proposalPk: proposalPk.proposalPk,
         fapId: data.id,
       });
 
@@ -379,7 +382,10 @@ const FapProposalsAndAssignmentsTable = ({
       }
 
       proposalReviews.forEach((proposalReview) =>
-        allProposalReviews.push({ ...proposalReview, proposalPk })
+        allProposalReviews.push({
+          ...proposalReview,
+          proposalPk: proposalPk.proposalPk,
+        })
       );
     }
 
@@ -472,7 +478,7 @@ const FapProposalsAndAssignmentsTable = ({
     memberUsers: FapAssignedMember[]
   ) => {
     const selectedProposals = FapProposalsData.filter((fapProposal) =>
-      proposalPks.includes(fapProposal.proposalPk)
+      proposalPks.some((pk) => pk.proposalPk === fapProposal.proposalPk)
     );
 
     if (selectedProposals.length === 0) {
