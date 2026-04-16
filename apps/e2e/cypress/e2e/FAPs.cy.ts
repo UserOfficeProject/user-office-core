@@ -1540,7 +1540,7 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it('Fap Secretary should be able to see private internal comments', () => {
+    it.only('Fap Secretary should be able to see private internal comments', () => {
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
         status: TechnicalReviewStatus.FEASIBLE,
@@ -1584,6 +1584,9 @@ context('Fap reviews tests', () => {
         variant: 'success',
         text: 'Member assigned',
       });
+
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(500); // Wait for the assignment to be processed else it the "click" goes missing and fails the test
 
       cy.contains('Review Proposals').click();
 
