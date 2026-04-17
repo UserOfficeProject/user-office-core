@@ -1,8 +1,8 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { AuthJwtPayload as AuthJwtPayloadBase } from '../../models/User';
 import { Role } from './Role';
 import { UserJWT } from './UserJWT';
+import { AuthJwtPayload as AuthJwtPayloadBase } from '../../models/User';
 
 @ObjectType()
 export class AuthJwtPayload implements AuthJwtPayloadBase {

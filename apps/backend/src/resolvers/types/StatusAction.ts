@@ -8,16 +8,16 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import {
-  StatusAction as StatusActionOrigin,
-  StatusActionType,
-} from '../../models/StatusAction';
 import {
   EmailActionDefaultConfig,
   RabbitMQActionDefaultConfig,
   StatusActionDefaultConfig,
 } from './StatusActionConfig';
+import { ResolverContext } from '../../context';
+import {
+  StatusAction as StatusActionOrigin,
+  StatusActionType,
+} from '../../models/StatusAction';
 
 @ObjectType()
 export class StatusAction implements Partial<StatusActionOrigin> {
