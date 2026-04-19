@@ -178,7 +178,12 @@ export class UserResolver {
 
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.instrument.dataSource.getUserInstruments(user.id);
+    const agentId = context.user?.currentRole?.id;
+
+    return context.queries.instrument.dataSource.getUserInstruments(
+      user.id,
+      agentId!
+    );
   }
 
   @FieldResolver(() => Institution)
