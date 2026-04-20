@@ -1,17 +1,16 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 
+import { getProposalMessageData } from './messageBroker';
 import { Tokens } from '../config/Tokens';
 import { mapClass } from '../config/utils';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
+import database from '../datasources/postgres/database';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
+import { createProposalObject } from '../datasources/postgres/records';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
-import database from '../datasources/postgres/database';
-import { createProposalObject } from '../datasources/postgres/records';
-import { getProposalMessageData } from './messageBroker';
 
 beforeAll(() => {
   mapClass(Tokens.UserDataSource, PostgresUserDataSource);
