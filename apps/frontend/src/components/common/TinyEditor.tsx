@@ -20,8 +20,15 @@ import React from 'react';
 const TinyEditor = (props: IAllProps) => (
   <Editor
     {...props}
-    // @ts-expect-error Tinymce types package is not updated and license_key has a wrong type
-    init={{ license_key: 'gpl', promotion: false, height: 300, ...props.init }}
+    init={{
+      // @ts-expect-error Tinymce types package is not updated and license_key has a wrong type
+      license_key: 'gpl',
+      promotion: false,
+      height: 300,
+      browser_spellcheck: true,
+      contextmenu: false,
+      ...props.init,
+    }}
   />
 );
 
