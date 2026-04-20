@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ProposalQueries from './ProposalQueries';
 import { Tokens } from '../config/Tokens';
 import {
   dummyProposal,
@@ -18,7 +19,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { omit } from '../utils/helperFunctions';
-import ProposalQueries from './ProposalQueries';
 
 const proposalQueries = container.resolve(ProposalQueries);
 
@@ -126,7 +126,9 @@ test('Whitespace does not stop user-officer role viewing proposal', () => {
         undefined,
         undefined,
         undefined,
-        'shortCode'
+        'shortCode',
+        undefined,
+        undefined
       );
     });
 });

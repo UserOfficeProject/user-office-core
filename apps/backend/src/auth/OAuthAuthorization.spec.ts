@@ -21,13 +21,13 @@ jest.mock('@user-office-software/openid', () => {
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { OAuthAuthorization } from './OAuthAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Institution } from '../models/Institution';
 import { User, UserRole } from '../models/User';
-import { OAuthAuthorization } from './OAuthAuthorization';
 
 describe('OAuthAuthorization', () => {
   let oauthAuthorization: OAuthAuthorization;

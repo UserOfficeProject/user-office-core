@@ -1,3 +1,4 @@
+import { basicDummyUser } from './UserDataSource';
 import {
   Fap,
   FapAssignment,
@@ -25,7 +26,6 @@ import {
   FapReviewsRecord,
   AssignProposalsToFapsInput,
 } from '../postgres/records';
-import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
   1,
@@ -488,6 +488,8 @@ export class FapDataSourceMock implements FapDataSource {
       shortCode: 'fap_chair',
       title: 'Fap Chair',
       description: '',
+      permissions: [],
+      isRootRole: true,
     };
   }
 

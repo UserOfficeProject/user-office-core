@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { getExperimentMessageData } from './messageBroker';
 import { Tokens } from '../config/Tokens';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';

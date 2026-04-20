@@ -10,14 +10,12 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import pug from 'pug';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
-import { AdminDataSource } from '../../datasources/AdminDataSource';
-import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
-import { SettingsId } from '../../models/Settings';
-import { isProduction } from '../../utils/helperFunctions';
-import EmailSettings from './EmailSettings';
-import { MailService, SendMailResults, SMTPEmailTemplate } from './MailService';
-import { ResultsPromise } from './SparkPost';
+import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { EmailTemplateDataSource } from '../../../datasources/EmailTemplateDataSource';
+import { SettingsId } from '../../../models/Settings';
+import { isProduction } from '../../../utils/helperFunctions';
+import SendMailOptions, { MailService, SendMailResults } from '../MailService';
 
 export class SMTPMailService extends MailService {
   private emailTemplate: EmailTemplates<any>;
@@ -81,7 +79,7 @@ export class SMTPMailService extends MailService {
           relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
         },
       },
-      render: (view: string, locals?: any) => {
+      render: (view: string) => {
         return new Promise((resolve, reject) => {
           const lastSlashIndex = view.lastIndexOf('/');
           const templateBody =
@@ -107,7 +105,7 @@ export class SMTPMailService extends MailService {
     );
   }
 
-  private async compileEmailTemplate(options: EmailSettings): Promise<{
+  private async compileEmailTemplate(options: SendMailOptions): Promise<{
     subject: string;
     body: string;
   } | null> {
@@ -191,7 +189,7 @@ export class SMTPMailService extends MailService {
     };
   }
 
-  async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
+  async sendMail(options: SendMailOptions) {
     const adminDataSource = container.resolve<AdminDataSource>(
       Tokens.AdminDataSource
     );
@@ -234,13 +232,13 @@ export class SMTPMailService extends MailService {
       emailPromises.push(
         this.emailTemplate.send({
           message: {
-            ...(typeof participant.address !== 'string'
+            ...(participant.header_to
               ? {
                   to: {
                     address: isProduction
-                      ? participant.address?.email
+                      ? participant.address
                       : <string>process.env.SINK_EMAIL,
-                    name: participant.address?.header_to,
+                    name: participant.header_to,
                   },
                   bcc: bccAddress,
                   subject: template.subject,
@@ -277,7 +275,7 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async getEmailTemplates(): ResultsPromise<SMTPEmailTemplate[]> {
+  async getEmailTemplates() {
     const emailTemplates =
       await this.emailTemplateDataSource.getEmailTemplates();
 

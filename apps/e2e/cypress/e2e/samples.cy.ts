@@ -285,6 +285,10 @@ context('Samples tests', () => {
 
       cy.contains('OK').click();
 
+      cy.get('#customized-dialog-title').contains('Sample Declaration');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
@@ -369,6 +373,10 @@ context('Samples tests', () => {
       cy.get('[data-cy="clone"]').click();
 
       cy.contains('OK').click();
+
+      cy.get('#customized-dialog-title').contains('Sample Declaration');
+
+      cy.get('[data-cy="close-modal-btn"]').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 

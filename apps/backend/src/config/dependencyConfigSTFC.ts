@@ -5,6 +5,10 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
+import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
+import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -23,6 +27,7 @@ import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/Propo
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -43,7 +48,7 @@ import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
+import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
 import {
   createPostToRabbitMQHandler,
   createSkipListeningHandler,
@@ -57,11 +62,8 @@ import {
 } from '../factory/xlsx/stfc/StfcFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
-import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
-import { Tokens } from './Tokens';
-import { mapClass, mapValue } from './utils';
 
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);

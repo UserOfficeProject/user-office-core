@@ -2,6 +2,7 @@ import { upsertUserByOidcSubValidationSchema } from '@user-office-software/duo-v
 import jsonwebtoken from 'jsonwebtoken';
 import { container, Lifecycle } from 'tsyringe';
 
+import UserMutations from './UserMutations';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import {
@@ -15,7 +16,6 @@ import {
 import { isRejection } from '../models/Rejection';
 import { AuthJwtPayload, User } from '../models/User';
 import { verifyToken } from '../utils/jwt';
-import UserMutations from './UserMutations';
 
 const secret = process.env.JWT_SECRET as string;
 
