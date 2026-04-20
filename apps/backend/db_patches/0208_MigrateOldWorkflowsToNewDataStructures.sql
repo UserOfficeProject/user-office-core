@@ -11,8 +11,6 @@ DECLARE
     v_logs_updated BIGINT := 0;
     v_unmapped_logs BIGINT := 0;
     has_status_actions_logs BOOLEAN := FALSE;
-    call_has_workflow_id BOOLEAN := FALSE;
-    call_has_proposal_workflow_id BOOLEAN := FALSE;
     v_proposals_updated BIGINT := 0;
     v_unmapped_proposals BIGINT := 0;
     node_rec RECORD;
@@ -25,57 +23,7 @@ BEGIN
        '2026-01-05'
      ) THEN
       BEGIN
-        SELECT COUNT(*) INTO v_node_count FROM workflow_connections;
 
-        IF v_node_count = 0 THEN
-          RAISE NOTICE 'No workflow connections to migrate. Continuing with cleanup.';
-        END IF;
-
-        PERFORM 1 FROM workflow_has_statuses LIMIT 1;
-        IF FOUND THEN
-          RAISE EXCEPTION 'workflow_has_statuses already contains rows. Migration must run on an empty target table.';
-        END IF;
-
-        PERFORM 1 FROM workflow_status_connections LIMIT 1;
-        IF FOUND THEN
-          RAISE EXCEPTION 'workflow_status_connections already contains rows. Migration must run on an empty target table.';
-        END IF;
-
-        PERFORM 1
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-          AND table_name = 'status_actions_logs';
-
-        IF FOUND THEN
-          has_status_actions_logs := TRUE;
-
-          ALTER TABLE status_actions_logs
-            DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_action_id_fkey,
-            DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_fkey,
-            DROP CONSTRAINT IF EXISTS status_actions_logs_action_id_fkey;
-        END IF;
-
-        SELECT EXISTS (
-                 SELECT 1
-                 FROM information_schema.columns
-                 WHERE table_schema = 'public'
-                   AND table_name = 'call'
-                   AND column_name = 'workflow_id'
-               )
-          INTO call_has_workflow_id;
-
-        SELECT EXISTS (
-                 SELECT 1
-                 FROM information_schema.columns
-                 WHERE table_schema = 'public'
-                   AND table_name = 'call'
-                   AND column_name = 'proposal_workflow_id'
-               )
-          INTO call_has_proposal_workflow_id;
-
-        IF NOT call_has_workflow_id AND NOT call_has_proposal_workflow_id THEN
-          RAISE EXCEPTION 'call table must expose either workflow_id or proposal_workflow_id to migrate proposals.';
-        END IF;
 
 
         -- Pre-migration validation: abort if any proposal has a status_id that
@@ -90,21 +38,10 @@ BEGIN
             workflow_id INT
           ) ON COMMIT DROP;
 
-          IF call_has_proposal_workflow_id THEN
-            INSERT INTO tmp_pre_val_call_workflow (call_id, workflow_id)
-            SELECT call_id, proposal_workflow_id
-            FROM call
-            WHERE proposal_workflow_id IS NOT NULL;
-          END IF;
-
-          IF call_has_workflow_id THEN
-            INSERT INTO tmp_pre_val_call_workflow (call_id, workflow_id)
-            SELECT call_id, workflow_id
-            FROM call
-            WHERE workflow_id IS NOT NULL
-            ON CONFLICT (call_id) DO UPDATE
-              SET workflow_id = COALESCE(EXCLUDED.workflow_id, tmp_pre_val_call_workflow.workflow_id);
-          END IF;
+          INSERT INTO tmp_pre_val_call_workflow (call_id, workflow_id)
+          SELECT call_id, proposal_workflow_id
+          FROM call
+          WHERE proposal_workflow_id IS NOT NULL;
 
           FOR v_validation_rec IN
             SELECT array_agg(p.proposal_pk ORDER BY p.proposal_pk) AS proposal_pks,
@@ -139,6 +76,11 @@ BEGIN
 
           DROP TABLE IF EXISTS tmp_pre_val_call_workflow;
         END;
+
+        ALTER TABLE status_actions_logs
+          DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_action_id_fkey,
+          DROP CONSTRAINT IF EXISTS status_actions_logs_connection_id_fkey,
+          DROP CONSTRAINT IF EXISTS status_actions_logs_action_id_fkey;
 
         CREATE TEMP TABLE tmp_workflow_status_map (
           workflow_connection_id INT PRIMARY KEY,
@@ -293,21 +235,10 @@ BEGIN
           workflow_id INT
         ) ON COMMIT DROP;
 
-        IF call_has_proposal_workflow_id THEN
-          INSERT INTO tmp_call_workflow_map (call_id, workflow_id)
-          SELECT call_id, proposal_workflow_id
-          FROM call
-          WHERE proposal_workflow_id IS NOT NULL;
-        END IF;
-
-        IF call_has_workflow_id THEN
-          INSERT INTO tmp_call_workflow_map (call_id, workflow_id)
-          SELECT call_id, workflow_id
-          FROM call
-          WHERE workflow_id IS NOT NULL
-          ON CONFLICT (call_id) DO UPDATE
-            SET workflow_id = COALESCE(EXCLUDED.workflow_id, tmp_call_workflow_map.workflow_id);
-        END IF;
+        INSERT INTO tmp_call_workflow_map (call_id, workflow_id)
+        SELECT call_id, proposal_workflow_id
+        FROM call
+        WHERE proposal_workflow_id IS NOT NULL;
 
         CREATE TEMP TABLE tmp_workflow_status_lookup (
           workflow_id INT NOT NULL,
