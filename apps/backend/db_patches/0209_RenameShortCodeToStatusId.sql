@@ -5,7 +5,7 @@ DECLARE
     v_count bigint;
 BEGIN
     IF register_patch(
-       '0205_RenameShortCodeToStatusId',
+       'RenameShortCodeToStatusId',
        'Jekabs Karklins',
        'Make short_code to be the primary key (renaming it to status_id) and update references.',
        '2026-01-12'
