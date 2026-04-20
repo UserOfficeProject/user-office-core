@@ -291,23 +291,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async updateProposalWfStatus(
-    proposalPk: number,
-    proposalWfStatusId: number
-  ): Promise<Proposal> {
-    return database
-      .update({ workflow_status_id: proposalWfStatusId }, ['*'])
-      .from('proposals')
-      .where('proposal_pk', proposalPk)
-      .then((records: ProposalRecord[]) => {
-        if (records === undefined || !records.length) {
-          throw new GraphQLError(`Proposal not found ${proposalPk}`);
-        }
-
-        return createProposalObject(records[0]);
-      });
-  }
-
   async get(id: number): Promise<Proposal | null> {
     return database
       .select()
@@ -776,7 +759,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               { userId: user.id }
             ).orWhereRaw(
               // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
-              // eslint-disable-next-line prettier/prettier
+
               "jsonb_path_exists(instruments, '$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)')",
               { userId: user.id }
             );

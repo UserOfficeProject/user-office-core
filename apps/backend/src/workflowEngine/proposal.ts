@@ -136,11 +136,13 @@ export class ProposalWorkflowEngine {
       const nextWfStatusId = meta?.workflowStatusId;
 
       if (nextWfStatusId) {
-        const updatedProposal =
-          await this.proposalDataSource.updateProposalWfStatus(
-            proposalPk,
-            nextWfStatusId
+        const { proposals } =
+          await this.proposalDataSource.changeProposalsWorkflowStatus(
+            nextWfStatusId,
+            [proposalPk]
           );
+
+        const updatedProposal = proposals[0];
 
         return {
           ...updatedProposal,

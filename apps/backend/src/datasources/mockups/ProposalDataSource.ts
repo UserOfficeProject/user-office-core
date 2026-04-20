@@ -259,20 +259,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async updateProposalWfStatus(
-    proposalPk: number,
-    proposalStatusId: number
-  ): Promise<Proposal> {
-    const proposal = await this.get(proposalPk);
-
-    if (!proposal) {
-      throw new Error('Proposal does not exist');
-    }
-    proposal.workflowStatusId = proposalStatusId;
-
-    return proposal;
-  }
-
   async setProposalUsers(
     proposalPk: number,
     usersIds: number[]
