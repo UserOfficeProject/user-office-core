@@ -604,15 +604,15 @@ export interface WorkflowConnectionRecord {
 // and contains full information about workflow statuses and connections,
 // so we do not need to make multiple calls to database to get workflow structure
 export interface WorkflowStructure {
-  workflowStatuses: {
-    workflowStatusId: number;
-    statusId: string;
+  readonly workflowStatuses: {
+    readonly workflowStatusId: number;
+    readonly statusId: string;
   }[];
-  workflowConnections: {
-    workflowStatusConnectionId: number;
-    prevWorkflowStatusId: number;
-    nextWorkflowStatusId: number;
-    statusChangingEvents: string[];
+  readonly workflowConnections: {
+    readonly workflowStatusConnectionId: number;
+    readonly prevWorkflowStatusId: number;
+    readonly nextWorkflowStatusId: number;
+    readonly statusChangingEvents: string[];
   }[];
 }
 
