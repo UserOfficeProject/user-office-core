@@ -2,6 +2,10 @@ import 'reflect-metadata';
 import { RabbitMQMessageBroker } from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
+import {
+  createPostToRabbitMQHandler,
+  createSkipPostingHandler,
+} from './messageBroker';
 import { Tokens } from '../config/Tokens';
 import {
   dummyProposal,
@@ -9,10 +13,6 @@ import {
 } from '../datasources/mockups/ProposalDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import { Event } from '../events/event.enum';
-import {
-  createPostToRabbitMQHandler,
-  createSkipPostingHandler,
-} from './messageBroker';
 
 const buildProposalSubmittedEvent = (isRejection = false) => ({
   type: Event.PROPOSAL_SUBMITTED,
