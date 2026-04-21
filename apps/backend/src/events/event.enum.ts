@@ -35,7 +35,7 @@ import {
   isProposalSampleSafeGuard,
   isProposalSubmittedGuard,
 } from '../workflowEngine/guards';
-import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachnine';
+import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachine';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {
@@ -94,6 +94,7 @@ export enum Event {
   PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
+  EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED = 'EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED',
   TOPIC_ANSWERED = 'TOPIC_ANSWERED',
   PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
   PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
@@ -449,6 +450,13 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when the proposal status action is being executed in the status engine',
+    },
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED,
+    {
+      label:
+        'Event occurs when the experiment safety status action is being executed in the status engine',
     },
   ],
   [

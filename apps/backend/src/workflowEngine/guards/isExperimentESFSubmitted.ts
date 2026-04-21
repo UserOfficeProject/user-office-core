@@ -2,8 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
-import { InstrumentScientistDecisionEnum } from '../../models/Experiment';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
+import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
 
 export const isExperimentESFSubmitted: GuardFn = async (entity: Entity) => {
   const experimentDataSource = container.resolve<ExperimentDataSource>(
@@ -14,8 +13,5 @@ export const isExperimentESFSubmitted: GuardFn = async (entity: Entity) => {
     entity.id
   );
 
-  return (
-    experimentSafety?.instrumentScientistDecision ===
-    InstrumentScientistDecisionEnum.REJECTED
-  );
+  return !!experimentSafety?.esiQuestionarySubmittedAt;
 };

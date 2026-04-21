@@ -4,7 +4,7 @@ import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { ReviewStatus } from '../../models/Review';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
+import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
 
 export const isProposalAllReviewsSubmittedForAllFapsGuard: GuardFn = async (
   entity: Entity

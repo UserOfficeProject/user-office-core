@@ -4,7 +4,7 @@ import { injectable } from 'tsyringe';
 import { WorkFlowEntity } from '../eventHandlers/workflowHandler';
 import { Event } from '../events/event.enum';
 import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
-import { createActor } from './simpleStateMachine/stateMachnine';
+import { createActor } from './simpleStateMachine/stateMachine';
 
 type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 
@@ -54,11 +54,9 @@ export class WorkflowEngine {
     } else {
       normalizedInput = [input];
     }
-
     const entitiesWithChangedStatuses = await Promise.all(
       normalizedInput.map(async ({ entity, currentEvent }) => {
         const workflowId = await workflowEntity.resolveWorkflowId(entity);
-
         if (!workflowId) {
           return;
         }
@@ -74,8 +72,11 @@ export class WorkflowEngine {
           workflowId,
           currentStatusId,
           currentEvent,
-          (newWorkflowStatusId: number) => {
-            workflowEntity.updateWorkflowStatus(entity, newWorkflowStatusId);
+          async (newWorkflowStatusId: number) => {
+            await workflowEntity.updateWorkflowStatus(
+              entity,
+              newWorkflowStatusId
+            );
           }
         );
       })
@@ -99,7 +100,6 @@ export class WorkflowEngine {
     handleEntityWorkflowChange: (newWorkflowStatus: number) => void
   ): Promise<WorkflowEngineType | void> {
     const machine = await createWorkflowMachine(workflowId);
-
     const currentEntityState = Object.entries(machine.schema.states).find(
       ([, state]) => {
         return (
@@ -110,10 +110,8 @@ export class WorkflowEngine {
     )?.[0];
 
     const actor = createActor(machine, { id: entityId }, currentEntityState);
-
     const { nextStateValue, connectionId, transitionPerformed } =
       await actor.event(event.toUpperCase());
-
     if (transitionPerformed) {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta

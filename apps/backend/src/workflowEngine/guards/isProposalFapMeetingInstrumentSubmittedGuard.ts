@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
+import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
 
 export const isProposalFapMeetingInstrumentSubmittedGuard: GuardFn = async (
   entity: Entity

@@ -31,7 +31,6 @@ export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
         await workflowDataSource.getWorkflowConnectionByNextStatusId(
           workflowStatusId
         );
-
       if (!currentConnection) {
         return;
       }

@@ -194,6 +194,11 @@ interface ProposalStatusActionExecutedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ExperimentSafetyStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED;
+  experimentSafety: ExperimentSafety;
+}
+
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
   proposals: Proposals;
@@ -535,6 +540,7 @@ export type ApplicationEvent =
   | InstrumentDeletedEvent
   | FapReviewerNotified
   | ProposalStatusActionExecutedEvent
+  | ExperimentSafetyStatusActionExecutedEvent
   | TechniqueCreatedEvent
   | TechniqueUpdatedEvent
   | TechniqueDeletedEvent

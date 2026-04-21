@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
+import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
 
 export const isProposalNotifiedGuard: GuardFn = async (entity: Entity) => {
   const proposalDataSource = container.resolve<ProposalDataSource>(

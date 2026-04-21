@@ -84,7 +84,6 @@ export const createActor = (
         transitionPerformed: false,
       };
     }
-
     // all Guards from current state to target state must pass
     for await (const guardTransition of transition.guards) {
       const result = await guardTransition(entity);

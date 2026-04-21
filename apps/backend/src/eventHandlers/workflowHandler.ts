@@ -4,7 +4,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { searchObjectByKey } from '../utils/helperFunctions';
 import { WorkflowEngine, WorkflowEngineType } from '../workflowEngine';
-import experimentSafetyWorkflowEntity from './workflowEntities/experiment/experiment';
+import experimentSafetyWorkflowEntity from './workflowEntities/experiment';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 
 type EntityKey = string;
@@ -57,7 +57,6 @@ const startWorkflow = async (
     },
     workflowEntity
   );
-
   await workflowEntity.onWorkflowStatusChange(updatedEntities);
 
   return updatedEntities;
@@ -67,7 +66,6 @@ function isValidWorkflowEntityValue(
   value: unknown
 ): value is number | number[] {
   if (!value) return false;
-
   if (Array.isArray(value)) {
     if (value.length === 0) return false;
 

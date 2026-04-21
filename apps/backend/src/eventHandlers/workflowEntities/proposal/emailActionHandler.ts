@@ -320,65 +320,6 @@ export const emailStatusActionRecipient = async (
       break;
     }
 
-    case EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS: {
-      const adminDataSource = container.resolve<AdminDataSource>(
-        Tokens.AdminDataSource
-      );
-
-      const experimentSafetyEmail = (
-        await adminDataSource.getSetting(
-          SettingsId.EXPERIMENT_SAFETY_REVIEW_EMAIL
-        )
-      )?.settingsValue;
-
-      if (!experimentSafetyEmail) {
-        logger.logError(
-          'Could not send email(s) to the Experiment Safety team as the setting (EXPERIMENT_SAFETY_REVIEW_EMAIL) is not set.',
-          { proposalEmailsSkipped: proposals }
-        );
-
-        break;
-      }
-
-      let experimentSafetyRecipients: EmailReadyType[];
-
-      if (recipientWithTemplate.combineEmails) {
-        experimentSafetyRecipients = [
-          {
-            id: recipientWithTemplate.recipient.name,
-            email: experimentSafetyEmail,
-            proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.id,
-          },
-        ];
-      } else {
-        experimentSafetyRecipients =
-          await getOtherAndFormatOutputForEmailSending(
-            proposals,
-            recipientWithTemplate,
-            experimentSafetyEmail
-          );
-      }
-
-      await sendMail(
-        experimentSafetyRecipients,
-        statusActionLogger({
-          connectionId: statusAction.connectionId,
-          actionId: statusAction.actionId,
-          statusActionsLogId,
-          emailStatusActionRecipient:
-            EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
-          proposalPks,
-        }),
-        successfulMessage,
-        failMessage,
-        emailTemplateId,
-        loggedInUserId
-      );
-
-      break;
-    }
-
     case EmailStatusActionRecipients.OTHER: {
       if (!recipientWithTemplate.otherRecipientEmails?.length) {
         logger.logError(
