@@ -37,6 +37,12 @@ export class StatusDataSourceMock implements StatusDataSource {
   async getAllStatuses(): Promise<Status[]> {
     return dummyStatuses;
   }
+  async getStatusByWorkflowStatusId(
+    workflowStatusId: number
+  ): Promise<Status | null> {
+    return dummyStatuses[0];
+  }
+
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     return { ...status, entityType: WorkflowType.PROPOSAL };
   }
