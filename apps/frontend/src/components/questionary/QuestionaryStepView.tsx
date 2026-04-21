@@ -291,7 +291,7 @@ function QuestionaryStepView(props: {
             {activeFields.map((field) => {
               return (
                 <Box
-                  sx={(theme) => ({ margin: theme.spacing(2, 0, 0, 0) })}
+                  sx={(theme) => ({ margin: theme.spacing(0, 0, 0, 0) })}
                   key={field.question.id}
                 >
                   {createQuestionaryComponent({
