@@ -295,6 +295,11 @@ BEGIN
 
         ALTER TABLE proposals ALTER COLUMN workflow_status_id SET NOT NULL;
 
+        DROP VIEW IF EXISTS proposal_table_view;
+        DROP VIEW IF EXISTS review_data;
+        ALTER TABLE proposals DROP CONSTRAINT IF EXISTS proposals_proposal_statuses_id_fkey;
+        ALTER TABLE proposals DROP COLUMN status_id;
+
         DROP TABLE IF EXISTS workflow_connection_has_actions;
         DROP TABLE IF EXISTS status_changing_events;
         DROP TABLE IF EXISTS workflow_connections;

@@ -90,32 +90,6 @@ BEGIN
 
 
         -- ==========================================
-        -- 4. Migrate 'proposals'
-        -- ==========================================
-
-        ALTER TABLE proposals ADD COLUMN new_status_id VARCHAR(50);
-
-        -- Map existing valid status IDs
-        UPDATE proposals p
-        SET new_status_id = s.status_id
-        FROM statuses s
-        WHERE p.status_id = s.old_id;
-
-
-        -- Clean up old column
-        ALTER TABLE proposals DROP COLUMN status_id;
-        ALTER TABLE proposals RENAME COLUMN new_status_id TO status_id;
-        
-        -- Set new default
-        ALTER TABLE proposals ALTER COLUMN status_id SET DEFAULT 'DRAFT';
-        ALTER TABLE proposals ALTER COLUMN status_id SET NOT NULL;
-
-        -- Re-add Foreign Key
-        ALTER TABLE proposals
-            ADD CONSTRAINT proposals_status_id_fkey FOREIGN KEY (status_id) REFERENCES statuses (status_id) ON UPDATE CASCADE;
-
-
-        -- ==========================================
         -- 5. Migrate 'workflow_status_actions'
         -- ==========================================
         -- Checking if table exists and column exists (it should based on schema history)
@@ -180,7 +154,7 @@ BEGIN
             p.title,
             p.proposer_id AS principal_investigator,
             p.workflow_status_id AS proposal_workflow_status_id,
-            p.status_id AS proposal_status_id,
+            whs.status_id AS proposal_status_id,
             s.name AS proposal_status_name,
             s.description AS proposal_status_description,
             p.proposal_id,
@@ -198,7 +172,8 @@ BEGIN
             c.call_id,
             c.proposal_workflow_id
         FROM proposals p
-        LEFT JOIN statuses s ON s.status_id = p.status_id
+        LEFT JOIN workflow_has_statuses whs ON whs.workflow_status_id = p.workflow_status_id
+        LEFT JOIN statuses s ON s.status_id = whs.status_id
         LEFT JOIN call c ON c.call_id = p.call_id
         LEFT JOIN (
             SELECT
@@ -322,8 +297,9 @@ BEGIN
             JOIN call_has_instruments chi ON chi.instrument_id = fp.instrument_id
                 AND chi.call_id = c.call_id
             JOIN instruments i ON i.instrument_id = chi.instrument_id
-            WHERE p.status_id <> 'EXPIRED'
-            AND p.status_id <> 'DRAFT'
+            LEFT JOIN workflow_has_statuses whs ON whs.workflow_status_id = p.workflow_status_id
+            WHERE whs.status_id <> 'EXPIRED'
+            AND whs.status_id <> 'DRAFT'
         ) proposal
                 LEFT JOIN ( SELECT fr.proposal_pk,
                         avg(CASE 
