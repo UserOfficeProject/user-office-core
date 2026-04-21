@@ -235,7 +235,7 @@ describe('Test Instrument Mutations', () => {
       // @ts-ignore skip type error for testing purposes
       jest.spyOn(proposalDataSource, 'get').mockResolvedValue({
         primaryKey: 1,
-        statusId: 'UNDER_REVIEW',
+        workflowStatusId: 2,
       });
 
       return expect(

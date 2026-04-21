@@ -66,8 +66,8 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return database
       .select('s.*')
       .from('statuses as s')
-      .join('workflows as w', 's.status_id', 'w.status_id')
-      .where('w.workflow_status_id', workflowStatusId)
+      .join('workflow_has_statuses as whs', 's.status_id', 'whs.status_id')
+      .where('whs.workflow_status_id', workflowStatusId)
       .first()
       .then((status: StatusRecord) =>
         status ? this.createStatusObject(status) : null

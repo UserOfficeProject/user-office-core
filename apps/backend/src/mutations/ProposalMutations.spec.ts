@@ -785,7 +785,6 @@ describe('Test technique proposal change status', () => {
         ...dummyProposal,
         primaryKey: 1,
         workflowStatusId: submittedId,
-        statusId: 'FINISHED',
       },
       {
         ...dummyProposal,

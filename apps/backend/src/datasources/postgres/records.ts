@@ -773,7 +773,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.title || '',
     proposal.abstract || '',
     proposal.proposer_id,
-    proposal.status_id,
     proposal.workflow_status_id,
     proposal.created_at,
     proposal.updated_at,

@@ -140,7 +140,9 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
+  const proposalStatus = await statusDataSource.getStatusByWorkflowStatusId(
+    proposal.workflowStatusId
+  );
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);

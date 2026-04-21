@@ -546,13 +546,17 @@ export default class InstrumentMutations {
         );
       }
 
-      if (proposal?.statusId !== 'UNDER_REVIEW') {
+      const proposalStatus =
+        await this.statusDataSource.getStatusByWorkflowStatusId(
+          proposal.workflowStatusId
+        );
+      if (proposalStatus?.id !== 'UNDER_REVIEW') {
         return rejection(
           'Could not assign instrument: forbidden current status',
           {
             agent,
             args,
-            currentStatus: proposal?.statusId,
+            currentStatus: proposalStatus?.id,
           }
         );
       }

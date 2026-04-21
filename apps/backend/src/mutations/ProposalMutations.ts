@@ -858,7 +858,6 @@ export default class ProposalMutations {
         title: `Copy of ${clonedProposal.title}`,
         abstract: clonedProposal.abstract,
         proposerId: sourceProposal.proposerId,
-        statusId: 'DRAFT',
         workflowStatusId: defaultWfStatus.workflowStatusId,
         created: new Date(),
         updated: new Date(),
