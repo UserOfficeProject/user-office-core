@@ -71,22 +71,11 @@ BEGIN
 
 
         -- ==========================================
-        -- 3. Migrate 'experiment_safety'
+        -- 3. Skip 'experiment_safety' (no status_id column)
         -- ==========================================
-
-        ALTER TABLE experiment_safety ADD COLUMN new_status_id VARCHAR(50);
-
-        UPDATE experiment_safety es
-        SET new_status_id = s.status_id
-        FROM statuses s
-        WHERE es.status_id = s.old_id;
-
-        ALTER TABLE experiment_safety DROP COLUMN status_id;
-        ALTER TABLE experiment_safety RENAME COLUMN new_status_id TO status_id;
-        -- ALTER TABLE experiment_safety ALTER COLUMN status_id SET NOT NULL; -- User requested nullable
-
-        ALTER TABLE experiment_safety
-            ADD CONSTRAINT experiment_safety_status_id_fkey FOREIGN KEY (status_id) REFERENCES statuses (status_id) ON UPDATE CASCADE;
+        -- experiment_safety no longer uses direct status_id column.
+        -- Status is looked up via workflow_status_id → workflow_has_statuses → status_id
+        -- Foreign key constraint already added in 0207_AddNewWorkflowDataStructures.sql
 
 
         -- ==========================================
