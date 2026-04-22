@@ -1,8 +1,9 @@
 import Box from '@mui/material/Box';
+import { useResizeObserver } from '@wojtekmaj/react-hooks';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { pdfjs, Document, Page } from 'react-pdf';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -15,7 +16,19 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
   const [numPages, setNumPages] = useState<number>();
-  const pdfViewerContainerRef = useRef<HTMLDivElement>(null);
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number>();
+  const resizeObserverOptions = {};
+
+  const onResize = useCallback<ResizeObserverCallback>((entries) => {
+    const [entry] = entries;
+
+    if (entry) {
+      setContainerWidth(entry.contentRect.width);
+    }
+  }, []);
+
+  useResizeObserver(containerRef, resizeObserverOptions, onResize);
 
   function onDocumentLoadSuccess({
     numPages: nextNumPages,
@@ -28,11 +41,15 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
       style={{
         height: '1000px',
       }}
-      ref={pdfViewerContainerRef}
+      ref={setContainerRef}
     >
       <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>
         {Array.from(new Array(numPages), (_el, index) => (
-          <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+          <Page
+            key={`page_${index + 1}`}
+            pageNumber={index + 1}
+            width={containerWidth!}
+          />
         ))}
       </Document>
     </Box>

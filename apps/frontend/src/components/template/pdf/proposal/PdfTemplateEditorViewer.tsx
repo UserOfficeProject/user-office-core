@@ -15,11 +15,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
-  const [numPages, setNumPages] = useState<number>(); // try not using state
+  const [numPages, setNumPages] = useState<number>();
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>();
   const resizeObserverOptions = {};
-  const maxWidth = 8000;
 
   const onResize = useCallback<ResizeObserverCallback>((entries) => {
     const [entry] = entries;
@@ -31,11 +30,11 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
 
   useResizeObserver(containerRef, resizeObserverOptions, onResize);
 
-  function onDocumentLoadSuccess({
+  const onDocumentLoadSuccess = ({
     numPages: nextNumPages,
-  }: PDFDocumentProxy): void {
+  }: PDFDocumentProxy) => {
     setNumPages(nextNumPages);
-  }
+  };
 
   return (
     <Box
@@ -49,9 +48,7 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
           <Page
             key={`page_${index + 1}`}
             pageNumber={index + 1}
-            width={
-              containerWidth ? Math.min(containerWidth, maxWidth) : maxWidth
-            }
+            width={containerWidth!}
           />
         ))}
       </Document>
