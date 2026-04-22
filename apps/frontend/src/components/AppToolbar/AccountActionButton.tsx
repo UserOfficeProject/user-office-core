@@ -62,7 +62,7 @@ const AccountActionButton = () => {
   )?.settingsValue;
 
   const externalHomepageURL = settingsContext.settingsMap.get(
-    'EXTERNAL_AUTH_HOMEPAGE_URL' as SettingsId
+    SettingsId.EXTERNAL_AUTH_HOMEPAGE_URL
   )?.settingsValue;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

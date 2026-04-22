@@ -81,6 +81,16 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-end-call-input"]').should('exist');
     });
 
+    it('Should show Facilities Homepage button in account menu', () => {
+      cy.visit('/');
+
+      cy.get('[data-cy="profile-page-btn"]').click();
+
+      cy.get('[data-cy="external-homepage-button"]')
+        .should('exist')
+        .and('contain.text', 'Facilities Homepage');
+    });
+
     it('Instrument Scientist filter should differ based on setting value', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until instr sci login is enabled
