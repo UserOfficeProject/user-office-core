@@ -1540,7 +1540,7 @@ context('Fap reviews tests', () => {
       });
     });
 
-    it.only('Fap Secretary should be able to see private internal comments', () => {
+    it('Fap Secretary should be able to see private internal comments', () => {
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
         status: TechnicalReviewStatus.FEASIBLE,

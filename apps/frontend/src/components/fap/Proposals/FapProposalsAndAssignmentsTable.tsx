@@ -779,7 +779,7 @@ const FapProposalsAndAssignmentsTable = ({
         />
       </ProposalReviewModal>
       <AssignFapMemberToProposalModal
-        proposalPks={proposalPks}
+        proposals={proposalPks}
         setProposalPks={setProposalPks}
         fapId={data.id}
         assignMembersToFapProposals={handleMemberAssignmentToFapProposals}

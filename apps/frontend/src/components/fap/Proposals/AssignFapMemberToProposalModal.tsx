@@ -17,7 +17,7 @@ export type FapAssignedMember = BasicUserDetails & {
 };
 
 type AssignFapMemberToProposalModalProps = {
-  proposalPks: { proposalPk: number; proposalId: string }[];
+  proposals: { proposalPk: number; proposalId: string }[];
   setProposalPks: React.Dispatch<
     React.SetStateAction<{ proposalPk: number; proposalId: string }[]>
   >;
@@ -46,7 +46,7 @@ const columns = [
 const AssignFapMemberToProposalModal = ({
   assignMembersToFapProposals,
   fapId,
-  proposalPks,
+  proposals,
   setProposalPks,
 }: AssignFapMemberToProposalModalProps) => {
   const [selectedParticipants, setSelectedParticipants] = useState<
@@ -56,10 +56,10 @@ const AssignFapMemberToProposalModal = ({
   const [rankSelectorOpen, setRankSelectorOpen] = useState(false);
 
   useEffect(() => {
-    if (proposalPks.length === 0) {
+    if (proposals.length === 0) {
       setSelectedParticipants([]);
     }
-  }, [proposalPks]);
+  }, [proposals]);
 
   const members: FapAssignedMember[] = FapMembersData
     ? FapMembersData.map((fapMember) => ({
@@ -75,12 +75,12 @@ const AssignFapMemberToProposalModal = ({
       fullWidth
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
-      open={proposalPks.length > 0}
+      open={proposals.length > 0}
       onClose={(): void => setProposalPks([])}
     >
       <DialogContent>
         <PeopleTable
-          title={`Select reviewers for proposals: ${proposalPks.map((pk) => pk.proposalId).join(', ')}`}
+          title={`Select reviewers for proposals: ${proposals.map((pk) => pk.proposalId).join(', ')}`}
           selection={true}
           data={members}
           emailSearch={false}
