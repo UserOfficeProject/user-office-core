@@ -54,9 +54,7 @@ export default class WorkflowQueries {
     agent: UserWithRole | null,
     workflowStatusId: number
   ) {
-    const status = await this.dataSource.getWorkflowStatus(workflowStatusId);
-
-    return status;
+    return this.dataSource.getWorkflowStatus(workflowStatusId);
   }
 
   @Authorized([Roles.USER_OFFICER])

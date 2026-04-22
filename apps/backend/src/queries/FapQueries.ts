@@ -166,10 +166,6 @@ export default class FapQueries {
       proposalPk: number;
     }
   ) {
-    if (!agent) {
-      return null;
-    }
-
     const proposal = await this.proposalDataSource.get(proposalPk);
     if (!proposal) {
       return null;
@@ -197,14 +193,17 @@ export default class FapQueries {
 
     switch (visibility) {
       case FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE:
-        const allFapReviewsComplete = await this.allFapReviewsComplete(
+        const isAllFapReviewsComplete = await this.allFapReviewsComplete(
           fapId,
-          proposalPk,
-          !!isApiToken,
-          isUserOfficer,
-          isChairOrSecretary
+          proposalPk
         );
-        if (allFapReviewsComplete) fapAccessRestrictions = false;
+        const canSeeAllAssignments =
+          isApiToken ||
+          isUserOfficer ||
+          isChairOrSecretary ||
+          isAllFapReviewsComplete;
+
+        if (canSeeAllAssignments) fapAccessRestrictions = false;
         break;
       case FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED:
         const hasFapEnded = this.hasFapEnded(call);
@@ -218,7 +217,7 @@ export default class FapQueries {
     return this.dataSource.getFapProposalAssignments(
       fapId,
       proposalPk,
-      fapAccessRestrictions ? agent.id : null
+      fapAccessRestrictions ? agent!.id : null
     );
   }
 
@@ -267,20 +266,7 @@ export default class FapQueries {
     );
   }
 
-  private async allFapReviewsComplete(
-    fapId: number,
-    proposalPk: number,
-    isApiToken: boolean,
-    isUserOfficer: boolean,
-    isChairOrSecretary: boolean
-  ) {
-    const canSeeAllAssignments =
-      isApiToken || isUserOfficer || isChairOrSecretary;
-
-    if (canSeeAllAssignments) {
-      return true;
-    }
-
+  private async allFapReviewsComplete(fapId: number, proposalPk: number) {
     const reviews = await this.reviewDataSource.getProposalReviews(
       proposalPk,
       fapId
