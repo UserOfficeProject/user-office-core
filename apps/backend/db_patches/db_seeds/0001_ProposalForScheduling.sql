@@ -69,7 +69,6 @@ BEGIN
     (
        title
      , abstract
-     , status_id
      , workflow_status_id
      , proposer_id
      , created_at
@@ -87,7 +86,6 @@ BEGIN
     (
        'Test proposal'   
      , 'Lorem ipsum'     
-     , 'SCHEDULING'   
      , 8              
      , 1                 
      , NOW()             
@@ -111,7 +109,6 @@ BEGIN
     (
        title
      , abstract
-     , status_id
      , workflow_status_id
      , proposer_id
      , created_at
@@ -129,7 +126,6 @@ BEGIN
     (
        'Test proposal 2'   
      , 'Lorem ipsum 2'     
-     , 'SCHEDULING'   
      , 8              
      , 1                 
      , NOW()             
