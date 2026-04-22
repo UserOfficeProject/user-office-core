@@ -82,10 +82,21 @@ context('App settings tests', () => {
     });
 
     it('Should show Facilities Homepage button in account menu', () => {
+      cy.login('officer');
+      cy.visit('/Settings');
+
+      cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[actions=""] > :nth-child(4)')
+        .clear()
+        .type('https://test-homepage.com');
+
+      cy.get('[aria-label="Save"]').click();
+
       cy.visit('/');
-
       cy.get('[data-cy="profile-page-btn"]').click();
-
       cy.get('[data-cy="external-homepage-button"]')
         .should('exist')
         .and('contain.text', 'Facilities Homepage');
