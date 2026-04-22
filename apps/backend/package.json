@@ -83,7 +83,7 @@
     "reflect-metadata": "^0.2.1",
     "sanitize-html": "^2.12.1",
     "simple-oauth2": "^4.3.0",
-    "string-strip-html": "^8.4.0",
+    "string-strip-html": "^13.5.3",
     "tsyringe": "^4.8.0",
     "type-graphql": "2.0.0-beta.1",
     "yup": "^0.32.11",
