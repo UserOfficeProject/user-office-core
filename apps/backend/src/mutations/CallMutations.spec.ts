@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import CallMutations from './CallMutations';
 import { dummyCall } from '../datasources/mockups/CallDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -8,7 +9,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { AllocationTimeUnits } from '../models/Call';
 import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
-import CallMutations from './CallMutations';
 
 const callMutations = container.resolve(CallMutations);
 

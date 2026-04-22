@@ -246,10 +246,10 @@ export default class PostgresTechniqueDataSource
         .ignore()
         .transacting(trx)
         .then(() => {
-          trx.commit;
+          trx.commit();
         })
         .catch((error) => {
-          trx.rollback;
+          trx.rollback();
           throw new Error(`Error assigning proposal to technique: ${error}`);
         });
     });

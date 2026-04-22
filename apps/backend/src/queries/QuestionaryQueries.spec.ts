@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import QuestionaryQueries from './QuestionaryQueries';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
@@ -8,7 +9,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import QuestionaryQueries from './QuestionaryQueries';
 
 const questionaryQueries = container.resolve(QuestionaryQueries);
 

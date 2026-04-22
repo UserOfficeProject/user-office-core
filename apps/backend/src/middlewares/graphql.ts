@@ -24,6 +24,7 @@ import { container } from 'tsyringe';
 import 'reflect-metadata';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
+import initGraphQLClient from './graphqlClient';
 import { Tokens } from '../config/Tokens';
 import { ResolverContext } from '../context';
 import { UserWithRole } from '../models/User';
@@ -31,7 +32,6 @@ import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import { isProduction } from '../utils/helperFunctions';
-import initGraphQLClient from './graphqlClient';
 import { apolloServerMetricsPlugin } from './metrics/apolloServerMetricsPlugin';
 
 export const context: ContextFunction<
