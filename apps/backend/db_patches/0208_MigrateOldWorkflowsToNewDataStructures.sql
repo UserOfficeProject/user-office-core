@@ -300,6 +300,8 @@ BEGIN
         ALTER TABLE proposals DROP CONSTRAINT IF EXISTS proposals_proposal_statuses_id_fkey;
         ALTER TABLE proposals DROP COLUMN status_id;
 
+        ALTER TABLE experiment_safety DROP COLUMN IF EXISTS status_id;
+
         DROP TABLE IF EXISTS workflow_connection_has_actions;
         DROP TABLE IF EXISTS status_changing_events;
         DROP TABLE IF EXISTS workflow_connections;

@@ -223,7 +223,7 @@ describe('handleWorkflowEngineChange', () => {
     test('should not publish if updated experiment has no statusId', async () => {
       const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       const updatedExperiment = createMockUpdatedExperiment({
-        statusId: 'DRAFT',
+        workflowStatusId: 1,
       });
 
       spyMarkEvent.mockResolvedValue([updatedExperiment]);

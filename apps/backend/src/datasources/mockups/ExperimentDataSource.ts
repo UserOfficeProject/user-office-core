@@ -43,7 +43,6 @@ const dummyExperimentSafetyFactory = (
     values?.esiQuestionaryId ?? 1,
     values?.esiQuestionarySubmittedAt ?? null,
     values?.createdBy ?? 1,
-    values?.statusId ?? null,
     values?.workflowStatusId ?? 1,
     values?.safetyReviewQuestionaryId ?? 1,
     values?.reviewedBy ?? null,
@@ -360,7 +359,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
             ? updateFields.esiQuestionarySubmittedAt
             : safety.esiQuestionarySubmittedAt,
           safety.createdBy,
-          safety.statusId,
           safety.workflowStatusId,
           updateFields.safetyReviewQuestionaryId !== undefined
             ? updateFields.safetyReviewQuestionaryId
