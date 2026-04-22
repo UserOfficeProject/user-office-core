@@ -650,7 +650,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.proposalStatusId) {
-          query.where('proposals.status_id', filter?.proposalStatusId);
+          query.whereExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .where('workflow_has_statuses.status_id', filter.proposalStatusId)
+          );
         }
 
         if (filter?.shortCodes) {
@@ -667,7 +673,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.excludeProposalStatusIds) {
-          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+          query.whereNotExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .whereIn(
+                'workflow_has_statuses.status_id',
+                filter.excludeProposalStatusIds
+              )
+          );
         }
 
         if (first) {
@@ -908,7 +923,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           INSERT INTO proposals
           (title,
            abstract,
-           status_id,
            workflow_status_id,
            proposer_id,
            created_at,
@@ -923,7 +937,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
            management_decision_submitted)
           SELECT title,
                  abstract,
-                 status_id,
                  workflow_status_id,
                  proposer_id,
                  created_at,
@@ -1132,7 +1145,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.proposalStatusId) {
-          query.where('status_id', filter?.proposalStatusId);
+          query.whereExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .where('workflow_has_statuses.status_id', filter.proposalStatusId)
+          );
         }
 
         if (filter?.shortCodes) {
@@ -1150,7 +1169,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.excludeProposalStatusIds) {
-          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+          query.whereNotExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .whereIn(
+                'workflow_has_statuses.status_id',
+                filter.excludeProposalStatusIds
+              )
+          );
         }
 
         if (
