@@ -11,6 +11,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { experimentSafetyStatusActionEngine } from '../eventHandlers/workflowEntities/experiment/statusActionEngine';
 import { Event } from '../events/event.enum';
 import {
   ExperimentHasSample,
@@ -31,6 +32,8 @@ import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
 import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
+import { ChangeExperimentsSafetyStatusInput } from '../resolvers/mutations/ChangeExperimentsSafetyStatusMutation';
+import { WorkflowEngineType } from '../workflowEngine';
 
 @injectable()
 export default class ExperimentMutations {
@@ -508,5 +511,105 @@ export default class ExperimentMutations {
         title: args.newSampleTitle,
       },
     });
+  }
+
+  private async processExperimentsSafetyStatusChange(
+    agent: UserWithRole | null,
+    args: ChangeExperimentsSafetyStatusInput
+  ): Promise<ExperimentSafety[] | Rejection> {
+    const { workflowStatusId: statusId, experimentSafetyPks } = args;
+
+    const result = await this.dataSource.changeExperimentSafetyWorkflowStatus(
+      statusId,
+      experimentSafetyPks
+    );
+
+    if (result.length === experimentSafetyPks.length) {
+      const fullExperimentsSafety = await Promise.all(
+        experimentSafetyPks.map(async (experimentSafetyPk) => {
+          const fullExperimentSafety = result.find(
+            (updateExperimentSafety) =>
+              updateExperimentSafety.experimentSafetyPk === experimentSafetyPk
+          );
+
+          if (!fullExperimentSafety) {
+            return null;
+          }
+
+          const experiment = await this.dataSource.getExperiment(
+            fullExperimentSafety.experimentPk
+          );
+
+          if (!experiment) {
+            return null;
+          }
+
+          const proposal = await this.proposalDataSource.get(
+            experiment.proposalPk
+          );
+
+          if (!proposal) {
+            return null;
+          }
+
+          const experimentSafetyWorkflow =
+            await this.callDataSource.getExperimentWorkflowByCall(
+              proposal.callId
+            );
+
+          if (!experimentSafetyWorkflow) {
+            return rejection(
+              `No experiment workflow found for the specific proposal call with id: ${proposal.callId}`,
+              {
+                agent,
+                args,
+              }
+            );
+          }
+
+          return {
+            experimentSafety: fullExperimentSafety,
+            entity: {
+              entityId: 1,
+              prevStatusId: 1,
+              nextStatusId: 1,
+              workflowStatusConnectionId: 1,
+            },
+          };
+        })
+      );
+
+      const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
+        (
+          item
+        ): item is {
+          experimentSafety: ExperimentSafety;
+          entity: WorkflowEngineType;
+        } => !!item
+      );
+
+      // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
+      experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);
+    } else {
+      rejection(
+        'Could not change statuses to all of the selected experiment safeties',
+        {
+          result,
+        }
+      );
+    }
+
+    return (
+      result || rejection('Can not change experiment safety status', { result })
+    );
+  }
+
+  @EventBus(Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER)
+  @Authorized([Roles.USER_OFFICER])
+  async changeExperimentsSafetyStatus(
+    agent: UserWithRole | null,
+    args: ChangeExperimentsSafetyStatusInput
+  ): Promise<ExperimentSafety[] | Rejection> {
+    return this.processExperimentsSafetyStatusChange(agent, args);
   }
 }

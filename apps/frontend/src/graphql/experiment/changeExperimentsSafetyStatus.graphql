@@ -1,0 +1,11 @@
+mutation changeExperimentsSafetyStatus(
+  $experimentSafetyPks: [Int!]!
+  $workflowStatusId: Int!
+) {
+  changeExperimentsSafetyStatus(
+    changeExperimentsSafetyStatusInput: {
+      experimentSafetyPks: $experimentSafetyPks
+      workflowStatusId: $workflowStatusId
+    }
+  )
+}

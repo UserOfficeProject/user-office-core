@@ -1,18 +1,34 @@
 import MaterialTable, {
+  Action,
   Column,
   Query,
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
-import { IconButton, Tooltip, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Experiment, PaginationSortDirection, SettingsId } from 'generated/sdk';
+import ListStatusIcon from 'components/common/icons/ListStatusIcon';
+import {
+  Experiment,
+  PaginationSortDirection,
+  SettingsId,
+  UserRole,
+  WorkflowStatus,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import ChangeExperimentSafetyStatus from './ChangeExperimentSafetyStatus';
 import ExperimentReviewContent, {
   EXPERIMENT_MODAL_TAB_NAMES,
 } from './ExperimentReviewContent';
@@ -45,6 +61,10 @@ const RowActionButtons = (rowData: Experiment) => {
   );
 };
 
+const ChangeExperimentSafetyStatusIcon = (): JSX.Element => (
+  <ListStatusIcon data-cy="change-experiment-safety-status" />
+);
+
 export default function ExperimentsTable({
   experimentsFilter,
 }: ExperimentsTableProps) {
@@ -54,7 +74,20 @@ export default function ExperimentsTable({
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableData, setTableData] = useState<Experiment[]>([]);
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment>();
+  const [
+    openChangeExperimentSafetyStatus,
+    setOpenChangeExperimentSafetyStatus,
+  ] = useState(false);
 
+  const getSelectedExperimentsData = useCallback(
+    () =>
+      tableData.filter((item) =>
+        searchParams.getAll('selection').includes(item.experimentPk.toString())
+      ),
+    [tableData, searchParams]
+  );
+
+  const selectedExperimentsData = getSelectedExperimentsData();
   const search = searchParams.get('search');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
@@ -62,6 +95,7 @@ export default function ExperimentsTable({
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
+  const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
   const isFirstRender = useRef(true);
 
@@ -102,7 +136,7 @@ export default function ExperimentsTable({
           experimentEndDate,
         } = experimentsFilter;
         api()
-          .getExperiments({
+          .getAllExperiments({
             filter: {
               callId,
               instrumentId,
@@ -159,6 +193,17 @@ export default function ExperimentsTable({
         reject(error);
       }
     });
+
+  const tableActions: Action<Experiment>[] = [
+    {
+      icon: ChangeExperimentSafetyStatusIcon,
+      tooltip: 'Change experiment safety status',
+      onClick: () => {
+        setOpenChangeExperimentSafetyStatus(true);
+      },
+      position: 'toolbarOnSelect',
+    },
+  ];
 
   let columns: Column<Experiment>[] = [
     {
@@ -224,8 +269,43 @@ export default function ExperimentsTable({
     EXPERIMENT_MODAL_TAB_NAMES.VISIT,
   ];
 
+  const changeStatusOnExperimentSafety = async (
+    workflowStatus: WorkflowStatus
+  ) => {
+    const experimentSafetyPks = getSelectedExperimentsData()
+      .map((experiment) => experiment.experimentSafety?.experimentSafetyPk)
+      .filter((pk): pk is number => pk !== undefined);
+    if (workflowStatus?.workflowStatusId && experimentSafetyPks.length) {
+      const shouldAddPluralLetter = experimentSafetyPks.length > 1 ? 's' : '';
+      await api({
+        toastSuccessMessage: `Experiment Safety${shouldAddPluralLetter} status changed successfully!`,
+      }).changeExperimentsSafetyStatus({
+        experimentSafetyPks: experimentSafetyPks,
+        workflowStatusId: workflowStatus.workflowStatusId,
+      });
+      refreshTableData();
+    }
+  };
+
   return (
     <div data-cy="experiments-table">
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openChangeExperimentSafetyStatus}
+        maxWidth="lg"
+        onClose={(): void => setOpenChangeExperimentSafetyStatus(false)}
+        fullWidth
+      >
+        <DialogContent>
+          <ChangeExperimentSafetyStatus
+            changeStatusOnExperiments={changeStatusOnExperimentSafety}
+            close={(): void => setOpenChangeExperimentSafetyStatus(false)}
+            selectedExperiments={selectedExperimentsData}
+          />
+        </DialogContent>
+      </Dialog>
+
       <MaterialTable
         tableRef={tableRef}
         title={
@@ -237,9 +317,11 @@ export default function ExperimentsTable({
         data={fetchExperimentsData}
         options={{
           searchText: search || undefined,
+          selection: isReadOnly ? false : true,
           pageSize: pageSize ? +pageSize : 10,
           initialPage: page ? +page : 0,
         }}
+        actions={tableActions}
         onRowsPerPageChange={(pageSize) => {
           setSearchParams((searchParams) => {
             searchParams.set('pageSize', pageSize.toString());
@@ -259,6 +341,27 @@ export default function ExperimentsTable({
 
             return searchParams;
           });
+        }}
+        onSelectionChange={(selectedItems) => {
+          if (selectedItems.length) {
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+              selectedItems.map((selectedItem) =>
+                searchParams.append(
+                  'selection',
+                  selectedItem.experimentPk.toString()
+                )
+              );
+
+              return searchParams;
+            });
+          } else {
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+
+              return searchParams;
+            });
+          }
         }}
         onPageChange={(page) => {
           setSearchParams((searchParams) => {
