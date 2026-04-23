@@ -269,6 +269,12 @@ export default function ExperimentsTable({
     EXPERIMENT_MODAL_TAB_NAMES.VISIT,
   ];
 
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
+  if (isUserOfficer) {
+    experimentReviewTabs.push(EXPERIMENT_MODAL_TAB_NAMES.LOGS);
+  }
+
   const changeStatusOnExperimentSafety = async (
     workflowStatus: WorkflowStatus
   ) => {

@@ -49,7 +49,7 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
 
       return;
     }
-    const proposal = await proposalDataSource.get(entityId);
+    const proposal = await proposalDataSource.get(experiment.proposalPk);
 
     if (!proposal) {
       logger.logError('Proposal not found', { entityId });

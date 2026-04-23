@@ -15,12 +15,14 @@ import { useTranslation } from 'react-i18next';
 import SimpleTabs from 'components/common/SimpleTabs';
 import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
+import EventLogList from 'components/eventLog/EventLogList';
 import ExperimentSafetyReview from 'components/experimentSafetyReview/ExperimentSafetyReview';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import { AnswersTable } from 'components/questionary/AnswersTable';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
-import { SettingsId } from 'generated/sdk';
+import { SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety';
 import { useProposalData } from 'hooks/proposal/useProposalData';
@@ -33,6 +35,7 @@ export enum EXPERIMENT_MODAL_TAB_NAMES {
   EXPERIMENT_SAFETY_FORM = 'Experiment Safety Form',
   EXPERIMENT_SAFETY_REVIEW = 'Experiment Safety Review',
   VISIT = 'Visit',
+  LOGS = 'Logs',
 }
 
 type ExperimentReviewContentProps = {
@@ -229,6 +232,8 @@ const ExperimentReviewContent = ({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
   if (experimentLoading) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
@@ -275,6 +280,13 @@ const ExperimentReviewContent = ({
     </>
   );
 
+  const EventLogsTab = isUserOfficer && (
+    <EventLogList
+      changedObjectId={experiment.experimentPk}
+      eventType="EXPERIMENT"
+    />
+  );
+
   const tabsContent = tabNames.map((tab, index) => {
     switch (tab) {
       case EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION:
@@ -313,6 +325,8 @@ const ExperimentReviewContent = ({
             <ExperimentVisitsTable experiment={experiment} />
           </Fragment>
         );
+      case EXPERIMENT_MODAL_TAB_NAMES.LOGS:
+        return <Fragment key={index}>{EventLogsTab}</Fragment>;
       default:
         return null;
     }
