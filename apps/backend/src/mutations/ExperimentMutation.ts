@@ -302,7 +302,6 @@ export default class ExperimentMutations {
     if (!experiment) {
       return rejection('No experiment found');
     }
-
     const proposal = await this.proposalDataSource.get(experiment.proposalPk);
     if (!proposal) {
       return rejection('No proposal found', { args });
@@ -323,7 +322,6 @@ export default class ExperimentMutations {
     if (!experimentSafety) {
       return rejection('No experiment safety found', { args });
     }
-
     const hasAccessRights =
       this.userAuth.isApiToken(agent) ||
       (await this.experimentSafetyAuth.hasWriteRights(
@@ -353,19 +351,16 @@ export default class ExperimentMutations {
     if (!questionTemplateRel) {
       return rejection('No question found', { args });
     }
-
     const templateId = (questionTemplateRel.config as SampleDeclarationConfig)
       .esiTemplateId;
     if (!templateId) {
       return rejection('Esi template is not defined', { args });
     }
-
     // Creating a new Questionary for the Sample using the ESI Template
     const newQuestionary = await this.questionaryDataSource.create(
       agent!.id,
       templateId!
     );
-
     // Copying the answers from the Sample Questionary to the new Sample ESI Questionary
     await this.questionaryDataSource.copyAnswers(
       sample.questionaryId,
