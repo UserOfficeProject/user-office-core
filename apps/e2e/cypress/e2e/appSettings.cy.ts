@@ -85,6 +85,10 @@ context('App settings tests', () => {
       cy.login('officer');
       cy.visit('/Settings');
 
+      cy.get('[placeholder="Search"]')
+        .clear()
+        .type('EXTERNAL_AUTH_HOMEPAGE_URL');
+
       cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
         .find('[aria-label="Edit"]')
         .click();
