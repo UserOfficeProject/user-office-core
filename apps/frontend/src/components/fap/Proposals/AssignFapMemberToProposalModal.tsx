@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
+import { getPreferredName } from 'utils/user';
 
 import { MultiRankAssignmentDialog } from './MultiRankAssignmentDialog';
 
@@ -29,8 +30,7 @@ const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 const columns = [
   {
     title: 'Name',
-    render: (rowData: FapAssignedMember) =>
-      rowData.preferredname ? rowData.preferredname : rowData.firstname,
+    render: (rowData: FapAssignedMember) => getPreferredName(rowData),
   },
   { title: 'Surname', field: 'lastname' },
   { title: 'Proposal Count', field: 'proposalsCountByCall' },
