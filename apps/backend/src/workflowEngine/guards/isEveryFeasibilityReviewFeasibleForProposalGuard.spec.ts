@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllFeasibilityReviewsFeasibleGuard } from './isProposalAllFeasibilityReviewsFeasibleGuard';
+import { isEveryFeasibilityReviewFeasibleForProposalGuard } from './isEveryFeasibilityReviewFeasibleForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 
-describe('isProposalAllFeasibilityReviewsFeasibleGuard', () => {
+describe('isEveryFeasibilityReviewFeasibleForProposalGuard', () => {
   const mockReviewDataSource = {
     getTechnicalReviews: jest.fn(),
   };
@@ -16,18 +16,18 @@ describe('isProposalAllFeasibilityReviewsFeasibleGuard', () => {
       if (token === Tokens.ReviewDataSource) return mockReviewDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no technical reviews found', async () => {
     mockReviewDataSource.getTechnicalReviews.mockResolvedValue([]);
-    const result = await isProposalAllFeasibilityReviewsFeasibleGuard({
+    const result = await isEveryFeasibilityReviewFeasibleForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);
 
     mockReviewDataSource.getTechnicalReviews.mockResolvedValue(null);
-    const resultNull = await isProposalAllFeasibilityReviewsFeasibleGuard({
+    const resultNull = await isEveryFeasibilityReviewFeasibleForProposalGuard({
       id: 1,
     });
     expect(resultNull).toBe(false);
@@ -39,7 +39,7 @@ describe('isProposalAllFeasibilityReviewsFeasibleGuard', () => {
       { status: TechnicalReviewStatus.FEASIBLE },
     ]);
 
-    const result = await isProposalAllFeasibilityReviewsFeasibleGuard({
+    const result = await isEveryFeasibilityReviewFeasibleForProposalGuard({
       id: 1,
     });
     expect(result).toBe(true);
@@ -51,7 +51,7 @@ describe('isProposalAllFeasibilityReviewsFeasibleGuard', () => {
       { status: TechnicalReviewStatus.UNFEASIBLE },
     ]);
 
-    const result = await isProposalAllFeasibilityReviewsFeasibleGuard({
+    const result = await isEveryFeasibilityReviewFeasibleForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);

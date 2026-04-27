@@ -5,7 +5,10 @@ import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
 
-export const isProposalAllFeasibilityReviewsFeasibleGuard: GuardFn = async (
+/**
+ * Returns true when every feasibility review for the proposal is marked feasible.
+ */
+export const isEveryFeasibilityReviewFeasibleForProposalGuard: GuardFn = async (
   entity: Entity
 ) => {
   const reviewDataSource = container.resolve<ReviewDataSource>(

@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllFeasibilityReviewsSubmittedGuard } from './isProposalAllFeasibilityReviewsSubmittedGuard';
+import { isEveryFeasibilityReviewSubmittedForProposalGuard } from './isEveryFeasibilityReviewSubmittedForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 
-describe('isProposalAllFeasibilityReviewsSubmittedGuard', () => {
+describe('isEveryFeasibilityReviewSubmittedForProposalGuard', () => {
   const mockReviewDataSource = {
     getTechnicalReviews: jest.fn(),
   };
@@ -15,12 +15,12 @@ describe('isProposalAllFeasibilityReviewsSubmittedGuard', () => {
       if (token === Tokens.ReviewDataSource) return mockReviewDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no technical reviews found', async () => {
     mockReviewDataSource.getTechnicalReviews.mockResolvedValue([]);
-    const result = await isProposalAllFeasibilityReviewsSubmittedGuard({
+    const result = await isEveryFeasibilityReviewSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);
@@ -32,7 +32,7 @@ describe('isProposalAllFeasibilityReviewsSubmittedGuard', () => {
       { submitted: true },
     ]);
 
-    const result = await isProposalAllFeasibilityReviewsSubmittedGuard({
+    const result = await isEveryFeasibilityReviewSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(true);
@@ -44,7 +44,7 @@ describe('isProposalAllFeasibilityReviewsSubmittedGuard', () => {
       { submitted: false },
     ]);
 
-    const result = await isProposalAllFeasibilityReviewsSubmittedGuard({
+    const result = await isEveryFeasibilityReviewSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);

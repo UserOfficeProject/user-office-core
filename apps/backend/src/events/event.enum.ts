@@ -2,14 +2,14 @@ import { isCallEndedGuard } from '../workflowEngine/guards/isCallEndedGuard';
 import { isCallEndedInternalGuard } from '../workflowEngine/guards/isCallEndedInternalGuard';
 import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapReviewEndedGuard';
 import { isCallReviewEndedGuard } from '../workflowEngine/guards/isCallReviewEndedGuard';
+import { isEveryFapInstrumentMeetingSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedForProposalGuard';
+import { isEveryFapInstrumentMeetingSubmittedGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedGuard';
+import { isEveryFapReviewerRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewerRequirementMetForProposalGuard';
+import { isEveryFapReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewSubmittedForProposalGuard';
+import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapSubmittedReviewRequirementMetForProposalGuard';
+import { isEveryFeasibilityReviewFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewFeasibleForProposalGuard';
+import { isEveryFeasibilityReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewSubmittedForProposalGuard';
 import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
-import { isProposalAllFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingInstrumentSubmittedGuard';
-import { isProposalAllFapMeetingsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapMeetingsSubmittedGuard';
-import { isProposalAllFapReviewersSelectedGuard } from '../workflowEngine/guards/isProposalAllFapReviewersSelectedGuard';
-import { isProposalAllFapReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFapReviewsSubmittedGuard';
-import { isProposalAllFeasibilityReviewsFeasibleGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsFeasibleGuard';
-import { isProposalAllFeasibilityReviewsSubmittedGuard } from '../workflowEngine/guards/isProposalAllFeasibilityReviewsSubmittedGuard';
-import { isProposalAllReviewsSubmittedForAllFapsGuard } from '../workflowEngine/guards/isProposalAllReviewsSubmittedForAllFapsGuard';
 import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
 import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
 import { isProposalBookingTimeCompletedGuard } from '../workflowEngine/guards/isProposalBookingTimeCompletedGuard';
@@ -200,16 +200,16 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED,
     {
       label:
-        'Event occurs when all proposal feasibility reviews are submitted with any value',
-      guard: isProposalAllFeasibilityReviewsSubmittedGuard,
+        'Event occurs when every feasibility review on a proposal is submitted',
+      guard: isEveryFeasibilityReviewSubmittedForProposalGuard,
     },
   ],
   [
     Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
     {
       label:
-        'Event occurs when all proposal feasibility reviews are submitted with Feasible value',
-      guard: isProposalAllFeasibilityReviewsFeasibleGuard,
+        'Event occurs when every feasibility review on a proposal is feasible',
+      guard: isEveryFeasibilityReviewFeasibleForProposalGuard,
     },
   ],
   [
@@ -231,8 +231,9 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.PROPOSAL_ALL_FAP_REVIEWERS_SELECTED,
     {
-      label: 'Event occurs when all FAP reviewers are selected on a proposal',
-      guard: isProposalAllFapReviewersSelectedGuard,
+      label:
+        'Event occurs when every FAP on a proposal meets its reviewer requirement',
+      guard: isEveryFapReviewerRequirementMetForProposalGuard,
     },
   ],
   [
@@ -252,8 +253,8 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
     {
       label:
-        'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
-      guard: isProposalAllFapReviewsSubmittedGuard,
+        'Event occurs when every FAP review on a proposal is submitted for the current FAP',
+      guard: isEveryFapReviewSubmittedForProposalGuard,
     },
   ],
   [
@@ -267,17 +268,16 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
     {
-      label:
-        'Event occurs when all the FAP meetings are submitted for a specific proposal',
-      guard: isProposalAllFapMeetingsSubmittedGuard,
+      label: 'Event occurs when every FAP meeting on a proposal is submitted',
+      guard: isEveryFapInstrumentMeetingSubmittedGuard,
     },
   ],
   [
     Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS,
     {
       label:
-        'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
-      guard: isProposalAllReviewsSubmittedForAllFapsGuard,
+        'Event occurs when every review on a proposal is submitted across every FAP',
+      guard: isEveryFapSubmittedReviewRequirementMetForProposalGuard,
     },
   ],
   [
@@ -313,8 +313,8 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
     {
       label:
-        'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
-      guard: isProposalAllFapMeetingInstrumentSubmittedGuard,
+        'Event occurs when every FAP linked to a proposal has its instrument meeting submitted',
+      guard: isEveryFapInstrumentMeetingSubmittedForProposalGuard,
     },
   ],
   [

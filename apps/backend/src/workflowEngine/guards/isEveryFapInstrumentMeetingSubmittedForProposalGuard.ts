@@ -4,7 +4,10 @@ import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
 
-export const isProposalAllFapMeetingInstrumentSubmittedGuard: GuardFn = async (
+/**
+ * Returns true when every FAP linked to the proposal has its instrument meeting submitted.
+ */
+export const isEveryFapInstrumentMeetingSubmittedForProposalGuard: GuardFn = async (
   entity: Entity
 ) => {
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);

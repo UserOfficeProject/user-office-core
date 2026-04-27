@@ -193,15 +193,11 @@ export default class FapQueries {
 
     switch (visibility) {
       case FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE:
-        const isAllFapReviewsComplete = await this.allFapReviewsComplete(
-          fapId,
-          proposalPk
-        );
         const canSeeAllAssignments =
           isApiToken ||
           isUserOfficer ||
           isChairOrSecretary ||
-          isAllFapReviewsComplete;
+          (await this.allFapReviewsComplete(fapId, proposalPk));
 
         if (canSeeAllAssignments) fapAccessRestrictions = false;
         break;
