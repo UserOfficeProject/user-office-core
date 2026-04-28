@@ -1,8 +1,5 @@
 // For some reason ESLint's own types are not resolved correctly :)
-
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
+/* eslint-disable import/no-unresolved */
 import eslint from '@eslint/js';
 import tsParser from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
@@ -12,9 +9,6 @@ import prettier from 'eslint-plugin-prettier';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-
-const configDirectory = path.dirname(fileURLToPath(import.meta.url));
-const tsconfigPath = path.join(configDirectory, 'tsconfig.json');
 
 export default defineConfig([
   {
@@ -42,14 +36,6 @@ export default defineConfig([
         sourceType: 'module',
       },
       globals: { ...globals.node },
-    },
-    settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: tsconfigPath,
-        },
-      },
     },
     plugins: {
       'unused-imports': unusedImports,
