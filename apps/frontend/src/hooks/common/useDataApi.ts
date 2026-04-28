@@ -17,7 +17,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, getSdk, SettingsId } from 'generated/sdk';
 import { RequestQuery } from 'utils/utilTypes';
 
-const endpoint = '/graphql';
+const endpoint = new URL('/graphql', window.location.origin).toString();
 
 const clientNameHeader = 'apollographql-client-name';
 const clientName = 'UOP frontend';
