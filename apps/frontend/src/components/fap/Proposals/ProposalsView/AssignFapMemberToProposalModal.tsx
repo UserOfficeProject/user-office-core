@@ -9,7 +9,7 @@ import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 
-import { MultiRankAssignmentDialog } from './MultiRankAssignmentDialog';
+import { MultiRankAssignmentDialog } from '../MultiRankAssignmentDialog';
 
 export type FapAssignedMember = BasicUserDetails & {
   role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
@@ -20,7 +20,10 @@ type AssignFapMemberToProposalModalProps = {
   proposalPks: number[];
   setProposalPks: React.Dispatch<React.SetStateAction<number[]>>;
   fapId: number;
-  assignMembersToFapProposals: (assignedMembers: FapAssignedMember[]) => void;
+  assignMembersToFapProposals: (
+    assignedMembers: FapAssignedMember[],
+    proposalPks: number[]
+  ) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
 };
 
@@ -86,7 +89,7 @@ const AssignFapMemberToProposalModal = ({
           columns={columns}
           search
           onUpdate={(members: FapAssignedMember[]) =>
-            assignMembersToFapProposals(members)
+            assignMembersToFapProposals(members, proposalPks)
           }
           selectedParticipants={selectedParticipants}
           setSelectedParticipants={setSelectedParticipants}
@@ -102,7 +105,9 @@ const AssignFapMemberToProposalModal = ({
         </Box>
         <Button
           type="button"
-          onClick={() => assignMembersToFapProposals(selectedParticipants)}
+          onClick={() =>
+            assignMembersToFapProposals(selectedParticipants, proposalPks)
+          }
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >
@@ -124,7 +129,7 @@ const AssignFapMemberToProposalModal = ({
             users={selectedParticipants ? selectedParticipants : []}
             open={rankSelectorOpen}
             setOpen={setRankSelectorOpen}
-            assign={assignMembersToFapProposals}
+            assign={(users) => assignMembersToFapProposals(users, proposalPks)}
           />
         )}
       </DialogActions>

@@ -38,7 +38,7 @@ import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import UOLoader from 'components/common/UOLoader';
-import AssignProposalsToFaps from 'components/fap/Proposals/AssignProposalsToFaps';
+import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,

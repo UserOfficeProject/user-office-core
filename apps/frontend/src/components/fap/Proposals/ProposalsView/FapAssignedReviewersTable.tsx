@@ -23,7 +23,7 @@ import {
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import RankInputModal from './RankInputModal';
+import RankInputModal from '../RankInputModal';
 
 type FapAssignedReviewersTableProps = {
   fapProposal: FapProposalType;
