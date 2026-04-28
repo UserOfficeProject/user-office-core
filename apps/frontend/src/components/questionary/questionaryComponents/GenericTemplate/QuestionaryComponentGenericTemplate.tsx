@@ -293,7 +293,7 @@ function QuestionaryComponentGenericTemplate(
               }}
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
-              title=""
+              title={selectedGenericTemplate?.title || ''}
             >
               <DialogContent>
                 {selectedGenericTemplate ? (
