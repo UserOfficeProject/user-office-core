@@ -22,7 +22,6 @@ interface QuestionaryProps {
   info?: JSX.Element | string;
   previewMode?: boolean;
   confirm: WithConfirmType;
-  showTitle?: boolean;
 }
 
 function Questionary({
@@ -30,7 +29,6 @@ function Questionary({
   info,
   previewMode = false,
   confirm,
-  showTitle = true,
 }: QuestionaryProps) {
   const isMobile = useMediaQuery('(max-width: 500px)');
 
@@ -120,17 +118,15 @@ function Questionary({
         minWidth: isMobile ? 'inherit' : '500px',
       }}
     >
-      {showTitle && (
-        <Typography
-          variant="h6"
-          component="h2"
-          sx={{ textAlign: 'center' }}
-          ref={titleRef}
-          data-cy="questionary-title"
-        >
-          {title}
-        </Typography>
-      )}
+      <Typography
+        variant="h6"
+        component="h2"
+        sx={{ textAlign: 'center' }}
+        ref={titleRef}
+        data-cy="questionary-title"
+      >
+        {title}
+      </Typography>
       <Typography
         sx={{
           color: theme.palette.grey[700],

@@ -67,7 +67,6 @@ export function GenericTemplateContainer(props: {
       <Questionary
         title={truncateString(state.genericTemplate.title || props.title, 30)}
         previewMode={props.previewMode}
-        showTitle={false}
       />
     </QuestionaryContext.Provider>
   );
