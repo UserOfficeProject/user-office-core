@@ -30,7 +30,7 @@
     "@user-office-software/duo-validation": "file:../../validation",
     "formik": "^2.4.6",
     "graphql": "^16.8.1",
-    "graphql-request": "^6.1.0",
+    "graphql-request": "^7.4.0",
     "html-react-parser": "^1.4.12",
     "i18next": "^23.11.5",
     "i18next-http-backend": "^3.0.5",
