@@ -31,6 +31,7 @@ import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/Propo
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
+import PostgresRoleDataSource from '../datasources/postgres/RoleDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
@@ -72,6 +73,7 @@ mapClass(Tokens.FileDataSource, PostgresFileDataSource);
 mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
+mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(
