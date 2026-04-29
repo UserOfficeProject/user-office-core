@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import TechniqueMutations from './TechniqueMutations';
 import { dummyTechnique1 } from '../datasources/mockups/TechniqueDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import TechniqueMutations from './TechniqueMutations';
 
 const techniqueMutations = container.resolve(TechniqueMutations);
 

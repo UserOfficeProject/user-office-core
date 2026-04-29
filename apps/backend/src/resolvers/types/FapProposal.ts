@@ -8,10 +8,10 @@ import {
   Ctx,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
 import { FapAssignment } from './FapAssignments';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
+import { ResolverContext } from '../../context';
 
 @ObjectType()
 export class FapProposal {

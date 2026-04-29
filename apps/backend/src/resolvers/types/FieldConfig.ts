@@ -9,11 +9,11 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Unit } from './Unit';
 import { ResolverContext } from '../../context';
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
 import { TechniqueOptionClass } from '../../models/questionTypes/TechniquePicker';
 import { Roles } from '../../models/Role';
-import { Unit } from './Unit';
 
 @ObjectType()
 export class ConfigBase {

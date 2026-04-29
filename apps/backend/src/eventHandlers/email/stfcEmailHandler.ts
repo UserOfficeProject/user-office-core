@@ -1,11 +1,11 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId } from './emailTemplateId';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null

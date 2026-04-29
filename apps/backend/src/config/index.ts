@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 

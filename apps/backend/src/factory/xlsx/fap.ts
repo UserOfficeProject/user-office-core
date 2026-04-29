@@ -1,14 +1,14 @@
 import { groupBy } from 'lodash';
-import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
+import { collectCallFapXLSXData } from './callFaps';
+import { getDataRow } from './FapDataRow';
 import baseContext from '../../buildContext';
+import { getStfcDataRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { UserWithRole } from '../../models/User';
-import { collectCallFapXLSXData } from './callFaps';
-import { getDataRow } from './FapDataRow';
-import { getStfcDataRow } from './stfc/StfcFapDataRow';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 type FapXLSXData = Array<{
   sheetName: string;
@@ -128,7 +128,7 @@ export const collectFapXLSXRowData = async (
           proposal.title,
           proposal.proposal_id,
           proposal.time_allocation,
-          stripHtml(proposal.comment ?? '').result,
+          stripHtml(proposal.comment ?? ''),
           proposal.rank_order,
           proposal.proposer_id,
           proposalAnswers,

@@ -1,11 +1,11 @@
 import { container } from 'tsyringe';
 
+import EmailTemplateMutations from './EmailTemplateMutations';
 import { dummyEmailTemplate } from '../datasources/mockups/EmailTemplateDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import EmailTemplateMutations from './EmailTemplateMutations';
 
 const emailTemplateMutations = container.resolve(EmailTemplateMutations);
 

@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 
-import { ProposalAttachments as ProposalAttachmentsOrigin } from '../../models/ProposalAttachments';
 import { Question } from './Question';
+import { ProposalAttachments as ProposalAttachmentsOrigin } from '../../models/ProposalAttachments';
 
 @ObjectType()
 export class ProposalAttachments implements Partial<ProposalAttachmentsOrigin> {

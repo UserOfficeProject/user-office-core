@@ -2,13 +2,13 @@
 /* eslint-disable quotes */
 import 'reflect-metadata';
 
+import CallDataSource from './CallDataSource';
+import database from './database';
+import { CallRecord, createCallObject, createProposalObject } from './records';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { WorkflowType } from '../../models/Workflow';
 import { dummyCallFactory } from '../mockups/CallDataSource';
-import CallDataSource from './CallDataSource';
-import database from './database';
-import { CallRecord, createCallObject, createProposalObject } from './records';
 
 const callDataSource = new CallDataSource();
 

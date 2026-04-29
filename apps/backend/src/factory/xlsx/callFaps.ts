@@ -1,14 +1,14 @@
-import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
+import { RowObj, collectFapXLSXRowData } from './fap';
+import { callFapPopulateRow } from './FapDataRow';
 import baseContext from '../../buildContext';
+import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
-import { RowObj, collectFapXLSXRowData } from './fap';
-import { callFapPopulateRow } from './FapDataRow';
-import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
@@ -57,12 +57,12 @@ const collectFAPRowData = async (
                   : null,
               fapMeetingExComment:
                 fapMeetingDecision[0] && fapMeetingDecision[0].commentForUser
-                  ? stripHtml(fapMeetingDecision[0].commentForUser).result
+                  ? stripHtml(fapMeetingDecision[0].commentForUser)
                   : null,
               fapMeetingInComment:
                 fapMeetingDecision[0] &&
                 fapMeetingDecision[0].commentForManagement
-                  ? stripHtml(fapMeetingDecision[0].commentForManagement).result
+                  ? stripHtml(fapMeetingDecision[0].commentForManagement)
                   : null,
             };
           })
