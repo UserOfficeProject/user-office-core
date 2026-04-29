@@ -95,7 +95,6 @@ export default function ExperimentsTable({
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-  const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
   const isFirstRender = useRef(true);
 
@@ -323,7 +322,7 @@ export default function ExperimentsTable({
         data={fetchExperimentsData}
         options={{
           searchText: search || undefined,
-          selection: isReadOnly ? false : true,
+          selection: isUserOfficer,
           pageSize: pageSize ? +pageSize : 10,
           initialPage: page ? +page : 0,
         }}
