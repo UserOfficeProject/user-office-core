@@ -5,7 +5,7 @@ import { Tokens } from '../../config/Tokens';
 import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
 import { Event, EventMetadataByEvent } from '../../events/event.enum';
 
-const createWfStatusName = (statusId: string, workflowStatusId: number) =>
+const createWorkFlowStatusName = (statusId: string, workflowStatusId: number) =>
   `${statusId}-${workflowStatusId}`;
 
 const getEventsGuards = (events: string[]): GuardFn[] => {
@@ -34,13 +34,16 @@ export const createWorkflowMachine = async (workflowId: number) => {
   const { workflowStatuses, workflowConnections } =
     await workflowDataSource.getWorkflowStructure(workflowId);
 
-  const wfStatuses: Record<string, StateConfig> = {};
-  const wfStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to statusId for easy lookup
+  const workFlowStates: Record<string, StateConfig> = {};
+  const workFlowStatusIdToNameMap = new Map<number, string>(); // Map workflowStatusId to statusId for easy lookup
 
   workflowStatuses.forEach((ws) => {
-    const wfStatusName = createWfStatusName(ws.statusId, ws.workflowStatusId);
-    wfStatusIdToNameMap.set(ws.workflowStatusId, wfStatusName);
-    wfStatuses[wfStatusName] = {
+    const workFlowStatusName = createWorkFlowStatusName(
+      ws.statusId,
+      ws.workflowStatusId
+    );
+    workFlowStatusIdToNameMap.set(ws.workflowStatusId, workFlowStatusName);
+    workFlowStates[workFlowStatusName] = {
       on: {},
       meta: {
         workflowStatusId: ws.workflowStatusId,
@@ -50,8 +53,12 @@ export const createWorkflowMachine = async (workflowId: number) => {
   });
 
   workflowConnections.forEach((conn) => {
-    const sourceStatus = wfStatusIdToNameMap.get(conn.prevWorkflowStatusId);
-    const targetStatus = wfStatusIdToNameMap.get(conn.nextWorkflowStatusId);
+    const sourceStatus = workFlowStatusIdToNameMap.get(
+      conn.prevWorkflowStatusId
+    );
+    const targetStatus = workFlowStatusIdToNameMap.get(
+      conn.nextWorkflowStatusId
+    );
 
     if (!sourceStatus || !targetStatus) {
       return;
@@ -65,8 +72,8 @@ export const createWorkflowMachine = async (workflowId: number) => {
       }
 
       const guards = getEventsGuards(conn.statusChangingEvents);
-      wfStatuses[sourceStatus].on = wfStatuses[sourceStatus].on || {};
-      wfStatuses[sourceStatus].on![event] = {
+      workFlowStates[sourceStatus].on = workFlowStates[sourceStatus].on || {};
+      workFlowStates[sourceStatus].on![event] = {
         connectionId: conn.workflowStatusConnectionId,
         target: targetStatus,
         guards,
@@ -74,13 +81,15 @@ export const createWorkflowMachine = async (workflowId: number) => {
     });
   });
 
-  const defaultWfStatus =
+  const defaultWorkFlowStatus =
     (await workflowDataSource.getInitialWorkflowStatus(workflowId))!;
 
   const machine = createMachine({
     id: `workflow-${workflowId}`,
-    initial: wfStatusIdToNameMap.get(defaultWfStatus.workflowStatusId)!,
-    states: wfStatuses,
+    initial: workFlowStatusIdToNameMap.get(
+      defaultWorkFlowStatus.workflowStatusId
+    )!,
+    states: workFlowStates,
   });
 
   return machine;
