@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GraphQLClient } from 'graphql-request';
-import { ClientError, RequestOptions, Variables } from 'graphql-request';
-import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/esm/types';
+import {
+  GraphQLClient,
+  ClientError,
+  RequestOptions,
+  Variables,
+} from 'graphql-request';
+import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/legacy/helpers/types';
 import { jwtDecode } from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
@@ -13,7 +17,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, getSdk, SettingsId } from 'generated/sdk';
 import { RequestQuery } from 'utils/utilTypes';
 
-const endpoint = '/graphql';
+const endpoint = new URL('/graphql', window.location.origin).toString();
 
 const clientNameHeader = 'apollographql-client-name';
 const clientName = 'UOP frontend';
