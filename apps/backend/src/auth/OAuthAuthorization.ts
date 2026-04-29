@@ -233,7 +233,7 @@ export class OAuthAuthorization extends UserAuthorization {
     }
   }
 
-  private getUserRole(newUser: { id: number; email: string }): UserRole {
+  protected getUserRole(newUser: { id: number; email: string }): UserRole {
     const roleID =
       env.INITIAL_USER_OFFICER_EMAIL &&
       newUser.email === env.INITIAL_USER_OFFICER_EMAIL
