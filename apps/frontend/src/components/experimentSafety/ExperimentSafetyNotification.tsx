@@ -2,8 +2,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import WarningIcon from '@mui/icons-material/Warning';
 import Box from '@mui/material/Box';
-import { alpha } from '@mui/material/styles';
-import { Theme } from '@mui/material/styles';
+import { alpha, Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 

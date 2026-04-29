@@ -4,7 +4,10 @@ import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
 
-export const isProposalAllFapReviewersSelectedGuard: GuardFn = async (
+/**
+ * Returns true when every FAP on the proposal has enough assigned reviewers to meet its requirement.
+ */
+export const isEveryFapReviewerRequirementMetForProposalGuard: GuardFn = async (
   entity: Entity
 ) => {
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);

@@ -325,8 +325,11 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
           })
+          .join('workflow_has_statuses as whs', {
+            'p.workflow_status_id': 'whs.workflow_status_id',
+          })
           .join('statuses as s', {
-            'p.status_id': 's.status_id',
+            'whs.status_id': 's.status_id',
           })
           .where(function () {
             this.where('s.status_id', 'ilike', 'FAP_%');
@@ -360,8 +363,11 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
           })
+          .join('workflow_has_statuses as whs', {
+            'p.workflow_status_id': 'whs.workflow_status_id',
+          })
           .join('statuses as s', {
-            'p.status_id': 's.status_id',
+            'whs.status_id': 's.status_id',
           })
           .join('call as c', {
             'p.call_id': 'c.call_id',
@@ -566,8 +572,11 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.proposal_pk': 'fp.proposal_pk',
         'p.call_id': callId,
       })
+      .join('workflow_has_statuses as whs', {
+        'p.workflow_status_id': 'whs.workflow_status_id',
+      })
       .join('statuses as s', {
-        'p.status_id': 's.status_id',
+        'whs.status_id': 's.status_id',
       })
       .where('fp.instrument_id', instrumentId)
       .modify((query) => {

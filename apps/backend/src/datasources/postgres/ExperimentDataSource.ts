@@ -51,7 +51,6 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.esi_questionary_submitted_at,
     record.created_by,
-    record.status_id,
     record.workflow_status_id,
     record.safety_review_questionary_id,
     record.reviewed_by,
@@ -622,10 +621,12 @@ export default class PostgresExperimentDataSource
               'experiments.experiment_pk',
               'experiment_safety.experiment_pk'
             )
-            .where(
-              'experiment_safety.status_id',
-              filter?.experimentSafetyStatusId
-            );
+            .leftJoin(
+              'workflow_has_statuses as es_whs',
+              'experiment_safety.workflow_status_id',
+              'es_whs.workflow_status_id'
+            )
+            .where('es_whs.status_id', filter.experimentSafetyStatusId);
         }
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);

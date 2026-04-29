@@ -42,9 +42,6 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Number)
   public createdBy: number;
 
-  @Field(() => String, { nullable: true })
-  public statusId: string | null;
-
   @Field(() => Number)
   public workflowStatusId: number;
 
@@ -156,14 +153,10 @@ export class ExperimentSafetyResolver {
     @Root() experimentSafety: ExperimentSafety,
     @Ctx() context: ResolverContext
   ): Promise<Status | null> {
-    if (experimentSafety.statusId === null) {
-      return null;
-    }
-
-    const status = await context.queries.status.getStatus(
-      context.user,
-      experimentSafety.statusId
-    );
+    const status =
+      await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+        experimentSafety.workflowStatusId
+      );
 
     if (status === null) {
       throw new GraphQLError(
@@ -172,5 +165,18 @@ export class ExperimentSafetyResolver {
     }
 
     return status;
+  }
+
+  @FieldResolver(() => String)
+  async statusId(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<string | null> {
+    const status =
+      await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+        experimentSafety.workflowStatusId
+      );
+
+    return status!.id;
   }
 }

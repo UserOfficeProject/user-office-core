@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllReviewsSubmittedForAllFapsGuard } from './isProposalAllReviewsSubmittedForAllFapsGuard';
+import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from './isEveryFapSubmittedReviewRequirementMetForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 import { ReviewStatus } from '../../models/Review';
 
-describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
+describe('isEveryFapSubmittedReviewRequirementMetForProposalGuard', () => {
   const mockFapDataSource = {
     getFapsByProposalPk: jest.fn(),
   };
@@ -20,16 +20,17 @@ describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
       if (token === Tokens.ReviewDataSource) return mockReviewDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no faps found for proposal', async () => {
     mockFapDataSource.getFapsByProposalPk.mockResolvedValue([]);
     mockReviewDataSource.getProposalReviews.mockResolvedValue([]);
 
-    const result = await isProposalAllReviewsSubmittedForAllFapsGuard({
-      id: 1,
-    });
+    const result =
+      await isEveryFapSubmittedReviewRequirementMetForProposalGuard({
+        id: 1,
+      });
     expect(result).toBe(false);
   });
 
@@ -42,9 +43,10 @@ describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
       { fapID: 1, status: ReviewStatus.SUBMITTED },
     ]);
 
-    const result = await isProposalAllReviewsSubmittedForAllFapsGuard({
-      id: 1,
-    });
+    const result =
+      await isEveryFapSubmittedReviewRequirementMetForProposalGuard({
+        id: 1,
+      });
     expect(result).toBe(true);
   });
 
@@ -57,9 +59,10 @@ describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
       { fapID: 1, status: ReviewStatus.DRAFT },
     ]);
 
-    const result = await isProposalAllReviewsSubmittedForAllFapsGuard({
-      id: 1,
-    });
+    const result =
+      await isEveryFapSubmittedReviewRequirementMetForProposalGuard({
+        id: 1,
+      });
     expect(result).toBe(false);
   });
 
@@ -73,9 +76,10 @@ describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
     mockReviewDataSource.getProposalReviews.mockResolvedValue([
       { fapID: 1, status: ReviewStatus.SUBMITTED },
     ]);
-    const result = await isProposalAllReviewsSubmittedForAllFapsGuard({
-      id: 1,
-    });
+    const result =
+      await isEveryFapSubmittedReviewRequirementMetForProposalGuard({
+        id: 1,
+      });
     expect(result).toBe(false);
 
     // Both have submitted reviews
@@ -83,9 +87,10 @@ describe('isProposalAllReviewsSubmittedForAllFapsGuard', () => {
       { fapID: 1, status: ReviewStatus.SUBMITTED },
       { fapID: 2, status: ReviewStatus.SUBMITTED },
     ]);
-    const result2 = await isProposalAllReviewsSubmittedForAllFapsGuard({
-      id: 1,
-    });
+    const result2 =
+      await isEveryFapSubmittedReviewRequirementMetForProposalGuard({
+        id: 1,
+      });
     expect(result2).toBe(true);
   });
 });

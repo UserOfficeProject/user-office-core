@@ -604,15 +604,15 @@ export interface WorkflowConnectionRecord {
 // and contains full information about workflow statuses and connections,
 // so we do not need to make multiple calls to database to get workflow structure
 export interface WorkflowStructure {
-  workflowStatuses: {
-    workflowStatusId: number;
-    statusId: string;
+  readonly workflowStatuses: {
+    readonly workflowStatusId: number;
+    readonly statusId: string;
   }[];
-  workflowConnections: {
-    workflowStatusConnectionId: number;
-    prevWorkflowStatusId: number;
-    nextWorkflowStatusId: number;
-    statusChangingEvents: string[];
+  readonly workflowConnections: {
+    readonly workflowStatusConnectionId: number;
+    readonly prevWorkflowStatusId: number;
+    readonly nextWorkflowStatusId: number;
+    readonly statusChangingEvents: string[];
   }[];
 }
 
@@ -773,7 +773,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.title || '',
     proposal.abstract || '',
     proposal.proposer_id,
-    proposal.status_id,
     proposal.workflow_status_id,
     proposal.created_at,
     proposal.updated_at,
@@ -1533,7 +1532,6 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
   readonly workflow_status_id: number;
-  readonly status_id: string | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;
   readonly created_at: Date;

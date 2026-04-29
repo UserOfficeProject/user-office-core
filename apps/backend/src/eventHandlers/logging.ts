@@ -182,9 +182,10 @@ export default function createLoggingHandler() {
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {
-              const proposalStatus = await statusDataSource.getStatus(
-                proposal.statusId
-              );
+              const proposalStatus =
+                await statusDataSource.getStatusByWorkflowStatusId(
+                  proposal.workflowStatusId
+                );
 
               const description = `Status changed to: ${proposalStatus?.name}`;
 

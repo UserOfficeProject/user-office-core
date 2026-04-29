@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllFapReviewsSubmittedGuard } from './isProposalAllFapReviewsSubmittedGuard';
+import { isEveryFapReviewSubmittedForProposalGuard } from './isEveryFapReviewSubmittedForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 import { ReviewStatus } from '../../models/Review';
 
-describe('isProposalAllFapReviewsSubmittedGuard', () => {
+describe('isEveryFapReviewSubmittedForProposalGuard', () => {
   const mockReviewDataSource = {
     getProposalReviews: jest.fn(),
   };
@@ -16,12 +16,12 @@ describe('isProposalAllFapReviewsSubmittedGuard', () => {
       if (token === Tokens.ReviewDataSource) return mockReviewDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no reviews are found', async () => {
     mockReviewDataSource.getProposalReviews.mockResolvedValue([]);
-    const result = await isProposalAllFapReviewsSubmittedGuard({ id: 1 });
+    const result = await isEveryFapReviewSubmittedForProposalGuard({ id: 1 });
     expect(result).toBe(false);
   });
 
@@ -31,7 +31,7 @@ describe('isProposalAllFapReviewsSubmittedGuard', () => {
       { status: ReviewStatus.SUBMITTED },
     ]);
 
-    const result = await isProposalAllFapReviewsSubmittedGuard({ id: 1 });
+    const result = await isEveryFapReviewSubmittedForProposalGuard({ id: 1 });
     expect(result).toBe(true);
   });
 
@@ -41,7 +41,7 @@ describe('isProposalAllFapReviewsSubmittedGuard', () => {
       { status: ReviewStatus.DRAFT },
     ]);
 
-    const result = await isProposalAllFapReviewsSubmittedGuard({ id: 1 });
+    const result = await isEveryFapReviewSubmittedForProposalGuard({ id: 1 });
     expect(result).toBe(false);
   });
 });

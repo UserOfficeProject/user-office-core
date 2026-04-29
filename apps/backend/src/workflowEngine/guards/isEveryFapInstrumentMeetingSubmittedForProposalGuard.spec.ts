@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllFapMeetingInstrumentSubmittedGuard } from './isProposalAllFapMeetingInstrumentSubmittedGuard';
+import { isEveryFapInstrumentMeetingSubmittedForProposalGuard } from './isEveryFapInstrumentMeetingSubmittedForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 
-describe('isProposalAllFapMeetingInstrumentSubmittedGuard', () => {
+describe('isEveryFapInstrumentMeetingSubmittedForProposalGuard', () => {
   const mockFapDataSource = {
     getFapsByProposalPks: jest.fn(),
   };
@@ -15,12 +15,12 @@ describe('isProposalAllFapMeetingInstrumentSubmittedGuard', () => {
       if (token === Tokens.FapDataSource) return mockFapDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no fap proposals found', async () => {
     mockFapDataSource.getFapsByProposalPks.mockResolvedValue([]);
-    const result = await isProposalAllFapMeetingInstrumentSubmittedGuard({
+    const result = await isEveryFapInstrumentMeetingSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);
@@ -32,7 +32,7 @@ describe('isProposalAllFapMeetingInstrumentSubmittedGuard', () => {
       { fapInstrumentMeetingSubmitted: true },
     ]);
 
-    const result = await isProposalAllFapMeetingInstrumentSubmittedGuard({
+    const result = await isEveryFapInstrumentMeetingSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(true);
@@ -44,7 +44,7 @@ describe('isProposalAllFapMeetingInstrumentSubmittedGuard', () => {
       { fapInstrumentMeetingSubmitted: false },
     ]);
 
-    const result = await isProposalAllFapMeetingInstrumentSubmittedGuard({
+    const result = await isEveryFapInstrumentMeetingSubmittedForProposalGuard({
       id: 1,
     });
     expect(result).toBe(false);

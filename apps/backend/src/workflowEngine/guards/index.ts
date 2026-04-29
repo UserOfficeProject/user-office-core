@@ -6,13 +6,6 @@ export { isCallReviewEndedGuard } from './isCallReviewEndedGuard';
 
 // Proposal Guards
 export { isProposalAcceptedGuard } from './isProposalAcceptedGuard';
-export { isProposalAllFapMeetingInstrumentSubmittedGuard } from './isProposalAllFapMeetingInstrumentSubmittedGuard';
-export { isProposalAllFapMeetingsSubmittedGuard } from './isProposalAllFapMeetingsSubmittedGuard';
-export { isProposalAllFapReviewersSelectedGuard } from './isProposalAllFapReviewersSelectedGuard';
-export { isProposalAllFapReviewsSubmittedGuard } from './isProposalAllFapReviewsSubmittedGuard';
-export { isProposalAllFeasibilityReviewsFeasibleGuard } from './isProposalAllFeasibilityReviewsFeasibleGuard';
-export { isProposalAllFeasibilityReviewsSubmittedGuard } from './isProposalAllFeasibilityReviewsSubmittedGuard';
-export { isProposalAllReviewsSubmittedForAllFapsGuard } from './isProposalAllReviewsSubmittedForAllFapsGuard';
 export { isProposalAllReviewsSubmittedGuard } from './isProposalAllReviewsSubmittedGuard';
 export { isProposalAssignedToTechniquesGuard } from './isProposalAssignedToTechniquesGuard';
 export { isProposalBookingTimeActivatedGuard } from './isProposalBookingTimeActivatedGuard';

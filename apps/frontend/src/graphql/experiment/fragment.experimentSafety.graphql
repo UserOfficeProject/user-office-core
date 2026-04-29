@@ -16,5 +16,4 @@ fragment experimentSafety on ExperimentSafety {
   status {
     ...status
   }
-  workflowStatusId
 }

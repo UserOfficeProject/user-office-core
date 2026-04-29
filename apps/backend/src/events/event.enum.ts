@@ -1,40 +1,40 @@
 import {
-  isCallEndedGuard,
-  isCallEndedInternalGuard,
-  isCallFapReviewEndedGuard,
-  isCallReviewEndedGuard,
   isExperimentESFApprovedByESR,
   isExperimentESFApprovedByIS,
   isExperimentESFRejectedByESR,
   isExperimentESFRejectedByIS,
   isExperimentESFSubmitted,
-  isProposalAcceptedGuard,
-  isProposalAllFapMeetingInstrumentSubmittedGuard,
-  isProposalAllFapMeetingsSubmittedGuard,
-  isProposalAllFapReviewersSelectedGuard,
-  isProposalAllFapReviewsSubmittedGuard,
-  isProposalAllFeasibilityReviewsFeasibleGuard,
-  isProposalAllFeasibilityReviewsSubmittedGuard,
-  isProposalAllReviewsSubmittedForAllFapsGuard,
-  isProposalAssignedToTechniquesGuard,
-  isProposalBookingTimeActivatedGuard,
-  isProposalBookingTimeCompletedGuard,
-  isProposalFapMeetingInstrumentSubmittedGuard,
-  isProposalFapMeetingInstrumentUnsubmittedGuard,
-  isProposalFapReviewSubmittedGuard,
-  isProposalFapsSelectedGuard,
-  isProposalFeasibilityReviewFeasibleGuard,
-  isProposalFeasibilityReviewSubmittedGuard,
-  isProposalFeasibilityReviewUnfeasibleGuard,
-  isProposalInstrumentsSelectedGuard,
-  isProposalManagementDecisionSubmittedGuard,
-  isProposalNotifiedGuard,
-  isProposalRejectedGuard,
-  isProposalReservedGuard,
-  isProposalSampleReviewSubmittedGuard,
-  isProposalSampleSafeGuard,
-  isProposalSubmittedGuard,
 } from '../workflowEngine/guards';
+import { isCallEndedGuard } from '../workflowEngine/guards/isCallEndedGuard';
+import { isCallEndedInternalGuard } from '../workflowEngine/guards/isCallEndedInternalGuard';
+import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapReviewEndedGuard';
+import { isCallReviewEndedGuard } from '../workflowEngine/guards/isCallReviewEndedGuard';
+import { isEveryFapInstrumentMeetingSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedForProposalGuard';
+import { isEveryFapInstrumentMeetingSubmittedGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedGuard';
+import { isEveryFapReviewerRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewerRequirementMetForProposalGuard';
+import { isEveryFapReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewSubmittedForProposalGuard';
+import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapSubmittedReviewRequirementMetForProposalGuard';
+import { isEveryFeasibilityReviewFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewFeasibleForProposalGuard';
+import { isEveryFeasibilityReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewSubmittedForProposalGuard';
+import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
+import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
+import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
+import { isProposalBookingTimeCompletedGuard } from '../workflowEngine/guards/isProposalBookingTimeCompletedGuard';
+import { isProposalFapMeetingInstrumentSubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentSubmittedGuard';
+import { isProposalFapMeetingInstrumentUnsubmittedGuard } from '../workflowEngine/guards/isProposalFapMeetingInstrumentUnsubmittedGuard';
+import { isProposalFapReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFapReviewSubmittedGuard';
+import { isProposalFapsSelectedGuard } from '../workflowEngine/guards/isProposalFapsSelectedGuard';
+import { isProposalFeasibilityReviewFeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewFeasibleGuard';
+import { isProposalFeasibilityReviewSubmittedGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewSubmittedGuard';
+import { isProposalFeasibilityReviewUnfeasibleGuard } from '../workflowEngine/guards/isProposalFeasibilityReviewUnfeasibleGuard';
+import { isProposalInstrumentsSelectedGuard } from '../workflowEngine/guards/isProposalInstrumentsSelectedGuard';
+import { isProposalManagementDecisionSubmittedGuard } from '../workflowEngine/guards/isProposalManagementDecisionSubmittedGuard';
+import { isProposalNotifiedGuard } from '../workflowEngine/guards/isProposalNotifiedGuard';
+import { isProposalRejectedGuard } from '../workflowEngine/guards/isProposalRejectedGuard';
+import { isProposalReservedGuard } from '../workflowEngine/guards/isProposalReservedGuard';
+import { isProposalSampleReviewSubmittedGuard } from '../workflowEngine/guards/isProposalSampleReviewSubmittedGuard';
+import { isProposalSampleSafeGuard } from '../workflowEngine/guards/isProposalSampleSafeGuard';
+import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
 import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachine';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
@@ -208,16 +208,16 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED,
     {
       label:
-        'Event occurs when all proposal feasibility reviews are submitted with any value',
-      guard: isProposalAllFeasibilityReviewsSubmittedGuard,
+        'Event occurs when every feasibility review on a proposal is submitted',
+      guard: isEveryFeasibilityReviewSubmittedForProposalGuard,
     },
   ],
   [
     Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
     {
       label:
-        'Event occurs when all proposal feasibility reviews are submitted with Feasible value',
-      guard: isProposalAllFeasibilityReviewsFeasibleGuard,
+        'Event occurs when every feasibility review on a proposal is feasible',
+      guard: isEveryFeasibilityReviewFeasibleForProposalGuard,
     },
   ],
   [
@@ -239,8 +239,9 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.PROPOSAL_ALL_FAP_REVIEWERS_SELECTED,
     {
-      label: 'Event occurs when all FAP reviewers are selected on a proposal',
-      guard: isProposalAllFapReviewersSelectedGuard,
+      label:
+        'Event occurs when every FAP on a proposal meets its reviewer requirement',
+      guard: isEveryFapReviewerRequirementMetForProposalGuard,
     },
   ],
   [
@@ -260,8 +261,8 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
     {
       label:
-        'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
-      guard: isProposalAllFapReviewsSubmittedGuard,
+        'Event occurs when every FAP review on a proposal is submitted for the current FAP',
+      guard: isEveryFapReviewSubmittedForProposalGuard,
     },
   ],
   [
@@ -275,17 +276,16 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
     {
-      label:
-        'Event occurs when all the FAP meetings are submitted for a specific proposal',
-      guard: isProposalAllFapMeetingsSubmittedGuard,
+      label: 'Event occurs when every FAP meeting on a proposal is submitted',
+      guard: isEveryFapInstrumentMeetingSubmittedGuard,
     },
   ],
   [
     Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS,
     {
       label:
-        'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
-      guard: isProposalAllReviewsSubmittedForAllFapsGuard,
+        'Event occurs when every review on a proposal is submitted across every FAP',
+      guard: isEveryFapSubmittedReviewRequirementMetForProposalGuard,
     },
   ],
   [
@@ -321,8 +321,8 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
     {
       label:
-        'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
-      guard: isProposalAllFapMeetingInstrumentSubmittedGuard,
+        'Event occurs when every FAP linked to a proposal has its instrument meeting submitted',
+      guard: isEveryFapInstrumentMeetingSubmittedForProposalGuard,
     },
   ],
   [

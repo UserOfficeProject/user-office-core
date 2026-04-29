@@ -52,9 +52,9 @@ const proposalWorkflowEntity: WorkFlowEntity = {
     const proposalDataSource = container.resolve<ProposalDataSource>(
       Tokens.ProposalDataSource
     );
-    await proposalDataSource.updateProposalWfStatus(
-      entityId,
-      newWorkflowStatusId
+    await proposalDataSource.changeProposalsWorkflowStatus(
+      newWorkflowStatusId,
+      [entityId]
     );
   },
   onWorkflowStatusChange: async (entities: WorkflowEngineType[]) => {

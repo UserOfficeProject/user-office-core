@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isProposalAllFapReviewersSelectedGuard } from './isProposalAllFapReviewersSelectedGuard';
+import { isEveryFapReviewerRequirementMetForProposalGuard } from './isEveryFapReviewerRequirementMetForProposalGuard';
 import { Tokens } from '../../config/Tokens';
 
-describe('isProposalAllFapReviewersSelectedGuard', () => {
+describe('isEveryFapReviewerRequirementMetForProposalGuard', () => {
   const mockFapDataSource = {
     getFapsByProposalPk: jest.fn(),
     getAllFapProposalAssignments: jest.fn(),
@@ -16,14 +16,16 @@ describe('isProposalAllFapReviewersSelectedGuard', () => {
       if (token === Tokens.FapDataSource) return mockFapDataSource;
 
       return null;
-    }) as any;
+    }) as typeof container.resolve;
   });
 
   it('returns false if no faps found for proposal', async () => {
     mockFapDataSource.getFapsByProposalPk.mockResolvedValue([]);
     mockFapDataSource.getAllFapProposalAssignments.mockResolvedValue([]);
 
-    const result = await isProposalAllFapReviewersSelectedGuard({ id: 1 });
+    const result = await isEveryFapReviewerRequirementMetForProposalGuard({
+      id: 1,
+    });
     expect(result).toBe(false);
   });
 
@@ -36,7 +38,9 @@ describe('isProposalAllFapReviewersSelectedGuard', () => {
       { fapId: 1 },
     ]);
 
-    const result = await isProposalAllFapReviewersSelectedGuard({ id: 1 });
+    const result = await isEveryFapReviewerRequirementMetForProposalGuard({
+      id: 1,
+    });
     expect(result).toBe(true);
   });
 
@@ -48,7 +52,9 @@ describe('isProposalAllFapReviewersSelectedGuard', () => {
       { fapId: 1 },
     ]);
 
-    const result = await isProposalAllFapReviewersSelectedGuard({ id: 1 });
+    const result = await isEveryFapReviewerRequirementMetForProposalGuard({
+      id: 1,
+    });
     expect(result).toBe(false);
   });
 
@@ -62,7 +68,9 @@ describe('isProposalAllFapReviewersSelectedGuard', () => {
       { fapId: 1 },
     ]);
 
-    const result = await isProposalAllFapReviewersSelectedGuard({ id: 1 });
+    const result = await isEveryFapReviewerRequirementMetForProposalGuard({
+      id: 1,
+    });
     expect(result).toBe(false);
 
     // Both have assignments
@@ -70,7 +78,9 @@ describe('isProposalAllFapReviewersSelectedGuard', () => {
       { fapId: 1 },
       { fapId: 2 },
     ]);
-    const result2 = await isProposalAllFapReviewersSelectedGuard({ id: 1 });
+    const result2 = await isEveryFapReviewerRequirementMetForProposalGuard({
+      id: 1,
+    });
     expect(result2).toBe(true);
   });
 });

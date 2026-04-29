@@ -42,7 +42,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.statusId || 'DRAFT',
     values?.workflowStatusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
@@ -159,7 +158,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
       managementDecisionSubmitted: true,
-      statusId: 'FEASIBILITY_REVIEW',
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
@@ -255,20 +253,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     }
 
     this.proposalsUpdated.push(proposal);
-
-    return proposal;
-  }
-
-  async updateProposalWfStatus(
-    proposalPk: number,
-    proposalStatusId: number
-  ): Promise<Proposal> {
-    const proposal = await this.get(proposalPk);
-
-    if (!proposal) {
-      throw new Error('Proposal does not exist');
-    }
-    proposal.workflowStatusId = proposalStatusId;
 
     return proposal;
   }
@@ -385,8 +369,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async changeProposalsWorkflowStatus(
-    workflowStatusId: number,
-    proposalPks: number[]
+    workflowStatusId: number
   ): Promise<Proposals> {
     const proposals = allProposals.map((p) => {
       return {

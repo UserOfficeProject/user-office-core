@@ -53,9 +53,6 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public abstract: string;
 
-  @Field(() => String)
-  public statusId: string;
-
   @Field(() => Int)
   public workflowStatusId: number;
 
@@ -164,10 +161,22 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Status | null> {
-    return await context.queries.status.getStatus(
-      context.user,
-      proposal.statusId
+    return await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+      proposal.workflowStatusId
     );
+  }
+
+  @FieldResolver(() => String)
+  async statusId(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<string | null> {
+    const status =
+      await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+        proposal.workflowStatusId
+      );
+
+    return status!.id;
   }
 
   @FieldResolver(() => ProposalPublicStatus)

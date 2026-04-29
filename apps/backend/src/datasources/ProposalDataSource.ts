@@ -47,10 +47,6 @@ export interface ProposalDataSource {
     questionary_id: number
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
-  updateProposalWfStatus(
-    proposalPk: number,
-    wfStatusId: number
-  ): Promise<Proposal>;
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<TechnicalReview[]>;

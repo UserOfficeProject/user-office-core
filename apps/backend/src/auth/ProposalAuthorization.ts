@@ -13,10 +13,9 @@ import { TagDataSource } from '../datasources/TagDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
-import { UserWithRole } from '../models/User';
+import { UserWithRole, UserJWT } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { UserDataSource } from './../datasources/UserDataSource';
-import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
@@ -350,11 +349,15 @@ export class ProposalAuthorization {
       callId,
       checkIfInternalEditable
     );
-    const proposalStatus = proposal.statusId;
+    const proposalStatus =
+      await this.statusDataSource.getStatusByWorkflowStatusId(
+        proposal.workflowStatusId
+      );
+    const proposalStatusId = proposalStatus!.id;
     if (
-      proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
+      proposalStatusId === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
       (checkIfInternalEditable &&
-        proposalStatus ===
+        proposalStatusId ===
           ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL)
     ) {
       return true;
@@ -363,7 +366,7 @@ export class ProposalAuthorization {
     if (isCallEnded) {
       return false;
     } else {
-      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
+      return proposalStatusId === ProposalStatusDefaultShortCodes.DRAFT;
     }
   }
 

@@ -3,6 +3,7 @@ import { Workflow } from '../models/Workflow';
 import { WorkflowConnection } from '../models/WorkflowConnections';
 import { WorkflowStatus } from '../models/WorkflowStatus';
 import { WorkflowStructure } from './postgres/records';
+import { AddStatusToWorkflowInput } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 import { CreateWorkflowConnectionInput } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
@@ -32,12 +33,9 @@ export interface WorkflowDataSource {
     connectionId: number
   ): Promise<WorkflowConnection | null>;
 
-  addStatusToWorkflow(newWorkflowStatusInput: {
-    workflowId: number;
-    statusId: string;
-    posX: number;
-    posY: number;
-  }): Promise<WorkflowStatus>;
+  addStatusToWorkflow(
+    newWorkflowStatusInput: AddStatusToWorkflowInput
+  ): Promise<WorkflowStatus>;
   getWorkflowStatus(workflowStatusId: number): Promise<WorkflowStatus | null>;
   getWorkflowStatuses(workflowId: number): Promise<WorkflowStatus[]>;
   updateWorkflowStatus(

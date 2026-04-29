@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
+import database from './database';
+import { StatusRecord } from './records';
 import { Status } from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
 import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
-import database from './database';
-import { StatusRecord } from './records';
 
 @injectable()
 export default class PostgresStatusDataSource implements StatusDataSource {
@@ -60,6 +60,19 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return statuses.map((status) => this.createStatusObject(status));
   }
 
+  public getStatusByWorkflowStatusId(
+    workflowStatusId: number
+  ): Promise<Status | null> {
+    return database
+      .select('s.*')
+      .from('statuses as s')
+      .join('workflow_has_statuses as whs', 's.status_id', 'whs.status_id')
+      .where('whs.workflow_status_id', workflowStatusId)
+      .first()
+      .then((status: StatusRecord) =>
+        status ? this.createStatusObject(status) : null
+      );
+  }
   async updateStatus(status: UpdateStatusInput): Promise<Status> {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
