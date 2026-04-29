@@ -7,16 +7,17 @@ import { Entity, GuardFn } from '../simpleStateMachine/stateMachnine';
 /**
  * Returns true when every FAP linked to the proposal has its instrument meeting submitted.
  */
-export const isEveryFapInstrumentMeetingSubmittedForProposalGuard: GuardFn = async (
-  entity: Entity
-) => {
-  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+export const isEveryFapInstrumentMeetingSubmittedForProposalGuard: GuardFn =
+  async (entity: Entity) => {
+    const fapDataSource = container.resolve<FapDataSource>(
+      Tokens.FapDataSource
+    );
 
-  const fapProposals = await fapDataSource.getFapsByProposalPks([entity.id]);
+    const fapProposals = await fapDataSource.getFapsByProposalPks([entity.id]);
 
-  if (fapProposals.length === 0) {
-    return false;
-  }
+    if (fapProposals.length === 0) {
+      return false;
+    }
 
-  return fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted);
-};
+    return fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted);
+  };
