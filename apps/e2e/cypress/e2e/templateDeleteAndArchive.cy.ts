@@ -901,7 +901,9 @@ context('Template Delete, Archive, Unarchive', () => {
 
       cy.get('[data-cy=select-proposal-dropdown]').click();
 
-      cy.get('[role="listbox"]').contains(existingProposal.title).click();
+      cy.get('[role="listbox"]')
+        .get(`[data-value="${existingProposal.id}"]`)
+        .click();
 
       cy.get('[data-cy=samples-dropdown]').click();
 
