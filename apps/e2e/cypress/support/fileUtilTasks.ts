@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-import fetch from 'cross-fetch';
 import pdf from 'pdf-parse';
 import * as xlsx from 'xlsx';
 
