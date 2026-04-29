@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { CallDataSource } from '../../datasources/CallDataSource';
@@ -19,7 +20,6 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { SettingsId } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId } from './emailTemplateId';
 
 function formatEmailDate(
   value: Date | null,

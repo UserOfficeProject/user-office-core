@@ -8,12 +8,12 @@ import {
   Ctx,
 } from 'type-graphql';
 
+import { BasicUserDetails } from './BasicUserDetails';
 import { ResolverContext } from '../../context';
 import {
   Fap as FapBase,
   FapProposalCount as FapProposalCountBase,
 } from '../../models/Fap';
-import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class FapProposalCount implements FapProposalCountBase {
