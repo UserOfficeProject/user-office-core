@@ -133,12 +133,12 @@ export class ProposalWorkflowEngine {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta
         | undefined;
-      const nextWfStatusId = meta?.workflowStatusId;
+      const nextWorkflowStatusId = meta?.workflowStatusId;
 
-      if (nextWfStatusId) {
+      if (nextWorkflowStatusId) {
         const { proposals } =
           await this.proposalDataSource.changeProposalsWorkflowStatus(
-            nextWfStatusId,
+            nextWorkflowStatusId,
             [proposalPk]
           );
 

@@ -840,12 +840,12 @@ export default class ProposalMutations {
         true
       );
 
-      const defaultWfStatus =
+      const defaultWorkflowStatus =
         await this.workflowDataSource.getInitialWorkflowStatus(
           call.proposalWorkflowId
         );
 
-      if (!defaultWfStatus) {
+      if (!defaultWorkflowStatus) {
         return rejection(
           'Could not clone the proposal because the call has misconfigured workflow statuses',
           { call, sourceProposal }
@@ -858,7 +858,7 @@ export default class ProposalMutations {
         title: `Copy of ${clonedProposal.title}`,
         abstract: clonedProposal.abstract,
         proposerId: sourceProposal.proposerId,
-        workflowStatusId: defaultWfStatus.workflowStatusId,
+        workflowStatusId: defaultWorkflowStatus.workflowStatusId,
         created: new Date(),
         updated: new Date(),
         proposalId: clonedProposal.proposalId,

@@ -72,7 +72,7 @@ export class ExperimentWorkflowEngine {
     );
 
     const validExperiments = experimentsWithChangedStatuses.filter(
-      (p): p is WorkflowEngineExperimentType => !!p
+      (exp): exp is WorkflowEngineExperimentType => !!exp
     );
 
     return validExperiments;
@@ -149,23 +149,23 @@ export class ExperimentWorkflowEngine {
       { id: experimentSafety.experimentSafetyPk },
       currentExperimentState
     );
-    const currentWfStatus = actor.getState();
+    const currentWorkflowStatus = actor.getState();
 
     const { nextStateValue, connectionId } = await actor.event(
       event.toUpperCase()
     );
 
-    if (nextStateValue !== currentWfStatus) {
+    if (nextStateValue !== currentWorkflowStatus) {
       const meta = machine.schema.states[nextStateValue]?.meta as
         | WorkflowStateMeta
         | undefined;
-      const nextWfStatusId = meta?.workflowStatusId;
+      const nextWorkflowStatusId = meta?.workflowStatusId;
 
-      if (nextWfStatusId) {
+      if (nextWorkflowStatusId) {
         const updatedExperimentSafety =
           await this.experimentDataSource.updateExperimentSafetyStatus(
             experimentSafety.experimentSafetyPk,
-            nextWfStatusId
+            nextWorkflowStatusId
           );
 
         return {
