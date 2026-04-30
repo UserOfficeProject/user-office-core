@@ -89,7 +89,7 @@ export class DLSUserAuthorization extends OAuthAuthorization {
         (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,
         userInfo.family_name,
-        userInfo.given_name ?? '',
+        userInfo.given_name ?? '', // Using given_name as preferred_name from the oauth provider is a federation id
         userId,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
