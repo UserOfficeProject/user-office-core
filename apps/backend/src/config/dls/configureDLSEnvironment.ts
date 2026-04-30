@@ -101,7 +101,6 @@ async function enableDefaultDLSFeatures() {
       ],
       true
     ),
-
     db.setFeatures(
       [
         FeatureId.EMAIL_SEARCH,
@@ -115,32 +114,26 @@ async function enableDefaultDLSFeatures() {
       ],
       false
     ),
-
     db.updateSettings({
       settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
       settingsValue: 'true',
     }),
-
     db.updateSettings({
       settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
       settingsValue: 'ME',
     }),
-
     db.updateSettings({
       settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
       settingsValue: 'FEASIBILITY_REVIEW',
     }),
-
     db.updateSettings({
       settingsId: SettingsId.INVITE_VALIDITY_PERIOD_DAYS,
       settingsValue: '180',
     }),
-
     db.updateSettings({
       settingsId: SettingsId.DISPLAY_FAQ_LINK,
       settingsValue: 'true',
     }),
-
     db.updateSettings({
       settingsId: SettingsId.PROFILE_PAGE_LINK,
       settingsValue: getUASInstance() + '/#PersonalDetailsPlace:',
