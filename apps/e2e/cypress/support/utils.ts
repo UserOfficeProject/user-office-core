@@ -69,9 +69,13 @@ const numbersOnly = (date: string): string => date.replace(/[^0-9]/gi, '');
 export const getE2EApi = (token?: string | null) => {
   // NOTE: Token is used when we want to do some action as a specific logged in user.
   const authHeader = `Bearer ${token ? token : Cypress.env('SVC_ACC_TOKEN')}`;
+  const graphqlUrl = new URL(
+    '/graphql',
+    Cypress.config('baseUrl') ?? window.location.origin
+  ).toString();
 
   return getSdk(
-    new GraphQLClient('/graphql', {
+    new GraphQLClient(graphqlUrl, {
       headers: { authorization: authHeader },
     })
   );

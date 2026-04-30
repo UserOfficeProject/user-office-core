@@ -8,8 +8,8 @@ import {
   Resolver,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
 import { AnswerInput } from './AnswerTopicMutation';
+import { ResolverContext } from '../../context';
 
 @ArgsType()
 export class UpdateAnswerArgs {

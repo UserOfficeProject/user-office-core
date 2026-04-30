@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import ExperimentMutations from './ExperimentMutation';
 import { Tokens } from '../config/Tokens';
 import {
   CallDataSourceMock,
@@ -32,7 +33,6 @@ import { Rejection } from '../models/Rejection';
 import { Sample } from '../models/Sample';
 import { DataType } from '../models/Template';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
-import ExperimentMutations from './ExperimentMutation';
 
 const experimentMutation = container.resolve(ExperimentMutations);
 const calldatasource = container.resolve<CallDataSourceMock>(

@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import DataAccessUsersMutations from './DataAccessUsersMutations';
 import { Tokens } from '../config/Tokens';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { dummyProposalSubmitted } from '../datasources/mockups/ProposalDataSource';
@@ -11,7 +12,6 @@ import {
   dummyUserNotOnProposalWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Rejection } from '../models/Rejection';
-import DataAccessUsersMutations from './DataAccessUsersMutations';
 
 const dataAccessUsersMutations = container.resolve(DataAccessUsersMutations);
 
