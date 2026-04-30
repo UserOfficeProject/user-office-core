@@ -10,7 +10,7 @@ import { OAuthAuthorization } from './OAuthAuthorization';
 import { User, UserRole } from '../models/User';
 import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 
-export class DlsUserAuthorization extends OAuthAuthorization {
+export class DLSUserAuthorization extends OAuthAuthorization {
   constructor() {
     super();
 
