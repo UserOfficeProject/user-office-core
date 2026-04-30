@@ -142,11 +142,13 @@ async function enableDefaultDLSFeatures() {
 }
 
 async function configureDLSEnvironment() {
-  await setDLSColourTheme();
-  await enableDefaultDLSFeatures();
-  await setTimezone();
-  await setDateTimeFormats();
-  await updateOIDCSettings();
+  await Promise.all([
+    setDLSColourTheme(),
+    enableDefaultDLSFeatures(),
+    setTimezone(),
+    setDateTimeFormats(),
+    updateOIDCSettings(),
+  ]);
 }
 
 export { configureDLSEnvironment, getUASInstance };
