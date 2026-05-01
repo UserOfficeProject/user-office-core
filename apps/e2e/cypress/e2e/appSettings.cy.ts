@@ -81,7 +81,7 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-end-call-input"]').should('exist');
     });
 
-    it('Should show Facilities Homepage button in account menu', () => {
+    it.only('Should show Facilities Homepage button in account menu', () => {
       cy.login('officer');
       cy.visit('/Settings');
 
@@ -93,7 +93,9 @@ context('App settings tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[actions=""] > :nth-child(4)')
+      cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
+        .find('input[type="text"]')
+        .first()
         .clear()
         .type('https://test-homepage.com');
 
