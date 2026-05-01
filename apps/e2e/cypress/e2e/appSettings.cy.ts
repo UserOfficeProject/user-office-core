@@ -95,7 +95,7 @@ context('App settings tests', () => {
 
       cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
         .find('input[type="text"]')
-        .first()
+        .last()
         .clear()
         .type('https://test-homepage.com');
 
