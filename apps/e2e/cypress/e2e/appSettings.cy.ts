@@ -100,6 +100,7 @@ context('App settings tests', () => {
         .type('https://test-homepage.com');
 
       cy.get('[aria-label="Save"]').click();
+      cy.notification({ text: 'Settings updated', variant: 'success' });
 
       cy.visit('/');
       cy.get('[data-cy="profile-page-btn"]').click();
