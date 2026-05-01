@@ -81,7 +81,7 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-end-call-input"]').should('exist');
     });
 
-    it.only('Should show Facilities Homepage button in account menu', () => {
+    it('Should show Facilities Homepage button in account menu', () => {
       cy.login('officer');
       cy.visit('/Settings');
 
