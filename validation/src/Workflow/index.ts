@@ -47,7 +47,7 @@ export const addStatusActionsToConnectionValidationSchema = <T, U>(
   rabbitMQStatusActionType: T,
   proposalDownloadStatusActionType: T,
   statusActionTypes: T[],
-  otherEmailActionRecipients: U
+  otherEmailActionRecipients: U,
 ) =>
   Yup.object().shape({
     connectionId: Yup.number().required(),
@@ -57,67 +57,71 @@ export const addStatusActionsToConnectionValidationSchema = <T, U>(
         Yup.object().shape({
           actionId: Yup.number().required(),
           actionType: Yup.mixed<T>().oneOf(statusActionTypes).required(),
-          config: Yup.object().test(
-            'RecipientWithTemplate',
-            'Invalid values provided for action config',
-            async (value: any, context: any) => {
-              switch (context.parent.actionType) {
-                case emailStatusActionType: {
-                  // NOTE: Value here is: EmailActionConfig from the core codebase
-                  if (value.recipientsWithEmailTemplate?.length) {
-                    const filteredNonCompleteValues =
-                      value.recipientsWithEmailTemplate.filter(
-                        (item: any) =>
-                          !item.recipient?.name || !item.emailTemplate?.id
+          config: Yup.object()
+            .transform((value, originalValue) => {
+              console.log({ value, originalValue });
+              if (typeof originalValue === 'string') {
+                try {
+                  return JSON.parse(originalValue);
+                } catch {
+                  return originalValue;
+                }
+              }
+              return value;
+            })
+            .test(
+              'RecipientWithTemplate',
+              'Invalid values provided for action config',
+              async (value: any, context: any) => {
+                switch (context.parent.actionType) {
+                  case emailStatusActionType: {
+                    // NOTE: Value here is: EmailActionConfig from the core codebase
+                    if (value.recipientsWithEmailTemplate?.length) {
+                      const filteredNonCompleteValues = value.recipientsWithEmailTemplate.filter(
+                        (item: any) => !item.recipient?.name || !item.emailTemplate?.id,
                       );
 
-                    if (filteredNonCompleteValues.length) {
+                      if (filteredNonCompleteValues.length) {
+                        return false;
+                      }
+
+                      const foundOtherRecipient = value.recipientsWithEmailTemplate.find(
+                        (recipientWithEmailTemplate: any) =>
+                          recipientWithEmailTemplate.recipient.name === otherEmailActionRecipients,
+                      );
+
+                      // NOTE: Check if 'OTHER' is selected as recipient and valid emails are provided as input.
+                      if (foundOtherRecipient) {
+                        await Yup.array()
+                          .of(Yup.string().email(({ value }) => `${value} is not a valid email`))
+                          .min(1, 'You must provide at least 1 valid email')
+                          .required()
+                          .validate(foundOtherRecipient.otherRecipientEmails);
+                      }
+
+                      return true;
+                    } else {
                       return false;
                     }
-
-                    const foundOtherRecipient =
-                      value.recipientsWithEmailTemplate.find(
-                        (recipientWithEmailTemplate: any) =>
-                          recipientWithEmailTemplate.recipient.name ===
-                          otherEmailActionRecipients
-                      );
-
-                    // NOTE: Check if 'OTHER' is selected as recipient and valid emails are provided as input.
-                    if (foundOtherRecipient) {
-                      await Yup.array()
-                        .of(
-                          Yup.string().email(
-                            ({ value }) => `${value} is not a valid email`
-                          )
-                        )
-                        .min(1, 'You must provide at least 1 valid email')
-                        .required()
-                        .validate(foundOtherRecipient.otherRecipientEmails);
+                  }
+                  case rabbitMQStatusActionType: {
+                    // NOTE: Value here is: RabbitMQActionConfig from the core codebase
+                    if (value.exchanges?.length) {
+                      return true;
+                    } else {
+                      return false;
                     }
-
-                    return true;
-                  } else {
-                    return false;
                   }
-                }
-                case rabbitMQStatusActionType: {
-                  // NOTE: Value here is: RabbitMQActionConfig from the core codebase
-                  if (value.exchanges?.length) {
-                    return true;
-                  } else {
-                    return false;
+                  case proposalDownloadStatusActionType: {
+                    // Proposal download action has no config
+                    return value === null || value === undefined;
                   }
+                  default:
+                    return false;
                 }
-                case proposalDownloadStatusActionType: {
-                  // Proposal download action has no config
-                  return value === null || value === undefined;
-                }
-                default:
-                  return false;
-              }
-            }
-          ),
-        })
+              },
+            ),
+        }),
       )
       .notRequired(),
   });
