@@ -57,11 +57,6 @@ const ChangeProposalStatus = ({
     (id) => id === selectedProposalsWorkflowIds[0]
   );
 
-  const selectedProposalsWorkflowStatus =
-    allSelectedProposalsHaveSameWorkflowStatus
-      ? selectedProposalStatuses[0]
-      : null;
-
   const highlightedNodes = useMemo(() => {
     const counts = selectedProposals.reduce(
       (acc, proposal) => {
@@ -69,11 +64,11 @@ const ChangeProposalStatus = ({
           (ws) => ws.workflowStatusId === proposal.workflowStatusId
         );
         if (workflowStatus) {
-          const id = workflowStatus.status.id;
-          if (!acc[id]) {
-            acc[id] = [];
+          const statusId = workflowStatus.status.id;
+          if (!acc[statusId]) {
+            acc[statusId] = [];
           }
-          acc[id].push(proposal.proposalId);
+          acc[statusId].push(proposal.proposalId);
         }
 
         return acc;
@@ -107,6 +102,11 @@ const ChangeProposalStatus = ({
       </Container>
     );
   }
+
+  const selectedProposalsWorkflowStatus =
+    allSelectedProposalsHaveSameWorkflowStatus
+      ? selectedProposalStatuses[0]
+      : null;
 
   return (
     <Container component="main" maxWidth="lg">
