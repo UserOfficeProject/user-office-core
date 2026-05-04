@@ -145,14 +145,14 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       }
 
       // Find source and target status names for the edge data
-      const sourceWfStatus = state.statuses.find(
+      const sourceWorkflowStatus = state.statuses.find(
         (s) => s.workflowStatusId.toString() === connection.source
       );
-      const targetWfStatus = state.statuses.find(
+      const targetWorkflowStatus = state.statuses.find(
         (s) => s.workflowStatusId.toString() === connection.target
       );
 
-      if (!sourceWfStatus || !targetWfStatus) {
+      if (!sourceWorkflowStatus || !targetWorkflowStatus) {
         return;
       }
 
@@ -168,9 +168,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         targetHandle,
         type: 'workflow', // Use custom workflow edge type
         data: {
-          events: [], // No events initially
-          sourceStatusId: sourceWfStatus.status.id,
-          targetStatusId: targetWfStatus.status.id,
+          events: [],
+          sourceStatusId: sourceWorkflowStatus.status.id,
+          targetStatusId: targetWorkflowStatus.status.id,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
         },
@@ -178,21 +178,16 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       setEdges((eds) => addEdge(newEdge, eds));
 
-      // Dispatch update events to persist the connection in the database
-      // We need to update BOTH nodes: source gets nextStatusId, target gets prevStatusId and prevConnectionId
-
-      // Update source node (A) - set its nextStatusId to target (B)
+      // Dispatch update event to persist the connection in the database
       dispatch({
         type: EventType.ADD_WORKFLOW_CONNECTION_REQUESTED,
         payload: {
-          sourceWorkflowStatusId: sourceWfStatus.workflowStatusId, // Use connection ID for persistence
-          targetWorkflowStatusId: targetWfStatus.workflowStatusId,
+          sourceWorkflowStatusId: sourceWorkflowStatus.workflowStatusId,
+          targetWorkflowStatusId: targetWorkflowStatus.workflowStatusId,
           sourceHandle,
           targetHandle,
         },
       });
-
-      // Note: Connection is persisted by updating both source and target statuses
     },
     [
       edges,
