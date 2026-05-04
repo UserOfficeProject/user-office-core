@@ -166,7 +166,7 @@ export function usePersistWorkflowEditorModel() {
           });
         }
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
-          // Find the workflow connection to remove based on connectionId
+          // Find the workflow status to remove based on workflowStatusId
 
           return executeAndMonitorCall(async () => {
             const result = await deleteWorkflowStatus(
