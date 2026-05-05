@@ -194,9 +194,7 @@ const FapAssignedProposalsTable = ({
       return searchParams;
     });
     const proposal = assignedProposals.find(
-      (aps) =>
-        aps.assignment.review?.id === review.id ||
-        aps.assignment.review?.id === review.id
+      (aps) => aps.assignment.review?.id === review.id
     )?.proposal;
     if (proposal) {
       setOpenProposalPk(proposal.proposalPk);
@@ -224,7 +222,7 @@ const FapAssignedProposalsTable = ({
         <ProposalReviewContent
           proposalPk={proposal?.proposalPk}
           reviewId={reviewerModal ? +reviewerModal : undefined}
-          fapId={assignedProposals[0]?.assignment.review?.fapID} //dumb
+          fapId={assignedProposals[0]?.assignment.review?.fapID}
           fapSec={fapSecs}
           tabNames={reviewProposalTabNames}
         />

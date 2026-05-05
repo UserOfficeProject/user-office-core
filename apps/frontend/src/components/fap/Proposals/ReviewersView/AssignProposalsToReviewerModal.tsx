@@ -60,10 +60,6 @@ const AssignProposalsToReviewerModal = ({
           }}
           onSelectionChange={(data) => {
             setSelectedProposals(data.map((d) => d.proposalPk));
-            console.log(
-              'Selected proposal PKs:',
-              data.map((d) => d.proposalPk)
-            );
           }}
         />
       </DialogContent>

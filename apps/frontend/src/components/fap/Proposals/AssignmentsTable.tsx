@@ -121,8 +121,6 @@ const AssignmentsTable = ({
       fapId: fap.id,
     });
 
-    // setProposalPks([]); // do when function is called from the proposlasand assigments table
-
     const allProposalReviews: ProposalReview[] = [];
 
     for (const proposalPk of proposalPks) {
@@ -223,10 +221,6 @@ const AssignmentsTable = ({
     memberUsers: FapAssignedMember[],
     proposalPks: number[]
   ) => {
-    console.log('handleMemberAssignmentToFapProposals', {
-      memberUsers,
-      proposalPks,
-    });
     const selectedProposals = FapProposalsData.filter((fapProposal) =>
       proposalPks.includes(fapProposal.proposalPk)
     );

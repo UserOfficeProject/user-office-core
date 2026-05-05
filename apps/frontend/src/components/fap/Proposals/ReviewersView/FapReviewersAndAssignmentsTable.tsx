@@ -94,7 +94,6 @@ const FapReviewersAndAssignmentsTableColumns: Column<ReviewerAndProposals>[] = [
 const FapReviewersAndAssignmentsTable = ({
   fap,
   onAssignmentsUpdate,
-  // confirm,
   fapProposals,
   handleMemberAssignmentToFapProposals,
   updateFapProposalAssignmentsView,

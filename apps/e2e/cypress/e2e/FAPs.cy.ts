@@ -1246,7 +1246,6 @@ context('Fap reviews tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=4`);
       cy.finishedLoading();
 
-      // cy.get(`[data-cy="assign-reviewer-${fapMembers.reviewer.id}-to-proposal-${firstCreatedProposalPk}"]`).click();
       cy.contains(fapMembers.reviewer.lastName)
         .parent()
         .find('input[type="checkbox"]')
