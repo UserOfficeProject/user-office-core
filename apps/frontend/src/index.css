@@ -261,3 +261,8 @@ div.MuiToolbar-root[class*='MTableToolbar-highlight'] {
 .MuiBox-root .MuiIconButton-root:not(.Mui-disabled) {
   color: inherit;
 }
+
+/* Add space between pages in PDF preview */
+.react-pdf__Page {
+  margin-bottom: 5px
+}
