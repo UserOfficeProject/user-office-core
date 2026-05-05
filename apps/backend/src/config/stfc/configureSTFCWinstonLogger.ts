@@ -38,7 +38,7 @@ function maskSensitiveFields(
 
 export function configureSTFCWinstonLogger() {
   const transports: Winston.transport[] = [new Winston.transports.Console()];
-  if (!!process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
+  if (process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
     transports.push(new OpentelemetryLogTransport());
   }
 
