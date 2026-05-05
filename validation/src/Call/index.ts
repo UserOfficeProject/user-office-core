@@ -1,141 +1,113 @@
-import * as Yup from "yup";
+import * as Yup from 'yup';
 
-import {
-  isValidDate,
-  TYPE_ERR_INVALID_DATE,
-  TYPE_ERR_INVALID_DATE_TIME,
-} from "../util";
+import { isValidDate, TYPE_ERR_INVALID_DATE, TYPE_ERR_INVALID_DATE_TIME } from '../util';
 
-const firstStepCreateCallValidationSchema = Yup.object().shape({
-  shortCode: Yup.string().required("Short Code is required"),
+const firstStepCreateCallValidationSchemaFields = {
+  shortCode: Yup.string().required('Short Code is required'),
   startCall: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE_TIME)
-    .required("Start call date is required"),
+    .required('Start call date is required'),
   endCall: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE_TIME)
-    .required("End call date is required")
-    .when("startCall", (startCall: Date, schema: Yup.DateSchema) => {
+    .required('End call date is required')
+    .when('startCall', ([startCall]: [Date], schema) => {
       if (!isValidDate(startCall)) {
         return schema;
       }
 
-      return schema.min(
-        startCall,
-        "End call date can not be before start call date.",
-      );
+      return schema.min(startCall, 'End call date can not be before start call date.');
     }),
   endCallInternal: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE_TIME)
-    .when("endCall", (endCall: Date, schema: Yup.DateSchema) => {
+    .when('endCall', ([endCall]: [Date], schema) => {
       if (!isValidDate(endCall)) {
         return schema;
       }
 
-      return schema.min(
-        endCall,
-        "Internal call end date can not be before call end date.",
-      );
+      return schema.min(endCall, 'Internal call end date can not be before call end date.');
     }),
   templateId: Yup.number().required(),
   proposalWorkflowId: Yup.number().required(),
   experimentWorkflowId: Yup.number().nullable().notRequired(),
   proposalPdfTemplateId: Yup.number().nullable().notRequired(),
   experimentPdfTemplateId: Yup.number().nullable().notRequired(),
-});
+};
 
-const firstStepUpdateCallValidationSchema =
-  firstStepCreateCallValidationSchema.concat(
-    Yup.object()
-      .shape({
-        id: Yup.number().required("Id is required"),
-      })
-      .required(),
-  );
+const firstStepCreateCallValidationSchema = Yup.object().shape(
+  firstStepCreateCallValidationSchemaFields,
+);
 
-const secondStepCallValidationSchema = Yup.object().shape({
+const firstStepUpdateCallValidationSchema = firstStepCreateCallValidationSchema.concat(
+  Yup.object()
+    .shape({
+      id: Yup.number().required('Id is required'),
+    })
+    .required(),
+);
+
+const secondStepCallValidationSchemaFields = {
   startReview: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
-    .required("Start review date is required"),
+    .required('Start review date is required'),
   endReview: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
-    .required("End review date is required")
-    .when("startReview", (startReview: Date, schema: Yup.DateSchema) => {
+    .required('End review date is required')
+    .when('startReview', ([startReview]: [Date], schema) => {
       if (!isValidDate(startReview)) {
         return schema;
       }
 
-      return schema.min(
-        startReview,
-        "End review date can not be before start review date.",
-      );
+      return schema.min(startReview, 'End review date can not be before start review date.');
     }),
-  startFapReview: Yup.date()
-    .typeError(TYPE_ERR_INVALID_DATE)
-    .nullable()
-    .notRequired(),
+  startFapReview: Yup.date().typeError(TYPE_ERR_INVALID_DATE).nullable().notRequired(),
   endFapReview: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
     .nullable()
     .notRequired()
-    .when(
-      "startFapReview",
-      (
-        startFapReview: Date,
-        schema: Yup.DateSchema<
-          Date | null | undefined,
-          Record<string, unknown>,
-          Date | null | undefined
-        >,
-      ) => {
-        if (!isValidDate(startFapReview)) {
-          return schema;
-        }
+    .when('startFapReview', ([startFapReview]: [Date], schema) => {
+      if (!isValidDate(startFapReview)) {
+        return schema;
+      }
 
-        return schema.min(
-          startFapReview,
-          "End Fap review date can not be before start Fap review date.",
-        );
-      },
-    ),
-});
+      return schema.min(
+        startFapReview,
+        'End Fap review date can not be before start Fap review date.',
+      );
+    }),
+};
 
-const thirdStepCallValidationSchema = Yup.object().shape({
+const secondStepCallValidationSchema = Yup.object().shape(secondStepCallValidationSchemaFields);
+
+const thirdStepCallValidationSchemaFields = {
   startNotify: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
-    .required("Start notify date is required"),
+    .required('Start notify date is required'),
   endNotify: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
-    .required("End notify date is required")
-    .when("startNotify", (startNotify: Date, schema: Yup.DateSchema) => {
+    .required('End notify date is required')
+    .when('startNotify', ([startNotify]: [Date], schema) => {
       if (!isValidDate(startNotify)) {
         return schema;
       }
 
-      return schema.min(
-        startNotify,
-        "End notify date can not be before start notify date.",
-      );
+      return schema.min(startNotify, 'End notify date can not be before start notify date.');
     }),
-  startCycle: Yup.date()
-    .typeError(TYPE_ERR_INVALID_DATE)
-    .required("Start cycle date is required"),
+  startCycle: Yup.date().typeError(TYPE_ERR_INVALID_DATE).required('Start cycle date is required'),
   endCycle: Yup.date()
     .typeError(TYPE_ERR_INVALID_DATE)
-    .required("End cycle date is required")
-    .when("startCycle", (startCycle: Date, schema: Yup.DateSchema) => {
+    .required('End cycle date is required')
+    .when('startCycle', ([startCycle]: [Date], schema) => {
       if (!isValidDate(startCycle)) {
         return schema;
       }
 
-      return schema.min(
-        startCycle,
-        "End cycle date can not be before start cycle date.",
-      );
+      return schema.min(startCycle, 'End cycle date can not be before start cycle date.');
     }),
   cycleComment: Yup.string()
-    .max(100, "Cycle comment should be no longer than 100 characters")
-    .required("Cycle comment is required"),
-});
+    .max(100, 'Cycle comment should be no longer than 100 characters')
+    .required('Cycle comment is required'),
+};
+const thirdStepCallValidationSchema = Yup.object().shape(thirdStepCallValidationSchemaFields);
 
 export const createCallValidationSchemas = [
   firstStepCreateCallValidationSchema,
@@ -152,49 +124,41 @@ export const updateCallValidationSchemas = [
 export const updateCallValidationBackendSchema = Yup.object().shape({
   // from first step
   id: firstStepUpdateCallValidationSchema.fields.id,
-  shortCode: firstStepCreateCallValidationSchema.fields.shortCode.optional(),
-  startCall: firstStepCreateCallValidationSchema.fields.startCall.optional(),
-  endCall: firstStepCreateCallValidationSchema.fields.endCall.optional(),
-  endCallInternal:
-    firstStepCreateCallValidationSchema.fields.endCallInternal.optional(),
-  templateId: firstStepCreateCallValidationSchema.fields.templateId.optional(),
-  proposalWorkflowId:
-    firstStepCreateCallValidationSchema.fields.proposalWorkflowId.optional(),
-  experimentWorkflowId:
-    firstStepCreateCallValidationSchema.fields.experimentWorkflowId.optional(),
-  proposalPdfTemplateId:
-    firstStepCreateCallValidationSchema.fields.proposalPdfTemplateId.optional(),
+  shortCode: firstStepCreateCallValidationSchemaFields.shortCode.optional(),
+  startCall: firstStepCreateCallValidationSchemaFields.startCall.optional(),
+  endCall: firstStepCreateCallValidationSchemaFields.endCall.optional(),
+  endCallInternal: firstStepCreateCallValidationSchemaFields.endCallInternal.optional(),
+  templateId: firstStepCreateCallValidationSchemaFields.templateId.optional(),
+  proposalWorkflowId: firstStepCreateCallValidationSchemaFields.proposalWorkflowId.optional(),
+  experimentWorkflowId: firstStepCreateCallValidationSchemaFields.experimentWorkflowId.optional(),
+  proposalPdfTemplateId: firstStepCreateCallValidationSchemaFields.proposalPdfTemplateId.optional(),
   experimentPdfTemplateId:
-    firstStepCreateCallValidationSchema.fields.experimentPdfTemplateId.optional(),
+    firstStepCreateCallValidationSchemaFields.experimentPdfTemplateId.optional(),
   // from second step
-  startReview: secondStepCallValidationSchema.fields.startReview.optional(),
-  endReview: secondStepCallValidationSchema.fields.endReview.optional(),
-  startFapReview:
-    secondStepCallValidationSchema.fields.startFapReview.optional(),
-  endFapReview: secondStepCallValidationSchema.fields.endFapReview.optional(),
+  startReview: secondStepCallValidationSchemaFields.startReview.optional(),
+  endReview: secondStepCallValidationSchemaFields.endReview.optional(),
+  startFapReview: secondStepCallValidationSchemaFields.startFapReview.optional(),
+  endFapReview: secondStepCallValidationSchemaFields.endFapReview.optional(),
   // from third step
-  startNotify: thirdStepCallValidationSchema.fields.startNotify.optional(),
-  endNotify: thirdStepCallValidationSchema.fields.endNotify.optional(),
-  startCycle: thirdStepCallValidationSchema.fields.startCycle.optional(),
-  endCycle: thirdStepCallValidationSchema.fields.endCycle.optional(),
-  cycleComment: thirdStepCallValidationSchema.fields.cycleComment.optional(),
+  startNotify: thirdStepCallValidationSchemaFields.startNotify.optional(),
+  endNotify: thirdStepCallValidationSchemaFields.endNotify.optional(),
+  startCycle: thirdStepCallValidationSchemaFields.startCycle.optional(),
+  endCycle: thirdStepCallValidationSchemaFields.endCycle.optional(),
+  cycleComment: thirdStepCallValidationSchemaFields.cycleComment.optional(),
 });
 
 export const assignInstrumentsToCallValidationSchema = Yup.object().shape({
-  callId: Yup.number().required("callId is required"),
-  instrumentIds: Yup.array(Yup.number())
-    .required("At least one instrumentId is required")
-    .min(1),
+  callId: Yup.number().required('callId is required'),
+  instrumentIds: Yup.array(Yup.number()).required('At least one instrumentId is required').min(1),
 });
 
-export const removeAssignedInstrumentFromCallValidationSchema =
-  Yup.object().shape({
-    callId: Yup.number().required("callId is required"),
-    instrumentId: Yup.number().required("instrumentId is required"),
-  });
+export const removeAssignedInstrumentFromCallValidationSchema = Yup.object().shape({
+  callId: Yup.number().required('callId is required'),
+  instrumentId: Yup.number().required('instrumentId is required'),
+});
 
 export const updateFapToCallInstrumentValidationSchema = Yup.object().shape({
-  callId: Yup.number().required("callId is required"),
-  instrumentId: Yup.number().required("instrumentId is required"),
+  callId: Yup.number().required('callId is required'),
+  instrumentId: Yup.number().required('instrumentId is required'),
   fapId: Yup.number(),
 });

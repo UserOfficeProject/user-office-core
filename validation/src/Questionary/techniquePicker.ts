@@ -1,15 +1,10 @@
 import * as Yup from 'yup';
-import { AnyObject } from 'yup/lib/types';
 
 export const techniquePickerValidationSchema = (field: any) => {
   const config = field.config;
 
   let schema:
-    | Yup.ArraySchema<
-        Yup.NumberSchema<number | null | undefined>,
-        AnyObject,
-        (number | undefined)[] | null | undefined
-      >
+    | Yup.ArraySchema<number[], Yup.AnyObject, '', ''>
     | Yup.NumberSchema<number | null | undefined>;
 
   if (config.isMultipleSelect) {
