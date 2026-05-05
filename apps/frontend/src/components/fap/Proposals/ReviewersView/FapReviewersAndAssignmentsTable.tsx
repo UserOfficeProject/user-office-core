@@ -48,11 +48,20 @@ type ReviewerAndProposals = {
 const FapReviewersAndAssignmentsTableColumns: Column<ReviewerAndProposals>[] = [
   {
     title: 'User',
-    field: 'user.name',
     cellStyle: {
       whiteSpace: 'nowrap',
     },
     render: (rowData) => getFullUserNameWithInstitution(rowData.user.user),
+    customSort(data1, data2, _, sortDirection) {
+      const name1 = getFullUserNameWithInstitution(data1.user.user);
+      const name2 = getFullUserNameWithInstitution(data2.user.user);
+
+      if (sortDirection === 'asc') {
+        return name1 < name2 ? -1 : 1;
+      } else {
+        return name1 > name2 ? -1 : 1;
+      }
+    },
   },
   {
     title: 'Role',

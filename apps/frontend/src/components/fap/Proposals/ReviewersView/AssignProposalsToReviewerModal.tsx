@@ -10,8 +10,18 @@ import { FapAssignedMember } from '../ProposalsView/AssignFapMemberToProposalMod
 
 const columns = [
   { title: 'Proposal ID', field: 'proposalId' },
-  { title: 'Proposal title', field: 'title' },
+  {
+    title: 'Proposal title',
+    field: 'title',
+    cellStyle: {
+      maxWidth: '400px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  },
   { title: 'Instrument', field: 'instrument' },
+  { title: 'Assigned Reviewers', field: 'numberOfReviewers' },
 ];
 
 type AssignProposalsToReviewerModalProps = {
@@ -54,6 +64,7 @@ const AssignProposalsToReviewerModal = ({
             proposalId: fapProposal.proposal.proposalId,
             title: fapProposal.proposal.title,
             instrument: fapProposal.instrument?.name || '-',
+            numberOfReviewers: fapProposal.assignments?.length,
           }))}
           options={{
             selection: true,
