@@ -61,7 +61,13 @@ function processAttributes(
     } else if (value instanceof Error) {
       attributes[key] = value.message;
     } else if (value !== undefined) {
-      attributes[key] = JSON.stringify(value);
+      try {
+        attributes[key] = JSON.stringify(value);
+      } catch {
+        throw new Error(
+          `Failed to convert JSON object to string for attribute "${key}".`
+        );
+      }
     }
   }
 
