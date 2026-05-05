@@ -362,11 +362,11 @@ context('visits tests', () => {
         .click();
 
       cy.get('[data-cy=save-and-continue-button]').click();
-      cy.contains(/invalid date/i).should('exist');
+      cy.contains(/Visit start date is required/i).should('exist');
 
       cy.contains(startQuestion).parent().click().clear().type('101010');
       cy.get('[data-cy=save-and-continue-button]').click();
-      cy.contains(/Invalid date/i).should('exist');
+      cy.contains(/Visit start date is required/i).should('exist');
 
       cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
       cy.contains(endQuestion).parent().find('input').clear().type(pastDate);

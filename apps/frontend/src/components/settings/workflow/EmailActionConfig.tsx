@@ -60,7 +60,12 @@ const EmailActionConfig = ({
       error = `${email} has already been added.`;
     }
 
-    if (!Yup.string().email().isValidSync(email)) {
+    if (
+      !Yup.string()
+        .email()
+        .matches(/^[^@]+@[^@]+\.[^@]+$/)
+        .isValidSync(email)
+    ) {
       error = `${email} is not a valid email address.`;
     }
 
