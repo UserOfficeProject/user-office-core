@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
@@ -20,7 +21,6 @@ import { RoleDataSource } from '../datasources/RoleDataSource';
 import { TagDataSource } from '../datasources/TagDataSource';
 import { AllocationTimeUnits } from '../models/Call';
 import { Roles } from '../models/Role';
-import { ProposalAuthorization } from './ProposalAuthorization';
 
 const proposalAuthorization = container.resolve(ProposalAuthorization);
 

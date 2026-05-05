@@ -240,8 +240,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
-    return database.transaction(async (trx) => {
-      return database
+    await database.transaction(async (trx) => {
+      await database
         .from('proposal_user')
         .where('proposal_pk', proposalPk)
         .del()
@@ -255,13 +255,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                 .transacting(trx)
             )
           );
-        })
-        .then(() => {
-          trx.commit;
-        })
-        .catch((error) => {
-          trx.rollback;
-          throw error; // re-throw
         });
     });
   }

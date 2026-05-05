@@ -9,12 +9,12 @@ import {
   Directive,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { Instrument as InstrumentOrigin } from '../../models/Instrument';
-import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Fap } from './Fap';
 import { Tag } from './Tag';
+import { ResolverContext } from '../../context';
+import { Instrument as InstrumentOrigin } from '../../models/Instrument';
+import { isRejection } from '../../models/Rejection';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
