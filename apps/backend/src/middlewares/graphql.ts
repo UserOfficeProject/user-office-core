@@ -4,15 +4,15 @@ import {
   ContextFunction,
 } from '@apollo/server';
 import {
-  ExpressContextFunctionArgument,
-  expressMiddleware,
-} from '@apollo/server/express4';
-import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
 } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
+import {
+  ExpressContextFunctionArgument,
+  expressMiddleware,
+} from '@as-integrations/express4';
 import { logger } from '@user-office-software/duo-logger';
 import { json } from 'body-parser';
 import cors from 'cors';
