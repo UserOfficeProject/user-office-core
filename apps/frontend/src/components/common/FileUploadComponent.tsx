@@ -296,7 +296,7 @@ export function NewFileEntry(props: {
               <ErrorIcon />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary="Error occurred" />
+          <ListItemText primary="Error Uploading File - Please contact support if this issue persists" />
           <ListItemSecondaryAction>
             <CancelIcon onClick={() => abort()} />
           </ListItemSecondaryAction>

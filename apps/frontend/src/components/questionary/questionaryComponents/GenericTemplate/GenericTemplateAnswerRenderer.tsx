@@ -72,7 +72,7 @@ const GenericTemplatesAnswerRenderer = ({
         fullWidth
         open={selectedGenericTemplateId !== null}
         onClose={() => setSelectedGenericTemplateId(null)}
-        title="GenericTemplate details"
+        title={answer.question.question}
       >
         <DialogContent dividers>
           {selectedGenericTemplateId ? (

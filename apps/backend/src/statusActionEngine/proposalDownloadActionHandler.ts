@@ -11,7 +11,7 @@ import {
 import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/FileDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
-import type { ProposalPDFData } from '../factory/pdf/proposal';
+import { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
