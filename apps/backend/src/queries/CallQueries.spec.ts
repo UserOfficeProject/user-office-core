@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import CallQueries from './CallQueries';
 import { dummyCall, dummyCalls } from '../datasources/mockups/CallDataSource';
 import {
   dummyUserWithRole,
   dummyInstrumentScientist,
 } from '../datasources/mockups/UserDataSource';
-import CallQueries from './CallQueries';
 
 const callQueries = container.resolve(CallQueries);
 

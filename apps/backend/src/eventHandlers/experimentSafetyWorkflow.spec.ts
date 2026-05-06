@@ -1,5 +1,8 @@
 import { container } from 'tsyringe';
 
+import createExperimentSafetyWorkflowHandler, {
+  handleWorkflowEngineChange,
+} from './experimentSafetyWorkflow';
 import { Tokens } from '../config/Tokens';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import * as eventBusModule from '../events';
@@ -7,9 +10,6 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import * as workflowEngineModule from '../workflowEngine/experiment';
 import { WorkflowEngineExperimentType } from '../workflowEngine/experiment';
-import createExperimentSafetyWorkflowHandler, {
-  handleWorkflowEngineChange,
-} from './experimentSafetyWorkflow';
 
 const mockPublish = jest.fn();
 

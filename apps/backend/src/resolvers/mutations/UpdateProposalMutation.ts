@@ -16,11 +16,11 @@ export class UpdateProposalArgs {
   @Field(() => Int)
   public proposalPk: number;
 
-  @Field(() => String, { nullable: true })
-  public title?: string;
+  @Field(() => String)
+  public title: string;
 
-  @Field(() => String, { nullable: true })
-  public abstract?: string;
+  @Field(() => String)
+  public abstract: string;
 
   @Field(() => [Int], { nullable: true })
   public users?: number[];

@@ -9,10 +9,10 @@ import {
   Root,
 } from 'type-graphql';
 
+import { InvitedProposal } from './Proposal';
 import { ResolverContext } from '../../context';
 import { Invite as InviteOrigin } from '../../models/Invite';
 import { Roles } from '../../models/Role';
-import { InvitedProposal } from './Proposal';
 
 @ObjectType()
 export class Invite implements Partial<InviteOrigin> {

@@ -8,10 +8,10 @@ import {
   Ctx,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { FapReviewer as FapReviewerBase } from '../../models/Fap';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Role } from './Role';
+import { ResolverContext } from '../../context';
+import { FapReviewer as FapReviewerBase } from '../../models/Fap';
 
 @ObjectType()
 export class FapReviewer implements Partial<FapReviewerBase> {

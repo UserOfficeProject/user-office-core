@@ -2,13 +2,13 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
+import { AgentTagsMetadataKey } from './AgentTags';
 import { Tokens } from '../config/Tokens';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { AgentTagsMetadataKey } from './AgentTags';
 
 export { AgentTags, AgentTagsMetadataKey } from './AgentTags';
 

@@ -4,6 +4,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -15,6 +16,7 @@ export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.RoleDataSource) public roleDataSource: RoleDataSource,
     @inject(Tokens.FapDataSource)
     public fapDataSource: FapDataSource
   ) {}
@@ -36,10 +38,12 @@ export default class CallQueries {
     if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
+    const userId = agent?.currentRole?.id;
     const calls = await this.dataSource.getCalls(
       filter,
       sortField,
-      sortDirection
+      sortDirection,
+      userId!
     );
 
     return calls;

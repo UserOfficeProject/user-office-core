@@ -11,6 +11,7 @@ jest.mock('@user-office-software/duo-logger', () => ({
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import UserQueries from './UserQueries';
 import {
   basicDummyUser,
   basicDummyUserNotOnProposal,
@@ -25,7 +26,6 @@ import {
   UserJWT,
 } from '../models/User';
 import { verifyToken } from '../utils/jwt';
-import UserQueries from './UserQueries';
 
 const userQueries = container.resolve(UserQueries);
 
