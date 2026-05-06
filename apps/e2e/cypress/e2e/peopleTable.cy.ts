@@ -140,6 +140,21 @@ context('PageTable component tests', () => {
           expect(firstTableRowTextAfterSorting).not.equal(element.text());
         });
     });
+
+    it('PeopleTable should allow search upon Enter', () => {
+      const user = initialDBData.users['user1'];
+      cy.login('officer');
+      cy.visit('/People');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="people-table"]').should('exist');
+
+      cy.get('[aria-label="people-search"]').type(user.lastName);
+      cy.get('[aria-label="people-search"]').type('Enter');
+      cy.get('[data-cy="people-table"]').find('li:first-child');
+      cy.contains(user.firstName);
+    });
   });
 
   describe('PeopleTable component allows swapping between PIs and CoIs', () => {

@@ -428,7 +428,7 @@ const PeopleTable = ({
               ></SearchIcon>
             </Tooltip>
             <TextField
-              id="standard-search"
+              id="people-search"
               label="Filter found users"
               type="search"
               variant="standard"
