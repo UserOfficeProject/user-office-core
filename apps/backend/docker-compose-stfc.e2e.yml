@@ -42,7 +42,7 @@ services:
       - SYS_ADMIN
 
   mockServer:
-    image: mockserver/mockserver:5.13.0
+    image: mockserver/mockserver:latest
     command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080
