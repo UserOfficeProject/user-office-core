@@ -48,7 +48,7 @@ import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/Vi
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { eliEmailHandler } from '../eventHandlers/email/eliEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
+import { MSGraphMailService } from '../eventHandlers/MailService/MSGraph/MSGraphMailService';
 import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
@@ -127,7 +127,7 @@ mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
-mapClass(Tokens.MailService, SMTPMailService);
+mapClass(Tokens.MailService, MSGraphMailService);
 
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
