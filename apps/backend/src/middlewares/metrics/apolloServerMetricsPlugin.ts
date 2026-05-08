@@ -4,6 +4,7 @@ import {
   GraphQLRequestContext,
   GraphQLRequestContextWillSendResponse,
 } from '@apollo/server';
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { Counter, Histogram } from 'prom-client';
 
@@ -53,12 +54,19 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
     const operationType = getOperationType(request.query);
     const clientName =
       request.http?.headers.get('apollographql-client-name') || 'unknown';
+    let apiClient = 'unknown';
+    if (clientName.startsWith('UOP frontend')) {
+      logger.logInfo('GraphQL request received', {
+        client: clientName,
+        operation: operationName,
+      });
+    } else apiClient = clientName;
 
     const labels: MetricLabels = {
       operation: operationName,
       operation_type: operationType,
       status: 'success',
-      client_name: clientName,
+      client_name: apiClient,
     };
 
     const end = graphqlRequestDuration.startTimer(labels);
