@@ -1,5 +1,6 @@
 import { ExitToApp, ManageAccounts } from '@mui/icons-material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
@@ -60,6 +61,10 @@ const AccountActionButton = () => {
     SettingsId.PROFILE_PAGE_LINK
   )?.settingsValue;
 
+  const externalHomepageURL = settingsContext.settingsMap.get(
+    SettingsId.EXTERNAL_AUTH_HOMEPAGE_URL
+  )?.settingsValue;
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -83,6 +88,13 @@ const AccountActionButton = () => {
       window.open(externalProfileLink, '_blank', 'noopener,noreferrer');
     } else {
       navigate(`/ProfilePage/${user.id}`);
+    }
+  };
+
+  const handleExternalHomepageClick = () => {
+    handleClose();
+    if (externalHomepageURL) {
+      window.open(externalHomepageURL, '_self');
     }
   };
 
@@ -207,6 +219,17 @@ const AccountActionButton = () => {
               >
                 Un-impersonate
               </ImpersonateButton>
+            </MenuItem>
+          )}
+          {externalHomepageURL && (
+            <MenuItem
+              onClick={handleExternalHomepageClick}
+              data-cy="external-homepage-button"
+            >
+              <Box paddingRight={1} paddingTop={1}>
+                <HomeOutlinedIcon />
+              </Box>
+              Facilities Homepage
             </MenuItem>
           )}
           <MenuItem
