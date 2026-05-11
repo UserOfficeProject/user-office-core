@@ -10,11 +10,11 @@ import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import i18n from 'i18n';
-import { useCallback, ReactElement } from 'react';
-import React, { useState } from 'react';
+import React, { useCallback, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -22,8 +22,11 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
   UpdateCallInput,
   AssignInstrumentsToCallMutation,
+  PaginationSortDirection,
+  InstrumentWithAvailabilityTime,
+  UserRole,
+  Call,
 } from 'generated/sdk';
-import { InstrumentWithAvailabilityTime, UserRole, Call } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -36,7 +39,6 @@ import withConfirm from 'utils/withConfirm';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CallReorder from './CallOrderEditor';
-// eslint-disable-next-line import/order
 import CallStatusFilter, {
   CallStatus,
   CallStatusFilters,
@@ -114,6 +116,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     calls,
     setCallsWithLoading: setCalls,
     setCallsFilter,
+    setCallsQueryParams,
   } = useCallsData(
     {
       ...getFilterStatus(
@@ -121,6 +124,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
         isArchivedTab
       ),
     },
+    {},
     CallsDataQuantity.EXTENDED
   );
 
@@ -250,7 +254,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       setCalls(newObjectsArray);
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -349,7 +353,11 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       result.source.index,
       result.destination.index
     );
-    setCalls(callsWithUpdatedOrder);
+    setCalls(
+      callsWithUpdatedOrder.sort((a, b) =>
+        a.sort_order > b.sort_order ? -1 : 1
+      )
+    );
     const callOrderList = callsWithUpdatedOrder.map((item, index) => ({
       callId: item.id,
       sort_order: index,
@@ -358,6 +366,18 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     api().updateCallOrder({
       data: callOrderList,
     });
+  };
+
+  const getCallOrder = (): void => {
+    setCallsFilter(() => ({
+      ...getFilterStatus(callStatus as CallStatusFilters, isArchivedTab),
+    }));
+
+    setCallsQueryParams((prevQueryParams) => ({
+      ...prevQueryParams,
+      sortField: 'sort_order',
+      sortDirection: PaginationSortDirection.ASC,
+    }));
   };
 
   return (
@@ -381,7 +401,12 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
             control={
               <Switch
                 checked={isCallReorderMode}
-                onChange={(): void => setIsCallReorderMode(!isCallReorderMode)}
+                onChange={(): void => {
+                  if (!isCallReorderMode) {
+                    getCallOrder();
+                  }
+                  setIsCallReorderMode(!isCallReorderMode);
+                }}
               />
             }
             label="Order calls mode"
@@ -395,12 +420,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
             Drag to order calls
           </Typography>
           <Paper>
-            <CallReorder
-              items={calls.sort((a, b) =>
-                a.sort_order > b.sort_order ? 1 : -1
-              )}
-              onDragEnd={onDragEnd}
-            />
+            <CallReorder items={calls} onDragEnd={onDragEnd} />
           </Paper>
         </div>
       )}

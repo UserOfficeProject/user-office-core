@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Tag } from '../../models/Tag';
 import { Workflow } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
@@ -13,6 +14,7 @@ import {
   CallOrderInput,
   CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
@@ -24,7 +26,13 @@ import {
   createCallObject,
   ProposalRecord,
   WorkflowRecord,
+  createTagObject,
 } from './records';
+
+const fieldMap: { [key: string]: string } = {
+  sort_order: 'sort_order',
+  call_id: 'call.call_id',
+};
 
 export default class PostgresCallDataSource implements CallDataSource {
   async delete(id: number): Promise<Call> {
@@ -46,11 +54,52 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+  async getTagsByRoleId(roleId: number): Promise<Tag[]> {
+    try {
+      const rows = await database
+        .select('t.tag_id', 't.name')
+        .from('roles_has_tags as rht')
+        .join('tag as t', 't.tag_id', 'rht.tag_id')
+        .where('rht.role_id', roleId);
+
+      return rows.map(createTagObject);
+    } catch (error) {
+      logger.logError('Failed to get tags by role id', {
+        roleId,
+      });
+      throw error;
+    }
+  }
+
+  async getCalls(
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection,
+    agentId?: number
+  ): Promise<Call[]> {
     const query = database('call').select([
       '*',
       'call.description as description',
     ]);
+
+    const tags = agentId ? (await this.getTagsByRoleId(agentId)) ?? [] : [];
+
+    if (tags.length != 0) {
+      const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const calls = await database<CallRecord>('call as c')
+          .join('tag_call as tc', 'c.call_id', 'tc.call_id')
+          .whereIn('tc.tag_id', tagIds)
+          .select('c.*');
+
+        return calls.map(createCallObject);
+      } else {
+        const calls = await database<CallRecord>('call as c').select('c.*');
+
+        return calls.map(createCallObject);
+      }
+    }
+
     if (filter?.shortCode) {
       query.where('call_short_code', 'like', `%${filter.shortCode}%`);
     }
@@ -175,6 +224,13 @@ export default class PostgresCallDataSource implements CallDataSource {
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
+    if (sortField && sortDirection) {
+      if (!fieldMap.hasOwnProperty(sortField)) {
+        throw new GraphQLError(`Bad sort field given: ${sortField}`);
+      }
+      sortField = fieldMap[sortField];
+      query.orderBy(sortField, sortDirection);
+    }
 
     return query.then((callDB: CallRecord[]) => {
       return callDB.map((call) => createCallObject(call));
@@ -217,7 +273,6 @@ export default class PostgresCallDataSource implements CallDataSource {
             end_cycle: args.endCycle,
             cycle_comment: args.cycleComment,
             submission_message: args.submissionMessage,
-            survey_comment: args.surveyComment,
             reference_number_format: args.referenceNumberFormat,
             proposal_sequence: args.proposalSequence,
             proposal_workflow_id: args.proposalWorkflowId,
@@ -390,7 +445,6 @@ export default class PostgresCallDataSource implements CallDataSource {
               end_cycle: args.endCycle,
               cycle_comment: args.cycleComment,
               submission_message: args.submissionMessage,
-              survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               experiment_workflow_id: args.experimentWorkflowId,
               call_ended: determineCallEndedFlag(
@@ -439,7 +493,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
   async setNewSortOrder(data: CallOrderArray): Promise<number> {
     return await database
-      .update({ sort_order: data.sort_order })
+      .update({ sort_order: data.sort_order + 1 })
       .from('call')
       .where({ call_id: data.callId });
   }
@@ -622,5 +676,16 @@ export default class PostgresCallDataSource implements CallDataSource {
           ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
+  }
+
+  async getCallsOfFaps(fapIds: number[]): Promise<Call[]> {
+    return database
+      .distinct('call.*')
+      .from('call')
+      .join('call_has_faps as chf', 'chf.call_id', 'call.call_id')
+      .whereIn('chf.fap_id', fapIds)
+      .then((calls: CallRecord[]) => {
+        return calls.map((call) => createCallObject(call));
+      });
   }
 }

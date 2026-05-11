@@ -277,4 +277,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
+
+  getInstrumentsByFapIds(fapId: number[]): Promise<Instrument[]> {
+    throw new Error('Method not implemented.');
+  }
 }

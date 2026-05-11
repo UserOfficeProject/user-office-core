@@ -11,6 +11,7 @@ import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
+import { EmailTemplateDataSourceMock } from '../datasources/mockups/EmailTemplateDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
@@ -28,6 +29,7 @@ import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/Propos
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
+import { RoleDataSourceMock } from '../datasources/mockups/RoleDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
@@ -55,6 +57,7 @@ import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+mapClass(Tokens.RoleDataSource, RoleDataSourceMock);
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
 mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);
@@ -104,6 +107,7 @@ mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 mapClass(Tokens.TagDataSource, TagDataSourceMock);
+mapClass(Tokens.EmailTemplateDataSource, EmailTemplateDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);

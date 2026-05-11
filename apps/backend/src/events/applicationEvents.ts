@@ -1,4 +1,6 @@
+import { Event } from './event.enum';
 import { Call } from '../models/Call';
+import { EmailTemplate } from '../models/EmailTemplate';
 import { ExperimentSafety } from '../models/Experiment';
 import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
@@ -14,7 +16,6 @@ import { Technique } from '../models/Technique';
 import { User } from '../models/User';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
-import { Event } from './event.enum';
 
 export interface GeneralEvent {
   type: Event;
@@ -451,6 +452,25 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   experimentsafety: ExperimentSafety;
 }
 
+interface ExperimentESFSubmittedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_ESF_SUBMITTED;
+  experimentsafety: ExperimentSafety;
+}
+interface EmailTemplateCreatedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_CREATED;
+  emailtemplate: EmailTemplate;
+}
+
+interface EmailTemplateUpdatedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_UPDATED;
+  emailtemplate: EmailTemplate;
+}
+
+interface EmailTemplateDeletedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_DELETED;
+  emailtemplate: EmailTemplate;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -535,4 +555,8 @@ export type ApplicationEvent =
   | ExperimentSafetyManagementDecisionSubmittedByISEvent
   | ExperimentSafetyManagementDecisionSubmittedByESREvent
   | ExperimentSafetyStatusChangedByWorkflowEvent
-  | ExperimentSafetyStatusChangedByUserEvent;
+  | ExperimentSafetyStatusChangedByUserEvent
+  | ExperimentESFSubmittedEvent
+  | EmailTemplateCreatedEvent
+  | EmailTemplateUpdatedEvent
+  | EmailTemplateDeletedEvent;

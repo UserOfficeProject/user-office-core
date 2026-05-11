@@ -1,0 +1,33 @@
+{
+  "name": "@user-office-software/duo-validation",
+  "version": "1.0.0",
+  "description": "User office frontend and backend validation in one place.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "clean": "rm -rf ./lib",
+    "build": "npm run clean && tsc -p ./tsconfig.json",
+    "test": "jest --config jestconfig.json"
+  },
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "luxon": "^3.7.2",
+    "sanitize-html": "^2.7.1",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "ts-jest": "^29.1.1",
+    "@types/luxon": "^3.7.1",
+    "@types/sanitize-html": "^2.3.2",
+    "@types/jest": "^29.5.6"
+  },
+  "engines": {
+    "npm": ">=10.9.2",
+    "node": ">=22.0.0"
+  }
+}

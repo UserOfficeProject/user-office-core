@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -213,7 +213,7 @@ function QuestionaryStepView(props: {
       });
 
       setLastSavedFormValues(initialValues);
-    } catch (error) {
+    } catch {
       return false;
     } finally {
       setIsSaving(false);
@@ -258,7 +258,24 @@ function QuestionaryStepView(props: {
     )();
   };
 
-  const saveHandler = () => performSave(true);
+  const validateProposalBasisFields = (
+    formikProps: FormikProps<Record<string, unknown>>
+  ): boolean => {
+    const proposal = (state as ProposalSubmissionState)?.proposal;
+    if (proposal === undefined) {
+      return true;
+    }
+
+    const missingTitle = !proposal.title?.trim();
+    const missingAbstract = !proposal.abstract?.trim();
+
+    if (missingTitle)
+      formikProps.setFieldTouched('proposal_basis.title', true, true);
+    if (missingAbstract)
+      formikProps.setFieldTouched('proposal_basis.abstract', true, true);
+
+    return !missingTitle && !missingAbstract;
+  };
 
   if (state === null || !questionaryStep) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -280,6 +297,18 @@ function QuestionaryStepView(props: {
     >
       {(formikProps) => {
         const { submitForm, setFieldValue, isSubmitting } = formikProps;
+
+        const saveHandler = async () => {
+          /*
+           * The title and abstract are non-nullable and should always be validated - even when
+           * using the save button to do a partial save that doesn't validate other questions.
+           */
+          if (!validateProposalBasisFields(formikProps)) {
+            return;
+          }
+
+          performSave(true);
+        };
 
         return (
           <form

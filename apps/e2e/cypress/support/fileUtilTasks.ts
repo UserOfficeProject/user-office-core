@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-import fetch from 'cross-fetch';
 import pdf from 'pdf-parse';
 import * as xlsx from 'xlsx';
 
@@ -68,7 +67,7 @@ export const readPdf = (pathToPdf: string) => {
 };
 
 export const unzip = (args: { source: string; destination: string }) => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const AdmZip = require('adm-zip');
   const zip = new AdmZip(args.source);
   zip.extractAllTo(args.destination);

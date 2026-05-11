@@ -22,6 +22,7 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { TagDataSource } from '../TagDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
@@ -103,7 +104,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     @inject(Tokens.WorkflowDataSource)
     private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
-    private AdminDataSource: AdminDataSource
+    private AdminDataSource: AdminDataSource,
+    @inject(Tokens.TagDataSource)
+    private tagDataSource: TagDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -237,8 +240,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
-    return database.transaction(async (trx) => {
-      return database
+    await database.transaction(async (trx) => {
+      await database
         .from('proposal_user')
         .where('proposal_pk', proposalPk)
         .del()
@@ -252,13 +255,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                 .transacting(trx)
             )
           );
-        })
-        .then(() => {
-          trx.commit;
-        })
-        .catch((error) => {
-          trx.rollback;
-          throw error; // re-throw
         });
     });
   }
@@ -379,6 +375,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return query;
   }
 
+  private async resolveTagConstraints(tags: number[]): Promise<{
+    instrumentIds: number[];
+    callIds: number[];
+  }> {
+    const [instruments, calls] = await Promise.all([
+      this.tagDataSource.getTagInstruments(tags),
+      this.tagDataSource.getTagCalls(tags),
+    ]);
+
+    const instrumentIds = [...new Set(instruments.map((i) => i.id))];
+    const callIds = [...new Set(calls.map((c) => c.id))];
+
+    return { instrumentIds, callIds };
+  }
+
   async getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -386,11 +397,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     sortField?: string,
     sortDirection?: PaginationSortDirection,
     searchText?: string,
-    principleInvestigator?: number[]
+    principleInvestigator?: number[],
+    tags?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
-    const principalInvestigator = principleInvestigator
-      ? principleInvestigator
-      : [];
+    const principalInvestigator = principleInvestigator ?? [];
+
+    let instrumentFilter: number[] | undefined;
+    let callFilter: number[] | undefined;
+
+    if (tags) {
+      const { instrumentIds, callIds } = await this.resolveTagConstraints(tags);
+      instrumentFilter = instrumentIds;
+      callFilter = callIds;
+    }
 
     return database
       .select([
@@ -419,14 +438,39 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposal_table_view.principal_investigator'
       )
       .modify((query) => {
-        if (filter?.callId) {
-          query.where('call_id', filter?.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
+        }
+
+        // If either instrumentFilter (ids) or callFilter is provided,
+        // return proposals that match any instrument id OR any call id.
+        if (instrumentFilter || callFilter) {
+          query.andWhere(function () {
+            if (instrumentFilter) {
+              instrumentFilter.forEach((inst) => {
+                this.orWhereRaw(
+                  'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+                  { instrumentId: inst }
+                );
+              });
+            }
+
+            if (callFilter) {
+              this.orWhereIn('call_id', callFilter);
+            }
+          });
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
         } else if (filter?.instrumentFilter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
             { instrumentId: filter.instrumentFilter.instrumentId }
@@ -456,19 +500,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
+          const trimmedSearchText = searchText.trim();
           query.andWhere((qb) =>
             qb
-              .orWhereRaw('proposal_id ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('title ILIKE ?', [`%${searchText}%`])
-              .orWhereRaw('proposal_status_name ILIKE ?', [`%${searchText}%`])
-              .orWhere('users.email', 'ilike', `%${searchText}%`)
-              .orWhere('users.firstname', 'ilike', `%${searchText}%`)
-              .orWhere('users.lastname', 'ilike', `%${searchText}%`)
+              .orWhereRaw('proposal_id ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('title ILIKE ?', [`%${trimmedSearchText}%`])
+              .orWhereRaw('proposal_status_name ILIKE ?', [
+                `%${trimmedSearchText}%`,
+              ])
+              .orWhere('users.email', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.firstname', 'ilike', `%${trimmedSearchText}%`)
+              .orWhere('users.lastname', 'ilike', `%${trimmedSearchText}%`)
               .orWhere('principal_investigator', 'in', principalInvestigator)
               .orWhereJsonFieldLikeEscaped(
                 'instruments',
                 'name',
-                `${searchText}`
+                `${trimmedSearchText}`
               )
           );
         }
@@ -506,13 +553,45 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async getProposals(
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    tags?: number[]
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
+    const { instrumentIds, callIds } = tags
+      ? await this.resolveTagConstraints(tags)
+      : { instrumentIds: [], callIds: [] };
+
     return database
       .select(['proposals.*', database.raw('count(*) OVER() AS full_count')])
       .from('proposals')
       .orderBy('proposals.proposal_pk', 'desc')
       .modify((query) => {
+        if (tags) {
+          query.andWhere((qb) => {
+            if (instrumentIds.length > 0) {
+              qb.orWhereExists((subQuery) => {
+                subQuery
+                  .select('*')
+                  .from('instrument_has_proposals')
+                  .whereRaw(
+                    'instrument_has_proposals.proposal_pk = proposals.proposal_pk'
+                  )
+                  .whereIn(
+                    'instrument_has_proposals.instrument_id',
+                    instrumentIds
+                  );
+              });
+            }
+            if (callIds.length > 0) {
+              qb.orWhereIn('proposals.call_id', callIds);
+            }
+
+            if (instrumentIds.length === 0 && callIds.length === 0) {
+              // If there are no instruments or calls, we should not see any proposals
+              qb.whereRaw('1=0');
+            }
+          });
+        }
+
         if (filter?.text) {
           query
             .where('title', 'ilike', `%${filter.text}%`)
@@ -522,8 +601,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.questionaryIds) {
           query.whereIn('proposals.questionary_id', filter.questionaryIds);
         }
-        if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('proposals.call_id', callIdsToFilter);
         }
 
         if (filter?.instrumentId) {
@@ -653,8 +739,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               )
           );
         }
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
@@ -1150,8 +1243,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
 
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
+        const callIdsToFilter = Array.from(
+          new Set([
+            ...(filter?.callIds || []),
+            ...(filter?.callId ? [filter.callId] : []),
+          ])
+        );
+
+        if (callIdsToFilter.length > 0) {
+          query.whereIn('call_id', callIdsToFilter);
         }
 
         if (filter?.proposalStatusId) {

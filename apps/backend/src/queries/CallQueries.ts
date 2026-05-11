@@ -3,16 +3,22 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { FapDataSource } from '../datasources/FapDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CallsFilter } from '../resolvers/queries/CallsQuery';
+import { PaginationSortDirection } from '../utils/pagination';
 
 @injectable()
 export default class CallQueries {
   constructor(
     @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.RoleDataSource) public roleDataSource: RoleDataSource,
+    @inject(Tokens.FapDataSource)
+    public fapDataSource: FapDataSource
   ) {}
 
   @Authorized()
@@ -23,11 +29,22 @@ export default class CallQueries {
   }
 
   @Authorized()
-  async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
+  async getAll(
+    agent: UserWithRole | null,
+    filter?: CallsFilter,
+    sortField?: string,
+    sortDirection?: PaginationSortDirection
+  ) {
     if (filter?.isActiveInternal && !agent?.isInternalUser) {
       delete filter?.isActiveInternal;
     }
-    const calls = await this.dataSource.getCalls(filter);
+    const userId = agent?.currentRole?.id;
+    const calls = await this.dataSource.getCalls(
+      filter,
+      sortField,
+      sortDirection,
+      userId!
+    );
 
     return calls;
   }
@@ -56,5 +73,19 @@ export default class CallQueries {
   @Authorized()
   async getCallOfAnswersProposal(user: UserWithRole | null, answerId: number) {
     return this.dataSource.getCallByAnswerIdProposal(answerId);
+  }
+
+  @Authorized([Roles.FAP_REVIEWER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getCallsOfReviewer(agent: UserWithRole | null) {
+    if (!agent || !agent.id || !agent.currentRole) {
+      return [];
+    }
+
+    const faps = await this.fapDataSource.getUserFapsByRoleAndFapId(
+      agent.id,
+      agent.currentRole
+    );
+
+    return this.dataSource.getCallsOfFaps(faps.map((fap) => fap.id));
   }
 }

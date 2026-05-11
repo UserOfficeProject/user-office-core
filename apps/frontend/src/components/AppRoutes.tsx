@@ -1,7 +1,8 @@
-import i18n from 'i18n';
 import React, { lazy, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -9,6 +10,7 @@ import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
+import RoleManagement from './admin/RoleManagement';
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
@@ -117,6 +119,7 @@ const ImportUnitsPage = lazy(() => import('./unit/ImportUnitsPage'));
 const PeoplePage = lazy(() => import('./user/PeoplePage'));
 const ProfilePage = lazy(() => import('./user/ProfilePage'));
 const UserPage = lazy(() => import('./user/UserPage'));
+const EmailTemplatePage = lazy(() => import('./template/EmailTemplatePage'));
 
 const PrivateOutlet = () => (
   <UserContext.Consumer>
@@ -126,7 +129,7 @@ const PrivateOutlet = () => (
         const redirectPath = queryParams.size
           ? `${pathName}?${queryParams.toString()}`
           : pathName;
-        localStorage.redirectPath = redirectPath;
+        localStorage.setItem('redirectPath', redirectPath);
 
         return <Navigate to="/external-auth" />;
       }
@@ -144,6 +147,7 @@ const AppRoutes = () => {
   const { t } = useTranslation();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isUser = useCheckAccess([UserRole.USER]);
+  const isProposalReader = useCheckAccess([UserRole.PROPOSAL_READER]);
   const isExperimentSafetyReviewer = useCheckAccess([
     UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
@@ -226,6 +230,14 @@ const AppRoutes = () => {
             element={<TitledRoute title="People" element={<PeoplePage />} />}
           />
         )}
+
+        <Route
+          path="/admin/roles"
+          element={
+            <TitledRoute title="Role creation" element={<RoleManagement />} />
+          }
+        />
+
         <Route
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
@@ -255,7 +267,7 @@ const AppRoutes = () => {
         {isTagsEnabled && isUserOfficer && (
           <Route
             path="/Tag"
-            element={<TitledRoute title="Tag" element={<TagPage />} />}
+            element={<TitledRoute title="Tags" element={<TagPage />} />}
           />
         )}
         <Route
@@ -454,6 +466,15 @@ const AppRoutes = () => {
             <TitledRoute
               title="Shipment Templates"
               element={<ShipmentTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/EmailTemplates"
+          element={
+            <TitledRoute
+              title="Email Templates"
+              element={<EmailTemplatePage />}
             />
           }
         />
@@ -685,6 +706,11 @@ const AppRoutes = () => {
           }
         />
         {isUserOfficer ? (
+          <Route
+            path="/"
+            element={<TitledRoute title="" element={<ProposalPage />} />}
+          />
+        ) : isProposalReader ? (
           <Route
             path="/"
             element={<TitledRoute title="" element={<ProposalPage />} />}

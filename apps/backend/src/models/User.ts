@@ -24,7 +24,7 @@ export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
 export class User {
   constructor(
     public id: number,
-    public user_title: string,
+    public userTitle: string,
     public firstname: string,
     public lastname: string,
     public preferredname: string | undefined,
@@ -58,6 +58,7 @@ export enum UserRole {
   INSTRUMENT_SCIENTIST,
   EXPERIMENT_SAFETY_REVIEWER,
   INTERNAL_REVIEWER,
+  PROPOSAL_READER,
 }
 
 export const UserRoleShortCodeMap = {
@@ -69,6 +70,7 @@ export const UserRoleShortCodeMap = {
   [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
   [UserRole.EXPERIMENT_SAFETY_REVIEWER]: Roles.EXPERIMENT_SAFETY_REVIEWER,
   [UserRole.INTERNAL_REVIEWER]: Roles.INTERNAL_REVIEWER,
+  [UserRole.PROPOSAL_READER]: Roles.PROPOSAL_READER,
 } as const;
 
 export class BasicUserDetails {
@@ -82,8 +84,8 @@ export class BasicUserDetails {
     public created: Date,
     public email: string,
     public country: string,
-    public user_title: string,
-    public oidc_sub: string | null
+    public userTitle: string,
+    public oidcSub: string | null
   ) {}
 }
 

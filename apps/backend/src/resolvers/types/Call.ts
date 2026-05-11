@@ -10,14 +10,14 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
-import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { Tag } from './Tag';
 import { Template } from './Template';
 import { Workflow } from './Workflow';
+import { ResolverContext } from '../../context';
+import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
+import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -69,9 +69,6 @@ export class Call implements Partial<CallOrigin> {
 
   @Field()
   public cycleComment: string;
-
-  @Field()
-  public surveyComment: string;
 
   @Field({ nullable: true })
   public submissionMessage: string;

@@ -7,6 +7,7 @@ import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import DataAccessUsersMutations from './mutations/DataAccessUsersMutations';
+import EmailTemplateMutations from './mutations/EmailTemplateMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
 import ExperimentSafetyPdfTemplateMutations from './mutations/ExperimentSafetyPdfTemplateMutations';
 import FapMutations from './mutations/FapMutations';
@@ -21,6 +22,8 @@ import ProposalMutations from './mutations/ProposalMutations';
 import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import RoleMutations from './mutations/RoleMutations';
+import RoleTagsMutation from './mutations/RoleTagsMutation';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
@@ -35,6 +38,7 @@ import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import DataAccessUsersQueries from './queries/DataAccessUsersQueries';
+import EmailTemplateQueries from './queries/EmailTemplateQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
 import ExperimentSafetyPdfTemplateQueries from './queries/ExperimentSafetyPdfTemplateQueries';
@@ -50,6 +54,7 @@ import ProposalPdfTemplateQueries from './queries/ProposalPdfTemplateQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
+import RoleTagsQuery from './queries/RoleTagsQuery';
 import SampleQueries from './queries/SampleQueries';
 import SettingsQueries from './queries/SettingsQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
@@ -103,6 +108,8 @@ const context: BasicResolverContext = {
     settings: container.resolve(SettingsQueries),
     tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
+    emailTemplate: container.resolve(EmailTemplateQueries),
+    roleTags: container.resolve(RoleTagsQuery),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -135,6 +142,9 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowMutations),
     tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
+    roleTags: container.resolve(RoleTagsMutation),
+    role: container.resolve(RoleMutations),
+    emailTemplate: container.resolve(EmailTemplateMutations),
   },
   clients: {
     scheduler: async () => {

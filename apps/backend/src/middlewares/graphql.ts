@@ -4,15 +4,15 @@ import {
   ContextFunction,
 } from '@apollo/server';
 import {
-  ExpressContextFunctionArgument,
-  expressMiddleware,
-} from '@apollo/server/express4';
-import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
 } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
+import {
+  ExpressContextFunctionArgument,
+  expressMiddleware,
+} from '@as-integrations/express4';
 import { logger } from '@user-office-software/duo-logger';
 import { json } from 'body-parser';
 import cors from 'cors';
@@ -24,6 +24,7 @@ import { container } from 'tsyringe';
 import 'reflect-metadata';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
+import initGraphQLClient from './graphqlClient';
 import { Tokens } from '../config/Tokens';
 import { ResolverContext } from '../context';
 import { UserWithRole } from '../models/User';
@@ -31,7 +32,6 @@ import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import { isProduction } from '../utils/helperFunctions';
-import initGraphQLClient from './graphqlClient';
 import { apolloServerMetricsPlugin } from './metrics/apolloServerMetricsPlugin';
 
 export const context: ContextFunction<
@@ -192,6 +192,9 @@ const apolloServer = async (app: Express) => {
         },
       })
     );
+  }
+
+  if (process.env.INCLUDE_USER_NUMBER_IN_METRICS) {
     app.use((req, res, next) => {
       const clientName = req.headers['apollographql-client-name'];
       if (

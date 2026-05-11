@@ -1,6 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { ProposalPdfTemplateRecord } from 'knex/types/tables';
 
 import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { UpdateProposalPdfTemplateArgs } from '../../resolvers/mutations/UpdateProposalPdfTemplateMutation';
@@ -10,7 +9,10 @@ import {
   ProposalPdfTemplateDataSource,
 } from '../ProposalPdfTemplateDataSource';
 import database from './database';
-import { createProposalPdfTemplateObject } from './records';
+import {
+  createProposalPdfTemplateObject,
+  ProposalPdfTemplateRecord,
+} from './records';
 
 export default class PostgresProposalPdfTemplateDataSource
   implements ProposalPdfTemplateDataSource

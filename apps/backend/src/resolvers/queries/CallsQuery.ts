@@ -1,6 +1,17 @@
-import { Ctx, Field, InputType, Int, Query, Resolver, Arg } from 'type-graphql';
+import {
+  Ctx,
+  Field,
+  InputType,
+  Int,
+  Query,
+  Resolver,
+  Arg,
+  ArgsType,
+  Args,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { Call } from '../types/Call';
 
 @InputType()
@@ -60,14 +71,28 @@ export class CallsFilter {
   public isCallUpcoming?: boolean;
 }
 
+@ArgsType()
+export class CallsArgs {
+  @Field(() => CallsFilter, { nullable: true })
+  filter?: CallsFilter;
+
+  @Field({ nullable: true })
+  public sortField?: string;
+
+  @Field(() => PaginationSortDirection, { nullable: true })
+  public sortDirection?: PaginationSortDirection;
+}
+
 @Resolver()
 export class CallsQuery {
   @Query(() => [Call], { nullable: true })
-  calls(
-    @Ctx() context: ResolverContext,
-    @Arg('filter', () => CallsFilter, { nullable: true }) filter: CallsFilter
-  ) {
-    return context.queries.call.getAll(context.user, filter);
+  calls(@Ctx() context: ResolverContext, @Args() args: CallsArgs) {
+    return context.queries.call.getAll(
+      context.user,
+      args.filter,
+      args.sortField,
+      args.sortDirection
+    );
   }
 
   @Query(() => [Call], { nullable: true })
@@ -79,5 +104,10 @@ export class CallsQuery {
       context.user,
       scientistId
     );
+  }
+
+  @Query(() => [Call], { nullable: true })
+  callsOfReviewer(@Ctx() context: ResolverContext) {
+    return context.queries.call.getCallsOfReviewer(context.user);
   }
 }

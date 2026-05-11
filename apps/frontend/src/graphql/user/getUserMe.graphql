@@ -1,6 +1,6 @@
 query getUserMe {
   me {
-    user_title
+    userTitle
     firstname
     lastname
     preferredname

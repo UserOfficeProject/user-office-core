@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ProposalQueries from './ProposalQueries';
 import { Tokens } from '../config/Tokens';
 import {
   dummyProposal,
@@ -18,7 +19,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { omit } from '../utils/helperFunctions';
-import ProposalQueries from './ProposalQueries';
 
 const proposalQueries = container.resolve(ProposalQueries);
 
@@ -95,4 +95,40 @@ test('A scientist can get proposal scientist comment', () => {
       dummyProposalInternalCommentOne.commentId
     )
   ).resolves.toBe(dummyProposalInternalCommentOne);
+});
+
+test('Whitespace does not stop user-officer role viewing proposal', () => {
+  const proposalDataSourceMock = container.resolve<ProposalDataSourceMock>(
+    Tokens.ProposalDataSource
+  );
+
+  const spy = jest
+    .spyOn(proposalDataSourceMock, 'getProposalsFromView')
+    .mockResolvedValue({ totalCount: 0, proposalViews: [] });
+
+  return expect(
+    proposalQueries.getAllView(
+      dummyUserOfficerWithRole,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      ' shortCode '
+    )
+  )
+    .resolves.toEqual({ totalCount: 0, proposalViews: [] })
+
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'shortCode',
+        undefined,
+        undefined
+      );
+    });
 });

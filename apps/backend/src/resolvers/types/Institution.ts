@@ -8,9 +8,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Entry } from './Entry';
 import { ResolverContext } from '../../context';
 import { Institution as InstitutionOrigin } from '../../models/Institution';
-import { Entry } from './Entry';
 
 @ObjectType()
 export class Institution implements Partial<InstitutionOrigin> {
@@ -31,6 +31,10 @@ export class InstitutionResolver {
     @Root() institution: InstitutionOrigin,
     @Ctx() context: ResolverContext
   ): Promise<Entry | null> {
+    if (institution.country === null) {
+      return null;
+    }
+
     return context.queries.admin.getCountry(institution.country);
   }
 }

@@ -4,12 +4,18 @@ import {
   FapReviewer,
   FapProposal,
   FapProposalWithReviewGradesAndRanking,
+  FapReviewVisibility,
+  ReviewVisibility,
 } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { Review, ReviewStatus } from '../models/Review';
 import { Role, Roles } from '../models/Role';
 import { BasicUserDetails } from '../models/User';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from './postgres/records';
 import {
   UpdateMemberFapArgs,
   AssignReviewersToFapArgs,
@@ -18,10 +24,6 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
-import {
-  FapReviewsRecord,
-  AssignProposalsToFapsInput,
-} from './postgres/records';
 
 export interface FapDataSource {
   create(
@@ -30,7 +32,8 @@ export interface FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    reviewVisibility: number
   ): Promise<Fap>;
   update(
     id: number,
@@ -40,7 +43,8 @@ export interface FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    files: string | null
+    files: string | null,
+    reviewVisibility: number
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
@@ -171,4 +175,6 @@ export interface FapDataSource {
     fapId: number,
     userId?: number
   ): Promise<FapProposal[]>;
+  getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
+  getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]>;
 }

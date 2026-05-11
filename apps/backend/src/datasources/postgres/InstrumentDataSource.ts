@@ -3,18 +3,6 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
-import {
-  Instrument,
-  InstrumentsHasProposals,
-  InstrumentWithAvailabilityTime,
-  InstrumentWithManagementTime,
-} from '../../models/Instrument';
-import { BasicUserDetails } from '../../models/User';
-import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
-import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
-import { FapDataSource } from '../FapDataSource';
-import { InstrumentDataSource } from '../InstrumentDataSource';
 import database from './database';
 import {
   InstrumentRecord,
@@ -26,7 +14,21 @@ import {
   InstitutionRecord,
   FapProposalRecord,
   CountryRecord,
+  createTagObject,
 } from './records';
+import { Tokens } from '../../config/Tokens';
+import {
+  Instrument,
+  InstrumentsHasProposals,
+  InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
+} from '../../models/Instrument';
+import { Tag } from '../../models/Tag';
+import { BasicUserDetails } from '../../models/User';
+import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
+import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
+import { FapDataSource } from '../FapDataSource';
+import { InstrumentDataSource } from '../InstrumentDataSource';
 
 @injectable()
 export default class PostgresInstrumentDataSource
@@ -156,7 +158,22 @@ export default class PostgresInstrumentDataSource
         };
       });
   }
+  async getTagsByRoleId(roleId: number): Promise<Tag[]> {
+    try {
+      const rows = await database
+        .select('t.tag_id', 't.name')
+        .from('roles_has_tags as rht')
+        .join('tag as t', 't.tag_id', 'rht.tag_id')
+        .where('rht.role_id', roleId);
 
+      return rows.map(createTagObject);
+    } catch (error) {
+      logger.logError('Failed to get tags by role id', {
+        roleId,
+      });
+      throw error;
+    }
+  }
   async getInstrumentsByCallId(
     callIds: number[],
     selectableOnly?: boolean
@@ -264,7 +281,30 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async getUserInstruments(userId: number): Promise<Instrument[]> {
+  async getUserInstruments(
+    userId: number,
+    agentId?: number
+  ): Promise<Instrument[]> {
+    const tags = agentId ? (await this.getTagsByRoleId(agentId)) ?? [] : [];
+    if (tags.length != 0) {
+      const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const instruments = await database<InstrumentRecord>(
+          'tag_instrument as ti'
+        )
+          .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
+          .whereIn('tag_id', tagIds)
+          .select('i.*');
+
+        return instruments.map(this.createInstrumentWithAvailabilityTimeObject);
+      } else {
+        const instruments =
+          await database<InstrumentRecord>('instruments as i').select('i.*');
+
+        return instruments.map(this.createInstrumentWithAvailabilityTimeObject);
+      }
+    }
+
     return database
       .select([
         'i.instrument_id',
@@ -794,6 +834,22 @@ export default class PostgresInstrumentDataSource
       .first()
       .then((result: undefined | { count: string }) => {
         return result?.count === '1';
+      });
+  }
+
+  async getInstrumentsByFapIds(fapId: number[]): Promise<Instrument[]> {
+    return database
+      .select('i.*')
+      .from('fap_proposals as fp')
+      .join('instruments as i', { 'fp.instrument_id': 'i.instrument_id' })
+      .where('fp.fap_id', 'in', fapId)
+      .distinct()
+      .then((instruments: InstrumentRecord[]) => {
+        const result = instruments.map((instrument) =>
+          this.createInstrumentObject(instrument)
+        );
+
+        return result;
       });
   }
 }

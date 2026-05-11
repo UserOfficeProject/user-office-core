@@ -284,6 +284,7 @@ function initializationBeforeTests() {
       numberRatingsRequired: 2,
       gradeGuide: fap1.gradeGuide,
       active: true,
+      reviewVisibility: 1,
     }).then((result) => {
       if (result.createFap) {
         createdFapId = result.createFap.id;
@@ -351,7 +352,6 @@ context('Fap reviews tests', () => {
     });
     initializationBeforeTests();
     cy.getAndStoreAppSettings();
-    cy.get;
   });
 
   describe('User officer role', () => {
@@ -1985,6 +1985,132 @@ context('Fap reviews tests', () => {
         });
       });
     });
+
+    it('Fap Reviewer should be able to see other reviews based on how review visibility is set', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [secondCreatedProposalPk],
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: [
+          {
+            memberId: fapMembers.reviewer2.id,
+            proposalPk: firstCreatedProposalPk,
+          },
+          {
+            memberId: fapMembers.reviewer.id,
+            proposalPk: secondCreatedProposalPk,
+          },
+          {
+            memberId: fapMembers.reviewer2.id,
+            proposalPk: secondCreatedProposalPk,
+          },
+        ],
+        fapId: createdFapId,
+      });
+      cy.visit(`/FapPage/${createdFapId}`);
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
+
+      // Reviewer should see only their reviews when review visibility is set to 1 (proposal_reviews_complete)
+
+      cy.contains(fapMembers.reviewer.firstName);
+      cy.contains(fapMembers.reviewer2.firstName).should('not.exist');
+
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 2,
+      });
+
+      cy.visit(`/FapPage/${createdFapId}`);
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
+
+      // Reviewer should see all reviews when review visibility is set to 2 (reviews_visible)
+
+      cy.contains(fapMembers.reviewer.firstName);
+      cy.contains(fapMembers.reviewer2.firstName);
+
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 1,
+      });
+
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 3,
+      });
+
+      // Reviewer should not see any reviews when review visibility is set to 3 (reviews_visible_fap_ended)
+
+      cy.visit(`/FapPage/${createdFapId}`);
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
+
+      cy.contains(fapMembers.reviewer.firstName);
+      cy.contains(fapMembers.reviewer2.firstName).should('not.exist');
+
+      cy.getProposalReviews({
+        proposalPk: firstCreatedProposalPk,
+        fapId: createdFapId,
+      }).then((res) => {
+        if (res.proposalReviews) {
+          for (const review of res.proposalReviews) {
+            cy.updateReview({
+              reviewID: review.id,
+              grade: '1',
+              comment: '1',
+              status: ReviewStatus.SUBMITTED,
+              fapID: review.fapID,
+              questionaryID: review.questionaryID,
+            });
+          }
+        }
+      });
+
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 1,
+      });
+
+      // Reviewer should see the reviews of proposals with a completed set of reviews
+
+      cy.visit(`/FapPage/${createdFapId}`);
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
+
+      cy.contains(fapMembers.reviewer.firstName);
+      cy.contains(fapMembers.reviewer2.firstName);
+
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
+      cy.get("[aria-label='Detail panel visibility toggle']").last().click();
+
+      cy.contains(fapMembers.reviewer.firstName);
+      cy.contains(fapMembers.reviewer2.firstName).should('not.exist');
+
+      // Right not there is not really a easy way to test reviews_visible_fap_ended
+      // The only way to set the proposals to have the call_fap_review_ended on the proposals events table
+      // Is to have the checkCallsFAPReviewEndedJob async job to to run ait only runs once a day at 00:07
+    });
   });
 });
 
@@ -2496,6 +2622,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({
@@ -2568,6 +2695,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.updateCall({
@@ -2716,6 +2844,7 @@ context('Fap meeting components tests', () => {
         active: true,
         numberRatingsRequired: 2,
         gradeGuide: fap2.gradeGuide,
+        reviewVisibility: 1,
       }).then((fapResult) => {
         if (fapResult.createFap) {
           cy.updateCall({
@@ -3337,6 +3466,7 @@ context('Fap meeting components tests', () => {
               active: true,
               numberRatingsRequired: 2,
               gradeGuide: fap2.gradeGuide,
+              reviewVisibility: 1,
             }).then((fapResult) => {
               if (fapResult.createFap) {
                 cy.assignProposalsToFaps({

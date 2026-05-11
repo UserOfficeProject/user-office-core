@@ -2,13 +2,13 @@
 /* eslint-disable quotes */
 import 'reflect-metadata';
 
+import CallDataSource from './CallDataSource';
+import database from './database';
+import { CallRecord, createCallObject, createProposalObject } from './records';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { WorkflowType } from '../../models/Workflow';
 import { dummyCallFactory } from '../mockups/CallDataSource';
-import CallDataSource from './CallDataSource';
-import database from './database';
-import { CallRecord, createCallObject, createProposalObject } from './records';
 
 const callDataSource = new CallDataSource();
 
@@ -50,7 +50,6 @@ async function createCall(
       start_cycle: yesterday,
       end_cycle: tomorrow,
       cycle_comment: '',
-      survey_comment: '',
       ...(args.format && { reference_number_format: args.format }),
       ...(args.callEnded && { call_ended: args.callEnded }),
       ...(args.callEndedInternal && {

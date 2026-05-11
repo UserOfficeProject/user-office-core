@@ -74,7 +74,6 @@ context('Proposal tests', () => {
     technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
-    surveyComment: faker.lorem.word(10),
   };
 
   const createTopicAndQuestionToExistingTemplate = () => {
@@ -192,6 +191,9 @@ context('Proposal tests', () => {
         createdProposalId
       );
       cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
+      cy.get('[data-cy="data-access-users-list"]').contains(
+        initialDBData.users.user3.lastName
+      );
     });
 
     it('Copy to clipboard should work for Proposal ID', () => {
@@ -276,26 +278,21 @@ context('Proposal tests', () => {
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
       cy.get('[data-cy=abstract] textarea').first().focus();
-      cy.get('[data-cy=save-button]').should('not.be.disabled');
+      cy.get('[data-cy=save-button]').focus().should('not.be.disabled').click();
 
-      cy.on('uncaught:exception', (err) => {
-        expect(err.message).to.include('Input validation errors');
+      cy.contains('Proposal Abstract is required');
 
-        // return false to prevent the error from
-        // failing this test
-        return false;
-      });
-
-      // Save button should be enabled after validation error
-      cy.get('[data-cy=save-button]').focus().click();
-
-      cy.finishedLoading();
-      cy.get('[data-cy=save-button]').should('not.be.disabled');
-
+      cy.get('[data-cy=title] input').clear().should('have.value', '');
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+
+      cy.get('[data-cy=save-button]').focus().should('not.be.disabled').click();
+
+      cy.contains('Proposal Title is required');
+
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
       // Save button should be disabled after successful save
       cy.get('[data-cy=save-button]').focus().click();
