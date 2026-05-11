@@ -1,7 +1,7 @@
 import EmailTemplates from 'email-templates';
 import { container } from 'tsyringe';
 
-import { SMTPMailService } from './SMTPMailService';
+import { MSGraphMailService } from './MSGraphMailService';
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
 import { SettingsId } from '../../../models/Settings';
@@ -36,8 +36,8 @@ test('Return result should indicate all emails were successfully sent', async ()
     ],
   };
 
-  const smtpMailService: SMTPMailService = new SMTPMailService();
-  const result = await smtpMailService.sendMail(options);
+  const msgGraphMailService: MSGraphMailService = new MSGraphMailService();
+  const result = await msgGraphMailService.sendMail(options);
 
   return expect(result).toStrictEqual({
     results: {
@@ -83,8 +83,8 @@ test('All emails with bcc were successfully sent', async () => {
     ],
   };
 
-  const smtpMailService: SMTPMailService = new SMTPMailService();
-  const result = await smtpMailService.sendMail(options);
+  const msgGraphMailService: MSGraphMailService = new MSGraphMailService();
+  const result = await msgGraphMailService.sendMail(options);
 
   expect(emailInfo).toHaveBeenCalledWith({
     message: {

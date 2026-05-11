@@ -20,6 +20,7 @@ interface MSGraphTransportOptions extends TransportOptions {
 class MSGraphTransport implements Transport<SentMessageInfo> {
   name: string;
   version: string;
+  apiUrl: string | undefined;
 
   private authToken: msal.AuthenticationResult | null = null;
   private msalClient: msal.ConfidentialClientApplication;
@@ -92,9 +93,9 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
         attachments = [],
       } = message.data || {};
 
-      const mail = {
+      const payload = {
         message: {
-          subject,
+          subject: subject || '',
           body: {
             contentType: html ? 'HTML' : 'TEXT',
             content: html || text || '',
@@ -106,11 +107,6 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
               },
             },
           ],
-          from: {
-            emailAddress: {
-              address: from,
-            },
-          },
           attachments: attachments?.map((item) => ({
             '@odata.type': '#microsoft.graph.fileAttachment',
             name: item.filename,
@@ -129,7 +125,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(mail),
+          body: JSON.stringify(payload),
         }
       );
 

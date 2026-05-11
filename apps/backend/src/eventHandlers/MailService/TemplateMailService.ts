@@ -14,7 +14,7 @@ import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
 
 export abstract class TemplateMailService extends MailService {
-  protected emailTemplate: EmailTemplates<any>;
+  protected emailTemplates: EmailTemplates<any>;
   protected emailTemplateDataSource: EmailTemplateDataSource;
 
   constructor() {
@@ -51,12 +51,12 @@ export abstract class TemplateMailService extends MailService {
     return undefined;
   }
 
-  protected createEmailTemplate() {
-    if (this.emailTemplate) {
+  protected createEmailTemplates() {
+    if (this.emailTemplates) {
       return;
     }
 
-    this.emailTemplate = new EmailTemplates({
+    this.emailTemplates = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
         attachments: this.createAttachments(),
@@ -75,7 +75,7 @@ export abstract class TemplateMailService extends MailService {
           const templateBody =
             lastSlashIndex !== -1 ? view.substring(0, lastSlashIndex) : view;
 
-          this.emailTemplate
+          this.emailTemplates
             .juiceResources(templateBody)
             .then((html) => {
               resolve(html);
@@ -95,7 +95,7 @@ export abstract class TemplateMailService extends MailService {
     );
   }
 
-  protected async compileEmailTemplate(options: SendMailOptions): Promise<{
+  protected async compileTemplate(options: SendMailOptions): Promise<{
     subject: string;
     body: string;
   } | null> {
@@ -103,11 +103,11 @@ export abstract class TemplateMailService extends MailService {
       return { subject: '= ``', body: '' };
     }
 
-    const emailTemplate = await this.emailTemplateDataSource.getEmailTemplate(
+    const template = await this.emailTemplateDataSource.getEmailTemplate(
       +options.content.template
     );
 
-    if (!emailTemplate) {
+    if (!template) {
       logger.logError('Email template not found', {
         template: options.content.template,
       });
@@ -118,11 +118,11 @@ export abstract class TemplateMailService extends MailService {
     let templateBody = '';
     let templateSubject = '';
 
-    if (emailTemplate.useTemplateFile) {
+    if (template.useTemplateFile) {
       const templateBodyPath =
-        this.getEmailTemplatePath('html', emailTemplate.name) + '.pug';
+        this.getEmailTemplatePath('html', template.name) + '.pug';
       const templateSubjectPath =
-        this.getEmailTemplatePath('subject', emailTemplate.name) + '.pug';
+        this.getEmailTemplatePath('subject', template.name) + '.pug';
 
       try {
         templateBody = readFileSync(templateBodyPath, 'utf-8');
@@ -135,8 +135,8 @@ export abstract class TemplateMailService extends MailService {
         return null;
       }
     } else {
-      templateBody = emailTemplate.body || '';
-      templateSubject = emailTemplate.subject || '';
+      templateBody = template.body || '';
+      templateSubject = template.subject || '';
     }
 
     try {
@@ -182,9 +182,9 @@ export abstract class TemplateMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    this.createEmailTemplate();
+    this.createEmailTemplates();
 
-    const template = await this.compileEmailTemplate(options);
+    const template = await this.compileTemplate(options);
 
     if (!template) {
       logger.logError('Email template not found', {
@@ -204,7 +204,7 @@ export abstract class TemplateMailService extends MailService {
 
     options.recipients.forEach((participant) => {
       emailPromises.push(
-        this.emailTemplate.send({
+        this.emailTemplates.send({
           message: {
             ...(participant.header_to
               ? {
