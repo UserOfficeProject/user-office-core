@@ -3,7 +3,7 @@ import { proposalSubmittedHandler } from './proposalSubmittedHandler';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
 
-export async function DSLEmailHandler(event: ApplicationEvent) {
+export async function DLSEmailHandler(event: ApplicationEvent) {
   const handlers: Partial<
     Record<Event, (event: ApplicationEvent) => Promise<void>>
   > = {

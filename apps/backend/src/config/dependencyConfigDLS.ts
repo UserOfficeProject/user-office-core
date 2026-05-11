@@ -46,7 +46,7 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
-import { DSLEmailHandler } from '../eventHandlers/email/DLS/DLSEmailHandler';
+import { DLSEmailHandler } from '../eventHandlers/email/DLS/DLSEmailHandler';
 import { createSkipLoggingHandler } from '../eventHandlers/logging';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
 import {
@@ -131,7 +131,7 @@ mapValue(Tokens.FapDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
 mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 
-mapValue(Tokens.EmailEventHandler, DSLEmailHandler);
+mapValue(Tokens.EmailEventHandler, DLSEmailHandler);
 mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
