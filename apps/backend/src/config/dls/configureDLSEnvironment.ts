@@ -16,6 +16,15 @@ function getUASInstance() {
   return instance;
 }
 
+function getBaseURL() {
+  let url = process.env.BASE_URL || 'https://uos.diamond.ac.uk';
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+
+  return url;
+}
+
 async function setDLSColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
 
@@ -151,4 +160,4 @@ async function configureDLSEnvironment() {
   ]);
 }
 
-export { configureDLSEnvironment, getUASInstance };
+export { configureDLSEnvironment, getUASInstance, getBaseURL };

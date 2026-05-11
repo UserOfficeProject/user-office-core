@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { getBaseURL } from '../../../config/dls/configureDLSEnvironment';
 import { Tokens } from '../../../config/Tokens';
 import { CallDataSource } from '../../../datasources/CallDataSource';
 import { EmailTemplateDataSource } from '../../../datasources/EmailTemplateDataSource';
@@ -90,11 +91,6 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
 
   const allocationPeriod = `${shortDateFormat.format(call.startCycle)} - ${shortDateFormat.format(call.endCycle)}`;
 
-  let baseURL = process.env.BASE_URL || 'https://uos.diamond.ac.uk';
-  if (baseURL.endsWith('/')) {
-    baseURL = baseURL.slice(0, -1);
-  }
-
   const template = EmailTemplateId.PROPOSAL_SUBMITTED;
   const emailTemplate =
     await emailTemplateDataSource.getEmailTemplateByName(template);
@@ -135,7 +131,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
       },
       allocationPeriod: allocationPeriod,
       deadline: longDateFormat.format(call.endCall),
-      uos_instance: baseURL,
+      uos_instance: getBaseURL(),
     },
     recipients: [],
   };
