@@ -40,10 +40,16 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
     this.name = 'MSGraphTransport';
     this.version = '1.0.0';
+  }
+
+  private createClient() {
+    if (this.msalClient) {
+      return;
+    }
 
     this.msalClient = new msal.ConfidentialClientApplication({
       auth: {
-        clientId: this.config.clientId,
+        clientId: this.config.clientId!,
         clientSecret: this.config.clientSecret,
         authority: `${this.config.authority}/${this.config.tenantId}`,
       },
@@ -83,6 +89,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
     callback: (err: Error | null, info: any) => void
   ) {
     try {
+      this.createClient();
       const accessToken = await this.getAccessToken();
       const {
         subject,
