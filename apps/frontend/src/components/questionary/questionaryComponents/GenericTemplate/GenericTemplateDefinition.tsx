@@ -10,7 +10,6 @@ import QuestionaryComponentGenericTemplate from './QuestionaryComponentGenericTe
 import { QuestionGenericTemplateForm } from './QuestionGenericTemplateForm';
 import { QuestionTemplateRelationGenericTemplateForm } from './QuestionTemplateRelationGenericTemplateForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE,
   name: 'Sub Template',
@@ -27,7 +26,13 @@ export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: (answer) => {
     const config = answer.config as SubTemplateConfig;
-    let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
+    let schema = Yup.array().of(
+      Yup.object({
+        questionary: Yup.object({
+          isCompleted: Yup.boolean().required(),
+        }),
+      })
+    );
 
     if (config.required) {
       schema = schema.min(1, 'This is a required field');
