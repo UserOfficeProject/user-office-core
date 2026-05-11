@@ -90,7 +90,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
 
   const allocationPeriod = `${shortDateFormat.format(call.startCycle)} - ${shortDateFormat.format(call.endCycle)}`;
 
-  let baseURL = process.env.BASE_URL || '';
+  let baseURL = process.env.BASE_URL || 'https://uos.diamond.ac.uk';
   if (baseURL.endsWith('/')) {
     baseURL = baseURL.slice(0, -1);
   }
@@ -135,7 +135,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
       },
       allocationPeriod: allocationPeriod,
       deadline: longDateFormat.format(call.endCall),
-      uos_instance: process.env.BASE_URL,
+      uos_instance: baseURL,
     },
     recipients: [],
   };
