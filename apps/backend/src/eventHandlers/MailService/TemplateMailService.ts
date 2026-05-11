@@ -161,7 +161,9 @@ export abstract class TemplateMailService extends MailService {
     }
   }
 
-  async sendMail(options: SendMailOptions) {
+  async sendMail(
+    options: SendMailOptions
+  ): Promise<{ results: SendMailResults }> {
     const adminDataSource = container.resolve<AdminDataSource>(
       Tokens.AdminDataSource
     );
@@ -194,7 +196,7 @@ export abstract class TemplateMailService extends MailService {
       return { results: sendMailResults };
     }
 
-    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+    if (process.env.SKIP_EMAIL_SENDING === 'true') {
       logger.logInfo('Skipping email sending', {
         template: options.content.template,
       });

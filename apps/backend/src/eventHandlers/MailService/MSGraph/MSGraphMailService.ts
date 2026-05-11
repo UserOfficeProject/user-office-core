@@ -19,12 +19,6 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
     this.name = 'MSGraphTransport';
     this.version = '1.0.0';
     this.apiUrl = process.env.MS_GRAPH_API_URL;
-  }
-
-  private createClient() {
-    if (this.msalClient) {
-      return;
-    }
 
     this.msalClient = new msal.ConfidentialClientApplication({
       auth: {
@@ -48,19 +42,15 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       return this.authToken.accessToken;
     }
 
-    try {
-      this.authToken = await this.msalClient.acquireTokenByClientCredential({
-        scopes: [`${this.apiUrl}/.default`],
-      });
+    this.authToken = await this.msalClient.acquireTokenByClientCredential({
+      scopes: [`${this.apiUrl}/.default`],
+    });
 
-      if (!this.authToken || !this.authToken.accessToken) {
-        throw new Error('Could not acquire access token');
-      }
-    } catch (error) {
-      throw new Error('Could not retrieve an access token.');
+    if (!this.authToken) {
+      throw new Error('Failed to acquire access token for Microsoft Graph API');
     }
 
-    return this.authToken.accessToken;
+    return this.authToken?.accessToken;
   }
 
   public async send(
@@ -68,8 +58,8 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
     callback: (err: Error | null, info: any) => void
   ) {
     try {
-      this.createClient();
       const accessToken = await this.getAccessToken();
+
       const {
         subject,
         to,
@@ -158,9 +148,6 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 }
 
 export class MSGraphMailService extends TemplateMailService {
-  private msalClient: msal.ConfidentialClientApplication;
-  private tokenInfo: msal.AuthenticationResult | null = null;
-
   constructor() {
     super();
   }
