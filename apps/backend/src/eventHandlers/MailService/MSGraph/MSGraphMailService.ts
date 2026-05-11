@@ -2,20 +2,10 @@ import * as msal from '@azure/msal-node';
 import { logger } from '@user-office-software/duo-logger';
 import { NodeMailerTransportOptions } from 'email-templates';
 import * as nodemailer from 'nodemailer';
-import { SentMessageInfo, Transport, TransportOptions } from 'nodemailer';
+import { SentMessageInfo, Transport } from 'nodemailer';
 import MailMessage from 'nodemailer/lib/mailer/mail-message';
 
 import { TemplateMailService } from '../TemplateMailService';
-
-interface MSGraphTransportOptions extends TransportOptions {
-  usePool: boolean;
-  maxConnections: number;
-  authority: string | undefined;
-  apiUrl: string | undefined;
-  clientId: string | undefined;
-  clientSecret: string | undefined;
-  tenantId: string | undefined;
-}
 
 class MSGraphTransport implements Transport<SentMessageInfo> {
   name: string;
@@ -25,21 +15,10 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
   private authToken: msal.AuthenticationResult | null = null;
   private msalClient: msal.ConfidentialClientApplication;
 
-  constructor(private config: MSGraphTransportOptions) {
-    if (
-      !this.config.authority ||
-      !this.config.apiUrl ||
-      !this.config.clientId ||
-      !this.config.clientSecret ||
-      !this.config.tenantId
-    ) {
-      throw new Error(
-        'authority, api url, client id, client secret and tenant id must be defined to be able to use the MS Graph API client'
-      );
-    }
-
+  constructor() {
     this.name = 'MSGraphTransport';
     this.version = '1.0.0';
+    this.apiUrl = process.env.MS_GRAPH_API_URL;
   }
 
   private createClient() {
@@ -49,9 +28,9 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
     this.msalClient = new msal.ConfidentialClientApplication({
       auth: {
-        clientId: this.config.clientId!,
-        clientSecret: this.config.clientSecret,
-        authority: `${this.config.authority}/${this.config.tenantId}`,
+        clientId: process.env.MS_GRAPH_API_CLIENT_ID!,
+        clientSecret: process.env.MS_GRAPH_API_CLIENT_SECRET!,
+        authority: `${process.env.MS_GRAPH_API_AUTHORITY}/${process.env.MS_GRAPH_API_TENANT_ID}`,
       },
     });
   }
@@ -71,7 +50,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
     try {
       this.authToken = await this.msalClient.acquireTokenByClientCredential({
-        scopes: [`${this.config.apiUrl}/.default`],
+        scopes: [`${this.apiUrl}/.default`],
       });
 
       if (!this.authToken || !this.authToken.accessToken) {
@@ -93,10 +72,10 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       const accessToken = await this.getAccessToken();
       const {
         subject,
-        from,
         to,
-        text,
+        from,
         html,
+        bcc,
         attachments = [],
       } = message.data || {};
 
@@ -104,8 +83,8 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
         message: {
           subject: subject || '',
           body: {
-            contentType: html ? 'HTML' : 'TEXT',
-            content: html || text || '',
+            contentType: 'HTML',
+            content: html || '',
           },
           toRecipients: [
             {
@@ -114,6 +93,16 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
               },
             },
           ],
+          bccRecipients: bcc
+            ? [
+                {
+                  emailAddress: {
+                    address: bcc,
+                  },
+                },
+              ]
+            : undefined,
+          //bccRecipients: bcc,
           attachments: attachments?.map((item) => ({
             '@odata.type': '#microsoft.graph.fileAttachment',
             name: item.filename,
@@ -125,7 +114,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       };
 
       const response = await fetch(
-        `${this.config.apiUrl}/v1.0/users/${from}/sendMail`,
+        `${this.apiUrl}/v1.0/users/${from}/sendMail`,
         {
           method: 'POST',
           headers: {
@@ -177,18 +166,6 @@ export class MSGraphMailService extends TemplateMailService {
   }
 
   protected createTransport(): NodeMailerTransportOptions {
-    return nodemailer.createTransport(
-      new MSGraphTransport({
-        usePool: process.env.MS_GRAPH_API_USE_POOL ? true : false,
-        maxConnections: parseInt(
-          process.env.MS_GRAPH_API_MAX_CONNECTIONS || '5'
-        ),
-        authority: process.env.MS_GRAPH_API_AUTHORITY,
-        apiUrl: process.env.MS_GRAPH_API_URL,
-        clientId: process.env.MS_GRAPH_API_CLIENT_ID,
-        clientSecret: process.env.MS_GRAPH_API_CLIENT_SECRET,
-        tenantId: process.env.MS_GRAPH_API_TENANT_ID,
-      })
-    );
+    return nodemailer.createTransport(new MSGraphTransport());
   }
 }
