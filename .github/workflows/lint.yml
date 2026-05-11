@@ -2,7 +2,7 @@ name: Lint
 
 on:
   pull_request:
-    branches: [develop, master]
+    branches: [ develop, master ]
 
 env:
   NODE_VERSION: 22.x
@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Install validation dependencies
-        run: npm --prefix validation install
+        run: npm --prefix validation ci
 
       - name: Test validation library
         run: npm --prefix validation run test
