@@ -1,5 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
-
 import { proposalCoProposerInvitesUpdatedHandler } from './proposalCoProposerInvitesUpdatedHandler';
 import { proposalSubmittedHandler } from './proposalSubmittedHandler';
 import { ApplicationEvent } from '../../../events/applicationEvents';
@@ -19,9 +17,7 @@ export async function DSLEmailHandler(event: ApplicationEvent) {
   const handler = handlers[event.type];
 
   if (!handler) {
-    logger.logError('No handler for event type', { type: event.type });
-
-    return;
+    throw new Error(`No handler for event type ${event.type}`);
   }
 
   return await handler(event);
