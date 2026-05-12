@@ -105,10 +105,8 @@ describe('DLSEmailHandler', () => {
       const expectedEmailTemplate =
         await emailTemplateDataSourceMock.getEmailTemplateByName(templateId);
 
-      // Call the eliEmailHandler with the mock event
       await DLSEmailHandler(mockEvent);
 
-      // Verify that sendMail was called with the correct template_id
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
