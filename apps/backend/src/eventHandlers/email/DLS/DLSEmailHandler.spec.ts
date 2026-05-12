@@ -34,7 +34,6 @@ describe('DLSEmailHandler', () => {
   });
 
   beforeEach(() => {
-    // Initialize mocks
     emailTemplateDataSourceMock =
       container.resolve<EmailTemplateDataSourceMock>(
         Tokens.EmailTemplateDataSource
