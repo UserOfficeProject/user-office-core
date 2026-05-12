@@ -13,7 +13,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
-import crossFetch from 'cross-fetch';
 import { useSnackbar } from 'notistack';
 import React, { useState, useContext, useRef } from 'react';
 
@@ -235,7 +234,7 @@ export const DownloadContextProvider = ({
     }
 
     const controller = new AbortController();
-    const req = crossFetch(generateLink(type, ids, options), {
+    const req = fetch(generateLink(type, ids, options), {
       signal: controller.signal,
       headers: {
         Authorization: `Bearer ${token}`,

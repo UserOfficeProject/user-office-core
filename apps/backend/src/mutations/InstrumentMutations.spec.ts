@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import InstrumentMutations from './InstrumentMutations';
 import { Tokens } from '../config/Tokens';
 import {
   dummyInstrument,
@@ -13,7 +14,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import InstrumentMutations from './InstrumentMutations';
 
 let proposalDataSource: ProposalDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;

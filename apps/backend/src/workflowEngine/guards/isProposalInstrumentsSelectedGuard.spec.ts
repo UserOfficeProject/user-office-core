@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { isProposalInstrumentsSelectedGuard } from './isProposalInstrumentsSelectedGuard';
+import { Tokens } from '../../config/Tokens';
 
 describe('isProposalInstrumentsSelectedGuard', () => {
   const mockInstrumentDataSource = {

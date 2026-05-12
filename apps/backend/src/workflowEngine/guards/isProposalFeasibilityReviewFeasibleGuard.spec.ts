@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalFeasibilityReviewFeasibleGuard } from './isProposalFeasibilityReviewFeasibleGuard';
 import { Tokens } from '../../config/Tokens';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { isProposalFeasibilityReviewFeasibleGuard } from './isProposalFeasibilityReviewFeasibleGuard';
 
 describe('isProposalFeasibilityReviewFeasibleGuard', () => {
   const mockReviewDataSource = {

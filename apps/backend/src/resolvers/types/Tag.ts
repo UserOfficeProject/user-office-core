@@ -8,10 +8,10 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { Tag as TagBase } from '../../models/Tag';
 import { Call } from './Call';
 import { Instrument } from './Instrument';
+import { ResolverContext } from '../../context';
+import { Tag as TagBase } from '../../models/Tag';
 
 @ObjectType()
 export class Tag implements TagBase {

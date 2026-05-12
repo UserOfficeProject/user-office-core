@@ -165,6 +165,7 @@ function QuestionaryComponentGenericTemplate(
                   newStateItems,
                   GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
                 );
+                setSelectedGenericTemplate(clonedGenericTemplate);
               }
             });
 
@@ -292,7 +293,7 @@ function QuestionaryComponentGenericTemplate(
               }}
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
-              title={selectedGenericTemplate?.title || 'Generic Template'}
+              title={selectedGenericTemplate?.title || ''}
             >
               <DialogContent>
                 {selectedGenericTemplate ? (

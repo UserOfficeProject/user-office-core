@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalSampleReviewSubmittedGuard } from './isProposalSampleReviewSubmittedGuard';
 import { Tokens } from '../../config/Tokens';
 import { SampleStatus } from '../../models/Sample';
-import { isProposalSampleReviewSubmittedGuard } from './isProposalSampleReviewSubmittedGuard';
 
 describe('isProposalSampleReviewSubmittedGuard', () => {
   const mockSampleDataSource = {

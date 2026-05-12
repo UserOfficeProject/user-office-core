@@ -1,18 +1,18 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
-import { dummyQuestionTemplateRelationFactory } from '../datasources/mockups/QuestionaryDataSource';
-import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { BooleanConfig } from '../resolvers/types/FieldConfig';
 import {
   areDependenciesSatisfied,
   getFieldById,
   isMatchingConstraints,
 } from './ProposalModelFunctions';
 import { Answer } from './Questionary';
+import { Tokens } from '../config/Tokens';
 import { createConfig } from './questionTypes/QuestionRegistry';
 import { DataType } from './Template';
+import { dummyQuestionTemplateRelationFactory } from '../datasources/mockups/QuestionaryDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { BooleanConfig } from '../resolvers/types/FieldConfig';
 
 let dataSource: QuestionaryDataSource;
 

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalRejectedGuard } from './isProposalRejectedGuard';
 import { Tokens } from '../../config/Tokens';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { isProposalRejectedGuard } from './isProposalRejectedGuard';
 
 describe('isProposalRejectedGuard', () => {
   const mockProposalDataSource = {

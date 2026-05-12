@@ -43,7 +43,7 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
           canCopy: Yup.bool().required(),
           copyButtonLabel: Yup.string().when('canCopy', {
             is: (canCopy: boolean) => canCopy,
-            then: Yup.string().required('Copy button label is required'),
+            then: (schema) => schema.required('Copy button label is required'),
           }),
         }),
       })}

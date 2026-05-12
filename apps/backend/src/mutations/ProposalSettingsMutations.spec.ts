@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import StatusMutations from './StatusMutations';
+import WorkflowMutations from './WorkflowMutations';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -9,8 +11,6 @@ import { dummyWorkflow } from '../datasources/mockups/WorkflowDataSource';
 import { Rejection } from '../models/Rejection';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { WorkflowType } from '../models/Workflow';
-import StatusMutations from './StatusMutations';
-import WorkflowMutations from './WorkflowMutations';
 
 const statusMutationsInstance = container.resolve(StatusMutations);
 

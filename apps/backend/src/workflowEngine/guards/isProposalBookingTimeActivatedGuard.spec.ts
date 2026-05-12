@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { isProposalBookingTimeActivatedGuard } from './isProposalBookingTimeActivatedGuard';
 import { Tokens } from '../../config/Tokens';
 import { ExperimentStatus } from '../../models/Experiment';
-import { isProposalBookingTimeActivatedGuard } from './isProposalBookingTimeActivatedGuard';
 
 describe('isProposalBookingTimeActivatedGuard', () => {
   const mockExperimentDataSource = {
