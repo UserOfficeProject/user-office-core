@@ -63,7 +63,6 @@ export class DLSUserAuthorization extends OAuthAuthorization {
       };
     }
 
-    const institution = await this.getOrCreateUserInstitution(institutionInput);
     const userId = this.getUniqueId(userInfo);
     const userWithOAuthSubMatch =
       await this.userDataSource.getByOIDCSub(userId);
@@ -85,6 +84,8 @@ export class DLSUserAuthorization extends OAuthAuthorization {
 
       return updatedUser;
     } else {
+      const institution =
+        await this.getOrCreateUserInstitution(institutionInput);
       const newUser = await this.userDataSource.create(
         (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,

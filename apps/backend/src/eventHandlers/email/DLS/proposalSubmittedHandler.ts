@@ -145,7 +145,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
         { participant, event }
       );
 
-      return;
+      continue;
     }
 
     // Create a copy of options for each participant to avoid mutation issues

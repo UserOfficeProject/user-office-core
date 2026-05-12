@@ -35,11 +35,7 @@ export async function proposalCoProposerInvitesUpdatedHandler(
   const emailTemplate =
     await emailTemplateDataSource.getEmailTemplateByName(template);
   if (!emailTemplate) {
-    logger.logError('Email template not found', {
-      template,
-    });
-
-    return;
+    throw new Error('Email template not found: ' + template);
   }
 
   for (const invite of event.array) {
