@@ -11,7 +11,12 @@ export class SMTPMailService extends TemplateMailService {
   constructor() {
     super();
 
-    logger.logInfo('Initializing SMTPMailService', {});
+    logger.logInfo('Initializing SMTPMailService', {
+      host: process.env.EMAIL_AUTH_HOST,
+      port: process.env.EMAIL_AUTH_PORT,
+      user: process.env.EMAIL_AUTH_USERNAME,
+      pass: process.env.EMAIL_AUTH_PASSWORD,
+    });
   }
 
   protected createTransport(): NodeMailerTransportOptions | any {
