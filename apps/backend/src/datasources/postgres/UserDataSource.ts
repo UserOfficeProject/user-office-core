@@ -260,7 +260,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
-        !!user ? createBasicUserObject(user) : null
+        user ? createBasicUserObject(user) : null
       );
   }
 
