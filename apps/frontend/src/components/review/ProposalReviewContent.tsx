@@ -62,6 +62,7 @@ const ProposalReviewContent = ({
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isProposalReader = useCheckAccess([UserRole.PROPOSAL_READER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const isFapSec = useCheckAccess([UserRole.FAP_SECRETARY]);
@@ -223,7 +224,7 @@ const ProposalReviewContent = ({
     <ProposalReviewContainer fapId={fapId} reviewId={reviewId} />
   );
 
-  const AllProposalReviewsTab = isUserOfficer && (
+  const AllProposalReviewsTab = (isUserOfficer || isProposalReader) && (
     <>
       <ExternalReviews
         reviews={proposalData.reviews as Review[]}
@@ -257,7 +258,7 @@ const ProposalReviewContent = ({
     />
   );
 
-  const EventLogsTab = isUserOfficer && (
+  const EventLogsTab = (isUserOfficer || isProposalReader) && (
     <EventLogList
       changedObjectId={proposalData.primaryKey}
       eventType="PROPOSAL"

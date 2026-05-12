@@ -49,7 +49,12 @@ export default class ReviewQueries {
     return this.dataSource.getReviews(filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+    Roles.PROPOSAL_READER,
+  ])
   async reviewsForProposal(
     agent: UserWithRole | null,
     {

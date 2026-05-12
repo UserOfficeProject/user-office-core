@@ -683,7 +683,7 @@ const ProposalTableOfficer = ({
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
     ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
-    PROPOSAL_MODAL_TAB_NAMES.ADMIN,
+    ...(!isReadOnly ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 

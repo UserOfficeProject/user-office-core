@@ -5,6 +5,7 @@ import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ReviewStatus } from '../models/Review';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
 
@@ -46,6 +47,12 @@ export class ReviewAuthorization {
   ): Promise<boolean> {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
+      return true;
+    }
+
+    const isProposalReader =
+      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
+    if (isProposalReader) {
       return true;
     }
 
