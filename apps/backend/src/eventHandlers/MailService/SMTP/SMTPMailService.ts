@@ -15,7 +15,6 @@ export class SMTPMailService extends TemplateMailService {
       host: process.env.EMAIL_AUTH_HOST,
       port: process.env.EMAIL_AUTH_PORT,
       user: process.env.EMAIL_AUTH_USERNAME,
-      pass: process.env.EMAIL_AUTH_PASSWORD,
     });
   }
 
