@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -27,29 +27,8 @@ export abstract class TemplateMailService extends MailService {
     );
   }
 
-  protected createAttachments(): any[] {
-    const attachments = [];
-
-    if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
-      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
-        attachments.push({
-          filename: 'logo.png',
-          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
-          cid: 'logo1',
-        });
-      } else {
-        logger.logWarn('Email footer image path does not exist', {
-          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
-        });
-      }
-    }
-
-    return attachments;
-  }
-
-  protected createTransport(): NodeMailerTransportOptions | undefined {
-    return undefined;
-  }
+  protected abstract createAttachments(): any[];
+  protected abstract createTransport(): NodeMailerTransportOptions | undefined;
 
   protected createEmailTemplates() {
     if (this.emailTemplates) {

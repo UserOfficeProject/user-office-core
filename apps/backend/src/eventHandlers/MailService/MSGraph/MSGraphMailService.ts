@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+
 import * as msal from '@azure/msal-node';
 import { logger } from '@user-office-software/duo-logger';
 import { NodeMailerTransportOptions } from 'email-templates';
@@ -10,15 +12,15 @@ import { TemplateMailService } from '../TemplateMailService';
 class MSGraphTransport implements Transport<SentMessageInfo> {
   name: string;
   version: string;
-  apiUrl: string | undefined;
 
+  private apiUrl: string;
   private authToken: msal.AuthenticationResult | null = null;
   private msalClient: msal.ConfidentialClientApplication;
 
   constructor() {
     this.name = 'MSGraphTransport';
     this.version = '1.0.0';
-    this.apiUrl = process.env.MS_GRAPH_API_URL;
+    this.apiUrl = process.env.MS_GRAPH_API_URL || '';
 
     this.msalClient = new msal.ConfidentialClientApplication({
       auth: {
@@ -55,7 +57,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
   public async send(
     message: MailMessage<SentMessageInfo>,
-    callback: (err: Error | null, info: any) => void
+    callback: (err: Error | null, info: unknown) => void
   ) {
     try {
       const accessToken = await this.getAccessToken();
@@ -92,13 +94,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
                 },
               ]
             : undefined,
-          //bccRecipients: bcc,
-          attachments: attachments?.map((item) => ({
-            '@odata.type': '#microsoft.graph.fileAttachment',
-            name: item.filename,
-            contentType: item.contentType,
-            contentBytes: item.content,
-          })),
+          attachments: attachments,
         },
         saveToSentItems: true,
       };
@@ -154,5 +150,28 @@ export class MSGraphMailService extends TemplateMailService {
 
   protected createTransport(): NodeMailerTransportOptions {
     return nodemailer.createTransport(new MSGraphTransport());
+  }
+
+  protected createAttachments() {
+    const attachments = [];
+
+    if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
+      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
+        attachments.push({
+          '@odata.type': '#microsoft.graph.fileAttachment',
+          name: 'logo.png',
+          contentType: 'image/png',
+          contentBytes: readFileSync(
+            process.env.EMAIL_FOOTER_IMAGE_PATH
+          ).toString('base64'),
+        });
+      } else {
+        logger.logWarn('Email footer image path does not exist', {
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        });
+      }
+    }
+
+    return attachments;
   }
 }

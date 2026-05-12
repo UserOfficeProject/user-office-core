@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import { logger } from '@user-office-software/duo-logger';
 import { NodeMailerTransportOptions } from 'email-templates';
 import * as nodemailer from 'nodemailer';
@@ -58,5 +60,25 @@ export class SMTPMailService extends TemplateMailService {
         rejectUnauthorized: false,
       },
     };
+  }
+
+  protected createAttachments(): any[] {
+    const attachments = [];
+
+    if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
+      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
+        attachments.push({
+          filename: 'logo.png',
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+          cid: 'logo1',
+        });
+      } else {
+        logger.logWarn('Email footer image path does not exist', {
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        });
+      }
+    }
+
+    return attachments;
   }
 }
