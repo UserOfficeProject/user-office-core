@@ -54,21 +54,20 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
     const operationType = getOperationType(request.query);
     const clientName =
       request.http?.headers.get('apollographql-client-name') || 'unknown';
-    let apiClient = 'unknown';
-    if (clientName.startsWith('UOP frontend')) {
+    const isFrontendClient = clientName.startsWith('UOP frontend');
+    if (isFrontendClient) {
       logger.logInfo('GraphQL request received', {
         client: clientName,
         client_type: 'frontend',
         operation: operationName,
         operation_Type: operationType,
       });
-    } else apiClient = clientName;
-
+    }
     const labels: MetricLabels = {
       operation: operationName,
       operation_type: operationType,
       status: 'success',
-      client_name: apiClient,
+      client_name: isFrontendClient ? 'frontend' : clientName,
     };
 
     const end = graphqlRequestDuration.startTimer(labels);
