@@ -7,14 +7,55 @@ import {
   Root,
   Ctx,
   Resolver,
+  createUnionType,
 } from 'type-graphql';
 
 import { Tag } from './Tag';
 import { ResolverContext } from '../../context';
-import { Role as RoleOrigin } from '../../models/Role';
+import {
+  Roles,
+  UserRolePermissions,
+  ProposalReaderRolePermissions,
+} from '../../models/Role';
 
 @ObjectType()
-export class Role implements Partial<RoleOrigin> {
+export class UserRoleConfig implements UserRolePermissions {
+  @Field()
+  note: string;
+}
+
+@ObjectType()
+export class ProposalReaderRoleConfig implements ProposalReaderRolePermissions {
+  @Field()
+  hasLogAccess: boolean;
+
+  @Field()
+  hasTechnicalReviewAccess: boolean;
+
+  @Field()
+  hasFapAccess: boolean;
+
+  @Field()
+  hasAdminAccess: boolean;
+}
+
+export const RoleConfig = createUnionType({
+  name: 'RoleConfig',
+  types: () => [UserRoleConfig, ProposalReaderRoleConfig] as const,
+  resolveType(value) {
+    if ('note' in value) return UserRoleConfig;
+
+    return ProposalReaderRoleConfig;
+  },
+});
+
+export type RoleConfigValue =
+  | UserRoleConfig
+  | ProposalReaderRoleConfig
+  | Record<string, never>;
+
+@ObjectType()
+export class Role {
   @Field(() => Int)
   public id: number;
 
@@ -30,8 +71,8 @@ export class Role implements Partial<RoleOrigin> {
   @Field(() => Boolean)
   public isRootRole: boolean;
 
-  @Field(() => [String])
-  public permissions: string[];
+  @Field(() => RoleConfig, { nullable: true })
+  public config: RoleConfigValue;
 
   constructor(initObj: {
     id: number;
@@ -39,7 +80,7 @@ export class Role implements Partial<RoleOrigin> {
     title: string;
     description: string;
     isRootRole: boolean;
-    permissions: string[];
+    config: RoleConfigValue;
   }) {
     Object.assign(this, initObj);
   }
@@ -52,11 +93,26 @@ export class RoleResolver {
     @Root() role: Role,
     @Ctx() context: ResolverContext
   ): Promise<Tag[] | null> {
-    const tags = await context.queries.roleTags.getTagsByRoleId(
-      context.user,
-      role.id
-    );
+    return context.queries.roleTags.getTagsByRoleId(context.user, role.id);
+  }
 
-    return tags;
+  @FieldResolver(() => RoleConfig, { nullable: true })
+  config(
+    @Root() role: { shortCode: string; config: unknown }
+  ): UserRoleConfig | ProposalReaderRoleConfig | null {
+    if (role.shortCode === Roles.USER) {
+      return Object.assign(
+        new UserRoleConfig(),
+        role.config as UserRolePermissions
+      );
+    }
+    if (role.shortCode === Roles.PROPOSAL_READER) {
+      return Object.assign(
+        new ProposalReaderRoleConfig(),
+        role.config as ProposalReaderRolePermissions
+      );
+    }
+
+    return null;
   }
 }

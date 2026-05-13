@@ -1,19 +1,25 @@
 import {
+  Box,
+  Button,
+  CircularProgress,
   Dialog,
   DialogContent,
-  Typography,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
-  CircularProgress,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
-import { Role } from 'generated/sdk';
+import { Role, UserRole } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+import ProposalReaderRoleConfigForm, {
+  ProposalReaderRoleConfig,
+} from './ProposalReaderRoleConfigForm';
+import UserRoleConfigForm, { UserRoleConfig } from './UserRoleConfigForm';
 
 interface RoleModalProps {
   open: boolean;
@@ -23,7 +29,7 @@ interface RoleModalProps {
     shortCode: string;
     title: string;
     description: string;
-    permissions?: string[];
+    config?: UserRoleConfig | ProposalReaderRoleConfig | null;
   } | null;
   onSubmit: () => void;
 }
@@ -38,55 +44,52 @@ const RoleModal: React.FC<RoleModalProps> = ({
   const [shortCode, setShortCode] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [config, setConfig] = useState<
+    UserRoleConfig | ProposalReaderRoleConfig | null
+  >(null);
   const [availableRoles, setAvailableRoles] = useState<
-    {
-      shortCode: string;
-      title?: string;
-    }[]
+    { shortCode: string; title?: string }[]
   >([]);
   const [loadingRoles, setLoadingRoles] = useState(false);
   const { api } = useDataApiWithFeedback();
 
   useEffect(() => {
     if (isEditMode && role) {
-      setShortCode(role.shortCode || '');
-      setTitle(role.title || '');
-      setDescription(role.description || '');
-      setPermissions(role.permissions || []);
+      setShortCode(role.shortCode);
+      setTitle(role.title);
+      setDescription(role.description);
+      setConfig(role.config ?? null);
     } else {
       setShortCode('');
       setTitle('');
       setDescription('');
-      setPermissions([]);
+      setConfig(null);
     }
   }, [isEditMode, role]);
 
-  // Fetch root roles when modal opens so user can pick an existing shortCode
   useEffect(() => {
+    if (!open) return;
+
     const fetchRootRoles = async () => {
       setLoadingRoles(true);
       try {
-        // Adjust the API call name/args if your backend uses a different query
         const res = await api().getRoles({});
         const roles = Array.isArray(res) ? res : res?.roles ?? [];
-        setAvailableRoles(
-          roles
-            .filter((role) => role.isRootRole)
-            .map((r: Role) => ({ shortCode: r.shortCode, title: r.title }))
-        );
+        const rootRoles = roles
+          .filter((r) => r.isRootRole)
+          .map((r: Role) => ({ shortCode: r.shortCode, title: r.title }));
 
-        // Ensure current edit role shortCode is present in availableRoles
-        if (isEditMode && role && role.shortCode) {
-          const exists = roles.some(
+        if (isEditMode && role?.shortCode) {
+          const alreadyPresent = roles.some(
             (r: Role) => r.shortCode === role.shortCode
           );
-          if (!exists) {
-            setAvailableRoles((prev) => [
-              ...prev,
-              { shortCode: role.shortCode, title: role.title },
-            ]);
-          }
+          setAvailableRoles(
+            alreadyPresent
+              ? rootRoles
+              : [...rootRoles, { shortCode: role.shortCode, title: role.title }]
+          );
+        } else {
+          setAvailableRoles(rootRoles);
         }
       } catch (e) {
         console.error('Failed to fetch root roles', e);
@@ -95,33 +98,36 @@ const RoleModal: React.FC<RoleModalProps> = ({
       }
     };
 
-    if (open) {
-      fetchRootRoles();
-    }
+    fetchRootRoles();
   }, [open, api, isEditMode, role]);
 
+  const getConfigArgs = () => {
+    switch (shortCode.toUpperCase()) {
+      case UserRole.USER:
+        return { config: { user: config as UserRoleConfig } };
+      case UserRole.PROPOSAL_READER:
+        return {
+          config: { proposalReader: config as ProposalReaderRoleConfig },
+        };
+      default:
+        return { config: {} };
+    }
+  };
+
   const handleSubmit = async () => {
+    const configArgs = getConfigArgs();
     const apiCall = isEditMode
-      ? api({
-          toastSuccessMessage: 'Role updated successfully',
-        }).updateRole({
+      ? api({ toastSuccessMessage: 'Role updated successfully' }).updateRole({
           args: {
             roleID: role!.id,
             shortCode,
             title,
             description,
-            permissions,
+            ...configArgs,
           },
         })
-      : api({
-          toastSuccessMessage: 'Role created successfully',
-        }).createRole({
-          args: {
-            shortCode,
-            title,
-            description,
-            permissions,
-          },
+      : api({ toastSuccessMessage: 'Role created successfully' }).createRole({
+          args: { shortCode, title, description, ...configArgs },
         });
 
     await apiCall;
@@ -129,13 +135,15 @@ const RoleModal: React.FC<RoleModalProps> = ({
     onClose();
   };
 
+  const hasConfig = shortCode === 'user' || shortCode === 'proposal_reader';
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
       aria-labelledby="role-dialog"
-      maxWidth="lg" // Set the maximum width to medium
-      fullWidth // Ensure the dialog takes the full width
+      maxWidth="lg"
+      fullWidth
     >
       <DialogContent>
         <Typography variant="h6">
@@ -151,7 +159,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
             labelId="role-shortcode-label"
             value={shortCode}
             label="Short Code"
-            onChange={(e) => setShortCode(e.target.value as string)}
+            onChange={(e) => setShortCode(e.target.value)}
             renderValue={(val) =>
               val || (loadingRoles ? 'Loading...' : 'Select a role')
             }
@@ -191,6 +199,23 @@ const RoleModal: React.FC<RoleModalProps> = ({
           margin="normal"
           data-cy="role-description-input"
         />
+        {hasConfig && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">Config</Typography>
+            {shortCode.toUpperCase() === UserRole.USER && (
+              <UserRoleConfigForm
+                value={config as UserRoleConfig}
+                onChange={setConfig}
+              />
+            )}
+            {shortCode.toUpperCase() === UserRole.PROPOSAL_READER && (
+              <ProposalReaderRoleConfigForm
+                value={config as ProposalReaderRoleConfig}
+                onChange={setConfig}
+              />
+            )}
+          </Box>
+        )}
         <Button
           onClick={handleSubmit}
           variant="contained"
