@@ -42,7 +42,7 @@ services:
       - SYS_ADMIN
 
   mockServer:
-    image: mockserver/mockserver:latest
+    image: mockserver/mockserver:latest-graaljs
     command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080
