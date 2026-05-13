@@ -25,6 +25,7 @@ import { ProposalDataSource } from '../ProposalDataSource';
 import { TagDataSource } from '../TagDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
+  InstrumentFilterInput,
   ProposalsFilter,
   QuestionFilterInput,
 } from './../../resolvers/queries/ProposalsQuery';
@@ -96,6 +97,29 @@ export async function calculateReferenceNumber(
   );
 
   return prefix + paddedSequence;
+}
+
+/**
+ * Resolves instrument IDs from an InstrumentFilterInput.
+ * Supports both `instrumentIds` and `instrumentId`(deprecated).
+ */
+function resolveInstrumentIds(
+  instrumentFilter?: InstrumentFilterInput
+): number[] | undefined {
+  if (!instrumentFilter) {
+    return undefined;
+  }
+  if (
+    instrumentFilter.instrumentIds &&
+    instrumentFilter.instrumentIds.length > 0
+  ) {
+    return instrumentFilter.instrumentIds;
+  }
+  if (instrumentFilter.instrumentId) {
+    return [instrumentFilter.instrumentId];
+  }
+
+  return undefined;
 }
 
 @injectable()
@@ -470,11 +494,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
-        } else if (filter?.instrumentFilter?.instrumentId) {
-          query.whereRaw(
-            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter.instrumentFilter.instrumentId }
+        } else {
+          const effectiveInstrumentIds = resolveInstrumentIds(
+            filter?.instrumentFilter
           );
+          if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
+            query.where(function () {
+              effectiveInstrumentIds.forEach((id) => {
+                this.orWhereRaw(
+                  'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+                  { instrumentId: id }
+                );
+              });
+            });
+          }
         }
 
         if (filter?.proposalStatusId) {
@@ -625,16 +658,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             );
         }
 
-        if (filter?.instrumentFilter?.instrumentId) {
+        const effectiveInstrumentIds = resolveInstrumentIds(
+          filter?.instrumentFilter
+        );
+        if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
           query
             .leftJoin(
               'instrument_has_proposals',
               'instrument_has_proposals.proposal_pk',
               'proposals.proposal_pk'
             )
-            .where(
+            .whereIn(
               'instrument_has_proposals.instrument_id',
-              filter.instrumentFilter.instrumentId
+              effectiveInstrumentIds
             );
         }
 
@@ -757,7 +793,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               { userId: user.id }
             ).orWhereRaw(
               // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
-              // eslint-disable-next-line prettier/prettier
+
               "jsonb_path_exists(instruments, '$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)')",
               { userId: user.id }
             );
@@ -766,12 +802,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
-        } else if (filter?.instrumentFilter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
-          query.whereRaw(
-            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter.instrumentFilter?.instrumentId }
+        } else {
+          const effectiveInstrumentIds = resolveInstrumentIds(
+            filter?.instrumentFilter
           );
+          if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+            query.where(function () {
+              effectiveInstrumentIds.forEach((id) => {
+                this.orWhereRaw(
+                  'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+                  { instrumentId: id }
+                );
+              });
+            });
+          }
         }
 
         if (filter?.proposalStatusId) {
@@ -1218,14 +1263,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'ins.instrument_id'
       )
       .modify((query) => {
-        const instrumentId = filter?.instrumentFilter?.instrumentId;
+        const effectiveInstrumentIds = resolveInstrumentIds(
+          filter?.instrumentFilter
+        );
 
-        if (instrumentId && !isNaN(instrumentId)) {
+        if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
           query.join('instrument_has_proposals as ihp', function () {
-            this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnVal(
+            this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnIn(
               'ihp.instrument_id',
-              '=',
-              instrumentId
+              effectiveInstrumentIds
             );
           });
         }

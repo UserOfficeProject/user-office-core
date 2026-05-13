@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -317,9 +318,9 @@ const ProposalTableInstrumentScientist = ({
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
     instrumentFilter: {
-      instrumentId: instrumentId != null ? +instrumentId : null,
+      instrumentIds: parseInstrumentQuery(instrumentId),
       showAllProposals: !instrumentId,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrumentId === 'multi',
     },
     proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
     referenceNumbers: proposalId ? [proposalId] : undefined,

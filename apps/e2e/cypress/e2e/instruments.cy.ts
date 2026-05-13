@@ -797,7 +797,8 @@ context('Instrument tests', () => {
       cy.contains(proposal2.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
-      cy.get('[data-value="multi"]').click();
+      cy.get('[role="listbox"]').contains('Multiple').click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.get('table.MuiTable-root tbody tr').should(
@@ -810,6 +811,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -817,6 +819,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.get('table.MuiTable-root tbody tr').should(
@@ -1158,7 +1161,8 @@ context('Instrument tests', () => {
       cy.contains(proposal2.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
-      cy.get('[data-value="multi"]').click();
+      cy.get('[role="listbox"]').contains('Multiple').click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.get('table.MuiTable-root tbody tr').should(
@@ -1169,6 +1173,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -1176,6 +1181,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.get('table.MuiTable-root tbody tr').should(
@@ -1202,6 +1208,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains('No records to display');
@@ -1209,6 +1216,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains('All').click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal1.title);

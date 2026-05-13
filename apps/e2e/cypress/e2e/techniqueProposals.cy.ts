@@ -631,6 +631,7 @@ context('Technique Proposal tests', () => {
         });
 
       cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -654,6 +655,7 @@ context('Technique Proposal tests', () => {
         });
 
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal3.title);
@@ -670,6 +672,7 @@ context('Technique Proposal tests', () => {
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains('All').click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -911,6 +914,7 @@ context('Technique Proposal tests', () => {
         });
 
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
       cy.finishedLoading();
 
       cy.contains(proposal2.title);
