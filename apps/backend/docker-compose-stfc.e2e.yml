@@ -42,7 +42,7 @@ services:
       - SYS_ADMIN
 
   mockServer:
-    image: mockserver/mockserver:latest-graaljs
+    image: ghcr.io/userofficeproject/mockserver:6.15.0
     command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080
