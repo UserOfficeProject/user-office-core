@@ -36,6 +36,8 @@ const fieldMap: { [key: string]: string } = {
   preferredname: 'preferredname',
   lastname: 'lastname',
   institution: 'i.institution',
+  email: 'email',
+  oidcSub: 'oidc_sub',
 };
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -433,7 +435,7 @@ export default class PostgresUserDataSource implements UserDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          query.orderByRaw(`LOWER(??) ${sortDirection}`, [sortField]);
         }
       })
       .then(
