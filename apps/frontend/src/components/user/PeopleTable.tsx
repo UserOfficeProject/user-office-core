@@ -429,6 +429,7 @@ const PeopleTable = ({
             </Tooltip>
             <TextField
               id="people-search"
+              data-cy="people-search"
               label="Filter found users"
               type="search"
               variant="standard"
