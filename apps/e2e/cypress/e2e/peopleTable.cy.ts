@@ -152,8 +152,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy="people-search"]').type(user.lastName);
       cy.get('[data-cy="people-search"]').type('Enter');
-      cy.get('[data-cy="people-table"]').find('li:first-child');
-      cy.contains(user.firstName);
+      cy.get('[data-cy="people-table"]').contains(user.firstName);
     });
   });
 
