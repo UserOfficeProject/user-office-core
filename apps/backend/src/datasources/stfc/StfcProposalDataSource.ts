@@ -192,7 +192,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
             query.where(function () {
               effectiveInstrumentIds.forEach((id) => {
-                this.orWhereRaw(
+                this.whereRaw(
                   'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
                   { instrumentId: id }
                 );
