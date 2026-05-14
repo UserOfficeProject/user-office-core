@@ -45,10 +45,6 @@ export const getInstrumentFilterIds = (
     return instrumentFilter.instrumentIds;
   }
 
-  if (instrumentFilter?.instrumentId) {
-    return [instrumentFilter.instrumentId];
-  }
-
   return undefined;
 };
 
