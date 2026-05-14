@@ -150,8 +150,8 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy="people-table"]').should('exist');
 
-      cy.get('[aria-label="people-search"]').type(user.lastName);
-      cy.get('[aria-label="people-search"]').type('Enter');
+      cy.get('[data-cy="people-search"]').type(user.lastName);
+      cy.get('[data-cy="people-search"]').type('Enter');
       cy.get('[data-cy="people-table"]').find('li:first-child');
       cy.contains(user.firstName);
     });
