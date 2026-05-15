@@ -6,9 +6,14 @@ import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
-import { Roles } from '../models/Role';
+import { ProposalReaderRolePermissions, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
+
+type ReviewsForProposalArgs = {
+  proposalPk: number;
+  fapId?: number;
+};
 
 @injectable()
 export default class ReviewQueries {
@@ -57,14 +62,17 @@ export default class ReviewQueries {
   ])
   async reviewsForProposal(
     agent: UserWithRole | null,
-    {
-      proposalPk,
-      fapId,
-    }: {
-      proposalPk: number;
-      fapId?: number;
-    }
+    { proposalPk, fapId }: ReviewsForProposalArgs
   ): Promise<Review[] | null> {
+    if (agent!.currentRole?.shortCode === Roles.PROPOSAL_READER) {
+      const hasReviewAccess = (
+        agent!.currentRole.config as ProposalReaderRolePermissions
+      ).hasTechnicalReviewAccess;
+      if (!hasReviewAccess) {
+        return null;
+      }
+    }
+
     const reviews = await this.dataSource.getProposalReviews(proposalPk, fapId);
 
     const permittedReviews = reviews.filter(

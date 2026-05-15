@@ -232,6 +232,44 @@ export const dummyProposalReaderWithoutLogAccess: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyProposalReaderWithTechnicalReviewAccess: UserWithRole = {
+  ...dummyUser,
+  id: 105,
+  currentRole: {
+    id: 12,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: true,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithoutTechnicalReviewAccess: UserWithRole = {
+  ...dummyUser,
+  id: 106,
+  currentRole: {
+    id: 13,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
 export const dummyVisitorWithRole: UserWithRole = {
   ...dummyUser,
   id: 102,
