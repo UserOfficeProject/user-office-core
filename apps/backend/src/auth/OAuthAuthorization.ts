@@ -162,7 +162,7 @@ export class OAuthAuthorization extends UserAuthorization {
     return institution;
   }
 
-  private async upsertUser(
+  protected async upsertUser(
     userInfo: ValidUserInfo,
     tokenSet: ValidTokenSet
   ): Promise<User> {

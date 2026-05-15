@@ -4,7 +4,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { OpenIdClient } from '@user-office-software/openid';
 import { ValidTokenSet } from '@user-office-software/openid/lib/model/ValidTokenSet';
 import { ValidUserInfo } from '@user-office-software/openid/lib/model/ValidUserInfo';
-import { GraphQLError } from 'graphql';
 
 import { OAuthAuthorization } from './OAuthAuthorization';
 import { User, UserRole } from '../models/User';
@@ -13,42 +12,9 @@ import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMu
 export class DLSUserAuthorization extends OAuthAuthorization {
   constructor() {
     super();
-
-    if (OpenIdClient.hasConfig()) {
-      this.initialize();
-    } else {
-      throw new GraphQLError(
-        'OpenIdClient has no configuration. Please check your environment variables!'
-      );
-    }
   }
 
-  public async externalTokenLogin(
-    code: string,
-    redirectUri: string,
-    iss: string | null
-  ): Promise<User | null> {
-    try {
-      const { userProfile, tokenSet } = await OpenIdClient.login(
-        code,
-        redirectUri,
-        iss
-      );
-
-      const user = await this.upsertUserDLS(userProfile, tokenSet);
-
-      return user;
-    } catch (error) {
-      logger.logError('Error ocurred while logging in with external token', {
-        error: (error as Error)?.message,
-        stack: (error as Error)?.stack,
-      });
-
-      throw new Error(error as string);
-    }
-  }
-
-  private async upsertUserDLS(
+  protected async upsertUser(
     userInfo: ValidUserInfo,
     tokenSet: ValidTokenSet
   ): Promise<User> {
