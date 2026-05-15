@@ -18,18 +18,6 @@ const ProposalReaderRoleConfigForm: React.FC<
 > = ({ value, onChange }) => (
   <Box sx={{ mt: 1 }}>
     <FormControlLabel
-      data-cy="role-config-has-log-access"
-      control={
-        <Checkbox
-          checked={value.hasLogAccess}
-          onChange={(e) =>
-            onChange({ ...value, hasLogAccess: e.target.checked })
-          }
-        />
-      }
-      label="Log Access"
-    />
-    <FormControlLabel
       data-cy="role-config-has-technical-review-access"
       control={
         <Checkbox
@@ -64,6 +52,18 @@ const ProposalReaderRoleConfigForm: React.FC<
         />
       }
       label="Admin Access"
+    />
+    <FormControlLabel
+      data-cy="role-config-has-log-access"
+      control={
+        <Checkbox
+          checked={value.hasLogAccess}
+          onChange={(e) =>
+            onChange({ ...value, hasLogAccess: e.target.checked })
+          }
+        />
+      }
+      label="Log Access"
     />
   </Box>
 );
