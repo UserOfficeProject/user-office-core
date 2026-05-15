@@ -5,8 +5,8 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
-import { FapReviewVisibility } from '../models/Fap';
-import { Roles } from '../models/Role';
+import { Fap, FapReviewVisibility } from '../models/Fap';
+import { ProposalReaderRolePermissions, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
 
@@ -251,5 +251,22 @@ export default class FapQueries {
   @Authorized([Roles.USER_OFFICER])
   async getFapReviewVisibilityOptions(agent: UserWithRole | null) {
     return await this.dataSource.getFapReviewVisibilityOptions();
+  }
+
+  @Authorized()
+  async getFapsByProposalPk(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<Fap[]> {
+    if (agent?.currentRole?.shortCode === Roles.PROPOSAL_READER) {
+      const hasFapAccess = (
+        agent.currentRole.config as ProposalReaderRolePermissions
+      ).hasFapAccess;
+      if (!hasFapAccess) {
+        return [];
+      }
+    }
+
+    return this.dataSource.getFapsByProposalPk(proposalPk);
   }
 }
