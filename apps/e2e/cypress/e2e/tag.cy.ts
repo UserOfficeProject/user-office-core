@@ -225,5 +225,38 @@ context('Tag tests', () => {
 
       cy.contains(title).should('exist');
     });
+
+    it('User officer should be able to assign and remove techniques from tags', () => {
+      cy.createTag({ name: tagName, shortCode: tagShortCode });
+      cy.visit('/Tag');
+
+      cy.contains(tagName);
+
+      cy.contains('Technique 1').should('not.exist');
+
+      cy.get('[aria-label="Assign Technique"]').click();
+
+      cy.contains('Technique 1').parent().find('[type="checkbox"]').click();
+
+      cy.get('[data-cy="assign-selected-techniques"]').click();
+
+      cy.contains(tagName)
+        .parent()
+        .get('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.contains('Technique 1');
+
+      // It persisits after reload
+      cy.visit('/Tag');
+      cy.contains(tagName)
+        .parent()
+        .get('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.contains('Technique 1');
+
+      cy.get('[data-testId=DeleteIcon]').click();
+      cy.contains('Technique 1').should('not.exist');
+    });
   });
 });

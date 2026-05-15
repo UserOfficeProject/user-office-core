@@ -3,7 +3,7 @@ import { Delete } from '@mui/icons-material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Call, InstrumentMinimalFragment } from 'generated/sdk';
+import { Call, InstrumentMinimalFragment, Technique } from 'generated/sdk';
 import { TagData } from 'hooks/tag/useTagsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -11,10 +11,12 @@ export const TagDetailsPanel = ({
   tag,
   removeInstrument,
   removeCall,
+  removeTechnique
 }: {
   tag: TagData;
   removeInstrument: (instrumentId: number, tagId: number) => void;
   removeCall: (callId: number, tagId: number) => void;
+  removeTechnique: (techniqueId: number, tagId: number) => void;
 }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
@@ -60,6 +62,28 @@ export const TagDetailsPanel = ({
     },
   ];
 
+  const techniqueRowActions = [
+    {
+      icon: () => <Delete />,
+      tooltip: 'Remove Technique',
+      onClick: (
+        event: React.MouseEvent<HTMLElement>,
+        rowData:
+          | Pick<Call, 'id' | 'shortCode'>
+          | Pick<Call, 'id' | 'shortCode'>[]
+      ) => {
+        // It will always be a singleton not a array but the type checker needs the array
+        const technique = rowData as Pick<Technique, 'id' | 'shortCode'>;
+
+        api().removeTechniqueFromTag({
+          techniqueId: technique.id,
+          tagId: tag.id,
+        });
+        removeTechnique(technique.id, tag.id);
+      },
+    },
+  ];
+
   return (
     <>
       <MaterialTable
@@ -84,6 +108,16 @@ export const TagDetailsPanel = ({
           selection: false,
         }}
         actions={callRowActions}
+      />
+      <MaterialTable
+        columns={[{ title: 'ShortCode', field: 'shortCode' }]}
+        data={tag.techniques}
+        isLoading={isExecutingCall}
+        title="Techniques"
+        options={{
+          selection: false,
+        }}
+        actions={techniqueRowActions}
       />
     </>
   );

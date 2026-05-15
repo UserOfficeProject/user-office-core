@@ -1,0 +1,9 @@
+mutation removeTechniqueFromTag(
+  $techniqueId: Int!
+  $tagId: Int!
+) {
+  removeTechniqueFromTag(
+    techniqueId: $techniquelId
+    tagId: $tagId
+  )
+}

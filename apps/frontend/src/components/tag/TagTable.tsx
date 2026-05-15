@@ -1,10 +1,11 @@
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { Call, InstrumentMinimalFragment } from 'generated/sdk';
+import { Call, InstrumentMinimalFragment, Technique } from 'generated/sdk';
 import { TagData, useTagsData } from 'hooks/tag/useTagsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -13,6 +14,7 @@ import { CreateUpdateTag } from './CreateUpdateTag';
 import { SelectCallModel } from './SelectCallModel';
 import { SelectInstrumentModel } from './SelectInstrumentModel';
 import { TagDetailsPanel } from './TagDetailsPanel';
+import { SelectTechniqueModel } from './selectTechniqueModel';
 
 const tagsColumns = [
   {
@@ -33,6 +35,9 @@ const TagTable = () => {
   const [assigningInstrumentTagId, setAssigningInstrumentTagId] = useState<
     number | null
   >(null);
+  const [assigningTechniqueTagId, setAssigningTechniqueTagId] = useState<number | null>(
+    null
+  );
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
@@ -88,15 +93,36 @@ const TagTable = () => {
     setAssigningCallTagId(null);
   };
 
-  const AssignInstrumentIcon = (): JSX.Element => <ScienceIcon />;
+  const assignTechniquesToTag = async (techniques: Pick<Technique, 'id' | 'shortCode'>[]) => {
+    api().assignTechniquesToTag({
+      techniqueIds: techniques.map((technique) => technique.id),
+      tagId: assigningTechniqueTagId as number,
+    });
 
+    setTagsWithLoading(
+      tags.map((tag) =>
+        tag.id === assigningTechniqueTagId
+          ? {
+              ...tag,
+              techniques: tag.calls.concat(techniques),
+            }
+          : tag
+      )
+    );
+
+    setAssigningTechniqueTagId(null);
+  };
+
+  const AssignInstrumentIcon = (): JSX.Element => <ScienceIcon />;
   const AssignCallIcon = (): JSX.Element => <CalendarTodayIcon />;
+  const AssignTechniqueIcon = (): JSX.Element => <AssignmentIcon />;
 
   const instrumentsAssignments = tags?.find(
     (tag) => tag.id === assigningInstrumentTagId
   );
 
   const callAssignments = tags?.find((tag) => tag.id === assigningCallTagId);
+  const techniqueAssignments = tags?.find((tag) => tag.id === assigningTechniqueTagId);
 
   const removeInstrument = (instrumentId: number, tagId: number) => {
     setTagsWithLoading(
@@ -124,6 +150,19 @@ const TagTable = () => {
     );
   };
 
+  const removeTechnique = (techniqueId: number, tagId: number) => {
+    setTagsWithLoading(
+      tags.map((tag) =>
+        tag.id === tagId
+          ? {
+              ...tag,
+              techniques: tag.techniques.filter((i) => i.id !== techniqueId),
+            }
+          : tag
+      )
+    );
+  };
+
   return (
     <>
       <SelectInstrumentModel
@@ -141,6 +180,13 @@ const TagTable = () => {
         open={!!assigningCallTagId}
         close={(): void => setAssigningCallTagId(null)}
         addCalls={assignCallsToTag}
+      />
+      <SelectTechniqueModel
+        tagId={assigningTechniqueTagId ?? 0}
+        preSelectedTechniques={techniqueAssignments?.techniques.map((technique) => technique.id)}
+        open={!!assigningTechniqueTagId}
+        close={(): void => setAssigningTechniqueTagId(null)}
+        addTechniques={assignTechniquesToTag}
       />
       <div data-cy="tag-table">
         <SuperMaterialTable
@@ -160,6 +206,7 @@ const TagTable = () => {
                 tag={rowData.rowData}
                 removeInstrument={removeInstrument}
                 removeCall={removeCall}
+                removeTechnique={removeTechnique}
               />
             );
           }}
@@ -176,6 +223,13 @@ const TagTable = () => {
               tooltip: `Assign Call`,
               onClick: (_event, rowdata) => {
                 setAssigningCallTagId((rowdata as TagData).id);
+              },
+            },
+            {
+              icon: AssignTechniqueIcon,
+              tooltip: `Assign Technique`,
+              onClick: (_event, rowdata) => {
+                setAssigningTechniqueTagId((rowdata as TagData).id);
               },
             },
           ]}

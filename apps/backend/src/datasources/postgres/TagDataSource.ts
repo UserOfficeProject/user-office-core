@@ -13,7 +13,9 @@ import {
   TagRecord,
   InstrumentRecord,
   createCallObject,
+  createTechniqueObject,
 } from './records';
+import { Technique } from '../../models/Technique';
 
 @injectable()
 class PostgresTagDataSource implements TagDataSource {
@@ -92,9 +94,29 @@ class PostgresTagDataSource implements TagDataSource {
 
     return result.length > 0;
   }
+
   async removeCallFromTag(callId: number, tagId: number): Promise<boolean> {
     const result = await database('tag_call')
       .where({ call_id: callId, tag_id: tagId })
+      .del();
+
+    return result > 0;
+  }
+
+  async addTechniquesToTag(techniqueIds: number[], tagId: number): Promise<boolean> {
+    const dataToInsert = techniqueIds.map((techniqueId) => ({
+      tag_id: tagId,
+      technique_id: techniqueId,
+    }));
+
+    const result = await database('tag_technique').insert(dataToInsert);
+
+    return result.length > 0;
+  }
+
+  async removeTechniqueFromTag(techniqueId: number, tagId: number): Promise<boolean> {
+    const result = await database('tag_technique')
+      .where({ technique_id: techniqueId, tag_id: tagId })
       .del();
 
     return result > 0;
@@ -120,6 +142,17 @@ class PostgresTagDataSource implements TagDataSource {
       .select('c.*');
 
     return calls.map(createCallObject);
+  }
+
+  async getTagTechniques(tagId: number | number[]): Promise<Technique[]> {
+    const tagIds = Array.isArray(tagId) ? tagId : [tagId];
+
+    const techniques = await database('tag_technique as ft')
+      .join('technique as t', 'ft.technique_id', 't.technique_id')
+      .whereIn('ft.tag_id', tagIds)
+      .select('t.*');
+
+    return techniques.map(createTechniqueObject);
   }
 
   async getTagsByNames(tagNames: string[]): Promise<Tag[]> {
@@ -148,6 +181,16 @@ class PostgresTagDataSource implements TagDataSource {
     return tags.map(createTagObject);
   }
 
+  async getTechniquesTags(techniqueId: number | null): Promise<Tag[]> {
+    const tags: TagRecord[] = await database<TagRecord>('tag_technique as ft')
+      .join('tag as f', 'ft.tag_id', 'f.tag_id')
+      .where('fc.technique_id', techniqueId)
+      .select('f.*');
+
+    return tags.map(createTagObject);
+  }
+
+  //this doesn't look like it's used anywhere?
   async getInstrumentsAndCallsTags(
     tags: number[]
   ): Promise<{ instruments: Instrument[]; calls: Call[] }> {

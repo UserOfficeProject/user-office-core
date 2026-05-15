@@ -1040,6 +1040,15 @@ export const createCallObject = (call: CallRecord) => {
   );
 };
 
+export const createTechniqueObject = (technique: TechniqueRecord) => {
+  return new Technique(
+    technique.technique_id,
+    technique.name,
+    technique.short_code,
+    technique.description,
+  )
+}
+
 export const createEmailTemplateObject = (
   emailTemplate: EmailTemplateRecord
 ) => {

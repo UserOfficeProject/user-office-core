@@ -1,0 +1,9 @@
+mutation assignTechniquesToTag(
+  $techniqueIds: [Int!]!
+  $tagId: Int!
+) {
+  assignTechniquesToTag(
+    techniqueIds: $techniqueIds
+    tagId: $tagId
+  )
+}

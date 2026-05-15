@@ -9,6 +9,7 @@ export type TagData = {
   shortCode: string;
   instruments: InstrumentMinimalFragment[];
   calls: { id: number; shortCode: string }[];
+  techniques: { id: number; shortCode: string }[];
 };
 
 export function useTagsData(): {

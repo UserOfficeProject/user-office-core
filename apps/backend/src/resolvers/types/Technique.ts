@@ -14,6 +14,7 @@ import { Instrument } from './Instrument';
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { Technique as TechniqueOrigin } from '../../models/Technique';
+import { Tag } from './Tag';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -55,5 +56,10 @@ export class TechniqueResolver {
       context.queries.technique.dataSource.getTechniqueScientists(technique.id);
 
     return isRejection(scientists) ? [] : scientists;
+  }
+
+  @FieldResolver(() => Tag)
+  async tags(@Root() technique: Technique, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getTechniquesTags(technique.id);
   }
 }

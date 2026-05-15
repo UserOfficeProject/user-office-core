@@ -14,6 +14,7 @@ import {
   AssignInstrumentsToTagArgs,
   RemoveInstrumentFromTagArgs,
 } from '../resolvers/mutations/AssignInstrumentsToTag';
+import { AssignTechniquesToTagArgs, RemoveTechniqueFromTagArgs } from '../resolvers/mutations/AssignTechniquesToTag';
 
 @injectable()
 export default class TagMutations {
@@ -76,5 +77,21 @@ export default class TagMutations {
     args: RemoveCallFromTagArgs
   ): Promise<boolean> {
     return this.dataSource.removeCallFromTag(args.callId, args.tagId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async addTechniquesToTag(
+    agent: UserWithRole | null,
+    args: AssignTechniquesToTagArgs
+  ): Promise<boolean> {
+    return this.dataSource.addTechniquesToTag(args.techniqueIds, args.tagId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async removeTechniqueFromTag(
+    agent: UserWithRole | null,
+    args: RemoveTechniqueFromTagArgs
+  ): Promise<boolean> {
+    return this.dataSource.removeTechniqueFromTag(args.techniqueId, args.tagId);
   }
 }

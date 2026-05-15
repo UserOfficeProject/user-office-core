@@ -1,6 +1,7 @@
 import { Call } from '../../models/Call';
 import { Instrument } from '../../models/Instrument';
 import { Tag } from '../../models/Tag';
+import { Technique } from '../../models/Technique';
 import { TagDataSource } from '../TagDataSource';
 
 export class TagDataSourceMock implements TagDataSource {
@@ -48,5 +49,17 @@ export class TagDataSourceMock implements TagDataSource {
   }
   getTagsByNames(tagNames: string[]): Promise<Tag[]> {
     return Promise.resolve([new Tag(0, 'ISIS Tag', 'ISIS')]);
+  }
+  getTechniquesTags(techniqueId: number): Promise<Tag[]> {
+    throw new Error('Method not implemented.');
+  }
+  addTechniquesToTag(techniqueIds: number[], tagId: number) {
+    throw new Error('Method not implemented.');
+  }
+  removeTechniqueFromTag(techniqueId: number, tagId: number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  getTagTechniques(tagId: number): Promise<Technique> {
+    throw new Error('Method not implemented.');
   }
 }
