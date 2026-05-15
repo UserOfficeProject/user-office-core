@@ -48,6 +48,7 @@ import TechnicalBulkReassignModal, {
   ReviewData,
 } from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import {
   Call,
   FapInstrument,
@@ -55,6 +56,7 @@ import {
   FeatureId,
   InstrumentMinimalFragment,
   PaginationSortDirection,
+  ProposalReaderRoleConfig,
   ProposalViewInstrument,
   ProposalsFilter,
   Status,
@@ -327,6 +329,90 @@ const RowActionButtons = (rowData: ProposalViewData) => {
   );
 };
 
+const getIsTechnicalReviewEnabled = (
+  user: React.ContextType<typeof UserContext>,
+  featureContext: React.ContextType<typeof FeatureContext>
+) => {
+  if (!featureContext.featuresMap.get(FeatureId.TECHNICAL_REVIEW)?.isEnabled) {
+    return false;
+  }
+
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find(
+      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
+    )!.config as ProposalReaderRoleConfig;
+
+    if (config.hasTechnicalReviewAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const getIsFapEnabled = (
+  user: React.ContextType<typeof UserContext>,
+  featureContext: React.ContextType<typeof FeatureContext>
+) => {
+  if (!featureContext.featuresMap.get(FeatureId.FAP_REVIEW)?.isEnabled) {
+    return false;
+  }
+
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find(
+      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
+    )!.config as ProposalReaderRoleConfig;
+
+    if (config.hasFapAccess) {
+      return true;
+    }
+  }
+};
+
+const getIsAdminEnabled = (user: React.ContextType<typeof UserContext>) => {
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find(
+      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
+    )!.config as ProposalReaderRoleConfig;
+
+    if (config.hasAdminAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const getIsLogsEnabled = (user: React.ContextType<typeof UserContext>) => {
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find(
+      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
+    )!.config as ProposalReaderRoleConfig;
+
+    if (config.hasLogAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const ProposalTableOfficer = ({
   proposalFilter,
   setProposalFilter,
@@ -355,6 +441,7 @@ const ProposalTableOfficer = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
@@ -399,14 +486,16 @@ const ProposalTableOfficer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(proposalFilter)]);
 
-  const isTechnicalReviewEnabled = featureContext.featuresMap.get(
-    FeatureId.TECHNICAL_REVIEW
-  )?.isEnabled;
+  const isTechnicalReviewEnabled = getIsTechnicalReviewEnabled(
+    userContext,
+    featureContext
+  );
+  const isFapEnabled = getIsFapEnabled(userContext, featureContext);
+  const isAdminEnabled = getIsAdminEnabled(userContext);
+  const isLogsEnabled = getIsLogsEnabled(userContext);
+
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
-  )?.isEnabled;
-  const isFapEnabled = featureContext.featuresMap.get(
-    FeatureId.FAP_REVIEW
   )?.isEnabled;
 
   if (!columns.find((column) => column.field === 'rowActionButtons')) {
@@ -683,8 +772,8 @@ const ProposalTableOfficer = ({
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
     ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
-    ...(!isReadOnly ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
+    ...(isAdminEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
+    ...(isLogsEnabled ? [PROPOSAL_MODAL_TAB_NAMES.LOGS] : []),
   ];
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
