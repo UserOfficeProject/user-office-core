@@ -194,6 +194,44 @@ export const dummyInstrumentScientist: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyProposalReaderWithLogAccess: UserWithRole = {
+  ...dummyUser,
+  id: 103,
+  currentRole: {
+    id: 10,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: true,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithoutLogAccess: UserWithRole = {
+  ...dummyUser,
+  id: 104,
+  currentRole: {
+    id: 11,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
 export const dummyVisitorWithRole: UserWithRole = {
   ...dummyUser,
   id: 102,
