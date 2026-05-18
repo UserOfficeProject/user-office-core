@@ -1045,9 +1045,9 @@ export const createTechniqueObject = (technique: TechniqueRecord) => {
     technique.technique_id,
     technique.name,
     technique.short_code,
-    technique.description,
-  )
-}
+    technique.description
+  );
+};
 
 export const createEmailTemplateObject = (
   emailTemplate: EmailTemplateRecord

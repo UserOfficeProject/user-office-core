@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { Technique } from 'generated/sdk';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 
-export const SelectTechniqueModel = ({
+export const SelectTechniqueModal = ({
   preSelectedTechniques,
   open,
   addTechniques,
@@ -28,7 +28,7 @@ export const SelectTechniqueModel = ({
   close: () => void;
 }) => {
   const theme = useTheme();
-  const [selectedTechniques, setTechniqueTechniques] = useState<
+  const [selectedTechniques, setSelectedTechniques] = useState<
     Pick<Technique, 'id' | 'shortCode'>[]
   >([]);
 
@@ -73,7 +73,9 @@ export const SelectTechniqueModel = ({
           columns={[{ title: 'Short Code', field: 'shortCode' }]}
           data={
             preSelectedTechniques
-              ? techniques.filter((technique) => !preSelectedTechniques.includes(technique.id))
+              ? techniques.filter(
+                  (technique) => !preSelectedTechniques.includes(technique.id)
+                )
               : techniques
           }
           isLoading={loadingTechniques}

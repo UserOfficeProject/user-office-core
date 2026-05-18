@@ -53,13 +53,13 @@ export class TagDataSourceMock implements TagDataSource {
   getTechniquesTags(techniqueId: number): Promise<Tag[]> {
     throw new Error('Method not implemented.');
   }
-  addTechniquesToTag(techniqueIds: number[], tagId: number) {
+  addTechniquesToTag(techniqueIds: number[], tagId: number): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
   removeTechniqueFromTag(techniqueId: number, tagId: number): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  getTagTechniques(tagId: number): Promise<Technique> {
+  getTagTechniques(tagId: number): Promise<Technique[]> {
     throw new Error('Method not implemented.');
   }
 }

@@ -11,7 +11,7 @@ export const TagDetailsPanel = ({
   tag,
   removeInstrument,
   removeCall,
-  removeTechnique
+  removeTechnique,
 }: {
   tag: TagData;
   removeInstrument: (instrumentId: number, tagId: number) => void;
@@ -69,8 +69,8 @@ export const TagDetailsPanel = ({
       onClick: (
         event: React.MouseEvent<HTMLElement>,
         rowData:
-          | Pick<Call, 'id' | 'shortCode'>
-          | Pick<Call, 'id' | 'shortCode'>[]
+          | Pick<Technique, 'id' | 'shortCode'>
+          | Pick<Technique, 'id' | 'shortCode'>[]
       ) => {
         // It will always be a singleton not a array but the type checker needs the array
         const technique = rowData as Pick<Technique, 'id' | 'shortCode'>;

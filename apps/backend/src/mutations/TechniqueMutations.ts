@@ -10,6 +10,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { TagDataSource } from '../datasources/TagDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
@@ -26,7 +27,6 @@ import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutat
 import { RemoveInstrumentsFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentsFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
 import { TechniqueDataSource } from './../datasources/TechniqueDataSource';
-import { TagDataSource } from '../datasources/TagDataSource';
 
 @injectable()
 export default class TechniqueMutations {
@@ -102,23 +102,26 @@ export default class TechniqueMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToTechniqueArgs
   ): Promise<boolean | Rejection> {
-    const techniqueTags = await this.tagDataSource.getTechniquesTags(args.techniqueId);
+    const techniqueTags = await this.tagDataSource.getTechniquesTags(
+      args.techniqueId
+    );
 
     if (techniqueTags.length > 0) {
       let shareTag = true;
 
       await Promise.all(
         args.instrumentIds.map(async (instrumentId) => {
-          const instrumentTag = await this.tagDataSource.getInstrumentsTags(
-            instrumentId
-          );
+          const instrumentTag =
+            await this.tagDataSource.getInstrumentsTags(instrumentId);
 
           if (instrumentTag.length === 0) {
             shareTag = false;
           }
 
           const tagCrossover = instrumentTag.some((tagInstrument) =>
-            techniqueTags.some((techniqueTag) => tagInstrument.id === techniqueTag.id)
+            techniqueTags.some(
+              (techniqueTag) => tagInstrument.id === techniqueTag.id
+            )
           );
 
           if (!tagCrossover) {

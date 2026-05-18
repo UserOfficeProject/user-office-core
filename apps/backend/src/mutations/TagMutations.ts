@@ -14,7 +14,10 @@ import {
   AssignInstrumentsToTagArgs,
   RemoveInstrumentFromTagArgs,
 } from '../resolvers/mutations/AssignInstrumentsToTag';
-import { AssignTechniquesToTagArgs, RemoveTechniqueFromTagArgs } from '../resolvers/mutations/AssignTechniquesToTag';
+import {
+  AssignTechniquesToTagArgs,
+  RemoveTechniqueFromTagArgs,
+} from '../resolvers/mutations/AssignTechniquesToTag';
 
 @injectable()
 export default class TagMutations {

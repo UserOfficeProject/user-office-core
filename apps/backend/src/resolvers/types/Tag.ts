@@ -10,6 +10,7 @@ import {
 
 import { Call } from './Call';
 import { Instrument } from './Instrument';
+import { Technique } from './Technique';
 import { ResolverContext } from '../../context';
 import { Tag as TagBase } from '../../models/Tag';
 
@@ -35,5 +36,10 @@ export class TagResolver {
   @FieldResolver(() => [Call])
   async calls(@Root() tag: Tag, @Ctx() context: ResolverContext) {
     return context.queries.tag.dataSource.getTagCalls(tag.id);
+  }
+
+  @FieldResolver(() => [Technique])
+  async techniques(@Root() tag: Tag, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getTagTechniques(tag.id);
   }
 }

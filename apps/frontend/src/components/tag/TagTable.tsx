@@ -1,5 +1,5 @@
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,8 +13,8 @@ import { FunctionType } from 'utils/utilTypes';
 import { CreateUpdateTag } from './CreateUpdateTag';
 import { SelectCallModel } from './SelectCallModel';
 import { SelectInstrumentModel } from './SelectInstrumentModel';
+import { SelectTechniqueModal } from './selectTechniqueModal';
 import { TagDetailsPanel } from './TagDetailsPanel';
-import { SelectTechniqueModel } from './selectTechniqueModel';
 
 const tagsColumns = [
   {
@@ -35,9 +35,9 @@ const TagTable = () => {
   const [assigningInstrumentTagId, setAssigningInstrumentTagId] = useState<
     number | null
   >(null);
-  const [assigningTechniqueTagId, setAssigningTechniqueTagId] = useState<number | null>(
-    null
-  );
+  const [assigningTechniqueTagId, setAssigningTechniqueTagId] = useState<
+    number | null
+  >(null);
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
@@ -93,7 +93,9 @@ const TagTable = () => {
     setAssigningCallTagId(null);
   };
 
-  const assignTechniquesToTag = async (techniques: Pick<Technique, 'id' | 'shortCode'>[]) => {
+  const assignTechniquesToTag = async (
+    techniques: Pick<Technique, 'id' | 'shortCode'>[]
+  ) => {
     api().assignTechniquesToTag({
       techniqueIds: techniques.map((technique) => technique.id),
       tagId: assigningTechniqueTagId as number,
@@ -104,7 +106,7 @@ const TagTable = () => {
         tag.id === assigningTechniqueTagId
           ? {
               ...tag,
-              techniques: tag.calls.concat(techniques),
+              techniques: tag.techniques.concat(techniques),
             }
           : tag
       )
@@ -122,7 +124,9 @@ const TagTable = () => {
   );
 
   const callAssignments = tags?.find((tag) => tag.id === assigningCallTagId);
-  const techniqueAssignments = tags?.find((tag) => tag.id === assigningTechniqueTagId);
+  const techniqueAssignments = tags?.find(
+    (tag) => tag.id === assigningTechniqueTagId
+  );
 
   const removeInstrument = (instrumentId: number, tagId: number) => {
     setTagsWithLoading(
@@ -181,9 +185,11 @@ const TagTable = () => {
         close={(): void => setAssigningCallTagId(null)}
         addCalls={assignCallsToTag}
       />
-      <SelectTechniqueModel
+      <SelectTechniqueModal
         tagId={assigningTechniqueTagId ?? 0}
-        preSelectedTechniques={techniqueAssignments?.techniques.map((technique) => technique.id)}
+        preSelectedTechniques={techniqueAssignments?.techniques.map(
+          (technique) => technique.id
+        )}
         open={!!assigningTechniqueTagId}
         close={(): void => setAssigningTechniqueTagId(null)}
         addTechniques={assignTechniquesToTag}

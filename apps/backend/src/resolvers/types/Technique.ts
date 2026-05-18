@@ -11,10 +11,10 @@ import {
 
 import { BasicUserDetails } from './BasicUserDetails';
 import { Instrument } from './Instrument';
+import { Tag } from './Tag';
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { Technique as TechniqueOrigin } from '../../models/Technique';
-import { Tag } from './Tag';
 
 @ObjectType()
 @Directive('@key(fields: "id")')

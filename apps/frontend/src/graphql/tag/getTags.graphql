@@ -10,5 +10,9 @@ query getTags {
         id
         shortCode
       }
+      techniques {
+        id
+        shortCode
+      }
   }
 }

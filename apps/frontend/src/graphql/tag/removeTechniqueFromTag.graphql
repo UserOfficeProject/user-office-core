@@ -3,7 +3,7 @@ mutation removeTechniqueFromTag(
   $tagId: Int!
 ) {
   removeTechniqueFromTag(
-    techniqueId: $techniquelId
+    techniqueId: $techniqueId
     tagId: $tagId
   )
 }

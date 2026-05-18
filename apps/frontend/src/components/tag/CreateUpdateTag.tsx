@@ -58,7 +58,7 @@ export const CreateUpdateTag = ({ tag, close }: CreateUpdateTagProps) => {
               ...result.createTag,
               instruments: [],
               calls: [],
-              techniques: []
+              techniques: [],
             } as TagData);
           }
         }}

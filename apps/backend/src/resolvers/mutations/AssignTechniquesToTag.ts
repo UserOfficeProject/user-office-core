@@ -31,7 +31,7 @@ export class RemoveTechniqueFromTagArgs {
 @Resolver()
 export class AssignTechniquesToTagMutation {
   @Mutation(() => Boolean)
-  async assignCallsToTag(
+  async assignTechniquesToTag(
     @Args() args: AssignTechniquesToTagArgs,
     @Ctx() context: ResolverContext
   ) {

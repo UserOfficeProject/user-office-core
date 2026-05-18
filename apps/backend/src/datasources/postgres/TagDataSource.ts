@@ -103,7 +103,10 @@ class PostgresTagDataSource implements TagDataSource {
     return result > 0;
   }
 
-  async addTechniquesToTag(techniqueIds: number[], tagId: number): Promise<boolean> {
+  async addTechniquesToTag(
+    techniqueIds: number[],
+    tagId: number
+  ): Promise<boolean> {
     const dataToInsert = techniqueIds.map((techniqueId) => ({
       tag_id: tagId,
       technique_id: techniqueId,
@@ -114,7 +117,10 @@ class PostgresTagDataSource implements TagDataSource {
     return result.length > 0;
   }
 
-  async removeTechniqueFromTag(techniqueId: number, tagId: number): Promise<boolean> {
+  async removeTechniqueFromTag(
+    techniqueId: number,
+    tagId: number
+  ): Promise<boolean> {
     const result = await database('tag_technique')
       .where({ technique_id: techniqueId, tag_id: tagId })
       .del();
@@ -148,7 +154,7 @@ class PostgresTagDataSource implements TagDataSource {
     const tagIds = Array.isArray(tagId) ? tagId : [tagId];
 
     const techniques = await database('tag_technique as ft')
-      .join('technique as t', 'ft.technique_id', 't.technique_id')
+      .join('techniques as t', 'ft.technique_id', 't.technique_id')
       .whereIn('ft.tag_id', tagIds)
       .select('t.*');
 
