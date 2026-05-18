@@ -26,6 +26,11 @@ context('Instrument tests', () => {
     abstract: faker.random.words(5),
   };
 
+  const proposal3 = {
+    title: faker.random.words(2),
+    abstract: faker.random.words(5),
+  };
+
   const scientist1 = initialDBData.users.user1;
   const scientist2 = initialDBData.users.user2;
 
@@ -788,6 +793,29 @@ context('Instrument tests', () => {
               }
             }
           );
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            ({ createProposal }) => {
+              if (createProposal) {
+                cy.updateProposal({
+                  proposalPk: createProposal.primaryKey,
+                  title: proposal3.title,
+                  abstract: proposal3.abstract,
+                });
+
+                cy.assignProposalsToInstruments({
+                  proposalPks: [createProposal.primaryKey],
+                  instrumentIds: [createInstrument.id],
+                });
+
+                cy.updateTechnicalReviewAssignee({
+                  proposalPks: [createProposal.primaryKey],
+                  userId: scientist2.id,
+                  instrumentId: createInstrument.id,
+                });
+              }
+            }
+          );
         }
       });
 
@@ -795,6 +823,7 @@ context('Instrument tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains('Multiple').click();
@@ -804,6 +833,10 @@ context('Instrument tests', () => {
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
         proposal1.title
+      );
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal3.title
       );
       cy.contains(proposal2.title);
       cy.contains(instrument1.name);
@@ -816,9 +849,22 @@ context('Instrument tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal3.title
+      );
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.get('body').type('{esc}');
       cy.finishedLoading();
 
@@ -827,6 +873,16 @@ context('Instrument tests', () => {
         proposal1.title
       );
       cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.get('body').type('{esc}');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
     });
 
     it('Officer should be able to update all un-assigned technical reviews to new contact', () => {
@@ -1153,12 +1209,38 @@ context('Instrument tests', () => {
           }
         }
       );
+
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        ({ createProposal }) => {
+          if (createProposal) {
+            cy.updateProposal({
+              proposalPk: createProposal.primaryKey,
+              title: proposal3.title,
+              abstract: proposal3.abstract,
+            });
+
+            cy.assignProposalsToInstruments({
+              proposalPks: [createProposal.primaryKey],
+              instrumentIds: [createdInstrument2Id],
+            });
+
+            cy.updateTechnicalReviewAssignee({
+              proposalPks: [createProposal.primaryKey],
+              userId: scientist2.id,
+              instrumentId: createdInstrument2Id,
+            });
+          }
+        }
+      );
+      cy.reload();
+
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains('Multiple').click();
@@ -1169,6 +1251,10 @@ context('Instrument tests', () => {
         'not.contain',
         proposal1.title
       );
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal3.title
+      );
       cy.contains(proposal2.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
@@ -1178,9 +1264,22 @@ context('Instrument tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal3.title
+      );
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.get('body').type('{esc}');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.get('body').type('{esc}');
       cy.finishedLoading();
 
@@ -1189,6 +1288,16 @@ context('Instrument tests', () => {
         proposal1.title
       );
       cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.get('body').type('{esc}');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
     });
 
     it('Instrument scientist should have a call and instrument filter', () => {

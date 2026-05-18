@@ -501,7 +501,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
             query.where(function () {
               effectiveInstrumentIds.forEach((id) => {
-                this.whereRaw(
+                this.orWhereRaw(
                   'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
                   { instrumentId: id }
                 );
@@ -810,7 +810,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
             query.where(function () {
               effectiveInstrumentIds.forEach((id) => {
-                this.whereRaw(
+                this.orWhereRaw(
                   'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
                   { instrumentId: id }
                 );
