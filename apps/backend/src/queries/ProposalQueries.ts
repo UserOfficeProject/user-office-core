@@ -14,7 +14,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, AgentTags } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
-import { ProposalReaderRolePermissions, Roles } from '../models/Role';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
 import { omit } from '../utils/helperFunctions';
@@ -44,17 +44,12 @@ export default class ProposalQueries {
       return null;
     }
 
-    const isProposalReaderWithAdminAccess =
-      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER &&
-      (agent.currentRole.config as ProposalReaderRolePermissions)
-        .hasAdminAccess;
-
     // If not a user officer or instrument scientist or proposal reader with admin access, remove commentForManagement
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !this.userAuth.isInstrumentScientist(agent) &&
       !this.userAuth.isApiToken(agent) &&
-      !isProposalReaderWithAdminAccess
+      !this.userAuth.isProposalReader(agent)
     ) {
       proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
@@ -64,7 +59,7 @@ export default class ProposalQueries {
       !this.userAuth.isUserOfficer(agent) &&
       !proposal.notified &&
       !this.userAuth.isApiToken(agent) &&
-      !isProposalReaderWithAdminAccess
+      !this.userAuth.isProposalReader(agent)
     ) {
       proposal = omit(proposal, 'commentForUser') as Proposal;
     }

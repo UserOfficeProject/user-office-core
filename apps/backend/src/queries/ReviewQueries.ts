@@ -6,7 +6,7 @@ import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
-import { ProposalReaderRolePermissions, Roles } from '../models/Role';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
 
@@ -64,15 +64,6 @@ export default class ReviewQueries {
     agent: UserWithRole | null,
     { proposalPk, fapId }: ReviewsForProposalArgs
   ): Promise<Review[] | null> {
-    if (agent!.currentRole?.shortCode === Roles.PROPOSAL_READER) {
-      const hasReviewAccess = (
-        agent!.currentRole.config as ProposalReaderRolePermissions
-      ).hasTechnicalReviewAccess;
-      if (!hasReviewAccess) {
-        return null;
-      }
-    }
-
     const reviews = await this.dataSource.getProposalReviews(proposalPk, fapId);
 
     const permittedReviews = reviews.filter(

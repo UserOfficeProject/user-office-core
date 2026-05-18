@@ -13,10 +13,9 @@ import { TagDataSource } from '../datasources/TagDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
-import { UserWithRole } from '../models/User';
+import { UserWithRole, UserJWT } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { UserDataSource } from './../datasources/UserDataSource';
-import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
