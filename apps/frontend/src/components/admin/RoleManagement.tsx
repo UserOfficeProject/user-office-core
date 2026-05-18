@@ -127,7 +127,6 @@ const RoleManagement: React.FC = () => {
               title: editRole.title,
               description: editRole.description,
               config: editRole.config,
-              isRootRole: false,
               tags: editRole.tags || [],
             } as Role)
           : null

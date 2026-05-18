@@ -48,10 +48,16 @@ const RoleModal: React.FC<RoleModalProps> = ({
     UserRoleConfig | ProposalReaderRoleConfig | null
   >(null);
   const [availableRoles, setAvailableRoles] = useState<
-    { shortCode: string; title?: string }[]
+    Pick<Role, 'shortCode' | 'title' | 'config'>[]
   >([]);
   const [loadingRoles, setLoadingRoles] = useState(false);
   const { api } = useDataApiWithFeedback();
+
+  const handleShortCodeChange = (newShortCode: string) => {
+    setShortCode(newShortCode);
+    const rootRole = availableRoles.find((r) => r.shortCode === newShortCode);
+    setConfig(rootRole?.config ?? null);
+  };
 
   useEffect(() => {
     if (isEditMode && role) {
@@ -77,7 +83,11 @@ const RoleModal: React.FC<RoleModalProps> = ({
         const roles = Array.isArray(res) ? res : res?.roles ?? [];
         const rootRoles = roles
           .filter((r) => r.isRootRole)
-          .map((r: Role) => ({ shortCode: r.shortCode, title: r.title }));
+          .map((r: Role) => ({
+            shortCode: r.shortCode,
+            title: r.title,
+            config: r.config,
+          }));
 
         if (isEditMode && role?.shortCode) {
           const alreadyPresent = roles.some(
@@ -86,7 +96,14 @@ const RoleModal: React.FC<RoleModalProps> = ({
           setAvailableRoles(
             alreadyPresent
               ? rootRoles
-              : [...rootRoles, { shortCode: role.shortCode, title: role.title }]
+              : [
+                  ...rootRoles,
+                  {
+                    shortCode: role.shortCode,
+                    title: role.title,
+                    config: role.config ?? null,
+                  },
+                ]
           );
         } else {
           setAvailableRoles(rootRoles);
@@ -159,7 +176,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
             labelId="role-shortcode-label"
             value={shortCode}
             label="Short Code"
-            onChange={(e) => setShortCode(e.target.value)}
+            onChange={(e) => handleShortCodeChange(e.target.value)}
             renderValue={(val) =>
               val || (loadingRoles ? 'Loading...' : 'Select a role')
             }
