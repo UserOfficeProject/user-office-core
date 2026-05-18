@@ -4,7 +4,7 @@ import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { ProposalReaderRolePermissions, Roles } from '../models/Role';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 
@@ -100,7 +100,7 @@ export class TechnicalReviewAuthorization {
       agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
 
     if (isProposalReader) {
-      const config = agent.currentRole!.config as ProposalReaderRolePermissions;
+      const config = agent.currentRole!.config as ProposalReaderRoleConfig;
       if (!config.hasTechnicalReviewAccess) {
         return false;
       }

@@ -10,8 +10,8 @@ export enum Roles {
   PROPOSAL_READER = 'proposal_reader',
 }
 
-export type UserRolePermissions = { note: string };
-export type ProposalReaderRolePermissions = {
+export type UserRoleConfig = { note: string };
+export type ProposalReaderRoleConfig = {
   hasLogAccess: boolean;
   hasTechnicalReviewAccess: boolean;
   hasFapAccess: boolean;
@@ -28,11 +28,11 @@ type RoleBase = {
 export type Role =
   | (RoleBase & {
       shortCode: typeof Roles.USER;
-      config: UserRolePermissions;
+      config: UserRoleConfig;
     })
   | (RoleBase & {
       shortCode: typeof Roles.PROPOSAL_READER;
-      config: ProposalReaderRolePermissions;
+      config: ProposalReaderRoleConfig;
     })
   // Add more roles here
   | (RoleBase & {
@@ -57,13 +57,13 @@ export function createRole(
       return {
         ...base,
         shortCode: Roles.USER,
-        config: config as UserRolePermissions,
+        config: config as UserRoleConfig,
       };
     case Roles.PROPOSAL_READER:
       return {
         ...base,
         shortCode: Roles.PROPOSAL_READER,
-        config: config as ProposalReaderRolePermissions,
+        config: config as ProposalReaderRoleConfig,
       };
     default:
       return {

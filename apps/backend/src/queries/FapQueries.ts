@@ -6,7 +6,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import { Fap, FapReviewVisibility } from '../models/Fap';
-import { ProposalReaderRolePermissions, Roles } from '../models/Role';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
 
@@ -260,7 +260,7 @@ export default class FapQueries {
   ): Promise<Fap[]> {
     if (agent?.currentRole?.shortCode === Roles.PROPOSAL_READER) {
       const hasFapAccess = (
-        agent.currentRole.config as ProposalReaderRolePermissions
+        agent.currentRole.config as ProposalReaderRoleConfig
       ).hasFapAccess;
       if (!hasFapAccess) {
         return [];

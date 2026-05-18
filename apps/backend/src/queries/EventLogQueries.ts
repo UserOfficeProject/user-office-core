@@ -7,7 +7,7 @@ import {
   EventLogFilter,
 } from '../datasources/EventLogsDataSource';
 import { Authorized } from '../decorators';
-import { ProposalReaderRolePermissions, Roles } from '../models/Role';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
 @injectable()
@@ -24,7 +24,7 @@ export default class EventLogQueries {
   ) {
     if (agent?.currentRole?.shortCode === Roles.PROPOSAL_READER) {
       const hasLogAccess = (
-        agent.currentRole.config as ProposalReaderRolePermissions
+        agent.currentRole.config as ProposalReaderRoleConfig
       ).hasLogAccess;
       if (!hasLogAccess) {
         logger.logError('Unauthorized access to event logs', {

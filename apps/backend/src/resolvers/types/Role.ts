@@ -14,18 +14,20 @@ import { Tag } from './Tag';
 import { ResolverContext } from '../../context';
 import {
   Roles,
-  UserRolePermissions,
-  ProposalReaderRolePermissions,
+  UserRoleConfig as UserRoleConfigOrigin,
+  ProposalReaderRoleConfig as ProposalReaderRoleConfigOrigin,
 } from '../../models/Role';
 
 @ObjectType()
-export class UserRoleConfig implements UserRolePermissions {
+export class UserRoleConfig implements Partial<UserRoleConfigOrigin> {
   @Field()
   note: string;
 }
 
 @ObjectType()
-export class ProposalReaderRoleConfig implements ProposalReaderRolePermissions {
+export class ProposalReaderRoleConfig
+  implements Partial<ProposalReaderRoleConfigOrigin>
+{
   @Field()
   hasLogAccess: boolean;
 
@@ -103,13 +105,13 @@ export class RoleResolver {
     if (role.shortCode === Roles.USER) {
       return Object.assign(
         new UserRoleConfig(),
-        role.config as UserRolePermissions
+        role.config as UserRoleConfigOrigin
       );
     }
     if (role.shortCode === Roles.PROPOSAL_READER) {
       return Object.assign(
         new ProposalReaderRoleConfig(),
-        role.config as ProposalReaderRolePermissions
+        role.config as ProposalReaderRoleConfigOrigin
       );
     }
 
