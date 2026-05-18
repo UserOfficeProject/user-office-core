@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 
+import initialDBData from '../support/initialDBData';
+
 const fillRoleBase = (
   title: string,
   description: string,
@@ -7,7 +9,8 @@ const fillRoleBase = (
 ) => {
   cy.get('[data-cy="create-new-entry"]').click();
   cy.get('[data-cy="role-shortcode-select"]').click();
-  cy.get('[role="listbox"]').contains(shortCode).click();
+  cy.contains('Root role').should('be.visible');
+  cy.get('[role="listbox"]').find(`[data-value="${shortCode}"]`).click();
   cy.get('[data-cy="role-title-input"]').type(title);
   cy.get('[data-cy="role-description-input"]').type(description);
 };
@@ -135,6 +138,50 @@ context('Role management', () => {
       cy.get('[data-cy="role-config-has-fap-access"]')
         .find('input')
         .should('be.checked');
+    });
+
+    it('disabled access settings hide corresponding tabs when viewing a proposal', () => {
+      const proposalReaderRoleId = 11;
+      const tagName = faker.word.words(2);
+      const tagShortCode = faker.word.words(1);
+
+      fillRoleBase(title, faker.word.words(3), 'proposal_reader');
+      cy.get('[data-cy="role-config-has-technical-review-access"]').click();
+      cy.get('[data-cy="role-config-has-fap-access"]').click();
+      cy.get('[data-cy="role-config-has-log-access"]').click();
+      cy.get('[data-cy="submit-role-button"]').click();
+
+      cy.contains('tr', title);
+
+      cy.createTag({ name: tagName, shortCode: tagShortCode }).then(
+        (tagResult) => {
+          const tagId = tagResult.createTag.id;
+
+          cy.assignCallsToTag({
+            tagId,
+            callIds: [initialDBData.call.id],
+          });
+          cy.updateRoleTags({
+            roleId: proposalReaderRoleId,
+            tagIds: [tagId],
+          });
+        }
+      );
+
+      cy.createProposal({ callId: initialDBData.call.id });
+
+      cy.updateUserRoles({
+        id: initialDBData.users.user1.id,
+        roles: [proposalReaderRoleId],
+      });
+
+      cy.login('user1', proposalReaderRoleId);
+      cy.visit('/Proposals');
+      cy.finishedLoading();
+
+      cy.get('[aria-label="View proposal"]').first().click();
+
+      cy.get('[data-cy="proposal-review-tabs"]').should('not.exist');
     });
   });
 });
