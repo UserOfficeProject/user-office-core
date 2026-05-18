@@ -41,18 +41,32 @@ export const QuestionTemplateRelationNumberForm = (
           numberMin: Yup.number()
             .typeError('Minimum score must be a number')
             .nullable(),
+          numberMinInclusive: Yup.bool().nullable(),
+          numberMaxInclusive: Yup.bool().nullable(),
           numberMax: Yup.number()
-            .typeError('Maximum score must be a number')
+            .typeError('Value must be a number')
             .nullable()
             // We cannot do the same for numberMin because it would create a circular dependency
-            .when('numberMin', (numberMin, schema) => {
-              return numberMin !== null
-                ? schema.moreThan(
-                    numberMin,
-                    'Maximum must be strictly greater than Minimum'
-                  )
-                : schema;
-            }),
+            .when(
+              ['numberMin', 'numberMaxInclusive', 'numberMinInclusive'],
+              ([numberMin, numberMaxInclusive, numberMinInclusive], schema) => {
+                if (numberMin !== undefined) {
+                  if (numberMinInclusive && numberMaxInclusive) {
+                    return schema.min(
+                      numberMin,
+                      'Maximum must be greater than or equal to Minimum'
+                    );
+                  } else {
+                    return schema.moreThan(
+                      numberMin,
+                      'Maximum must be strictly greater than Minimum'
+                    );
+                  }
+                }
+
+                return schema;
+              }
+            ),
         }),
       })}
     >
