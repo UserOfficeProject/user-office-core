@@ -49,11 +49,11 @@ test('A proposal reader with hasTechnicalReviewAccess can get reviews for a prop
   ).resolves.toStrictEqual([dummyReview]);
 });
 
-test('A proposal reader without hasTechnicalReviewAccess cannot get reviews for a proposal', () => {
+test('A proposal reader without hasTechnicalReviewAccess cannot get reviews for a proposal', async () => {
   return expect(
     reviewQueries.reviewsForProposal(
       dummyProposalReaderWithoutTechnicalReviewAccess,
       { proposalPk: 10 }
     )
-  ).resolves.toBe(null);
+  ).resolves.toStrictEqual([]);
 });

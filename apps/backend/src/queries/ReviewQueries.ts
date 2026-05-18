@@ -63,15 +63,17 @@ export default class ReviewQueries {
   async reviewsForProposal(
     agent: UserWithRole | null,
     { proposalPk, fapId }: ReviewsForProposalArgs
-  ): Promise<Review[] | null> {
+  ): Promise<Review[]> {
     const reviews = await this.dataSource.getProposalReviews(proposalPk, fapId);
 
-    const permittedReviews = reviews.filter(
-      async (review) =>
-        this.userAuth.isApiToken(agent) ||
-        (await this.reviewAuth.hasReadRights(agent, review))
+    const accessFlags = await Promise.all(
+      reviews.map(
+        (review) =>
+          this.userAuth.isApiToken(agent) ||
+          this.reviewAuth.hasReadRights(agent, review)
+      )
     );
 
-    return permittedReviews;
+    return reviews.filter((_, i) => accessFlags[i]);
   }
 }

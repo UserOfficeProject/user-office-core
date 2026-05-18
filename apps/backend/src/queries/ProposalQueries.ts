@@ -44,7 +44,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    // If not a user officer or instrument scientist or proposal reader with admin access, remove commentForManagement
+    // If not a user officer or instrument scientist or proposal, remove commentForManagement
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !this.userAuth.isInstrumentScientist(agent) &&
@@ -54,7 +54,7 @@ export default class ProposalQueries {
       proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
 
-    // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer or proposal reader with admin access
+    // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer or proposal reader
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !proposal.notified &&
