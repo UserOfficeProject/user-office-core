@@ -22,6 +22,10 @@ import {
 export class UserRoleConfig implements Partial<UserRoleConfigOrigin> {
   @Field()
   note: string;
+
+  constructor({ note }: UserRoleConfigOrigin) {
+    this.note = note;
+  }
 }
 
 @ObjectType()
@@ -39,6 +43,18 @@ export class ProposalReaderRoleConfig
 
   @Field()
   hasAdminAccess: boolean;
+
+  constructor({
+    hasLogAccess,
+    hasTechnicalReviewAccess,
+    hasFapAccess,
+    hasAdminAccess,
+  }: ProposalReaderRoleConfigOrigin) {
+    this.hasLogAccess = hasLogAccess;
+    this.hasTechnicalReviewAccess = hasTechnicalReviewAccess;
+    this.hasFapAccess = hasFapAccess;
+    this.hasAdminAccess = hasAdminAccess;
+  }
 }
 
 export const RoleConfig = createUnionType({
@@ -99,18 +115,12 @@ export class RoleResolver {
   }
 
   @FieldResolver(() => RoleConfig, { nullable: true })
-  config(
-    @Root() role: { shortCode: string; config: unknown }
-  ): UserRoleConfig | ProposalReaderRoleConfig | null {
+  config(@Root() role: Role): UserRoleConfig | ProposalReaderRoleConfig | null {
     if (role.shortCode === Roles.USER) {
-      return Object.assign(
-        new UserRoleConfig(),
-        role.config as UserRoleConfigOrigin
-      );
+      return new UserRoleConfig(role.config as UserRoleConfigOrigin);
     }
     if (role.shortCode === Roles.PROPOSAL_READER) {
-      return Object.assign(
-        new ProposalReaderRoleConfig(),
+      return new ProposalReaderRoleConfig(
         role.config as ProposalReaderRoleConfigOrigin
       );
     }
