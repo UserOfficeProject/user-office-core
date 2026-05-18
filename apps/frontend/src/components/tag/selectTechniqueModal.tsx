@@ -41,8 +41,6 @@ export const SelectTechniqueModal = ({
 
   return (
     <Dialog
-      aria-labelledby="simple-modal-title"
-      aria-describedby="simple-modal-description"
       open={open}
       onClose={(_, reason) => {
         if (reason && reason == 'backdropClick') return;
@@ -70,6 +68,7 @@ export const SelectTechniqueModal = ({
       </DialogTitle>
       <DialogContent>
         <MaterialTable
+          title="Assign Techniques to Tag"
           columns={[{ title: 'Short Code', field: 'shortCode' }]}
           data={
             preSelectedTechniques

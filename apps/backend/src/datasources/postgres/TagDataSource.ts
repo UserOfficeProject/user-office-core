@@ -196,7 +196,6 @@ class PostgresTagDataSource implements TagDataSource {
     return tags.map(createTagObject);
   }
 
-  //this doesn't look like it's used anywhere?
   async getInstrumentsAndCallsTags(
     tags: number[]
   ): Promise<{ instruments: Instrument[]; calls: Call[] }> {

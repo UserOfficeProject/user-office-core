@@ -102,44 +102,6 @@ export default class TechniqueMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToTechniqueArgs
   ): Promise<boolean | Rejection> {
-    const techniqueTags = await this.tagDataSource.getTechniquesTags(
-      args.techniqueId
-    );
-
-    if (techniqueTags.length > 0) {
-      let shareTag = true;
-
-      await Promise.all(
-        args.instrumentIds.map(async (instrumentId) => {
-          const instrumentTag =
-            await this.tagDataSource.getInstrumentsTags(instrumentId);
-
-          if (instrumentTag.length === 0) {
-            shareTag = false;
-          }
-
-          const tagCrossover = instrumentTag.some((tagInstrument) =>
-            techniqueTags.some(
-              (techniqueTag) => tagInstrument.id === techniqueTag.id
-            )
-          );
-
-          if (!tagCrossover) {
-            shareTag = false;
-          }
-        })
-      );
-
-      if (!shareTag) {
-        return rejection(
-          'One or more instruments do not share a tag with the selected technique',
-          {
-            args,
-          }
-        );
-      }
-    }
-
     return this.dataSource
       .assignInstrumentsToTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
