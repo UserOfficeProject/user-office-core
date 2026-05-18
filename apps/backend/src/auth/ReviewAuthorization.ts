@@ -50,15 +50,20 @@ export class ReviewAuthorization {
       return true;
     }
 
-    const isProposalReader =
-      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
-    if (isProposalReader) {
-      return true;
-    }
-
     const review = await this.resolveReview(reviewOrReviewId);
     if (!review) {
       return false;
+    }
+
+    const isProposalReader =
+      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
+    if (isProposalReader) {
+      const hasProposalReadRights = await this.proposalAuth.hasReadRights(
+        agent,
+        review.proposalPk
+      );
+
+      return hasProposalReadRights;
     }
 
     const isAuthor = review.userID === agent?.id;
