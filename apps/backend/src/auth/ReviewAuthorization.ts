@@ -59,7 +59,7 @@ export class ReviewAuthorization {
       agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
     if (isProposalReader) {
       const config = agent.currentRole!.config as ProposalReaderRolePermissions;
-      if (!config.hasTechnicalReviewAccess) {
+      if (!config.hasFapAccess) {
         return false;
       }
       const hasProposalReadRights = await this.proposalAuth.hasReadRights(

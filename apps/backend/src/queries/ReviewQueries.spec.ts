@@ -6,8 +6,8 @@ import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
-  dummyProposalReaderWithTechnicalReviewAccess,
-  dummyProposalReaderWithoutTechnicalReviewAccess,
+  dummyProposalReaderWithFapAccess,
+  dummyProposalReaderWithoutFapAccess,
 } from '../datasources/mockups/UserDataSource';
 
 const reviewQueries = container.resolve(ReviewQueries);
@@ -40,20 +40,18 @@ test('A user can not get reviews for a proposal', () => {
   ).resolves.toStrictEqual(null);
 });
 
-test('A proposal reader with hasTechnicalReviewAccess can get reviews for a proposal', () => {
+test('A proposal reader with FAP access can get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(
-      dummyProposalReaderWithTechnicalReviewAccess,
-      { proposalPk: 10 }
-    )
+    reviewQueries.reviewsForProposal(dummyProposalReaderWithFapAccess, {
+      proposalPk: 10,
+    })
   ).resolves.toStrictEqual([dummyReview]);
 });
 
-test('A proposal reader without hasTechnicalReviewAccess cannot get reviews for a proposal', async () => {
+test('A proposal reader without FAP access cannot get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(
-      dummyProposalReaderWithoutTechnicalReviewAccess,
-      { proposalPk: 10 }
-    )
+    reviewQueries.reviewsForProposal(dummyProposalReaderWithoutFapAccess, {
+      proposalPk: 10,
+    })
   ).resolves.toStrictEqual([]);
 });
