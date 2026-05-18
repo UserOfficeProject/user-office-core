@@ -99,6 +99,15 @@ export class TechnicalReviewAuthorization {
     const isProposalReader =
       agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
 
+    if (isProposalReader) {
+      const hasProposalReadRights = await this.proposalAuth.hasReadRights(
+        agent,
+        technicalreview.proposalPk
+      );
+
+      return hasProposalReadRights;
+    }
+
     const isScientistToProposal = await this.proposalAuth.isScientistToProposal(
       agent,
       technicalreview.proposalPk
@@ -118,8 +127,7 @@ export class TechnicalReviewAuthorization {
     if (
       isScientistToProposal ||
       isInstrumentManagerToProposal ||
-      isInternalReviewerOnTechnicalReview ||
-      isProposalReader
+      isInternalReviewerOnTechnicalReview
     ) {
       return true;
     }
