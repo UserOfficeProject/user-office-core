@@ -342,9 +342,8 @@ const getIsTechnicalReviewEnabled = (
   }
 
   if (user.currentRole === UserRole.PROPOSAL_READER) {
-    const config = user.roles.find(
-      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
-    )!.config as ProposalReaderRoleConfig;
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
 
     if (config.hasTechnicalReviewAccess) {
       return true;
@@ -367,9 +366,8 @@ const getIsFapEnabled = (
   }
 
   if (user.currentRole === UserRole.PROPOSAL_READER) {
-    const config = user.roles.find(
-      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
-    )!.config as ProposalReaderRoleConfig;
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
 
     if (config.hasFapAccess) {
       return true;
@@ -383,9 +381,8 @@ const getIsAdminEnabled = (user: React.ContextType<typeof UserContext>) => {
   }
 
   if (user.currentRole === UserRole.PROPOSAL_READER) {
-    const config = user.roles.find(
-      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
-    )!.config as ProposalReaderRoleConfig;
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
 
     if (config.hasAdminAccess) {
       return true;
@@ -401,9 +398,8 @@ const getIsLogsEnabled = (user: React.ContextType<typeof UserContext>) => {
   }
 
   if (user.currentRole === UserRole.PROPOSAL_READER) {
-    const config = user.roles.find(
-      (role) => role.shortCode.toUpperCase() === UserRole.PROPOSAL_READER
-    )!.config as ProposalReaderRoleConfig;
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
 
     if (config.hasLogAccess) {
       return true;
