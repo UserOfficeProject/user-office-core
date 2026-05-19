@@ -308,6 +308,25 @@ export const dummyProposalReaderWithoutFapAccess: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyProposalReaderWithAdminAccess: UserWithRole = {
+  ...dummyUser,
+  id: 109,
+  currentRole: {
+    id: 16,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: true,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
 export const dummyVisitorWithRole: UserWithRole = {
   ...dummyUser,
   id: 102,

@@ -14,7 +14,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, AgentTags } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
 import { omit } from '../utils/helperFunctions';
@@ -49,7 +49,10 @@ export default class ProposalQueries {
       !this.userAuth.isUserOfficer(agent) &&
       !this.userAuth.isInstrumentScientist(agent) &&
       !this.userAuth.isApiToken(agent) &&
-      !this.userAuth.isProposalReader(agent)
+      !(
+        this.userAuth.isProposalReader(agent) &&
+        (agent!.currentRole?.config as ProposalReaderRoleConfig).hasAdminAccess
+      )
     ) {
       proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
