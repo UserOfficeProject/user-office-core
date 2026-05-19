@@ -27,7 +27,9 @@ function defaultConfig(shortCode: string): unknown {
   }
 }
 
-function resolveConfig(shortCode: string, config: RoleConfigInput) {
+function resolveConfig(shortCode: string, config: RoleConfigInput | undefined) {
+  if (!config) return defaultConfig(shortCode);
+
   switch (shortCode) {
     case Roles.USER:
       return config.user;

@@ -16,8 +16,8 @@ export class CreateRoleArgs {
   @Field()
   description: string;
 
-  @Field(() => RoleConfigInput)
-  config: RoleConfigInput;
+  @Field(() => RoleConfigInput, { nullable: true })
+  config?: RoleConfigInput;
 }
 
 @Resolver()
