@@ -8,8 +8,8 @@ const fillRoleBase = (
   shortCode: string
 ) => {
   cy.get('[data-cy="create-new-entry"]').click();
+  cy.get('[data-cy="role-shortcode-select"]').should('be.visible');
   cy.get('[data-cy="role-shortcode-select"]').click();
-  cy.contains('Root role').should('be.visible');
   cy.get('[role="listbox"]').find(`[data-value="${shortCode}"]`).click();
   cy.get('[data-cy="role-title-input"]').type(title);
   cy.get('[data-cy="role-description-input"]').type(description);
