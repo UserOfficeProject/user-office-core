@@ -17,13 +17,12 @@ import { WorkflowConnection, WorkflowType } from 'generated/sdk';
 import { usePersistWorkflowEditorModel } from 'hooks/settings/usePersistWorkflowEditorModel';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
-import { FunctionType } from 'utils/utilTypes';
 
 import LoadingOverlay from './LoadingOverlay';
 import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
 import StatusPicker from './StatusPicker';
 import WorkflowCanvas from './WorkflowCanvas';
-import WorkflowEditorModel, { Event, EventType } from './WorkflowEditorModel';
+import WorkflowEditorModel, { EventType } from './WorkflowEditorModel';
 import WorkflowMetadataEditor from './WorkflowMetadataEditor';
 import {
   EdgeData,
@@ -45,17 +44,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   const [selectedWorkflowConnection, setSelectedWorkflowConnection] =
     useState<WorkflowConnection | null>(null);
 
-  const reducerMiddleware = () => {
-    return (next: FunctionType) => (action: Event) => {
-      next(action);
-    };
-  };
-
   const { persistModel, isLoading } = usePersistWorkflowEditorModel();
-  const { state, dispatch } = WorkflowEditorModel(entityType, [
-    persistModel,
-    reducerMiddleware,
-  ]);
+  const { state, dispatch } = WorkflowEditorModel(entityType, [persistModel]);
 
   // Effect to update edge labels when workflowConnection changes
   React.useEffect(() => {
