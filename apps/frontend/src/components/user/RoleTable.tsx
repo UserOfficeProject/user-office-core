@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { Role } from 'generated/sdk';
+import { Role as RoleSDK } from 'generated/sdk';
 import { useRolesData } from 'hooks/user/useRolesData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -11,6 +11,8 @@ type RoleTableProps = {
   add: (values: Role[]) => void;
   activeRoles?: Role[];
 };
+
+type Role = Omit<RoleSDK, 'tags'>;
 
 const columns = [{ title: 'Role', field: 'title' }];
 
@@ -33,6 +35,7 @@ const RoleTable = ({ add, activeRoles }: RoleTableProps) => {
         onSelectionChange={(data) => setSelectedRoles(data)}
         options={{
           search: true,
+          pageSize: 10,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
           },

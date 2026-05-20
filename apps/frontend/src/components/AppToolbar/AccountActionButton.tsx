@@ -1,5 +1,6 @@
 import { ExitToApp, ManageAccounts } from '@mui/icons-material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
@@ -33,16 +34,14 @@ const AccountActionButton = () => {
   const [show, setShow] = useState(false);
   const { user } = useContext(UserContext);
   const settingsContext = useContext(SettingsContext);
-  const { roles, currentRole, handleLogout, impersonatingUserId } =
+  const { roles, currentRoleId, handleLogout, impersonatingUserId } =
     useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const hasMultipleRoles = getUniqueArrayBy(roles, 'id').length > 1;
   const humanReadableActiveRole = useMemo(
-    () =>
-      roles.find(({ shortCode }) => shortCode.toUpperCase() === currentRole)
-        ?.title ?? 'Unknown',
-    [roles, currentRole]
+    () => roles.find(({ id }) => id === currentRoleId)?.title ?? 'Unknown',
+    [roles, currentRoleId]
   );
 
   useEffect(() => {
@@ -60,6 +59,10 @@ const AccountActionButton = () => {
 
   const externalProfileLink = settingsContext.settingsMap.get(
     SettingsId.PROFILE_PAGE_LINK
+  )?.settingsValue;
+
+  const externalHomepageURL = settingsContext.settingsMap.get(
+    SettingsId.EXTERNAL_AUTH_HOMEPAGE_URL
   )?.settingsValue;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -85,6 +88,13 @@ const AccountActionButton = () => {
       window.open(externalProfileLink, '_blank', 'noopener,noreferrer');
     } else {
       navigate(`/ProfilePage/${user.id}`);
+    }
+  };
+
+  const handleExternalHomepageClick = () => {
+    handleClose();
+    if (externalHomepageURL) {
+      window.open(externalHomepageURL, '_self');
     }
   };
 
@@ -209,6 +219,17 @@ const AccountActionButton = () => {
               >
                 Un-impersonate
               </ImpersonateButton>
+            </MenuItem>
+          )}
+          {externalHomepageURL && (
+            <MenuItem
+              onClick={handleExternalHomepageClick}
+              data-cy="external-homepage-button"
+            >
+              <Box paddingRight={1} paddingTop={1}>
+                <HomeOutlinedIcon />
+              </Box>
+              Facilities Homepage
             </MenuItem>
           )}
           <MenuItem

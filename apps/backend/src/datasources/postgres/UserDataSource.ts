@@ -36,6 +36,8 @@ const fieldMap: { [key: string]: string } = {
   preferredname: 'preferredname',
   lastname: 'lastname',
   institution: 'i.institution',
+  email: 'email',
+  oidcSub: 'oidc_sub',
 };
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -127,7 +129,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -147,7 +151,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.is_root_role
             )
         )
       );
@@ -254,7 +260,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
-        !!user ? createBasicUserObject(user) : null
+        user ? createBasicUserObject(user) : null
       );
   }
 
@@ -429,7 +435,7 @@ export default class PostgresUserDataSource implements UserDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          query.orderByRaw(`LOWER(??) ${sortDirection}`, [sortField]);
         }
       })
       .then(
@@ -738,7 +744,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title, role.description)
+          new Role(
+            role.role_id,
+            role.short_code,
+            role.title,
+            role.description,
+            role.permissions,
+            role.is_root_role
+          )
       );
   }
 

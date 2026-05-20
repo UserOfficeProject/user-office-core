@@ -10,6 +10,7 @@ import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
+import RoleManagement from './admin/RoleManagement';
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
@@ -146,6 +147,7 @@ const AppRoutes = () => {
   const { t } = useTranslation();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isUser = useCheckAccess([UserRole.USER]);
+  const isProposalReader = useCheckAccess([UserRole.PROPOSAL_READER]);
   const isExperimentSafetyReviewer = useCheckAccess([
     UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
@@ -228,10 +230,24 @@ const AppRoutes = () => {
             element={<TitledRoute title="People" element={<PeoplePage />} />}
           />
         )}
+
         <Route
-          path="/Proposals"
-          element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
+          path="/admin/roles"
+          element={
+            <TitledRoute title="Role creation" element={<RoleManagement />} />
+          }
         />
+
+        {isUserOfficer || isProposalReader ? (
+          <Route
+            path="/Proposals"
+            element={
+              <TitledRoute title="Proposals" element={<ProposalPage />} />
+            }
+          />
+        ) : (
+          <Route path="/Proposals" element={<Navigate to="/" replace />} />
+        )}
         {isTechniqueProposalsEnabled &&
           (isInstrumentScientist || isUserOfficer) && (
             <Route
@@ -257,7 +273,7 @@ const AppRoutes = () => {
         {isTagsEnabled && isUserOfficer && (
           <Route
             path="/Tag"
-            element={<TitledRoute title="Tag" element={<TagPage />} />}
+            element={<TitledRoute title="Tags" element={<TagPage />} />}
           />
         )}
         <Route
@@ -696,6 +712,11 @@ const AppRoutes = () => {
           }
         />
         {isUserOfficer ? (
+          <Route
+            path="/"
+            element={<TitledRoute title="" element={<ProposalPage />} />}
+          />
+        ) : isProposalReader ? (
           <Route
             path="/"
             element={<TitledRoute title="" element={<ProposalPage />} />}

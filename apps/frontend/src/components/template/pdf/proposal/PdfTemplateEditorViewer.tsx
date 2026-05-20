@@ -1,75 +1,57 @@
 import Box from '@mui/material/Box';
-import {
-  Viewer,
-  Worker,
-  Plugin,
-  SpecialZoomLevel,
-  createStore,
-  PluginFunctions,
-} from '@react-pdf-viewer/core';
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
-
-import '@react-pdf-viewer/core/lib/styles/index.css';
+import { useResizeObserver } from '@wojtekmaj/react-hooks';
+import { PDFDocumentProxy } from 'pdfjs-dist';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import React, { useCallback, useContext, useState } from 'react';
+import { pdfjs, Document, Page } from 'react-pdf';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalPdfTemplate } from 'generated/sdk';
 
-interface CustomZoomPlugin extends Plugin {
-  zoomTo(scale: number | SpecialZoomLevel): void;
-}
-
-interface StoreProps {
-  zoom?(scale: number | SpecialZoomLevel): void;
-}
-
-const CustomZoomPlugin = (): CustomZoomPlugin => {
-  const store = React.useMemo(() => createStore<StoreProps>({}), []);
-
-  return {
-    install: (pluginFunctions: PluginFunctions) => {
-      store.update('zoom', pluginFunctions.zoom);
-    },
-    zoomTo: (scale: number | SpecialZoomLevel) => {
-      const zoom = store.get('zoom');
-      if (zoom) {
-        zoom(scale);
-      }
-    },
-  };
-};
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  '/scripts/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
-  const customZoomPluginInstance = CustomZoomPlugin();
-  const { zoomTo } = customZoomPluginInstance;
-  const pdfViewerContainerRef = useRef<HTMLDivElement>(null);
+  const [numPages, setNumPages] = useState<number>();
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number>();
+  const resizeObserverOptions = {};
 
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (entries[0]) {
-        zoomTo(SpecialZoomLevel.PageWidth);
-      }
-    });
+  const onResize = useCallback<ResizeObserverCallback>((entries) => {
+    const [entry] = entries;
 
-    const pdfViewerContainerRefCurrent = pdfViewerContainerRef.current;
-    if (pdfViewerContainerRefCurrent) {
-      resizeObserver.observe(pdfViewerContainerRefCurrent);
+    if (entry) {
+      setContainerWidth(entry.contentRect.width);
     }
+  }, []);
 
-    return () => {
-      if (pdfViewerContainerRefCurrent) {
-        resizeObserver.unobserve(pdfViewerContainerRefCurrent);
-      }
-    };
-  }, [zoomTo]);
+  useResizeObserver(containerRef, resizeObserverOptions, onResize);
+
+  const onDocumentLoadSuccess = ({
+    numPages: nextNumPages,
+  }: PDFDocumentProxy) => {
+    setNumPages(nextNumPages);
+  };
 
   return (
     <Box
       style={{
         height: '1000px',
       }}
-      ref={pdfViewerContainerRef}
+      ref={setContainerRef}
     >
-      <Viewer fileUrl={fileUrl} plugins={[customZoomPluginInstance]} />
+      <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>
+        {Array.from(new Array(numPages), (_el, index) => (
+          <Page
+            key={`page_${index + 1}`}
+            pageNumber={index + 1}
+            width={containerWidth!}
+          />
+        ))}
+      </Document>
     </Box>
   );
 };
@@ -105,13 +87,11 @@ function PdfTemplateEditorViewer({
     });
   }, [fetchGeneratedPdfPreviewData]);
 
-  return (
-    <Worker workerUrl={'/scripts/pdf.worker.min.js'}>
-      {generatedPdfPreviewBlob && (
-        <PDFViewer fileUrl={URL.createObjectURL(generatedPdfPreviewBlob)} />
-      )}
-    </Worker>
-  );
+  if (generatedPdfPreviewBlob) {
+    return <PDFViewer fileUrl={URL.createObjectURL(generatedPdfPreviewBlob)} />;
+  } else {
+    return <div></div>;
+  }
 }
 
 export default React.memo(

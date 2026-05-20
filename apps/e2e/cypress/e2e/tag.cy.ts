@@ -6,7 +6,12 @@ import initialDBData from '../support/initialDBData';
 
 const tagName = faker.word.words(2);
 const tagShortCode = faker.word.words(1);
-
+const dynamicRoleDetails = {
+  id: 11,
+  title: 'Dynamic Proposal Reader',
+  description: 'Role that can only see calls and proposals with specific tags',
+  shortCode: 'proposal_reader',
+};
 const scientist1 = initialDBData.users.user1;
 
 const instrument1 = {
@@ -137,6 +142,88 @@ context('Tag tests', () => {
         variant: 'error',
         text: 'One or more instruments do not share a tag with the selected call',
       });
+    });
+
+    it('User should only see proposal if tag has been assigned to role', () => {
+      const title: string = faker.word.words(3);
+      const abstract: string = faker.word.words(3);
+      cy.createTag({ name: tagName, shortCode: tagShortCode });
+
+      cy.visit('/Tag');
+
+      cy.get('[aria-label="Assign Call"]').click();
+
+      cy.contains('call 1').parent().find('[type="checkbox"]').click();
+
+      cy.get('[data-cy="assign-selected-calls"]').click();
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+        cy.updateProposal({
+          proposalPk: createdProposal.primaryKey,
+          title: title,
+          abstract: abstract,
+        });
+      });
+
+      cy.visit('/Tag');
+
+      cy.contains(tagName)
+        .parent()
+        .get('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.contains('call 1');
+
+      cy.get('[data-cy="officer-menu-items"]')
+        .contains('Configuration Settings')
+        .click();
+      cy.get('[data-cy="officer-menu-items"]')
+        .contains('Role management')
+        .click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+
+      cy.get('[data-cy="role-title-input"]').type(dynamicRoleDetails.title);
+      cy.get('[data-cy="role-description-input"]').type(
+        dynamicRoleDetails.description
+      );
+      cy.get('[data-cy="role-shortcode-select"]').click();
+      cy.get('[role="listbox"]').contains(dynamicRoleDetails.shortCode).click();
+      cy.get('[data-cy="submit-role-button"]').click();
+
+      cy.updateUserRoles({
+        id: initialDBData.users.user1.id,
+        roles: [dynamicRoleDetails.id], // newly created role
+      });
+
+      cy.login('user1');
+      cy.visit('/Proposals');
+
+      cy.finishedLoading();
+      cy.contains('No records to display').should('exist');
+      cy.contains('Loading...').should('not.exist');
+      cy.contains(title).should('not.exist');
+
+      cy.login('officer');
+      cy.visit('/admin/roles');
+      cy.finishedLoading();
+
+      cy.contains('tr', dynamicRoleDetails.title)
+        .find('[aria-label="Assign Tags"]')
+        .click();
+
+      cy.get('[role="dialog"] input[placeholder="Select tags"]')
+        .should('be.visible')
+        .click()
+        .type(tagName);
+
+      cy.get('[role="option"]').contains(tagName).should('be.visible').click();
+
+      cy.get('[role="dialog"] [data-cy="assign-selected-tags"]').click();
+      cy.login('user1', dynamicRoleDetails.id);
+      cy.visit('/Proposals');
+
+      cy.contains(title).should('exist');
     });
   });
 });

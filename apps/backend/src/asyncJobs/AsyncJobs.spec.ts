@@ -2,11 +2,11 @@
 import 'reflect-metadata';
 import sinon from 'sinon';
 
-import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import checkCallsEndedJob from './jobs/checkAllCallsEnded';
 import checkCallsFAPReviewEndedJob from './jobs/checkCallsFAPReviewEnded';
 import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
 import { runAsyncJobs } from './startAsyncJobs';
+import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 
 describe('Test if predefined async jobs are running correctly', () => {
   let clock: sinon.SinonFakeTimers;

@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ProposalMutations from './ProposalMutations';
 import { Tokens } from '../config/Tokens';
 import {
   ProposalDataSourceMock,
@@ -21,7 +22,6 @@ import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
 import { WorkflowType } from '../models/Workflow';
-import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
@@ -69,7 +69,8 @@ test('A user on the proposal can not update its title if it is not in edit mode'
   return expect(
     proposalMutations.update(dummyUserWithRole, {
       proposalPk: dummyProposalSubmitted.primaryKey,
-      title: '',
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toBeInstanceOf(Rejection);
 });
@@ -145,6 +146,8 @@ test('A user can not update a proposals score mode', async () => {
     proposalMutations.update(dummyUserWithRole, {
       proposalPk: dummyProposalSubmitted.primaryKey,
       proposerId: newProposerId,
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toBeInstanceOf(Rejection);
 });
@@ -154,6 +157,8 @@ test('A user not on a proposal can not update it', () => {
     proposalMutations.update(dummyUserNotOnProposalWithRole, {
       proposalPk: 1,
       proposerId: dummyUserNotOnProposal.id,
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toBeInstanceOf(Rejection);
 });
@@ -328,6 +333,8 @@ test('User cannot import a proposal', () => {
       referenceNumber: '21219999',
       callId: 1,
       submittedDate: new Date(),
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
@@ -339,6 +346,8 @@ test('User Officer can import a legacy proposal', () => {
       referenceNumber: '21219999',
       callId: 1,
       submittedDate: new Date(),
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toBeInstanceOf(Proposal);
 });
@@ -350,6 +359,8 @@ test('Proposal import is creating a proposal', () => {
       referenceNumber: '21219999',
       callId: 1,
       submittedDate: new Date(),
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toHaveProperty('proposerId', 1);
 });
@@ -359,8 +370,9 @@ test('Proposal import is updating the proposal', async () => {
     submitterId: 1,
     referenceNumber: '21219999',
     callId: 1,
-    title: 'new title',
     submittedDate: new Date(),
+    title: 'new title',
+    abstract: 'abstract',
   });
 
   return expect(
@@ -375,6 +387,8 @@ test('Proposal import is submitting the proposal', () => {
       referenceNumber: '21219999',
       callId: 1,
       submittedDate: new Date(),
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.toHaveProperty('proposalId', '21219999');
 });
@@ -386,6 +400,8 @@ test('Proposal cannot be submitted without a call', () => {
       referenceNumber: '21219999',
       callId: -1,
       submittedDate: new Date(),
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
@@ -399,6 +415,8 @@ test('Proposal can be submitted with techniques and instrument', () => {
       submittedDate: new Date(),
       techniqueIds: [1, 2],
       instrumentId: 1,
+      title: 'title',
+      abstract: 'abstract',
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
