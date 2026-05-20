@@ -1,6 +1,6 @@
 import { createActor, createMachine } from './stateMachnine';
 
-describe('simpleStateMachine', () => {
+describe('stateMachine', () => {
   it('throws when the initial state is missing from the schema', () => {
     expect(() =>
       createMachine({
