@@ -18,10 +18,11 @@ export const createVisitBasisValidationSchema: CreateYupValidation = () => {
         is: (startsAt: Date) => {
           return !!startsAt;
         },
-        then: Yup.date()
-          .min(Yup.ref('startsAt'), "End date can't be before Start date")
-          .required('End Date/Time is required')
-          .typeError('Invalid date'),
+        then: (schema) =>
+          schema
+            .min(Yup.ref('startsAt'), "End date can't be before Start date")
+            .required('End Date/Time is required')
+            .typeError('Invalid date'),
       })
       .typeError('Invalid date'),
   });

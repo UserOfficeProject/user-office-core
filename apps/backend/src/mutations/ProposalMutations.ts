@@ -166,13 +166,8 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const { proposalPk, title, abstract, users, proposerId, created } = args;
 
-    if (title !== undefined) {
-      proposal.title = title;
-    }
-
-    if (abstract !== undefined) {
-      proposal.abstract = abstract;
-    }
+    proposal.title = title;
+    proposal.abstract = abstract;
 
     if (created !== undefined) {
       proposal.created = created;

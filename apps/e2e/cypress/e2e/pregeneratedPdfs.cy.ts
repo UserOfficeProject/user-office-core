@@ -3,8 +3,6 @@ import {
   AllocationTimeUnits,
   FeatureId,
   FeatureUpdateAction,
-} from '@user-office-software-libs/shared-types';
-import {
   Event as PROPOSAL_EVENTS,
   StatusActionType,
 } from '@user-office-software-libs/shared-types';
