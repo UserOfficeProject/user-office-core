@@ -44,7 +44,7 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserName, getUserPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type ProposalReview = {
@@ -102,6 +102,18 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     field: 'proposal.title',
   },
   {
+    title: 'Principal Investigator',
+    render: (rowData) => {
+      return getUserPreferredName(rowData.proposal.proposer);
+    },
+    customSort(a, b) {
+      const name1 = getUserPreferredName(a.proposal.proposer);
+      const name2 = getUserPreferredName(b.proposal.proposer);
+
+      return name1 < name2 ? -1 : 1;
+    },
+  },
+  {
     title: 'Status',
     field: 'proposal.status.name',
   },
@@ -112,6 +124,8 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Reviewers',
     render: (data) => data.assignments?.length,
+    customSort: (a, b) =>
+      (a.assignments?.length || 0) - (b.assignments?.length || 0),
   },
   {
     title: 'Reviews',
@@ -124,6 +138,29 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       const countReviews = gradedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
+    },
+    customSort: (a, b) => {
+      const totalReviewsA = a.assignments?.length || 0;
+      const totalReviewsB = b.assignments?.length || 0;
+      const gradedProposalsA =
+        a.assignments?.filter(
+          (assignment) =>
+            assignment.review !== null && assignment.review.grade !== null
+        ).length || 0;
+      const gradedProposalsB =
+        b.assignments?.filter(
+          (assignment) =>
+            assignment.review !== null && assignment.review.grade !== null
+        ).length || 0;
+
+      const incompleteReviewsA = totalReviewsA - gradedProposalsA;
+      const incompleteReviewsB = totalReviewsB - gradedProposalsB;
+
+      if (incompleteReviewsA === incompleteReviewsB) {
+        return totalReviewsB - totalReviewsA;
+      }
+
+      return incompleteReviewsA - incompleteReviewsB;
     },
   },
   {
@@ -796,6 +833,8 @@ const FapProposalsAndAssignmentsTable = ({
           ]}
           actions={tableActions}
           options={{
+            columnsButton: true,
+            defaultExpanded: true,
             search: true,
             selection: true,
             pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),

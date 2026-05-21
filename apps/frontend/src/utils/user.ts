@@ -5,6 +5,18 @@ export const getFullUserName = (
   user?: Pick<BasicUserDetails, 'firstname' | 'lastname'> | null
 ): string => (user ? `${user.firstname} ${user.lastname}` : 'None');
 
+export const getUserPreferredName = (
+  user?: Pick<
+    BasicUserDetails,
+    'firstname' | 'lastname' | 'preferredname'
+  > | null
+): string =>
+  user
+    ? user.preferredname
+      ? `${user.preferredname} ${user.lastname}`
+      : `${user.firstname} ${user.lastname}`
+    : 'None';
+
 export const getFullUserNameWithEmail = (
   user?: Pick<
     BasicUserDetails,
