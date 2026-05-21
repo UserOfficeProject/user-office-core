@@ -129,6 +129,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
           url: urlValidation,
+          useBaseDomain: Yup.bool(),
           jsonPath: Yup.string(),
           apiRequestHeaders: Yup.array(),
         }),
@@ -208,6 +209,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
               <InputLabel htmlFor="config.url" shrink>
                 Link
               </InputLabel>
+              <InputLabel htmlFor="config.url" shrink>
+                koanrec
+              </InputLabel>
               <Field
                 name="config.url"
                 id="config.url"
@@ -219,6 +223,14 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             </FormControl>
 
             <FormControl fullWidth>
+              <Field
+                name="config.useBaseDomain"
+                id="config.useBaseDomain"
+                type="checkbox"
+                component={CheckboxWithLabel}
+                Label={{ label: 'Use base domain for dynamic URL' }}
+                data-cy="use-base-domain"
+              />
               <InputLabel htmlFor="config.jsonPath" shrink>
                 JsonPath
               </InputLabel>
