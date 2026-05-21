@@ -66,6 +66,7 @@ BEGIN
      , comment_for_management
      , comment_for_user
      , notified
+    , management_decision_submitted
      , submitted
     )
     VALUES 
@@ -83,6 +84,7 @@ BEGIN
      , NULL              
      , NULL              
      , true              
+    , true              
      , true              
     );
 
@@ -106,6 +108,7 @@ BEGIN
      , comment_for_management
      , comment_for_user
      , notified
+    , management_decision_submitted
      , submitted
     )
     VALUES 
@@ -123,6 +126,7 @@ BEGIN
      , NULL              
      , NULL              
      , true              
+    , true              
      , true              
     );
 

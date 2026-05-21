@@ -239,6 +239,7 @@ export interface UserRecord {
 }
 
 export interface VisitRegistrationRecord {
+  id: string;
   user_id: number;
   visit_id: number;
   registration_questionary_id: number | null;
@@ -992,6 +993,7 @@ export const createVisitRegistrationObject = (
   record: VisitRegistrationRecord
 ) => {
   return new VisitRegistration(
+    record.id,
     record.visit_id,
     record.user_id,
     record.registration_questionary_id,

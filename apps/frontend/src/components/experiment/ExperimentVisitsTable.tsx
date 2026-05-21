@@ -69,7 +69,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
         visit: {
           ...prev.visit,
           registrations: prev.visit.registrations.map((registration) =>
-            registration.userId === submittedRegistration.userId
+            registration.id === submittedRegistration.id
               ? submittedRegistration
               : registration
           ),
@@ -87,13 +87,13 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       if (!prev.visit) {
         return prev;
       }
-
+      alert(newRegistration.id)
       const next = {
         ...prev,
         visit: {
           ...prev.visit,
           registrations: prev.visit.registrations.map((registration) =>
-            registration.userId === newRegistration.userId
+            registration.id === newRegistration.id
               ? newRegistration
               : registration
           ),
@@ -170,7 +170,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       sorting: false,
       render: (rowData: RowType) => {
         const editButton = (
-          <IconButton onClick={() => setSelectedVisit(rowData)}>
+          <IconButton onClick={() => setSelectedVisit(rowData)} component="button" data-cy="edit-visit-registration-button">
             <EditIcon />
           </IconButton>
         );
@@ -250,6 +250,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
           case VisitRegistrationStatus.APPROVED:
             return (
               <ActionDiv>
+                {editButton}
                 {sendEmailButton}
                 {cancelButton}
               </ActionDiv>
