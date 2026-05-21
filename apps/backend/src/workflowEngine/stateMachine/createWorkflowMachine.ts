@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 
-import { createMachine, GuardFn, StateConfig } from './stateMachnine';
+import { createMachine, GuardFn, StateConfig } from './stateMachine';
 import { Tokens } from '../../config/Tokens';
 import { WorkflowDataSource } from '../../datasources/WorkflowDataSource';
 import { Event, EventMetadataByEvent } from '../../events/event.enum';

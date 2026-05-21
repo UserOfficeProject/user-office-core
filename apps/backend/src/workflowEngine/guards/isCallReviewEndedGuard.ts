@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { Entity, GuardFn } from '../stateMachine/stateMachnine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isCallReviewEndedGuard: GuardFn = async (entity: Entity) => {
   const proposalDataSource = container.resolve<ProposalDataSource>(

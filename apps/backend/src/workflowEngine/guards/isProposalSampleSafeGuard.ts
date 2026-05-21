@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { SampleStatus } from '../../models/Sample';
-import { Entity, GuardFn } from '../stateMachine/stateMachnine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isProposalSampleSafeGuard: GuardFn = async (entity: Entity) => {
   const sampleDataSource = container.resolve<SampleDataSource>(
