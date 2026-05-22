@@ -110,6 +110,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const urlValidation = urlValidationSchema();
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
+  const [useBaseDomain, setUseBaseDomain] = useState(
+    config.useBaseDomain ?? false
+  );
 
   const availableVariantOptions = [
     { label: 'Radio', value: 'radio' },
@@ -135,7 +138,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
         }),
       })}
     >
-      {() => (
+      {({ setFieldValue }) => (
         <>
           <Field
             name="naturalKey"
@@ -209,9 +212,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
               <InputLabel htmlFor="config.url" shrink>
                 Link
               </InputLabel>
-              <InputLabel htmlFor="config.url" shrink>
-                koanrec
-              </InputLabel>
+              {useBaseDomain && (
+                <InputLabel htmlFor="config.url" shrink>
+                  https://www.koanarec.com
+                </InputLabel>
+              )}
               <Field
                 name="config.url"
                 id="config.url"
@@ -230,6 +235,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                 component={CheckboxWithLabel}
                 Label={{ label: 'Use base domain for dynamic URL' }}
                 data-cy="use-base-domain"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const checked = e.target.checked;
+                  setUseBaseDomain(checked);
+                  setFieldValue('config.useBaseDomain', checked);
+                }}
               />
               <InputLabel htmlFor="config.jsonPath" shrink>
                 JsonPath
