@@ -1876,7 +1876,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="Faps-table"]')
         .contains(fap1.code)
         .closest('tr')
-        .find('[aria-label="Edit"]')
+        .find('[aria-label="View"]')
         .click();
 
       cy.get('[role="tablist"] [role="tab"]').should('have.length', 3);
