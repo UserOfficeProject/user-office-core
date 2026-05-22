@@ -15,6 +15,7 @@ import ProposalReviewContent, {
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import {
   FapProposalType,
   FapProposalAssignmentType,
@@ -159,6 +160,10 @@ const FapLegacyProposalsTable = ({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { t } = useTranslation();
+  const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
+    '[data-cy="fap-assignments-table"]',
+    [loadingFapProposals]
+  );
 
   const translatedColumns = FapProposalColumns.map((column) =>
     column.title === 'Instrument'
@@ -360,6 +365,7 @@ const FapLegacyProposalsTable = ({
       </ProposalReviewModal>
       <div data-cy="fap-assignments-table">
         <MaterialTable
+          tableRef={tableRef}
           icons={tableIcons}
           columns={translatedColumns}
           title={
@@ -424,6 +430,7 @@ const FapLegacyProposalsTable = ({
           }}
         />
       </div>
+      {expandCollapseAllButton}
     </>
   );
 };

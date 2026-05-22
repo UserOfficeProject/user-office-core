@@ -21,6 +21,7 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import {
   FapProposalType,
   FapProposalAssignmentType,
@@ -180,6 +181,10 @@ const FapProposalsAndAssignmentsTable = ({
     UserRole.USER_OFFICER,
   ]);
   const { t } = useTranslation();
+  const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
+    '[data-cy="fap-assignments-table"]',
+    [loadingFapProposals]
+  );
 
   const translatedColumns = FapProposalColumns.map((column) =>
     column.title === 'Instrument'
@@ -426,6 +431,7 @@ const FapProposalsAndAssignmentsTable = ({
       />
       <div data-cy="fap-assignments-table">
         <MaterialTable
+          tableRef={tableRef}
           icons={tableIcons}
           columns={translatedColumns}
           title={
@@ -490,6 +496,7 @@ const FapProposalsAndAssignmentsTable = ({
           }}
         />
       </div>
+      {expandCollapseAllButton}
     </>
   );
 };
