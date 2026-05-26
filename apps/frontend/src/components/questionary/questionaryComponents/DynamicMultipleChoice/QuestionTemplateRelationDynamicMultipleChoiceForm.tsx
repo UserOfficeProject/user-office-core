@@ -2,7 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
@@ -11,9 +11,11 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
+  SettingsId,
 } from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
@@ -25,12 +27,23 @@ const columns = [
   { title: 'Value', field: 'value' },
 ];
 
+const pathNameValidationSchema = Yup.string()
+  .matches(
+    /^(?!http|www)/i,
+    'Provide a valid pathname, the base domain is already provided'
+  )
+  .matches(/^(?!\/).+$/, 'Leading slash should not be included')
+  .required('Pathname is required');
+
 export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
   const config = props.questionRel.config as DynamicMultipleChoiceConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
+  const [useBaseDomain, setUseBaseDomain] = useState(
+    config.useBaseDomain ?? false
+  );
 
   const availableVariantOptions = [
     { label: 'Radio', value: 'radio' },
@@ -38,6 +51,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
   ];
 
   const urlValidation = urlValidationSchema();
+  const { settingsMap } = useContext(SettingsContext);
 
   return (
     <QuestionTemplateRelationFormShell
@@ -46,11 +60,15 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: urlValidation,
+          url: Yup.string().when('useBaseDomain', (useBaseDomain, schema) =>
+            useBaseDomain
+              ? schema.concat(pathNameValidationSchema)
+              : schema.concat(urlValidation)
+          ),
         }),
       })}
     >
-      {() => (
+      {({ setFieldValue }) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
@@ -103,17 +121,51 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               <InputLabel htmlFor="config.url" shrink>
                 Link
               </InputLabel>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {useBaseDomain && (
+                  <span
+                    style={{
+                      whiteSpace: 'nowrap',
+                      color: 'grey',
+                      paddingTop: '20px',
+                    }}
+                  >
+                    {`http://${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
+                  </span>
+                )}
+
+                <Field
+                  name="config.url"
+                  id="config.url"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                />
+              </div>
+
               <Field
-                name="config.url"
-                id="config.url"
-                type="text"
-                component={TextField}
-                fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url' }}
+                name="config.useBaseDomain"
+                id="config.useBaseDomain"
+                type="checkbox"
+                component={CheckboxWithLabel}
+                Label={{ label: 'Use base domain for dynamic URL' }}
+                data-cy="use-base-domain"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const checked = e.target.checked;
+                  setUseBaseDomain(checked);
+                  setFieldValue('config.useBaseDomain', checked);
+                }}
               />
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="config.jsonPath" shrink>
+
+            <FormControl fullWidth style={{ paddingTop: '30px' }}>
+              <InputLabel
+                htmlFor="config.jsonPath"
+                shrink
+                style={{ paddingTop: '40px' }}
+              >
                 JsonPath
               </InputLabel>
               <Field

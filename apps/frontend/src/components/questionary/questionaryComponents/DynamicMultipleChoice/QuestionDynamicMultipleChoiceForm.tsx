@@ -85,15 +85,13 @@ const jsonPathFieldsDocRows = [
   },
 ];
 
-const pathNameValidationSchema = () => {
-  return Yup.string()
-    .matches(
-      /^(?!http|www)/i,
-      'Provide a valid pathname, the domain is already provided'
-    )
-    .matches(/^(?!\/).+$/, 'Leading slash should not be included')
-    .required('Pathname is required');
-};
+const pathNameValidationSchema = Yup.string()
+  .matches(
+    /^(?!http|www)/i,
+    'Provide a valid pathname, the base domain is already provided'
+  )
+  .matches(/^(?!\/).+$/, 'Leading slash should not be included')
+  .required('Pathname is required');
 
 const CustomizedTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -145,11 +143,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: Yup.string().when('useBaseDomain', {
-            is: true,
-            then: pathNameValidationSchema,
-            otherwise: urlValidation,
-          }),
+          url: Yup.string().when('useBaseDomain', (useBaseDomain, schema) =>
+            useBaseDomain
+              ? schema.concat(pathNameValidationSchema)
+              : schema.concat(urlValidation)
+          ),
           useBaseDomain: Yup.bool(),
           jsonPath: Yup.string(),
           apiRequestHeaders: Yup.array(),
@@ -231,11 +229,15 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                 Link
               </InputLabel>
 
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
+              <div style={{ display: 'flex', gap: '8px' }}>
                 {useBaseDomain && (
-                  <span style={{ whiteSpace: 'nowrap' }}>
+                  <span
+                    style={{
+                      whiteSpace: 'nowrap',
+                      color: 'grey',
+                      paddingTop: '20px',
+                    }}
+                  >
                     {`http://${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
                   </span>
                 )}
@@ -265,8 +267,12 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
               />
             </FormControl>
 
-            <FormControl fullWidth>
-              <InputLabel htmlFor="config.jsonPath" shrink>
+            <FormControl fullWidth style={{ paddingTop: '30px' }}>
+              <InputLabel
+                htmlFor="config.jsonPath"
+                shrink
+                style={{ paddingTop: '40px' }}
+              >
                 JsonPath
               </InputLabel>
               <Field
