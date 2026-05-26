@@ -39,7 +39,7 @@ export const QuestionTemplateRelationNumberForm = (
             })
           ),
           numberMin: Yup.number()
-            .typeError('Minimum score must be a number')
+            .typeError('Value must be a number')
             .nullable(),
           numberMinInclusive: Yup.bool().nullable(),
           numberMaxInclusive: Yup.bool().nullable(),
@@ -154,9 +154,15 @@ export const QuestionTemplateRelationNumberForm = (
                 fullWidth
                 inputProps={{ 'data-cy': 'numberMin' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const value =
-                    e.target.value === '' ? null : Number(e.target.value);
+                  const minIsNull = e.target.value === '';
+                  const value = minIsNull ? null : Number(e.target.value);
                   formikProps.setFieldValue('config.numberMin', value);
+
+                  minIsNull &&
+                    formikProps.setFieldValue(
+                      'config.numberMinInclusive',
+                      false
+                    );
                   //Trigger validation for numberMax when numberMin changes
                   formikProps.setFieldTouched('config.numberMax', true, true);
                 }}
@@ -183,8 +189,16 @@ export const QuestionTemplateRelationNumberForm = (
                 fullWidth
                 inputProps={{ 'data-cy': 'numberMax' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const value =
-                    e.target.value === '' ? null : Number(e.target.value);
+                  const maxIsNull = e.target.value === '';
+                  const value = maxIsNull ? null : Number(e.target.value);
+                  formikProps.setFieldValue('config.numberMax', value);
+
+                  maxIsNull &&
+                    formikProps.setFieldValue(
+                      'config.numberMaxInclusive',
+                      false
+                    );
+
                   formikProps.setFieldValue('config.numberMax', value);
                 }}
               />
