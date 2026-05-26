@@ -1281,7 +1281,7 @@ context('Template Basic tests', () => {
         instrumentId: 1,
       });
 
-      cy.changeProposalsStatus({ proposalPks: [1], statusId: 2 });
+      cy.changeProposalsStatus({ proposalPks: [1], workflowStatusId: 2 });
 
       cy.login('officer');
       cy.visit('/');
@@ -2158,14 +2158,13 @@ context('Template Basic tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.reload();
         cy.addConnectionStatusActions({
@@ -2176,7 +2175,7 @@ context('Template Basic tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });
