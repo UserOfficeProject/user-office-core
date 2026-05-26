@@ -11,8 +11,12 @@ import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView'
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { CallDataSource } from '../CallDataSource';
+import { StfcUserDataSource } from './StfcUserDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
 import database from '../postgres/database';
+import PostgresProposalDataSource, {
+  resolveInstrumentIds,
+} from '../postgres/ProposalDataSource';
 import {
   CallRecord,
   createCallObject,
@@ -24,8 +28,6 @@ import PostgresTagDataSource from '../postgres/TagDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
-import PostgresProposalDataSource from './../postgres/ProposalDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
@@ -178,15 +180,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
         } else {
-          let effectiveInstrumentIds: number[] | undefined;
-          if (
-            filter?.instrumentFilter?.instrumentIds &&
-            filter.instrumentFilter.instrumentIds.length > 0
-          ) {
-            effectiveInstrumentIds = filter.instrumentFilter.instrumentIds;
-          } else if (filter?.instrumentFilter?.instrumentId) {
-            effectiveInstrumentIds = [filter.instrumentFilter.instrumentId];
-          }
+          const effectiveInstrumentIds = resolveInstrumentIds(
+            filter?.instrumentFilter
+          );
 
           if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
             // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId

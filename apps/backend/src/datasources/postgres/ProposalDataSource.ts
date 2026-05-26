@@ -103,7 +103,7 @@ export async function calculateReferenceNumber(
  * Resolves instrument IDs from an InstrumentFilterInput.
  * Supports both `instrumentIds` and `instrumentId`(deprecated).
  */
-function resolveInstrumentIds(
+export function resolveInstrumentIds(
   instrumentFilter?: InstrumentFilterInput
 ): number[] | undefined {
   if (!instrumentFilter) {
