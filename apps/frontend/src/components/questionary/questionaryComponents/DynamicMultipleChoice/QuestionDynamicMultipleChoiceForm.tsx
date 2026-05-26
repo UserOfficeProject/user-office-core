@@ -132,6 +132,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const [isJsonPathFieldDocPopupOpen, setIsJsonPathFieldDocPopupOpen] =
     useState(false);
 
+  const [isBaseURLCheckBoxPopupOpen, setIsBaseURLCheckBoxPopupOpen] =
+    useState(false);
+
   const { settingsMap } = useContext(SettingsContext);
 
   return (
@@ -251,22 +254,63 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                   inputProps={{ 'data-cy': 'dynamic-url' }}
                 />
               </div>
-
-              <Field
-                name="config.useBaseDomain"
-                id="config.useBaseDomain"
-                type="checkbox"
-                component={CheckboxWithLabel}
-                Label={{ label: 'Use base domain for dynamic URL' }}
-                data-cy="use-base-domain"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const checked = e.target.checked;
-                  setUseBaseDomain(checked);
-                  setFieldValue('config.useBaseDomain', checked);
-                }}
-              />
+              <div style={{ display: 'flex' }}>
+                <Field
+                  name="config.useBaseDomain"
+                  id="config.useBaseDomain"
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  Label={{ label: 'Use base domain for dynamic URL' }}
+                  data-cy="use-base-domain"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const checked = e.target.checked;
+                    setUseBaseDomain(checked);
+                    setFieldValue('config.useBaseDomain', checked);
+                  }}
+                />
+                <InputAdornment
+                  position="start"
+                  style={{
+                    paddingTop: '20px',
+                  }}
+                >
+                  <IconButton
+                    onClick={() => setIsBaseURLCheckBoxPopupOpen(true)}
+                  >
+                    <Help />
+                  </IconButton>
+                  <Dialog
+                    open={isBaseURLCheckBoxPopupOpen}
+                    onClose={() => setIsBaseURLCheckBoxPopupOpen(false)}
+                    aria-labelledby="customized-dialog-title"
+                  >
+                    <DialogContent>
+                      <div>
+                        Instead of providing a full URL to retrieve a list for
+                        your question, this option allows you to use the current
+                        server&#39;s domain and specify only the relative path.
+                      </div>
+                      <div>
+                        This is particularly useful for GraphQL queries that
+                        access the UOS database. Please note that while the
+                        domain displayed in the UI reflects the current
+                        deployment, it is not stored. At runtime, the system
+                        will automatically resolve and apply the current servers
+                        domain.
+                      </div>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        variant="text"
+                        onClick={() => setIsBaseURLCheckBoxPopupOpen(false)}
+                      >
+                        CLOSE
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </InputAdornment>
+              </div>
             </FormControl>
-
             <FormControl fullWidth style={{ paddingTop: '30px' }}>
               <InputLabel
                 htmlFor="config.jsonPath"
