@@ -1,4 +1,4 @@
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import React from 'react';
 import {
   BaseEdge,
@@ -15,23 +15,37 @@ import { ConnectionStatusAction } from 'generated/sdk';
 
 interface WorkflowEdgeData {
   events: string[];
-  sourceStatusShortCode: string;
-  targetStatusShortCode: string;
+  sourceStatusId: string;
+  targetStatusId: string;
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
+  isReadOnly?: boolean;
 }
 
-const List = styled('ul')({
-  padding: '0px 5px',
-  margin: '0',
+const List = styled('ul')(({ theme }) => ({
+  padding: '4px 8px',
+  margin: '2px',
   listStyleType: 'none',
-  fontSize: '11px',
-  color: '#333',
-  lineHeight: '1.6',
-  backgroundColor: '#FFF',
-  textAlign: 'center',
-});
+  fontSize: '10px',
+  fontWeight: 600,
+  color: theme.palette.primary.contrastText,
+  backgroundColor: theme.palette.primary.main,
+  borderRadius: '12px',
+  boxShadow: theme.shadows[1] as string,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '2px',
+  minWidth: '60px',
+  border: `1px solid ${theme.palette.primary.dark}`,
+}));
+
+const ActionList = styled(List)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.secondary.contrastText,
+  border: `1px solid ${theme.palette.secondary.dark}`,
+}));
 
 const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   id,
@@ -77,10 +91,22 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
 
   const events = data?.events || [];
   const statusActions = data?.statusActions || [];
+  const edgeStyle =
+    events.length > 0
+      ? style
+      : {
+          ...style,
+          strokeDasharray: '2 4',
+        };
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        style={edgeStyle}
+        markerEnd={markerEnd}
+      />
       <EdgeLabelRenderer>
         <div
           style={{
@@ -89,23 +115,23 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           }}
           className="nodrag nopan"
         >
-          {events.length > 0 && (
+          {!data?.isReadOnly && events.length > 0 && (
             <List
-              data-cy={`edge-label-events-list-${data?.sourceStatusShortCode}-${data?.targetStatusShortCode}`}
+              data-cy={`edge-label-events-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >
               {events.map((e) => (
                 <li key={e}>{e}</li>
               ))}
             </List>
           )}
-          {statusActions.length > 0 && (
-            <List
-              data-cy={`edge-label-actions-list-${data?.sourceStatusShortCode}-${data?.targetStatusShortCode}`}
+          {!data?.isReadOnly && statusActions.length > 0 && (
+            <ActionList
+              data-cy={`edge-label-actions-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >
               {statusActions.map((e) => (
                 <li key={e.actionId}>{`⚡ ${e.action.name}`}</li>
               ))}
-            </List>
+            </ActionList>
           )}
         </div>
       </EdgeLabelRenderer>

@@ -32,7 +32,7 @@ import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
-import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
+import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -140,7 +140,9 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
+  const proposalStatus = await statusDataSource.getStatusByWorkflowStatusId(
+    proposal.workflowStatusId
+  );
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
@@ -203,7 +205,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
       mapUserWithInstitutionToMember
     ),
     visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
-    newStatus: proposalStatus?.shortCode,
+    newStatus: proposalStatus?.id,
     submitted: proposal.submitted,
     samples: (
       await sampleDataSource.getSamples({
@@ -551,6 +553,8 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+
   const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -559,9 +563,10 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
-      proposalPk,
-    ]);
+    await workflowEngine.run({
+      event: eventType,
+      proposalPks: [proposalPk],
+    });
   };
 
   const cancelVisit = async (visit: Visit) => {

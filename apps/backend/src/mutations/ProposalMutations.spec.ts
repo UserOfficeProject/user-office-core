@@ -4,10 +4,10 @@ import { container } from 'tsyringe';
 import ProposalMutations from './ProposalMutations';
 import { Tokens } from '../config/Tokens';
 import {
-  ProposalDataSourceMock,
-  dummyProposalWithNotActiveCall,
-  dummyProposalSubmitted,
   dummyProposal,
+  dummyProposalSubmitted,
+  dummyProposalWithNotActiveCall,
+  ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
@@ -18,15 +18,18 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
 import { WorkflowType } from '../models/Workflow';
+import { WorkflowStatus } from '../models/WorkflowStatus';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
+let workflowDataSource: WorkflowDataSourceMock;
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
@@ -36,6 +39,10 @@ beforeEach(() => {
 
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
+  );
+
+  workflowDataSource = container.resolve<WorkflowDataSourceMock>(
+    Tokens.WorkflowDataSource
   );
 });
 
@@ -432,63 +439,47 @@ describe('Test technique proposal change status', () => {
   const expiredId = 7;
 
   const dummyProposalStatuses = [
-    new Status(draftId, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+    new Status('DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
     new Status(
-      submittedId,
       'SUBMITTED_LOCKED',
       'Submitted (locked)',
       '',
-      true,
+      false,
       WorkflowType.PROPOSAL
     ),
     new Status(
-      underReviewId,
       'UNDER_REVIEW',
       'Under review',
       '',
-      true,
+      false,
       WorkflowType.PROPOSAL
     ),
+    new Status('APPROVED', 'Approved', '', false, WorkflowType.PROPOSAL),
     new Status(
-      approvedId,
-      'APPROVED',
-      'Approved',
-      '',
-      true,
-      WorkflowType.PROPOSAL
-    ),
-    new Status(
-      unsuccessfulId,
       'UNSUCCESSFUL',
       'Unsuccessful',
       '',
-      true,
+      false,
       WorkflowType.PROPOSAL
     ),
+    new Status('FINISHED', 'Finished', '', false, WorkflowType.PROPOSAL),
     new Status(
-      finishedId,
-      'FINISHED',
-      'Finished',
-      '',
-      true,
-      WorkflowType.PROPOSAL
-    ),
-    new Status(
-      nonTechniqueProposalId,
       'NON-TP',
-      'A non-technique proposal status',
+      'Non-technique proposal',
       '',
-      true,
+      false,
       WorkflowType.PROPOSAL
     ),
-    new Status(
-      expiredId,
-      'EXPIRED',
-      'Expired',
-      '',
-      true,
-      WorkflowType.PROPOSAL
-    ),
+  ];
+
+  const dummyWorkflowStatuses = [
+    new WorkflowStatus(draftId, 1, 'DRAFT', 0, 0),
+    new WorkflowStatus(submittedId, 1, 'SUBMITTED_LOCKED', 0, 0),
+    new WorkflowStatus(underReviewId, 1, 'UNDER_REVIEW', 0, 0),
+    new WorkflowStatus(approvedId, 1, 'APPROVED', 0, 0),
+    new WorkflowStatus(unsuccessfulId, 1, 'UNSUCCESSFUL', 0, 0),
+    new WorkflowStatus(finishedId, 1, 'FINISHED', 0, 0),
+    new WorkflowStatus(nonTechniqueProposalId, 1, 'NON-TP', 0, 0),
   ];
 
   beforeEach(() => {
@@ -497,6 +488,14 @@ describe('Test technique proposal change status', () => {
     jest
       .spyOn(statusDataSource, 'getAllStatuses')
       .mockResolvedValue(dummyProposalStatuses);
+
+    jest
+      .spyOn(workflowDataSource, 'getWorkflowStatus')
+      .mockImplementation((id: number) => {
+        return Promise.resolve(
+          dummyWorkflowStatuses.find((ws) => ws.workflowStatusId === id) || null
+        );
+      });
   });
 
   test('A scientist cannot change status when a proposal is a draft', async () => {
@@ -504,12 +503,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: draftId,
+        workflowStatusId: draftId,
       },
     ]);
 
@@ -517,7 +516,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: underReviewId,
+          workflowStatusId: underReviewId,
           proposalPks: [1, 2],
         }
       )
@@ -533,12 +532,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: finishedId,
+        workflowStatusId: finishedId,
       },
     ]);
 
@@ -546,7 +545,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: underReviewId,
+          workflowStatusId: underReviewId,
           proposalPks: [1, 2],
         }
       )
@@ -562,12 +561,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: unsuccessfulId,
+        workflowStatusId: unsuccessfulId,
       },
     ]);
 
@@ -575,7 +574,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: underReviewId,
+          workflowStatusId: underReviewId,
           proposalPks: [1, 2],
         }
       )
@@ -591,12 +590,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
     ]);
 
@@ -604,7 +603,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: underReviewId,
+          workflowStatusId: underReviewId,
           proposalPks: [1, 2],
         }
       )
@@ -620,12 +619,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
     ]);
 
@@ -633,7 +632,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: nonTechniqueProposalId,
+          workflowStatusId: nonTechniqueProposalId,
           proposalPks: [1, 2],
         }
       )
@@ -649,12 +648,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
     ]);
 
@@ -662,7 +661,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: draftId,
+          workflowStatusId: draftId,
           proposalPks: [1, 2],
         }
       )
@@ -678,12 +677,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
     ]);
 
@@ -691,7 +690,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: expiredId,
+          workflowStatusId: expiredId,
           proposalPks: [1, 2],
         }
       )
@@ -707,12 +706,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
     ]);
 
@@ -720,7 +719,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: submittedId,
+          workflowStatusId: submittedId,
           proposalPks: [1, 2],
         }
       )
@@ -736,12 +735,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: underReviewId,
+        workflowStatusId: underReviewId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: approvedId,
+        workflowStatusId: approvedId,
       },
     ]);
 
@@ -749,7 +748,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: finishedId,
+          workflowStatusId: finishedId,
           proposalPks: [1, 2],
         }
       )
@@ -765,12 +764,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: submittedId,
+        workflowStatusId: submittedId,
       },
     ]);
 
@@ -778,7 +777,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyInstrumentScientist,
         {
-          statusId: underReviewId,
+          workflowStatusId: underReviewId,
           proposalPks: [1, 2],
         }
       )
@@ -787,11 +786,11 @@ describe('Test technique proposal change status', () => {
         proposals: expect.arrayContaining([
           expect.objectContaining({
             primaryKey: 1,
-            statusId: underReviewId,
+            workflowStatusId: underReviewId,
           }),
           expect.objectContaining({
             primaryKey: 2,
-            statusId: underReviewId,
+            workflowStatusId: underReviewId,
           }),
         ]),
       })
@@ -803,12 +802,12 @@ describe('Test technique proposal change status', () => {
       {
         ...dummyProposal,
         primaryKey: 1,
-        statusId: finishedId,
+        workflowStatusId: submittedId,
       },
       {
         ...dummyProposal,
         primaryKey: 2,
-        statusId: finishedId,
+        workflowStatusId: finishedId,
       },
     ]);
 
@@ -816,7 +815,7 @@ describe('Test technique proposal change status', () => {
       proposalMutations.changeTechniqueProposalsStatus(
         dummyUserOfficerWithRole,
         {
-          statusId: draftId,
+          workflowStatusId: draftId,
           proposalPks: [1, 2],
         }
       )
@@ -825,11 +824,11 @@ describe('Test technique proposal change status', () => {
         proposals: expect.arrayContaining([
           expect.objectContaining({
             primaryKey: 1,
-            statusId: draftId,
+            workflowStatusId: draftId,
           }),
           expect.objectContaining({
             primaryKey: 2,
-            statusId: draftId,
+            workflowStatusId: draftId,
           }),
         ]),
       })
