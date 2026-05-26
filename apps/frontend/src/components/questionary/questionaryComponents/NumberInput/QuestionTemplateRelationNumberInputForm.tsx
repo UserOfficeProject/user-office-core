@@ -154,17 +154,18 @@ export const QuestionTemplateRelationNumberForm = (
                 fullWidth
                 inputProps={{ 'data-cy': 'numberMin' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const minIsNull = e.target.value === '';
-                  const value = minIsNull ? null : Number(e.target.value);
+                  const value =
+                    e.target.value === '' ? null : Number(e.target.value);
                   formikProps.setFieldValue('config.numberMin', value);
-
-                  minIsNull &&
+                  //Trigger validation for numberMax when numberMin changes
+                  formikProps.setFieldTouched('config.numberMax', true, true);
+                }}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.value === '' &&
                     formikProps.setFieldValue(
                       'config.numberMinInclusive',
                       false
                     );
-                  //Trigger validation for numberMax when numberMin changes
-                  formikProps.setFieldTouched('config.numberMax', true, true);
                 }}
               />
               {(formikProps.values.config as NumberInputConfig).numberMin !==
@@ -189,17 +190,16 @@ export const QuestionTemplateRelationNumberForm = (
                 fullWidth
                 inputProps={{ 'data-cy': 'numberMax' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const maxIsNull = e.target.value === '';
-                  const value = maxIsNull ? null : Number(e.target.value);
+                  const value =
+                    e.target.value === '' ? null : Number(e.target.value);
                   formikProps.setFieldValue('config.numberMax', value);
-
-                  maxIsNull &&
+                }}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.value === '' &&
                     formikProps.setFieldValue(
                       'config.numberMaxInclusive',
                       false
                     );
-
-                  formikProps.setFieldValue('config.numberMax', value);
                 }}
               />
               {(formikProps.values.config as NumberInputConfig).numberMax !==
