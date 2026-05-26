@@ -412,7 +412,7 @@ export default class PostgresUserDataSource implements UserDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderByRaw(`LOWER(??) ${sortDirection}`, [sortField]);
+          query.orderByRaw(`LOWER(??::text) ${sortDirection}`, [sortField]);
         }
       })
       .then(
