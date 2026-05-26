@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { WorkflowConnection } from './WorkflowConnection';
+import { WorkflowStatus } from './WorkflowStatus';
 import { ResolverContext } from '../../context';
 import { Event } from '../../events/event.enum';
 import { isRejection } from '../../models/Rejection';
@@ -38,18 +39,32 @@ export class Workflow implements Partial<WorkflowOrigin> {
 @Resolver(() => Workflow)
 export class WorkflowResolver {
   @FieldResolver(() => [WorkflowConnection])
-  async workflowConnections(
+  async connections(
     @Root() workflow: Workflow,
     @Ctx() context: ResolverContext
   ): Promise<WorkflowConnection[]> {
-    const connections = await context.queries.workflow.getWorkflowConnections(
+    const connections = await context.queries.workflow.getConnections(
       context.user,
       workflow.id
     );
 
     return isRejection(connections) ? [] : connections;
   }
+
+  @FieldResolver(() => [WorkflowStatus])
+  async statuses(
+    @Root() workflow: Workflow,
+    @Ctx() context: ResolverContext
+  ): Promise<WorkflowStatus[]> {
+    const statuses = await context.queries.workflow.getWorkflowStatuses(
+      context.user,
+      workflow.id
+    );
+
+    return isRejection(statuses) ? [] : statuses;
+  }
 }
+
 @ObjectType()
 export class WorkflowEvent {
   @Field(() => Event)

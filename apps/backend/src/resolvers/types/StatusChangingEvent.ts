@@ -5,9 +5,6 @@ import { StatusChangingEvent as StatusChangingEventOrigin } from '../../models/S
 @ObjectType()
 export class StatusChangingEvent implements StatusChangingEventOrigin {
   @Field(() => Int)
-  public statusChangingEventId: number;
-
-  @Field(() => Int)
   public workflowConnectionId: number;
 
   @Field(() => String)
