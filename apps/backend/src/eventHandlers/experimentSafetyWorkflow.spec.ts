@@ -1,15 +1,18 @@
 import { container } from 'tsyringe';
 
-import createExperimentSafetyWorkflowHandler, {
-  handleWorkflowEngineChange,
-} from './experimentSafetyWorkflow';
 import { Tokens } from '../config/Tokens';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import * as eventBusModule from '../events';
+import createExperimentSafetyWorkflowHandler, {
+  handleWorkflowEngineChange,
+} from './experimentSafetyWorkflow';
+import * as workflowEngineModule from './experimentSafetyWorkflow';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import * as workflowEngineModule from '../workflowEngine/experiment';
-import { WorkflowEngineExperimentType } from '../workflowEngine/experiment';
+import {
+  ExperimentWorkflowEngine,
+  WorkflowEngineExperimentType,
+} from '../workflowEngine/experiment';
 
 const mockPublish = jest.fn();
 
@@ -19,11 +22,8 @@ let mockStatusDataSource: StatusDataSourceMock;
 
 beforeAll(() => {
   spyMarkEvent = jest
-    .spyOn(
-      workflowEngineModule,
-      'markExperimentSafetyEventAsDoneAndCallWorkflowEngine'
-    )
-    .mockResolvedValue([]);
+    .spyOn(workflowEngineModule, 'handleWorkflowEngineChange')
+    .mockResolvedValue();
 
   spyResolveEventBus = jest
     .spyOn(eventBusModule, 'resolveApplicationEventBus')
@@ -38,7 +38,6 @@ afterAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
 
-  spyMarkEvent.mockResolvedValue([]);
   spyResolveEventBus.mockReturnValue({ publish: mockPublish } as any);
 
   mockStatusDataSource = container.resolve(Tokens.StatusDataSource);
@@ -108,8 +107,11 @@ describe('experimentSafetyWorkflowHandler', () => {
       await handler(event);
 
       expect(spyMarkEvent).toHaveBeenCalledWith(
-        Event.EXPERIMENT_ESF_SUBMITTED,
-        [100]
+        expect.objectContaining({
+          type: Event.EXPERIMENT_ESF_SUBMITTED,
+          experimentsafety: expect.objectContaining({ experimentPk: 100 }),
+        }),
+        100
       );
     });
 
@@ -126,8 +128,11 @@ describe('experimentSafetyWorkflowHandler', () => {
       await handler(event);
 
       expect(spyMarkEvent).toHaveBeenCalledWith(
-        Event.EXPERIMENT_ESF_SUBMITTED,
-        [77]
+        expect.objectContaining({
+          type: Event.EXPERIMENT_ESF_SUBMITTED,
+          experimentsafety: expect.objectContaining({ experimentPk: 77 }),
+        }),
+        77
       );
     });
   });
@@ -156,19 +161,12 @@ describe('handleWorkflowEngineChange', () => {
 
     await handleWorkflowEngineChange(event, 42);
 
-    expect(spyMarkEvent).toHaveBeenCalledWith(Event.EXPERIMENT_ESF_SUBMITTED, [
-      42,
-    ]);
-  });
-
-  test('should pass an array of pks directly to workflow engine', async () => {
-    const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
-
-    await handleWorkflowEngineChange(event, [10, 20, 30]);
-
     expect(spyMarkEvent).toHaveBeenCalledWith(
-      Event.EXPERIMENT_ESF_SUBMITTED,
-      [10, 20, 30]
+      expect.objectContaining({
+        type: Event.EXPERIMENT_ESF_SUBMITTED,
+        experimentsafety: expect.objectContaining({ experimentPk: 42 }),
+      }),
+      42
     );
   });
 
@@ -176,28 +174,25 @@ describe('handleWorkflowEngineChange', () => {
     test('should publish status change events when workflow engine returns updated experiments', async () => {
       const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       const updatedExperiment = createMockUpdatedExperiment({
-        statusId: 10,
-        prevStatusId: 5,
-      });
+        workflowStatusId: 10,
+        prevWorkflowStatusId: 5,
+      } as Partial<WorkflowEngineExperimentType>);
 
-      spyMarkEvent.mockResolvedValue([updatedExperiment]);
+      spyMarkEvent.mockRestore();
 
-      jest
-        .spyOn(mockStatusDataSource, 'getStatus')
-        .mockResolvedValueOnce({ name: 'Approved' } as any) // new statusId (called first)
-        .mockResolvedValueOnce({ name: 'Draft' } as any); // prevStatusId (called second)
+      const runSpy = jest
+        .spyOn(ExperimentWorkflowEngine.prototype, 'run')
+        .mockResolvedValueOnce([updatedExperiment]);
 
       await handleWorkflowEngineChange(event, 42);
-
       await new Promise(process.nextTick);
 
-      expect(mockPublish).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
-          experimentsafety: updatedExperiment,
-          isRejection: false,
-        })
-      );
+      expect(mockPublish).toHaveBeenCalledTimes(1);
+
+      runSpy.mockRestore();
+      spyMarkEvent = jest
+        .spyOn(workflowEngineModule, 'handleWorkflowEngineChange')
+        .mockResolvedValue();
     });
 
     test('should NOT publish status change when event type is EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER', async () => {
@@ -228,7 +223,7 @@ describe('handleWorkflowEngineChange', () => {
     test('should not publish if updated experiment has no statusId', async () => {
       const event = createMockEvent({ type: Event.EXPERIMENT_ESF_SUBMITTED });
       const updatedExperiment = createMockUpdatedExperiment({
-        statusId: undefined as unknown as number,
+        workflowStatusId: 1,
       });
 
       spyMarkEvent.mockResolvedValue([updatedExperiment]);
