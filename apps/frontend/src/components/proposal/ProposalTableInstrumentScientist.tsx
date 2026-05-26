@@ -191,11 +191,6 @@ const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
   { title: t('FAP'), field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
-const proposalStatusFilter: Record<string, number> = {
-  ALL: 0,
-  FEASIBILITY_REVIEW: 2,
-};
-
 const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
 /**
@@ -276,14 +271,10 @@ const ProposalTableInstrumentScientist = ({
   const { t } = useTranslation();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const statusFilterValue = isInstrumentScientist
+  const statusFilter = isInstrumentScientist
     ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)
-        ?.settingsValue || 2
-    : 0;
-  let statusFilter = proposalStatusFilter[statusFilterValue];
-  if (statusFilter === undefined || statusFilter === null) {
-    statusFilter = isInstrumentScientist ? 2 : 0;
-  }
+        ?.settingsValue || 'FEASIBILITY_REVIEW'
+    : 'ALL';
   const reviewFilterValue = isInstrumentScientist
     ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
         ?.settingsValue || 'ME'
@@ -322,9 +313,9 @@ const ProposalTableInstrumentScientist = ({
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: instrumentId === 'multi',
     },
-    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    proposalStatusId: proposalStatusId,
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    excludeProposalStatusIds: [9],
+    excludeProposalStatusIds: ['SCHEDULING'],
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,
       dataType,
@@ -351,7 +342,10 @@ const ProposalTableInstrumentScientist = ({
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(
       {
-        proposalStatusId: proposalFilter.proposalStatusId,
+        proposalStatusId:
+          proposalFilter.proposalStatusId === 'ALL'
+            ? null
+            : proposalFilter.proposalStatusId,
         excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
         instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,
@@ -992,7 +986,7 @@ const ProposalTableInstrumentScientist = ({
               setProposalFilter={setProposalFilter}
               filter={proposalFilter}
               hiddenStatuses={
-                proposalFilter.excludeProposalStatusIds as number[]
+                proposalFilter.excludeProposalStatusIds as string[]
               }
             />
           </Grid>

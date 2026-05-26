@@ -5,7 +5,6 @@ import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -16,7 +15,6 @@ import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import { UserWithRole } from '../../models/User';
-import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { PaginationSortDirection } from '../../utils/pagination';
@@ -29,22 +27,20 @@ import {
   ProposalsFilter,
   QuestionFilterInput,
 } from './../../resolvers/queries/ProposalsQuery';
+import CallDataSource from './CallDataSource';
 import database from './database';
 import {
-  CallRecord,
+  createInvitedProposalObject,
   createProposalObject,
   createProposalViewObject,
+  createProposalViewObjectWithTechniques,
   createTechnicalReviewObject,
-  ProposalEventsRecord,
+  InvitedProposalRecord,
   ProposalRecord,
   ProposalViewRecord,
-  WorkflowConnectionRecord,
-  StatusChangingEventRecord,
   TechnicalReviewRecord,
   TechniqueRecord,
-  createProposalViewObjectWithTechniques,
-  InvitedProposalRecord,
-  createInvitedProposalObject,
+  WorkflowStatusRecord,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
@@ -128,7 +124,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     @inject(Tokens.WorkflowDataSource)
     private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
-    private AdminDataSource: AdminDataSource,
+    private adminDataSource: AdminDataSource,
+    @inject(Tokens.CallDataSource)
+    protected callDataSource: CallDataSource,
     @inject(Tokens.TagDataSource)
     private tagDataSource: TagDataSource
   ) {}
@@ -290,7 +288,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           title: proposal.title,
           abstract: proposal.abstract,
           proposer_id: proposal.proposerId,
-          status_id: proposal.statusId,
+          workflow_status_id: proposal.workflowStatusId,
           created_at: proposal.created,
           updated_at: proposal.updated,
           proposal_id: proposal.proposalId,
@@ -310,28 +308,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
           throw new GraphQLError(`Proposal not found ${proposal.primaryKey}`);
-        }
-
-        return createProposalObject(records[0]);
-      });
-  }
-
-  async updateProposalStatus(
-    proposalPk: number,
-    proposalStatusId: number
-  ): Promise<Proposal> {
-    return database
-      .update(
-        {
-          status_id: proposalStatusId,
-        },
-        ['*']
-      )
-      .from('proposals')
-      .where('proposal_pk', proposalPk)
-      .then((records: ProposalRecord[]) => {
-        if (records === undefined || !records.length) {
-          throw new GraphQLError(`Proposal not found ${proposalPk}`);
         }
 
         return createProposalObject(records[0]);
@@ -365,8 +341,33 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     call_id: number,
     questionary_id: number
   ): Promise<Proposal> {
+    const call = await this.callDataSource.getCall(call_id);
+
+    if (!call) {
+      throw new GraphQLError(`Call not found with id: ${call_id}`);
+    }
+
+    const proposalInitialStatus =
+      await this.workflowDataSource.getInitialWorkflowStatus(
+        call.proposalWorkflowId
+      );
+
+    if (!proposalInitialStatus) {
+      throw new GraphQLError(
+        `Draft workflow status not found for call with id: ${call_id}`
+      );
+    }
+
     return database
-      .insert({ proposer_id, call_id, questionary_id, status_id: 1 }, ['*'])
+      .insert(
+        {
+          proposer_id,
+          call_id,
+          questionary_id,
+          workflow_status_id: proposalInitialStatus.workflowStatusId,
+        },
+        ['*']
+      )
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
@@ -685,7 +686,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.proposalStatusId) {
-          query.where('proposals.status_id', filter?.proposalStatusId);
+          query.whereExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .where('workflow_has_statuses.status_id', filter.proposalStatusId)
+          );
         }
 
         if (filter?.shortCodes) {
@@ -702,7 +709,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.excludeProposalStatusIds) {
-          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+          query.whereNotExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .whereIn(
+                'workflow_has_statuses.status_id',
+                filter.excludeProposalStatusIds
+              )
+          );
         }
 
         if (first) {
@@ -936,46 +952,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposal) => createProposalObject(proposal));
   }
 
-  async markEventAsDoneOnProposals(
-    event: Event,
-    proposalPks: number[]
-  ): Promise<ProposalEventsRecord[] | null> {
-    const dataToInsert = proposalPks.map((proposalPk) => ({
-      proposal_pk: proposalPk,
-      [event.toLowerCase()]: true,
-    }));
-
-    const result = await database.raw(
-      `? ON CONFLICT (proposal_pk)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('proposal_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return result.rows;
-    } else {
-      return null;
-    }
-  }
-
-  async getProposalEvents(
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    const result = await database
-      .select()
-      .from('proposal_events')
-      .where('proposal_pk', proposalPk)
-      .first();
-
-    if (!result) {
-      return null;
-    }
-
-    return result;
-  }
-
   async getCount(callId: number): Promise<number> {
     return database('proposals')
       .count('call_id')
@@ -992,7 +968,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           INSERT INTO proposals
           (title,
            abstract,
-           status_id,
+           workflow_status_id,
            proposer_id,
            created_at,
            updated_at,
@@ -1006,7 +982,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
            management_decision_submitted)
           SELECT title,
                  abstract,
-                 status_id,
+                 workflow_status_id,
                  proposer_id,
                  created_at,
                  updated_at,
@@ -1026,105 +1002,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return createProposalObject(newProposal);
   }
 
-  async resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean> {
-    return database.transaction(async (trx) => {
-      try {
-        const proposalCall: CallRecord = await database('call')
-          .select('*')
-          .where('call_id', callId)
-          .first()
-          .transacting(trx);
-
-        if (!proposalCall) {
-          logger.logError(
-            'Could not reset proposal events because proposal call does not exist',
-            { callId }
-          );
-
-          throw new GraphQLError('Could not reset proposal events');
-        }
-
-        const proposalWorkflowId = proposalCall.proposal_workflow_id;
-
-        const proposalEventsToReset: (StatusChangingEventRecord &
-          WorkflowConnectionRecord)[] = (
-          await database
-            .raw(
-              `
-        SELECT *
-        FROM workflow_connections AS wc
-        JOIN status_changing_events sce
-        ON sce.workflow_connection_id = wc.workflow_connection_id
-        WHERE wc.workflow_connection_id >= (
-          SELECT workflow_connection_id
-          FROM workflow_connections
-          WHERE workflow_id = ${proposalWorkflowId}
-          AND status_id = ${statusId}
-        )
-        AND wc.workflow_id = ${proposalWorkflowId};
-      `
-            )
-            .transacting(trx)
-        ).rows;
-
-        if (proposalEventsToReset?.length) {
-          const dataToUpdate: Record<string, boolean> = {};
-
-          proposalEventsToReset.forEach((event) => {
-            const dataToUpdateHasProperty = dataToUpdate.hasOwnProperty(
-              event.status_changing_event.toLocaleLowerCase()
-            );
-            // NOTE: Reset the property only if it is not present in the dataToUpdate otherwise we end up with overwriting existing data.
-            if (!dataToUpdateHasProperty) {
-              dataToUpdate[event.status_changing_event.toLocaleLowerCase()] =
-                false;
-            }
-          });
-
-          const [updatedProposalEvents] = await database
-            .update(dataToUpdate)
-            .from('proposal_events')
-            .where('proposal_pk', proposalPk)
-            .returning<ProposalEventsRecord[]>('*')
-            .transacting(trx);
-
-          if (!updatedProposalEvents) {
-            logger.logError('Could not reset proposal events', {
-              dataToUpdate,
-            });
-
-            throw new GraphQLError('Could not reset proposal events');
-          }
-        }
-
-        return true;
-      } catch (error) {
-        logger.logException(
-          `Failed to reset proposal events proposalPk: ${proposalPk}`,
-          error
-        );
-
-        return false;
-      }
-    });
-  }
-
-  async changeProposalsStatus(
-    statusId: number,
+  async changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    const dataToUpdate: { status_id: number; submitted?: boolean } = {
-      status_id: statusId,
-    };
+    const workflowStatus =
+      await this.workflowDataSource.getWorkflowStatus(workflowStatusId);
 
     // NOTE: If status is DRAFT re-open the proposal for submission
-    if (statusId === 1) {
-      dataToUpdate.submitted = false;
-    }
+    const dataToUpdate: Partial<ProposalRecord> = {
+      workflow_status_id: workflowStatusId,
+      submitted: workflowStatus?.statusId === 'DRAFT' ? false : undefined,
+    };
 
     const result: ProposalRecord[] = await database
       .update(dataToUpdate, ['*'])
@@ -1184,7 +1073,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
     const workflowStatus = (
-      await this.AdminDataSource.getSetting(
+      await this.adminDataSource.getSetting(
         SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS
       )
     )?.settingsValue;
@@ -1201,11 +1090,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: WorkflowConnectionWithStatus[] =
-      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
+    const proposalStatus = await database<WorkflowStatusRecord>(
+      'workflow_has_statuses'
+    ).where('workflow_id', proposalWorkflowId);
 
     return !!proposalStatus.find((status) =>
-      status.status.shortCode.match(workflowStatus)
+      status.status_id.match(workflowStatus)
     );
   }
 
@@ -1301,7 +1191,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.proposalStatusId) {
-          query.where('status_id', filter?.proposalStatusId);
+          query.whereExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .where('workflow_has_statuses.status_id', filter.proposalStatusId)
+          );
         }
 
         if (filter?.shortCodes) {
@@ -1319,7 +1215,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.excludeProposalStatusIds) {
-          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+          query.whereNotExists(
+            database('workflow_has_statuses')
+              .whereRaw(
+                'workflow_has_statuses.workflow_status_id = proposals.workflow_status_id'
+              )
+              .whereIn(
+                'workflow_has_statuses.status_id',
+                filter.excludeProposalStatusIds
+              )
+          );
         }
 
         if (

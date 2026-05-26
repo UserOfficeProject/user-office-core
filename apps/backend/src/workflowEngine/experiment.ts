@@ -1,318 +1,179 @@
-import { container } from 'tsyringe';
+import { logger } from '@user-office-software/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
-import { ExperimentSafetyEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { ExperimentSafety } from '../models/Experiment';
-import { StatusChangingEvent } from '../models/StatusChangingEvent';
-import { Workflow } from '../models/Workflow';
-import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
+import { createWorkflowMachine } from './stateMachine/createWorkflowMachine';
+import { createActor } from './stateMachine/stateMachine';
 
-const getExperimentWorkflowByCallId = (callId: number) => {
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
+type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 
-  return callDataSource.getExperimentWorkflowByCall(callId);
+export type WorkflowEngineExperimentType = ExperimentSafety & {
+  prevWorkflowStatusId: number;
+  workflowStatusConnectionId: number;
 };
 
-export const getWorkflowConnectionByStatusId = (
-  workflowId: number,
-  statusId?: number,
-  prevStatusId?: number
-) => {
-  const workflowDataSource = container.resolve<WorkflowDataSource>(
-    Tokens.WorkflowDataSource
-  );
-
-  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
-    prevStatusId,
-  });
+type WorkflowRunSingleInput = {
+  experimentPk: number;
+  currentEvent: Event;
 };
 
-const shouldMoveToNextStatus = (
-  statusChangingEvents: StatusChangingEvent[],
-  experimentSafetyEvents: ExperimentSafetyEventsRecord
-): boolean => {
-  const experimentSafetyEventsKeys = Object.keys(experimentSafetyEvents);
-  const allExperimentIncompleteEvents = experimentSafetyEventsKeys.filter(
-    (experimentSafetyEventsKey) =>
-      !experimentSafetyEvents[
-        experimentSafetyEventsKey as keyof ExperimentSafetyEventsRecord
-      ]
-  );
-  const allNextStatusRulesFulfilled = !statusChangingEvents.some(
-    (statusChangingEvent) =>
-      allExperimentIncompleteEvents.indexOf(
-        statusChangingEvent.statusChangingEvent.toLowerCase()
-      ) >= 0
-  );
-
-  return allNextStatusRulesFulfilled;
+type WorkflowRunBatchInput = {
+  experimentPks: number[];
+  event: Event;
 };
 
-const checkIfConditionsForNextStatusAreMet = async ({
-  nextWorkflowConnections,
-  experimentWorkflow,
-  workflowDataSource,
-  experimentSafetyWithEvents,
-}: {
-  nextWorkflowConnections: WorkflowConnectionWithStatus[];
-  experimentWorkflow: Workflow;
-  workflowDataSource: WorkflowDataSource;
-  experimentSafetyWithEvents: {
-    experimentPk: number;
-    experimentSafetyEvents?: ExperimentSafetyEventsRecord;
-    currentEvent: Event;
-  };
-}) => {
-  for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextStatusId) {
-      continue;
+export type WorkflowRunInput =
+  | WorkflowRunSingleInput
+  | WorkflowRunSingleInput[]
+  | WorkflowRunBatchInput;
+
+const isBatchWorkflowInput = (
+  input: WorkflowRunInput
+): input is WorkflowRunBatchInput => {
+  return Array.isArray((input as WorkflowRunBatchInput).experimentPks);
+};
+
+@injectable()
+export class ExperimentWorkflowEngine {
+  constructor(
+    @inject(Tokens.ExperimentDataSource)
+    private readonly experimentDataSource: ExperimentDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private readonly proposalDataSource: ProposalDataSource,
+    @inject(Tokens.CallDataSource)
+    private readonly callDataSource: CallDataSource
+  ) {}
+
+  async run(
+    input: WorkflowRunInput
+  ): Promise<Array<WorkflowEngineExperimentType>> {
+    let normalizedInput: WorkflowRunSingleInput[];
+
+    if (Array.isArray(input)) {
+      normalizedInput = input;
+    } else if (isBatchWorkflowInput(input)) {
+      normalizedInput = input.experimentPks.map((experimentPk) => ({
+        experimentPk,
+        currentEvent: input.event,
+      }));
+    } else {
+      normalizedInput = [input];
     }
 
-    const nextNextWorkflowConnections = await getWorkflowConnectionByStatusId(
-      experimentWorkflow.id,
-      nextWorkflowConnection.nextStatusId
+    const experimentsWithChangedStatuses = await Promise.all(
+      normalizedInput.map(({ experimentPk, currentEvent }) =>
+        this.runOne(experimentPk, currentEvent)
+      )
     );
-    const newStatusChangingEvents =
-      await workflowDataSource.getStatusChangingEventsByConnectionIds(
-        nextNextWorkflowConnections.map((connection) => connection.id)
-      );
 
-    if (!experimentSafetyWithEvents.experimentSafetyEvents) {
+    const validExperiments = experimentsWithChangedStatuses.filter(
+      (exp): exp is WorkflowEngineExperimentType => !!exp
+    );
+
+    return validExperiments;
+  }
+
+  /**
+   * Internal method to run the workflow engine for a single experiment and event.
+   */
+  private async runOne(
+    experimentPk: number,
+    event: Event
+  ): Promise<WorkflowEngineExperimentType | void> {
+    const experiment =
+      await this.experimentDataSource.getExperiment(experimentPk);
+
+    if (!experiment) {
+      logger.logError('Experiment not found', { experimentPk });
+
       return;
     }
 
-    for (const sce of newStatusChangingEvents) {
-      const experimentSafetyEventsKeys = Object.keys(
-        experimentSafetyWithEvents.experimentSafetyEvents!
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
+
+    if (!proposal) {
+      logger.logError('Proposal not found', {
+        proposalPk: experiment.proposalPk,
+      });
+
+      return;
+    }
+
+    const experimentWorkflowId = (
+      await this.callDataSource.getExperimentWorkflowByCall(proposal.callId)
+    )?.id;
+
+    if (!experimentWorkflowId) {
+      logger.logError('Workflow not found for experiment', { experimentPk });
+
+      return;
+    }
+
+    const experimentSafety =
+      await this.experimentDataSource.getExperimentSafetyByExperimentPk(
+        experimentPk
       );
-      const allExperimnentSafetiesCompleteEvents =
-        experimentSafetyEventsKeys.filter(
-          (experimentSafetyEventsKey) =>
-            experimentSafetyWithEvents.experimentSafetyEvents![
-              experimentSafetyEventsKey as keyof ExperimentSafetyEventsRecord
-            ]
-        );
 
-      const nextStatusRulesFulfilled =
-        allExperimnentSafetiesCompleteEvents.includes(
-          sce.statusChangingEvent.toLowerCase()
-        );
+    if (!experimentSafety) {
+      return;
+    }
 
-      if (sce.statusChangingEvent && nextStatusRulesFulfilled)
-        await workflowEngine([
-          {
-            currentEvent: sce.statusChangingEvent as Event,
-            experimentSafetyEvents:
-              experimentSafetyWithEvents.experimentSafetyEvents,
-            experimentPk: experimentSafetyWithEvents.experimentPk,
-          },
-        ]);
+    const currentWorkflowStatusId = experimentSafety.workflowStatusId;
+
+    if (!currentWorkflowStatusId) {
+      logger.logError('Experiment safety does not have a workflow status id', {
+        experimentSafetyPk: experimentSafety.experimentSafetyPk,
+      });
+
+      return;
+    }
+
+    const machine = await createWorkflowMachine(experimentWorkflowId);
+
+    const currentExperimentState = Object.entries(machine.schema.states).find(
+      ([, state]) => {
+        return (
+          (state.meta as WorkflowStateMeta | undefined)?.workflowStatusId ===
+          currentWorkflowStatusId
+        );
+      }
+    )?.[0];
+
+    const actor = createActor(
+      machine,
+      { id: experimentSafety.experimentSafetyPk },
+      currentExperimentState
+    );
+    const currentWorkflowStatus = actor.getState();
+
+    const { nextStateValue, connectionId } = await actor.event(
+      event.toUpperCase()
+    );
+
+    if (nextStateValue !== currentWorkflowStatus) {
+      const meta = machine.schema.states[nextStateValue]?.meta as
+        | WorkflowStateMeta
+        | undefined;
+      const nextWorkflowStatusId = meta?.workflowStatusId;
+
+      if (nextWorkflowStatusId) {
+        const updatedExperimentSafety =
+          await this.experimentDataSource.updateExperimentSafetyStatus(
+            experimentSafety.experimentSafetyPk,
+            nextWorkflowStatusId
+          );
+
+        return {
+          ...updatedExperimentSafety,
+          prevWorkflowStatusId: currentWorkflowStatusId,
+          workflowStatusConnectionId: connectionId,
+        };
+      }
     }
   }
-};
-
-export type WorkflowEngineExperimentType = ExperimentSafety & {
-  workflowId: number;
-  prevStatusId: number;
-  callShortCode: string;
-};
-
-export const workflowEngine = async (
-  args: {
-    experimentPk: number;
-    experimentSafetyEvents?: ExperimentSafetyEventsRecord;
-    currentEvent: Event;
-  }[]
-): Promise<Array<WorkflowEngineExperimentType | void> | void> => {
-  const experimentDataSource = container.resolve<ExperimentDataSource>(
-    Tokens.ExperimentDataSource
-  );
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-  const experimentWithChangedStatuses = (
-    await Promise.all(
-      args.map(async (experimentSafetyWithEvents) => {
-        const experiment = await experimentDataSource.getExperiment(
-          experimentSafetyWithEvents.experimentPk
-        );
-        if (!experiment) {
-          throw new Error(
-            `Experiment with Primary Key ${experimentSafetyWithEvents.experimentPk} not found`
-          );
-        }
-
-        const proposal = await proposalDataSource.get(experiment.proposalPk);
-        if (!proposal) {
-          throw new Error(
-            `Proposal with id ${experiment.proposalPk} not found`
-          );
-        }
-
-        const experimentSafety =
-          await experimentDataSource.getExperimentSafetyByExperimentPk(
-            experimentSafetyWithEvents.experimentPk
-          );
-
-        if (!experimentSafety) {
-          return;
-        }
-
-        const experimentWorkflow = await getExperimentWorkflowByCallId(
-          proposal.callId
-        );
-
-        if (!experimentWorkflow) {
-          return;
-        }
-        if (!experimentSafety.statusId) return;
-
-        const currentWorkflowConnections =
-          await getWorkflowConnectionByStatusId(
-            experimentWorkflow.id,
-            experimentSafety.statusId
-          );
-
-        if (!currentWorkflowConnections.length) {
-          return;
-        }
-
-        const callDataSource = container.resolve<CallDataSource>(
-          Tokens.CallDataSource
-        );
-
-        const call = await callDataSource.getCall(proposal.callId);
-
-        if (!call) {
-          return;
-        }
-
-        /**
-         * NOTE: We can have more than one current connection because of the multi-column workflows.
-         * This is the way how we store the connection that has multiple next connections.
-         * We have multiple separate connection records pointing to each next connection.
-         * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: FAP_SELECTION and NOT_FEASIBLE.
-         * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
-         * We go through each record and based on the currentEvent we move the proposal into the right direction
-         */
-        const response = await Promise.all(
-          currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            const nextWorkflowConnections =
-              await getWorkflowConnectionByStatusId(
-                experimentWorkflow.id,
-                undefined,
-                currentWorkflowConnection.statusId
-              );
-
-            return Promise.all(
-              nextWorkflowConnections.map(async (nextWorkflowConnection) => {
-                if (!experimentSafetyWithEvents.experimentSafetyEvents) {
-                  return;
-                }
-                const workflowDataSource =
-                  container.resolve<WorkflowDataSource>(
-                    Tokens.WorkflowDataSource
-                  );
-
-                const statusChangingEvents =
-                  await workflowDataSource.getStatusChangingEventsByConnectionIds(
-                    [nextWorkflowConnection.id]
-                  );
-                if (!statusChangingEvents) {
-                  return;
-                }
-
-                const eventThatTriggeredStatusChangeIsStatusChangingEvent =
-                  statusChangingEvents.find(
-                    (statusChangingEvent) =>
-                      experimentSafetyWithEvents.currentEvent ===
-                      statusChangingEvent.statusChangingEvent
-                  );
-
-                if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
-                  return;
-                }
-
-                if (
-                  shouldMoveToNextStatus(
-                    statusChangingEvents,
-                    experimentSafetyWithEvents.experimentSafetyEvents
-                  )
-                ) {
-                  const updatedExperimentSafety =
-                    await experimentDataSource.updateExperimentSafetyStatus(
-                      experimentSafety.experimentSafetyPk,
-                      nextWorkflowConnection.statusId
-                    );
-
-                  if (updatedExperimentSafety) {
-                    await checkIfConditionsForNextStatusAreMet({
-                      nextWorkflowConnections,
-                      experimentWorkflow,
-                      workflowDataSource,
-                      experimentSafetyWithEvents,
-                    });
-
-                    return {
-                      ...updatedExperimentSafety,
-                      workflowId: experimentWorkflow.id,
-                      prevStatusId: currentWorkflowConnection.statusId,
-                      callShortCode: call.shortCode,
-                    };
-                  }
-                }
-              })
-            );
-          })
-        ).then((results) => results.flat());
-
-        return response;
-      })
-    )
-  ).flat();
-
-  // NOTE: Filter the undefined or null items in the array.
-  const filteredExperimentsWithChangedStatuses =
-    experimentWithChangedStatuses.filter(
-      (p): p is WorkflowEngineExperimentType => !!p
-    );
-
-  return filteredExperimentsWithChangedStatuses;
-};
-
-export const markExperimentSafetyEventAsDoneAndCallWorkflowEngine = async (
-  eventType: Event,
-  experimentPks: number[]
-) => {
-  const ExperimentDataSource = container.resolve<ExperimentDataSource>(
-    Tokens.ExperimentDataSource
-  );
-
-  const allExperimentSafetyEvents =
-    await ExperimentDataSource.markEventAsDoneOnExperimentSafeties(
-      eventType,
-      experimentPks
-    );
-
-  const experimentPksWithEvents = experimentPks.map((experimentPk) => {
-    return {
-      experimentPk,
-      experimentSafetyEvents: allExperimentSafetyEvents?.find(
-        (experimentSafetyEvents) =>
-          experimentSafetyEvents.experiment_pk === experimentPk
-      ),
-      currentEvent: eventType,
-    };
-  });
-
-  const updatedExperiments = await workflowEngine(experimentPksWithEvents);
-
-  return updatedExperiments;
-};
+}

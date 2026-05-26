@@ -39,6 +39,7 @@ query getTechniqueScientistProposals(
         id
         name
       }
+      workflowId
     }
     totalCount
   }

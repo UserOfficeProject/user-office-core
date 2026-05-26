@@ -45,7 +45,7 @@ export default function ProposalPage() {
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: instrumentId === 'multi',
     },
-    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    proposalStatusId: proposalStatusId ?? undefined,
     referenceNumbers: proposalId ? [proposalId] : undefined,
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,

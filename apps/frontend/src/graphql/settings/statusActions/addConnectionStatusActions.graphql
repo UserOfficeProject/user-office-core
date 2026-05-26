@@ -1,10 +1,10 @@
-mutation addConnectionStatusActions(
+mutation setStatusActionsOnConnection(
   $connectionId: Int!
   $workflowId: Int!
   $actions: [ConnectionHasActionsInput!]!
 ) {
-  addConnectionStatusActions(
-    newConnectionStatusActionsInput: {
+  setStatusActionsOnConnection(
+    input: {
       connectionId: $connectionId
       workflowId: $workflowId
       actions: $actions

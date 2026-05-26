@@ -193,6 +193,9 @@ let thirdCreatedProposalPk: number;
 let createdWorkflowId: number;
 let createdEsiTemplateId: number;
 let newlyCreatedInstrumentId: number;
+let fapReviewWorkflowStatusId: number;
+let expiredWorkflowStatusId: number;
+let finishedWorkflowStatusId: number;
 
 function createWorkflowAndEsiTemplate() {
   const workflowName = faker.lorem.words(2);
@@ -212,14 +215,32 @@ function createWorkflowAndEsiTemplate() {
           .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
         'FEASIBILITY'
       ) {
-        cy.addWorkflowStatus({
-          statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        cy.addStatusToWorkflow({
+          statusId: initialDBData.proposalStatuses.fapReview.id,
           workflowId: createdWorkflowId,
-          sortOrder: 1,
-          prevStatusId: 1,
           posX: 0,
           posY: 200,
-          prevConnectionId: 1,
+        }).then((wfConnection) => {
+          fapReviewWorkflowStatusId =
+            wfConnection.addStatusToWorkflow.workflowStatusId;
+        });
+        cy.addStatusToWorkflow({
+          statusId: initialDBData.proposalStatuses.expired.id,
+          workflowId: createdWorkflowId,
+          posX: 0,
+          posY: 400,
+        }).then((wfConnection) => {
+          expiredWorkflowStatusId =
+            wfConnection.addStatusToWorkflow.workflowStatusId;
+        });
+        cy.addStatusToWorkflow({
+          statusId: initialDBData.proposalStatuses.finished.id,
+          workflowId: createdWorkflowId,
+          posX: 0,
+          posY: 400,
+        }).then((wfConnection) => {
+          finishedWorkflowStatusId =
+            wfConnection.addStatusToWorkflow.workflowStatusId;
         });
       }
 
@@ -263,7 +284,7 @@ function initializationBeforeTests() {
 
         // Manually changing the proposal status to be shown in the Faps. -------->
         cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.fapReview.id,
+          workflowStatusId: fapReviewWorkflowStatusId,
           proposalPks: [firstCreatedProposalPk],
         });
 
@@ -315,10 +336,17 @@ function initializationBeforeTests() {
                 proposerId: initialDBData.users.user1.id,
               });
 
-              // Manually changing the proposal status to be shown in the Faps. -------->
-              cy.changeProposalsStatus({
+              cy.addStatusToWorkflow({
                 statusId: initialDBData.proposalStatuses.fapReview.id,
-                proposalPks: [secondCreatedProposalPk],
+                workflowId: initialDBData.workflows.defaultWorkflow.id,
+                posX: 0,
+                posY: 200,
+              }).then((wfConnection) => {
+                cy.changeProposalsStatus({
+                  workflowStatusId:
+                    wfConnection.addStatusToWorkflow.workflowStatusId,
+                  proposalPks: [createdProposal.primaryKey],
+                });
               });
 
               cy.assignProposalsToInstruments({
@@ -343,7 +371,7 @@ function initializationBeforeTests() {
 
 context('Fap reviews tests', () => {
   beforeEach(function () {
-    cy.resetDB();
+    cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
@@ -468,9 +496,15 @@ context('Fap reviews tests', () => {
 
             cy.submitProposal({ proposalPk: createdProposal.primaryKey });
 
+            cy.addStatusToWorkflow({
+              statusId: initialDBData.proposalStatuses.fapReview.id,
+              workflowId: initialDBData.workflows.defaultWorkflow.id,
+              posX: 0,
+              posY: 200,
+            });
             // Manually changing the proposal status to be shown in the Faps. -------->
             cy.changeProposalsStatus({
-              statusId: initialDBData.proposalStatuses.fapReview.id,
+              workflowStatusId: fapReviewWorkflowStatusId,
               proposalPks: [createdProposal.primaryKey],
             });
 
@@ -1948,7 +1982,7 @@ context('Fap reviews tests', () => {
             cy.submitProposal({ proposalPk: createdProposal.primaryKey });
 
             cy.changeProposalsStatus({
-              statusId: initialDBData.proposalStatuses.finished.id,
+              workflowStatusId: finishedWorkflowStatusId,
               proposalPks: [secondCreatedProposalPk],
             });
 
@@ -2045,17 +2079,21 @@ context('Fap reviews tests', () => {
         numberRatingsRequired: 2,
         gradeGuide: fap1.gradeGuide,
         active: true,
-        reviewVisibility: 1,
+        reviewVisibility: 3,
       });
 
-      cy.updateFap({
-        id: createdFapId,
-        code: fap1.code,
-        description: fap1.description,
-        numberRatingsRequired: 2,
-        gradeGuide: fap1.gradeGuide,
-        active: true,
-        reviewVisibility: 3,
+      cy.updateCall({
+        id: initialDBData.call.id,
+        endFapReview: new Date(
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        ).toISOString(),
+      });
+
+      cy.updateCall({
+        id: createdCallId,
+        endFapReview: new Date(
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        ).toISOString(),
       });
 
       // Reviewer should not see any reviews when review visibility is set to 3 (reviews_visible_fap_ended)
@@ -2307,7 +2345,7 @@ context('Fap meeting components tests', () => {
 
                 // Manually changing the proposal status to be shown in the Faps. -------->
                 cy.changeProposalsStatus({
-                  statusId: initialDBData.proposalStatuses.fapReview.id,
+                  workflowStatusId: fapReviewWorkflowStatusId,
                   proposalPks: [createdProposal.primaryKey],
                 });
               }
@@ -2369,7 +2407,7 @@ context('Fap meeting components tests', () => {
 
           // Manually changing the proposal status to be shown in the Faps. -------->
           cy.changeProposalsStatus({
-            statusId: initialDBData.proposalStatuses.fapReview.id,
+            workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
         }
@@ -2488,7 +2526,7 @@ context('Fap meeting components tests', () => {
 
           // Manually changing the proposal status to be shown in the Faps. -------->
           cy.changeProposalsStatus({
-            statusId: initialDBData.proposalStatuses.fapReview.id,
+            workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
 
@@ -3069,7 +3107,7 @@ context('Fap meeting components tests', () => {
 
           // Manually changing the proposal status to be shown in the Faps. -------->
           cy.changeProposalsStatus({
-            statusId: initialDBData.proposalStatuses.fapReview.id,
+            workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
 
@@ -3655,7 +3693,7 @@ context('Fap meeting components tests', () => {
 
           // Manually changing the proposal status to be shown in the Faps. -------->
           cy.changeProposalsStatus({
-            statusId: initialDBData.proposalStatuses.fapReview.id,
+            workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
 
@@ -3889,7 +3927,7 @@ context('Fap meeting components tests', () => {
 
           // Manually changing the proposal status to be shown in the Faps. -------->
           cy.changeProposalsStatus({
-            statusId: initialDBData.proposalStatuses.fapReview.id,
+            workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
 
@@ -4616,7 +4654,7 @@ context('Fap meeting exports test', () => {
 
         // Manually changing the proposal status to be shown in the Faps. -------->
         cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.fapReview.id,
+          workflowStatusId: fapReviewWorkflowStatusId,
           proposalPks: [createdProposal.primaryKey],
         });
 
@@ -4829,7 +4867,7 @@ context('Fap meeting exports test', () => {
 
     cy.changeProposalsStatus({
       proposalPks: [proposalPK],
-      statusId: 9,
+      workflowStatusId: expiredWorkflowStatusId,
     });
 
     cy.login('officer');
