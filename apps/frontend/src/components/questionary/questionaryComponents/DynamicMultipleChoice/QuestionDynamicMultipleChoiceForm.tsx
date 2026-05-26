@@ -31,8 +31,8 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { SettingsId } from 'generated/sdk';
 import {
+  SettingsId,
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
 } from 'generated/sdk';
@@ -88,15 +88,10 @@ const jsonPathFieldsDocRows = [
 const pathNameValidationSchema = () => {
   return Yup.string()
     .matches(
-      // eslint-disable-next-line no-useless-escape
-      /^(?!https?:\/\/)(?!www\.)\/?[A-Za-z0-9\-._~\/]*$/,
+      /^(?!http|www)/i,
       'Provide a valid pathname, the domain is already provided'
     )
-    .matches(
-      // eslint-disable-next-line no-useless-escape
-      /^(?!\/)[A-Za-z0-9\-._~\/]*$/,
-      'Leading slash should not be included'
-    )
+    .matches(/^(?!\/).+$/, 'Leading slash should not be included')
     .required('Pathname is required');
 };
 

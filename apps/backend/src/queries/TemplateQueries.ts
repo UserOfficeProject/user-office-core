@@ -100,10 +100,11 @@ export default class TemplateQueries {
     if (!question) return [];
 
     const config = question.config as DynamicMultipleChoiceConfig;
-    if (config.url === '') return [];
+    const dynamicURL = constructDynamicURL(config.url, config.useBaseDomain);
+    if (dynamicURL === '') return [];
 
     try {
-      const response = await fetch(config.url, {
+      const response = await fetch(dynamicURL, {
         headers: config.apiCallRequestHeaders?.reduce(
           (acc, header) => ({
             ...acc,
@@ -139,4 +140,12 @@ export default class TemplateQueries {
 
     return [];
   }
+}
+
+function constructDynamicURL(url: string, useBaseURL: boolean): string {
+  if (useBaseURL) {
+    return `${process.env.BASE_URL}/{config.url)`;
+  }
+
+  return url;
 }
