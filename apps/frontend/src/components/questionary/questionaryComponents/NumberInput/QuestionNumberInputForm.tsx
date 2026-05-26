@@ -224,9 +224,11 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               fullWidth
               inputProps={{ 'data-cy': 'numberMin' }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const value =
-                  e.target.value === '' ? null : Number(e.target.value);
+                const minIsNull = e.target.value === '';
+                const value = minIsNull ? null : Number(e.target.value);
                 setFieldValue('config.numberMin', value);
+
+                minIsNull && setFieldValue('config.numberMinInclusive', false);
                 //Trigger validation for numberMax when numberMin changes
                 setFieldTouched('config.numberMax', true, true);
               }}
@@ -252,8 +254,12 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               fullWidth
               inputProps={{ 'data-cy': 'numberMax' }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const value =
-                  e.target.value === '' ? null : Number(e.target.value);
+                const maxIsNull = e.target.value === '';
+                const value = maxIsNull ? null : Number(e.target.value);
+                setFieldValue('config.numberMax', value);
+
+                maxIsNull && setFieldValue('config.numberMaxInclusive', false);
+
                 setFieldValue('config.numberMax', value);
               }}
             />
