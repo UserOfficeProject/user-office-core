@@ -236,7 +236,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
               >
                 {useBaseDomain && (
                   <span style={{ whiteSpace: 'nowrap' }}>
-                    {`${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
+                    {`http://${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
                   </span>
                 )}
 

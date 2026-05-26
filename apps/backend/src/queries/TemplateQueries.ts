@@ -144,7 +144,7 @@ export default class TemplateQueries {
 
 function constructDynamicURL(url: string, useBaseURL: boolean): string {
   if (useBaseURL) {
-    return `${process.env.BASE_URL}/{config.url)`;
+    return `http://${process.env.BASE_URL}/${url}`;
   }
 
   return url;
