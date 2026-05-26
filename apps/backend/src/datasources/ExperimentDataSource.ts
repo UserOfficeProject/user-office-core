@@ -1,4 +1,3 @@
-import { Event } from '../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -96,10 +95,6 @@ export interface ExperimentDataSource {
     experiments: Experiment[];
   }>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
-  markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null>;
   getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null>;
