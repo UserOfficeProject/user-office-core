@@ -1,0 +1,7 @@
+fragment workflow on Workflow {
+  id
+  name
+  description
+  connectionLineType
+  entityType
+}

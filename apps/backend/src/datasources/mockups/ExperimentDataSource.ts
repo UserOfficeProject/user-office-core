@@ -1,4 +1,3 @@
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentSafety,
@@ -44,7 +43,7 @@ const dummyExperimentSafetyFactory = (
     values?.esiQuestionaryId ?? 1,
     values?.esiQuestionarySubmittedAt ?? null,
     values?.createdBy ?? 1,
-    values?.statusId ?? null,
+    values?.workflowStatusId ?? 1,
     values?.safetyReviewQuestionaryId ?? 1,
     values?.reviewedBy ?? null,
     values?.createdAt ?? new Date(),
@@ -130,13 +129,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
       totalCount: this.experiments.length,
       experiments: this.experiments,
     };
-  }
-
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    return [dummyExperimentSafetyEvents];
   }
 
   async getExperimentSafetyEvents(
@@ -367,7 +359,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
             ? updateFields.esiQuestionarySubmittedAt
             : safety.esiQuestionarySubmittedAt,
           safety.createdBy,
-          safety.statusId,
+          safety.workflowStatusId,
           updateFields.safetyReviewQuestionaryId !== undefined
             ? updateFields.safetyReviewQuestionaryId
             : safety.safetyReviewQuestionaryId,
@@ -413,14 +405,14 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
   async updateExperimentSafetyStatus(
     experimentSafetyPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety> {
     const experimentSafety = await this.getExperimentSafety(experimentSafetyPk);
 
     if (!experimentSafety) {
       throw new Error('Experiment does not exist');
     }
-    experimentSafety.statusId = statusId;
+    experimentSafety.workflowStatusId = workflowStatusId;
 
     return experimentSafety;
   }
