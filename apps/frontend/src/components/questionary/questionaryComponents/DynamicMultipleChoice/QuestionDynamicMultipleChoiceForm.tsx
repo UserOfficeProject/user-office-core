@@ -21,7 +21,7 @@ import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
 import { Field } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
@@ -30,6 +30,8 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import { SettingsId } from 'generated/sdk';
 import {
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
@@ -83,6 +85,21 @@ const jsonPathFieldsDocRows = [
   },
 ];
 
+const pathNameValidationSchema = () => {
+  return Yup.string()
+    .matches(
+      // eslint-disable-next-line no-useless-escape
+      /^(?!https?:\/\/)(?!www\.)\/?[A-Za-z0-9\-._~\/]*$/,
+      'Provide a valid pathname, the domain is already provided'
+    )
+    .matches(
+      // eslint-disable-next-line no-useless-escape
+      /^(?!\/)[A-Za-z0-9\-._~\/]*$/,
+      'Leading slash should not be included'
+    )
+    .required('Pathname is required');
+};
+
 const CustomizedTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     background: theme.palette.common.black,
@@ -122,6 +139,8 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const [isJsonPathFieldDocPopupOpen, setIsJsonPathFieldDocPopupOpen] =
     useState(false);
 
+  const { settingsMap } = useContext(SettingsContext);
+
   return (
     <QuestionFormShell
       {...props}
@@ -131,7 +150,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: urlValidation,
+          url: Yup.string().when('useBaseDomain', {
+            is: true,
+            then: pathNameValidationSchema,
+            otherwise: urlValidation,
+          }),
           useBaseDomain: Yup.bool(),
           jsonPath: Yup.string(),
           apiRequestHeaders: Yup.array(),
@@ -212,22 +235,26 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
               <InputLabel htmlFor="config.url" shrink>
                 Link
               </InputLabel>
-              {useBaseDomain && (
-                <InputLabel htmlFor="config.url" shrink>
-                  https://www.koanarec.com
-                </InputLabel>
-              )}
-              <Field
-                name="config.url"
-                id="config.url"
-                type="text"
-                component={TextField}
-                fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url' }}
-              />
-            </FormControl>
 
-            <FormControl fullWidth>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                {useBaseDomain && (
+                  <span style={{ whiteSpace: 'nowrap' }}>
+                    {`${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
+                  </span>
+                )}
+
+                <Field
+                  name="config.url"
+                  id="config.url"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                />
+              </div>
+
               <Field
                 name="config.useBaseDomain"
                 id="config.useBaseDomain"
@@ -241,6 +268,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                   setFieldValue('config.useBaseDomain', checked);
                 }}
               />
+            </FormControl>
+
+            <FormControl fullWidth>
               <InputLabel htmlFor="config.jsonPath" shrink>
                 JsonPath
               </InputLabel>
