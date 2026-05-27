@@ -20,7 +20,7 @@ export class CallsFilter {
   public shortCode?: string;
 
   @Field(() => String, { nullable: true })
-  public proposalStatusShortCode?: string;
+  public proposalStatus?: string;
 
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];

@@ -1,15 +1,17 @@
 import {
-  AddStatusChangingEventsToConnectionMutationVariables,
-  AddStatusChangingEventsToConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutationVariables,
+  SetStatusChangingEventsOnConnectionMutation,
   CreateWorkflowMutationVariables,
   CreateWorkflowMutation,
   CreateStatusMutationVariables,
   CreateStatusMutation,
-  AddWorkflowStatusMutationVariables,
   AddWorkflowStatusMutation,
   AddConnectionStatusActionsMutation,
+  AddStatusToWorkflowMutation,
   AddConnectionStatusActionsMutationVariables,
+  AddStatusToWorkflowMutationVariables,
   Status,
+  CreateWorkflowConnectionMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -42,26 +44,35 @@ declare global {
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.
        *
-       * @returns {typeof addStatusChangingEventsToConnection}
+       * @returns {typeof setStatusChangingEventsOnConnection}
        * @memberof Chainable
        * @example
-       *    cy.addStatusChangingEventsToConnection('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
+       *    cy.setStatusChangingEventsOnConnection('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
        */
-      addStatusChangingEventsToConnection: (
-        addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
-      ) => Cypress.Chainable<AddStatusChangingEventsToConnectionMutation>;
+      setStatusChangingEventsOnConnection: (
+        setStatusChangingEventsOnConnectionInput: SetStatusChangingEventsOnConnectionMutationVariables
+      ) => Cypress.Chainable<SetStatusChangingEventsOnConnectionMutation>;
 
       /**
-       * Add proposal status to workflow.
+       * Add proposal status to workflow and optionally create connection from previous status.
        *
-       * @returns {typeof addWorkflowStatus}
+       * @returns {typeof addStatusToWorkflow}
        * @memberof Chainable
        * @example
-       *    cy.addWorkflowStatus(addWorkflowStatusInput: AddWorkflowStatusMutationVariables)
+       *    cy.addStatusToWorkflow(addStatusToWorkflowInput: AddStatusToWorkflowMutationVariables)
        */
-      addWorkflowStatus: (
-        addWorkflowStatusInput: AddWorkflowStatusMutationVariables
-      ) => Cypress.Chainable<AddWorkflowStatusMutation>;
+      addStatusToWorkflow: (
+        addStatusToWorkflowInput: Omit<
+          AddStatusToWorkflowMutationVariables,
+          'posX' | 'posY'
+        > & {
+          prevId?: number;
+          posX?: number;
+          posY?: number;
+        }
+      ) => Cypress.Chainable<
+        AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
+      >;
       /**
        * Add proposal status action to workflow connection.
        *
@@ -92,7 +103,7 @@ declare global {
        * cy.dragStatusIntoWorkflow(initialDBData.proposalStatuses.draft, { clientX: 100, clientY: 200 });
        */
       dragStatusIntoWorkflow(
-        sourceSelector: Pick<Status, 'shortCode' | 'id'>,
+        sourceSelector: Pick<Status, 'id'>,
         options?: {
           clientX?: number;
           clientY?: number;
@@ -112,8 +123,8 @@ declare global {
        * );
        */
       connectReactFlowNodes(
-        sourceStatus: Pick<Status, 'shortCode'>,
-        targetStatus: Pick<Status, 'shortCode'>,
+        sourceStatus: Pick<Status, 'id'>,
+        targetStatus: Pick<Status, 'id'>,
         options?: {
           force?: boolean;
         }

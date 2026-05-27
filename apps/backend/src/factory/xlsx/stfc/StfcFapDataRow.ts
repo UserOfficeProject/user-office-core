@@ -62,7 +62,7 @@ export async function getStfcDataRow(
       (answer) =>
         answer.question.naturalKey === 'Proposed_Route' ||
         answer.question.naturalKey === 'direct_access_route'
-    )?.value.value;
+    )?.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
     proposer_id?.toString() ?? '',

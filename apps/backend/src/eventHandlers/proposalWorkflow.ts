@@ -2,15 +2,15 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { searchObjectByKey } from '../utils/helperFunctions';
 import {
+  ProposalWorkflowEngine,
   WorkflowEngineProposalType,
-  markProposalsEventAsDoneAndCallWorkflowEngine,
 } from '../workflowEngine/proposal';
 
 enum ProposalInformationKeys {
@@ -20,22 +20,19 @@ enum ProposalInformationKeys {
 }
 
 const publishProposalStatusChange = async (
-  updatedProposals: (void | WorkflowEngineProposalType)[]
+  updatedProposals: WorkflowEngineProposalType[]
 ) => {
-  if (!updatedProposals) {
-    return;
-  }
   const eventBus = resolveApplicationEventBus();
 
-  const statusDataSource = container.resolve<StatusDataSource>(
-    Tokens.StatusDataSource
+  const workflowDataSource = container.resolve<WorkflowDataSource>(
+    Tokens.WorkflowDataSource
   );
   updatedProposals.map(async (updatedProposal) => {
     if (updatedProposal) {
-      const proposalStatus = await statusDataSource.getStatus(
-        updatedProposal.statusId
+      const proposalStatus = await workflowDataSource.getWorkflowStatus(
+        updatedProposal.workflowStatusId
       );
-      const previousProposalStatus = await statusDataSource.getStatus(
+      const previousProposalStatus = await workflowDataSource.getWorkflowStatus(
         updatedProposal.prevStatusId
       );
 
@@ -45,21 +42,21 @@ const publishProposalStatusChange = async (
         isRejection: false,
         key: 'proposal',
         loggedInUserId: null,
-        description: `From "${previousProposalStatus?.name}" to "${proposalStatus?.name}"`,
+        description: `From "${previousProposalStatus?.statusId}" to "${proposalStatus?.statusId}"`,
       });
     }
   });
 };
 
 const handleSubmittedProposalsAfterCallEnded = async (
-  updatedProposals: (void | WorkflowEngineProposalType)[]
+  updatedProposals: WorkflowEngineProposalType[]
 ) => {
-  if (!updatedProposals) {
-    return;
-  }
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
+
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+
   const notEndedInternalCalls = await callDataSource
     .getCalls({
       isEnded: true,
@@ -77,11 +74,10 @@ const handleSubmittedProposalsAfterCallEnded = async (
     return;
   }
 
-  const updatedSubmittedProposals =
-    await markProposalsEventAsDoneAndCallWorkflowEngine(
-      Event.CALL_ENDED,
-      proposalPks
-    );
+  const updatedSubmittedProposals = await workflowEngine.run({
+    event: Event.CALL_ENDED,
+    proposalPks,
+  });
   if (updatedSubmittedProposals) {
     await publishProposalStatusChange(updatedSubmittedProposals);
   }
@@ -93,15 +89,17 @@ export const handleWorkflowEngineChange = async (
 ) => {
   const isArray = Array.isArray(proposalPks);
 
-  const updatedProposals = await markProposalsEventAsDoneAndCallWorkflowEngine(
-    event.type,
-    isArray ? proposalPks : [proposalPks]
-  );
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+  const updatedProposals = await workflowEngine.run({
+    event: event.type,
+    proposalPks: isArray ? proposalPks : [proposalPks],
+  });
 
   if (
     event.type !== Event.PROPOSAL_STATUS_CHANGED_BY_USER &&
     updatedProposals?.length
   ) {
+    // publish PROPOSAL_STATUS_CHANGED_BY_WORKFLOW event to the EventBus
     await publishProposalStatusChange(updatedProposals);
     if (event.type === Event.PROPOSAL_SUBMITTED) {
       await handleSubmittedProposalsAfterCallEnded(updatedProposals);
