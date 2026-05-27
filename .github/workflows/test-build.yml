@@ -321,6 +321,9 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: [resolve_dep, build]
+    permissions:
+      contents: read
+      packages: read
 
     strategy:
       fail-fast: false
@@ -444,6 +447,13 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run e2e tests stfc
         env:
