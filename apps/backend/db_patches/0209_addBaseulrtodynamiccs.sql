@@ -1,0 +1,16 @@
+DO
+$$
+BEGIN
+    IF register_patch('addBaseulrtodynamiccs.sql', 'Zachary Hankin', 'dfkljafkld', '2026-5-21') THEN
+        UPDATE duo.public.questions
+        SET default_config = jsonb_set(
+            default_config::jsonb,
+            '{useBaseDomain}',
+            'false'::jsonb,
+            true
+        )
+        WHERE data_type = 'DYNAMIC_MULTIPLE_CHOICE';
+    END IF;
+END;
+$$
+LANGUAGE plpgsql;

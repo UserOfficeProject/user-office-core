@@ -152,4 +152,33 @@ describe('getDynamicMultipleChoiceOptions', () => {
 
     expect(options).toEqual(['option1', 'option2']);
   });
+
+  it('Should return options if selected useBaseDomain', async () => {
+    process.env = {
+      ...process.env,
+      BASE_URL: 'mocked.example.com',
+    };
+
+    jest
+      .spyOn(global, 'fetch')
+      .mockImplementation((input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input.toString();
+
+        if (url === 'http://mocked.example.com/getListOfCountries') {
+          return Promise.resolve({
+            json: () => Promise.resolve(['option1', 'option2']),
+            ok: true,
+          } as Response);
+        } else {
+          return Promise.reject(new Error('Unknown URL'));
+        }
+      });
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionWithBaseDomain'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+  });
 });
