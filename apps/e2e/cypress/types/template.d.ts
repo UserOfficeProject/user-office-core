@@ -221,6 +221,10 @@ declare global {
           units?: string[];
           valueConstraint?: string;
           firstTopic?: boolean;
+          numberMax?: number;
+          numberMaxInclusive?: boolean;
+          numberMin?: number;
+          numberMinInclusive?: boolean;
         }
       ) => void;
 
