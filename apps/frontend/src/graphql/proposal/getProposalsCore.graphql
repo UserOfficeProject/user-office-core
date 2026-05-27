@@ -17,6 +17,7 @@ query getProposalsCore(
     proposalViews {
       primaryKey
       title
+      workflowStatusId
       statusId
       statusName
       statusDescription

@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 
 export const createStatusValidationSchema = Yup.object()
   .shape({
-    shortCode: Yup.string()
+    id: Yup.string()
       .max(50)
       .trim()
       .test(
@@ -20,8 +20,7 @@ export const createStatusValidationSchema = Yup.object()
 
 export const updateStatusValidationSchema = Yup.object()
   .shape({
-    id: Yup.number().required(),
-    shortCode: Yup.string()
+    id: Yup.string()
       .max(50)
       .trim()
       .test(
@@ -33,9 +32,10 @@ export const updateStatusValidationSchema = Yup.object()
       .required(),
     name: Yup.string().max(100).required(),
     description: Yup.string().max(200).required(),
+    isDefault: Yup.bool(),
   })
   .strict(true);
 
 export const deleteStatusValidationSchema = Yup.object().shape({
-  id: Yup.number().required(),
+  id: Yup.string().required(),
 });

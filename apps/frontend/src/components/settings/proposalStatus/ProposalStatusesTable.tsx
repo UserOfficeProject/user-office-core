@@ -14,7 +14,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CreateUpdateProposalStatus from './CreateUpdateProposalStatus';
 
 const columns = [
-  { title: 'Short code', field: 'shortCode' },
+  { title: 'Status ID', field: 'id' },
   { title: 'Name', field: 'name' },
   { title: 'Description', field: 'description' },
 ];
@@ -44,7 +44,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
     />
   );
 
-  const deleteProposalStatus = async (id: number) => {
+  const deleteProposalStatus = async (id: string) => {
     return await api({
       toastSuccessMessage: 'Proposal status deleted successfully',
     })
