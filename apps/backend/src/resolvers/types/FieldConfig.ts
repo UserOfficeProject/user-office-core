@@ -3,6 +3,7 @@ import {
   Ctx,
   Field,
   FieldResolver,
+  Float,
   Int,
   ObjectType,
   Resolver,
@@ -309,6 +310,18 @@ export class NumberInputConfig extends ConfigBase {
 
   @Field(() => NumberValueConstraint, { nullable: true })
   numberValueConstraint: NumberValueConstraint | null;
+
+  @Field(() => Float, { nullable: true })
+  numberMin: number | null;
+
+  @Field(() => Boolean, { nullable: true })
+  numberMinInclusive: boolean | null;
+
+  @Field(() => Float, { nullable: true })
+  numberMax: number | null;
+
+  @Field(() => Boolean, { nullable: true })
+  numberMaxInclusive: boolean | null;
 }
 
 @ObjectType()

@@ -20,12 +20,12 @@ const postgresUserDataSource = new PostgresUserDataSource();
 
 const UOWSClient = createUOWSClient();
 
-type StfcRolesToEssRole = { [key: string]: Roles[] };
+type StfcRolesToSystemRole = { [key: string]: Roles[] };
 
 /*
  * Must not contain user role, this is appended at the very last step.
  */
-const stfcRolesToSystemRoleDefinitions: StfcRolesToEssRole = {
+const stfcRolesToSystemRoleDefinitions: StfcRolesToSystemRole = {
   'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
