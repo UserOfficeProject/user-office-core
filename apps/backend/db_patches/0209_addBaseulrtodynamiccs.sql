@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-    IF register_patch('addBaseulrtodynamiccs.sql', 'Zachary Hankin', 'dfkljafkld', '2026-5-21') THEN
+    IF register_patch('addBaseulrtodynamiccs.sql', 'Zachary Hankin', 'Adds an option to the dynamic HTTP question type allowing use of base domain', '2026-5-21') THEN
         UPDATE duo.public.questions
         SET default_config = jsonb_set(
             default_config::jsonb,
