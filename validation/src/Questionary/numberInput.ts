@@ -36,6 +36,31 @@ export const numberInputQuestionValidationSchema = (
       break;
   }
 
+  if (config.numberMin !== null) {
+    valueScheme = config.numberMinInclusive
+      ? valueScheme.min(
+          config.numberMin,
+          `Value must be greater than or equal to ${config.numberMin}`,
+        )
+      : valueScheme.moreThan(
+          config.numberMin,
+          `Value must be greater than ${config.numberMin}`,
+        );
+  }
+
+  if (config.numberMax !== null) {
+    valueScheme = config.numberMaxInclusive
+      ? valueScheme.max(
+          config.numberMax,
+          `Value must be less than or equal to ${config.numberMax}`,
+        )
+      : valueScheme.lessThan(
+          config.numberMax,
+          `Value must be less than ${config.numberMax}`,
+        );
+  }
+
+
   let unitScheme = Yup.object().nullable();
 
   // available units are specified and the field is required
