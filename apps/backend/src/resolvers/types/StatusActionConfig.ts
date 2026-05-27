@@ -57,6 +57,7 @@ export class EmailStatusActionRecipient {
 export class EmailStatusActionEmailTemplate {
   @Field(() => String)
   public id: string;
+
   @Field(() => String)
   public name: string;
 }

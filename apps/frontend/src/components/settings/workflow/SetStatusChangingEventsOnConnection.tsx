@@ -15,7 +15,7 @@ import { Event, WorkflowType } from 'generated/sdk';
 import { useEventsData } from 'hooks/settings/useEventsData';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
-const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
+const setStatusChangingEventsOnConnectionValidationSchema = yup.object().shape({
   selectedStatusChangingEvents: yup
     .array()
     .of(yup.string())
@@ -23,8 +23,8 @@ const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
     .required('You must select at least one event'),
 });
 
-type AddStatusChangingEventsToConnectionProps = {
-  addStatusChangingEventsToConnection: (statusChangingEvents: string[]) => void;
+type SetStatusChangingEventsOnConnectionProps = {
+  setStatusChangingEventsOnConnection: (statusChangingEvents: string[]) => void;
   deleteWorkflowConnection: () => void;
   onClose: () => void;
   statusChangingEvents?: Event[];
@@ -33,15 +33,15 @@ type AddStatusChangingEventsToConnectionProps = {
   entityType: WorkflowType;
 };
 
-const AddStatusChangingEventsToConnection = ({
+const SetStatusChangingEventsOnConnection = ({
   statusChangingEvents,
-  addStatusChangingEventsToConnection,
+  setStatusChangingEventsOnConnection,
   deleteWorkflowConnection,
   onClose,
   statusName,
   isLoading,
   entityType,
-}: AddStatusChangingEventsToConnectionProps) => {
+}: SetStatusChangingEventsOnConnectionProps) => {
   const theme = useTheme();
   const { events, loadingEvents } = useEventsData(entityType);
 
@@ -60,11 +60,11 @@ const AddStatusChangingEventsToConnection = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        addStatusChangingEventsToConnection(
+        setStatusChangingEventsOnConnection(
           values.selectedStatusChangingEvents
         );
       }}
-      validationSchema={addStatusChangingEventsToConnectionValidationSchema}
+      validationSchema={setStatusChangingEventsOnConnectionValidationSchema}
     >
       {({ isSubmitting, values }): JSX.Element => (
         <Form>
@@ -170,7 +170,7 @@ const AddStatusChangingEventsToConnection = ({
                 data-cy="submit"
               >
                 {isLoading && <UOLoader size={20} />}
-                Add status changing events
+                Set status changing events
               </Button>
             </Grid>
           </Grid>
@@ -180,4 +180,4 @@ const AddStatusChangingEventsToConnection = ({
   );
 };
 
-export default AddStatusChangingEventsToConnection;
+export default SetStatusChangingEventsOnConnection;

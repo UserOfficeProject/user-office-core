@@ -13,13 +13,7 @@ import { ResolverContext } from '../../../context';
 @InputType()
 export class DeleteWorkflowStatusInput {
   @Field(() => Int)
-  public statusId: number;
-
-  @Field(() => Int)
-  public workflowId: number;
-
-  @Field(() => Int)
-  public sortOrder: number;
+  public workflowStatusId: number;
 }
 
 @Resolver()

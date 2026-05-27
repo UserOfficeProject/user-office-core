@@ -7,6 +7,7 @@ import {
   dummyInstrument,
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
+import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
@@ -16,17 +17,21 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { WorkflowType } from '../models/Workflow';
 
-let statusDataSource: StatusDataSourceMock;
+let proposalDataSource: ProposalDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
+let statusDataSource: StatusDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
 beforeEach(() => {
-  statusDataSource = container.resolve<StatusDataSourceMock>(
-    Tokens.StatusDataSource
-  );
   techniqueDataSource = container.resolve<TechniqueDataSourceMock>(
     Tokens.TechniqueDataSource
+  );
+  proposalDataSource = container.resolve<ProposalDataSourceMock>(
+    Tokens.ProposalDataSource
+  );
+  statusDataSource = container.resolve<StatusDataSourceMock>(
+    Tokens.StatusDataSource
   );
 });
 
@@ -200,19 +205,6 @@ describe('Test Instrument Mutations', () => {
 
   describe('Test technique proposal instrument assignment', () => {
     test('A user officer can change the instrument of a technique proposal from any status', () => {
-      const proposal = { statusId: 1 };
-
-      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
-        {
-          id: proposal.statusId,
-          shortCode: 'EXPIRED',
-          name: 'Expired',
-          description: '',
-          isDefault: true,
-          entityType: WorkflowType.PROPOSAL,
-        },
-      ]);
-
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyUserOfficerWithRole,
@@ -230,19 +222,6 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('A scientist cannot change the instrument of a technique proposal from any status', () => {
-      const proposal = { statusId: 1 };
-
-      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
-        {
-          id: proposal.statusId,
-          shortCode: 'EXPIRED',
-          name: 'Expired',
-          description: '',
-          isDefault: true,
-          entityType: WorkflowType.PROPOSAL,
-        },
-      ]);
-
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,
@@ -259,18 +238,21 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('A scientist can change the instrument of a technique proposal when the status is under review', () => {
-      const proposal = { statusId: 1 };
+      // @ts-ignore skip type error for testing purposes
+      jest.spyOn(proposalDataSource, 'get').mockResolvedValue({
+        primaryKey: 1,
+        workflowStatusId: 2,
+      });
 
-      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
-        {
-          id: proposal.statusId,
-          shortCode: 'UNDER_REVIEW',
-          name: 'Under review',
+      jest
+        .spyOn(statusDataSource, 'getStatusByWorkflowStatusId')
+        .mockResolvedValue({
+          id: 'UNDER_REVIEW',
+          name: 'UNDER_REVIEW',
           description: '',
           isDefault: true,
           entityType: WorkflowType.PROPOSAL,
-        },
-      ]);
+        });
 
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
@@ -330,6 +312,16 @@ describe('Test Instrument Mutations', () => {
             managerUserId: 1,
           },
         ]);
+
+      jest
+        .spyOn(statusDataSource, 'getStatusByWorkflowStatusId')
+        .mockResolvedValue({
+          id: 'UNDER_REVIEW',
+          name: 'UNDER_REVIEW',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        });
 
       return expect(
         instrumentMutations.assignTechniqueProposalsToInstruments(
