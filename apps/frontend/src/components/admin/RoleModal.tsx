@@ -152,7 +152,10 @@ const RoleModal: React.FC<RoleModalProps> = ({
     onClose();
   };
 
-  const hasConfig = shortCode === 'user' || shortCode === 'proposal_reader';
+  const shortCodeUpper = shortCode.toUpperCase();
+  const hasConfig =
+    shortCodeUpper === UserRole.USER ||
+    shortCodeUpper === UserRole.PROPOSAL_READER;
 
   return (
     <Dialog
@@ -219,13 +222,13 @@ const RoleModal: React.FC<RoleModalProps> = ({
         {hasConfig && (
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle1">Config</Typography>
-            {shortCode.toUpperCase() === UserRole.USER && (
+            {shortCodeUpper === UserRole.USER && (
               <UserRoleConfigForm
                 value={config as UserRoleConfig}
                 onChange={setConfig}
               />
             )}
-            {shortCode.toUpperCase() === UserRole.PROPOSAL_READER && (
+            {shortCodeUpper === UserRole.PROPOSAL_READER && (
               <ProposalReaderRoleConfigForm
                 value={config as ProposalReaderRoleConfig}
                 onChange={setConfig}
