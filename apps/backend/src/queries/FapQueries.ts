@@ -9,7 +9,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Call } from '../models/Call';
-import { FapReviewVisibility } from '../models/Fap';
+import { Fap, FapReviewVisibility } from '../models/Fap';
 import { ReviewStatus } from '../models/Review';
 import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -267,7 +267,7 @@ export default class FapQueries {
 
     return this.dataSource.getFapsByProposalPk(proposalPk);
   }
-  
+
   private async userHasFapAccess(
     agent: UserWithRole | null,
     fapId: number
