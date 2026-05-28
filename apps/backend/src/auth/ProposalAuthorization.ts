@@ -349,13 +349,15 @@ export class ProposalAuthorization {
       callId,
       checkIfInternalEditable
     );
-    const proposalStatus = (
-      await this.statusDataSource.getStatus(proposal.statusId)
-    )?.shortCode;
+    const proposalStatus =
+      await this.statusDataSource.getStatusByWorkflowStatusId(
+        proposal.workflowStatusId
+      );
+    const proposalStatusId = proposalStatus!.id;
     if (
-      proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
+      proposalStatusId === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
       (checkIfInternalEditable &&
-        proposalStatus ===
+        proposalStatusId ===
           ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL)
     ) {
       return true;
@@ -364,7 +366,7 @@ export class ProposalAuthorization {
     if (isCallEnded) {
       return false;
     } else {
-      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
+      return proposalStatusId === ProposalStatusDefaultShortCodes.DRAFT;
     }
   }
 

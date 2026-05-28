@@ -1,11 +1,16 @@
+import { DateTime } from 'luxon';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
-import { Fap, FapReviewVisibility } from '../models/Fap';
+import { Call } from '../models/Call';
+import { FapReviewVisibility } from '../models/Fap';
+import { ReviewStatus } from '../models/Review';
 import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
@@ -16,6 +21,9 @@ export default class FapQueries {
     @inject(Tokens.FapDataSource) public dataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ReviewDataSource)
+    private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -32,15 +40,7 @@ export default class FapQueries {
       return null;
     }
 
-    if (
-      this.userAuth.isApiToken(agent) ||
-      this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfFap(agent, id))
-    ) {
-      return fap;
-    } else {
-      return null;
-    }
+    return (await this.userHasFapAccess(agent, id)) ? fap : null;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -124,15 +124,9 @@ export default class FapQueries {
     agent: UserWithRole | null,
     { fapId, proposalPk }: { fapId: number; proposalPk: number }
   ) {
-    if (
-      this.userAuth.isApiToken(agent) ||
-      this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfFap(agent, fapId))
-    ) {
-      return this.dataSource.getFapProposal(fapId, proposalPk);
-    } else {
-      return null;
-    }
+    return (await this.userHasFapAccess(agent, fapId))
+      ? this.dataSource.getFapProposal(fapId, proposalPk)
+      : null;
   }
 
   @Authorized([
@@ -149,17 +143,11 @@ export default class FapQueries {
       callId,
     }: { fapId: number; instrumentId: number; callId: number }
   ) {
-    if (
-      this.userAuth.isApiToken(agent) ||
-      this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfFap(agent, fapId))
-    ) {
-      return this.dataSource.getFapProposalsByInstrument(instrumentId, callId, {
-        fapId,
-      });
-    } else {
-      return null;
-    }
+    return (await this.userHasFapAccess(agent, fapId))
+      ? this.dataSource.getFapProposalsByInstrument(instrumentId, callId, {
+          fapId,
+        })
+      : null;
   }
 
   @Authorized([
@@ -178,42 +166,54 @@ export default class FapQueries {
       proposalPk: number;
     }
   ) {
-    let reviewerId = null;
+    const proposal = await this.proposalDataSource.get(proposalPk);
+    if (!proposal) {
+      return null;
+    }
 
-    const proposalEvents =
-      await this.proposalDataSource.getProposalEvents(proposalPk);
+    const call = await this.callDataSource.getCall(proposal.callId);
+    if (!call) {
+      return null;
+    }
+
+    const isApiToken = this.userAuth.isApiToken(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isChairOrSecretary = await this.userAuth.isChairOrSecretaryOfFap(
+      agent,
+      fapId
+    );
+
+    if (isUserOfficer || isChairOrSecretary) {
+      // Applying no restrictions for user officers, fap chairs and fap secretaries
+      return this.dataSource.getFapProposalAssignments(fapId, proposalPk, null);
+    }
 
     const visibility = await this.dataSource.getFapReviewVisibility(fapId);
-
-    let reviewsVisibleOnFap = false;
+    let fapAccessRestrictions = true;
 
     switch (visibility) {
       case FapReviewVisibility.PROPOSAL_REVIEWS_COMPLETE:
-        reviewsVisibleOnFap =
-          proposalEvents?.proposal_all_fap_reviews_submitted || false;
+        const canSeeAllAssignments =
+          isApiToken ||
+          isUserOfficer ||
+          isChairOrSecretary ||
+          (await this.allFapReviewsComplete(fapId, proposalPk));
+
+        if (canSeeAllAssignments) fapAccessRestrictions = false;
         break;
       case FapReviewVisibility.REVIEWS_VISIBLE_FAP_ENDED:
-        reviewsVisibleOnFap = proposalEvents?.call_fap_review_ended || false;
+        const hasFapEnded = this.hasFapEnded(call);
+        if (hasFapEnded) fapAccessRestrictions = false;
         break;
       case FapReviewVisibility.REVIEWS_VISIBLE:
-        reviewsVisibleOnFap = true;
+        fapAccessRestrictions = false;
         break;
-    }
-
-    // NOTE: If not officer, Fap Chair or Fap Secretary should return only the proposals based the review visibility setting of the fap
-    if (
-      agent &&
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId)) &&
-      !reviewsVisibleOnFap
-    ) {
-      reviewerId = agent.id;
     }
 
     return this.dataSource.getFapProposalAssignments(
       fapId,
       proposalPk,
-      reviewerId
+      fapAccessRestrictions ? agent!.id : null
     );
   }
 
@@ -227,21 +227,19 @@ export default class FapQueries {
         [proposalPk],
         fapId
       );
+
+    if (!fapMeetingDecisions.length) {
+      return [];
+    }
+
     const fap = await this.dataSource.getFapByProposalPk(proposalPk);
-
-    if (!fapMeetingDecisions.length || !fap) {
+    if (!fap) {
       return [];
     }
 
-    if (
-      this.userAuth.isApiToken(agent) ||
-      this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfFap(agent, fap.id))
-    ) {
-      return fapMeetingDecisions;
-    } else {
-      return [];
-    }
+    return (await this.userHasFapAccess(agent, fap.id))
+      ? fapMeetingDecisions
+      : [];
   }
 
   async getProposalsFaps(agent: UserWithRole | null, proposalPks: number[]) {
@@ -268,5 +266,34 @@ export default class FapQueries {
     }
 
     return this.dataSource.getFapsByProposalPk(proposalPk);
+  }
+  
+  private async userHasFapAccess(
+    agent: UserWithRole | null,
+    fapId: number
+  ): Promise<boolean> {
+    return (
+      this.userAuth.isApiToken(agent) ||
+      this.userAuth.isUserOfficer(agent) ||
+      (await this.userAuth.isMemberOfFap(agent, fapId))
+    );
+  }
+
+  private async allFapReviewsComplete(fapId: number, proposalPk: number) {
+    const reviews = await this.reviewDataSource.getProposalReviews(
+      proposalPk,
+      fapId
+    );
+
+    return (
+      reviews.length > 0 &&
+      reviews.every((review) => review.status === ReviewStatus.SUBMITTED)
+    );
+  }
+
+  private hasFapEnded(call: Call) {
+    const currentDate = DateTime.now();
+
+    return call.endFapReview?.getTime() <= currentDate.toMillis();
   }
 }

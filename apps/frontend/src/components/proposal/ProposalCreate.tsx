@@ -40,8 +40,7 @@ export function createProposalStub(
     questionaryId: 0,
     proposalId: '',
     status: {
-      id: 0,
-      shortCode: 'DRAFT',
+      id: 'DRAFT',
       description: '',
       name: '',
       isDefault: true,

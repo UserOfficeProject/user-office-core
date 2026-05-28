@@ -63,7 +63,7 @@ export abstract class UserAuthorization {
   }
 
   isApiToken(agent: UserWithRole | null) {
-    return agent?.isApiAccessToken;
+    return agent?.isApiAccessToken ?? false;
   }
 
   async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {
