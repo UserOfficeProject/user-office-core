@@ -13,6 +13,7 @@ import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
+import ProposalAdminReadOnly from 'components/proposal/ProposalAdminReadOnly';
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
@@ -62,6 +63,7 @@ const ProposalReviewContent = ({
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isProposalReader = useCheckAccess([UserRole.PROPOSAL_READER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const isFapSec = useCheckAccess([UserRole.FAP_SECRETARY]);
@@ -223,7 +225,7 @@ const ProposalReviewContent = ({
     <ProposalReviewContainer fapId={fapId} reviewId={reviewId} />
   );
 
-  const AllProposalReviewsTab = isUserOfficer && (
+  const AllProposalReviewsTab = (isUserOfficer || isProposalReader) && (
     <>
       <ExternalReviews
         reviews={proposalData.reviews as Review[]}
@@ -237,27 +239,31 @@ const ProposalReviewContent = ({
     </>
   );
 
-  const ProposalAdminTab = (isUserOfficer || isInstrumentScientist) && (
-    <ProposalAdmin
-      data={proposalData}
-      setAdministration={(data: AdministrationFormData) =>
-        setProposalData({
-          ...proposalData,
-          ...data,
-          instruments:
-            proposalData.instruments?.map((instrument) => ({
-              ...(instrument as InstrumentWithManagementTime),
-              managementTimeAllocation:
-                data.managementTimeAllocations?.find(
-                  (item) => item.instrumentId === instrument?.id
-                )?.value ?? null,
-            })) || [],
-        })
-      }
-    />
-  );
+  const ProposalAdminTab =
+    (isUserOfficer || isInstrumentScientist || isProposalReader) &&
+    (isUserOfficer || isInstrumentScientist ? (
+      <ProposalAdmin
+        data={proposalData}
+        setAdministration={(data: AdministrationFormData) =>
+          setProposalData({
+            ...proposalData,
+            ...data,
+            instruments:
+              proposalData.instruments?.map((instrument) => ({
+                ...(instrument as InstrumentWithManagementTime),
+                managementTimeAllocation:
+                  data.managementTimeAllocations?.find(
+                    (item) => item.instrumentId === instrument?.id
+                  )?.value ?? null,
+              })) || [],
+          })
+        }
+      />
+    ) : (
+      <ProposalAdminReadOnly data={proposalData} />
+    ));
 
-  const EventLogsTab = isUserOfficer && (
+  const EventLogsTab = (isUserOfficer || isProposalReader) && (
     <EventLogList
       changedObjectId={proposalData.primaryKey}
       eventType="PROPOSAL"
