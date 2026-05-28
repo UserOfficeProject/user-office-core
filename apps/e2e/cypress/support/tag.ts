@@ -1,8 +1,12 @@
 import {
+  AssignCallsToTagMutation,
+  AssignCallsToTagMutationVariables,
   CreateTagMutation,
   CreateTagMutationVariables,
   AssignInstrumentsToTagMutationVariables,
   AssignInstrumentsToTagMutation,
+  UpdateRoleTagsMutation,
+  UpdateRoleTagsMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -25,5 +29,25 @@ const addInstrumentToTag = (
   return cy.wrap(request);
 };
 
+const assignCallsToTag = (
+  assignCallsInput: AssignCallsToTagMutationVariables
+): Cypress.Chainable<AssignCallsToTagMutation> => {
+  const api = getE2EApi();
+  const request = api.assignCallsToTag(assignCallsInput);
+
+  return cy.wrap(request);
+};
+
+const updateRoleTags = (
+  updateRoleTagsInput: UpdateRoleTagsMutationVariables
+): Cypress.Chainable<UpdateRoleTagsMutation> => {
+  const api = getE2EApi();
+  const request = api.updateRoleTags(updateRoleTagsInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createTag', createTag);
 Cypress.Commands.add('addInstrumentToTag', addInstrumentToTag);
+Cypress.Commands.add('assignCallsToTag', assignCallsToTag);
+Cypress.Commands.add('updateRoleTags', updateRoleTags);
