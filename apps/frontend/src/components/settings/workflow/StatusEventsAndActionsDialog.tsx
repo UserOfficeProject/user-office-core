@@ -14,7 +14,7 @@ import {
 } from 'generated/sdk';
 
 import AddStatusActionsToConnection from './AddStatusActionsToConnection';
-import AddStatusChangingEventsToConnection from './AddStatusChangingEventsToConnection';
+import SetStatusChangingEventsOnConnection from './SetStatusChangingEventsOnConnection';
 import { EventType, Event } from './WorkflowEditorModel';
 
 type StatusEventsAndActionsDialogProps = {
@@ -76,29 +76,31 @@ const StatusEventsAndActionsDialog = ({
           }
           tabPanelPadding={theme.spacing(0, 3)}
         >
-          <AddStatusChangingEventsToConnection
+          <SetStatusChangingEventsOnConnection
             statusChangingEvents={
               workflowConnection?.statusChangingEvents?.map(
                 (statusChangingEvent) => statusChangingEvent.statusChangingEvent
               ) as WorkflowEvent[]
             }
-            statusName={workflowConnection?.status.name}
-            addStatusChangingEventsToConnection={(
+            statusName={workflowConnection?.nextStatus.status.name}
+            setStatusChangingEventsOnConnection={(
               statusChangingEvents: string[]
             ) =>
+              workflowConnection &&
               dispatch({
-                type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED,
+                type: EventType.SET_STATUS_CHANGING_EVENTS_ON_CONNECTION_REQUESTED,
                 payload: {
-                  statusChangingEvents,
-                  workflowConnection,
+                  workflowConnection: workflowConnection,
+                  statusChangingEvents: statusChangingEvents,
                 },
               })
             }
             deleteWorkflowConnection={() =>
+              workflowConnection &&
               dispatch({
                 type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED,
                 payload: {
-                  connectionId: workflowConnection?.id,
+                  connectionId: workflowConnection.id,
                 },
               })
             }
@@ -113,12 +115,12 @@ const StatusEventsAndActionsDialog = ({
                   type: EventType.ADD_STATUS_ACTION_REQUESTED,
                   payload: {
                     statusActions,
-                    workflowConnection,
+                    workflowConnection: workflowConnection!,
                   },
                 });
               }}
               connectionStatusActions={workflowConnection?.statusActions}
-              statusName={workflowConnection?.status.name}
+              statusName={workflowConnection?.nextStatus.status.name}
               isLoading={isLoading}
             />
           )}
