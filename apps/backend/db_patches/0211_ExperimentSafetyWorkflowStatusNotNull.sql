@@ -4,14 +4,11 @@ DECLARE
     v_updated BIGINT := 0;
 BEGIN
     IF register_patch(
-       'ExperimentSafetyWorkflowStatusNullable',
+       'ExperimentSafetyWorkflowStatusNotNull',
        'Yoganandan Pandiyan',
-       'Make experiment_safety.workflow_status_id nullable and backfill with AWAITING_ESF status from experiment workflow.',
+       'Make experiment_safety.workflow_status_id NOT NULL after backfilling with AWAITING_ESF status from experiment workflow.',
        '2026-05-29'
      ) THEN
-
-        -- Ensure the column is nullable (it was added as NULL in 0207, but make explicit)
-        ALTER TABLE experiment_safety ALTER COLUMN workflow_status_id DROP NOT NULL;
 
         -- Backfill existing experiment_safety rows that have NULL workflow_status_id.
         -- Chain: experiment_safety → experiments (experiment_pk) → proposals (proposal_pk)
@@ -20,8 +17,7 @@ BEGIN
         --
         -- NOTE: If a call has no experiment_workflow_id assigned, those rows are skipped.
         -- This means experiment_safety rows linked to such calls will retain NULL
-        -- workflow_status_id, which may cause errors since the column is non-nullable
-        -- in application logic.
+        -- workflow_status_id, which will cause an error when SET NOT NULL is applied.
         UPDATE experiment_safety es
         SET workflow_status_id = whs.workflow_status_id
         FROM experiments e
@@ -41,6 +37,9 @@ BEGIN
         ELSE
           RAISE NOTICE USING MESSAGE = format('%s experiment_safety rows updated with AWAITING_ESF workflow_status_id.', v_updated);
         END IF;
+
+        -- Make the column non-nullable now that existing rows have been backfilled
+        ALTER TABLE experiment_safety ALTER COLUMN workflow_status_id SET NOT NULL;
 
     END IF;
 END;
