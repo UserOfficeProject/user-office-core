@@ -5,7 +5,9 @@ query getRoles {
     title
     description
     isRootRole
-    permissions
+    config {
+      ...roleConfig
+    }
     tags {
       id
       name
