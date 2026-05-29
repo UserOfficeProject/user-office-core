@@ -3,8 +3,6 @@ import {
   AllocationTimeUnits,
   FeatureId,
   FeatureUpdateAction,
-} from '@user-office-software-libs/shared-types';
-import {
   Event as PROPOSAL_EVENTS,
   StatusActionType,
 } from '@user-office-software-libs/shared-types';
@@ -108,17 +106,16 @@ context('Pregenerated PDF tests', () => {
       }
     });
 
-    cy.addWorkflowStatus({
+    cy.addStatusToWorkflow({
       statusId: initialDBData.proposalStatuses.editableSubmitted.id,
       workflowId: initialDBData.workflows.defaultWorkflow.id,
-      sortOrder: 1,
-      prevStatusId: initialDBData.proposalStatuses.draft.id,
+      prevId: initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
       posX: 0,
       posY: 200,
     }).then((result) => {
-      const connection = result.addWorkflowStatus;
+      const connection = result.createWorkflowConnection;
       if (connection) {
-        cy.addStatusChangingEventsToConnection({
+        cy.setStatusChangingEventsOnConnection({
           workflowConnectionId: connection.id,
           statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
         });

@@ -1,16 +1,17 @@
-import { Role } from '../../models/Role';
+import { Role, createRole } from '../../models/Role';
 import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { RoleDataSource, Tag } from '../RoleDataSource';
 
-const dummyRole: Role = {
-  id: 1,
-  shortCode: 'admin',
-  title: 'Administrator',
-  description: 'Has full access to all features and settings.',
-  isRootRole: false,
-  permissions: [],
-};
+const dummyRole: Role = createRole(
+  1,
+  'admin',
+  'Administrator',
+  'Has full access to all features and settings.',
+  {},
+  false
+);
+
 export class RoleDataSourceMock implements RoleDataSource {
   private roleTagsMap: Map<number, Set<number>> = new Map();
   private tags: Map<number, string> = new Map([
@@ -20,36 +21,29 @@ export class RoleDataSourceMock implements RoleDataSource {
   ]);
 
   async createRole(args: CreateRoleArgs): Promise<Role> {
-    return {
-      id: 1,
-      title: args.title,
-      shortCode: args.shortCode,
-      description: args.description,
-      permissions: [],
-      isRootRole: false,
-    } as Role;
+    return createRole(
+      1,
+      args.shortCode,
+      args.title,
+      args.description,
+      {},
+      false
+    );
   }
 
   async updateRole(args: UpdateRoleArgs): Promise<Role> {
-    return {
-      id: args.roleID || 1,
-      title: args.title,
-      shortCode: args.shortCode,
-      description: args.description,
-      permissions: [],
-      isRootRole: false,
-    } as Role;
+    return createRole(
+      args.roleID || 1,
+      args.shortCode,
+      args.title,
+      args.description,
+      {},
+      false
+    );
   }
 
   async deleteRole(id: number): Promise<Role> {
-    return {
-      id,
-      title: 'deleted',
-      shortCode: 'deleted',
-      description: 'deleted',
-      permissions: [],
-      isRootRole: false,
-    } as Role;
+    return createRole(id, 'deleted', 'deleted', 'deleted', {}, false);
   }
 
   async updateRoleTags(roleId: number, tagIds: number[]): Promise<Role> {

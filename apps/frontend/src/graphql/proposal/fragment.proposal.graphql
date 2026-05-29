@@ -3,6 +3,7 @@ fragment proposal on Proposal {
   title
   abstract
   statusId
+  workflowStatusId
   status {
     ...status
   }

@@ -81,6 +81,34 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-end-call-input"]').should('exist');
     });
 
+    it('Should show Facilities Homepage button in account menu', () => {
+      cy.login('officer');
+      cy.visit('/Settings');
+
+      cy.get('[placeholder="Search"]')
+        .clear()
+        .type('EXTERNAL_AUTH_HOMEPAGE_URL');
+
+      cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.contains('tr', 'EXTERNAL_AUTH_HOMEPAGE_URL')
+        .find('input[type="text"]')
+        .last()
+        .clear()
+        .type('https://test-homepage.com');
+
+      cy.get('[aria-label="Save"]').click();
+      cy.notification({ text: 'Settings updated', variant: 'success' });
+
+      cy.visit('/');
+      cy.get('[data-cy="profile-page-btn"]').click();
+      cy.get('[data-cy="external-homepage-button"]')
+        .should('exist')
+        .and('contain.text', 'Facilities Homepage');
+    });
+
     it('Instrument Scientist filter should differ based on setting value', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         //temporarily skipping, until instr sci login is enabled
@@ -112,9 +140,12 @@ context('App settings tests', () => {
         );
       }
       if (initialDBData.getFormats().statusFilter === 'ALL') {
-        cy.get('[data-cy="status-filter"] input').should('have.value', 0);
+        cy.get('[data-cy="status-filter"] input').should('have.value', 'ALL');
       } else {
-        cy.get('[data-cy="status-filter"] input').should('have.value', 2);
+        cy.get('[data-cy="status-filter"] input').should(
+          'have.value',
+          'FEASIBILITY_REVIEW'
+        );
       }
     });
   });
