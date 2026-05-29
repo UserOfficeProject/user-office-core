@@ -1,6 +1,7 @@
 import { Field, InputType, Int, ObjectType } from 'type-graphql';
 import { Resolver, Mutation, Arg, Ctx } from 'type-graphql';
 
+import { RoleConfigInput } from './RoleConfigInput';
 import { ResolverContext } from '../../context';
 import { Role } from '../types/Role'; // Adjust the path as necessary
 
@@ -18,8 +19,8 @@ export class UpdateRoleArgs {
   @Field()
   description: string;
 
-  @Field(() => [String])
-  permissions: string[];
+  @Field(() => RoleConfigInput, { nullable: true })
+  config?: RoleConfigInput;
 }
 
 @ObjectType()

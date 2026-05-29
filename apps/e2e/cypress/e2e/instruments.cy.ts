@@ -56,6 +56,19 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createStatus({
+      id: 'FEASIBILITY',
+      name: 'Feasibility',
+      description: 'Feasibility status',
+      entityType: WorkflowType.PROPOSAL,
+    });
+
+    cy.addStatusToWorkflow({
+      workflowId: initialDBData.workflows.defaultWorkflow.id,
+      statusId: 'FEASIBILITY',
+    });
+
     if (
       settings
         .getEnabledSettings()
