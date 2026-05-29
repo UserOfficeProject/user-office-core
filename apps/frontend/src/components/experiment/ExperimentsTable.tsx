@@ -236,6 +236,8 @@ export default function ExperimentsTable({
         columns={columns}
         data={fetchExperimentsData}
         options={{
+          search: true,
+          debounceInterval: 100,
           searchText: search || undefined,
           pageSize: pageSize ? +pageSize : 10,
           initialPage: page ? +page : 0,
