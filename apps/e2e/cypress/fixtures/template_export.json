@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.2.0",
-    "exportDate": "2025-10-17T11:23:20.021Z"
+    "exportDate": "2026-04-15T14:00:17.520Z"
   },
   "data": {
     "template": {
@@ -119,6 +119,10 @@
                     "siConversionFormula": "x / 100"
                   }
                 ],
+                "numberMin": null,
+                "numberMinInclusive": false,
+                "numberMax": null,
+                "numberMaxInclusive": false,
                 "readPermissions": [],
                 "numberValueConstraint": null
               }
@@ -145,6 +149,10 @@
                   "siConversionFormula": "x / 100"
                 }
               ],
+              "numberMin": null,
+              "numberMinInclusive": false,
+              "numberMax": null,
+              "numberMaxInclusive": false,
               "readPermissions": [],
               "numberValueConstraint": null
             },
@@ -601,6 +609,10 @@
               "siConversionFormula": "x / 100"
             }
           ],
+          "numberMin": null,
+          "numberMinInclusive": false,
+          "numberMax": null,
+          "numberMaxInclusive": false,
           "readPermissions": [],
           "numberValueConstraint": null
         }
@@ -1015,6 +1027,10 @@
                         "siConversionFormula": "x / 100"
                       }
                     ],
+                    "numberMin": null,
+                    "numberMinInclusive": false,
+                    "numberMax": null,
+                    "numberMaxInclusive": false,
                     "readPermissions": [],
                     "numberValueConstraint": null
                   }
@@ -1041,6 +1057,10 @@
                       "siConversionFormula": "x / 100"
                     }
                   ],
+                  "numberMin": null,
+                  "numberMinInclusive": false,
+                  "numberMax": null,
+                  "numberMaxInclusive": false,
                   "readPermissions": [],
                   "numberValueConstraint": null
                 },
@@ -1303,6 +1323,10 @@
                   "siConversionFormula": "x / 100"
                 }
               ],
+              "numberMin": null,
+              "numberMinInclusive": false,
+              "numberMax": null,
+              "numberMaxInclusive": false,
               "readPermissions": [],
               "numberValueConstraint": null
             }

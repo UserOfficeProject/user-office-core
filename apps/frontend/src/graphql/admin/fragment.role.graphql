@@ -3,6 +3,8 @@ fragment role on Role {
   shortCode
   title
   description
-  permissions
   isRootRole
+  config {
+    ...roleConfig
+  }
 }
