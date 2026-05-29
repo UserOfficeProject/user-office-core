@@ -27,6 +27,7 @@ export default function CreateUpdateCancelVisitRegistration(
 ) {
   const { onClose, onSubmitted, onCancelled, registration } = props;
   const isDialogOpen = !!registration;
+
   return (
     registration && (
       <StyledDialog

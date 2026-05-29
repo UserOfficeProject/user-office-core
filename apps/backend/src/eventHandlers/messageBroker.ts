@@ -511,14 +511,12 @@ export async function createPostToRabbitMQHandler() {
           visitorId: user!.oidcSub,
           proposal: JSON.parse(proposalPayload),
         });
-        console.log("1--------------------------------")
         let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
         if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
         } else if (event.type === Event.VISIT_REGISTRATION_CANCELLED) {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
         }
-        console.log("2--------------------------------", rabbitMQVisitEventType)
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,

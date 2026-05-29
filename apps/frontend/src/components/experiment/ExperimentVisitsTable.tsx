@@ -87,7 +87,6 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       if (!prev.visit) {
         return prev;
       }
-      alert(newRegistration.id)
       const next = {
         ...prev,
         visit: {
@@ -170,7 +169,11 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       sorting: false,
       render: (rowData: RowType) => {
         const editButton = (
-          <IconButton onClick={() => setSelectedVisit(rowData)} component="button" data-cy="edit-visit-registration-button">
+          <IconButton
+            onClick={() => setSelectedVisit(rowData)}
+            component="button"
+            data-cy="edit-visit-registration-button"
+          >
             <EditIcon />
           </IconButton>
         );
