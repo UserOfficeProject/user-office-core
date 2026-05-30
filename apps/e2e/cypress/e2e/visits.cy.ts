@@ -220,8 +220,7 @@ context('visits tests', () => {
       cy.get('input[name="visit_basis.startsAt"]').clear().type(startDate);
       cy.get('input[name="visit_basis.endsAt"]').clear().type(endDate);
       cy.get('[data-cy="save-and-continue-button"]').click();
-      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED'); 
-      
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
 
     it('User officer should be able to approve visit registration', () => {
