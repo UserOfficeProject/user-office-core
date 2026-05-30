@@ -3,6 +3,8 @@ $$
 BEGIN
   IF register_patch('0210_AddIdPkToVisitsHasUsers.sql', 'GitHubCopilot', 'Add UUID primary key to visits_has_users', '2026-05-19') THEN
     BEGIN
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
       ALTER TABLE visits_has_users
       ADD COLUMN id UUID;
 
