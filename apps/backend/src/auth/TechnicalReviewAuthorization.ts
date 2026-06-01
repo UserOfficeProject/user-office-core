@@ -4,6 +4,7 @@ import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 
@@ -93,6 +94,22 @@ export class TechnicalReviewAuthorization {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (isUserOfficer) {
       return true;
+    }
+
+    const isProposalReader =
+      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
+
+    if (isProposalReader) {
+      const config = agent.currentRole!.config as ProposalReaderRoleConfig;
+      if (!config.hasTechnicalReviewAccess) {
+        return false;
+      }
+      const hasProposalReadRights = await this.proposalAuth.hasReadRights(
+        agent,
+        technicalreview.proposalPk
+      );
+
+      return hasProposalReadRights;
     }
 
     const isScientistToProposal = await this.proposalAuth.isScientistToProposal(
