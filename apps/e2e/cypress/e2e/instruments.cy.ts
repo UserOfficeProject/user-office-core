@@ -1878,7 +1878,7 @@ context('Instrument tests', () => {
     });
   });
 
-  describe.only('Instrument contact (manager) visibility tests', () => {
+  describe.only('Instrument contact visibility tests', () => {
     let contactOnlyInstrumentId: number;
     let scientistInstrumentId: number;
     let createdProposalPk: number;
@@ -1962,7 +1962,7 @@ context('Instrument tests', () => {
       cy.visit('/');
     });
 
-    it('Instrument contact should see their contact-only instrument in the instrument filter dropdown', () => {
+    it('Instrument contact should see their instrument in the instrument filter dropdown', () => {
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
@@ -1980,7 +1980,7 @@ context('Instrument tests', () => {
         .should('exist');
     });
 
-    it('Instrument contact should see proposals when filtering by their contact-only instrument', () => {
+    it('Instrument contact should see proposals when filtering by their instrument', () => {
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
@@ -1994,7 +1994,7 @@ context('Instrument tests', () => {
       cy.contains(proposal1.title).should('exist');
     });
 
-    it('Instrument contact should see their contact-only instrument on the instruments page', () => {
+    it('Instrument contact should see their instrument on the instruments page', () => {
       cy.visit('/Instruments');
 
       cy.finishedLoading();
