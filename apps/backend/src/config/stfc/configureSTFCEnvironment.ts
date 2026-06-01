@@ -69,6 +69,10 @@ async function setStfcColourTheme() {
     settingsId: SettingsId.HEADER_LOGO_FILENAME,
     settingsValue: 'stfc-ukri-white.svg',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.FAVICON_FILENAME,
+    settingsValue: 'stfc-favicon.ico',
+  });
 }
 
 async function enableDefaultStfcFeatures() {

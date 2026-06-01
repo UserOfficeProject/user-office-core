@@ -9,6 +9,8 @@ import React, { useCallback, useContext, useEffect } from 'react';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 
+import DynamicFavicon from './DynamicFavicon';
+
 const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
@@ -113,7 +115,12 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
     updateCssPalette();
   }, [updateCssPalette]);
 
-  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
+  return (
+    <ThemeProvider theme={theme}>
+      <DynamicFavicon />
+      {props.children}
+    </ThemeProvider>
+  );
 };
 
 export default ThemeWrapper;

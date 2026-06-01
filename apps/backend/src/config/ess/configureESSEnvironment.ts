@@ -66,6 +66,10 @@ async function setEssColourTheme() {
     settingsId: SettingsId.HEADER_LOGO_FILENAME,
     settingsValue: 'ess-white.svg',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.FAVICON_FILENAME,
+    settingsValue: 'ess-favicon.ico',
+  });
 }
 
 async function enableDefaultEssFeatures() {
