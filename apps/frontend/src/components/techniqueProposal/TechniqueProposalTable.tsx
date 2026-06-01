@@ -701,6 +701,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           callId,
           callIds,
           instrumentFilter,
+          instrumentIds,
           techniqueFilter,
           proposalStatusId,
           text,
@@ -719,6 +720,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               callId,
               callIds,
               instrumentFilter,
+              instrumentIds: [23],
               techniqueFilter,
               proposalStatusId,
               text,
@@ -834,6 +836,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       }
     }
 
+    if (filter.instrumentId != null) {
+      if (filter.instrumentId === 0) {
+        updatedFilter.instrumentId = null;
+        updatedFilter.instrumentIds = allInstruments?.map((instrument) => instrument.id) || [];
+      } else {
+        updatedFilter.instrumentIds = [filter.instrumentId as number];
+      }
+    }
+
     setProposalFilter(updatedFilter);
     refreshTableData();
   };
@@ -857,6 +868,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       callId,
       callIds,
       instrumentFilter,
+      instrumentIds = [23],
       techniqueFilter,
       proposalStatusId,
       text,
@@ -874,6 +886,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       .getTechniqueScientistProposalsBasic({
         filter: {
           callId,
+          instrumentIds,
           instrumentFilter,
           callIds,
           techniqueFilter,
