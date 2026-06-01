@@ -1877,4 +1877,131 @@ context('Instrument tests', () => {
       cy.should('not.contain', proposal1.title);
     });
   });
+
+  describe.only('Instrument contact (manager) visibility tests', () => {
+    let contactOnlyInstrumentId: number;
+    let scientistInstrumentId: number;
+    let createdProposalPk: number;
+
+    const contactOnlyInstrument = {
+      name: faker.word.words(2),
+      shortCode: faker.string.alphanumeric(15),
+      description: faker.word.words(5),
+      managerUserId: scientist2.id,
+    };
+
+    const scientistInstrument = {
+      name: faker.word.words(2),
+      shortCode: faker.string.alphanumeric(15),
+      description: faker.word.words(5),
+      managerUserId: scientist1.id,
+    };
+
+    beforeEach(function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        cy.updateUserRoles({
+          id: scientist2.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
+
+      //create an instrument where scientist2 is only the contact and not a scientist
+      cy.createInstrument(contactOnlyInstrument).then((result) => {
+        if (result.createInstrument) {
+          contactOnlyInstrumentId = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: contactOnlyInstrumentId }],
+          });
+        }
+      });
+
+      //create an instrument where scientist2 is an instrument scientist
+      cy.createInstrument(scientistInstrument).then((result) => {
+        if (result.createInstrument) {
+          scientistInstrumentId = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: scientistInstrumentId }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: scientistInstrumentId,
+            scientistIds: [scientist2.id],
+          });
+        }
+      });
+
+      //create a proposal and assign it to the contact only instrument
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposal1.title,
+            abstract: proposal1.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposalPk],
+            instrumentIds: [contactOnlyInstrumentId],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposalPk],
+            userId: scientist2.id,
+            instrumentId: contactOnlyInstrumentId,
+          });
+        }
+      });
+
+      cy.login(scientist2);
+      cy.visit('/');
+    });
+
+    it('Instrument contact should see their contact-only instrument in the instrument filter dropdown', () => {
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
+
+      cy.get('[role="listbox"]')
+        .contains(contactOnlyInstrument.name)
+        .should('exist');
+
+      cy.get('[role="listbox"]')
+        .contains(scientistInstrument.name)
+        .should('exist');
+    });
+
+    it('Instrument contact should see proposals when filtering by their contact-only instrument', () => {
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(contactOnlyInstrument.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title).should('exist');
+    });
+
+    it('Instrument contact should see their contact-only instrument on the instruments page', () => {
+      cy.visit('/Instruments');
+
+      cy.finishedLoading();
+
+      cy.contains(contactOnlyInstrument.name).should('exist');
+
+      cy.contains(scientistInstrument.name).should('exist');
+    });
+  });
 });

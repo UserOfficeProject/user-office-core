@@ -588,15 +588,25 @@ export default class PostgresExperimentDataSource
     // Add instrument scientist filtering if provided
     if (filter?.instrumentScientistUserId) {
       query
-        .join(
+        .leftJoin(
           'instrument_has_scientists',
           'experiments.instrument_id',
           'instrument_has_scientists.instrument_id'
         )
-        .where(
-          'instrument_has_scientists.user_id',
-          filter.instrumentScientistUserId
-        );
+        .join(
+          'instruments',
+          'experiments.instrument_id',
+          'instruments.instrument_id'
+        )
+        .where(function () {
+          this.where(
+            'instrument_has_scientists.user_id',
+            filter!.instrumentScientistUserId
+          ).orWhere(
+            'instruments.manager_user_id',
+            filter!.instrumentScientistUserId
+          );
+        });
     }
 
     return query
