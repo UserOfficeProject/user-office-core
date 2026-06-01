@@ -34,6 +34,8 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
+  const registration = state.registration;
+
   const id = answer.question.id;
 
   return (
@@ -75,7 +77,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         disableToolbar
         autoOk={true}
         required
-        minDate={state.registration.startsAt}
+        minDate={registration?.startsAt ?? DateTime.now()}
         textField={{
           fullWidth: true,
           required: true,
