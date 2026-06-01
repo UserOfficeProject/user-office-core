@@ -242,7 +242,8 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Fap[] | null> {
-    return await context.queries.fap.dataSource.getFapsByProposalPk(
+    return await context.queries.fap.getFapsByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }

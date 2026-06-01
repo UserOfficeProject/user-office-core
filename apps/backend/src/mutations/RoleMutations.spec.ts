@@ -26,7 +26,7 @@ describe('Role Mutations', () => {
       title: 'New Role',
       shortCode: 'new_role',
       description: 'A new role',
-      permissions: [],
+      config: {},
     });
     expect(isRejection(result)).toBe(true);
     expect(result).toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
@@ -37,7 +37,7 @@ describe('Role Mutations', () => {
       title: 'New Role',
       shortCode: 'new_role',
       description: 'A new role',
-      permissions: [],
+      config: {},
     });
     expect(isRejection(result)).toBe(false);
     expect(result).toHaveProperty('title', 'New Role');
@@ -50,7 +50,6 @@ describe('Role Mutations', () => {
       title: 'Updated Role',
       shortCode: 'updated_role',
       description: 'An updated role',
-      permissions: [],
     });
     expect(isRejection(result)).toBe(true);
     expect(result).toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
@@ -62,7 +61,6 @@ describe('Role Mutations', () => {
       title: 'Updated Role',
       shortCode: 'updated_role',
       description: 'An updated role',
-      permissions: [],
     });
     expect(isRejection(result)).toBe(false);
     expect(result).toHaveProperty('title', 'Updated Role');

@@ -5,9 +5,8 @@ import { container } from 'tsyringe';
 import { AgentTagsMetadataKey } from './AgentTags';
 import { Tokens } from '../config/Tokens';
 import { RoleDataSource } from '../datasources/RoleDataSource';
-import { UserDataSource } from '../datasources/UserDataSource';
 import { Rejection, rejection } from '../models/Rejection';
-import { Role, Roles } from '../models/Role';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
 export { AgentTags, AgentTagsMetadataKey } from './AgentTags';
@@ -92,32 +91,6 @@ const Authorized = (roles: Roles[] = []) => {
       }
 
       if (roles.length === 0) {
-        return await execute();
-      }
-
-      const userDataSource = container.resolve<UserDataSource>(
-        Tokens.UserDataSource
-      );
-
-      const rolesArray: Role[] = await userDataSource.getUserRoles(agent.id);
-      const userRoles: Record<string, { permissions: string[] }> =
-        rolesArray.reduce(
-          (acc, role) => {
-            acc[role.id] = { permissions: role.permissions };
-
-            return acc;
-          },
-          {} as Record<string, { permissions: string[] }>
-        );
-
-      //check if user has dynamic role with permissions for this method
-      if (
-        agent.currentRole?.id &&
-        userRoles[agent.currentRole.id]?.permissions.some(
-          (permission: string) =>
-            permission === `${target.constructor.name}.${name}`
-        )
-      ) {
         return await execute();
       }
 
