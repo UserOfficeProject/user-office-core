@@ -13,6 +13,8 @@ import {
 } from '../datasources/mockups/ProposalInternalCommentsDataSource';
 import {
   dummyInstrumentScientist,
+  dummyProposalReaderWithAdminAccess,
+  dummyProposalReaderWithLogAccess,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -95,6 +97,26 @@ test('A scientist can get proposal scientist comment', () => {
       dummyProposalInternalCommentOne.commentId
     )
   ).resolves.toBe(dummyProposalInternalCommentOne);
+});
+
+test('A proposal reader with hasAdminAccess should get commentForManagement', async () => {
+  const proposal = await proposalQueries.get(
+    dummyProposalReaderWithAdminAccess,
+    1
+  );
+
+  expect(proposal).not.toBeNull();
+  expect(proposal).toHaveProperty('commentForManagement');
+});
+
+test('A proposal reader without hasAdminAccess should not get commentForManagement', async () => {
+  const proposal = await proposalQueries.get(
+    dummyProposalReaderWithLogAccess,
+    1
+  );
+
+  expect(proposal).not.toBeNull();
+  expect(proposal).not.toHaveProperty('commentForManagement');
 });
 
 test('Whitespace does not stop user-officer role viewing proposal', () => {
