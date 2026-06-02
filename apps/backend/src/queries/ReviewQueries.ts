@@ -10,6 +10,11 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
 
+type ReviewsForProposalArgs = {
+  proposalPk: number;
+  fapId?: number;
+};
+
 @injectable()
 export default class ReviewQueries {
   private reviewAuth = container.resolve(ReviewAuthorization);
@@ -49,25 +54,26 @@ export default class ReviewQueries {
     return this.dataSource.getReviews(filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+    Roles.PROPOSAL_READER,
+  ])
   async reviewsForProposal(
     agent: UserWithRole | null,
-    {
-      proposalPk,
-      fapId,
-    }: {
-      proposalPk: number;
-      fapId?: number;
-    }
-  ): Promise<Review[] | null> {
+    { proposalPk, fapId }: ReviewsForProposalArgs
+  ): Promise<Review[]> {
     const reviews = await this.dataSource.getProposalReviews(proposalPk, fapId);
 
-    const permittedReviews = reviews.filter(
-      async (review) =>
-        this.userAuth.isApiToken(agent) ||
-        (await this.reviewAuth.hasReadRights(agent, review))
+    const accessFlags = await Promise.all(
+      reviews.map(
+        (review) =>
+          this.userAuth.isApiToken(agent) ||
+          this.reviewAuth.hasReadRights(agent, review)
+      )
     );
 
-    return permittedReviews;
+    return reviews.filter((_, i) => accessFlags[i]);
   }
 }
