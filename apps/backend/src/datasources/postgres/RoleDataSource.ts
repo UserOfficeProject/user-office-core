@@ -2,73 +2,77 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-import { Role } from '../../models/Role';
-import { Tag } from '../../models/Tag';
-import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
-import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
-import { RoleDataSource } from '../RoleDataSource';
 import database from './database';
 import { RoleRecord, createRoleObject, createTagObject } from './records';
+import { Role, Roles } from '../../models/Role';
+import { Tag } from '../../models/Tag';
+import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
+import { RoleConfigInput } from '../../resolvers/mutations/RoleConfigInput';
+import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
+import { RoleDataSource } from '../RoleDataSource';
+
+function defaultConfig(shortCode: string): unknown {
+  switch (shortCode) {
+    case Roles.USER:
+      return { note: '' };
+    case Roles.PROPOSAL_READER:
+      return {
+        hasLogAccess: true,
+        hasTechnicalReviewAccess: true,
+        hasFapAccess: true,
+        hasAdminAccess: false,
+      };
+    default:
+      return {};
+  }
+}
+
+function resolveConfig(shortCode: string, config: RoleConfigInput | undefined) {
+  if (!config) return defaultConfig(shortCode);
+
+  switch (shortCode) {
+    case Roles.USER:
+      return config.user;
+    case Roles.PROPOSAL_READER:
+      return config.proposalReader;
+    default:
+      return defaultConfig(shortCode);
+  }
+}
 
 @injectable()
 export default class PostgresRoleDataSource implements RoleDataSource {
-  private toPostgresArray(array: string[]): string {
-    return `{${array.map((item) => `"${item}"`).join(',')}}`;
-  }
-
   async createRole(args: CreateRoleArgs): Promise<Role> {
-    const { shortCode, title, description, permissions } = args;
-
-    const postgresPermissions = Array.isArray(permissions)
-      ? this.toPostgresArray(permissions)
-      : permissions;
+    const { shortCode, title, description, config } = args;
 
     const [roleRecord] = await database
       .insert({
         short_code: shortCode,
         title,
         description,
-        permissions: postgresPermissions,
+        config: resolveConfig(shortCode, config),
         is_root_role: false,
       })
       .into('roles')
       .returning<RoleRecord[]>('*');
 
-    return new Role(
-      roleRecord.role_id,
-      roleRecord.short_code,
-      roleRecord.title,
-      roleRecord.description,
-      roleRecord.permissions,
-      roleRecord.is_root_role
-    );
+    return createRoleObject(roleRecord);
   }
 
   async updateRole(args: UpdateRoleArgs): Promise<Role> {
-    const { roleID, title, description, permissions } = args;
-
-    const postgresPermissions = Array.isArray(permissions)
-      ? this.toPostgresArray(permissions)
-      : permissions;
+    const { roleID, shortCode, title, description, config } = args;
 
     const [roleRecord] = await database
       .update({
         title,
         description,
-        permissions: postgresPermissions,
+        config: config ? resolveConfig(shortCode, config) : undefined,
       })
       .from('roles')
       .where('role_id', roleID)
       .returning('*');
 
-    return new Role(
-      roleRecord.role_id,
-      roleRecord.short_code,
-      roleRecord.title,
-      roleRecord.description,
-      roleRecord.permissions,
-      roleRecord.isRootRole
-    );
+    return createRoleObject(roleRecord);
   }
 
   async deleteRole(id: number): Promise<Role> {
@@ -81,14 +85,7 @@ export default class PostgresRoleDataSource implements RoleDataSource {
       throw new GraphQLError(`Role with id ${id} not found`);
     }
 
-    return new Role(
-      deletedRole.role_id,
-      deletedRole.short_code,
-      deletedRole.title,
-      deletedRole.description,
-      deletedRole.permissions,
-      deletedRole.data_access
-    );
+    return createRoleObject(deletedRole);
   }
 
   async updateRoleTags(roleId: number, tagIds: number[]): Promise<Role> {

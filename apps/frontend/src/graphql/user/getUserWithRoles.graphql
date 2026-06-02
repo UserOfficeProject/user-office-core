@@ -8,7 +8,9 @@ query getUserWithRoles($userId: Int!) {
       title
       description
       isRootRole
-      permissions
+      config {
+        ...roleConfig
+      }
     }
   }
 }
