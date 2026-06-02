@@ -16,6 +16,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
   private apiUrl: string;
   private authToken: msal.AuthenticationResult | null = null;
   private msalClient: msal.ConfidentialClientApplication;
+  private tokenPromise: Promise<any> | null = null;
 
   constructor() {
     this.name = 'MSGraphTransport';
@@ -33,26 +34,38 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
   protected isTokenExpired(): boolean {
     if (!this.authToken?.expiresOn) {
-      return false;
+      throw new Error('Invalid token: Missing expiresOn property');
     }
 
     return Date.now() >= this.authToken.expiresOn.getTime();
   }
 
-  private async getAccessToken(): Promise<string> {
+  private async getAuthToken(): Promise<msal.AuthenticationResult> {
+    // if we already have a valid token, return it
     if (this.authToken && !this.isTokenExpired()) {
-      return this.authToken.accessToken;
+      return this.authToken;
     }
 
-    this.authToken = await this.msalClient.acquireTokenByClientCredential({
-      scopes: [`${this.apiUrl}/.default`],
-    });
+    // cache the promise to prevent multiple simultaneous token requests
+    if (!this.tokenPromise) {
+      this.tokenPromise = (async () => {
+        try {
+          this.authToken = await this.msalClient.acquireTokenByClientCredential(
+            {
+              scopes: [`${this.apiUrl}/.default`],
+            }
+          );
 
-    if (!this.authToken) {
-      throw new Error('Failed to acquire access token for Microsoft Graph API');
+          logger.logInfo('Acquired new access token for Microsoft Graph API', {
+            expiresOn: this.authToken?.expiresOn,
+          });
+        } finally {
+          this.tokenPromise = null;
+        }
+      })();
     }
 
-    return this.authToken?.accessToken;
+    return this.tokenPromise;
   }
 
   public async send(
@@ -60,7 +73,13 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
     callback: (err: Error | null, info: unknown) => void
   ) {
     try {
-      const accessToken = await this.getAccessToken();
+      const token = await this.getAuthToken();
+
+      if (!token?.accessToken) {
+        throw new Error(
+          'Failed to acquire access token for Microsoft Graph API'
+        );
+      }
 
       const {
         subject,
@@ -104,7 +123,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token.accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),

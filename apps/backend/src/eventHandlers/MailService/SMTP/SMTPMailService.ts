@@ -20,7 +20,7 @@ export class SMTPMailService extends TemplateMailService {
     });
   }
 
-  protected createTransport(): NodeMailerTransportOptions | any {
+  protected createTransport(): NodeMailerTransportOptions {
     let smtpTransport:
       | Transporter<SMTPPool.SentMessageInfo>
       | Transporter<SMTPTransport.SentMessageInfo>;
