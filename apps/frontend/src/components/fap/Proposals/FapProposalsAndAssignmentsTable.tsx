@@ -6,7 +6,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -179,12 +179,6 @@ const FapProposalsAndAssignmentsTable = ({
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
-
-  // Skip all onPageChange calls until after the first render is committed.
-  const tableInitialized = useRef(false);
-  useEffect(() => {
-    tableInitialized.current = true;
-  }, []);
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     fapProposals;
@@ -815,7 +809,6 @@ const FapProposalsAndAssignmentsTable = ({
             },
           }}
           onPageChange={(page) => {
-            if (!tableInitialized.current) return;
             setSearchParams((searchParams) => {
               searchParams.set('page', page.toString());
 
