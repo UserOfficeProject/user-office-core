@@ -149,7 +149,17 @@ Drag proposal onto the calendar to specify desired start date
 Edit the experiment details (e.g duration and Local Contanct) and activate the Experiment time
 ![scheduler_plan](../assets/images/scheduler_plan.png)
 
+
+
 You should now see the experiment time in the callendar
 ![scheduler_planned](../assets/images/scheduler_planned.png)
 
 ---
+
+## Scheduler demo session video recordings
+
+### Part 1
+[![Scheduler Demo](https://img.youtube.com/vi/_qM8SbkDU_Q/0.jpg)](https://www.youtube.com/watch?v=_qM8SbkDU_Q)
+
+### Part 2
+[![Scheduler Demo](https://img.youtube.com/vi/NDzMgjwqrQU/0.jpg)](https://www.youtube.com/watch?v=NDzMgjwqrQU)
