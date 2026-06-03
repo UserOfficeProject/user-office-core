@@ -5,10 +5,14 @@ import { container } from 'tsyringe';
 
 import { stfcEmailHandler } from './stfcEmailHandler';
 import { Tokens } from '../../config/Tokens';
+import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 
 const ORIGINAL_ENV = process.env;
+const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+  Tokens.EmailTemplateDataSource
+);
 const spyLogError = jest
   .spyOn(Logger.logger, 'logError')
   .mockImplementation(() => {});
@@ -109,7 +113,12 @@ describe('stfcEmailHandler', () => {
       await new Promise(setImmediate);
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template: 'call-created-email' },
+        content: {
+          template:
+            await emailTemplateDataSource.getEmailTemplateByName(
+              'call-created-email'
+            ),
+        },
         substitution_data: {
           shortCode: 'error',
         },
