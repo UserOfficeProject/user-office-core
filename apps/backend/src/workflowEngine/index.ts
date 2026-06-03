@@ -3,8 +3,8 @@ import { injectable } from 'tsyringe';
 
 import { WorkFlowEntity } from '../eventHandlers/workflowHandler';
 import { Event } from '../events/event.enum';
-import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
-import { createActor } from './simpleStateMachine/stateMachine';
+import { createWorkflowMachine } from './stateMachine/createWorkflowMachine';
+import { createActor } from './stateMachine/stateMachine';
 
 type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 

@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { ReviewStatus } from '../../models/Review';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isProposalFapReviewSubmittedGuard: GuardFn = async (
   entity: Entity

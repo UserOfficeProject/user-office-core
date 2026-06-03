@@ -4,7 +4,7 @@ import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { ReviewStatus } from '../../models/Review';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 /**
  * Returns true when every FAP on the proposal has enough submitted reviews to satisfy its requirement.

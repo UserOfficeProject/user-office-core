@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentStatus } from '../../models/Experiment';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isProposalBookingTimeCompletedGuard: GuardFn = async (
   entity: Entity

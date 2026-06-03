@@ -35,7 +35,7 @@ import { isProposalReservedGuard } from '../workflowEngine/guards/isProposalRese
 import { isProposalSampleReviewSubmittedGuard } from '../workflowEngine/guards/isProposalSampleReviewSubmittedGuard';
 import { isProposalSampleSafeGuard } from '../workflowEngine/guards/isProposalSampleSafeGuard';
 import { isProposalSubmittedGuard } from '../workflowEngine/guards/isProposalSubmittedGuard';
-import { GuardFn } from '../workflowEngine/simpleStateMachine/stateMachine';
+import { GuardFn } from '../workflowEngine/stateMachine/stateMachine';
 
 // NOTE: When creating new event we need to follow the same name standardization/convention: [WHERE]_[WHAT]
 export enum Event {

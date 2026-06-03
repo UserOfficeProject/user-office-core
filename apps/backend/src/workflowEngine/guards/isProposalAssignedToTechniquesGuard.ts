@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isProposalAssignedToTechniquesGuard: GuardFn = async (
   entity: Entity

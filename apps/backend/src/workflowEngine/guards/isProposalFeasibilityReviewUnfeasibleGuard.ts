@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isProposalFeasibilityReviewUnfeasibleGuard: GuardFn = async (
   entity: Entity

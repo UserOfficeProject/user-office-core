@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isExperimentESFSubmitted: GuardFn = async (entity: Entity) => {
   const experimentDataSource = container.resolve<ExperimentDataSource>(

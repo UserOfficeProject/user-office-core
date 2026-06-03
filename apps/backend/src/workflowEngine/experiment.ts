@@ -7,8 +7,8 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Event } from '../events/event.enum';
 import { ExperimentSafety } from '../models/Experiment';
-import { createWorkflowMachine } from './simpleStateMachine/createWorkflowMachine';
-import { createActor } from './simpleStateMachine/stateMachine';
+import { createWorkflowMachine } from './stateMachine/createWorkflowMachine';
+import { createActor } from './stateMachine/stateMachine';
 
 type WorkflowStateMeta = { statusId: number; workflowStatusId: number };
 

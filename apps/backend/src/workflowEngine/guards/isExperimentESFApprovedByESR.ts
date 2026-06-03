@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentSafetyReviewerDecisionEnum } from '../../models/Experiment';
-import { Entity, GuardFn } from '../simpleStateMachine/stateMachine';
+import { Entity, GuardFn } from '../stateMachine/stateMachine';
 
 export const isExperimentESFApprovedByESR: GuardFn = async (entity: Entity) => {
   const experimentDataSource = container.resolve<ExperimentDataSource>(
