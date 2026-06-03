@@ -73,7 +73,12 @@ describe('stfcEmailHandler', () => {
 
       expect(process.env.FBS_EMAIL).toBe(inviteEmail);
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template: 'call-created-email' },
+        content: {
+          template:
+            await emailTemplateDataSource.getEmailTemplateByName(
+              'call-created-email'
+            ),
+        },
         substitution_data: {
           shortCode: 'string',
           startCall: new Date(2000, 1, 1),
@@ -114,10 +119,7 @@ describe('stfcEmailHandler', () => {
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
         content: {
-          template:
-            await emailTemplateDataSource.getEmailTemplateByName(
-              'call-created-email'
-            ),
+          template: 'call-created-email',
         },
         substitution_data: {
           shortCode: 'error',
