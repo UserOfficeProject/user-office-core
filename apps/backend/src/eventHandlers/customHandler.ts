@@ -1,6 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import proposalWorkflowEntity from './workflowEntities/proposal';
+import { startWorkflow } from './workflowHandler';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -379,7 +381,7 @@ export default function createCustomHandler() {
             const proposalPks = allProposalsOnCall.proposalViews.map(
               (proposal) => proposal.primaryKey
             );
-            // handleWorkflowEngineChange(event, proposalPks);
+            await startWorkflow(event, proposalPks, proposalWorkflowEntity);
           }
         } catch (error) {
           logger.logException(

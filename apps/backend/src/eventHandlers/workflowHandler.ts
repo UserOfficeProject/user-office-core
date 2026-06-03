@@ -42,7 +42,7 @@ const extractEntityFromEvent = (
   return null;
 };
 
-const startWorkflow = async (
+export const startWorkflow = async (
   event: ApplicationEvent,
   entityIdentifier: number | number[],
   workflowEntity: WorkFlowEntity
