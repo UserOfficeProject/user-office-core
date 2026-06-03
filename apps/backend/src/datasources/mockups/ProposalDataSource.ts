@@ -158,6 +158,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
       managementDecisionSubmitted: true,
+      workflowStatusId: 2,
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({

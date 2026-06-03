@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { isExperimentESFSubmitted } from './isExperimentESFSubmitted';
+import { isExperimentESFRejectedByIS } from './isExperimentESFRejectedByIS';
 import { Tokens } from '../../config/Tokens';
+import { InstrumentScientistDecisionEnum } from '../../models/Experiment';
 
-describe('isExperimentESFSubmitted', () => {
+describe('isExperimentESFRejectedByIS', () => {
   const mockExperimentDataSource = {
     getExperimentSafety: jest.fn(),
   };
@@ -21,23 +22,23 @@ describe('isExperimentESFSubmitted', () => {
 
   it('returns false if experiment safety not found', async () => {
     mockExperimentDataSource.getExperimentSafety.mockResolvedValue(null);
-    const result = await isExperimentESFSubmitted({ id: 1 });
+    const result = await isExperimentESFRejectedByIS({ id: 1 });
     expect(result).toBe(false);
   });
 
-  it('returns false if esiQuestionarySubmittedAt is not set', async () => {
+  it('returns false if instrumentScientistDecision is not REJECTED', async () => {
     mockExperimentDataSource.getExperimentSafety.mockResolvedValue({
-      esiQuestionarySubmittedAt: null,
+      instrumentScientistDecision: InstrumentScientistDecisionEnum.ACCEPTED,
     });
-    const result = await isExperimentESFSubmitted({ id: 1 });
+    const result = await isExperimentESFRejectedByIS({ id: 1 });
     expect(result).toBe(false);
   });
 
-  it('returns true if esiQuestionarySubmittedAt is set', async () => {
+  it('returns true if instrumentScientistDecision is REJECTED', async () => {
     mockExperimentDataSource.getExperimentSafety.mockResolvedValue({
-      esiQuestionarySubmittedAt: new Date('2024-01-01'),
+      instrumentScientistDecision: InstrumentScientistDecisionEnum.REJECTED,
     });
-    const result = await isExperimentESFSubmitted({ id: 1 });
+    const result = await isExperimentESFRejectedByIS({ id: 1 });
     expect(result).toBe(true);
   });
 });

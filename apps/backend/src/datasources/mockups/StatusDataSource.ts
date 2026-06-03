@@ -40,7 +40,13 @@ export class StatusDataSourceMock implements StatusDataSource {
   async getStatusByWorkflowStatusId(
     workflowStatusId: number
   ): Promise<Status | null> {
-    return dummyStatuses[0];
+    const workflowStatus = dummyWorkflowStatuses.find(
+      (ws) => ws.workflowStatusId === workflowStatusId
+    );
+
+    return dummyStatuses.find(
+      (s) => s.id === workflowStatus?.statusId
+    ) as Status;
   }
 
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
