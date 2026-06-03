@@ -88,7 +88,6 @@ export default function workflowHandler() {
         event,
         extractionEntityKeys
       );
-
       if (extractedEntity) {
         const { entity: extractedEntityObject, entityKey: extractedEntityKey } =
           extractedEntity;
