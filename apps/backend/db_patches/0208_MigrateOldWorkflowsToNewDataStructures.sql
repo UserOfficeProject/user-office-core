@@ -294,7 +294,6 @@ BEGIN
         END IF;
 
         ALTER TABLE proposals ALTER COLUMN workflow_status_id SET NOT NULL;
-        ALTER TABLE experiment_safety ALTER COLUMN workflow_status_id SET NOT NULL;
 
         DROP VIEW IF EXISTS proposal_table_view;
         DROP VIEW IF EXISTS review_data;

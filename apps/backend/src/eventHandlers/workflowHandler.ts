@@ -83,6 +83,9 @@ export default function workflowHandler() {
       return;
     }
     for (const entity of entities) {
+      if (entity.exemptedEvents.includes(event.type)) {
+        continue;
+      }
       const { extractionEntityKeys } = entity;
       const extractedEntity = extractEntityFromEvent(
         event,
