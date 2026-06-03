@@ -17,6 +17,7 @@
 import './admin';
 import './call';
 import './emailTemplate';
+import './exceptions';
 import './fap';
 import './instrument';
 import './internalReview';
