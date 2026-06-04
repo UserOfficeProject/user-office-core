@@ -52,29 +52,31 @@ export const emailActionHandler = async (
       );
     }
 
-    experimentSafeties.map(async (experimentSafety) => {
-      emailStatusActionRecipient(
-        recipientWithTemplate,
-        experimentSafety,
-        statusActionsLogId,
-        loggedInUserId
-      );
-    });
-
-    return;
-  }
-
-  await Promise.all(
-    experimentSafeties.map(async (experimentSafety) => {
-      config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) =>
+    await Promise.all(
+      experimentSafeties.map((experimentSafety) =>
         emailStatusActionRecipient(
           recipientWithTemplate,
           experimentSafety,
           statusActionsLogId,
           loggedInUserId
         )
-      );
-    })
+      )
+    );
+
+    return;
+  }
+
+  await Promise.all(
+    experimentSafeties.flatMap((experimentSafety) =>
+      config.recipientsWithEmailTemplate.map((recipientWithTemplate) =>
+        emailStatusActionRecipient(
+          recipientWithTemplate,
+          experimentSafety,
+          statusActionsLogId,
+          loggedInUserId
+        )
+      )
+    )
   );
 };
 
