@@ -15,16 +15,7 @@ import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
-const {
-  feasibilityReview,
-  fapSelection,
-  notFeasible,
-  draft,
-  esfIsReview,
-  awaitingEsf,
-  esfEsrReview,
-  esfRejected,
-} = initialDBData.proposalStatuses;
+const statuses = initialDBData.proposalStatuses;
 
 context('Settings tests', () => {
   beforeEach(() => {
@@ -35,7 +26,7 @@ context('Settings tests', () => {
   describe('Proposal statuses tests', () => {
     const name = faker.lorem.words(2);
     const description = faker.lorem.words(5);
-    const shortCode = name.toUpperCase().replace(/\s/g, '_');
+    const id = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
       cy.login('user1', initialDBData.roles.user);
@@ -56,7 +47,7 @@ context('Settings tests', () => {
       cy.contains('Proposal statuses').click();
       cy.finishedLoading();
       cy.contains('Create').click();
-      cy.get('#shortCode').type(shortCode);
+      cy.get('#id').type(id);
       cy.get('#name').type(name);
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
@@ -65,15 +56,14 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      cy.get('@proposalStatusesTable')
-        .find('span[aria-label="Last Page"] > button')
-        .as('lastPageButtonElement');
-
-      cy.get('@lastPageButtonElement').click({ force: true });
-
       cy.get('[data-cy="proposal-statuses-table"]').as(
         'proposalStatusesTableNew'
       );
+
+      cy.get('@proposalStatusesTableNew')
+        .find('[placeholder="Search"]')
+        .type(id);
+
       cy.get('@proposalStatusesTableNew')
         .find('tr[level="0"]')
         .last()
@@ -81,7 +71,7 @@ context('Settings tests', () => {
 
       cy.get('@proposalStatusesTableLastRow').invoke('text').as('lastRowText');
 
-      cy.get('@lastRowText').should('contain', shortCode);
+      cy.get('@lastRowText').should('contain', id);
       cy.get('@lastRowText').should('contain', name);
       cy.get('@lastRowText').should('contain', description);
     });
@@ -98,7 +88,7 @@ context('Settings tests', () => {
 
       cy.contains('DRAFT').parent().find('[aria-label="Edit"]').click();
 
-      cy.get('#shortCode').should('be.disabled');
+      cy.get('#id').should('be.disabled');
 
       cy.get('#name').clear();
       cy.get('#name').type(newName);
@@ -115,9 +105,9 @@ context('Settings tests', () => {
 
     it('User Officer should be able to delete Proposal status', () => {
       cy.createStatus({
+        id,
         name,
         description,
-        shortCode,
         entityType: WorkflowType.PROPOSAL,
       });
       cy.login('officer');
@@ -129,12 +119,9 @@ context('Settings tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
-
       cy.get('@proposalStatusesTable')
-        .find('span[aria-label="Last Page"] > button')
-        .as('lastPageButtonElement');
-
-      cy.get('@lastPageButtonElement').click({ force: true });
+        .find('[placeholder="Search"]')
+        .type(name);
 
       cy.contains(name).parent().find('[aria-label="Delete"]').click();
 
@@ -156,14 +143,13 @@ context('Settings tests', () => {
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
     const instrument1 = {
-      name: faker.random.words(2),
-      shortCode: faker.random.alphaNumeric(15),
-      description: faker.random.words(5),
+      name: faker.lorem.words(2),
+      shortCode: faker.string.alphanumeric(15),
+      description: faker.lorem.words(5),
       managerUserId: initialDBData.users.user1.id,
     };
     let createdWorkflowId: number;
-    let prevStatusId: number;
-    let prevConnectionId: number;
+    let createdDraftWorkflowStatusId: number;
     let createdEsiTemplateId: number;
     let createdInstrumentId: number;
 
@@ -181,120 +167,131 @@ context('Settings tests', () => {
     };
 
     const addWorkflowWithChangingEvents = () => {
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      // Add FEASIBILITY_REVIEW
+      cy.addStatusToWorkflow({
+        statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 100,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
-      }).then((result) => {
-        const connection = result.addWorkflowStatus;
-        if (connection) {
-          cy.addStatusChangingEventsToConnection({
+        prevId: createdDraftWorkflowStatusId,
+      })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((feasibilityReviewWorkflowStatusId) => {
+          // Add FAP_SELECTION
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapSelection.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 200,
+            prevId: feasibilityReviewWorkflowStatusId,
+          });
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [
+                Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
+                Event.PROPOSAL_INSTRUMENTS_SELECTED,
+              ],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((fapSelectionWorkflowStatusId) => {
+          // Add FAP_REVIEW
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapReview.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 300,
+            prevId: fapSelectionWorkflowStatusId,
+          });
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+
+          return cy
+            .setStatusChangingEventsOnConnection({
+              workflowConnectionId: connection.id,
+              statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
+            })
+            .then(() => result.addStatusToWorkflow.workflowStatusId);
+        })
+        .then((fapReviewWorkflowStatusId) => {
+          // Add FAP_MEETING
+          return cy.addStatusToWorkflow({
+            statusId: statuses.fapMeeting.id,
+            workflowId: createdWorkflowId,
+            posX: 0,
+            posY: 400,
+            prevId: fapReviewWorkflowStatusId,
+          });
+        })
+        .then((result) => {
+          const connection = result.createWorkflowConnection;
+          cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.fapSelection.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        sortOrder: 2,
-        prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [
-              Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
-              Event.PROPOSAL_INSTRUMENTS_SELECTED,
-            ],
-          });
-        }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 300,
-        sortOrder: 3,
-        prevStatusId: initialDBData.proposalStatuses.fapSelection.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
-          });
-        }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.fapMeeting.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 400,
-        sortOrder: 4,
-        prevStatusId: initialDBData.proposalStatuses.fapReview.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
           });
-        }
-      });
+        });
     };
 
     const addWorkflowWithBranchesAndChangingEvents = () => {
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      // Add FEASIBILITY_REVIEW from DRAFT
+      cy.addStatusToWorkflow({
+        statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 500,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
+        posY: 100,
+        prevId: createdDraftWorkflowStatusId,
       }).then((result) => {
-        const connection = result.addWorkflowStatus;
-        if (connection) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: connection.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.fapSelection.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 600,
-        sortOrder: 0,
-        prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
+        const createdFeasibilityReviewWorkflowStatus =
+          result.addStatusToWorkflow;
+        const connection = result.createWorkflowConnection;
+
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: connection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
+
+        // Add FAP_SELECTION from FEASIBILITY_REVIEW
+        cy.addStatusToWorkflow({
+          statusId: statuses.fapSelection.id,
+          workflowId: createdWorkflowId,
+          posX: -100,
+          posY: 200,
+          prevId: createdFeasibilityReviewWorkflowStatus.workflowStatusId,
+        }).then((result) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: result.createWorkflowConnection.id,
             statusChangingEvents: [Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE],
           });
-        }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.notFeasible.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 700,
-        sortOrder: 0,
-        prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
+        });
+
+        // Add NOT_FEASIBLE from FEASIBILITY_REVIEW
+        cy.addStatusToWorkflow({
+          statusId: statuses.notFeasible.id,
+          workflowId: createdWorkflowId,
+          posX: 100,
+          posY: 200,
+          prevId: createdFeasibilityReviewWorkflowStatus.workflowStatusId,
+        }).then((result) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: result.createWorkflowConnection.id,
             statusChangingEvents: [
               Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
             ],
           });
-        }
+        });
       });
     };
 
@@ -309,8 +306,7 @@ context('Settings tests', () => {
         const workflow = result.createWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
-          prevStatusId = workflow.workflowConnections[0].statusId!;
-          prevConnectionId = workflow.workflowConnections[0].id;
+          createdDraftWorkflowStatusId = workflow.statuses[0].workflowStatusId;
 
           cy.createTemplate({
             name: 'default esi template',
@@ -336,20 +332,17 @@ context('Settings tests', () => {
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
       const proposalTitle = faker.random.words(3);
       const editedProposalTitle = faker.random.words(3);
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.editableSubmitted.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
+        prevId: createdDraftWorkflowStatusId,
       }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -422,20 +415,17 @@ context('Settings tests', () => {
       const proposalTitle = faker.random.words(3);
       const currentDayStart = DateTime.now().startOf('day');
       const editedProposalTitle = faker.random.words(3);
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
+        prevId: createdDraftWorkflowStatusId,
       }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -516,20 +506,17 @@ context('Settings tests', () => {
       }
       const proposalTitle = faker.random.words(3);
       const currentDayStart = DateTime.now().startOf('day');
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 200,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
+        prevId: createdDraftWorkflowStatusId,
       }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -602,36 +589,34 @@ context('Settings tests', () => {
       }
       const internalProposalTitle = faker.lorem.words(3);
       const currentDayStart = DateTime.now().startOf('day');
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.editableSubmitted.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
+        prevId: createdDraftWorkflowStatusId,
+      }).then(
+        ({
+          createWorkflowConnection: connectionFromDraft,
+          addStatusToWorkflow: editableSubmittedWorkflowStatus,
+        }) => {
+          cy.setStatusChangingEventsOnConnection({
+            workflowConnectionId: connectionFromDraft.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
+
+          cy.addStatusToWorkflow({
+            statusId: statuses.editableSubmittedInternal.id,
+            workflowId: createdWorkflowId,
+            prevId: editableSubmittedWorkflowStatus.workflowStatusId,
+          }).then(
+            ({ createWorkflowConnection: connectionFromSubmittedInternal }) => {
+              cy.setStatusChangingEventsOnConnection({
+                workflowConnectionId: connectionFromSubmittedInternal.id,
+                statusChangingEvents: [Event.CALL_ENDED],
+              });
+            }
+          );
         }
-      });
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
-        workflowId: createdWorkflowId,
-        posX: 0,
-        posY: 200,
-        sortOrder: 2,
-        prevStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
-      }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.CALL_ENDED],
-          });
-        }
-      });
+      );
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -655,6 +640,7 @@ context('Settings tests', () => {
         endCall: currentDayStart.plus({ days: -3 }),
         endCallInternal: currentDayStart.plus({ days: 365 }),
         proposalWorkflowId: createdWorkflowId,
+        callEnded: true,
       });
 
       cy.contains(internalProposalTitle)
@@ -690,10 +676,7 @@ context('Settings tests', () => {
 
       cy.contains(internalProposalTitle)
         .parent()
-        .should(
-          'contain.text',
-          initialDBData.proposalStatuses.editableSubmittedInternal.name
-        );
+        .should('contain.text', statuses.editableSubmittedInternal.name);
     });
 
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
@@ -710,7 +693,10 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy^="connection_DRAFT"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy^="workflow_status_DRAFT"]').should(
+        'contain.text',
+        'DRAFT'
+      );
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
@@ -747,12 +733,12 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.dragStatusIntoWorkflow(feasibilityReview, {
+      cy.dragStatusIntoWorkflow(statuses.feasibilityReview, {
         clientX: 0,
         clientY: 100,
       });
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
@@ -766,14 +752,12 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to select events that are triggering change to proposal workflow status', () => {
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
         posX: 0,
         posY: 150,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
-        prevConnectionId: prevConnectionId,
+        prevId: createdDraftWorkflowStatusId,
       });
       cy.login('officer');
       cy.visit('/');
@@ -795,7 +779,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.closeModal();
@@ -812,7 +796,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.get(
@@ -885,9 +869,7 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain(
-            initialDBData.proposalStatuses.feasibilityReview.name
-          )
+          expect(element.text()).to.contain(statuses.feasibilityReview.name)
         );
 
       cy.contains(proposalTitle)
@@ -1003,85 +985,6 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Proposal/s assigned to the selected Fap successfully',
       });
-
-      cy.should('not.contain', 'FAP_SELECTION');
-      cy.contains('FAP_REVIEW');
-    });
-
-    it('Proposal status should update multiple times if conditions are met', () => {
-      addWorkflowWithChangingEvents();
-      cy.createInstrument(instrument1).then((result) => {
-        if (result.createInstrument) {
-          createdInstrumentId = result.createInstrument.id;
-
-          cy.assignInstrumentToCall({
-            callId: initialDBData.call.id,
-            instrumentFapIds: [
-              {
-                instrumentId: createdInstrumentId,
-                fapId: initialDBData.fap.id,
-              },
-            ],
-          });
-        }
-      });
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.updateProposal({
-            proposalPk: proposal.primaryKey,
-            title: proposalTitle,
-            abstract: proposalAbstract,
-            proposerId: initialDBData.users.user1.id,
-          });
-
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.finishedLoading();
-
-      cy.get('[type="checkbox"]').first().check();
-
-      cy.get('[data-cy="assign-remove-instrument"]').click();
-
-      cy.get('[data-cy="proposals-instrument-assignment"]')
-        .contains('Loading...')
-        .should('not.exist');
-
-      cy.get('#selectedInstrumentIds-input').first().click();
-
-      cy.get('[data-cy="instrument-selection-options"] li')
-        .contains(instrument1.name)
-        .click();
-
-      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
-
-      cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
-
-      cy.get('[data-cy="view-proposal"]').first().click();
-      cy.get('[role="dialog"]').contains('Technical review').click();
-
-      cy.get('[data-cy="timeAllocation"] input').clear().type('20');
-
-      cy.get('[data-cy="technical-review-status"]').click();
-      cy.get('[data-cy="technical-review-status-options"]')
-        .contains('Feasible')
-        .click();
-
-      cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.get('[data-cy="is-review-submitted"]').click();
-      cy.get('[data-cy="save-button"]').focus().click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Updated',
-      });
-
-      cy.closeNotification();
-      cy.closeModal();
 
       cy.should('not.contain', 'FAP_SELECTION');
       cy.contains('FAP_REVIEW');
@@ -1243,21 +1146,17 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain(
-            initialDBData.proposalStatuses.draft.name
-          )
+          expect(element.text()).to.contain(statuses.draft.name)
         );
 
       cy.get('.MuiTable-root tbody')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain(
-            initialDBData.proposalStatuses.fapReview.name
-          )
+          expect(element.text()).to.contain(statuses.fapReview.name)
         );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="5"]').click();
+      cy.get('[role="listbox"] [data-value="FAP_REVIEW"]').click();
 
       cy.finishedLoading();
 
@@ -1266,13 +1165,11 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain(
-            initialDBData.proposalStatuses.fapReview.name
-          )
+          expect(element.text()).to.contain(statuses.fapReview.name)
         );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="1"]').click();
+      cy.get('[role="listbox"] [data-value="DRAFT"]').click();
 
       cy.finishedLoading();
 
@@ -1281,9 +1178,7 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then((element) =>
-          expect(element.text()).to.contain(
-            initialDBData.proposalStatuses.draft.name
-          )
+          expect(element.text()).to.contain(statuses.draft.name)
         );
     });
 
@@ -1299,12 +1194,16 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
+      cy.get('[role="dialog"]').get('[data-cy="confirm-ok"]').click();
+
       cy.notification({
         variant: 'success',
         text: 'Workflow status removed successfully',
       });
 
-      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
+      cy.get('[data-cy^="workflow_status_FEASIBILITY_REVIEW"]').should(
+        'not.exist'
+      );
     });
 
     it.skip('User Officer should be able to create proposal workflow with branches', () => {
@@ -1312,7 +1211,7 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
-      cy.dragStatusIntoWorkflow(feasibilityReview, {
+      cy.dragStatusIntoWorkflow(statuses.feasibilityReview, {
         clientX: 600,
         clientY: 400,
       });
@@ -1321,12 +1220,12 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
 
-      cy.dragStatusIntoWorkflow(fapSelection, {
+      cy.dragStatusIntoWorkflow(statuses.fapSelection, {
         clientX: 300,
         clientY: 800,
       });
@@ -1335,12 +1234,12 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_FAP_SELECTION"]').should(
+      cy.get('[data-cy="workflow_status_FAP_SELECTION"]').should(
         'contain.text',
         'FAP_SELECTION'
       );
 
-      cy.dragStatusIntoWorkflow(notFeasible, {
+      cy.dragStatusIntoWorkflow(statuses.notFeasible, {
         clientX: 900,
         clientY: 800,
       });
@@ -1349,7 +1248,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_NOT_FEASIBLE"]').should(
+      cy.get('[data-cy="workflow_status_NOT_FEASIBLE"]').should(
         'contain.text',
         'NOT_FEASIBLE'
       );
@@ -1358,23 +1257,31 @@ context('Settings tests', () => {
 
       cy.get('[title="fit view"]').click();
 
-      cy.connectReactFlowNodes(feasibilityReview, fapSelection, {
-        force: true,
-      });
+      cy.connectReactFlowNodes(
+        statuses.feasibilityReview,
+        statuses.fapSelection,
+        {
+          force: true,
+        }
+      );
       cy.finishedLoading();
       cy.get(
         `[aria-label="Edge from FEASIBILITY_REVIEW to FAP_SELECTION"]`
       ).should('exist');
 
-      cy.connectReactFlowNodes(feasibilityReview, notFeasible, {
-        force: true,
-      });
+      cy.connectReactFlowNodes(
+        statuses.feasibilityReview,
+        statuses.notFeasible,
+        {
+          force: true,
+        }
+      );
       cy.finishedLoading();
       cy.get(
         `[aria-label="Edge from FEASIBILITY_REVIEW to NOT_FEASIBLE"]`
       ).should('exist');
 
-      cy.connectReactFlowNodes(draft, feasibilityReview, {
+      cy.connectReactFlowNodes(statuses.draft, statuses.feasibilityReview, {
         force: true,
       });
       cy.finishedLoading();
@@ -1393,7 +1300,9 @@ context('Settings tests', () => {
       const secondProposalAbstract = faker.random.words(5);
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
+
       addWorkflowWithBranchesAndChangingEvents();
+
       createInstrumentAndAssignItToCall();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
@@ -1532,20 +1441,17 @@ context('Settings tests', () => {
         }
       });
 
-      cy.addWorkflowStatus({
-        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      cy.addStatusToWorkflow({
+        statusId: statuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
+        prevId: createdDraftWorkflowStatusId,
         posX: 0,
         posY: 200,
-        sortOrder: 1,
-        prevStatusId: prevStatusId,
       }).then((result) => {
-        if (result.addWorkflowStatus) {
-          cy.addStatusChangingEventsToConnection({
-            workflowConnectionId: result.addWorkflowStatus.id,
-            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
-          });
-        }
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
       });
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -1637,7 +1543,7 @@ context('Settings tests', () => {
       cy.notification({ variant: 'success', text: 'created successfully' });
       cy.finishedLoading();
 
-      cy.get('[data-cy^="connection_AWAITING_ESF"]').should('exist');
+      cy.get('[data-cy^="workflow_status_AWAITING_ESF"]').should('exist');
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
@@ -1674,7 +1580,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.dragStatusIntoWorkflow(esfIsReview, {
+      cy.dragStatusIntoWorkflow(statuses.esfIsReview, {
         clientX: 300,
         clientY: 300,
       });
@@ -1682,7 +1588,7 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should(
+      cy.get('[data-cy^="workflow_status_ESF_IS_REVIEW"]').should(
         'contain.text',
         'ESF IS REVIEW'
       );
@@ -1701,19 +1607,19 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.dragStatusIntoWorkflow(esfIsReview, {
+      cy.dragStatusIntoWorkflow(statuses.esfIsReview, {
         clientX: 300,
-        clientY: 300,
+        clientY: 400,
       });
 
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should('exist');
+      cy.get('[data-cy^="workflow_status_ESF_IS_REVIEW"]').should('exist');
 
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
 
-      cy.connectReactFlowNodes(awaitingEsf, esfIsReview, {
+      cy.connectReactFlowNodes(statuses.awaitingEsf, statuses.esfIsReview, {
         force: true,
       });
 
@@ -1727,7 +1633,7 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.closeModal();
@@ -1744,7 +1650,7 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
       cy.notification({
         variant: 'success',
-        text: 'Status changing events added successfully!',
+        text: 'Status changing events set successfully!',
       });
 
       cy.get(
@@ -1760,7 +1666,7 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit(`/ExperimentWorkflowEditor/${createdWorkflowId}`);
 
-      cy.dragStatusIntoWorkflow(esfIsReview, {
+      cy.dragStatusIntoWorkflow(statuses.esfIsReview, {
         clientX: 600,
         clientY: 400,
       });
@@ -1769,12 +1675,12 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_IS_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_ESF_IS_REVIEW"]').should(
         'contain.text',
-        esfIsReview.name
+        statuses.esfIsReview.name
       );
 
-      cy.dragStatusIntoWorkflow(esfEsrReview, {
+      cy.dragStatusIntoWorkflow(statuses.esfEsrReview, {
         clientX: 300,
         clientY: 800,
       });
@@ -1783,12 +1689,12 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_ESR_REVIEW"]').should(
+      cy.get('[data-cy="workflow_status_ESF_ESR_REVIEW"]').should(
         'contain.text',
-        esfEsrReview.name
+        statuses.esfEsrReview.name
       );
 
-      cy.dragStatusIntoWorkflow(esfRejected, {
+      cy.dragStatusIntoWorkflow(statuses.esfRejected, {
         clientX: 900,
         clientY: 800,
       });
@@ -1797,16 +1703,16 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-      cy.get('[data-cy="connection_ESF_REJECTED"]').should(
+      cy.get('[data-cy="workflow_status_ESF_REJECTED"]').should(
         'contain.text',
-        esfRejected.name
+        statuses.esfRejected.name
       );
 
       cy.finishedLoading();
 
       cy.get('[title="fit view"]').click();
 
-      cy.connectReactFlowNodes(esfIsReview, esfEsrReview, {
+      cy.connectReactFlowNodes(statuses.esfIsReview, statuses.esfEsrReview, {
         force: true,
       });
       cy.finishedLoading();
@@ -1814,7 +1720,7 @@ context('Settings tests', () => {
         'exist'
       );
 
-      cy.connectReactFlowNodes(esfIsReview, esfRejected, {
+      cy.connectReactFlowNodes(statuses.esfIsReview, statuses.esfRejected, {
         force: true,
       });
       cy.finishedLoading();
@@ -1822,7 +1728,7 @@ context('Settings tests', () => {
         'exist'
       );
 
-      cy.connectReactFlowNodes(awaitingEsf, esfIsReview, {
+      cy.connectReactFlowNodes(statuses.awaitingEsf, statuses.esfIsReview, {
         force: true,
       });
       cy.finishedLoading();
