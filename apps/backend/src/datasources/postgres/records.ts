@@ -43,7 +43,7 @@ import {
   QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
 import { Review } from '../../models/Review';
-import { Role } from '../../models/Role';
+import { createRole } from '../../models/Role';
 import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
 import { Settings, SettingsId } from '../../models/Settings';
@@ -241,6 +241,7 @@ export interface UserRecord {
 }
 
 export interface VisitRegistrationRecord {
+  id: string;
   user_id: number;
   visit_id: number;
   registration_questionary_id: number | null;
@@ -259,7 +260,7 @@ export interface RoleRecord {
   readonly short_code: string;
   readonly title: string;
   readonly description: string;
-  readonly permissions: string[]; // Changed from string to string[]
+  readonly config: unknown;
   readonly is_root_role: boolean;
 }
 
@@ -976,6 +977,7 @@ export const createVisitRegistrationObject = (
   record: VisitRegistrationRecord
 ) => {
   return new VisitRegistration(
+    record.id,
     record.visit_id,
     record.user_id,
     record.registration_questionary_id,
@@ -1196,12 +1198,12 @@ export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
 };
 
 export const createRoleObject = (role: RoleRecord) => {
-  return new Role(
+  return createRole(
     role.role_id,
     role.short_code,
     role.title,
     role.description,
-    role.permissions,
+    role.config,
     role.is_root_role
   );
 };

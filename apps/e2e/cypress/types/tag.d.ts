@@ -1,10 +1,14 @@
 import {
+  AssignCallsToTagMutation,
+  AssignCallsToTagMutationVariables,
   CreateTagMutation,
   CreateTagMutationVariables,
   AssignUsersToTagMutationVariables,
   AssignUsersToTagMutation,
   AssignInstrumentsToTagMutationVariables,
   AssignInstrumentsToTagMutation,
+  UpdateRoleTagsMutation,
+  UpdateRoleTagsMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -45,6 +49,30 @@ declare global {
       addInstrumentToTag: (
         updateTagInput: AssignInstrumentsToTagMutationVariables
       ) => Cypress.Chainable<AssignInstrumentsToTagMutation>;
+
+      /**
+       * Assign calls to a tag
+       *
+       * @returns {typeof AssignCallsToTagMutation}
+       * @memberof Chainable
+       * @example
+       *    cy.assignCallsToTag({ callIds: [1], tagId: 1 })
+       */
+      assignCallsToTag: (
+        assignCallsInput: AssignCallsToTagMutationVariables
+      ) => Cypress.Chainable<AssignCallsToTagMutation>;
+
+      /**
+       * Update tags assigned to a role
+       *
+       * @returns {typeof UpdateRoleTagsMutation}
+       * @memberof Chainable
+       * @example
+       *    cy.updateRoleTags({ roleId: 11, tagIds: [1] })
+       */
+      updateRoleTags: (
+        updateRoleTagsInput: UpdateRoleTagsMutationVariables
+      ) => Cypress.Chainable<UpdateRoleTagsMutation>;
     }
   }
 }

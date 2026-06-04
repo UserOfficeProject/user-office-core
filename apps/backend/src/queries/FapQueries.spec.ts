@@ -15,6 +15,8 @@ import {
   dummyFapReviewerWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
+  dummyProposalReaderWithFapAccess,
+  dummyProposalReaderWithoutFapAccess,
 } from '../datasources/mockups/UserDataSource';
 
 const FapQueriesInstance = container.resolve(FapQueries);
@@ -82,6 +84,24 @@ describe('Test FapQueries', () => {
         legacy: false,
       })
     ).resolves.toStrictEqual([dummyFapProposal]);
+  });
+
+  test('A proposal reader with hasFapAccess can get FAPs by proposal PK', () => {
+    return expect(
+      FapQueriesInstance.getFapsByProposalPk(
+        dummyProposalReaderWithFapAccess,
+        1
+      )
+    ).resolves.toStrictEqual(dummyFaps);
+  });
+
+  test('A proposal reader without hasFapAccess cannot get FAPs by proposal PK', () => {
+    return expect(
+      FapQueriesInstance.getFapsByProposalPk(
+        dummyProposalReaderWithoutFapAccess,
+        1
+      )
+    ).resolves.toStrictEqual([]);
   });
 
   describe('reviewer visibility tests', () => {
