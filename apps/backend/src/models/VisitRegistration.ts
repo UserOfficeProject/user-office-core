@@ -1,5 +1,6 @@
 export class VisitRegistration {
   constructor(
+    public id: string,
     public visitId: number,
     public userId: number,
     public registrationQuestionaryId: number | null,
