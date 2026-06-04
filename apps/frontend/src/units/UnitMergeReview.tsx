@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import produce from 'immer';
+import { produce } from 'immer';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
