@@ -194,11 +194,10 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                       </div>
                       <div>
                         This is particularly useful for GraphQL queries that
-                        access the UOS database. Please note that while the
-                        domain displayed in the UI reflects the current
-                        deployment, it is not stored. At runtime, the system
-                        will automatically resolve and apply the current servers
-                        domain.
+                        access the database. Please note that while the domain
+                        displayed in the UI reflects the current deployment, it
+                        is not stored. At runtime, the system will automatically
+                        resolve and apply the current servers domain.
                       </div>
                     </DialogContent>
                     <DialogActions>
