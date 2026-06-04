@@ -2024,6 +2024,16 @@ context('Template Basic tests', () => {
       // Create another template
       cy.finishedLoading();
       cy.visit('/VisitTemplates');
+
+      cy.contains('Visit Registration Template')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist')
+        .click();
+
+      // Create another template
+      cy.finishedLoading();
+      cy.visit('/VisitTemplates');
       cy.get('[data-cy=create-new-button]').click();
 
       cy.get('[data-cy="name"]').type('Visit Registration Template 2');

@@ -80,6 +80,7 @@ BEGIN
      , comment_for_management
      , comment_for_user
      , notified
+    , management_decision_submitted
      , submitted
      , management_decision_submitted
     )
@@ -122,6 +123,7 @@ BEGIN
      , comment_for_management
      , comment_for_user
      , notified
+    , management_decision_submitted
      , submitted
      , management_decision_submitted
     )

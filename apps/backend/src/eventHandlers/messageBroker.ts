@@ -45,6 +45,7 @@ export const EXCHANGE_NAME =
 enum RABBITMQ_VISIT_EVENT_TYPE {
   VISIT_CREATED = 'VISIT_CREATED',
   VISIT_DELETED = 'VISIT_DELETED',
+  VISIT_UPDATED = 'VISIT_UPDATED',
 }
 
 type Member = {
@@ -487,26 +488,40 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.VISIT_REGISTRATION_UPDATED:
       case Event.VISIT_REGISTRATION_APPROVED:
       case Event.VISIT_REGISTRATION_CANCELLED: {
         const { visitregistration: visitRegistration } = event;
+
+        if (
+          event.type === Event.VISIT_REGISTRATION_UPDATED &&
+          visitRegistration.status !== VisitRegistrationStatus.APPROVED
+        ) {
+          break;
+        }
+
         const proposal = await proposalDataSource.getProposalByVisitId(
           visitRegistration.visitId
         );
         const proposalPayload = await getProposalMessageData(proposal);
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
+          id: visitRegistration.id,
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
           visitorId: user!.oidcSub,
           proposal: JSON.parse(proposalPayload),
         });
+        let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
+        if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
+          rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
+        } else if (event.type === Event.VISIT_REGISTRATION_CANCELLED) {
+          rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
+        }
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
-          event.type === Event.VISIT_REGISTRATION_APPROVED
-            ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
-            : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          rabbitMQVisitEventType,
           jsonMessage
         );
 
