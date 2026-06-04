@@ -108,7 +108,8 @@ export default function UserUpcomingExperimentsTable() {
       <Dialog
         open={modalContents !== null}
         onClose={() => setModalContents(null)}
-        style={{ maxWidth: 'inherit' }}
+        maxWidth="md"
+        fullWidth
       >
         <DialogContent>{modalContents}</DialogContent>
       </Dialog>
