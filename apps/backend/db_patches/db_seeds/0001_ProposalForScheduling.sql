@@ -100,7 +100,7 @@ BEGIN
      , NULL              
      , true              
      , true
-     , true             
+     , true
     );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk, management_time_allocation) VALUES (1, 1, 100);
@@ -142,8 +142,8 @@ BEGIN
      , NULL              
      , NULL              
      , true              
-     , true  
-     , true            
+     , true
+     , true
     );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk, management_time_allocation) VALUES (2, 2, 100);
