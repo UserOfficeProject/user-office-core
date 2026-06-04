@@ -8,7 +8,7 @@ export class EsiWizardStep extends QuestionaryWizardStep {
 
     return (
       registrationState.experimentSafety.esiQuestionarySubmittedAt === null ||
-      registrationState.experimentSafety.statusId == 'AWAITING_ESF'
+      registrationState.experimentSafety.statusId === 'AWAITING_ESF'
     );
   }
 }
