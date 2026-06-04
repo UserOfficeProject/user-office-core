@@ -28,7 +28,7 @@ export function createExperimentSafetyStub(
     esiQuestionaryId: 0,
     esiQuestionarySubmittedAt: 0,
     createdBy: 0,
-    statusId: null,
+    statusId: '',
     safetyReviewQuestionaryId: 0,
     reviewedBy: 0,
     createdAt: 0,

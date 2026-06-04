@@ -154,11 +154,11 @@ const ProposalTable = ({
 
     const readonly =
       proposalData.submitted &&
-      proposalData.status?.shortCode !==
+      proposalData.status?.id !==
         ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED;
     if (readonly && isInternalUser) {
       return (
-        proposalData.status?.shortCode !==
+        proposalData.status?.id !==
         ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
       );
     }
