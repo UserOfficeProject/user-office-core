@@ -70,14 +70,15 @@ describe('stfcEmailHandler', () => {
       mockMailService.sendMail.mockResolvedValue({ success: true });
 
       await stfcEmailHandler(mockEvent);
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(
+          'call-created-email'
+        );
 
       expect(process.env.FBS_EMAIL).toBe(inviteEmail);
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
         content: {
-          template:
-            await emailTemplateDataSource.getEmailTemplateByName(
-              'call-created-email'
-            ),
+          template: emailTemplate?.id.toString(),
         },
         substitution_data: {
           shortCode: 'string',
@@ -108,6 +109,10 @@ describe('stfcEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
       const forcedError = new Error('SMTP down');
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(
+          'call-created-email'
+        );
 
       mockMailService.sendMail.mockRejectedValueOnce(forcedError);
       container.registerInstance(Tokens.MailService, mockMailService);
@@ -119,7 +124,7 @@ describe('stfcEmailHandler', () => {
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
         content: {
-          template: 'call-created-email',
+          template: emailTemplate?.id.toString(),
         },
         substitution_data: {
           shortCode: 'error',
