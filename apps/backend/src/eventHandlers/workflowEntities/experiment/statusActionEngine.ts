@@ -20,7 +20,7 @@ export const experimentSafetyStatusActionEngine = async (
     Tokens.WorkflowDataSource
   );
 
-  const groupByProperties = ['workflowId', 'statusId'];
+  const groupByProperties = ['workflowStatusId'];
   const groupResult = groupExperimentSafetiesByProperties(
     experimentSafeties,
     groupByProperties
