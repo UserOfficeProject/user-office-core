@@ -32,7 +32,6 @@ export default class StatusMutations {
       return rejection('Could not create status', { agent, args }, error);
     });
   }
-
   @ValidateArgs(updateStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateStatus(
@@ -48,7 +47,7 @@ export default class StatusMutations {
   @Authorized([Roles.USER_OFFICER])
   async deleteStatus(
     agent: UserWithRole | null,
-    args: { id: number }
+    args: { id: string }
   ): Promise<Status | Rejection> {
     return this.dataSource.deleteStatus(args.id).catch((error) => {
       return rejection('Could not delete status', { agent, args }, error);

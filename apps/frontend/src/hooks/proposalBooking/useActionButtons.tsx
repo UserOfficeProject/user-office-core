@@ -223,7 +223,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             onSubmitted={(updatedRegistration) => {
               const updatedRegistrations = event.visit!.registrations.map(
                 (registration) =>
-                  registration.userId === updatedRegistration.userId
+                  registration.id === updatedRegistration.id
                     ? updatedRegistration
                     : registration
               );
@@ -236,7 +236,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             onCancelled={(cancelledRegistration) => {
               const updatedRegistrations = event.visit!.registrations.map(
                 (registration) =>
-                  registration.userId === cancelledRegistration.userId
+                  registration.id === cancelledRegistration.id
                     ? cancelledRegistration
                     : registration
               );

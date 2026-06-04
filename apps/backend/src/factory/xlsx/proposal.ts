@@ -144,10 +144,10 @@ export const collectTechniqueProposalXLSXData = async (
     ? proposal.submittedDate.toLocaleString()
     : '';
 
-  const status = await baseContext.queries.status.getStatus(
-    user,
-    proposal.statusId
-  );
+  const status =
+    await baseContext.queries.status.dataSource.getStatusByWorkflowStatusId(
+      proposal.workflowStatusId
+    );
 
   return [
     proposal.proposalId,

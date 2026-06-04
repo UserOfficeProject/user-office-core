@@ -1,13 +1,5 @@
-mutation deleteWorkflowStatus(
-  $statusId: Int!
-  $workflowId: Int!
-  $sortOrder: Int!
-) {
+mutation deleteWorkflowStatus($workflowStatusId: Int!) {
   deleteWorkflowStatus(
-    deleteWorkflowStatusInput: {
-      statusId: $statusId
-      workflowId: $workflowId
-      sortOrder: $sortOrder
-    }
+    deleteWorkflowStatusInput: { workflowStatusId: $workflowStatusId }
   )
 }

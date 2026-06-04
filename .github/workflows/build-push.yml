@@ -101,15 +101,10 @@ jobs:
           gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
           image-tag: ${{ github.sha }}
 
-      - name: Trigger frontend deployment at STFC
+      - name: Trigger deployment updates at STFC
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
-          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalFrontend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
-
-      - name: Trigger backend deployment at STFC
-        if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
-        run: |
-          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalBackend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
+          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_UopCore.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
 
       - uses: actions/create-github-app-token@v1
         id: app-token

@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { Event } from '../../events/event.enum';
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import {
@@ -16,9 +15,9 @@ import {
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { dummyWorkflowStatuses } from './StatusDataSource';
 import { basicDummyUser } from './UserDataSource';
 
 export let dummyProposal: Proposal;
@@ -43,7 +42,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.statusId || 1,
+    values?.workflowStatusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.proposalId || 'shortCode',
@@ -89,45 +88,6 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   1
 );
 
-const dummyProposalEvents = {
-  proposal_pk: 1,
-  proposal_created: true,
-  proposal_submitted: true,
-  proposal_feasibility_review_feasible: true,
-  proposal_feasibility_review_unfeasible: false,
-  call_ended: false,
-  call_ended_internal: false,
-  call_review_ended: false,
-  call_fap_review_ended: false,
-  proposal_faps_selected: false,
-  proposal_instruments_selected: false,
-  proposal_feasibility_review_submitted: false,
-  proposal_sample_review_submitted: false,
-  proposal_all_fap_reviews_submitted: false,
-  proposal_feasibility_review_updated: false,
-  proposal_management_decision_submitted: false,
-  proposal_management_decision_updated: false,
-  proposal_sample_safe: false,
-  proposal_fap_review_updated: false,
-  proposal_all_fap_reviewers_selected: false,
-  proposal_fap_review_submitted: false,
-  proposal_fap_meeting_submitted: false,
-  proposal_all_fap_meetings_submitted: false,
-  proposal_all_reviews_submitted_for_all_faps: false,
-  proposal_all_fap_meeting_instrument_submitted: false,
-  proposal_instrument_submitted: false,
-  proposal_accepted: false,
-  proposal_reserved: false,
-  proposal_rejected: false,
-  proposal_notified: false,
-  proposal_booking_time_activated: false,
-  proposal_booking_time_updated: false,
-  proposal_booking_time_slot_added: false,
-  proposal_booking_time_slots_removed: false,
-  proposal_booking_time_completed: false,
-  proposal_booking_time_reopened: false,
-};
-
 export class ProposalDataSourceMock implements ProposalDataSource {
   proposalsUpdated: Proposal[];
   constructor() {
@@ -159,7 +119,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
       managementDecisionSubmitted: true,
-      statusId: 2,
+      workflowStatusId: 2,
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
@@ -179,6 +139,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       '',
       1,
       1,
+      'DRAFT',
       '',
       '',
       'shortCode',
@@ -254,20 +215,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     }
 
     this.proposalsUpdated.push(proposal);
-
-    return proposal;
-  }
-
-  async updateProposalStatus(
-    proposalPk: number,
-    proposalStatusId: number
-  ): Promise<Proposal> {
-    const proposal = await this.get(proposalPk);
-
-    if (!proposal) {
-      throw new Error('Proposal does not exist');
-    }
-    proposal.statusId = proposalStatusId;
 
     return proposal;
   }
@@ -375,27 +322,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }
 
-  async markEventAsDoneOnProposals(
-    event: Event,
-    proposalPk: number[]
-  ): Promise<ProposalEventsRecord[] | null> {
-    return [dummyProposalEvents];
-  }
-
-  async getProposalEvents(
-    proposalPk: number
-  ): Promise<ProposalEventsRecord | null> {
-    if (proposalPk === 101) {
-      return {
-        ...dummyProposalEvents,
-        call_fap_review_ended: true,
-        proposal_all_fap_reviews_submitted: true,
-      };
-    }
-
-    return dummyProposalEvents;
-  }
-
   async getCount(callId: number): Promise<number> {
     return 1;
   }
@@ -404,20 +330,18 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return dummyProposal;
   }
 
-  async resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean> {
-    return true;
-  }
-
-  async changeProposalsStatus(
-    statusId: number,
+  async changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
     const proposals = allProposals.map((p) => {
-      return { ...p, statusId };
+      return {
+        ...p,
+        workflowStatusId,
+        statusId: dummyWorkflowStatuses.find(
+          (ws) => ws.workflowStatusId === workflowStatusId
+        )?.statusId as string,
+      };
     });
 
     return { proposals: proposals };

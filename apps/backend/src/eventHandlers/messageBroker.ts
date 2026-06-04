@@ -32,7 +32,7 @@ import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
-import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
+import { ProposalWorkflowEngine } from '../workflowEngine/proposal';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -44,6 +44,7 @@ export const EXCHANGE_NAME =
 enum RABBITMQ_VISIT_EVENT_TYPE {
   VISIT_CREATED = 'VISIT_CREATED',
   VISIT_DELETED = 'VISIT_DELETED',
+  VISIT_UPDATED = 'VISIT_UPDATED',
 }
 
 type Member = {
@@ -140,7 +141,9 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
+  const proposalStatus = await statusDataSource.getStatusByWorkflowStatusId(
+    proposal.workflowStatusId
+  );
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
@@ -203,7 +206,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
       mapUserWithInstitutionToMember
     ),
     visitors: visitorsWithInstitution.map(mapUserWithInstitutionToMember),
-    newStatus: proposalStatus?.shortCode,
+    newStatus: proposalStatus?.id,
     submitted: proposal.submitted,
     samples: (
       await sampleDataSource.getSamples({
@@ -484,26 +487,40 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.VISIT_REGISTRATION_UPDATED:
       case Event.VISIT_REGISTRATION_APPROVED:
       case Event.VISIT_REGISTRATION_CANCELLED: {
         const { visitregistration: visitRegistration } = event;
+
+        if (
+          event.type === Event.VISIT_REGISTRATION_UPDATED &&
+          visitRegistration.status !== VisitRegistrationStatus.APPROVED
+        ) {
+          break;
+        }
+
         const proposal = await proposalDataSource.getProposalByVisitId(
           visitRegistration.visitId
         );
         const proposalPayload = await getProposalMessageData(proposal);
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
+          id: visitRegistration.id,
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
           visitorId: user!.oidcSub,
           proposal: JSON.parse(proposalPayload),
         });
+        let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
+        if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
+          rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
+        } else if (event.type === Event.VISIT_REGISTRATION_CANCELLED) {
+          rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
+        }
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
-          event.type === Event.VISIT_REGISTRATION_APPROVED
-            ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
-            : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          rabbitMQVisitEventType,
           jsonMessage
         );
 
@@ -551,6 +568,8 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
+  const workflowEngine = container.resolve(ProposalWorkflowEngine);
+
   const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -559,9 +578,10 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
-      proposalPk,
-    ]);
+    await workflowEngine.run({
+      event: eventType,
+      proposalPks: [proposalPk],
+    });
   };
 
   const cancelVisit = async (visit: Visit) => {
