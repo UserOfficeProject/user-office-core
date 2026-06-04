@@ -1620,6 +1620,8 @@ context('Fap reviews tests', () => {
         text: 'Member assigned',
       });
 
+      cy.closeNotification();
+
       cy.contains('Review Proposals').click();
 
       cy.contains(proposal1.title)
