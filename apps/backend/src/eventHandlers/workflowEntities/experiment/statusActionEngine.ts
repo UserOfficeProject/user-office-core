@@ -5,36 +5,40 @@ import { rabbitMQActionHandler } from './rabbitMQHandler';
 import { groupExperimentSafetiesByProperties } from './utils';
 import { Tokens } from '../../../config/Tokens';
 import { StatusActionsDataSource } from '../../../datasources/StatusActionsDataSource';
+import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { ExperimentSafety } from '../../../models/Experiment';
 import { StatusActionType } from '../../../models/StatusAction';
-import { WorkflowEngineType } from '../../../workflowEngine';
 
 export const experimentSafetyStatusActionEngine = async (
-  experimentSafetyWithConnection: {
-    experimentSafety: ExperimentSafety;
-    entity: WorkflowEngineType;
-  }[]
+  experimentSafeties: ExperimentSafety[]
 ) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
     Tokens.StatusActionsDataSource
   );
 
+  const workflowDataSource: WorkflowDataSource = container.resolve(
+    Tokens.WorkflowDataSource
+  );
+
   const groupByProperties = ['workflowId', 'statusId'];
   const groupResult = groupExperimentSafetiesByProperties(
-    experimentSafetyWithConnection,
+    experimentSafeties,
     groupByProperties
   );
   Promise.all(
-    groupResult.map(async (groupedExperimentSafetiesWithConnection) => {
-      const [
-        {
-          entity: { workflowStatusConnectionId },
-        },
-      ] = groupedExperimentSafetiesWithConnection;
+    groupResult.map(async (groupedExperimentSafeties) => {
+      const [{ workflowStatusId }] = groupedExperimentSafeties;
+      const currentConnection =
+        await workflowDataSource.getWorkflowConnectionByNextStatusId(
+          workflowStatusId
+        );
+      if (!currentConnection) {
+        return;
+      }
 
       const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
-          workflowStatusConnectionId
+          currentConnection.id
         );
       if (!statusActions?.length) {
         return;
@@ -48,21 +52,11 @@ export const experimentSafetyStatusActionEngine = async (
 
           switch (statusAction.type) {
             case StatusActionType.EMAIL:
-              emailActionHandler(
-                statusAction,
-                groupedExperimentSafetiesWithConnection.map(
-                  ({ experimentSafety }) => experimentSafety
-                )
-              );
+              emailActionHandler(statusAction, groupedExperimentSafeties);
               break;
 
             case StatusActionType.RABBITMQ:
-              rabbitMQActionHandler(
-                statusAction,
-                groupedExperimentSafetiesWithConnection.map(
-                  ({ experimentSafety }) => experimentSafety
-                )
-              );
+              rabbitMQActionHandler(statusAction, groupedExperimentSafeties);
               break;
 
             default:

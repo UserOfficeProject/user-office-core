@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -71,6 +72,7 @@ export default function ExperimentsTable({
   const tableRef = React.useRef<MaterialTable<Experiment>>();
 
   const { api } = useDataApiWithFeedback();
+  const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableData, setTableData] = useState<Experiment[]>([]);
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment>();
@@ -277,10 +279,22 @@ export default function ExperimentsTable({
   const changeStatusOnExperimentSafety = async (
     workflowStatus: WorkflowStatus
   ) => {
-    const experimentSafetyPks = getSelectedExperimentsData()
+    const selectedExperimentsData = getSelectedExperimentsData();
+    const experimentSafetyPks = selectedExperimentsData
       .map((experiment) => experiment.experimentSafety?.experimentSafetyPk)
       .filter((pk): pk is number => pk !== undefined);
+
+    if (experimentSafetyPks.length !== selectedExperimentsData.length) {
+      enqueueSnackbar(
+        'Cannot change status. Some or all selected experiments do not have required safety information.',
+        { variant: 'error' }
+      );
+
+      return;
+    }
+
     if (workflowStatus?.workflowStatusId && experimentSafetyPks.length) {
+      console.log('Experiment Safety PKs to update:', experimentSafetyPks);
       const shouldAddPluralLetter = experimentSafetyPks.length > 1 ? 's' : '';
       await api({
         toastSuccessMessage: `Experiment Safety${shouldAddPluralLetter} status changed successfully!`,

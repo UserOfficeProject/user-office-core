@@ -9,6 +9,7 @@ import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../../../events';
 import { Event } from '../../../events/event.enum';
+import { ExperimentSafety } from '../../../models/Experiment';
 import { WorkflowEngineType } from '../../../workflowEngine';
 import { WorkFlowEntity } from '../../workflowHandler';
 
@@ -119,15 +120,12 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
           description: `From "${previousWorkflowStatus?.statusId}" to "${nextWorkflowStatus?.statusId}"`,
         });
 
-        return { experimentSafety, entity };
+        return experimentSafety;
       })
     );
 
     const validExperimentSafeties = experimentSafeties.filter(
-      (
-        experimentSafety
-      ): experimentSafety is NonNullable<typeof experimentSafety> =>
-        experimentSafety != null
+      (item): item is ExperimentSafety => item != null
     );
     await experimentSafetyStatusActionEngine(validExperimentSafeties);
   },

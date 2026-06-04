@@ -14,17 +14,11 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../../../resolvers/types/StatusActionConfig';
-import { WorkflowEngineType } from '../../../workflowEngine';
 
-export const groupExperimentSafetiesByProperties = <
-  T extends {
-    experimentSafety: ExperimentSafety;
-    entity: WorkflowEngineType;
-  },
->(
-  experimentSafeties: T[],
+export const groupExperimentSafetiesByProperties = (
+  experimentSafeties: ExperimentSafety[],
   props: string[]
-): T[][] => {
+): ExperimentSafety[][] => {
   const getExperimentSafetyGroups = (item: ExperimentSafety) => {
     const groupItemsArray = [];
     for (let i = 0; i < props.length; i++) {
@@ -34,12 +28,12 @@ export const groupExperimentSafetiesByProperties = <
     return groupItemsArray;
   };
 
-  const experimentSafetyGroups: Record<string, T[]> = {};
+  const experimentSafetyGroups: Record<string, ExperimentSafety[]> = {};
 
   for (let i = 0; i < experimentSafeties.length; i++) {
     const item = experimentSafeties[i];
     const experimentSafetyGroup = JSON.stringify(
-      getExperimentSafetyGroups(item.experimentSafety)
+      getExperimentSafetyGroups(item)
     );
     experimentSafetyGroups[experimentSafetyGroup] =
       experimentSafetyGroups[experimentSafetyGroup] || [];

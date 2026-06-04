@@ -33,7 +33,6 @@ import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
 import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { ChangeExperimentsSafetyStatusInput } from '../resolvers/mutations/ChangeExperimentsSafetyStatusMutation';
-import { WorkflowEngineType } from '../workflowEngine';
 
 @injectable()
 export default class ExperimentMutations {
@@ -562,25 +561,12 @@ export default class ExperimentMutations {
             );
           }
 
-          return {
-            experimentSafety: fullExperimentSafety,
-            entity: {
-              entityId: 1,
-              prevStatusId: 1,
-              nextStatusId: 1,
-              workflowStatusConnectionId: 1,
-            },
-          };
+          return fullExperimentSafety;
         })
       );
 
       const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
-        (
-          item
-        ): item is {
-          experimentSafety: ExperimentSafety;
-          entity: WorkflowEngineType;
-        } => !!item
+        (item): item is ExperimentSafety => !!item
       );
 
       // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.

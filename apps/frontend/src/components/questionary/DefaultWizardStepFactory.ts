@@ -67,7 +67,6 @@ export abstract class QuestionaryWizardStep implements WizardStep {
   ): boolean;
 
   getMetadata(state: QuestionarySubmissionState) {
-    console.log(state);
     const check = {
       title: this.step.topic.title,
       isCompleted: this.step.isCompleted,

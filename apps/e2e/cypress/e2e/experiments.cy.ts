@@ -292,5 +292,60 @@ context('Experiments tests', () => {
         }
       );
     });
+
+    it('Should display error when trying to change status of experiment without experimentSafety', () => {
+      // NOTE: The beforeEach creates experimentSafety only for the "upcoming" experiment
+      // This test should find an experiment without experimentSafety and try to change its status
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      // Remove date filter to show all experiments
+      cy.get('[value=NONE]').click();
+      cy.finishedLoading();
+
+      // Find the table and count rows - should have multiple experiments
+      cy.get('[data-cy=experiments-table] table tbody tr').should(
+        'have.length.at.least',
+        1
+      );
+
+      // Get all experiment rows and find one that shows "ESF Not Started" status
+      // These are experiments without experimentSafety
+      cy.get('[data-cy=experiments-table] table tbody tr').then(($rows) => {
+        // Look for a row with "ESF Not Started" status
+        let selectedRowIndex = -1;
+        $rows.each((index, row) => {
+          const cells = Cypress.$(row).find('td');
+          const statusCell = cells.eq(5); // Experiment Safety Status column
+          if (statusCell.text().includes('ESF Not Started')) {
+            selectedRowIndex = index;
+
+            return false; // break
+          }
+        });
+
+        // If we found a row with ESF Not Started, select it
+        if (selectedRowIndex !== -1) {
+          cy.get('[data-cy=experiments-table] input[type="checkbox"]')
+            .eq(selectedRowIndex + 1) // +1 because first row is header
+            .check({ force: true });
+          cy.finishedLoading();
+
+          // Click on the change status button
+          cy.get('[data-cy=change-experiment-safety-status]').click();
+          cy.finishedLoading();
+
+          // Check for the error notification
+          cy.notification({
+            variant: 'error',
+            text: /Cannot change status\. Some or all selected experiments do not have required safety information\./,
+          });
+        } else {
+          // If no experiment without ESF was found, skip this test
+          cy.log('No experiment without experimentSafety found');
+        }
+      });
+    });
   });
 });

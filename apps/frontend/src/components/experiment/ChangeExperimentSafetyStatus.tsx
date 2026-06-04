@@ -106,7 +106,7 @@ const ChangeExperimentSafetyStatus = ({
     <Container component="main" maxWidth="lg">
       <Formik
         initialValues={{
-          selectedWorkflowStatusId: selectedExperimentsWorkflowStatus,
+          selectedWorkflowStatusId: selectedExperimentsWorkflowStatus ?? '',
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedStatus = experimentStatuses.find(
