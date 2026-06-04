@@ -103,7 +103,9 @@ function ExperimentSafetyReviewSummary({
         }
       } catch (error) {
         // Silently fail on polling errors to not interrupt user experience
-        console.error('Error polling experiment safety status:', error);
+        api().addClientLog({
+          error: `Error polling experiment safety status: ${String(error)}`,
+        });
       }
     }, 5000);
 
