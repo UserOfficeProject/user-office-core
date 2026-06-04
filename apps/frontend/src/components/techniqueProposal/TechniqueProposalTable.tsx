@@ -740,7 +740,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               dateFilter,
               excludeProposalStatusIds:
                 currentRole === UserRole.INSTRUMENT_SCIENTIST
-                  ? ['EXPIRED']
+                  ? [StatusCode.EXPIRED]
                   : [],
             },
             sortField: orderBy?.orderByField,
