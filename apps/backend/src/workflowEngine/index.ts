@@ -97,7 +97,7 @@ export class WorkflowEngine {
     workflowId: number,
     currentStatusId: number,
     event: Event,
-    handleEntityWorkflowChange: (newWorkflowStatus: number) => void
+    handleEntityWorkflowChange: (newWorkflowStatus: number) => Promise<void>
   ): Promise<WorkflowEngineType | void> {
     const machine = await createWorkflowMachine(workflowId);
     const currentEntityState = Object.entries(machine.schema.states).find(
