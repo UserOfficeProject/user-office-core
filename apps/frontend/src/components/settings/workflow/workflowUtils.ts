@@ -58,7 +58,6 @@ export const mapWorkflowToNodesAndEdges = (
   state.statuses.forEach((workflowStatus) => {
     const statusId = workflowStatus.status.id.toString();
     const nodeId = workflowStatus.workflowStatusId.toString();
-    // Use database coordinates if available, otherwise fall back to grid layout
     const nodePositionX = workflowStatus.posX;
     const nodePositionY = workflowStatus.posY;
 

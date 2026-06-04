@@ -205,7 +205,7 @@ const WorkflowEditorModel = (
           return draft;
         }
         case EventType.WORKFLOW_STATUS_DELETED: {
-          // Remove the workflow status by statusId
+          // Remove the workflow status by workflow statusId
           if (action.payload.workflowStatusId) {
             draft.statuses = draft.statuses.filter(
               (status) =>

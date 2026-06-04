@@ -9,6 +9,7 @@ import {
 import React, { useState } from 'react';
 
 import { Status } from 'generated/sdk';
+import { WORKFLOW_INITIAL_STATUSES } from 'utils/workflowInitialStatuses';
 
 interface StatusPickerProps {
   statuses: Status[];
@@ -22,12 +23,16 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   // Filter statuses based on search term
-  const filteredStatuses = statuses.filter(
-    (status) =>
-      status.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (status.description &&
-        status.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredStatuses = statuses
+    .filter(
+      (status) =>
+        status.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (status.description &&
+          status.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .filter(
+      (status) => WORKFLOW_INITIAL_STATUSES.includes(status.id) === false
+    );
 
   return (
     <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>

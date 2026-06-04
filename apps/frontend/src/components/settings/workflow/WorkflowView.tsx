@@ -3,10 +3,9 @@ import { ConnectionLineType, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import { WorkflowType } from 'generated/sdk';
-import { FunctionType } from 'utils/utilTypes';
 
 import WorkflowCanvas from './WorkflowCanvas';
-import WorkflowEditorModel, { Event } from './WorkflowEditorModel';
+import WorkflowEditorModel from './WorkflowEditorModel';
 import { mapWorkflowToNodesAndEdges } from './workflowUtils';
 
 interface WorkflowViewProps {
@@ -28,19 +27,8 @@ const WorkflowView: React.FC<WorkflowViewProps> = ({
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const reducerMiddleware = () => {
-    return (next: FunctionType) => (action: Event) => {
-      // Read-only model, no middleware modifications expected
-      next(action);
-    };
-  };
-
   // Pass externalWorkflowId to the model
-  const { state } = WorkflowEditorModel(
-    entityType,
-    [reducerMiddleware],
-    workflowId
-  );
+  const { state } = WorkflowEditorModel(entityType, [], workflowId);
 
   useEffect(() => {
     if (state.id === 0) return; // Not loaded yet
