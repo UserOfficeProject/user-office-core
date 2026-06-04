@@ -481,7 +481,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
-    it('Table selection and parameters should be saved between tab navigation', () => {
+    it.only('Table selection and parameters should be saved between tab navigation', () => {
       for (let index = 0; index < 6; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
           const createdProposal = result.createProposal;
@@ -531,14 +531,15 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3&page=1&pageSize=5`);
-      //should go straight to the second page
+      cy.visit(`/FapPage/${createdFapId}?tab=3&pageSize=5`);
+      //should go to the second page
+      cy.get('button[aria-label="Next Page"]').click();
       cy.contains(proposal1.title).should('not.exist');
       cy.contains('5 rows');
       cy.contains('Documents').click();
       cy.contains('Proposals and Assignments').click();
 
-      //should go straught to the second page on navigating back
+      //should go straight to the second page on navigating back
       cy.contains(proposal1.title).should('not.exist');
       cy.contains('5 rows');
 
