@@ -9,8 +9,7 @@ BEGIN
             'false'::jsonb,
             true
         )
-        WHERE data_type = 'DYNAMIC_MULTIPLE_CHOICE'
-            AND NOT (default_config::jsonb ? 'useBaseDomain');
+        WHERE data_type = 'DYNAMIC_MULTIPLE_CHOICE';
     END IF;
 END;
 $$
