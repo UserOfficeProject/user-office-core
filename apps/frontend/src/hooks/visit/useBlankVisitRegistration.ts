@@ -16,6 +16,7 @@ function createRegistrationStub(
   visitId: number
 ): RegistrationWithQuestionary {
   return {
+    id: '',
     userId: userId,
     registrationQuestionaryId: 0,
     status: VisitRegistrationStatus.DRAFTED,
