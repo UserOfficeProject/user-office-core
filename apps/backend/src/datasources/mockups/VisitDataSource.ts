@@ -14,7 +14,18 @@ import { dummyUserWithRole } from './UserDataSource';
 export class VisitDataSourceMock implements VisitDataSource {
   private visits: Visit[];
   private visitsHasVisitors: VisitRegistration[];
+  private nextRegistrationId = 1;
+
+  private createRegistrationId() {
+    const id = `mock-visit-registration-${this.nextRegistrationId}`;
+    this.nextRegistrationId += 1;
+
+    return id;
+  }
+
   init() {
+    this.nextRegistrationId = 1;
+
     this.visits = [
       new Visit(1, 1, 1, dummyUserWithRole.id, new Date(), 1),
       new Visit(3, 3, 3, dummyUserWithRole.id, new Date(), 3),
@@ -23,6 +34,7 @@ export class VisitDataSourceMock implements VisitDataSource {
 
     this.visitsHasVisitors = [
       new VisitRegistration(
+        this.createRegistrationId(),
         1,
         1,
         1,
@@ -31,6 +43,7 @@ export class VisitDataSourceMock implements VisitDataSource {
         VisitRegistrationStatus.DRAFTED
       ),
       new VisitRegistration(
+        this.createRegistrationId(),
         1,
         2,
         2,
@@ -120,9 +133,10 @@ export class VisitDataSourceMock implements VisitDataSource {
       args.team?.forEach((userId) => {
         this.visitsHasVisitors.push(
           new VisitRegistration(
-            this.visitsHasVisitors.length,
-            userId,
+            this.createRegistrationId(),
             args.visitId,
+            userId,
+            null,
             new Date(),
             new Date(),
             VisitRegistrationStatus.DRAFTED

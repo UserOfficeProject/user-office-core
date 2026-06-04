@@ -1,4 +1,5 @@
 fragment visitRegistration on VisitRegistration {
+  id
   userId
   visitId
   registrationQuestionaryId
