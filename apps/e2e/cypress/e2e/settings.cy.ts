@@ -1905,5 +1905,49 @@ context('Settings tests', () => {
         );
       });
     });
+
+    it('User Officer should be able to select and unselect all permissions for a group', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+
+      cy.get('fieldset').first().as('permissionGroup');
+
+      cy.get('@permissionGroup')
+        .contains('button', 'Unselect all')
+        .should('not.exist');
+
+      // click 'Select all' and verify it switches to 'Unselect all'
+      cy.get('@permissionGroup').contains('button', 'Select all').click();
+      cy.get('@permissionGroup')
+        .contains('button', 'Select all')
+        .should('not.exist');
+      cy.get('@permissionGroup')
+        .contains('button', 'Unselect all')
+        .should('exist');
+
+      // verify all checkboxes are checked
+      cy.get('@permissionGroup')
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+
+      // click 'Unselect all' and verify it switches to 'Select all'
+      cy.get('@permissionGroup').contains('button', 'Unselect all').click();
+      cy.get('@permissionGroup')
+        .contains('button', 'Unselect all')
+        .should('not.exist');
+      cy.get('@permissionGroup')
+        .contains('button', 'Select all')
+        .should('exist');
+
+      // verify all checkboxes are unchecked
+      cy.get('@permissionGroup')
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
+    });
   });
 });
