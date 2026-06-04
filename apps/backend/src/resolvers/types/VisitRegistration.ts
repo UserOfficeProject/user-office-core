@@ -19,6 +19,9 @@ import {
 
 @ObjectType()
 export class VisitRegistration implements Partial<VisitRegistrationOrig> {
+  @Field()
+  public id: string;
+
   @Field(() => Int)
   public userId: number;
 
