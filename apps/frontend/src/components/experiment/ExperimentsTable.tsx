@@ -294,7 +294,6 @@ export default function ExperimentsTable({
     }
 
     if (workflowStatus?.workflowStatusId && experimentSafetyPks.length) {
-      console.log('Experiment Safety PKs to update:', experimentSafetyPks);
       const shouldAddPluralLetter = experimentSafetyPks.length > 1 ? 's' : '';
       await api({
         toastSuccessMessage: `Experiment Safety${shouldAddPluralLetter} status changed successfully!`,
