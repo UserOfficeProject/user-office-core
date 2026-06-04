@@ -396,6 +396,12 @@ interface VisitCreatedEvent extends GeneralEvent {
   type: Event.VISIT_CREATED;
   visit: Visit;
 }
+
+interface VisitRegistrationUpdatedEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_UPDATED;
+  visitregistration: VisitRegistration;
+}
+
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -545,6 +551,7 @@ export type ApplicationEvent =
   | InternalReviewUpdated
   | InternalReviewDeleted
   | VisitCreatedEvent
+  | VisitRegistrationUpdatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
   | UserDataAccessUpdatedEvent
