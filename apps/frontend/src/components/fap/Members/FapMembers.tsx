@@ -31,7 +31,7 @@ import { useRenewToken } from 'hooks/common/useRenewToken';
 import { FapMember, useFapReviewersData } from 'hooks/fap/useFapReviewersData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserName, getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
@@ -45,10 +45,7 @@ type FapMembersProps = {
 const columns = [
   {
     title: 'Name',
-    render: (rowData: FapMember) =>
-      rowData.user.preferredname
-        ? rowData.user.preferredname
-        : rowData.user.firstname,
+    render: (rowData: FapMember) => getPreferredName(rowData.user),
   },
   {
     title: 'Surname',
