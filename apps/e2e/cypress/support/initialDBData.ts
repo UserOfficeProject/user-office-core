@@ -253,6 +253,7 @@ export default {
     user1: {
       id: 1,
       firstName: 'Carl',
+      preferredName: 'Carl',
       lastName: 'Carlsson',
       email: 'Javon4@hotmail.com',
       password: 'Test1234!',
@@ -261,6 +262,7 @@ export default {
       id: 4,
       firstName: 'Benjamin',
       lastName: 'Beckley',
+      preferredName: 'Ben',
       email: 'ben@inbox.com',
       password: 'Test1234!',
     },
