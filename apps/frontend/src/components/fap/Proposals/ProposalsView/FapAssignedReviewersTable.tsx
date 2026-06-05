@@ -22,6 +22,7 @@ import {
 } from 'hooks/fap/useFapProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getPreferredName } from 'utils/user';
 
 import RankInputModal from '../RankInputModal';
 
@@ -107,11 +108,7 @@ const FapAssignedReviewersTable = ({
     {
       title: 'First name',
       render: (rowData: FapProposalAssignmentType) =>
-        rowData.user
-          ? rowData.user.preferredname
-            ? rowData.user.preferredname
-            : rowData.user.firstname
-          : '-',
+        rowData.user ? getPreferredName(rowData.user) : '-',
     },
     {
       title: 'Last name',
