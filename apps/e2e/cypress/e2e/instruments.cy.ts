@@ -545,8 +545,14 @@ context('Instrument tests', () => {
         'have.length',
         numberOfScientistsAndManagerAssignedToCreatedInstrument
       );
+      const reassignDisplayName = featureFlags
+        .getEnabledFeatures()
+        .get(FeatureId.USER_SEARCH_FILTER)
+        ? scientist2.preferredName
+        : scientist2.firstName;
+
       cy.get('[title="user-list-options"]')
-        .contains(scientist2.preferredName)
+        .contains(reassignDisplayName)
         .click();
 
       cy.get('[data-cy="re-assign-submit"]').click();
@@ -554,7 +560,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: `Assigned to ${scientist2.preferredName} ${scientist2.lastName}`,
+        text: `Assigned to ${reassignDisplayName} ${scientist2.lastName}`,
       });
 
       cy.closeModal();
