@@ -165,7 +165,9 @@ const FapProposalsAndAssignmentsTable = ({
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     fapProposals;
   const { api } = useDataApiWithFeedback();
-  const [proposalPks, setProposalPks] = useState<number[]>([]);
+  const [proposals, setProposals] = useState<
+    { proposalPk: number; proposalId: string }[]
+  >([]);
   const downloadPDFProposal = useDownloadPDFProposal();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -257,10 +259,13 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
 
-    const proposalPksToAssign = proposalsToAssign.map(
-      (proposalToAssign) => proposalToAssign.proposalPk
-    );
-    setProposalPks(proposalPksToAssign);
+    const proposalPksToAssign = proposalsToAssign.map((proposalToAssign) => {
+      return {
+        proposalPk: proposalToAssign.proposalPk,
+        proposalId: proposalToAssign.proposal.proposalId,
+      };
+    });
+    setProposals(proposalPksToAssign);
   };
 
   const handleBulkRemoveProposalsFromFap = async (
@@ -416,12 +421,12 @@ const FapProposalsAndAssignmentsTable = ({
         />
       </ProposalReviewModal>
       <AssignFapMemberToProposalModal
-        proposalPks={proposalPks}
-        setProposalPks={setProposalPks}
+        proposals={proposals}
+        setProposals={setProposals}
         fapId={fap.id}
         assignMembersToFapProposals={(fm, p) => {
           handleMemberAssignmentToFapProposals(fm, p);
-          setProposalPks([]);
+          setProposals([]);
         }}
       />
       <div data-cy="fap-assignments-table">
