@@ -979,7 +979,7 @@ context('Instrument tests', () => {
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.contains(`${scientist2.preferredName} ${scientist2.lastName}`).should(
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
         'not.exist'
       );
 
