@@ -253,7 +253,6 @@ export default {
     user1: {
       id: 1,
       firstName: 'Carl',
-      preferredName: 'Carl',
       lastName: 'Carlsson',
       email: 'Javon4@hotmail.com',
       password: 'Test1234!',
@@ -261,15 +260,14 @@ export default {
     user2: {
       id: 4,
       firstName: 'Benjamin',
-      preferredName: 'Benjamin',
       lastName: 'Beckley',
+      preferredName: 'Ben',
       email: 'ben@inbox.com',
       password: 'Test1234!',
     },
     user3: {
       id: 6,
       firstName: 'David',
-      preferredName: 'David',
       lastName: 'Dawson',
       email: 'david@teleworm.us',
       password: 'Test1234!',
@@ -277,7 +275,6 @@ export default {
     reviewer: {
       id: 3,
       firstName: 'Nils',
-      preferredName: 'Nils',
       lastName: 'Nilsson',
       email: 'nils@ess.se',
       password: 'Test1234!',
@@ -285,7 +282,6 @@ export default {
     officer: {
       id: 2,
       firstName: 'Anders',
-      preferredName: 'Anders',
       lastName: 'Andersson',
       email: 'Aaron_Harris49@gmail.com',
       password: 'Test1234!',
@@ -293,7 +289,6 @@ export default {
     placeholderUser: {
       id: 5,
       firstName: 'Unverified email',
-      preferredName: 'Unverified email',
       lastName: 'Placeholder',
       email: 'unverified-user@example.com',
       password: '',
@@ -301,7 +296,6 @@ export default {
     instrumentScientist1: {
       id: 100,
       firstName: 'Instrument',
-      preferredName: 'Instrument',
       lastName: 'Scientist1',
       email: 'instr.sci1@local.host',
       password: 'Test1234!',
@@ -309,7 +303,6 @@ export default {
     instrumentScientist2: {
       id: 101,
       firstName: 'Instrument',
-      preferredName: 'Instrument',
       lastName: 'Scientist2',
       email: 'instr.sci2@local.host',
       password: 'Test1234!',
@@ -317,7 +310,6 @@ export default {
     experimentSafetyReviewer1: {
       id: 103,
       firstName: 'Experiment',
-      preferredName: 'Experiment',
       lastName: 'Safety',
       email: 'experiment.safety@local.host',
       password: 'Test1234!',
