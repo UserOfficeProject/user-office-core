@@ -185,6 +185,44 @@ context('visits tests', () => {
       );
     });
 
+    it('User officer should be able to edit visit registration after visit is approved', () => {
+      cy.approveVisitRegistration({
+        visitRegistration: {
+          userId: visitor.id,
+          visitId: createdVisitId,
+        },
+      });
+
+      cy.login('officer');
+      cy.visit('/Experiments');
+      cy.finishedLoading();
+
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
+      cy.get('[data-cy="edit-visit-registration-button"]').click();
+
+      const startDateObj = faker.date.future();
+      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
+
+      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+
+      //click the tab New visit
+      cy.get('button').contains('New visit').click({ force: true });
+
+      cy.get('input[name="visit_basis.startsAt"]').clear().type(startDate);
+      cy.get('input[name="visit_basis.endsAt"]').clear().type(endDate);
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
+    });
+
     it('User officer should be able to approve visit registration', () => {
       cy.login('officer');
       cy.visit('/Experiments');

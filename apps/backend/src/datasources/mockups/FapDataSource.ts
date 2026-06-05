@@ -488,7 +488,7 @@ export class FapDataSourceMock implements FapDataSource {
       shortCode: 'fap_chair',
       title: 'Fap Chair',
       description: '',
-      permissions: [],
+      config: {},
       isRootRole: true,
     };
   }

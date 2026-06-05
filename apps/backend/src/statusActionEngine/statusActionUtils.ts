@@ -12,7 +12,6 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { InstrumentWithManagementTime } from '../models/Instrument';
@@ -197,7 +196,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
 
         const quickReviewCalls = await callDataSource
           .getCalls({
-            proposalStatusShortCode: 'QUICK_REVIEW',
+            proposalStatus: 'QUICK_REVIEW',
           })
           .then((calls) => calls.map((call) => call.id));
         if (quickReviewCalls.includes(proposal.callId)) {
@@ -517,42 +516,6 @@ export const constructProposalStatusChangeEvent = (
   } as ApplicationEvent;
 
   return event;
-};
-
-export const publishProposalMessageToTheEventBus = async (
-  proposal: WorkflowEngineProposalType,
-  messageDescription: string,
-  exchange?: string,
-  loggedInUserId?: number
-) => {
-  const eventBus = resolveApplicationEventBus();
-  const event = constructProposalStatusChangeEvent(
-    proposal,
-    loggedInUserId || null,
-    messageDescription,
-    exchange
-  );
-
-  return eventBus
-    .publish(event)
-    .catch((e) => logger.logError(`EventBus publish failed ${event.type}`, e));
-};
-export const publishMessageToTheEventBus = async (
-  proposals: WorkflowEngineProposalType[],
-  messageDescription: string,
-  exchange?: string,
-  loggedInUserId?: number
-) => {
-  await Promise.all(
-    proposals.map(async (proposal) =>
-      publishProposalMessageToTheEventBus(
-        proposal,
-        messageDescription,
-        exchange,
-        loggedInUserId
-      )
-    )
-  );
 };
 
 export const statusActionLogger = (args: {

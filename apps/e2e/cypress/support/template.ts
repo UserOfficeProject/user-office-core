@@ -507,6 +507,10 @@ function createNumberInputQuestion(
     units?: string[];
     valueConstraint?: string;
     firstTopic?: boolean;
+    numberMax?: number;
+    numberMaxInclusive?: boolean;
+    numberMin?: number;
+    numberMinInclusive?: boolean;
   }
 ) {
   openQuestionsMenu({
@@ -531,6 +535,22 @@ function createNumberInputQuestion(
   if (options?.valueConstraint) {
     cy.get('[data-cy="numberValueConstraint"]').click();
     cy.contains(options?.valueConstraint).click();
+  }
+
+  if (options?.numberMin !== undefined) {
+    cy.get('[data-cy="numberMin"]').clear().type(options.numberMin.toString());
+
+    if (options.numberMinInclusive) {
+      cy.get('[data-cy="numberMinInclusive"]').click();
+    }
+  }
+
+  if (options?.numberMax !== undefined) {
+    cy.get('[data-cy="numberMax"]').clear().type(options.numberMax.toString());
+
+    if (options.numberMaxInclusive) {
+      cy.get('[data-cy="numberMaxInclusive"]').click();
+    }
   }
 
   cy.contains('Save').click();

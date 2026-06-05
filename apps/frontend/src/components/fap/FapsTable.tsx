@@ -1,5 +1,6 @@
 import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
+import Visibility from '@mui/icons-material/Visibility';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
@@ -66,7 +67,14 @@ const FapsTable = () => {
   const fapStatus = searchParam.get('fapStatus');
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isChairOrSecretary = useCheckAccess([
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
+
   const { t } = useTranslation();
+
+  const canEdit = isUserOfficer || isChairOrSecretary;
 
   const handleStatusFilterChange = (fapStatus: FapStatus) => {
     setSearchParam((searchParam) => {
@@ -86,6 +94,7 @@ const FapsTable = () => {
   }
 
   const EditIcon = (): JSX.Element => <Edit />;
+  const ViewIcon = (): JSX.Element => <Visibility />;
 
   const deleteFap = async (id: number | string) => {
     try {
@@ -160,8 +169,8 @@ const FapsTable = () => {
         }}
         actions={[
           {
-            icon: EditIcon,
-            tooltip: 'Edit',
+            icon: canEdit ? EditIcon : ViewIcon,
+            tooltip: canEdit ? t('Edit') : t('View'),
             onClick: (event, rowData): void =>
               setEditFapID((rowData as Fap).id),
             position: 'row',

@@ -18,8 +18,7 @@ export enum ProposalStatusDefaultShortCodes {
 
 export class Status {
   constructor(
-    public id: number,
-    public shortCode: string,
+    public id: string,
     public name: string,
     public description: string,
     public isDefault: boolean,

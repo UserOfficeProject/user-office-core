@@ -252,6 +252,7 @@ export default class VisitMutations {
   }
 
   @Authorized()
+  @EventBus(Event.VISIT_REGISTRATION_UPDATED)
   async updateVisitRegistration(
     agent: UserWithRole | null,
     args: UpdateVisitRegistrationArgs

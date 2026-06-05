@@ -13,7 +13,7 @@ import RoleModal from './RoleModal';
 
 export type RoleRow = Pick<
   Role,
-  'id' | 'shortCode' | 'title' | 'description' | 'isRootRole' | 'permissions'
+  'id' | 'shortCode' | 'title' | 'description' | 'isRootRole' | 'config'
 > & {
   tags?: Pick<Tag, 'id' | 'name'>[];
 };
@@ -36,7 +36,7 @@ const RoleManagement: React.FC = () => {
             title: role.title,
             description: role.description,
             isRootRole: role.isRootRole,
-            permissions: [],
+            config: role.config,
             tags: role.tags || [],
           }))
         );
@@ -60,7 +60,7 @@ const RoleManagement: React.FC = () => {
             title: role.title,
             description: role.description,
             isRootRole: role.isRootRole,
-            permissions: [],
+            config: role.config,
             tags: role.tags || [],
           }))
         )
@@ -126,7 +126,7 @@ const RoleManagement: React.FC = () => {
               shortCode: editRole.shortCode,
               title: editRole.title,
               description: editRole.description,
-              isRootRole: false,
+              config: editRole.config,
               tags: editRole.tags || [],
             } as Role)
           : null
