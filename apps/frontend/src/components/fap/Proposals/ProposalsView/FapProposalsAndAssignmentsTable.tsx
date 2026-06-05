@@ -1,20 +1,26 @@
 import { Action, Column } from '@material-table/core';
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
-import FapAssignedReviewersTable from 'components/fap/Proposals/FapAssignedReviewersTable';
+import AssignFapMemberToProposalModal, {
+  FapAssignedMember,
+} from 'components/fap/Proposals/ProposalsView/AssignFapMemberToProposalModal';
+import FapAssignedReviewersTable from 'components/fap/Proposals/ProposalsView/FapAssignedReviewersTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { Review, SettingsId, Fap } from 'generated/sdk';
+import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   FapProposalType,
   FapProposalAssignmentType,
@@ -30,17 +36,19 @@ import {
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-type FapLegacyProposalsTableProps = {
+type FapProposalsAndAssignmentsTableProps = {
   /** Fap we are assigning members to */
-  data: Fap;
+  fap: Fap;
   /** Call this function in case of Fap assigned members update */
   onAssignmentsUpdate: (fap: Fap) => void;
-  /** Call id that we want to filter by */
-  selectedCallId: number | null;
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
-  selectedInstrumentId: number | null;
   fapProposals: FapProposals;
+  handleMemberAssignmentToFapProposals: (
+    memberUsers: FapAssignedMember[],
+    proposalPks: number[]
+  ) => void;
+  updateFapProposalAssignmentsView: (proposalPk: number) => Promise<void>;
 };
 
 const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
@@ -143,21 +151,36 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   },
 ];
 
-const FapLegacyProposalsTable = ({
-  data,
+const FapProposalsAndAssignmentsTable = ({
+  fap,
   onAssignmentsUpdate,
+  confirm,
   fapProposals,
-}: FapLegacyProposalsTableProps) => {
+  handleMemberAssignmentToFapProposals,
+  updateFapProposalAssignmentsView,
+}: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     fapProposals;
   const { api } = useDataApiWithFeedback();
+  const [proposals, setProposals] = useState<
+    { proposalPk: number; proposalId: string }[]
+  >([]);
   const downloadPDFProposal = useDownloadPDFProposal();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
+
+  const hasRightToAssignReviewers = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
+  const hasRightToRemoveAssignedProposal = useCheckAccess([
+    UserRole.USER_OFFICER,
+  ]);
   const { t } = useTranslation();
 
   const translatedColumns = FapProposalColumns.map((column) =>
@@ -206,15 +229,80 @@ const FapLegacyProposalsTable = ({
     );
   };
 
+  const removeProposalsFromFap = async (
+    proposalsToRemove: FapProposalType[]
+  ): Promise<void> => {
+    await api({
+      toastSuccessMessage: 'Assignment/s removed',
+    }).removeProposalsFromFaps({
+      proposalPks: proposalsToRemove.map(
+        (proposalToRemove) => proposalToRemove.proposalPk
+      ),
+      fapIds: [fap.id],
+    });
+
+    setFapProposalsData((fapProposalData) =>
+      fapProposalData.filter((proposalItem) =>
+        proposalsToRemove.every(
+          (proposalToRemove) =>
+            proposalToRemove.proposalPk !== proposalItem.proposalPk
+        )
+      )
+    );
+  };
+
+  const handleAssignMembersToFapProposals = async (
+    _: React.MouseEventHandler<HTMLButtonElement>,
+    proposalsToAssign: FapProposalType | FapProposalType[]
+  ): Promise<void> => {
+    if (!Array.isArray(proposalsToAssign)) {
+      return;
+    }
+
+    const proposalPksToAssign = proposalsToAssign.map((proposalToAssign) => {
+      return {
+        proposalPk: proposalToAssign.proposalPk,
+        proposalId: proposalToAssign.proposal.proposalId,
+      };
+    });
+    setProposals(proposalPksToAssign);
+  };
+
+  const handleBulkRemoveProposalsFromFap = async (
+    _: React.MouseEventHandler<HTMLButtonElement>,
+    proposalsToRemove: FapProposalType | FapProposalType[]
+  ): Promise<void> => {
+    if (!Array.isArray(proposalsToRemove)) {
+      return;
+    }
+    confirm(() => removeProposalsFromFap(proposalsToRemove), {
+      title: `Remove ${t('Fap')} assignment/s`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('Fap')}?`,
+    })();
+  };
+
   const initialValues: FapProposalType[] = FapProposalsData;
   const tableActions: Action<FapProposalType>[] = [];
-
+  hasRightToAssignReviewers &&
+    tableActions.push({
+      icon: () => <AssignmentInd data-cy="assign-fap-members" />,
+      tooltip: `Assign ${t('Fap')} members`,
+      onClick: handleAssignMembersToFapProposals,
+      position: 'toolbarOnSelect',
+    });
   tableActions.push({
     icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
     tooltip: 'Download proposals',
     onClick: handleBulkDownloadClick,
     position: 'toolbarOnSelect',
   });
+  hasRightToRemoveAssignedProposal &&
+    tableActions.push({
+      icon: () => <DeleteOutline data-cy="remove-assigned-fap-proposal" />,
+      tooltip: 'Remove assigned proposal',
+      onClick: handleBulkRemoveProposalsFromFap,
+      position: 'toolbarOnSelect',
+    });
 
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', FapProposalType>) => {
@@ -226,7 +314,7 @@ const FapLegacyProposalsTable = ({
           toastSuccessMessage: 'Reviewer removed',
         }).removeMemberFromFapProposal({
           proposalPk,
-          fapId: data.id,
+          fapId: fap.id,
           memberId: assignedReviewer.fapMemberUserId as number,
         });
 
@@ -251,9 +339,9 @@ const FapLegacyProposalsTable = ({
         );
 
         onAssignmentsUpdate({
-          ...data,
+          ...fap,
           fapChairsCurrentProposalCounts:
-            data.fapChairsCurrentProposalCounts.map((value) => {
+            fap.fapChairsCurrentProposalCounts.map((value) => {
               return {
                 userId: value.userId,
                 count:
@@ -263,7 +351,7 @@ const FapLegacyProposalsTable = ({
               };
             }),
           fapSecretariesCurrentProposalCounts:
-            data.fapSecretariesCurrentProposalCounts.map((value) => {
+            fap.fapSecretariesCurrentProposalCounts.map((value) => {
               return {
                 userId: value.userId,
                 count:
@@ -275,48 +363,22 @@ const FapLegacyProposalsTable = ({
         });
       };
 
-      const loadFapProposal = async (proposalPk: number) => {
-        return api()
-          .getFapProposal({ fapId: data.id, proposalPk })
-          .then((data) => {
-            return data.fapProposal;
-          });
-      };
-
-      const updateFapProposalAssignmentsView = async (proposalPk: number) => {
-        const refreshedFapProposal = await loadFapProposal(proposalPk);
-
-        if (refreshedFapProposal) {
-          setFapProposalsData((fapProposalsData) => {
-            return fapProposalsData.map((fapProposal) => ({
-              ...fapProposal,
-              proposal: {
-                ...fapProposal.proposal,
-                status:
-                  refreshedFapProposal.proposalPk === fapProposal.proposalPk
-                    ? refreshedFapProposal.proposal.status
-                    : fapProposal.proposal.status,
-              },
-              assignments:
-                refreshedFapProposal.proposalPk === fapProposal.proposalPk
-                  ? refreshedFapProposal.assignments
-                  : fapProposal.assignments,
-            }));
-          });
-        }
-      };
-
       return (
         <FapAssignedReviewersTable
           fapProposal={rowData}
-          fapSecs={data.fapSecretaries.map((user) => user.id)}
+          fapSecs={fap.fapSecretaries.map((user) => user.id)}
           removeAssignedReviewer={removeAssignedReviewer}
           updateView={updateFapProposalAssignmentsView}
-          editable={false}
         />
       );
     },
-    [setFapProposalsData, data, onAssignmentsUpdate, api]
+    [
+      fap,
+      updateFapProposalAssignmentsView,
+      api,
+      setFapProposalsData,
+      onAssignmentsUpdate,
+    ]
   );
 
   const FapProposalsWitIdAndFormattedDate = initialValues.map((fapProposal) =>
@@ -355,16 +417,25 @@ const FapLegacyProposalsTable = ({
             PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
             PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
           ]}
-          fapSec={data.fapSecretaries.map((user) => user.id)}
+          fapSec={fap.fapSecretaries.map((user) => user.id)}
         />
       </ProposalReviewModal>
+      <AssignFapMemberToProposalModal
+        proposals={proposals}
+        setProposals={setProposals}
+        fapId={fap.id}
+        assignMembersToFapProposals={(fm, p) => {
+          handleMemberAssignmentToFapProposals(fm, p);
+          setProposals([]);
+        }}
+      />
       <div data-cy="fap-assignments-table">
         <MaterialTable
           icons={tableIcons}
           columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${data.code} - ${t('Fap')} Proposals`}
+              {`${fap.code} - ${t('Fap')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}
@@ -428,4 +499,4 @@ const FapLegacyProposalsTable = ({
   );
 };
 
-export default withConfirm(FapLegacyProposalsTable);
+export default withConfirm(FapProposalsAndAssignmentsTable);

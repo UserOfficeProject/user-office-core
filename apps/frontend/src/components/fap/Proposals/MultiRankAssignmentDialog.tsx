@@ -20,7 +20,7 @@ import React, { ChangeEvent } from 'react';
 import { BasicUserDetails } from 'generated/sdk';
 import { getPreferredName } from 'utils/user';
 
-import { FapAssignedMember } from './AssignFapMemberToProposalModal';
+import { FapAssignedMember } from './ProposalsView/AssignFapMemberToProposalModal';
 
 type MultiRankAssignmentDialogProps = {
   users: BasicUserDetails[];
