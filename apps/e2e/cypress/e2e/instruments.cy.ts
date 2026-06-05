@@ -1011,9 +1011,9 @@ context('Instrument tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').eq(0).click();
-      cy.contains(
-        `${contactDisplayName} ${scientist2.lastName}`
-      ).should('be.visible');
+      cy.contains(`${contactDisplayName} ${scientist2.lastName}`).should(
+        'be.visible'
+      );
 
       cy.visit('/');
 
@@ -1028,9 +1028,9 @@ context('Instrument tests', () => {
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.contains(
-        `${contactDisplayName} ${scientist2.lastName}`
-      ).should('not.exist');
+      cy.contains(`${contactDisplayName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
     });
   });
 
