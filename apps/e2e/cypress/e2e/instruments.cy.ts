@@ -962,7 +962,12 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
-      const updatedContact = `${scientist2.preferredName} ${scientist2.lastName} (${scientist2.email})`;
+      const contactDisplayName = featureFlags
+        .getEnabledFeatures()
+        .get(FeatureId.USER_SEARCH_FILTER)
+        ? scientist2.preferredName
+        : scientist2.firstName;
+      const updatedContact = `${contactDisplayName} ${scientist2.lastName} (${scientist2.email})`;
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
@@ -1006,9 +1011,9 @@ context('Instrument tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').eq(0).click();
-      cy.contains(`${scientist2.preferredName} ${scientist2.lastName}`).should(
-        'be.visible'
-      );
+      cy.contains(
+        `${contactDisplayName} ${scientist2.lastName}`
+      ).should('be.visible');
 
       cy.visit('/');
 
@@ -1023,9 +1028,9 @@ context('Instrument tests', () => {
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.contains(`${scientist2.preferredName} ${scientist2.lastName}`).should(
-        'not.exist'
-      );
+      cy.contains(
+        `${contactDisplayName} ${scientist2.lastName}`
+      ).should('not.exist');
     });
   });
 
