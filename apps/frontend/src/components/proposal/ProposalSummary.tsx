@@ -1,4 +1,6 @@
 import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -14,6 +16,7 @@ import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { isCallEnded } from 'utils/helperFunctions';
+import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -140,64 +143,95 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   return (
     <>
       <ProposalQuestionaryReview data={proposal} />
-      <NavigationFragment
-        disabled={proposal.status?.id === ''}
-        isLoading={isSubmitting}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
       >
-        <NavigButton
-          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-          disabled={state.stepIndex === 0}
-          isBusy={isSubmitting}
+        <div style={{ display: 'inline-block', marginTop: 'auto' }}>
+          {proposal.submitted && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginLeft: '20px',
+                marginBottom: '8px',
+              }}
+            >
+              <Chip
+                label="Submitted"
+                color="success"
+                variant="outlined"
+                size="small"
+              />
+              <Typography sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
+                {timeAgo(proposal.submittedDate)}
+              </Typography>
+            </div>
+          )}
+        </div>
+        <NavigationFragment
+          disabled={proposal.status?.id === ''}
+          isLoading={isSubmitting}
         >
-          Back
-        </NavigButton>
-        <NavigButton
-          onClick={() => {
-            confirm(
-              async () => {
-                setIsSubmitting(true);
-                try {
-                  const { submitProposal } = await api({
-                    toastSuccessMessage: proposalSubmissionSuccessMessage,
-                  }).submitProposal({
-                    proposalPk: state.proposal.primaryKey,
-                  });
+          <NavigButton
+            onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+            disabled={state.stepIndex === 0}
+            isBusy={isSubmitting}
+          >
+            Back
+          </NavigButton>
+          <NavigButton
+            onClick={() => {
+              confirm(
+                async () => {
+                  setIsSubmitting(true);
+                  try {
+                    const { submitProposal } = await api({
+                      toastSuccessMessage: proposalSubmissionSuccessMessage,
+                    }).submitProposal({
+                      proposalPk: state.proposal.primaryKey,
+                    });
 
-                  const { proposal } = await api().getProposal({
-                    primaryKey: submitProposal.primaryKey,
-                  }); // refetching proposal after event handling is done in backend
+                    const { proposal } = await api().getProposal({
+                      primaryKey: submitProposal.primaryKey,
+                    }); // refetching proposal after event handling is done in backend
 
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: proposal!,
-                  });
-                } finally {
-                  setSubmitDisabled(true);
-                  setIsSubmitting(false);
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                      itemWithQuestionary: proposal!,
+                    });
+                  } finally {
+                    setSubmitDisabled(true);
+                    setIsSubmitting(false);
+                  }
+                },
+                {
+                  title: 'Please confirm',
+                  description: submitButtonMessage,
                 }
-              },
-              {
-                title: 'Please confirm',
-                description: submitButtonMessage,
-              }
-            )();
-          }}
-          disabled={submitDisabled}
-          isBusy={isSubmitting}
-          data-cy="button-submit-proposal"
-        >
-          {proposal.submitted ? '✔ Submitted' : 'Submit'}
-        </NavigButton>
-        <Button
-          onClick={() =>
-            downloadPDFProposal([proposal.primaryKey], proposal.title)
-          }
-          disabled={!allStepsComplete || isSubmitting}
-          color="secondary"
-        >
-          Download PDF
-        </Button>
-      </NavigationFragment>
+              )();
+            }}
+            disabled={submitDisabled}
+            isBusy={isSubmitting}
+            data-cy="button-submit-proposal"
+          >
+            {proposal.submitted ? '✔ Submitted' : 'Submit'}
+          </NavigButton>
+          <Button
+            onClick={() =>
+              downloadPDFProposal([proposal.primaryKey], proposal.title)
+            }
+            disabled={!allStepsComplete || isSubmitting}
+            color="secondary"
+          >
+            Download PDF
+          </Button>
+        </NavigationFragment>
+      </div>
     </>
   );
 }

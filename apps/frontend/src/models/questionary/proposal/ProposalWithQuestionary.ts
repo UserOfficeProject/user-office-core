@@ -22,6 +22,7 @@ export type ProposalWithQuestionary = Pick<
   | 'callId'
   | 'questionaryId'
   | 'submitted'
+  | 'submittedDate'
 > & {
   call?: Maybe<
     Pick<
