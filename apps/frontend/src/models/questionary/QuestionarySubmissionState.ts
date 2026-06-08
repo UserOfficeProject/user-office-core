@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import produce, { Draft } from 'immer';
+import { Draft, produce } from 'immer';
 import { Reducer } from 'react';
 
 import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
