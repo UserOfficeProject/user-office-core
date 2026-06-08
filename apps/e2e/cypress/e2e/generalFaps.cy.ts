@@ -714,7 +714,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
       const fileName2 = 'pdf_3_pages.pdf';
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -747,7 +747,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName2).should('exist');
 
       // Files persist after reload
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.contains(fileName1).should('exist');
       cy.contains(fileName2).should('exist');
@@ -758,7 +758,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName2).should('not.exist');
 
       // Files removed after reload
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.contains(fileName1).should('not.exist');
       cy.contains(fileName2).should('not.exist');
@@ -783,7 +783,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -828,7 +828,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -870,7 +870,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',

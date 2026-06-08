@@ -24,7 +24,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getPreferredName } from 'utils/user';
 
-import RankInputModal from './RankInputModal';
+import RankInputModal from '../RankInputModal';
 
 type FapAssignedReviewersTableProps = {
   fapProposal: FapProposalType;
