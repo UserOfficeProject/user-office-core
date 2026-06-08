@@ -114,8 +114,8 @@
     "@types/sanitize-html": "^2.6.2",
     "@types/simple-oauth2": "^4.1.1",
     "@types/sinon": "^21.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.46.3",
-    "@typescript-eslint/parser": "^8.46.2",
+    "@typescript-eslint/eslint-plugin": "^8.60.1",
+    "@typescript-eslint/parser": "^8.60.1",
     "@user-office-software/uows_client_generator": "^3.1.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
@@ -131,7 +131,7 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3",
-    "typescript-eslint": "^8.46.3"
+    "typescript-eslint": "^8.60.1"
   },
   "engines": {
     "npm": ">=10.9.2",
