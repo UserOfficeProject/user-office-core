@@ -371,6 +371,8 @@ export default function ExperimentsTable({
         columns={columns}
         data={fetchExperimentsData}
         options={{
+          search: true,
+          debounceInterval: 600,
           searchText: search || undefined,
           selection: isUserOfficer,
           pageSize: pageSize ? +pageSize : 10,
