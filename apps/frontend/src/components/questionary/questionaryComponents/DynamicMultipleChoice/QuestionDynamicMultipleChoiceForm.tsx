@@ -21,7 +21,7 @@ import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
 import { Field } from 'formik';
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
@@ -30,12 +30,11 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import {
-  SettingsId,
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
 } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { urlValidationSchema } from 'utils/helperFunctions';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -135,7 +134,21 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
   const [isBaseURLCheckBoxPopupOpen, setIsBaseURLCheckBoxPopupOpen] =
     useState(false);
 
-  const { settingsMap } = useContext(SettingsContext);
+  const api = useDataApi();
+  const [serverConfig, setServerConfig] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const { ServerConfig } = await api().getServerConfig();
+        setServerConfig(ServerConfig.baseURL);
+      } catch (err) {
+        console.error('Failed to fetch server config', err);
+      }
+    };
+
+    fetchConfig();
+  }, [api]);
 
   return (
     <QuestionFormShell
@@ -241,7 +254,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                       paddingTop: '20px',
                     }}
                   >
-                    {`http://${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
+                    {`http://${serverConfig}/`}
                   </span>
                 )}
 

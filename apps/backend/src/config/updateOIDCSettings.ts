@@ -23,9 +23,4 @@ export async function updateOIDCSettings() {
     settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
     settingsValue: logoutUrl,
   });
-
-  await db.updateSettings({
-    settingsId: SettingsId.BASE_URL,
-    settingsValue: process.env.BASE_URL,
-  });
 }

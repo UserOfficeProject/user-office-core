@@ -11,7 +11,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
@@ -20,12 +20,11 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
-  SettingsId,
 } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
@@ -62,7 +61,22 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
   ];
 
   const urlValidation = urlValidationSchema();
-  const { settingsMap } = useContext(SettingsContext);
+
+  const api = useDataApi();
+  const [serverConfig, setServerConfig] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const { ServerConfig } = await api().getServerConfig();
+        setServerConfig(ServerConfig.baseURL);
+      } catch (err) {
+        console.error('Failed to fetch server config', err);
+      }
+    };
+
+    fetchConfig();
+  }, [api]);
 
   return (
     <QuestionTemplateRelationFormShell
@@ -142,7 +156,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                       paddingTop: '20px',
                     }}
                   >
-                    {`http://${settingsMap.get(SettingsId.BASE_URL)?.settingsValue}/`}
+                    {`http://${serverConfig}/`}
                   </span>
                 )}
 
