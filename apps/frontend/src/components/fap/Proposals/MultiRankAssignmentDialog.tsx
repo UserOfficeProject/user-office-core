@@ -18,8 +18,9 @@ import { useTheme } from '@mui/material/styles';
 import React, { ChangeEvent } from 'react';
 
 import { BasicUserDetails } from 'generated/sdk';
+import { getPreferredName } from 'utils/user';
 
-import { FapAssignedMember } from './AssignFapMemberToProposalModal';
+import { FapAssignedMember } from './ProposalsView/AssignFapMemberToProposalModal';
 
 type MultiRankAssignmentDialogProps = {
   users: BasicUserDetails[];
@@ -94,7 +95,7 @@ export const MultiRankAssignmentDialog = ({
                   }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.preferredname ? row.preferredname : row.firstname}
+                    {getPreferredName(row)}
                   </TableCell>
                   <TableCell align="left">{row.lastname}</TableCell>
                   <TableCell align="right">
