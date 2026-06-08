@@ -85,11 +85,11 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: Yup.string().when('useBaseDomain', (useBaseDomain, schema) =>
-            useBaseDomain
-              ? schema.concat(pathNameValidationSchema)
-              : schema.concat(urlValidation)
-          ),
+          url: Yup.string().when('useBaseDomain', {
+            is: true,
+            then: (schema) => schema.concat(pathNameValidationSchema),
+            otherwise: (schema) => schema.concat(urlValidation),
+          }),
         }),
       })}
     >
@@ -177,6 +177,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                   type="checkbox"
                   component={CheckboxWithLabel}
                   Label={{ label: 'Use base domain for dynamic URL' }}
+                  checked={useBaseDomain}
                   data-cy="use-base-domain"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const checked = e.target.checked;
