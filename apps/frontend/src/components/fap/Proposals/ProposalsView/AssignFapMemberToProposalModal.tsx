@@ -8,8 +8,9 @@ import React, { useEffect, useState } from 'react';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
+import { getPreferredName } from 'utils/user';
 
-import { MultiRankAssignmentDialog } from './MultiRankAssignmentDialog';
+import { MultiRankAssignmentDialog } from '../MultiRankAssignmentDialog';
 
 export type FapAssignedMember = BasicUserDetails & {
   role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
@@ -18,11 +19,14 @@ export type FapAssignedMember = BasicUserDetails & {
 
 type AssignFapMemberToProposalModalProps = {
   proposals: { proposalPk: number; proposalId: string }[];
-  setProposalPks: React.Dispatch<
+  setProposals: React.Dispatch<
     React.SetStateAction<{ proposalPk: number; proposalId: string }[]>
   >;
   fapId: number;
-  assignMembersToFapProposals: (assignedMembers: FapAssignedMember[]) => void;
+  assignMembersToFapProposals: (
+    assignedMembers: FapAssignedMember[],
+    proposalPks: number[]
+  ) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
 };
 
@@ -31,8 +35,7 @@ const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 const columns = [
   {
     title: 'Name',
-    render: (rowData: FapAssignedMember) =>
-      rowData.preferredname ? rowData.preferredname : rowData.firstname,
+    render: (rowData: FapAssignedMember) => getPreferredName(rowData),
   },
   { title: 'Surname', field: 'lastname' },
   { title: 'Proposal Count', field: 'proposalsCountByCall' },
@@ -47,7 +50,7 @@ const AssignFapMemberToProposalModal = ({
   assignMembersToFapProposals,
   fapId,
   proposals,
-  setProposalPks,
+  setProposals,
 }: AssignFapMemberToProposalModalProps) => {
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
@@ -76,7 +79,7 @@ const AssignFapMemberToProposalModal = ({
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
       open={proposals.length > 0}
-      onClose={(): void => setProposalPks([])}
+      onClose={(): void => setProposals([])}
     >
       <DialogContent>
         <PeopleTable
@@ -88,7 +91,10 @@ const AssignFapMemberToProposalModal = ({
           columns={columns}
           search
           onUpdate={(members: FapAssignedMember[]) =>
-            assignMembersToFapProposals(members)
+            assignMembersToFapProposals(
+              members,
+              proposals.map((p) => p.proposalPk)
+            )
           }
           selectedParticipants={selectedParticipants}
           setSelectedParticipants={setSelectedParticipants}
@@ -104,7 +110,12 @@ const AssignFapMemberToProposalModal = ({
         </Box>
         <Button
           type="button"
-          onClick={() => assignMembersToFapProposals(selectedParticipants)}
+          onClick={() =>
+            assignMembersToFapProposals(
+              selectedParticipants,
+              proposals.map((p) => p.proposalPk)
+            )
+          }
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >
@@ -126,7 +137,12 @@ const AssignFapMemberToProposalModal = ({
             users={selectedParticipants ? selectedParticipants : []}
             open={rankSelectorOpen}
             setOpen={setRankSelectorOpen}
-            assign={assignMembersToFapProposals}
+            assign={(users) =>
+              assignMembersToFapProposals(
+                users,
+                proposals.map((p) => p.proposalPk)
+              )
+            }
           />
         )}
       </DialogActions>

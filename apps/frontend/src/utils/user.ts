@@ -1,21 +1,17 @@
 import { BasicUserDetails } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
-export const getFullUserName = (
-  user?: Pick<BasicUserDetails, 'firstname' | 'lastname'> | null
-): string => (user ? `${user.firstname} ${user.lastname}` : 'None');
+export const getPreferredName = (
+  user: Pick<BasicUserDetails, 'firstname'> & { preferredname?: string | null }
+): string => user.preferredname || user.firstname;
 
-export const getUserPreferredName = (
-  user?: Pick<
-    BasicUserDetails,
-    'firstname' | 'lastname' | 'preferredname'
-  > | null
-): string =>
-  user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname}`
-      : `${user.firstname} ${user.lastname}`
-    : 'None';
+export const getFullUserName = (
+  user?:
+    | (Pick<BasicUserDetails, 'firstname' | 'lastname'> & {
+        preferredname?: string | null;
+      })
+    | null
+): string => (user ? `${getPreferredName(user)} ${user.lastname}` : 'None');
 
 export const getFullUserNameWithEmail = (
   user?: Pick<
@@ -24,26 +20,14 @@ export const getFullUserNameWithEmail = (
   > | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        }`
-      : `${user.firstname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        }`
+    ? `${getPreferredName(user)} ${user.lastname} ${user.email ? `(${user.email})` : ''}`
     : 'None';
 
 export const getFullUserNameWithInstitution = (
   user?: BasicUserData | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname}; ${
-          user.institution ? `${user.institution}` : ''
-        }`
-      : `${user.firstname} ${user.lastname}; ${
-          user.institution ? `${user.institution}` : ''
-        }`
+    ? `${getPreferredName(user)} ${user.lastname}; ${user.institution ? `${user.institution}` : ''}`
     : 'None';
 
 export const getFullUserNameWithBasicDetails = (
@@ -58,15 +42,9 @@ export const getFullUserNameWithBasicDetails = (
   > | null
 ): string =>
   user
-    ? user.preferredname
-      ? `${user.preferredname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        } ${user.institution ? `(${user.institution})` : ''} ${
-          user.country ? `(${user.country})` : ''
-        }`
-      : `${user.firstname} ${user.lastname} ${
-          user.email ? `(${user.email})` : ''
-        } ${user.institution ? `(${user.institution})` : ''} ${
-          user.country ? `(${user.country})` : ''
-        }`
+    ? `${getPreferredName(user)} ${user.lastname} ${
+        user.email ? `(${user.email})` : ''
+      } ${user.institution ? `(${user.institution})` : ''} ${
+        user.country ? `(${user.country})` : ''
+      }`
     : 'None';
