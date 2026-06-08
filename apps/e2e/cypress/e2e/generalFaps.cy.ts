@@ -238,17 +238,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedChairUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedChairUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedChairUserFirstName = preferredName || cells.eq(0).text();
+          selectedChairUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
@@ -279,17 +272,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedSecretaryUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedSecretaryUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
+          selectedSecretaryUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
@@ -322,17 +308,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedSecretaryUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedSecretaryUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
+          selectedSecretaryUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
