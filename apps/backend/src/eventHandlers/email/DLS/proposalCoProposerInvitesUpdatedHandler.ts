@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
-import { getUASInstance } from '../../../config/dls/configureDLSEnvironment';
 import { Tokens } from '../../../config/Tokens';
 import { EmailTemplateDataSource } from '../../../datasources/EmailTemplateDataSource';
 import { InviteDataSource } from '../../../datasources/InviteDataSource';
@@ -63,7 +62,6 @@ export async function proposalCoProposerInvitesUpdatedHandler(
         sender: inviter.preferredname + ' ' + inviter.lastname,
         redeem_code: invite.code,
         uos_instance: process.env.BASE_URL,
-        uas_instance: getUASInstance(),
       },
       recipients: [{ address: invite.email }],
     };

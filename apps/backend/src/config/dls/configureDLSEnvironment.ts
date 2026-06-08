@@ -7,15 +7,6 @@ import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 import { updateOIDCSettings } from '../updateOIDCSettings';
 
-function getUASInstance() {
-  let instance = process.env.UAS_INSTANCE || 'https://uas.diamond.ac.uk/uas';
-  if (instance.endsWith('/')) {
-    instance = instance.slice(0, -1);
-  }
-
-  return instance;
-}
-
 function getBaseURL() {
   let url = process.env.BASE_URL || 'https://uos.diamond.ac.uk';
   if (url.endsWith('/')) {
@@ -145,7 +136,7 @@ async function enableDefaultDLSFeatures() {
     }),
     db.updateSettings({
       settingsId: SettingsId.PROFILE_PAGE_LINK,
-      settingsValue: getUASInstance() + '/#PersonalDetailsPlace:',
+      settingsValue: 'https://uas.diamond.ac.uk/uas/#PersonalDetailsPlace:',
     }),
   ]);
 }
@@ -160,4 +151,4 @@ async function configureDLSEnvironment() {
   ]);
 }
 
-export { configureDLSEnvironment, getUASInstance, getBaseURL };
+export { configureDLSEnvironment, getBaseURL };
