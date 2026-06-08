@@ -150,7 +150,9 @@ const ChangeExperimentSafetyStatus = ({
                     selectedStatusId={
                       experimentStatuses.find(
                         (s) =>
-                          s.workflowStatusId === values.selectedWorkflowStatusId
+                          s.workflowStatusId ===
+                          (values.selectedWorkflowStatusId ||
+                            selectedExperimentsWorkflowStatus)
                       )?.status.id
                     }
                     onNodeClicked={(statusId, workflowStatusId) => {

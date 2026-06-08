@@ -347,5 +347,221 @@ context('Experiments tests', () => {
         }
       });
     });
+
+    it('User officer should see experiment status as a clickable link', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.finishedLoading();
+
+      // Find the status column cell that contains ESF text and verify it's clickable
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .find('a, button')
+        .should('exist')
+        .and('include.text', 'ESF');
+    });
+
+    it('Instrument scientist should see experiment status as plain text, not clickable', () => {
+      cy.login('instrumentScientist1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // Find the status column cell and verify it has no clickable elements
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .then(($cell) => {
+          // Should contain ESF text
+          cy.wrap($cell).should('include.text', 'ESF');
+          // Should NOT have any clickable links or buttons
+          cy.wrap($cell).find('a, button').should('not.exist');
+        });
+    });
+
+    it('User officer should be able to open and change experiment safety status', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.finishedLoading();
+
+      // Click on the status cell (which should be clickable for officer)
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .find('a, button')
+        .click();
+      cy.finishedLoading();
+
+      // Verify the modal opened with the workflow tree
+      cy.get('[role="presentation"]').should(
+        'contain',
+        'Change experiment(s) safety status'
+      );
+      cy.get('.MuiDialogContent-root').should('exist');
+
+      // Verify the status selection dropdown exists and is enabled
+      cy.get('#selectedWorkflowStatusId-input').should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+    });
+
+    it('Instrument scientist should not be able to click on status to open change status modal', () => {
+      cy.login('instrumentScientist1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // The status cell should be plain text (no clickable elements)
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .then(($cell) => {
+          // Verify it's not a button or link
+          cy.wrap($cell).find('a, button').should('not.exist');
+        });
+
+      // Verify the change status modal is NOT present (check for specific modal title)
+      cy.contains('Change experiment(s) safety status').should('not.exist');
+    });
+
+    it('Instrument scientist should not see change status button in toolbar', () => {
+      cy.login('instrumentScientist1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // Non-officers don't have checkboxes, so the change status button should not exist
+      cy.get('[data-cy=change-experiment-safety-status]').should('not.exist');
+    });
+
+    it('Experiment safety reviewer should see experiment status as plain text, not clickable', () => {
+      cy.login('experimentSafetyReviewer1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // Find the status column cell and verify it has no clickable elements
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .then(($cell) => {
+          // Should contain ESF text
+          cy.wrap($cell).should('include.text', 'ESF');
+          // Should NOT have any clickable links or buttons
+          cy.wrap($cell).find('a, button').should('not.exist');
+        });
+    });
+
+    it('Experiment safety reviewer should not be able to click on status to open change status modal', () => {
+      cy.login('experimentSafetyReviewer1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // The status cell should be plain text (no clickable elements)
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .then(($cell) => {
+          // Verify it's not a button or link
+          cy.wrap($cell).find('a, button').should('not.exist');
+        });
+
+      // Verify the change status modal is NOT present (check for specific modal title)
+      cy.contains('Change experiment(s) safety status').should('not.exist');
+    });
+
+    it('Experiment safety reviewer should not see change status button in toolbar', () => {
+      cy.login('experimentSafetyReviewer1');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // Non-officers don't have checkboxes, so the change status button should not exist
+      cy.get('[data-cy=change-experiment-safety-status]').should('not.exist');
+    });
+
+    it('User officer should see status action logs after changing experiment status', () => {
+      cy.login('officer');
+      cy.visit('/experiments');
+      cy.finishedLoading();
+
+      // Click the status link to open the change status modal
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .contains('ESF')
+        .closest('td')
+        .find('a, button')
+        .click({ force: true });
+      cy.finishedLoading();
+
+      // Modal for changing status should appear
+      cy.contains('Change experiment(s) safety status').should('exist');
+
+      // Click the status selection dropdown and select the second status (which has status actions)
+      cy.get('[data-cy=status-selection]').should('exist');
+
+      // Find the input field within the autocomplete component and click it
+      cy.get('[data-cy=status-selection] input').click();
+
+      // Wait for the dropdown to appear and select the second option
+      cy.get('[role="listbox"]').should('be.visible');
+      cy.get('[role="option"]').eq(1).click();
+
+      // Click submit button to change status
+      cy.get('[data-cy=submit-experiment-status-change]').click();
+      cy.finishedLoading();
+
+      // Verify success notification
+      cy.notification({
+        variant: 'success',
+        text: 'status changed successfully',
+      });
+
+      // Wait for modal to close
+      cy.contains('Change experiment(s) safety status').should('not.exist');
+      cy.finishedLoading();
+
+      // Now open experiment details to check the logs
+      cy.get('[data-cy=experiments-table] tbody tr')
+        .first()
+        .find('[data-cy=view-experiment]')
+        .click();
+      cy.finishedLoading();
+
+      // Experiment details modal should be open
+      cy.get('[role="presentation"]').should('exist');
+
+      // Click on the Logs tab
+      cy.get('[role="tab"]').contains(/Logs/i).should('exist').click();
+      cy.finishedLoading();
+
+      // Verify that event logs table is displayed
+      cy.get('[data-cy="event-logs-table"]').should('exist');
+
+      // Verify the logs are not empty and contain status action entries
+      cy.get('[data-cy="event-logs-table"] tbody tr').should(
+        'have.length.at.least',
+        1
+      );
+
+      // Verify the logs contain the expected status action messages
+      cy.get('[data-cy="event-logs-table"]')
+        .invoke('text')
+        .then((tableText) => {
+          // Should contain email status action log entries
+          // The logs show: Email successfully sent template: [template-name] to: [email] recipient: [recipient-type]
+          expect(tableText).to.contain('Email successfully sent template');
+          // Should also contain RabbitMQ action log entries
+          // The logs show: RabbitMQ message successfully sent
+          expect(tableText).to.contain(
+            'Experiment event successfully sent to the message broker'
+          );
+        });
+    });
   });
 });

@@ -481,7 +481,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
-    it.only('Table selection and parameters should be saved between tab navigation', () => {
+    it('Table selection and parameters should be saved between tab navigation', () => {
       for (let index = 0; index < 6; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
           const createdProposal = result.createProposal;

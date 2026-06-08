@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Link,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -80,6 +81,7 @@ export default function ExperimentsTable({
     openChangeExperimentSafetyStatus,
     setOpenChangeExperimentSafetyStatus,
   ] = useState(false);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const getSelectedExperimentsData = useCallback(
     () =>
@@ -262,6 +264,43 @@ export default function ExperimentsTable({
         : undefined
   );
 
+  // Make the status column clickable to open the workflow tree (only for user officers)
+  columns = columns.map((column) => {
+    if (column.field === 'experimentSafety.status.name') {
+      return {
+        ...column,
+        render: (rowData: Experiment) =>
+          isUserOfficer ? (
+            <Link
+              component="button"
+              variant="body2"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+                setSearchParams((searchParams) => {
+                  searchParams.delete('selection');
+                  searchParams.append(
+                    'selection',
+                    rowData.experimentPk.toString()
+                  );
+
+                  return searchParams;
+                });
+                setOpenChangeExperimentSafetyStatus(true);
+              }}
+            >
+              {rowData.experimentSafety?.status?.name ?? 'ESF Not Started'}
+            </Link>
+          ) : (
+            <span>
+              {rowData.experimentSafety?.status?.name ?? 'ESF Not Started'}
+            </span>
+          ),
+      };
+    }
+
+    return column;
+  });
+
   const experimentReviewTabs = [
     EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
     EXPERIMENT_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -269,8 +308,6 @@ export default function ExperimentsTable({
     EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_REVIEW,
     EXPERIMENT_MODAL_TAB_NAMES.VISIT,
   ];
-
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (isUserOfficer) {
     experimentReviewTabs.push(EXPERIMENT_MODAL_TAB_NAMES.LOGS);

@@ -2,10 +2,10 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { experimentSafetyStatusActionEngine } from './statusActionEngine';
-import { experimentSafetyStatusActionEngine } from './statusActionEngine';
 import { Tokens } from '../../../config/Tokens';
 import { CallDataSource } from '../../../datasources/CallDataSource';
 import { ExperimentDataSource } from '../../../datasources/ExperimentDataSource';
+import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../../../events';
 import { Event } from '../../../events/event.enum';
