@@ -1265,6 +1265,11 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: templateName,
+      }).then(({ createTemplate: newTemplate }) => {
+        cy.setActiveTemplate({
+          templateGroupId: TemplateGroupId.VISIT_REGISTRATION,
+          templateId: newTemplate.templateId,
+        });
       });
 
       cy.createVisit({
@@ -1305,7 +1310,7 @@ context('Template Delete, Archive, Unarchive', () => {
         this.skip();
     });
 
-    it('Generic Template can be deleted if it is not associated with any Questionary', () => {
+    it('Visit Template can be deleted if it is not associated with any Questionary', () => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: templateName,
@@ -1314,13 +1319,13 @@ context('Template Delete, Archive, Unarchive', () => {
       shouldDeleteTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Generic Template can not be deleted if it is associated with any Questionary', () => {
+    it('Visit Template can not be deleted if it is associated with any Questionary', () => {
       createVisit();
 
       shouldNotDeleteTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Archived Generic Template can be deleted if it is not associated with any Questionary', () => {
+    it('Archived Visit Template can be deleted if it is not associated with any Questionary', () => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: templateName,
@@ -1329,19 +1334,19 @@ context('Template Delete, Archive, Unarchive', () => {
       shouldDeleteArchivedTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Archived Generic Template can not be deleted if it is associated with any Questionary', () => {
+    it('Archived Visit Template can not be deleted if it is associated with any Questionary', () => {
       createVisit();
 
       shouldNotDeleteArchivedTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Generic Template can be archived if it is associated with a Questionary', () => {
+    it('Visit Template can be archived if it is associated with a Questionary', () => {
       createVisit();
 
       shouldArchiveTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Generic Template can be archived if it is not associated with a Questionary', () => {
+    it('Visit Template can be archived if it is not associated with a Questionary', () => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: templateName,
@@ -1350,13 +1355,13 @@ context('Template Delete, Archive, Unarchive', () => {
       shouldArchiveTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Generic Template can be unarchived if archived and associated with a Questionary', () => {
+    it('Visit Template can be unarchived if archived and associated with a Questionary', () => {
       createVisit();
 
       shouldUnarchiveArchivedTemplate(templateName, '/VisitTemplates');
     });
 
-    it('Generic Template can be unarchived if archived and not associated with a Questionary', () => {
+    it('Visit Template can be unarchived if archived and not associated with a Questionary', () => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: templateName,

@@ -63,7 +63,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserName, getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -110,21 +110,10 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Principal Investigator',
     field: 'principalInvestigator',
     emptyValue: '-',
-    render: (proposalView) => {
-      if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.preferredname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-      } else if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.firstname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
-      }
-
-      return '';
-    },
+    render: (proposalView) =>
+      proposalView.principalInvestigator?.lastname
+        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+        : '',
   },
   {
     title: 'PI Email',

@@ -160,7 +160,7 @@ context('Internal Review tests', () => {
     }
 
     cy.get('[data-cy="internal-reviewer-options"]')
-      .contains(scientist2.firstName)
+      .contains(scientist2.preferredName)
       .click();
 
     cy.setTinyMceContent('internal_review_comment', comment);
@@ -170,7 +170,9 @@ context('Internal Review tests', () => {
     cy.notification({ variant: 'success', text: 'success' });
 
     cy.get('[data-cy="internal-reviews-table"]').contains(title);
-    cy.get('[data-cy="internal-reviews-table"]').contains(scientist2.firstName);
+    cy.get('[data-cy="internal-reviews-table"]').contains(
+      scientist2.preferredName
+    );
   });
 
   it('User Officer should be able to update an internal review', () => {
@@ -227,7 +229,7 @@ context('Internal Review tests', () => {
       .click();
 
     cy.get('[data-cy="internal-reviewer-options"]')
-      .contains(scientist2.firstName)
+      .contains(scientist2.preferredName)
       .click();
 
     cy.get('[data-cy="create-modal"]').find('[data-cy="submit"]').click();
@@ -235,7 +237,9 @@ context('Internal Review tests', () => {
     cy.notification({ variant: 'success', text: 'success' });
 
     cy.get('[data-cy="internal-reviews-table"]').contains(newTitle);
-    cy.get('[data-cy="internal-reviews-table"]').contains(scientist2.firstName);
+    cy.get('[data-cy="internal-reviews-table"]').contains(
+      scientist2.preferredName
+    );
   });
 
   it('User Officer should be able to delete internal review', () => {
