@@ -8,6 +8,7 @@ import { EventLog } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
 import { tableIcons } from 'utils/materialIcons';
+import { getPreferredName } from 'utils/user';
 
 type EventLogListProps = {
   /** Id of the changed object that we want to list event logs for. */
@@ -25,7 +26,7 @@ const columns: Column<EventLog>[] = [
     title: 'Changed by',
     render: (rowData: EventLog): string =>
       rowData.changedBy
-        ? `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`
+        ? `${getPreferredName(rowData.changedBy)} ${rowData.changedBy.lastname}`
         : 'System',
   },
   {
