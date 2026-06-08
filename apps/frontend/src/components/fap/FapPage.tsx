@@ -16,8 +16,9 @@ import FapFilesView from './Files/FapFilesView';
 import FapGeneralInfo from './General/FapGeneralInfo';
 import FapMeetingComponentsView from './MeetingComponents/FapMeetingComponentsView';
 import FapMembers from './Members/FapMembers';
-import FapProposalsAndAssignmentsView from './Proposals/FapProposalsAndAssignmentsView';
-import LegacyFapProposals from './Proposals/LegacyFapProposals';
+import FapProposalsAndAssignmentsView from './Proposals/ProposalsView/FapProposalsAndAssignmentsView';
+import LegacyFapProposals from './Proposals/ProposalsView/LegacyFapProposals';
+import FapReviewersAndAssignmentsView from './Proposals/ReviewersView/FapReviewersAndAssignmentsView';
 
 const FapPage = () => {
   const { id } = useParams();
@@ -116,6 +117,20 @@ const FapPage = () => {
         name: 'Proposals and Assignments',
         element: (
           <FapProposalsAndAssignmentsView
+            data={fap}
+            onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+            fapProposals={{
+              loadingFapProposals,
+              FapProposalsData,
+              setFapProposalsData,
+            }}
+          />
+        ),
+      },
+      {
+        name: 'Reviewers and Assignments',
+        element: (
+          <FapReviewersAndAssignmentsView
             data={fap}
             onFapUpdate={(newFap: Fap): void => setFap(newFap)}
             fapProposals={{
