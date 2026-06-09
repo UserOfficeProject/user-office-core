@@ -326,6 +326,7 @@ function QuestionaryStepView(props: {
                   {createQuestionaryComponent({
                     answer: field,
                     formikProps,
+                    templateId: state.questionary.templateId || undefined,
                     onComplete: (newValue: Answer['value']) => {
                       if (field.value !== newValue) {
                         dispatch({

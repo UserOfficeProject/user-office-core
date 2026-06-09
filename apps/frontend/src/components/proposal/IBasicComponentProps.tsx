@@ -7,4 +7,5 @@ export interface BasicComponentProps {
   answer: Answer;
   formikProps: FormikProps<any>;
   onComplete: (newValue: Answer['value']) => void;
+  templateId?: number;
 }

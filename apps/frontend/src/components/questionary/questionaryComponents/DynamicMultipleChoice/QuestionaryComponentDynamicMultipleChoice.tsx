@@ -34,7 +34,10 @@ export function QuestionaryComponentDynamicMultipleChoice(
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
 
-  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(id);
+  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(
+    id,
+    props.templateId
+  );
   const [stateValue, setStateValue] = useState<Array<string>>([]);
 
   useEffect(() => {

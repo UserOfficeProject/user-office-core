@@ -63,7 +63,11 @@ const extractSearchableQuestions = (
     ); // only searchable questions
 };
 
-function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
+function QuestionaryFilter({
+  onSubmit,
+  templateId,
+  callId,
+}: QuestionaryFilterProps) {
   const { loading: isLoadingQuestionarySteps, questionarySteps } =
     useBlankQuestionaryStepsDataByCallId(callId);
 
@@ -159,6 +163,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
               }}
               questionTemplateRelation={selectedQuestion}
               callId={callId}
+              templateId={templateId}
             />
           )}
         </Collapse>
