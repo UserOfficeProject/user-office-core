@@ -17,4 +17,5 @@ export enum EmailTemplateId {
   INTERNAL_REVIEW_DELETED = 'internal-review-deleted',
   CALL_CREATED_EMAIL = 'call-created-email',
   FEEDBACK_REQUEST = 'feedback-request',
+  CO_PROPOSER_INVITE = 'co-proposer-invite',
 }
