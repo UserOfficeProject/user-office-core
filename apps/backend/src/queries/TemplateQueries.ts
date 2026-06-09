@@ -103,6 +103,7 @@ export default class TemplateQueries {
     templateId?: number
   ) {
     let question: Question | QuestionTemplateRelation | null = null;
+
     if (templateId) {
       question = await this.dataSource.getQuestionTemplateRelation(
         questionId,
