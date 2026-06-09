@@ -6,7 +6,12 @@ import { Tokens } from '../config/Tokens';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { Question, TemplateGroupId, TemplateStep } from '../models/Template';
+import {
+  Question,
+  QuestionTemplateRelation,
+  TemplateGroupId,
+  TemplateStep,
+} from '../models/Template';
 import { UserWithRole } from '../models/User';
 import {
   AllQuestionsFilterArgs,
@@ -94,9 +99,19 @@ export default class TemplateQueries {
   @Authorized()
   async getDynamicMultipleChoiceOptions(
     user: UserWithRole | null,
-    questionId: string
+    questionId: string,
+    templateId?: number
   ) {
-    const question = await this.dataSource.getQuestion(questionId);
+    let question: Question | QuestionTemplateRelation | null = null;
+    if (templateId) {
+      question = await this.dataSource.getQuestionTemplateRelation(
+        questionId,
+        templateId
+      );
+    } else {
+      question = await this.dataSource.getQuestion(questionId);
+    }
+
     if (!question) return [];
 
     const config = question.config as DynamicMultipleChoiceConfig;
