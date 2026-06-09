@@ -103,6 +103,24 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
         'Welcome to Our Service',
         'Hello, thank you for signing up for our service. We are excited to have you on board!'
       ),
+      new EmailTemplate(
+        10,
+        1,
+        EmailTemplateId.PROPOSAL_SUBMITTED,
+        'This is a dummy email template for testing purposes.',
+        false,
+        'Proposal Submitted',
+        'Proposal submitted body text'
+      ),
+      new EmailTemplate(
+        11,
+        1,
+        EmailTemplateId.CO_PROPOSER_INVITE,
+        'This is a dummy email template for testing purposes.',
+        false,
+        'Co-Proposer Invite',
+        'You have been invited to be a co-proposer on a proposal.'
+      ),
     ];
   }
 
