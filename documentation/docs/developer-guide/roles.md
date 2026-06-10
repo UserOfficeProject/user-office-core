@@ -29,7 +29,7 @@ The current root roles are:
 | Instrument Scientist | `instrument_scientist` | Responsible for instruments; sees proposals tied to their instruments/techniques. |
 | Experiment Safety Reviewer | `experiment_safety_reviewer` | Reviews the safety of proposed experiments. |
 | Internal Reviewer | `internal_reviewer` | Reviews technical/internal aspects of assigned proposals. |
-| Proposal Reader | `proposal_reader` | Role that is intended for |
+| Proposal Reader | `proposal_reader` | Role that is intended for set of users who need same level of read access as user officer but without possibility to alter the data |
 
 
 _________________________________________________________________________________________________________
