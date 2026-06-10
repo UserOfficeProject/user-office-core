@@ -9,7 +9,8 @@ export const getSecondsFromAllocationTimeUnits: AllocationTimeUnitConverter = (
   timeAllocation: number,
   unit: AllocationTimeUnits
 ) => {
-  // NOTE: Default AllocationTimeUnit is 'Day'. The UI supports Days and Hours.
+  // NOTE: Default AllocationTimeUnit is 'Day'.
+  // 'Shift' is configurable per organisation; it defaults to 8 hours here.
   switch (unit) {
     case AllocationTimeUnits.Hour:
       return timeAllocation * 60 * 60;
