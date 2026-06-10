@@ -47,7 +47,7 @@ The Extreme Light Infrastructure (ELI) is the world's largest and most advanced 
 
 ![DLS Logo](assets/images/DLS_logo.jpg){ align=left, width="150" } 
 
-Diamond Light Source (DLS) is the UK's national synchrotron science facility, located at the Harwell Science and Innovation Campus in Oxfordshire. DLS joined the collaboration in 2025 and is working towards fully incorporating the application to manage user office processes.
+Diamond Light Source Limited (DLS) is the United Kingdom’s national synchrotron. It is located on the Harwell Science and Innovation Campus in South Oxfordshire. DLS joined the Collaboration in 2025 and is working towards fully incorporating the application to manage user office processes.
 _________________________________________________________________________________________________________
 
 ## Quickstart
