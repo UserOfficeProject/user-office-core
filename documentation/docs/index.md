@@ -42,7 +42,6 @@ The Science and Technology Facilities Council (STFC) joined the collaboration wi
 
 The Extreme Light Infrastructure (ELI) is the world's largest and most advanced high-power laser infrastructure. They are a global technology and innovation leader in high-power, high-intensity, and short-pulsed laser systems. 
 
-
 #### Diamond Light Source
 
 ![DLS Logo](assets/images/DLS_logo.jpg){ align=left, width="150" } 
