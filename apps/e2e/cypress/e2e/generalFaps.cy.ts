@@ -82,8 +82,11 @@ context('General facility access panel tests', () => {
         variant: 'success',
       });
       cy.contains('People').click();
+      cy.get('[data-cy="people-search"]').type(fapMembers.secretary.lastName);
+      cy.get('[data-cy="people-search"]').type('Enter');
+      cy.get('[role="progressbar"]').should('exist');
+      cy.get('[role="progressbar"]').should('not.exist');
 
-      searchMuiTableAsync(fapMembers.secretary.lastName);
       cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
