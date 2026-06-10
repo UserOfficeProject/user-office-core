@@ -15,7 +15,7 @@
     "jwt-decode": "^4.0.0",
     "luxon": "^3.4.4",
     "pdf-parse": "^1.1.1",
-    "typescript": "^5.3.3",
+    "typescript": "^6.0.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

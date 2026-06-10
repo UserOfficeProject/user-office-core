@@ -6,7 +6,7 @@ import jsonwebtoken, {
 } from 'jsonwebtoken';
 
 const secret = process.env.JWT_SECRET as string;
-const expiresIn = process.env.JWT_TOKEN_LIFE as string;
+const expiresIn = process.env.JWT_TOKEN_LIFE as string | number;
 
 if (!secret) {
   logger.logError(
@@ -30,11 +30,13 @@ export function signToken<T extends Record<string, unknown> | string | Buffer>(
   payload: T,
   signOptions?: SignOptions
 ) {
-  return jsonwebtoken.sign(payload, secret, {
+  const mergedOptions = {
     expiresIn,
     algorithm: JwtAlg,
     ...signOptions,
-  });
+  } as SignOptions;
+
+  return jsonwebtoken.sign(payload, secret, mergedOptions);
 }
 
 export function verifyToken<T extends Record<string, unknown> | string>(
