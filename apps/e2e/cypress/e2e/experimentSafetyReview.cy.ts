@@ -243,10 +243,10 @@ function createWorkflowForESR() {
 
       return cy
         .addStatusToWorkflow({
-          statusId: 'ESR_REVIEW',
+          statusId: 'ESF_ESR_REVIEW',
           workflowId: workflowData.id,
           prevId: workflowData.statuses.find(
-            (status) => status.statusId === 'INITIAL'
+            (status) => status.statusId === 'AWAITING_ESF'
           )!.workflowStatusId,
           posX: 1,
           posY: 111,
@@ -255,14 +255,13 @@ function createWorkflowForESR() {
           if (result.addStatusToWorkflow) {
             return cy
               .setStatusChangingEventsOnConnection({
-                workflowConnectionId:
-                  result.addStatusToWorkflow.workflowStatusId,
+                workflowConnectionId: result.createWorkflowConnection.id,
                 statusChangingEvents: [TEST_CONSTANTS.EVENTS.ESF_SUBMITTED],
               })
               .then(() => {
                 return cy
                   .addStatusToWorkflow({
-                    statusId: 'APPROVED',
+                    statusId: 'ESF_APPROVED',
                     workflowId: workflowData.id,
                     prevId: result.addStatusToWorkflow.workflowStatusId,
                     posX: -211,
@@ -281,7 +280,7 @@ function createWorkflowForESR() {
                         .then(() => {
                           return cy
                             .addStatusToWorkflow({
-                              statusId: 'REJECTED',
+                              statusId: 'ESF_REJECTED',
                               workflowId: workflowData.id,
                               prevId:
                                 result.addStatusToWorkflow.workflowStatusId,
@@ -319,37 +318,6 @@ function createWorkflowForESR() {
       throw new Error('Workflow creation failed');
     }
   });
-}
-
-// Helper function to approve proposal
-function approveProposal() {
-  cy.login('officer');
-  cy.visit('/');
-  cy.contains(TEST_CONSTANTS.UI_LABELS.PROPOSALS).click();
-  cy.get('[data-cy=view-proposal]').first().click();
-  cy.finishedLoading();
-  cy.get('[role="dialog"]').contains(TEST_CONSTANTS.UI_LABELS.ADMIN).click();
-  cy.get('[data-cy="proposal-final-status"]').should('exist');
-  cy.get('[role="dialog"]').contains(TEST_CONSTANTS.UI_LABELS.ADMIN).click();
-  cy.get('[data-cy="proposal-final-status"]').click();
-  cy.get('li[data-cy="proposal-final-status-options"]')
-    .contains(TEST_CONSTANTS.FORM_VALUES.PROPOSAL_STATUS)
-    .click();
-  cy.get(
-    `[data-cy="managementTimeAllocation-${initialDBData.instrument1.id}"] input`
-  )
-    .clear()
-    .type(TEST_CONSTANTS.FORM_VALUES.MANAGEMENT_TIME);
-  cy.get('[data-cy="is-management-decision-submitted"]').click();
-  cy.get('[data-cy="save-admin-decision"]').click();
-  cy.notification({ variant: 'success', text: 'Saved' });
-  cy.reload();
-  cy.get('[data-cy="is-management-decision-submitted"] input').should(
-    'have.value',
-    'true'
-  );
-  cy.closeModal();
-  cy.contains(TEST_CONSTANTS.FORM_VALUES.PROPOSAL_STATUS);
 }
 
 // Helper function to submit ESF by user
@@ -542,9 +510,6 @@ context('Experiment Safety Review tests', () => {
         templateGroupId: TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
         templateId: initialDBData.experimentSafetyReviewTemplate.id,
       });
-
-      // Approve proposal for all tests
-      approveProposal();
     });
 
     describe('User Experiment Safety Form Submission', () => {
@@ -561,7 +526,7 @@ context('Experiment Safety Review tests', () => {
         cy.testActionButton('finish-experiment-safety-form-icon', 'completed');
       });
 
-      it.only('Should validate experiment status change after ESF submission', () => {
+      it('Should validate experiment status change after ESF submission', () => {
         submitESFByUser();
 
         // Instrument scientist should see status change to "ESF IS REVIEW"
@@ -847,9 +812,6 @@ context('Experiment Safety Review tests', () => {
         templateGroupId: TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
         templateId: initialDBData.experimentSafetyReviewTemplate.id,
       });
-
-      // Approve proposal for all tests
-      approveProposal();
     });
 
     describe('User Experiment Safety Form Submission', () => {
