@@ -10,7 +10,6 @@ import initialDBData from '../support/initialDBData';
 
 function searchMuiTableAsync(search: string) {
   cy.get('[data-cy="co-proposers"] [aria-label="Search"]').type(search);
-  cy.get('[data-cy="co-proposers"] [aria-label="Search"]').type('Enter');
 
   cy.get('[role="progressbar"]').should('exist');
   cy.get('[role="progressbar"]').should('not.exist');

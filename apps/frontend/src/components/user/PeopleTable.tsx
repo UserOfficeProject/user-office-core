@@ -64,6 +64,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   isFreeAction?: boolean;
   data?: T[];
   search?: boolean;
+  customSearch?: boolean;
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [T[]]>;
   emailInvite?: boolean;
@@ -151,6 +152,7 @@ const PeopleTable = ({
   mtOptions,
   onRemove,
   search,
+  customSearch,
   title,
   persistUrlQueryParams = false,
 }: PeopleTableProps) => {
@@ -407,44 +409,47 @@ const PeopleTable = ({
             },
           }}
         >
-          <Grid
-            container
-            direction={'row'}
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              marginTop: '-30px',
-              marginBottom: '-10px',
-            }}
-          >
-            <Tooltip title="Filter Found Users">
-              <SearchIcon
+          {customSearch && (
+            <Grid
+              container
+              direction={'row'}
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: '-30px',
+                marginBottom: '-10px',
+              }}
+            >
+              <Tooltip title="Filter Found Users">
+                <SearchIcon
+                  sx={(theme) => ({
+                    marginRight: theme.spacing(1),
+                    alignSelf: 'center',
+                    fontSize: 'large',
+                    color: theme.palette.primary.main,
+                  })}
+                ></SearchIcon>
+              </Tooltip>
+              <TextField
+                id="people-search"
+                data-cy="people-search"
+                label="Filter found users"
+                type="search"
+                variant="standard"
+                onKeyDown={handleKeyDown}
+                value={searchName}
+                helperText={'Press Enter to search'}
+                onChange={(e) => setSearchName(e.target.value)}
                 sx={(theme) => ({
-                  marginRight: theme.spacing(1),
+                  flex: 1,
                   alignSelf: 'center',
-                  fontSize: 'large',
-                  color: theme.palette.primary.main,
+                  maxWidth: 260,
+                  marginRight: theme.spacing(3),
                 })}
-              ></SearchIcon>
-            </Tooltip>
-            <TextField
-              id="people-search"
-              data-cy="people-search"
-              label="Filter found users"
-              type="search"
-              variant="standard"
-              onKeyDown={handleKeyDown}
-              value={searchName}
-              helperText={'Press Enter to search'}
-              onChange={(e) => setSearchName(e.target.value)}
-              sx={(theme) => ({
-                flex: 1,
-                alignSelf: 'center',
-                maxWidth: 260,
-                marginRight: theme.spacing(3),
-              })}
-            />
-          </Grid>
+              />
+            </Grid>
+          )}
+
           <MaterialTable
             tableRef={tableRef}
             icons={tableIcons}
