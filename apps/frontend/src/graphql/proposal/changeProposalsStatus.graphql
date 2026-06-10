@@ -1,9 +1,9 @@
-mutation changeProposalsStatus($proposalPks: [Int!]!, $workflowStatusId: Int!, $workflowConnectionId: Int) {
+mutation changeProposalsStatus($proposalPks: [Int!]!, $workflowStatusId: Int!, $statusActionsWorkflowConnectionId: Int) {
   changeProposalsStatus(
     changeProposalsStatusInput: {
       proposalPks: $proposalPks
       workflowStatusId: $workflowStatusId
-      workflowConnectionId: $workflowConnectionId
+      statusActionsWorkflowConnectionId: $statusActionsWorkflowConnectionId
     }
   )
 }

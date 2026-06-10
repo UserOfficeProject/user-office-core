@@ -544,7 +544,7 @@ export default class ProposalMutations {
     const {
       workflowStatusId: statusId,
       proposalPks,
-      workflowConnectionId,
+      statusActionsWorkflowConnectionId,
     } = args;
 
     const result = await this.proposalDataSource.changeProposalsWorkflowStatus(
@@ -554,7 +554,7 @@ export default class ProposalMutations {
 
     if (result.proposals.length === proposalPks.length) {
       // Only run status actions if a specific workflow connection was provided
-      if (workflowConnectionId) {
+      if (statusActionsWorkflowConnectionId) {
         const fullProposals = await Promise.all(
           proposalPks.map(async (proposalPk) => {
             const fullProposal = result.proposals.find(
@@ -583,7 +583,7 @@ export default class ProposalMutations {
             return {
               ...fullProposal,
               prevStatusId: fullProposal.workflowStatusId,
-              workflowStatusConnectionId: workflowConnectionId,
+              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
             };
           })
         );

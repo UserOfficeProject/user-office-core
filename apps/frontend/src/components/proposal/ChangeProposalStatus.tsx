@@ -37,7 +37,7 @@ type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (
     workflowStatus: WorkflowStatus,
-    workflowConnectionId?: number
+    statusActionsWorkflowConnectionId?: number
   ) => Promise<void>;
   selectedProposals: ProposalViewData[];
 };

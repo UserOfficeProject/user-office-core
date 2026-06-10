@@ -712,7 +712,7 @@ const ProposalTableOfficer = ({
 
   const changeStatusOnProposals = async (
     workflowStatus: WorkflowStatus,
-    workflowConnectionId?: number
+    statusActionsWorkflowConnectionId?: number
   ) => {
     const proposalPks = getSelectedProposalPks();
     if (workflowStatus?.workflowStatusId && proposalPks.length) {
@@ -722,7 +722,7 @@ const ProposalTableOfficer = ({
       }).changeProposalsStatus({
         proposalPks: proposalPks,
         workflowStatusId: workflowStatus.workflowStatusId,
-        workflowConnectionId: workflowConnectionId,
+        statusActionsWorkflowConnectionId: statusActionsWorkflowConnectionId,
       });
       refreshTableData();
     }
