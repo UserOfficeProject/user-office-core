@@ -414,7 +414,7 @@ export class UserDataSourceMock implements UserDataSource {
     return 1;
   }
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
-    throw new Error('Method not implemented.');
+    return [dummyUser];
   }
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
     if (id === dummyUser.id) {
