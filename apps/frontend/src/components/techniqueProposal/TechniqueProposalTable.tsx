@@ -106,6 +106,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     instrumentsMinimal,
   ]);
 
+  const relevantTechniques =
+    currentRole === UserRole.USER_OFFICER
+      ? techniques.filter((t) =>
+          t.instruments
+            .map((ti) => ti.id)
+            .some((i) => instrumentsMinimal.map((im) => im.id).includes(i))
+        )
+      : techniques;
+
   const { calls, loadingCalls, setCallsFilter } = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
@@ -990,7 +999,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               isLoading: loadingInstruments,
             }}
             techniques={{
-              data: techniques,
+              data: relevantTechniques,
               isLoading: loadingTechniques,
             }}
             proposalStatuses={{
