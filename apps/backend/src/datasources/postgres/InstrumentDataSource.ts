@@ -137,7 +137,9 @@ export default class PostgresInstrumentDataSource
     agentRoleId?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     let instruments: InstrumentRecord[];
-    const tags = agentRoleId ? (await this.getTagsByRoleId(agentRoleId)) ?? [] : [];
+    const tags = agentRoleId
+      ? (await this.getTagsByRoleId(agentRoleId)) ?? []
+      : [];
     if (tags.length > 0) {
       const tagIds = tags.map((tag) => tag.id);
 
@@ -154,7 +156,7 @@ export default class PostgresInstrumentDataSource
           if (offset) {
             query.offset(offset);
           }
-        })
+        });
     } else {
       instruments = await database
         .select(['*', database.raw('count(*) OVER() AS full_count')])
@@ -167,11 +169,12 @@ export default class PostgresInstrumentDataSource
           if (offset) {
             query.offset(offset);
           }
-        })
+        });
     }
     const result = instruments.map((instrument) =>
       this.createInstrumentObject(instrument)
     );
+
     return {
       totalCount: instruments[0] ? instruments[0].full_count : 0,
       instruments: result,

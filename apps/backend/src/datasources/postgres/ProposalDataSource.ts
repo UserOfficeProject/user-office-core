@@ -1226,12 +1226,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         );
 
         if (instrumentIdsToFilter.length > 0) {
-
           query.join('instrument_has_proposals as ihp', function () {
             this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnIn(
               'ihp.instrument_id',
               instrumentIdsToFilter
-            )
+            );
           });
         }
       })

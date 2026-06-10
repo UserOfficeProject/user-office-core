@@ -47,6 +47,7 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
@@ -83,11 +84,27 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { techniques, loadingTechniques } =
     useTechniqueProposalsTechniquesData();
 
-  const instrumentIds = useMemo(() => {
-    if (loadingTechniques || !techniques) return [];
+  const {
+    instruments: instrumentsMinimal,
+    loadingInstruments: loadingInstrumentsMinimal,
+  } = useInstrumentsMinimalData();
 
-    return techniques.flatMap((t) => t.instruments.map((i) => i.id));
-  }, [loadingTechniques, techniques]);
+  const instrumentIds = useMemo(() => {
+    if (currentRole === UserRole.USER_OFFICER) {
+      if (loadingInstrumentsMinimal || !instrumentsMinimal) return [];
+
+      return instrumentsMinimal.map((i) => i.id);
+    } else {
+      if (loadingTechniques || !techniques) return [];
+
+      return techniques.flatMap((t) => t.instruments.map((i) => i.id));
+    }
+  }, [
+    loadingTechniques,
+    techniques,
+    loadingInstrumentsMinimal,
+    instrumentsMinimal,
+  ]);
 
   const { calls, loadingCalls, setCallsFilter } = useCallsData(
     {
@@ -193,6 +210,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
+    instrumentIds,
     instrumentFilter: {
       instrumentId: instrument ? +instrument : null,
       showAllProposals: !instrument,
@@ -227,7 +245,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return prev;
       });
-      setProposalFilter((prev) => ({ ...prev, callId }));
+      setProposalFilter((prev) => ({ ...prev, callId, instrumentIds }));
       refreshTableData();
     }
   }, [callId, setSearchParams, setProposalFilter, refreshTableData]);
@@ -713,32 +731,40 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           proposals: ProposalViewData[] | undefined;
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
-
         api()
-          .getTechniqueScientistProposals({
-            filter: {
-              callId,
-              callIds,
-              instrumentFilter,
-              instrumentIds: [23],
-              techniqueFilter,
-              proposalStatusId,
-              text,
-              referenceNumbers,
-              dateFilter,
-              excludeProposalStatusIds:
-                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
-            },
-            sortField: orderBy?.orderByField,
-            sortDirection:
-              orderBy?.orderDirection == PaginationSortDirection.ASC
-                ? PaginationSortDirection.ASC
-                : orderBy?.orderDirection == PaginationSortDirection.DESC
-                  ? PaginationSortDirection.DESC
-                  : undefined,
-            first: tableQuery.pageSize,
-            offset: tableQuery.page * tableQuery.pageSize,
-            searchText: tableQuery.search,
+          .getInstrumentsMinimal()
+          .then((data) => {
+            return data.instruments?.instruments.map((i) => i.id);
+          })
+          .then((fetchedInstrumentIds) => {
+            return api().getTechniqueScientistProposals({
+              filter: {
+                callId,
+                callIds,
+                instrumentFilter,
+                instrumentIds:
+                  instrumentIds != null && instrumentIds.length > 0
+                    ? instrumentIds
+                    : fetchedInstrumentIds,
+                techniqueFilter,
+                proposalStatusId,
+                text,
+                referenceNumbers,
+                dateFilter,
+                excludeProposalStatusIds:
+                  currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
+              },
+              sortField: orderBy?.orderByField,
+              sortDirection:
+                orderBy?.orderDirection == PaginationSortDirection.ASC
+                  ? PaginationSortDirection.ASC
+                  : orderBy?.orderDirection == PaginationSortDirection.DESC
+                    ? PaginationSortDirection.DESC
+                    : undefined,
+              first: tableQuery.pageSize,
+              offset: tableQuery.page * tableQuery.pageSize,
+              searchText: tableQuery.search,
+            });
           })
           .then((data) => {
             result.totalCount =
@@ -836,15 +862,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       }
     }
 
-    if (filter.instrumentId != null) {
-      if (filter.instrumentId === 0) {
-        updatedFilter.instrumentId = null;
-        updatedFilter.instrumentIds = allInstruments?.map((instrument) => instrument.id) || [];
-      } else {
-        updatedFilter.instrumentIds = [filter.instrumentId as number];
-      }
+    if (filter.instrumentFilter?.instrumentId != null) {
+      updatedFilter.instrumentIds = [
+        filter.instrumentFilter.instrumentId as number,
+      ];
+    } else {
+      updatedFilter.instrumentId = null;
+      updatedFilter.instrumentIds =
+        allInstruments?.map((instrument) => instrument.id) || [];
     }
-
     setProposalFilter(updatedFilter);
     refreshTableData();
   };
@@ -868,7 +894,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       callId,
       callIds,
       instrumentFilter,
-      instrumentIds = [23],
+      instrumentIds,
       techniqueFilter,
       proposalStatusId,
       text,
