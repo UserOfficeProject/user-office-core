@@ -279,7 +279,7 @@ const PeopleTable = ({
                 : orderBy?.orderDirection == PaginationSortDirection.DESC
                   ? PaginationSortDirection.DESC
                   : undefined,
-            searchText: searchParams.get('search'),
+            searchText: searchParams.get('search') ?? tableQuery.search,
           })
           .then(({ users }) => {
             const filteredData = data
