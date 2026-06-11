@@ -66,7 +66,8 @@ context('General facility access panel tests', () => {
         this.skip();
       }
       cy.contains('People').click();
-      searchMuiTableAsync(fapMembers.chair.lastName);
+      cy.get('[data-cy="people-search"]').type(fapMembers.chair.lastName);
+      cy.get('[data-cy="people-search"]').type('Enter');
       cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
