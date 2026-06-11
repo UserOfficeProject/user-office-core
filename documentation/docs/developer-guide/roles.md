@@ -115,6 +115,8 @@ ________________________________________________________________________________
 
 You won't usually call tag logic by hand. The `@Authorized` decorator ([`apps/backend/src/decorators/Authorized.ts`](https://github.com/UserOfficeProject/user-office-core/blob/develop/apps/backend/src/decorators/Authorized.ts)) does it for you when the current role is a derived (non-root) role.
 
+The @Authorized decorator takes the allowed root roles as arguments, controlling which roles may call the query/mutation. For derived roles it additionally populates any parameter marked with @AgentTags with the current role's tags.
+
 The mechanism:
 
 1. **Mark which arguments should receive tags.** On a query/mutation method, decorate the tag parameter with `@AgentTags`. This records the argument's position in metadata.
