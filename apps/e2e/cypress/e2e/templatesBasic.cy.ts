@@ -697,7 +697,7 @@ context('Template Basic tests', () => {
       );
     });
 
-    it('should render the Number field accepting only positive, negative numbers if set', () => {
+    it('should render the Number field accepting only numbers according to the config', () => {
       const generateId = () =>
         `${faker.lorem.word()}_${faker.lorem.word()}_${faker.lorem.word()}`;
 
@@ -738,6 +738,48 @@ context('Template Basic tests', () => {
           goodInput: '1',
           failureMessage: 'Value must be positive whole number',
         },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          fieldName: 'numberField2',
+          numberMin: 0,
+          numberMax: 10,
+          badInput: '10',
+          goodInput: '5',
+          failureMessage: 'Value must be less than 10',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          fieldName: 'numberField3',
+          numberMin: 0,
+          numberMax: 10,
+          badInput: '-1',
+          goodInput: '5',
+          failureMessage: 'Value must be greater than 0',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          fieldName: 'numberField4',
+          numberMin: 0,
+          numberMax: 10,
+          numberMaxInclusive: true,
+          badInput: '10.1',
+          goodInput: '10',
+          failureMessage: 'Value must be less than or equal to 10',
+        },
+        {
+          id: generateId(),
+          title: faker.lorem.words(3),
+          fieldName: 'numberField5',
+          numberMin: 0,
+          numberMax: 10,
+          numberMinInclusive: true,
+          badInput: '-0.1',
+          goodInput: '0',
+          failureMessage: 'Value must be greater than or equal to 0',
+        },
       ];
 
       cy.login('officer');
@@ -751,6 +793,10 @@ context('Template Basic tests', () => {
           units: ['kelvin'],
           valueConstraint: question.valueConstraint,
           firstTopic: true,
+          numberMin: question.numberMin,
+          numberMax: question.numberMax,
+          numberMinInclusive: question.numberMinInclusive,
+          numberMaxInclusive: question.numberMaxInclusive,
         });
       }
 
@@ -1235,7 +1281,7 @@ context('Template Basic tests', () => {
         instrumentId: 1,
       });
 
-      cy.changeProposalsStatus({ proposalPks: [1], statusId: 2 });
+      cy.changeProposalsStatus({ proposalPks: [1], workflowStatusId: 2 });
 
       cy.login('officer');
       cy.visit('/');
@@ -1978,6 +2024,16 @@ context('Template Basic tests', () => {
       // Create another template
       cy.finishedLoading();
       cy.visit('/VisitTemplates');
+
+      cy.contains('Visit Registration Template')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist')
+        .click();
+
+      // Create another template
+      cy.finishedLoading();
+      cy.visit('/VisitTemplates');
       cy.get('[data-cy=create-new-button]').click();
 
       cy.get('[data-cy="name"]').type('Visit Registration Template 2');
@@ -2095,7 +2151,7 @@ context('Template Basic tests', () => {
       );
     });
 
-    it.only('User officer cannot delete referenced email template', () => {
+    it('User officer cannot delete referenced email template', () => {
       const statusActionConfig = {
         recipientsWithEmailTemplate: [
           {
@@ -2112,14 +2168,13 @@ context('Template Basic tests', () => {
         ],
       };
 
-      cy.addWorkflowStatus({
+      cy.addStatusToWorkflow({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
-        sortOrder: 1,
-        prevStatusId: initialDBData.proposalStatuses.draft.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
         posX: 0,
         posY: 200,
-        prevConnectionId: 1,
       }).then((result) => {
         cy.reload();
         cy.addConnectionStatusActions({
@@ -2130,7 +2185,7 @@ context('Template Basic tests', () => {
               config: JSON.stringify(statusActionConfig),
             },
           ],
-          connectionId: result.addWorkflowStatus.id,
+          connectionId: result.createWorkflowConnection.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
         });
       });

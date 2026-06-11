@@ -44,6 +44,10 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
+  isProposalReader(agent: UserWithRole | null) {
+    return agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
+  }
+
   isExperimentSafetyReviewer(agent: UserWithRole | null) {
     return agent?.currentRole?.shortCode === Roles.EXPERIMENT_SAFETY_REVIEWER;
   }
@@ -59,7 +63,7 @@ export abstract class UserAuthorization {
   }
 
   isApiToken(agent: UserWithRole | null) {
-    return agent?.isApiAccessToken;
+    return agent?.isApiAccessToken ?? false;
   }
 
   async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {

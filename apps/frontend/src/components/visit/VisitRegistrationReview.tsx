@@ -58,6 +58,8 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
       return 'Submit changes';
     } else if (registration.status === VisitRegistrationStatus.SUBMITTED) {
       return '✔ Submitted';
+    } else if (registration.status === VisitRegistrationStatus.APPROVED) {
+      return '✔ Approved';
     }
 
     return '';

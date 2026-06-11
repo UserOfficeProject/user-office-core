@@ -115,85 +115,109 @@ const CreateUpdateApiAccessToken = ({
 
     return (
       <>
-        {groups.map((group, index) => (
-          <FormControl
-            component="fieldset"
-            variant="standard"
-            key={index}
-            sx={(theme) => ({
-              border: `1px solid ${theme.palette.grey[200]}`,
-              padding: theme.spacing(0, 1),
-              width: '100%',
+        {groups.map((group, index) => {
+          const allSelected = group.items.every((item) =>
+            formValues.accessPermissions.includes(item)
+          );
 
-              '& legend': {
-                textTransform: 'capitalize',
-              },
-            })}
-          >
-            <FormLabel component="legend">
-              {group.groupName} {title} (
-              <Link
-                component="button"
-                type="button"
-                onClick={() => {
-                  group.items.forEach((item) => fieldArrayHelpers.push(item));
-                }}
-              >
-                Select all
-              </Link>
-              )
-            </FormLabel>
-            <FormGroup>
-              {schedulerAlert(group)}
-              <Grid container spacing={1}>
-                {group.items.map((item, index) => (
-                  <Grid
-                    item
-                    md={6}
-                    xs={12}
-                    key={index}
-                    sx={{
-                      '& label': {
-                        width: '100%',
+          return (
+            <FormControl
+              component="fieldset"
+              variant="standard"
+              key={index}
+              sx={(theme) => ({
+                border: `1px solid ${theme.palette.grey[200]}`,
+                padding: theme.spacing(0, 1),
+                width: '100%',
 
-                        '& .MuiFormControlLabel-label': {
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                '& legend': {
+                  textTransform: 'capitalize',
+                },
+              })}
+            >
+              <FormLabel component="legend">
+                {group.groupName} {title} (
+                <Link
+                  component="button"
+                  type="button"
+                  onClick={() => {
+                    if (allSelected) {
+                      const indicesToRemove = group.items
+                        .map((item) =>
+                          formValues.accessPermissions.indexOf(item)
+                        )
+                        .filter((index) => index !== -1)
+                        .sort((a, b) => b - a); //sort in descending order to avoid index shifting
+                      indicesToRemove.forEach((index) =>
+                        fieldArrayHelpers.remove(index)
+                      );
+                    } else {
+                      group.items.forEach((item) => {
+                        if (!formValues.accessPermissions.includes(item)) {
+                          fieldArrayHelpers.push(item);
+                        }
+                      });
+                    }
+                  }}
+                >
+                  {allSelected ? 'Unselect all' : 'Select all'}
+                </Link>
+                )
+              </FormLabel>
+              <FormGroup>
+                {schedulerAlert(group)}
+                <Grid container spacing={1}>
+                  {group.items.map((item, index) => (
+                    <Grid
+                      item
+                      md={6}
+                      xs={12}
+                      key={index}
+                      sx={{
+                        '& label': {
+                          width: '100%',
+
+                          '& .MuiFormControlLabel-label': {
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          },
                         },
-                      },
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          id={item}
-                          name="accessPermissions"
-                          value={item}
-                          checked={formValues.accessPermissions.includes(item)}
-                          data-cy={`permission-${title.toLowerCase()}`}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              fieldArrayHelpers.push(item);
-                            } else {
-                              const idx =
-                                formValues.accessPermissions.indexOf(item);
-                              fieldArrayHelpers.remove(idx);
-                            }
-                          }}
-                          inputProps={{
-                            'aria-label': 'primary checkbox',
-                          }}
-                        />
-                      }
-                      label={item}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </FormGroup>
-          </FormControl>
-        ))}
+                      }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            id={item}
+                            name="accessPermissions"
+                            value={item}
+                            checked={formValues.accessPermissions.includes(
+                              item
+                            )}
+                            data-cy={`permission-${title.toLowerCase()}`}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                fieldArrayHelpers.push(item);
+                              } else {
+                                const idx =
+                                  formValues.accessPermissions.indexOf(item);
+                                fieldArrayHelpers.remove(idx);
+                              }
+                            }}
+                            inputProps={{
+                              'aria-label': 'primary checkbox',
+                            }}
+                          />
+                        }
+                        label={item}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </FormGroup>
+            </FormControl>
+          );
+        })}
       </>
     );
   };

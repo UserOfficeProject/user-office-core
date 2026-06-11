@@ -27,6 +27,7 @@ import {
 } from './experimentSample';
 import { collectGenericTemplatePDFData } from './genericTemplates';
 import { collectSamplePDFData } from './sample';
+import { StatusDataSource } from '../../datasources/StatusDataSource';
 
 export type ExperimentSafetyPDFData = {
   proposal: Proposal;
@@ -98,6 +99,10 @@ export const collectExperimentPDFData = async (
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ExperimentSafetyPDFData> => {
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
+
   const experiment = await baseContext.queries.experiment.getExperiment(
     user,
     experimentPk
@@ -117,10 +122,10 @@ export const collectExperimentPDFData = async (
   }
 
   // Get the status of the experiment safety
-  const experimentSafetyStatus = await baseContext.queries.status.getStatus(
-    user,
-    experimentSafety.statusId ?? 0
-  );
+  const experimentSafetyStatus =
+    await statusDataSource.getStatusByWorkflowStatusId(
+      experimentSafety.workflowStatusId
+    );
 
   const esiQuestionarySteps =
     await baseContext.queries.questionary.getQuestionarySteps(
@@ -325,12 +330,6 @@ export const collectExperimentPDFDataTokenAccess = async (
 
   // Get PDF template
   const experimentSafetyPdfTemplateDataSource =
-    container.resolve<ExperimentSafetyPdfTemplateDataSource>(
-      Tokens.ExperimentSafetyPdfTemplateDataSource
-    );
-
-  // Try to get experiment-specific template
-  const templateDataSource =
     container.resolve<ExperimentSafetyPdfTemplateDataSource>(
       Tokens.ExperimentSafetyPdfTemplateDataSource
     );

@@ -1,0 +1,85 @@
+import Grid from '@mui/material/Grid';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import CallFilter from 'components/common/proposalFilters/CallFilter';
+import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import { Fap } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { FapProposals } from 'hooks/fap/useFapProposalsData';
+import { useFapInstruments } from 'hooks/instrument/useFapInstruments';
+
+import AssignmentsTable from '../AssignmentsTable';
+
+type FapReviewersAndAssignmentsProps = {
+  /** Id of the Fap we are assigning members to */
+  data: Fap;
+  onFapUpdate: (fap: Fap) => void;
+  fapProposals: FapProposals;
+};
+
+const FapReviewersAndAssignments = ({
+  data: fapData,
+  onFapUpdate,
+  fapProposals,
+}: FapReviewersAndAssignmentsProps) => {
+  const { loadingCalls, calls } = useCallsData({
+    fapIds: [fapData.id],
+    isFapReviewEnded: false,
+  });
+
+  // NOTE: Default null means load all calls if nothing is selected
+  const { loadingInstruments, instruments } = useFapInstruments(
+    fapData.id,
+    null
+  );
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const call = searchParams.get('call');
+  const instrument = searchParams.get('instrument');
+
+  useEffect(() => {
+    const currentCall = call ? parseInt(call) : null;
+
+    // If the selected call is not valid, remove it from the URL
+    if (call && !loadingCalls && !calls.find((c) => c.id === currentCall)) {
+      setSearchParams((searchParams) => {
+        searchParams.delete('call');
+
+        return searchParams;
+      });
+    }
+  }, [call, calls, loadingCalls, searchParams, setSearchParams]);
+
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            calls={calls}
+            isLoading={loadingCalls}
+            shouldShowAll={true}
+            callId={call ? +call : null}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
+          <InstrumentFilter
+            instruments={instruments}
+            isLoading={loadingInstruments}
+            shouldShowAll={true}
+            instrumentId={instrument ? +instrument : null}
+            data-cy="instrument-filter"
+          />
+        </Grid>
+      </Grid>
+      <AssignmentsTable
+        fap={fapData}
+        onAssignmentsUpdate={onFapUpdate}
+        fapProposals={fapProposals}
+        proposalView={false}
+      />
+    </>
+  );
+};
+
+export default FapReviewersAndAssignments;

@@ -4,6 +4,7 @@ import {
   TechnicalReviewStatus,
   FeatureId,
   SettingsId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -12,7 +13,7 @@ import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();
-  cy.get('[role="listbox"] [data-value="0"]').click();
+  cy.get('[role="listbox"] [data-value="ALL"]').click();
 };
 
 context('Instrument tests', () => {
@@ -55,6 +56,19 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.createStatus({
+      id: 'FEASIBILITY',
+      name: 'Feasibility',
+      description: 'Feasibility status',
+      entityType: WorkflowType.PROPOSAL,
+    });
+
+    cy.addStatusToWorkflow({
+      workflowId: initialDBData.workflows.defaultWorkflow.id,
+      statusId: 'FEASIBILITY',
+    });
+
     if (
       settings
         .getEnabledSettings()
@@ -486,7 +500,6 @@ context('Instrument tests', () => {
       cy.get('[role="dialog"]').contains('Technical review').click();
 
       cy.get('[data-cy="save-and-continue-button"]').should('not.be.disabled');
-      //cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] label').should(
         'include.text',
@@ -523,7 +536,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="user-list"] input').should(
         'have.value',
-        `${scientist1.firstName} ${scientist1.lastName}`
+        `${scientist1.preferredName} ${scientist1.lastName}`
       );
 
       cy.get('[data-cy="user-list"]').click();
@@ -532,8 +545,14 @@ context('Instrument tests', () => {
         'have.length',
         numberOfScientistsAndManagerAssignedToCreatedInstrument
       );
+      const reassignDisplayName = featureFlags
+        .getEnabledFeatures()
+        .get(FeatureId.USER_SEARCH_FILTER)
+        ? scientist2.preferredName
+        : scientist2.firstName;
+
       cy.get('[title="user-list-options"]')
-        .contains(scientist2.firstName)
+        .contains(reassignDisplayName)
         .click();
 
       cy.get('[data-cy="re-assign-submit"]').click();
@@ -541,7 +560,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: `Assigned to ${scientist2.firstName} ${scientist2.lastName}`,
+        text: `Assigned to ${reassignDisplayName} ${scientist2.lastName}`,
       });
 
       cy.closeModal();
@@ -949,10 +968,12 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
-      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
-      }
+      const contactDisplayName = featureFlags
+        .getEnabledFeatures()
+        .get(FeatureId.USER_SEARCH_FILTER)
+        ? scientist2.preferredName
+        : scientist2.firstName;
+      const updatedContact = `${contactDisplayName} ${scientist2.lastName} (${scientist2.email})`;
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
@@ -996,7 +1017,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').eq(0).click();
-      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+      cy.contains(`${contactDisplayName} ${scientist2.lastName}`).should(
         'be.visible'
       );
 
@@ -1013,7 +1034,7 @@ context('Instrument tests', () => {
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+      cy.contains(`${contactDisplayName} ${scientist2.lastName}`).should(
         'not.exist'
       );
     });
