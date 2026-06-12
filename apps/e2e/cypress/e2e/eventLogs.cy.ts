@@ -78,7 +78,7 @@ context('Event log tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="people-search"]').type(user.lastName);
-      cy.get('[data-cy="people-search"]').type('Enter');
+      cy.realPress('Enter');
 
       cy.contains(user.firstName)
         .parent()
