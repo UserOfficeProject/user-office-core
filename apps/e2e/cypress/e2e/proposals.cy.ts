@@ -293,6 +293,15 @@ context('Proposal tests', () => {
       );
 
       cy.contains('New Proposal').click();
+
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Changes you recently made in this tab will be lost! Are you sure?'
+        );
+
+        return true;
+      });
+
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=save-button]').should('be.disabled');
