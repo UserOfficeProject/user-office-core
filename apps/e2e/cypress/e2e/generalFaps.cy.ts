@@ -88,7 +88,11 @@ context('General facility access panel tests', () => {
       cy.get('[role="progressbar"]').should('exist');
       cy.get('[role="progressbar"]').should('not.exist');
 
-      cy.get('[aria-label="Edit user"]').click();
+      cy.contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('button[aria-label="Edit user"]')
+        .click();
+
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
 
