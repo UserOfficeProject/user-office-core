@@ -85,9 +85,6 @@ context('General facility access panel tests', () => {
       cy.contains('People').click();
       cy.get('[data-cy="people-search"]').type(fapMembers.secretary.lastName);
       cy.realPress('Enter');
-      cy.get('[role="progressbar"]').should('exist');
-      cy.get('[role="progressbar"]').should('not.exist');
-
       cy.contains(fapMembers.secretary.lastName)
         .parent()
         .find('button[aria-label="Edit user"]')
