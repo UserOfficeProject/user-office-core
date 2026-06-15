@@ -1,4 +1,5 @@
 import Edit from '@mui/icons-material/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
 import { Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { capitalize } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CreateWorkflow from './CreateWorkflow';
 
@@ -24,11 +26,13 @@ const WorkflowsTable = ({
   editorPath,
   title,
   createTitle,
+  confirm,
 }: {
   entityType: WorkflowType;
   editorPath: 'ProposalWorkflowEditor' | 'ExperimentWorkflowEditor';
   title: string;
   createTitle: string;
+  confirm: WithConfirmType;
 }) => {
   const { api } = useDataApiWithFeedback();
   const {
@@ -69,6 +73,7 @@ const WorkflowsTable = ({
   };
 
   const EditIcon = (): JSX.Element => <Edit />;
+  const FileCopyIcon = (): JSX.Element => <FileCopy />;
 
   return (
     <div data-cy="workflows-table">
@@ -102,6 +107,42 @@ const WorkflowsTable = ({
               navigate(`/${editorPath}/${(rowData as Workflow).id}`),
             position: 'row',
           },
+          {
+            icon: FileCopyIcon,
+            hidden: false,
+            tooltip: 'Clone',
+            onClick: (event, rowData): void => {
+              confirm(
+                () => {
+                  api({
+                    toastSuccessMessage: `${capitalize(
+                      entityType
+                    )} workflow cloned successfully`,
+                  })
+                    .cloneWorkflow({
+                      workflowId: (rowData as Workflow).id,
+                    })
+                    .then((result) => {
+                      const clonedWorkflow = result.cloneWorkflow;
+                      if (clonedWorkflow) {
+                        const newWorkflows = [...workflows];
+                        newWorkflows.push(clonedWorkflow as Workflow);
+                        setWorkflows(newWorkflows);
+                      }
+                    });
+                },
+                {
+                  title: 'Are you sure?',
+                  description: `Are you sure you want to clone ${
+                    (rowData as Workflow).name
+                  }?`,
+                  confirmationText: 'Yes',
+                  cancellationText: 'Cancel',
+                }
+              )();
+            },
+            position: 'row',
+          },
         ]}
         persistUrlQueryParams={true}
       />
@@ -109,4 +150,4 @@ const WorkflowsTable = ({
   );
 };
 
-export default WorkflowsTable;
+export default withConfirm(WorkflowsTable);

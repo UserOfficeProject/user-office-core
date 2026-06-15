@@ -156,6 +156,14 @@ describe('Test Proposal settings mutations', () => {
     ).resolves.toStrictEqual(dummyWorkflow);
   });
 
+  test('A userofficer can clone proposal workflow', () => {
+    return expect(
+      workflowMutationsInstance.cloneWorkflow(dummyUserOfficerWithRole, {
+        workflowId: 1,
+      })
+    ).resolves.toStrictEqual(dummyWorkflow);
+  });
+
   test('A userofficer can create new proposal workflow connection', () => {
     const newConnection = {
       nextWorkflowStatusId: 2,

@@ -722,6 +722,20 @@ context('Settings tests', () => {
         .should('contain.text', updatedWorkflowDescription);
     });
 
+    it('User Officer should be able to clone proposal workflow', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.contains(workflowName).parent().find('[aria-label="Clone"]').click();
+
+      cy.contains('Yes').click();
+
+      cy.contains(`Copy of ${workflowName}`);
+    });
+
     it('User Officer should be able to add more statuses in proposal workflow', () => {
       cy.login('officer');
       cy.visit('/');
