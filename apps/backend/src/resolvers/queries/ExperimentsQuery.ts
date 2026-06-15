@@ -24,6 +24,12 @@ class TimeSpan {
   to?: Date;
 }
 
+export type ExperimentTableSortField =
+  | 'experimentId'
+  | 'proposal.proposalId'
+  | 'startsAt'
+  | 'endsAt';
+
 @InputType()
 export class ExperimentsFilter {
   @Field({ nullable: true })
@@ -60,7 +66,7 @@ export class ExperimentsArgs {
   public offset?: number;
 
   @Field({ nullable: true })
-  public sortField?: string;
+  public sortField?: ExperimentTableSortField;
 
   @Field(() => PaginationSortDirection, { nullable: true })
   public sortDirection?: PaginationSortDirection;

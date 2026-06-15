@@ -12,6 +12,7 @@ import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExpe
 import {
   UserExperimentsFilter,
   ExperimentsFilter,
+  ExperimentTableSortField,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { ExperimentDataSource } from '../ExperimentDataSource';
@@ -121,7 +122,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {

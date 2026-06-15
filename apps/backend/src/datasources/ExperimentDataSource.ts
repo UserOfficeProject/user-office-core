@@ -11,6 +11,7 @@ import { ExperimentSafetyEventsRecord } from './postgres/records';
 import {
   ExperimentsFilter,
   UserExperimentsFilter,
+  ExperimentTableSortField,
 } from '../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../utils/pagination';
 
@@ -87,7 +88,7 @@ export interface ExperimentDataSource {
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{

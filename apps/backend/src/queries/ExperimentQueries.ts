@@ -7,7 +7,10 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ExperimentSampleArgs } from '../resolvers/queries/ExperimentSampleQuery';
-import { ExperimentsFilter } from '../resolvers/queries/ExperimentsQuery';
+import {
+  ExperimentsFilter,
+  ExperimentTableSortField,
+} from '../resolvers/queries/ExperimentsQuery';
 import { Experiment } from '../resolvers/types/Experiment';
 import { ExperimentHasSample } from '../resolvers/types/ExperimentHasSample';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
@@ -97,7 +100,7 @@ export default class ExperimentQueries {
     filter: ExperimentsFilter = {},
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {

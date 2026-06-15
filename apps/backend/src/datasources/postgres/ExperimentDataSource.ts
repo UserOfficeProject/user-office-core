@@ -13,6 +13,7 @@ import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsFilter,
+  ExperimentTableSortField,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
@@ -83,10 +84,17 @@ function generateExperimentId(
   return `${proposalNumber}-${sequence ?? 0}`;
 }
 
+type SortableExperimentTableColumnName =
+  | 'experiment_id'
+  | 'proposal_id'
+  | 'starts_at'
+  | 'ends_at';
+
 // Which fields we are allowed to sort on
-const fieldMap: { [key: string]: string } = {
-  // These fields are in ExperimentsTable.tsx (frontend),
-  // refer Column[] and field
+const fieldMap: Record<
+  ExperimentTableSortField,
+  SortableExperimentTableColumnName
+> = {
   experimentId: 'experiment_id',
   'proposal.proposalId': 'proposal_id',
   startsAt: 'starts_at',
@@ -579,7 +587,7 @@ export default class PostgresExperimentDataSource
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
@@ -683,8 +691,8 @@ export default class PostgresExperimentDataSource
           if (!fieldMap.hasOwnProperty(sortField)) {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
-          sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          const databaseSortField = fieldMap[sortField];
+          query.orderBy(databaseSortField, sortDirection);
         }
 
         if (first) {
