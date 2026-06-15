@@ -49,8 +49,7 @@
     "monorepo"
   ],
   "dependencies": {
-    "concurrently": "^9.0.1",
-    "ts-node-dev": "^2.0.0",
+    "concurrently": "^10.0.0",
     "wait-on": "^9.0.1"
   },
   "devDependencies": {
