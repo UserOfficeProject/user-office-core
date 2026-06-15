@@ -84,6 +84,38 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
+    it('Columns in Experiments Table are sortable', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.finishedLoading();
+
+      cy.get(
+        'div[data-rfd-draggable-id="1"] [data-testid="mtableheader-sortlabel"]'
+      ).click();
+      cy.get('span[aria-sort="ascending"]').click();
+      cy.get('span[aria-sort="descending"]').click();
+
+      cy.get(
+        'div[data-rfd-draggable-id="2"] [data-testid="mtableheader-sortlabel"]'
+      ).click();
+      cy.get('span[aria-sort="ascending"]').click();
+      cy.get('span[aria-sort="descending"]').click();
+
+      cy.get(
+        'div[data-rfd-draggable-id="3"] [data-testid="mtableheader-sortlabel"]'
+      ).click();
+      cy.get('span[aria-sort="ascending"]').click();
+      cy.get('span[aria-sort="descending"]').click();
+
+      cy.get(
+        'div[data-rfd-draggable-id="4"] [data-testid="mtableheader-sortlabel"]'
+      ).click();
+      cy.get('span[aria-sort="ascending"]').click();
+      cy.get('span[aria-sort="descending"]').click();
+    });
+
     it('Can view visits', () => {
       cy.login('officer');
       cy.visit('/');
