@@ -182,10 +182,12 @@ export default function ExperimentsTable({
     {
       title: 'Instrument',
       field: 'instrument.name',
+      sorting: false,
     },
     {
       title: 'Experiment Safety Status',
       field: 'experimentSafety.status.name',
+      sorting: false,
       render: (rowData: Experiment) =>
         rowData.experimentSafety?.status?.name ?? 'ESF Not Started',
     },

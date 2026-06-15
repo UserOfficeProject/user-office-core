@@ -83,8 +83,17 @@ function generateExperimentId(
   return `${proposalNumber}-${sequence ?? 0}`;
 }
 
+// Which fields we are allowed to sort on
 const fieldMap: { [key: string]: string } = {
+  // These fields are in ExperimentsTable.tsx (frontend),
+  // refer Column[] and field
   experimentId: 'experiment_id',
+  'proposal.proposalId': 'proposal_id',
+  startsAt: 'starts_at',
+  endsAt: 'ends_at',
+  // We don't sort on the fields below, create a view later if sorting needed
+  // 'instrument.name': 'instrument_id',
+  // 'experimentSafety.status.name': '',
 };
 
 @injectable()
