@@ -1,0 +1,6 @@
+query GetProposalTimeRequested($proposalPk: Int!, $instrumentId: Int!) {
+  getProposalTimeRequested(
+    proposalPk: $proposalPk,
+    instrumentId: $instrumentId
+  )
+}
