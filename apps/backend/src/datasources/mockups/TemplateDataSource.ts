@@ -118,50 +118,56 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
+  const dmcQuestionEmptyUrlConfig = {
+    url: '',
+    jsonPath: '',
+  } as DynamicMultipleChoiceConfig;
   const dmcQuestionEmptyUrl = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       id: 'dmcQuestionEmptyUrl',
       naturalKey: 'dmcQuestionEmptyUrl',
       dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
-      config: {
-        url: '',
-        jsonPath: '',
-      } as DynamicMultipleChoiceConfig,
+      config: dmcQuestionEmptyUrlConfig,
     }),
+    config: dmcQuestionEmptyUrlConfig,
   });
 
+  const dmcQuestionEmptyJsonPathConfig = {
+    url: 'api-url',
+    jsonPath: '',
+    apiCallRequestHeaders: [
+      {
+        name: 'header1',
+        value: 'value1',
+      },
+      {
+        name: 'header2',
+        value: 'value2',
+      },
+    ],
+  } as DynamicMultipleChoiceConfig;
   const dmcQuestionEmptyJsonPath = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       id: 'dmcQuestionEmptyJsonPath',
       naturalKey: 'dmcQuestionEmptyJsonPath',
       dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
-      config: {
-        url: 'api-url',
-        jsonPath: '',
-        apiCallRequestHeaders: [
-          {
-            name: 'header1',
-            value: 'value1',
-          },
-          {
-            name: 'header2',
-            value: 'value2',
-          },
-        ],
-      } as DynamicMultipleChoiceConfig,
+      config: dmcQuestionEmptyJsonPathConfig,
     }),
+    config: dmcQuestionEmptyJsonPathConfig,
   });
 
+  const dmcQuestionWithUrlAndJsonPathConfig = {
+    url: 'api-url',
+    jsonPath: '$..option',
+  } as DynamicMultipleChoiceConfig;
   const dmcQuestionWithUrlAndJsonPath = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       id: 'dmcQuestionWithUrlAndJsonPath',
       naturalKey: 'dmcQuestionWithUrlAndJsonPath',
       dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
-      config: {
-        url: 'api-url',
-        jsonPath: '$..option',
-      } as DynamicMultipleChoiceConfig,
+      config: dmcQuestionWithUrlAndJsonPathConfig,
     }),
+    config: dmcQuestionWithUrlAndJsonPathConfig,
   });
 
   return [
