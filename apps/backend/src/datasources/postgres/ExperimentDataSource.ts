@@ -90,18 +90,17 @@ type SortableExperimentTableColumnName =
   | 'starts_at'
   | 'ends_at';
 
-// Which fields we are allowed to sort on
+// Maps a sortable column from the API to its database column.
+// Instrument and experiment safety status are intentionally omitted
+// (not sortable at the DB layer; create a view later if needed).
 const fieldMap: Record<
   ExperimentTableSortField,
   SortableExperimentTableColumnName
 > = {
-  experimentId: 'experiment_id',
-  'proposal.proposalId': 'proposal_id',
-  startsAt: 'starts_at',
-  endsAt: 'ends_at',
-  // We don't sort on the fields below, create a view later if sorting needed
-  // 'instrument.name': 'instrument_id',
-  // 'experimentSafety.status.name': '',
+  [ExperimentTableSortField.experimentId]: 'experiment_id',
+  [ExperimentTableSortField.proposalId]: 'proposal_id',
+  [ExperimentTableSortField.startsAt]: 'starts_at',
+  [ExperimentTableSortField.endsAt]: 'ends_at',
 };
 
 @injectable()
