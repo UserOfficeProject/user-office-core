@@ -315,7 +315,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async getRequestedTime(
     proposalId: number,
     instrumentId: number
-  ): Promise<number | null> {
+  ): Promise<number> {
+    //Non-nullable, time is either requested for the instrument or it is zero.
     const result = await database('proposals as p')
       .sum({
         total_time_requested: database.raw(
@@ -323,7 +324,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         ),
       })
       .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
-      .innerJoin('templates as t', 't.template_id', 'q2.template_id')
       .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
       .where('p.proposal_pk', proposalId)
       .where('a.question_id', 'instrument_picker_question')
@@ -332,9 +332,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       ])
       .first();
 
-    return result && result.total_time_requested !== null
+    return result?.total_time_requested
       ? Number(result.total_time_requested)
-      : null;
+      : 0;
   }
 
   async create(

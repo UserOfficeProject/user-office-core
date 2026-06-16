@@ -378,7 +378,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getRequestedTime(
     proposalId: number,
     instrumentId: number
-  ): Promise<number | null> {
+  ): Promise<number> {
     return 32;
   }
 }

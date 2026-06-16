@@ -43,7 +43,7 @@ type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
   proposalAverageScore: number | string;
   proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
-  timeRequested?: number | string;
+  timeRequested: number;
   tableData?: { index: number; id: number };
 };
 
@@ -131,11 +131,6 @@ const FapInstrumentProposalsTable = ({
 
   const assignmentColumns = [
     {
-      title: 'Time Requested',
-      field: 'timeRequested',
-      emptyValue: '-',
-    },
-    {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 100 },
       sorting: false,
@@ -160,7 +155,7 @@ const FapInstrumentProposalsTable = ({
       },
     },
     {
-      title: 'Principal Investigator',
+      title: 'Principal investigator',
       render: (rowData: FapProposal) => {
         return getFullUserName(rowData.proposal.proposer);
       },
@@ -192,6 +187,10 @@ const FapInstrumentProposalsTable = ({
 
         return rankOrder || '-';
       },
+    },
+    {
+      title: 'Time requested',
+      field: 'timeRequested',
     },
     {
       title: 'Time allocation',
@@ -297,7 +296,7 @@ const FapInstrumentProposalsTable = ({
             instrumentId: fapInstrument.id,
           });
 
-          const timeRequested = result.getProposalTimeRequested || 0;
+          const timeRequested = result.getProposalTimeRequested;
 
           return {
             ...proposalData,

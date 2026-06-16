@@ -24,7 +24,7 @@ export class ProposalQuery {
     return context.queries.proposal.get(context.user, proposalPk) !== null;
   }
 
-  @Query(() => Number, { nullable: true })
+  @Query(() => Number, { nullable: false })
   async getProposalTimeRequested(
     @Arg('proposalPk', () => Int) proposalPk: number,
     @Arg('instrumentId', () => Int) instrumentId: number,
