@@ -25,7 +25,7 @@ export class ProposalQuery {
   }
 
   @Query(() => Number, { nullable: false })
-  async getProposalTimeRequested(
+  async proposalTimeRequested(
     @Arg('proposalPk', () => Int) proposalPk: number,
     @Arg('instrumentId', () => Int) instrumentId: number,
     @Ctx() context: ResolverContext

@@ -26,7 +26,6 @@ import {
   ProposalPkWithRankOrder,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -120,7 +119,6 @@ const FapInstrumentProposalsTable = ({
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
   const { t } = useTranslation();
-  const dataapi = useDataApi();
 
   const getInstrumentTechnicalReview = (
     technicalReviews: TechnicalReview[] | null
@@ -294,12 +292,12 @@ const FapInstrumentProposalsTable = ({
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
 
-          const result = await dataapi().GetProposalTimeRequested({
+          const result = await api().getProposalTimeRequested({
             proposalPk: proposalData.proposal.primaryKey,
             instrumentId: fapInstrument.id,
           });
 
-          const timeRequested = result.getProposalTimeRequested;
+          const timeRequested = result.proposalTimeRequested;
 
           return {
             ...proposalData,
