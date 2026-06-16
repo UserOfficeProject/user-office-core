@@ -26,6 +26,7 @@ import {
   ProposalPkWithRankOrder,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -42,6 +43,7 @@ type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
   proposalAverageScore: number | string;
   proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
+  timeRequested?: number | string;
   tableData?: { index: number; id: number };
 };
 
@@ -118,6 +120,7 @@ const FapInstrumentProposalsTable = ({
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
   const { t } = useTranslation();
+  const dataapi = useDataApi();
 
   const getInstrumentTechnicalReview = (
     technicalReviews: TechnicalReview[] | null
@@ -127,6 +130,11 @@ const FapInstrumentProposalsTable = ({
     );
 
   const assignmentColumns = [
+    {
+      title: 'Time Requested',
+      field: 'timeRequested',
+      emptyValue: '-',
+    },
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 100 },
@@ -272,17 +280,24 @@ const FapInstrumentProposalsTable = ({
     useState<FapProposalWithAverageScoreAndAvailabilityZone[]>([]);
 
   useEffect(() => {
-    const sortByRankOrAverageScore = (data: FapProposal[]) => {
+    const sortByRankOrAverageScore = async (data: FapProposal[]) => {
       let allocationTimeSum = 0;
 
-      return data
-        .map((proposalData) => {
+      const returnData = await Promise.all(
+        data.map(async (proposalData) => {
           const proposalAverageScore = average(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
           const proposalDeviation = standardDeviation(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
+
+          const result = await dataapi().GetProposalTimeRequested({
+            proposalPk: proposalData.proposal.primaryKey,
+            instrumentId: fapInstrument.id,
+          });
+
+          const timeRequested = result.getProposalTimeRequested || 0;
 
           return {
             ...proposalData,
@@ -292,8 +307,12 @@ const FapInstrumentProposalsTable = ({
             proposalDeviation: isNaN(proposalDeviation)
               ? '-'
               : proposalDeviation,
+            timeRequested,
           };
         })
+      );
+
+      const sortedData = await returnData
         .sort((a, b) => {
           if (
             typeof a.proposalDeviation === 'number' &&
@@ -343,10 +362,20 @@ const FapInstrumentProposalsTable = ({
             };
           }
         });
+
+      return sortedData;
     };
 
-    const sortedProposals = sortByRankOrAverageScore(instrumentProposalsData);
-    setSortedProposalsWithAverageScore(sortedProposals);
+    const run = async () => {
+      const sortedProposals = await sortByRankOrAverageScore(
+        instrumentProposalsData
+      );
+      setSortedProposalsWithAverageScore(sortedProposals);
+    };
+
+    if (instrumentProposalsData.length) {
+      run();
+    }
   }, [instrumentProposalsData, fapInstrument.availabilityTime]);
 
   const ProposalTimeAllocationColumn = (
