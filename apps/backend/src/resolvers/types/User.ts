@@ -12,12 +12,6 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ProposalEndStatus } from '../../models/Proposal';
-import { ReviewerFilter, ReviewStatus } from '../../models/Review';
-import { Roles } from '../../models/Role';
-import { User as UserOrigin } from '../../models/User';
-import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
 import { Fap } from './Fap';
 import { Institution } from './Institution';
@@ -26,6 +20,12 @@ import { Invite } from './Invite';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
+import { ResolverContext } from '../../context';
+import { ProposalEndStatus } from '../../models/Proposal';
+import { ReviewerFilter, ReviewStatus } from '../../models/Review';
+import { Roles } from '../../models/Role';
+import { User as UserOrigin } from '../../models/User';
+import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 
 @InputType()
 export class UserProposalsFilter {
@@ -178,7 +178,12 @@ export class UserResolver {
 
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.instrument.dataSource.getUserInstruments(user.id);
+    const agentId = context.user?.currentRole?.id;
+
+    return context.queries.instrument.dataSource.getUserInstruments(
+      user.id,
+      agentId!
+    );
   }
 
   @FieldResolver(() => Institution)

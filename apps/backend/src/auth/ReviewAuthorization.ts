@@ -1,12 +1,13 @@
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ReviewStatus } from '../models/Review';
+import { ProposalReaderRoleConfig, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
-import { ProposalAuthorization } from './ProposalAuthorization';
-import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ReviewAuthorization {
@@ -52,6 +53,21 @@ export class ReviewAuthorization {
     const review = await this.resolveReview(reviewOrReviewId);
     if (!review) {
       return false;
+    }
+
+    const isProposalReader =
+      agent?.currentRole?.shortCode === Roles.PROPOSAL_READER;
+    if (isProposalReader) {
+      const config = agent.currentRole!.config as ProposalReaderRoleConfig;
+      if (!config.hasFapAccess) {
+        return false;
+      }
+      const hasProposalReadRights = await this.proposalAuth.hasReadRights(
+        agent,
+        review.proposalPk
+      );
+
+      return hasProposalReadRights;
     }
 
     const isAuthor = review.userID === agent?.id;

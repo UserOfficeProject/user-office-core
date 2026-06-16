@@ -35,7 +35,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isUser = useCheckAccess([UserRole.USER]);
   const { isInternalUser } = useContext(UserContext);
   const callHasEnded = isCallEnded(
     state.proposal.call?.startCall,
@@ -95,23 +94,23 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       const { call } = await api().getCallSubmissionDetails({
         callId: proposal.callId,
       });
-      const connections = call?.proposalWorkflow?.workflowConnections;
+      const statuses = call?.proposalWorkflow?.statuses;
 
       const currentStatusId = proposal.status?.id;
 
-      if (connections) {
+      if (statuses) {
         const editableStatusesShortCodes = [
           ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED.valueOf(),
           ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL.valueOf(),
         ];
         const hasUpcomingEditableStatus =
-          connections &&
-          connections.some(
-            (conn) =>
-              conn.prevStatusId &&
+          statuses &&
+          statuses.some(
+            (status) =>
+              status.statusId &&
               currentStatusId &&
-              conn.prevStatusId === currentStatusId &&
-              editableStatusesShortCodes?.includes(conn.status.shortCode)
+              status.statusId === currentStatusId &&
+              editableStatusesShortCodes?.includes(status.statusId)
           );
 
         if (proposal.status != null && hasUpcomingEditableStatus) {
@@ -142,7 +141,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     <>
       <ProposalQuestionaryReview data={proposal} />
       <NavigationFragment
-        disabled={proposal.status?.id === 0}
+        disabled={proposal.status?.id === ''}
         isLoading={isSubmitting}
       >
         <NavigButton
@@ -193,9 +192,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
-          disabled={
-            !allStepsComplete || isSubmitting || (!proposal.submitted && isUser)
-          }
+          disabled={!allStepsComplete || isSubmitting}
           color="secondary"
         >
           Download PDF

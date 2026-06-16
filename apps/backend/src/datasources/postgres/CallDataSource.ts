@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Tag } from '../../models/Tag';
 import { Workflow } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
@@ -25,6 +26,7 @@ import {
   createCallObject,
   ProposalRecord,
   WorkflowRecord,
+  createTagObject,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
@@ -52,15 +54,52 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
+  async getTagsByRoleId(roleId: number): Promise<Tag[]> {
+    try {
+      const rows = await database
+        .select('t.tag_id', 't.name')
+        .from('roles_has_tags as rht')
+        .join('tag as t', 't.tag_id', 'rht.tag_id')
+        .where('rht.role_id', roleId);
+
+      return rows.map(createTagObject);
+    } catch (error) {
+      logger.logError('Failed to get tags by role id', {
+        roleId,
+      });
+      throw error;
+    }
+  }
+
   async getCalls(
     filter?: CallsFilter,
     sortField?: string,
-    sortDirection?: PaginationSortDirection
+    sortDirection?: PaginationSortDirection,
+    agentId?: number
   ): Promise<Call[]> {
     const query = database('call').select([
       '*',
       'call.description as description',
     ]);
+
+    const tags = agentId ? (await this.getTagsByRoleId(agentId)) ?? [] : [];
+
+    if (tags.length != 0) {
+      const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const calls = await database<CallRecord>('call as c')
+          .join('tag_call as tc', 'c.call_id', 'tc.call_id')
+          .whereIn('tc.tag_id', tagIds)
+          .select('c.*');
+
+        return calls.map(createCallObject);
+      } else {
+        const calls = await database<CallRecord>('call as c').select('c.*');
+
+        return calls.map(createCallObject);
+      }
+    }
+
     if (filter?.shortCode) {
       query.where('call_short_code', 'like', `%${filter.shortCode}%`);
     }
@@ -174,15 +213,14 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_ended', false);
     }
 
-    if (filter?.proposalStatusShortCode) {
+    if (filter?.proposalStatus) {
       query
         .join(
-          'workflow_connections as w',
+          'workflow_has_statuses as w',
           'call.proposal_workflow_id',
           'w.workflow_id'
         )
-        .leftJoin('statuses as s', 'w.status_id', 's.status_id')
-        .where('s.short_code', filter.proposalStatusShortCode)
+        .where('w.status_id', filter.proposalStatus)
         .distinctOn('call.call_id');
     }
     if (sortField && sortDirection) {

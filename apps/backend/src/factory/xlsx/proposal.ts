@@ -7,6 +7,7 @@ import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 type ProposalXLSData = Array<string | number>;
 
@@ -86,7 +87,10 @@ export const collectProposalXLSXData = async (
           .join(', ')
       : '<missing>',
     technicalReviews
-      ?.map((technicalReview) => technicalReview?.publicComment || '<missing>')
+      ?.map(
+        (technicalReview) =>
+          stripHtml(technicalReview.publicComment ?? '').trim() || '<missing>'
+      )
       .join(', ') || '<missing>',
     technicalReviews
       ?.map((technicalReview) => technicalReview?.timeAllocation ?? '<missing>')
@@ -140,10 +144,10 @@ export const collectTechniqueProposalXLSXData = async (
     ? proposal.submittedDate.toLocaleString()
     : '';
 
-  const status = await baseContext.queries.status.getStatus(
-    user,
-    proposal.statusId
-  );
+  const status =
+    await baseContext.queries.status.dataSource.getStatusByWorkflowStatusId(
+      proposal.workflowStatusId
+    );
 
   return [
     proposal.proposalId,

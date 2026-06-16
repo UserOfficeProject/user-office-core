@@ -10,15 +10,6 @@ import {
   Root,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import {
-  Proposal as ProposalOrigin,
-  InvitedProposal as InvitedProposalOrigin,
-  ProposalEndStatus,
-  ProposalPublicStatus,
-} from '../../models/Proposal';
-import { isRejection } from '../../models/Rejection';
-import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Experiment } from './Experiment';
@@ -35,6 +26,15 @@ import { Status } from './Status';
 import { TechnicalReview } from './TechnicalReview';
 import { Technique } from './Technique';
 import { Visit } from './Visit';
+import { ResolverContext } from '../../context';
+import {
+  Proposal as ProposalOrigin,
+  InvitedProposal as InvitedProposalOrigin,
+  ProposalEndStatus,
+  ProposalPublicStatus,
+} from '../../models/Proposal';
+import { isRejection } from '../../models/Rejection';
+import { TemplateCategoryId } from '../../models/Template';
 
 const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
 statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
@@ -54,7 +54,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public abstract: string;
 
   @Field(() => Int)
-  public statusId: number;
+  public workflowStatusId: number;
 
   @Field(() => Date)
   public created: Date;
@@ -161,10 +161,22 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Status | null> {
-    return await context.queries.status.getStatus(
-      context.user,
-      proposal.statusId
+    return await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+      proposal.workflowStatusId
     );
+  }
+
+  @FieldResolver(() => String)
+  async statusId(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<string | null> {
+    const status =
+      await context.queries.status.dataSource.getStatusByWorkflowStatusId(
+        proposal.workflowStatusId
+      );
+
+    return status!.id;
   }
 
   @FieldResolver(() => ProposalPublicStatus)
@@ -230,7 +242,8 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Fap[] | null> {
-    return await context.queries.fap.dataSource.getFapsByProposalPk(
+    return await context.queries.fap.getFapsByProposalPk(
+      context.user,
       proposal.primaryKey
     );
   }

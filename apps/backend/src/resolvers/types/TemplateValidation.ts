@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { TemplateValidation as TemplateValidationOrigin } from '../../models/Template';
 import { TemplateValidationData } from './TemplateValidationData';
+import { TemplateValidation as TemplateValidationOrigin } from '../../models/Template';
 
 @ObjectType()
 export class TemplateValidation implements Partial<TemplateValidationOrigin> {

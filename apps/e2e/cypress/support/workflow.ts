@@ -1,14 +1,15 @@
 import {
-  AddConnectionStatusActionsMutation,
-  AddConnectionStatusActionsMutationVariables,
-  AddWorkflowStatusMutation,
-  AddWorkflowStatusMutationVariables,
-  AddStatusChangingEventsToConnectionMutation,
-  AddStatusChangingEventsToConnectionMutationVariables,
+  AddStatusToWorkflowMutation,
+  AddStatusToWorkflowMutationVariables,
   CreateStatusMutation,
   CreateStatusMutationVariables,
+  CreateWorkflowConnectionMutation,
   CreateWorkflowMutation,
   CreateWorkflowMutationVariables,
+  SetStatusActionsOnConnectionInput,
+  SetStatusActionsOnConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutation,
+  SetStatusChangingEventsOnConnectionMutationVariables,
   Status,
 } from '@user-office-software-libs/shared-types';
 
@@ -33,48 +34,85 @@ const createStatus = (
   return cy.wrap(request);
 };
 
-const addWorkflowStatus = (
-  addWorkflowStatusInput: AddWorkflowStatusMutationVariables
-): Cypress.Chainable<AddWorkflowStatusMutation> => {
+const addStatusToWorkflow = (
+  addStatusToWorkflowInput: Omit<
+    AddStatusToWorkflowMutationVariables,
+    'posX' | 'posY'
+  > & {
+    prevId?: number;
+    posX?: number;
+    posY?: number;
+  }
+): Cypress.Chainable<
+  AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
+> => {
   const api = getE2EApi();
-  const request = api.addWorkflowStatus(addWorkflowStatusInput);
 
-  return cy.wrap(request);
+  return cy
+    .wrap(null)
+    .then<AddStatusToWorkflowMutation>(() =>
+      api.addStatusToWorkflow({
+        ...addStatusToWorkflowInput,
+        posX: addStatusToWorkflowInput.posX ?? 0,
+        posY: addStatusToWorkflowInput.posY ?? 0,
+      })
+    )
+    .then<AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation>(
+      (request) => {
+        if (!addStatusToWorkflowInput.prevId) {
+          const emptyConnection = {
+            createWorkflowConnection: null,
+          } as unknown as CreateWorkflowConnectionMutation;
+
+          return Promise.resolve({ ...request, ...emptyConnection });
+        }
+
+        return api
+          .createWorkflowConnection({
+            newWorkflowConnectionInput: {
+              nextWorkflowStatusId:
+                request.addStatusToWorkflow.workflowStatusId,
+              prevWorkflowStatusId: addStatusToWorkflowInput.prevId,
+              sourceHandle: 'bottom-source',
+              targetHandle: 'top-target',
+            },
+          })
+          .then((request2) => ({ ...request, ...request2 }));
+      }
+    );
 };
 
-const addStatusChangingEventsToConnection = (
-  addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
-): Cypress.Chainable<AddStatusChangingEventsToConnectionMutation> => {
+const setStatusChangingEventsOnConnection = (
+  setStatusChangingEventsOnConnectionInput: SetStatusChangingEventsOnConnectionMutationVariables
+): Cypress.Chainable<SetStatusChangingEventsOnConnectionMutation> => {
   const api = getE2EApi();
-  const request = api.addStatusChangingEventsToConnection(
-    addStatusChangingEventsToConnectionInput
+  const request = api.setStatusChangingEventsOnConnection(
+    setStatusChangingEventsOnConnectionInput
   );
 
   return cy.wrap(request);
 };
 
 const addConnectionStatusActions = (
-  addStatusActionToConnectionInput: AddConnectionStatusActionsMutationVariables
-): Cypress.Chainable<AddConnectionStatusActionsMutation> => {
+  setStatusActionsOnConnectionInput: SetStatusActionsOnConnectionInput
+): Cypress.Chainable<SetStatusActionsOnConnectionMutation> => {
   const api = getE2EApi();
-  const request = api.addConnectionStatusActions(
-    addStatusActionToConnectionInput
+  const request = api.setStatusActionsOnConnection(
+    setStatusActionsOnConnectionInput
   );
 
   return cy.wrap(request);
 };
 
-const addFeasibilityReviewToDefaultWorkflow =
-  (): Cypress.Chainable<AddWorkflowStatusMutation> => {
-    return cy.addWorkflowStatus({
-      statusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      workflowId: 1,
-      sortOrder: 1,
-      prevStatusId: 1,
-      posX: 0,
-      posY: 200,
-    });
-  };
+const addFeasibilityReviewToDefaultWorkflow = (): Cypress.Chainable<
+  AddStatusToWorkflowMutation & CreateWorkflowConnectionMutation
+> => {
+  return cy.addStatusToWorkflow({
+    statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+    workflowId: initialDBData.workflows.defaultWorkflow.id,
+    prevId: 1,
+  });
+};
 /**
  * Creates a proper DataTransfer mock that stores and returns data like the real browser API
  */
@@ -100,7 +138,7 @@ function createDataTransferMock() {
  */
 
 function dragStatusIntoWorkflow(
-  status: Pick<Status, 'shortCode' | 'id'>,
+  status: Pick<Status, 'id'>,
   options: {
     clientX?: number;
     clientY?: number;
@@ -108,7 +146,7 @@ function dragStatusIntoWorkflow(
 ) {
   const { clientX = 500, clientY = 300 } = options;
 
-  const sourceSelector = `[data-cy="status_${status.shortCode}"]`;
+  const sourceSelector = `[data-cy="status_${status.id}"]`;
   const targetSelector = '[data-testid="rf__background"]';
   cy.get(sourceSelector).then(($element) => {
     const sourceElement = $element[0];
@@ -147,24 +185,24 @@ function dragStatusIntoWorkflow(
  * @param options - Additional options for the connection operation
  */
 function connectReactFlowNodes(
-  sourceStatus: Pick<Status, 'shortCode'>,
-  targetStatus: Pick<Status, 'shortCode'>,
+  sourceStatus: Pick<Status, 'id'>,
+  targetStatus: Pick<Status, 'id'>,
   options?: {
     force?: boolean;
   }
 ) {
-  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.shortCode}"] [data-handlepos="bottom"]`;
-  const targetNodeSelector = `[data-cy="connection_${targetStatus.shortCode}"] [data-handlepos="top"]`;
+  const sourceNodeSelector = `[data-cy="workflow_status_${sourceStatus.id}"] [data-handlepos="bottom"]`;
+  const targetNodeSelector = `[data-cy="workflow_status_${targetStatus.id}"] [data-handlepos="top"]`;
   cy.get(sourceNodeSelector).click(options);
   cy.get(targetNodeSelector).click(options);
 }
 
 Cypress.Commands.add('createWorkflow', createWorkflow);
 Cypress.Commands.add('createStatus', createStatus);
-Cypress.Commands.add('addWorkflowStatus', addWorkflowStatus);
+Cypress.Commands.add('addStatusToWorkflow', addStatusToWorkflow);
 Cypress.Commands.add(
-  'addStatusChangingEventsToConnection',
-  addStatusChangingEventsToConnection
+  'setStatusChangingEventsOnConnection',
+  setStatusChangingEventsOnConnection
 );
 Cypress.Commands.add('addConnectionStatusActions', addConnectionStatusActions);
 Cypress.Commands.add(

@@ -1,4 +1,3 @@
-import { Event } from '../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -8,12 +7,12 @@ import {
 } from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
+import { ExperimentSafetyEventsRecord } from './postgres/records';
 import {
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../utils/pagination';
-import { ExperimentSafetyEventsRecord } from './postgres/records';
 
 export interface ExperimentDataSource {
   create(
@@ -96,10 +95,6 @@ export interface ExperimentDataSource {
     experiments: Experiment[];
   }>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
-  markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null>;
   getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null>;

@@ -1,12 +1,14 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import ReviewQueries from './ReviewQueries';
 import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
+  dummyProposalReaderWithFapAccess,
+  dummyProposalReaderWithoutFapAccess,
 } from '../datasources/mockups/UserDataSource';
-import ReviewQueries from './ReviewQueries';
 
 const reviewQueries = container.resolve(ReviewQueries);
 
@@ -36,4 +38,20 @@ test('A user can not get reviews for a proposal', () => {
       proposalPk: 10,
     })
   ).resolves.toStrictEqual(null);
+});
+
+test('A proposal reader with FAP access can get reviews for a proposal', () => {
+  return expect(
+    reviewQueries.reviewsForProposal(dummyProposalReaderWithFapAccess, {
+      proposalPk: 10,
+    })
+  ).resolves.toStrictEqual([dummyReview]);
+});
+
+test('A proposal reader without FAP access cannot get reviews for a proposal', () => {
+  return expect(
+    reviewQueries.reviewsForProposal(dummyProposalReaderWithoutFapAccess, {
+      proposalPk: 10,
+    })
+  ).resolves.toStrictEqual([]);
 });

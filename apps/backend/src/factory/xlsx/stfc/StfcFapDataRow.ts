@@ -1,10 +1,10 @@
-import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
 import { QuestionaryStep } from '../../../models/Questionary';
 import { Review } from '../../../models/Review';
+import { stripHtml } from '../../../utils/stringStripHtml';
 import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
 import { getDataRow } from '../FapDataRow';
@@ -41,7 +41,7 @@ export async function getStfcDataRow(
               ? `${reviewer.preferredname} ${reviewer.lastname} `
               : '<missing>',
             rev.grade,
-            rev.comment && stripHtml(rev.comment).result,
+            rev.comment && stripHtml(rev.comment),
           ];
         })
       )
@@ -62,7 +62,7 @@ export async function getStfcDataRow(
       (answer) =>
         answer.question.naturalKey === 'Proposed_Route' ||
         answer.question.naturalKey === 'direct_access_route'
-    )?.value.value;
+    )?.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
     proposer_id?.toString() ?? '',

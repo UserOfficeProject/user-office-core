@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import EventLogQueries from './EventLogQueries';
 import {
   dummyEventLogUserUpdated,
   dummyEventLogs,
@@ -9,8 +10,9 @@ import {
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
+  dummyProposalReaderWithLogAccess,
+  dummyProposalReaderWithoutLogAccess,
 } from '../datasources/mockups/UserDataSource';
-import EventLogQueries from './EventLogQueries';
 
 const eventLogQueries = container.resolve(EventLogQueries);
 
@@ -52,5 +54,26 @@ describe('Test EventLogQueries', () => {
     return expect(eventLogQueries.getAll(dummyUserWithRole)).resolves.toBe(
       null
     );
+  });
+
+  test('A proposal reader with hasLogAccess can get all event logs', () => {
+    return expect(
+      eventLogQueries.getAll(dummyProposalReaderWithLogAccess)
+    ).resolves.toStrictEqual(dummyEventLogs);
+  });
+
+  test('A proposal reader with hasLogAccess can get filtered event logs', () => {
+    return expect(
+      eventLogQueries.getAll(dummyProposalReaderWithLogAccess, {
+        eventType: 'USER',
+        changedObjectId: '*',
+      })
+    ).resolves.toStrictEqual([dummyEventLogUserUpdated]);
+  });
+
+  test('A proposal reader without hasLogAccess cannot get event logs', () => {
+    return expect(
+      eventLogQueries.getAll(dummyProposalReaderWithoutLogAccess)
+    ).resolves.toBe(null);
   });
 });

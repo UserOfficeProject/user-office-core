@@ -238,10 +238,16 @@ const AppRoutes = () => {
           }
         />
 
-        <Route
-          path="/Proposals"
-          element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
-        />
+        {isUserOfficer || isProposalReader ? (
+          <Route
+            path="/Proposals"
+            element={
+              <TitledRoute title="Proposals" element={<ProposalPage />} />
+            }
+          />
+        ) : (
+          <Route path="/Proposals" element={<Navigate to="/" replace />} />
+        )}
         {isTechniqueProposalsEnabled &&
           (isInstrumentScientist || isUserOfficer) && (
             <Route

@@ -3,12 +3,16 @@ import * as Logger from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { stfcEmailHandler } from './stfcEmailHandler';
 import { Tokens } from '../../config/Tokens';
+import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { stfcEmailHandler } from './stfcEmailHandler';
 
 const ORIGINAL_ENV = process.env;
+const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+  Tokens.EmailTemplateDataSource
+);
 const spyLogError = jest
   .spyOn(Logger.logger, 'logError')
   .mockImplementation(() => {});
@@ -66,10 +70,16 @@ describe('stfcEmailHandler', () => {
       mockMailService.sendMail.mockResolvedValue({ success: true });
 
       await stfcEmailHandler(mockEvent);
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(
+          'call-created-email'
+        );
 
       expect(process.env.FBS_EMAIL).toBe(inviteEmail);
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template: 'call-created-email' },
+        content: {
+          template: emailTemplate?.id.toString(),
+        },
         substitution_data: {
           shortCode: 'string',
           startCall: new Date(2000, 1, 1),
@@ -99,6 +109,10 @@ describe('stfcEmailHandler', () => {
         isRejection: false,
       } as ApplicationEvent;
       const forcedError = new Error('SMTP down');
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(
+          'call-created-email'
+        );
 
       mockMailService.sendMail.mockRejectedValueOnce(forcedError);
       container.registerInstance(Tokens.MailService, mockMailService);
@@ -109,7 +123,9 @@ describe('stfcEmailHandler', () => {
       await new Promise(setImmediate);
 
       expect(mockMailService.sendMail).toHaveBeenCalledWith({
-        content: { template: 'call-created-email' },
+        content: {
+          template: emailTemplate?.id.toString(),
+        },
         substitution_data: {
           shortCode: 'error',
         },

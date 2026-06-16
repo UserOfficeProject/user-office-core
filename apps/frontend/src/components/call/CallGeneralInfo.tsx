@@ -182,10 +182,10 @@ const CallGeneralInfo = ({
       (value) => value.id === proposalWorkflowId
     );
     if (selectedProposalWorkFlow) {
-      const result = selectedProposalWorkFlow.workflowConnections.some(
-        (connectionStatus) => {
+      const result = selectedProposalWorkFlow.statuses.some(
+        (workflowStatus) => {
           return (
-            connectionStatus.status.shortCode ===
+            workflowStatus.statusId ===
             ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
           );
         }

@@ -13,6 +13,9 @@ import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { UserDataSource } from '../UserDataSource';
 
+export const dummyInstitution = { id: 1, name: 'Test Institution', country: 1 };
+export const dummyCountry = { countryId: 1, country: 'Test Country' };
+
 export const basicDummyUser = new BasicUserDetails(
   2,
   'john',
@@ -64,7 +67,7 @@ export const dummyUserOfficerWithRole: UserWithRole = {
     title: 'User Officer',
     shortCode: 'user_officer',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -94,7 +97,7 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
     title: 'Principal investigator',
     shortCode: 'user',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -107,7 +110,7 @@ export const dummyUserWithRole: UserWithRole = {
     title: 'User',
     shortCode: 'user',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -120,7 +123,7 @@ export const dummyFapChairWithRole: UserWithRole = {
     title: 'Fap Chair',
     shortCode: 'fap_chair',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -133,7 +136,7 @@ export const dummyFapSecretaryWithRole: UserWithRole = {
     title: 'Fap Secretary',
     shortCode: 'fap_secretary',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -146,7 +149,7 @@ export const dummyFapReviewerWithRole: UserWithRole = {
     title: 'Fap Reviewer',
     shortCode: 'fap_reviewer',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -159,7 +162,7 @@ export const dummySampleReviewer: UserWithRole = {
     title: 'Experiment Safety Reviewer',
     shortCode: 'experiment_safety_reviewer',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -172,7 +175,7 @@ export const dummyInternalReviewer: UserWithRole = {
     title: 'Internal Reviewer',
     shortCode: 'internal_reviewer',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
 };
@@ -185,9 +188,142 @@ export const dummyInstrumentScientist: UserWithRole = {
     title: 'Instrument Scientist',
     shortCode: 'instrument_scientist',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithLogAccess: UserWithRole = {
+  ...dummyUser,
+  id: 103,
+  currentRole: {
+    id: 10,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: true,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithoutLogAccess: UserWithRole = {
+  ...dummyUser,
+  id: 104,
+  currentRole: {
+    id: 11,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithTechnicalReviewAccess: UserWithRole = {
+  ...dummyUser,
+  id: 105,
+  currentRole: {
+    id: 12,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: true,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithoutTechnicalReviewAccess: UserWithRole = {
+  ...dummyUser,
+  id: 106,
+  currentRole: {
+    id: 13,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithFapAccess: UserWithRole = {
+  ...dummyUser,
+  id: 107,
+  currentRole: {
+    id: 14,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: true,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithoutFapAccess: UserWithRole = {
+  ...dummyUser,
+  id: 108,
+  currentRole: {
+    id: 15,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: false,
+    },
+    isRootRole: false,
+  } as Role,
+  externalTokenValid: true,
+};
+
+export const dummyProposalReaderWithAdminAccess: UserWithRole = {
+  ...dummyUser,
+  id: 109,
+  currentRole: {
+    id: 16,
+    title: 'Proposal Reader',
+    shortCode: Roles.PROPOSAL_READER,
+    description: '',
+    config: {
+      hasLogAccess: false,
+      hasTechnicalReviewAccess: false,
+      hasFapAccess: false,
+      hasAdminAccess: true,
+    },
+    isRootRole: false,
+  } as Role,
   externalTokenValid: true,
 };
 
@@ -199,7 +335,7 @@ export const dummyVisitorWithRole: UserWithRole = {
     title: 'Visitor',
     shortCode: 'user',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -244,7 +380,7 @@ export const dummyUserNotOnProposalWithRole: UserWithRole = {
     title: 'User',
     shortCode: 'user',
     description: '',
-    permissions: [],
+    config: {},
     isRootRole: true,
   },
   externalTokenValid: true,
@@ -278,7 +414,7 @@ export class UserDataSourceMock implements UserDataSource {
     return 1;
   }
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
-    throw new Error('Method not implemented.');
+    return [dummyUser];
   }
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
     if (id === dummyUser.id) {
@@ -347,7 +483,7 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'user_officer',
           title: 'User Officer',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: true,
         },
       ];
@@ -358,7 +494,7 @@ export class UserDataSourceMock implements UserDataSource {
           title: 'Instrument Scientist',
           shortCode: 'instrument_scientist',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: true,
         },
       ];
@@ -369,7 +505,7 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'fap_reviewer',
           title: 'Fap Reviewer',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: true,
         },
       ];
@@ -380,7 +516,7 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'fap_chair',
           title: 'Fap Chair',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: true,
         },
       ];
@@ -391,7 +527,7 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'user',
           title: 'User',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: true,
         },
       ];
@@ -405,7 +541,7 @@ export class UserDataSourceMock implements UserDataSource {
         shortCode: 'user_officer',
         title: 'User Officer',
         description: '',
-        permissions: [],
+        config: {},
         isRootRole: true,
       },
       {
@@ -413,7 +549,7 @@ export class UserDataSourceMock implements UserDataSource {
         shortCode: 'user',
         title: 'User',
         description: '',
-        permissions: [],
+        config: {},
         isRootRole: true,
       },
     ];
@@ -442,8 +578,8 @@ export class UserDataSourceMock implements UserDataSource {
   } | null> {
     return {
       user: dummyUser,
-      institution: { id: 1, name: 'Test Institution', country: 1 },
-      country: { countryId: 1, country: 'Test Country' },
+      institution: dummyInstitution,
+      country: dummyCountry,
     };
   }
 
@@ -486,8 +622,8 @@ export class UserDataSourceMock implements UserDataSource {
     return [
       {
         user: dummyUser,
-        institution: { id: 1, name: 'Test Institution', country: 1 },
-        country: { countryId: 1, country: 'Test Country' },
+        institution: dummyInstitution,
+        country: dummyCountry,
       },
     ];
   }
@@ -575,7 +711,7 @@ export class UserDataSourceMock implements UserDataSource {
       shortCode: 'user_officer',
       title: 'User Officer',
       description: '',
-      permissions: [],
+      config: {},
       isRootRole: true,
     };
   }
@@ -646,8 +782,8 @@ export class UserDataSourceMock implements UserDataSource {
     return [
       {
         user: dummyUser,
-        institution: { id: 1, name: 'Test Institution', country: 1 },
-        country: { countryId: 1, country: 'Test Country' },
+        institution: dummyInstitution,
+        country: dummyCountry,
       },
     ];
   }

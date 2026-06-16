@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
@@ -20,7 +21,6 @@ import { RoleDataSource } from '../datasources/RoleDataSource';
 import { TagDataSource } from '../datasources/TagDataSource';
 import { AllocationTimeUnits } from '../models/Call';
 import { Roles } from '../models/Role';
-import { ProposalAuthorization } from './ProposalAuthorization';
 
 const proposalAuthorization = container.resolve(ProposalAuthorization);
 
@@ -121,7 +121,7 @@ test('A instrument sci cannot access proposals they are not on', async () => {
           title: 'Instrument Scientist',
           shortCode: 'instrument_scientist',
           description: '',
-          permissions: [],
+          config: {},
           isRootRole: false,
         },
       },
@@ -150,7 +150,7 @@ test('A proposal reader has access to proposal matching their instrument', async
       title: 'Proposal Reader',
       shortCode: Roles.PROPOSAL_READER,
       description: '',
-      permissions: [],
+      config: {},
       isRootRole: false,
     },
   };
@@ -215,7 +215,7 @@ test('A proposal reader does not have access to proposal not matching their inst
       title: 'Proposal Reader',
       shortCode: Roles.PROPOSAL_READER,
       description: '',
-      permissions: [],
+      config: {},
       isRootRole: false,
     },
   };
@@ -276,7 +276,7 @@ test('A proposal reader has access to proposal matching their call', async () =>
       title: 'Proposal Reader',
       shortCode: Roles.PROPOSAL_READER,
       description: '',
-      permissions: [],
+      config: {},
       isRootRole: false,
     },
   };

@@ -1,8 +1,11 @@
 mutation changeTechniqueProposalsStatus(
   $proposalPks: [Int!]!
-  $statusId: Int!
+  $workflowStatusId: Int!
 ) {
   changeTechniqueProposalsStatus(
-    changeProposalsStatusInput: { proposalPks: $proposalPks, statusId: $statusId }
+    changeProposalsStatusInput: {
+      proposalPks: $proposalPks
+      workflowStatusId: $workflowStatusId
+    }
   )
 }

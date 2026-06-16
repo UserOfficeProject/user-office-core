@@ -1,0 +1,11 @@
+fragment roleConfig on RoleConfig {
+  ... on UserRoleConfig {
+    note
+  }
+  ... on ProposalReaderRoleConfig {
+    hasLogAccess
+    hasTechnicalReviewAccess
+    hasFapAccess
+    hasAdminAccess
+  }
+}

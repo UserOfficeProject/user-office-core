@@ -1,10 +1,10 @@
 import { randomBytes } from 'crypto';
 
-import * as Yup from 'yup';
+import { AnyObjectSchema } from 'yup';
 
 import { BasicResolverContext } from '../context';
-import { Review, ReviewStatus } from '../models/Review';
 import { OmitType } from './utilTypes';
+import { Review, ReviewStatus } from '../models/Review';
 
 export const omit: OmitType = (obj, ...keys) => {
   const ret = {} as {
@@ -20,8 +20,11 @@ export const omit: OmitType = (obj, ...keys) => {
   return ret;
 };
 
-export const mergeValidationSchemas = (...schemas: Yup.AnyObjectSchema[]) => {
-  const [first, ...rest] = schemas;
+export const mergeValidationSchemas = (
+  ...schemas: (AnyObjectSchema | AnyObjectSchema[])[]
+): AnyObjectSchema => {
+  const flatSchemas = schemas.flat();
+  const [first, ...rest] = flatSchemas;
 
   const merged = rest.reduce(
     (mergedSchemas, schema) => mergedSchemas.concat(schema),
