@@ -230,13 +230,16 @@ const FapInstrumentProposalsTable = ({
   ];
 
   // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
-  const columns = assignmentColumns.map((column) => ({
-    ...column,
-    title:
-      column.field === 'timeAllocation'
-        ? `${column.title} (${selectedCall?.allocationTimeUnit}s)`
-        : column.title,
-  }));
+  const columns = assignmentColumns.map((column) => {
+    if (column.field === 'timeAllocation' || column.field === 'timeRequested') {
+      return {
+        ...column,
+        title: `${column.title} (${selectedCall?.allocationTimeUnit}s)`,
+      };
+    }
+
+    return column;
+  });
 
   const DragState = {
     row: -1,
