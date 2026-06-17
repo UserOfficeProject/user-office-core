@@ -148,7 +148,7 @@ context('Experiments tests', () => {
       cy.get('span[aria-sort="descending"]').click();
     });
 
-    it('Columns in Experiments Table are sortable - Experiment Safety Reviwer', () => {
+    it('Columns in Experiments Table are sortable - Experiment Safety Reviewer', () => {
       cy.login('experimentSafetyReviewer1');
       cy.visit('/');
 
