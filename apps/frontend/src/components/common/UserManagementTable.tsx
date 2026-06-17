@@ -78,7 +78,7 @@ const UserManagementTable = ({
   const InviteComponent = (
     <ProposalPeopleSelectorModal
       modalOpen={modalOpen}
-      title="Add co-proposers"
+      title="Add Data Access User"
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
