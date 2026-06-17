@@ -325,8 +325,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
       .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
+      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
       .where('p.proposal_pk', proposalId)
-      .where('a.question_id', 'instrument_picker_question')
+      .where('q.data_type', 'INSTRUMENT_PICKER')
       .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
         instrumentId.toString(),
       ])
