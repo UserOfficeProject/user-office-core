@@ -758,34 +758,34 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           })
           .then((fetchedInstrumentIds) => {
             return api().getTechniqueScientistProposals({
-            filter: {
-              callId,
-              callIds,
-              instrumentFilter,
-              instrumentIds:
+              filter: {
+                callId,
+                callIds,
+                instrumentFilter,
+                instrumentIds:
                   instrumentIds != null && instrumentIds.length > 0
                     ? instrumentIds
                     : fetchedInstrumentIds,
-              techniqueFilter,
-              proposalStatusId,
-              text,
-              referenceNumbers,
-              dateFilter,
-              excludeProposalStatusIds:
-                currentRole === UserRole.INSTRUMENT_SCIENTIST
-                  ? [StatusCode.EXPIRED]
-                  : [],
-            },
-            sortField: orderBy?.orderByField,
-            sortDirection:
-              orderBy?.orderDirection == PaginationSortDirection.ASC
-                ? PaginationSortDirection.ASC
-                : orderBy?.orderDirection == PaginationSortDirection.DESC
-                  ? PaginationSortDirection.DESC
-                  : undefined,
-            first: tableQuery.pageSize,
-            offset: tableQuery.page * tableQuery.pageSize,
-            searchText: tableQuery.search,
+                techniqueFilter,
+                proposalStatusId,
+                text,
+                referenceNumbers,
+                dateFilter,
+                excludeProposalStatusIds:
+                  currentRole === UserRole.INSTRUMENT_SCIENTIST
+                    ? [StatusCode.EXPIRED]
+                    : [],
+              },
+              sortField: orderBy?.orderByField,
+              sortDirection:
+                orderBy?.orderDirection == PaginationSortDirection.ASC
+                  ? PaginationSortDirection.ASC
+                  : orderBy?.orderDirection == PaginationSortDirection.DESC
+                    ? PaginationSortDirection.DESC
+                    : undefined,
+              first: tableQuery.pageSize,
+              offset: tableQuery.page * tableQuery.pageSize,
+              searchText: tableQuery.search,
             });
           })
           .then((data) => {
