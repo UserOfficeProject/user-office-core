@@ -29,7 +29,7 @@ import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
@@ -429,6 +429,7 @@ const ProposalTableOfficer = ({
   const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
   const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
@@ -1215,11 +1216,21 @@ const ProposalTableOfficer = ({
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={() => {
+          const from = searchParams.get('from');
+
           if (searchParams.get('proposalId')) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
+          }
+
+          if (from) {
+            // Return to the page that opened the modal (e.g. Experiments),
+            // restoring its filters, instead of staying on /Proposals.
+            navigate(decodeURIComponent(from), { replace: true });
+
+            return;
           }
 
           setSearchParams((searchParams) => {
