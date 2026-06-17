@@ -180,7 +180,7 @@ export default function ExperimentsTable({
         <RoleBasedLink
           roleRoutes={{
             [UserRole.USER_OFFICER]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
-            // [UserRole.INSTRUMENT_SCIENTIST]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
+            [UserRole.INSTRUMENT_SCIENTIST]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
           }}
         >
           {rowData.proposal.proposalId}

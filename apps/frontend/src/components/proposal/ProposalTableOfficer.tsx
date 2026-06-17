@@ -37,6 +37,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import RoleBasedLink from 'components/common/RoleBasedLink';
 import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
@@ -68,6 +69,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
+import { fromArrayToCommaSeparatedLinks } from 'utils/fromArrayToCommaSeparatedLinks';
 import {
   addColumns,
   fromArrayToCommaSeparated,
@@ -130,9 +132,17 @@ let columns: Column<ProposalViewData>[] = [
     sorting: false,
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname
-        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
-        : '',
+      proposalView.principalInvestigator?.lastname ? (
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/People/${proposalView.principalInvestigator.id}`,
+          }}
+        >
+          {`${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`}
+        </RoleBasedLink>
+      ) : (
+        ''
+      ),
   },
   {
     title: 'PI Email',
@@ -157,6 +167,15 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Call',
     field: 'callShortCode',
+    // No per-call route exists, so officers link to the Calls list page.
+    render: (rowData) =>
+      rowData.callShortCode ? (
+        <RoleBasedLink roleRoutes={{ [UserRole.USER_OFFICER]: '/Calls' }}>
+          {rowData.callShortCode}
+        </RoleBasedLink>
+      ) : (
+        ''
+      ),
   },
 ];
 
@@ -200,10 +219,17 @@ const instrumentManagementColumns = (
   {
     title: t('instrument'),
     field: 'instruments.name',
+    // No per-instrument route exists, so officers link to the Instruments list page.
+
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(
-        rowData.instruments?.map((instrument) => instrument.name)
+      fromArrayToCommaSeparatedLinks(
+        rowData.instruments?.map((instrument) => ({
+          key: instrument.id,
+          label: instrument.name,
+          roleRoutes: { [UserRole.USER_OFFICER]: '/Instruments' },
+        }))
       ),
+
     customFilterAndSearch: () => true,
   },
 ];
@@ -223,7 +249,13 @@ const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
     title: t('FAP'),
     field: 'faps.code',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
+      fromArrayToCommaSeparatedLinks(
+        rowData.faps?.map((fap) => ({
+          key: fap.id,
+          label: fap.code,
+          roleRoutes: { [UserRole.USER_OFFICER]: `/FapPage/${fap.id}` },
+        }))
+      ),
   },
 ];
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
