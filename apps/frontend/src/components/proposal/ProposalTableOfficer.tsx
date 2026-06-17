@@ -170,7 +170,11 @@ let columns: Column<ProposalViewData>[] = [
     // No per-call route exists, so officers link to the Calls list page.
     render: (rowData) =>
       rowData.callShortCode ? (
-        <RoleBasedLink roleRoutes={{ [UserRole.USER_OFFICER]: '/Calls' }}>
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/Calls?search=${encodeURIComponent(rowData.callShortCode)}`,
+          }}
+        >
           {rowData.callShortCode}
         </RoleBasedLink>
       ) : (
@@ -226,7 +230,9 @@ const instrumentManagementColumns = (
         rowData.instruments?.map((instrument) => ({
           key: instrument.id,
           label: instrument.name,
-          roleRoutes: { [UserRole.USER_OFFICER]: '/Instruments' },
+          roleRoutes: {
+            [UserRole.USER_OFFICER]: `/Instruments?search=${instrument.name}`,
+          },
         }))
       ),
 
