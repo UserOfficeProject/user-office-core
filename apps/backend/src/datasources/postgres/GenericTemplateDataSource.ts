@@ -126,12 +126,12 @@ export default class PostgresGenericTemplateDataSource
       })
       .catch((err) => {
         if (err.message.includes('value too long')) {
-          return new GraphQLError(
+          throw new GraphQLError(
             'Failed to insert genericTemplate as the value is too long'
           );
         }
 
-        return err;
+        throw err;
       });
   }
 
