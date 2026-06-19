@@ -572,7 +572,7 @@ export default class ExperimentMutations {
       // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
       experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);
     } else {
-      rejection(
+      return rejection(
         'Could not change statuses to all of the selected experiment safeties',
         {
           result,

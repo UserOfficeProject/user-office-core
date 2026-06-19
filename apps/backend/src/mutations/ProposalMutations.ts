@@ -591,9 +591,12 @@ export default class ProposalMutations {
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
       proposalStatusActionEngine(statusEngineReadyProposals);
     } else {
-      rejection('Could not change statuses to all of the selected proposals', {
-        result,
-      });
+      return rejection(
+        'Could not change statuses to all of the selected proposals',
+        {
+          result,
+        }
+      );
     }
 
     return result || rejection('Can not change proposal status', { result });

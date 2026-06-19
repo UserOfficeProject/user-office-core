@@ -88,45 +88,6 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   1
 );
 
-const dummyProposalEvents = {
-  proposal_pk: 1,
-  proposal_created: true,
-  proposal_submitted: true,
-  proposal_feasibility_review_feasible: true,
-  proposal_feasibility_review_unfeasible: false,
-  call_ended: false,
-  call_ended_internal: false,
-  call_review_ended: false,
-  call_fap_review_ended: false,
-  proposal_faps_selected: false,
-  proposal_instruments_selected: false,
-  proposal_feasibility_review_submitted: false,
-  proposal_sample_review_submitted: false,
-  proposal_all_fap_reviews_submitted: false,
-  proposal_feasibility_review_updated: false,
-  proposal_management_decision_submitted: false,
-  proposal_management_decision_updated: false,
-  proposal_sample_safe: false,
-  proposal_fap_review_updated: false,
-  proposal_all_fap_reviewers_selected: false,
-  proposal_fap_review_submitted: false,
-  proposal_fap_meeting_submitted: false,
-  proposal_all_fap_meetings_submitted: false,
-  proposal_all_reviews_submitted_for_all_faps: false,
-  proposal_all_fap_meeting_instrument_submitted: false,
-  proposal_instrument_submitted: false,
-  proposal_accepted: false,
-  proposal_reserved: false,
-  proposal_rejected: false,
-  proposal_notified: false,
-  proposal_booking_time_activated: false,
-  proposal_booking_time_updated: false,
-  proposal_booking_time_slot_added: false,
-  proposal_booking_time_slots_removed: false,
-  proposal_booking_time_completed: false,
-  proposal_booking_time_reopened: false,
-};
-
 export class ProposalDataSourceMock implements ProposalDataSource {
   proposalsUpdated: Proposal[];
   constructor() {
