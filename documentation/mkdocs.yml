@@ -80,6 +80,7 @@ nav:
       - Email Service: developer-guide/email.md
       - Documentation Changes: developer-guide/documentation_changes.md
       - Technique Proposals: developer-guide/technique_proposals.md
+      - Roles: developer-guide/roles.md
   - FAQ: faq.md
   - Glossary: glossary.md
   
