@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { ExperimentSafetyAuthorization } from '../auth/ExperimentSafetyAuthorization';
@@ -527,6 +528,11 @@ export default class ExperimentMutations {
           );
 
           if (!fullExperimentSafety) {
+            logger.logError(
+              'Full experiment safety not found after status change',
+              { experimentSafetyPk, statusId }
+            );
+
             return null;
           }
 
@@ -535,6 +541,11 @@ export default class ExperimentMutations {
           );
 
           if (!experiment) {
+            logger.logError('Experiment not found for experiment safety', {
+              experimentSafetyPk,
+              experimentPk: fullExperimentSafety.experimentPk,
+            });
+
             return null;
           }
 
@@ -543,6 +554,12 @@ export default class ExperimentMutations {
           );
 
           if (!proposal) {
+            logger.logError('Proposal not found for experiment', {
+              experimentSafetyPk,
+              experimentPk: experiment.experimentPk,
+              proposalPk: experiment.proposalPk,
+            });
+
             return null;
           }
 
@@ -568,6 +585,15 @@ export default class ExperimentMutations {
       const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
         (item): item is ExperimentSafety => !!item
       );
+
+      if (
+        statusEngineReadyExperimentsSafety.length !== experimentSafetyPks.length
+      ) {
+        return rejection(
+          'Could not fetch required data for all experiment safeties after status change',
+          { experimentSafetyPks, fullExperimentsSafety }
+        );
+      }
 
       // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
       experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);

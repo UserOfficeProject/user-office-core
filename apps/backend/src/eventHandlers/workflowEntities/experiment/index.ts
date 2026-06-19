@@ -53,7 +53,10 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
     const proposal = await proposalDataSource.get(experiment.proposalPk);
 
     if (!proposal) {
-      logger.logError('Proposal not found', { entityId });
+      logger.logError('Proposal not found', {
+        experimentSafetyPk: entityId,
+        proposalPk: experiment.proposalPk,
+      });
 
       return;
     }
@@ -61,6 +64,15 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
     const workflowId = (
       await callDataSource.getExperimentWorkflowByCall(proposal.callId)
     )?.id;
+
+    if (!workflowId) {
+      logger.logError('Experiment workflow not found for call', {
+        experimentSafetyPk: entityId,
+        callId: proposal.callId,
+      });
+
+      return;
+    }
 
     return workflowId;
   },

@@ -5,6 +5,7 @@ import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
+import { ExperimentSafetyWorkflowStatusCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 
@@ -113,7 +114,8 @@ export class ExperimentSafetyAuthorization {
     }
     if (
       experimentSafety.esiQuestionarySubmittedAt !== null &&
-      experimentSafetyStatus?.id !== 'AWAITING_ESF' &&
+      experimentSafetyStatus?.id !==
+        ExperimentSafetyWorkflowStatusCodes.AWAITING_ESF &&
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;

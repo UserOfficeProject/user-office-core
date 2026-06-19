@@ -153,6 +153,11 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
     await instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey);
 
   if (!proposalInstruments?.length) {
+    logger.logError('No instruments found for proposal', {
+      experimentSafety,
+      proposalPk: proposal.primaryKey,
+    });
+
     return;
   }
 
@@ -163,6 +168,12 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
       );
 
       if (!instrumentContact) {
+        logger.logError('Instrument manager user not found', {
+          experimentSafety,
+          instrumentId: proposalInstrument.id,
+          managerUserId: proposalInstrument.managerUserId,
+        });
+
         return;
       }
 
@@ -179,7 +190,8 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
     .flat()
     .filter(
       (user, i, array): user is BasicUserDetails =>
-        !!user && array.findIndex((v2) => v2?.id === user?.id) === i
+        !!user &&
+        array.findIndex((comparedUser) => comparedUser?.id === user?.id) === i
     );
 
   return filteredInstrumentPeople.map((IS) => ({
