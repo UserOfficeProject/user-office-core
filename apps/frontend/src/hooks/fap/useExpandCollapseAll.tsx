@@ -47,29 +47,27 @@ export function useExpandCollapseAll(
 
   //index each row and expand/collapse them
   const toggleExpandAll = useCallback(() => {
-    setIsAllExpanded((prev) => {
-      const nextExpandedState = !prev;
+    const nextExpandedState = !isAllExpanded;
 
-      const sortedData = tableRef.current?.dataManager?.sortedData || [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      sortedData.forEach((row: any, index: number) => {
-        const isCurrentlyExpanded = !!row.tableData.showDetailPanel;
-        if (isCurrentlyExpanded !== nextExpandedState) {
-          const detailPanelProp = tableRef.current?.props.detailPanel;
-          const detailPanelRenderFunction = Array.isArray(detailPanelProp)
-            ? detailPanelProp[0].render
-            : detailPanelProp;
+    const sortedData = tableRef.current?.dataManager?.sortedData || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sortedData.forEach((row: any, index: number) => {
+      const isCurrentlyExpanded = !!row.tableData.showDetailPanel;
+      if (isCurrentlyExpanded !== nextExpandedState) {
+        const detailPanelProp = tableRef.current?.props.detailPanel;
+        const detailPanelRenderFunction = Array.isArray(detailPanelProp)
+          ? detailPanelProp[0].render
+          : detailPanelProp;
 
-          tableRef.current?.onToggleDetailPanel(
-            [index],
-            detailPanelRenderFunction
-          );
-        }
-      });
-
-      return nextExpandedState;
+        tableRef.current?.onToggleDetailPanel(
+          [index],
+          detailPanelRenderFunction
+        );
+      }
     });
-  }, []);
+
+    setIsAllExpanded(nextExpandedState);
+  }, [isAllExpanded]);
 
   const expandCollapseAllButton = portalTarget
     ? createPortal(
