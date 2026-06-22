@@ -27,6 +27,8 @@ export type UserManagementTableProps = {
   title: string;
   addButtonLabel?: string;
   addButtonTooltip?: string;
+  /** Header shown at the top of the invite/selector modal */
+  addModalTitle?: string;
   /** Disable the add button */
   disabled?: boolean;
   /** Custom actions to be passed to PeopleTable */
@@ -45,6 +47,7 @@ const UserManagementTable = ({
   title,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
+  addModalTitle,
   disabled = false,
   onUserAction,
   excludeUserIds = [],
@@ -78,7 +81,7 @@ const UserManagementTable = ({
   const InviteComponent = (
     <ProposalPeopleSelectorModal
       modalOpen={modalOpen}
-      title="Add Data Access User"
+      title={addModalTitle}
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
