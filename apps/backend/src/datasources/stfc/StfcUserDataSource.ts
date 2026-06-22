@@ -430,6 +430,30 @@ export class StfcUserDataSource implements UserDataSource {
       throw error;
     }
   }
+
+  async addUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean> {
+    //Any duplicate roles from uows should be filtered out when getUserRoles is called
+
+    userIds.forEach((userId) => {
+      this.stfcRolesCache.remove(String(userId));
+      this.uopRolesCache.remove(String(userId));
+    });
+
+    return postgresUserDataSource.addUsersRoles(userIds, roleIds);
+  }
+
+  async removeUsersRoles(
+    userIds: number[],
+    roleIds: number[]
+  ): Promise<boolean> {
+    userIds.forEach((userId) => {
+      this.stfcRolesCache.remove(String(userId));
+      this.uopRolesCache.remove(String(userId));
+    });
+
+    return postgresUserDataSource.removeUsersRoles(userIds, roleIds);
+  }
+
   async getRolesForUser(id: number): Promise<RoleDTO[]> {
     const cachedRoles = this.stfcRolesCache.get(String(id));
     if (cachedRoles) {
@@ -564,12 +588,18 @@ export class StfcUserDataSource implements UserDataSource {
   }: UsersArgs): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     let userDetails: BasicUserDetails[] = [];
 
+    let finalTotalCount = 0;
+
     if (searchText) {
       userDetails = [];
+      const emailSearchText = searchText.includes('@')
+        ? [searchText]
+        : undefined;
+      const surnameSearchText = !emailSearchText ? searchText : undefined;
 
       const BasicPeopleByLastName: BasicPersonDetailsDTO[] | null =
         await UOWSClient.basicPersonDetails
-          .getBasicPersonDetails(undefined, searchText, undefined)
+          .getBasicPersonDetails(undefined, surnameSearchText, emailSearchText)
           .catch((error) => {
             logger.logError(
               'An error occurred while fetching searchable person details using getBasicPersonDetails',
@@ -590,12 +620,18 @@ export class StfcUserDataSource implements UserDataSource {
         toEssBasicUserDetails(person)
       );
 
+      finalTotalCount = userDetails.length;
+
       if (subtractUsers && subtractUsers.length > 0) {
         const usersToRemove = new Set(subtractUsers);
         userDetails = userDetails.filter((user) => !usersToRemove.has(user.id));
       }
+
+      if (first !== undefined && offset !== undefined) {
+        userDetails = userDetails.slice(offset, offset + first);
+      }
     } else {
-      const { users } = await postgresUserDataSource.getUsers({
+      const { users, totalCount } = await postgresUserDataSource.getUsers({
         searchText: undefined,
         first: first,
         offset: offset,
@@ -612,12 +648,13 @@ export class StfcUserDataSource implements UserDataSource {
         userDetails = stfcBasicPeople.map((person) =>
           toEssBasicUserDetails(person)
         );
+        finalTotalCount = totalCount;
       }
     }
 
     return {
       users: userDetails.sort((a, b) => a.id - b.id),
-      totalCount: userDetails.length,
+      totalCount: finalTotalCount,
     };
   }
 

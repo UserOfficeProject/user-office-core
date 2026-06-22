@@ -10,6 +10,8 @@ import { PaginationSortDirection } from '../utils/pagination';
 export interface UserDataSource {
   delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
+  addUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean>;
+  removeUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
