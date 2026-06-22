@@ -1,4 +1,5 @@
-import produce from 'immer';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { produce } from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ConnectionLineType } from 'reactflow';
