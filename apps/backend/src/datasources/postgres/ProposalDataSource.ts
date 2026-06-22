@@ -313,7 +313,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getRequestedTime(
-    proposalId: number,
+    proposalPk: number,
     instrumentId: number
   ): Promise<number> {
     //Non-nullable, time is either requested for the instrument or it is zero.
@@ -326,7 +326,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
       .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
       .innerJoin('questions as q', 'q.question_id', 'a.question_id')
-      .where('p.proposal_pk', proposalId)
+      .where('p.proposal_pk', proposalPk)
       .where('q.data_type', 'INSTRUMENT_PICKER')
       .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
         instrumentId.toString(),
