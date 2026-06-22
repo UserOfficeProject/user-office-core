@@ -1886,10 +1886,11 @@ context('Instrument tests', () => {
     });
   });
 
-  describe.only('Instrument contact visibility tests', () => {
+  describe('Instrument contact visibility tests', () => {
     let contactOnlyInstrumentId: number;
     let scientistInstrumentId: number;
     let createdProposalPk: number;
+    let createdScientistProposalPk: number;
 
     const contactOnlyInstrument = {
       name: faker.word.words(2),
@@ -1966,6 +1967,30 @@ context('Instrument tests', () => {
         }
       });
 
+      //create a proposal and assign it to the instrument where scientist2 is a scientist
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdScientistProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdScientistProposalPk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdScientistProposalPk],
+            instrumentIds: [scientistInstrumentId],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdScientistProposalPk],
+            userId: scientist2.id,
+            instrumentId: scientistInstrumentId,
+          });
+        }
+      });
+
       cy.login(scientist2);
       cy.visit('/');
     });
@@ -2000,6 +2025,20 @@ context('Instrument tests', () => {
       cy.finishedLoading();
 
       cy.contains(proposal1.title).should('exist');
+    });
+
+    it('Instrument scientist should see proposals when filtering by their scientist instrument', () => {
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(scientistInstrument.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal2.title).should('exist');
     });
 
     it('Instrument contact should see their instrument on the instruments page', () => {

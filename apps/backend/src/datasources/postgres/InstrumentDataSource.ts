@@ -820,15 +820,16 @@ export default class PostgresInstrumentDataSource
       await database
         .count({ count: '*' })
         .from('instruments as i')
-        .leftJoin('instrument_has_scientists as ihs', {
-          'i.instrument_id': 'ihs.instrument_id',
+        .leftJoin('instrument_has_scientists as ihs', function () {
+          this.on('i.instrument_id', '=', 'ihs.instrument_id').andOnVal(
+            'ihs.user_id',
+            '=',
+            userId
+          );
         })
         .where('i.instrument_id', instrumentId)
         .andWhere(function () {
-          this.where('ihs.user_id', userId).orWhere(
-            'i.manager_user_id',
-            userId
-          );
+          this.whereNotNull('ihs.user_id').orWhere('i.manager_user_id', userId);
         })
         .first();
 

@@ -577,7 +577,7 @@ export default class PostgresExperimentDataSource
     //print all arguments
 
     const query = database('experiments')
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select(['experiments.*', database.raw('count(*) OVER() AS full_count')])
       .join(
         'proposals',
         'proposals.proposal_pk',
@@ -587,24 +587,29 @@ export default class PostgresExperimentDataSource
 
     // Add instrument scientist filtering if provided
     if (filter?.instrumentScientistUserId) {
+      const instrumentScientistUserId = filter.instrumentScientistUserId;
+
       query
-        .leftJoin(
-          'instrument_has_scientists',
-          'experiments.instrument_id',
-          'instrument_has_scientists.instrument_id'
-        )
+        .leftJoin('instrument_has_scientists', function () {
+          this.on(
+            'experiments.instrument_id',
+            '=',
+            'instrument_has_scientists.instrument_id'
+          ).andOnVal(
+            'instrument_has_scientists.user_id',
+            '=',
+            instrumentScientistUserId
+          );
+        })
         .join(
           'instruments',
           'experiments.instrument_id',
           'instruments.instrument_id'
         )
         .where(function () {
-          this.where(
-            'instrument_has_scientists.user_id',
-            filter!.instrumentScientistUserId
-          ).orWhere(
+          this.whereNotNull('instrument_has_scientists.user_id').orWhere(
             'instruments.manager_user_id',
-            filter!.instrumentScientistUserId
+            instrumentScientistUserId
           );
         });
     }
