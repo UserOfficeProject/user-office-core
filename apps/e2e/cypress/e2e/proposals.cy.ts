@@ -278,12 +278,8 @@ context('Proposal tests', () => {
       cy.contains('Proposal Title is required');
       cy.contains('Proposal Abstract is required');
 
-      cy.get('[data-cy=title]')
-        .clear()
-        .type('x'.repeat(maxTitleLen + 1));
-      cy.get('[data-cy=abstract]')
-        .clear()
-        .type('y'.repeat(maxAbstractLen + 1));
+      cy.get('[data-cy=title]').type('x'.repeat(maxTitleLen + 1));
+      cy.get('[data-cy=abstract]').type('y'.repeat(maxAbstractLen + 1));
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
