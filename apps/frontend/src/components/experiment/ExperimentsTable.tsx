@@ -8,7 +8,12 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Experiment, PaginationSortDirection, SettingsId } from 'generated/sdk';
+import {
+  Experiment,
+  ExperimentTableSortField,
+  PaginationSortDirection,
+  SettingsId,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -22,6 +27,14 @@ import { ExperimentsFilter } from './ExperimentsPage';
 type ExperimentsTableProps = {
   experimentsFilter: ExperimentsFilter;
   setExperimentsFilter?: (filter: ExperimentsFilter) => void;
+};
+
+// Maps a material-table column `field` to the GraphQL sort enum.
+const COLUMN_FIELD_TO_SORT_FIELD: Record<string, ExperimentTableSortField> = {
+  experimentId: ExperimentTableSortField.EXPERIMENTID,
+  'proposal.proposalId': ExperimentTableSortField.PROPOSALID,
+  startsAt: ExperimentTableSortField.STARTSAT,
+  endsAt: ExperimentTableSortField.ENDSAT,
 };
 
 const RowActionButtons = (rowData: Experiment) => {
@@ -111,7 +124,9 @@ export default function ExperimentsTable({
               ...(experimentStartDate ? { experimentStartDate } : {}),
               ...(experimentEndDate ? { experimentEndDate } : {}),
             },
-            sortField: orderBy?.orderByField,
+            sortField: orderBy
+              ? COLUMN_FIELD_TO_SORT_FIELD[orderBy.orderByField]
+              : undefined,
             sortDirection:
               orderBy?.orderDirection == PaginationSortDirection.ASC
                 ? PaginationSortDirection.ASC
