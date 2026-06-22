@@ -492,7 +492,6 @@ const FapProposalsAndAssignmentsTable = ({
           actions={tableActions}
           options={{
             columnsButton: true,
-            defaultExpanded: true,
             search: true,
             selection: true,
             pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
