@@ -46,6 +46,15 @@ export class UserProposalsArgs {
 }
 
 @ObjectType()
+export class UserProposalsResult {
+  @Field(() => [Proposal])
+  public userProposals: Proposal[];
+
+  @Field(() => Int)
+  public totalCount: number;
+}
+
+@ObjectType()
 @Directive('@key(fields: "id")')
 export class User implements Partial<UserOrigin> {
   @Field(() => Int)
@@ -140,9 +149,28 @@ export class UserResolver {
     @Arg('filter', () => UserProposalsFilter, { nullable: true })
     filter: UserProposalsFilter
   ) {
-    return context.queries.proposal.dataSource.getUserProposals(
+    const result = await context.queries.proposal.dataSource.getUserProposals(
       user.id,
       filter
+    );
+
+    return result.userProposals;
+  }
+
+  @FieldResolver(() => UserProposalsResult)
+  async paginatedProposals(
+    @Root() user: User,
+    @Ctx() context: ResolverContext,
+    @Arg('filter', () => UserProposalsFilter, { nullable: true })
+    filter: UserProposalsFilter,
+    @Arg('first', () => Int, { nullable: true }) first?: number,
+    @Arg('offset', () => Int, { nullable: true }) offset?: number
+  ) {
+    return context.queries.proposal.dataSource.getUserProposals(
+      user.id,
+      filter,
+      first,
+      offset
     );
   }
 
