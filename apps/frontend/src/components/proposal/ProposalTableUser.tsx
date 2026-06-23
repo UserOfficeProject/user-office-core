@@ -40,20 +40,15 @@ export type UserProposalDataType = {
 
 const ProposalTableUser = () => {
   const api = useDataApi();
-  const [loading, setLoading] = useState<boolean>(false);
   const [refreshTableKey, setRefreshTableKey] = useState(0);
-  const sendUserProposalRequest = useCallback(async () => {
-    setLoading(true);
-
+  const sendUserProposalRequest = useCallback(async (page: number, pageSize: number) => {
     return api()
-      .getUserProposals()
+      .getUserProposals({first: pageSize, offset: page * pageSize})
       .then((data) => {
-        setLoading(false);
-
         return {
-          page: 0,
-          totalCount: data?.me?.proposals.length,
-          data: data?.me?.proposals
+          page,
+          totalCount: data?.me?.paginatedProposals?.totalCount,
+          data: data?.me?.paginatedProposals?.userProposals
             .sort((a, b) => {
               return (
                 new Date(b.created).getTime() - new Date(a.created).getTime()
@@ -92,7 +87,6 @@ const ProposalTableUser = () => {
         title="My proposals"
         search={false}
         searchQuery={sendUserProposalRequest}
-        isLoading={loading}
         key={refreshTableKey}
       />
     </>
