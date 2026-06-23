@@ -1,14 +1,12 @@
 query getUserProposals(
   $first: Int, 
   $offset: Int
-  $searchText: String
 ) {
   me {
     paginatedProposals(
-      first: $first,
+      first: $first, 
       offset: $offset
-      searchText: $searchText
-  ) {
+    ) {
       totalCount
       userProposals {
         primaryKey
