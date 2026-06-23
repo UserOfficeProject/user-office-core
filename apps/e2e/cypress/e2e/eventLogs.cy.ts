@@ -70,35 +70,35 @@ context('Event log tests', () => {
         lastname: 'Doe',
         institutionId: 1,
         email: faker.internet.email(),
+      }).then(() => {
+        cy.login('officer');
+        cy.visit('/People');
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy="people-search"]').type(user.lastName);
+        cy.realPress('Enter');
+
+        cy.contains(user.firstName)
+          .parent()
+          .find('button[aria-label="Edit user"]')
+          .click();
+
+        cy.get("[name='firstname']").should('have.value', newFirstName);
+
+        cy.get('[role="tab"]').contains('Logs').click();
+
+        cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
+        cy.get('@eventLogsTable')
+          .find('tr[level="0"]')
+          .last()
+          .as('eventLogsTableLastRow');
+
+        cy.get('@eventLogsTableLastRow').invoke('text').as('lastRowText');
+
+        cy.get('@lastRowText').should('contain', 'USER_UPDATED');
+        cy.get('@lastRowText').should('contain', updateProfileDate);
       });
-
-      cy.login('officer');
-      cy.visit('/People');
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="people-search"]').type(user.lastName);
-      cy.realPress('Enter');
-
-      cy.contains(user.firstName)
-        .parent()
-        .find('button[aria-label="Edit user"]')
-        .click();
-
-      cy.get("[name='firstname']").should('have.value', newFirstName);
-
-      cy.get('[role="tab"]').contains('Logs').click();
-
-      cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
-      cy.get('@eventLogsTable')
-        .find('tr[level="0"]')
-        .last()
-        .as('eventLogsTableLastRow');
-
-      cy.get('@eventLogsTableLastRow').invoke('text').as('lastRowText');
-
-      cy.get('@lastRowText').should('contain', 'USER_UPDATED');
-      cy.get('@lastRowText').should('contain', updateProfileDate);
     });
 
     it('If user impersonates someone, it reflects in the action logs', () => {
