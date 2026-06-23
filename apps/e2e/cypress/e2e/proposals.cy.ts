@@ -23,6 +23,8 @@ context('Proposal tests', () => {
   faker.seed(0);
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
+  const maxTitleLen = 175;
+  const maxAbstractLen = 1500;
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
@@ -279,7 +281,26 @@ context('Proposal tests', () => {
       cy.contains('Proposal Title is required');
       cy.contains('Proposal Abstract is required');
 
+      cy.get('[data-cy=title]').type('x'.repeat(maxTitleLen + 1));
+      cy.get('[data-cy=abstract]').type('y'.repeat(maxAbstractLen + 1));
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+
+      cy.contains(`Please make title at most ${maxTitleLen} characters long`);
+      cy.contains(
+        `Please make abstract at most ${maxAbstractLen} characters long`
+      );
+
       cy.contains('New Proposal').click();
+
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Changes you recently made in this tab will be lost! Are you sure?'
+        );
+
+        return true;
+      });
+
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=save-button]').should('be.disabled');
