@@ -846,9 +846,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number,
-    searchText?: string
-  ): Promise<{ proposals: Proposal[]; totalCount: number }> {
+    offset?: number
+  ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
     return (
       database
         .select('p.*', database.raw('count(*) OVER() AS full_count'))
