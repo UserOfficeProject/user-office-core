@@ -21,7 +21,7 @@ services:
       - 'traefik.http.routers.traefik.entrypoints=web'
       - 'traefik.http.routers.traefik.service=api@internal'
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
