@@ -67,7 +67,7 @@ context('Event log tests', () => {
         id: user.id,
         firstname: newFirstName,
         userTitle: 'Dr.',
-        lastname: 'Doe',
+        lastname: user.lastName,
         institutionId: 1,
         email: faker.internet.email(),
       }).then(() => {
@@ -79,7 +79,7 @@ context('Event log tests', () => {
         cy.get('[data-cy="people-search"]').type(user.lastName);
         cy.realPress('Enter');
 
-        cy.contains(user.firstName)
+        cy.contains(user.lastName)
           .parent()
           .find('button[aria-label="Edit user"]')
           .click();
