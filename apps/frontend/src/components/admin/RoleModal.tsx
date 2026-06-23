@@ -127,7 +127,7 @@ const RoleModal: React.FC<RoleModalProps> = ({
           config: { proposalReader: config as ProposalReaderRoleConfig },
         };
       default:
-        return { config: {} };
+        return { config: { user: { note: '' } } };
     }
   };
 
