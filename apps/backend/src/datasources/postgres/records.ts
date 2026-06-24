@@ -9,6 +9,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { DataAccessClaim } from '../../models/DataAccessClaim';
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
@@ -1462,6 +1463,17 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+// TODO: create a similar claim record for Data Access User
+// what role should they get by default?
+// apply db patch to create db table
+export interface DataAccessClaimRecord {
+  readonly invite_id: number;
+  readonly proposal_pk: number;
+}
+
+export const createDataAccessClaimRecord = (invite: DataAccessClaimRecord) =>
+  new DataAccessClaim(invite.invite_id, invite.proposal_pk);
 
 export interface TagRecord {
   readonly tag_id: number;

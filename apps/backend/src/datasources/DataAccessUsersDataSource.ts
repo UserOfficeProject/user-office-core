@@ -9,6 +9,7 @@ export type UserWithInstitution = {
   country: Country;
 };
 
+// TODO: how does this entity relate to the invite flow?
 export interface DataAccessUsersDataSource {
   findByProposalPk(proposalPk: number): Promise<BasicUserDetails[]>;
   getDataAccessUsersWithInstitution(
