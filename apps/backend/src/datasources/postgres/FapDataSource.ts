@@ -1220,6 +1220,10 @@ export default class PostgresFapDataSource implements FapDataSource {
           .orWhere('fr.user_id', id);
       });
 
+    if (relatedFaps.length === 0) {
+      return [];
+    }
+
     const relatedFapIds = relatedFaps.map((fap) => fap.fap_id);
 
     const secretaries = await database
