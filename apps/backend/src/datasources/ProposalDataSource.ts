@@ -9,6 +9,7 @@ import { PaginationSortDirection } from '../utils/pagination';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
+  getRequestedTime(proposalPk: number, instrumentId: number): Promise<number>;
   getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
