@@ -1,5 +1,6 @@
 import { container, injectable } from 'tsyringe';
 
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Tokens } from '../../config/Tokens';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
@@ -10,8 +11,6 @@ import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { CallDataSource } from '../CallDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
 import PostgresCallDataSource from '../postgres/CallDataSource';
 import database from '../postgres/database';
