@@ -2111,7 +2111,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains('untagged call');
@@ -2124,7 +2124,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="technique-filter"]').click();
       cy.get('[role="listbox"]').contains(technique1.name);
@@ -2140,7 +2140,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       //the call dropdown will default to a call with no proposals
       cy.get('[data-cy="call-filter"]').click();
@@ -2161,7 +2161,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       //the call dropdown will default to a call with no proposals
       cy.get('[data-cy="call-filter"]').click();
@@ -2202,7 +2202,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains('untagged call').should('not.exist');
@@ -2215,7 +2215,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="technique-filter"]').click();
       cy.get('[role="listbox"]').contains(technique1.name);
@@ -2231,7 +2231,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument1.name);
@@ -2247,7 +2247,7 @@ context('Technique Proposal tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.contains(createdProposalId1);
       cy.should('not.contain', createdProposalId2);
