@@ -2233,6 +2233,10 @@ context('Technique Proposal tests', () => {
 
       cy.contains('Technique Proposals').click();
 
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.finishedLoading();
+
       cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument1.name);
       cy.get('[role="listbox"]').contains(instrument2.name).should('not.exist');
