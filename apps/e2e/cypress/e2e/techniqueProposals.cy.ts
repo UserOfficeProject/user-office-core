@@ -713,6 +713,11 @@ context('Technique Proposal tests', () => {
       );
 
       cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.get('body').type('{esc}');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
 
       // Wait for instruments to load
       cy.get('ul[role="listbox"]')
