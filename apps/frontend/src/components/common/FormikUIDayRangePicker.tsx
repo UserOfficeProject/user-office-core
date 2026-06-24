@@ -1,10 +1,10 @@
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import { Button } from '@mui/material';
-import Paper from '@mui/material/Paper';
+import { Button, IconButton } from '@mui/material';
+import Popover from '@mui/material/Popover';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import { DateTime } from 'luxon';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { DayPicker, DateRange, Matcher } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
@@ -80,23 +80,8 @@ export default function DayRangePicker({
   helperText,
   id,
 }: DayRangePickerProps) {
-  const [showPicker, setShowPicker] = useState(false);
-  const pickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        pickerRef.current &&
-        !pickerRef.current.contains(event.target as Node)
-      ) {
-        setShowPicker(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
 
   const selected: DateRange = {
     from: value?.from?.toJSDate(),
@@ -119,9 +104,7 @@ export default function DayRangePicker({
     : undefined;
 
   return (
-    <div
-      style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
-    >
+    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
       <div style={{ flex: 1 }}>
         <TextField
           data-cy={id}
@@ -133,55 +116,51 @@ export default function DayRangePicker({
           value={displayValue}
           error={!!error}
           helperText={error ?? helperText}
-          onClick={() => !disabled && setShowPicker((prev) => !prev)}
           InputLabelProps={{ shrink: true }}
           InputProps={{ readOnly: true }}
         />
       </div>
-      <div
-        onClick={() => !disabled && setShowPicker((prev) => !prev)}
-        style={{
-          marginLeft: '8px',
-          marginTop: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          cursor: disabled ? 'default' : 'pointer',
-        }}
+      <IconButton
+        onClick={(event) => setAnchorEl(event.currentTarget)}
+        disabled={disabled}
+        data-cy={id ? `${id}-calendar-btn` : undefined}
+        aria-label="Open date range picker"
+        sx={{ marginLeft: 1, marginTop: 1 }}
       >
         <DateRangeIcon />
-      </div>
-      {showPicker && (
-        <Paper
-          elevation={3}
-          ref={pickerRef}
-          style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1 }}
+      </IconButton>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <StyledPickerWrapper>
+          <DayPicker
+            mode="range"
+            selected={selected}
+            onSelect={handleSelect}
+            disabled={disabledDays}
+          />
+        </StyledPickerWrapper>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: '8px',
+          }}
         >
-          <StyledPickerWrapper>
-            <DayPicker
-              mode="range"
-              selected={selected}
-              onSelect={handleSelect}
-              disabled={disabledDays}
-            />
-          </StyledPickerWrapper>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              padding: '8px',
-            }}
+          <Button
+            onClick={() => setAnchorEl(null)}
+            variant="contained"
+            color="primary"
+            data-cy={id ? `${id}-done-btn` : undefined}
           >
-            <Button
-              onClick={() => setShowPicker(false)}
-              variant="contained"
-              color="primary"
-              data-cy={id ? `${id}-done-btn` : undefined}
-            >
-              Done
-            </Button>
-          </div>
-        </Paper>
-      )}
+            Done
+          </Button>
+        </div>
+      </Popover>
     </div>
   );
 }
