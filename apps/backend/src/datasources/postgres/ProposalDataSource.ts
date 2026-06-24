@@ -336,6 +336,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  async getRequestedTime(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<number> {
+    //Non-nullable, time is either requested for the instrument or it is zero.
+    const result = await database('proposals as p')
+      .sum({
+        total_time_requested: database.raw(
+          "(a.answer->'value'->>'timeRequested')::numeric"
+        ),
+      })
+      .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
+      .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
+      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
+      .where('p.proposal_pk', proposalPk)
+      .where('q.data_type', 'INSTRUMENT_PICKER')
+      .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
+        instrumentId.toString(),
+      ])
+      .first();
+
+    return result?.total_time_requested
+      ? Number(result.total_time_requested)
+      : 0;
+  }
+
   async create(
     proposer_id: number,
     call_id: number,
@@ -516,13 +542,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
         if (filter?.questionFilter) {
           const questionFilter = filter.questionFilter;
@@ -696,13 +725,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('proposals.call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
         if (filter?.referenceNumbers) {
           query.whereIn('proposals.proposal_id', filter.referenceNumbers);
@@ -840,13 +872,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
 
         if (filter?.questionFilter) {
@@ -1201,13 +1236,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('proposals.call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
 
         if (filter?.referenceNumbers) {

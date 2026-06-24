@@ -3,32 +3,31 @@ import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter, {
-  parseInstrumentQuery,
-} from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { Fap } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { FapProposals } from 'hooks/fap/useFapProposalsData';
 import { useFapInstruments } from 'hooks/instrument/useFapInstruments';
 
-import FapProposalsAndAssignmentsTable from './FapProposalsAndAssignmentsTable';
+import AssignmentsTable from '../AssignmentsTable';
 
-type FapProposalsAndAssignmentsProps = {
+type FapReviewersAndAssignmentsProps = {
   /** Id of the Fap we are assigning members to */
   data: Fap;
   onFapUpdate: (fap: Fap) => void;
   fapProposals: FapProposals;
 };
 
-const FapProposalsAndAssignments = ({
+const FapReviewersAndAssignments = ({
   data: fapData,
   onFapUpdate,
   fapProposals,
-}: FapProposalsAndAssignmentsProps) => {
+}: FapReviewersAndAssignmentsProps) => {
   const { loadingCalls, calls } = useCallsData({
     fapIds: [fapData.id],
     isFapReviewEnded: false,
   });
+
   // NOTE: Default null means load all calls if nothing is selected
   const { loadingInstruments, instruments } = useFapInstruments(
     fapData.id,
@@ -68,20 +67,19 @@ const FapProposalsAndAssignments = ({
             instruments={instruments}
             isLoading={loadingInstruments}
             shouldShowAll={true}
-            instrumentIds={parseInstrumentQuery(instrument) ?? undefined}
+            instrumentId={instrument ? +instrument : null}
             data-cy="instrument-filter"
           />
         </Grid>
       </Grid>
-      <FapProposalsAndAssignmentsTable
-        data={fapData}
+      <AssignmentsTable
+        fap={fapData}
         onAssignmentsUpdate={onFapUpdate}
-        selectedCallId={call ? +call : null}
-        selectedInstrumentId={instrument ? +instrument : null}
         fapProposals={fapProposals}
+        proposalView={false}
       />
     </>
   );
 };
 
-export default FapProposalsAndAssignments;
+export default FapReviewersAndAssignments;

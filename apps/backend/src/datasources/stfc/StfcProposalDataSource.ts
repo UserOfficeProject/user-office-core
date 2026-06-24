@@ -197,13 +197,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
 
         if (filter?.questionFilter) {

@@ -8,7 +8,9 @@ query getMyRoles {
       title
       description
       isRootRole
-      permissions
+      config {
+        ...roleConfig
+      }
     }
   }
 }

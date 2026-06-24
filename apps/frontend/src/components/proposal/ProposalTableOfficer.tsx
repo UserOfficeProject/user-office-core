@@ -38,7 +38,7 @@ import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import UOLoader from 'components/common/UOLoader';
-import AssignProposalsToFaps from 'components/fap/Proposals/AssignProposalsToFaps';
+import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -48,6 +48,7 @@ import TechnicalBulkReassignModal, {
   ReviewData,
 } from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import {
   Call,
   FapInstrument,
@@ -55,6 +56,7 @@ import {
   FeatureId,
   InstrumentMinimalFragment,
   PaginationSortDirection,
+  ProposalReaderRoleConfig,
   ProposalViewInstrument,
   ProposalsFilter,
   WorkflowStatus,
@@ -75,7 +77,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserName, getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
@@ -127,21 +129,10 @@ let columns: Column<ProposalViewData>[] = [
     field: 'principalInvestigator',
     sorting: false,
     emptyValue: '-',
-    render: (proposalView) => {
-      if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.preferredname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-      } else if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.firstname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
-      }
-
-      return '';
-    },
+    render: (proposalView) =>
+      proposalView.principalInvestigator?.lastname
+        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+        : '',
   },
   {
     title: 'PI Email',
@@ -327,6 +318,86 @@ const RowActionButtons = (rowData: ProposalViewData) => {
   );
 };
 
+const getIsTechnicalReviewEnabled = (
+  user: React.ContextType<typeof UserContext>,
+  featureContext: React.ContextType<typeof FeatureContext>
+) => {
+  if (!featureContext.featuresMap.get(FeatureId.TECHNICAL_REVIEW)?.isEnabled) {
+    return false;
+  }
+
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
+
+    if (config.hasTechnicalReviewAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const getIsFapEnabled = (
+  user: React.ContextType<typeof UserContext>,
+  featureContext: React.ContextType<typeof FeatureContext>
+) => {
+  if (!featureContext.featuresMap.get(FeatureId.FAP_REVIEW)?.isEnabled) {
+    return false;
+  }
+
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
+
+    if (config.hasFapAccess) {
+      return true;
+    }
+  }
+};
+
+const getIsAdminEnabled = (user: React.ContextType<typeof UserContext>) => {
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
+
+    if (config.hasAdminAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const getIsLogsEnabled = (user: React.ContextType<typeof UserContext>) => {
+  if (user.currentRole === UserRole.USER_OFFICER) {
+    return true;
+  }
+
+  if (user.currentRole === UserRole.PROPOSAL_READER) {
+    const config = user.roles.find((role) => role.id === user.currentRoleId)!
+      .config as ProposalReaderRoleConfig;
+
+    if (config.hasLogAccess) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const ProposalTableOfficer = ({
   proposalFilter,
   setProposalFilter,
@@ -355,6 +426,7 @@ const ProposalTableOfficer = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
@@ -399,14 +471,16 @@ const ProposalTableOfficer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(proposalFilter)]);
 
-  const isTechnicalReviewEnabled = featureContext.featuresMap.get(
-    FeatureId.TECHNICAL_REVIEW
-  )?.isEnabled;
+  const isTechnicalReviewEnabled = getIsTechnicalReviewEnabled(
+    userContext,
+    featureContext
+  );
+  const isFapEnabled = getIsFapEnabled(userContext, featureContext);
+  const isAdminEnabled = getIsAdminEnabled(userContext);
+  const isLogsEnabled = getIsLogsEnabled(userContext);
+
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
-  )?.isEnabled;
-  const isFapEnabled = featureContext.featuresMap.get(
-    FeatureId.FAP_REVIEW
   )?.isEnabled;
 
   if (!columns.find((column) => column.field === 'rowActionButtons')) {
@@ -444,7 +518,7 @@ const ProposalTableOfficer = ({
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
 
-    if (v.field === 'statusName') {
+    if (v.field === 'statusName' && !isReadOnly) {
       return {
         ...v,
         render: (rowData: ProposalViewData) => (
@@ -707,8 +781,8 @@ const ProposalTableOfficer = ({
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
     ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.REVIEWS] : []),
-    PROPOSAL_MODAL_TAB_NAMES.ADMIN,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
+    ...(isAdminEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
+    ...(isLogsEnabled ? [PROPOSAL_MODAL_TAB_NAMES.LOGS] : []),
   ];
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
