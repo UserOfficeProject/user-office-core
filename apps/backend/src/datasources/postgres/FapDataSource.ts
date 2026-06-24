@@ -1232,7 +1232,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .from('faps as s')
       .leftJoin('fap_secretaries as fs', 'fs.fap_id', 's.fap_id')
       .leftJoin('fap_chairs as fc', 'fc.fap_id', 's.fap_id')
-      .leftJoin('fap_reviewers as r', function () {
+      .innerJoin('fap_reviewers as r', function () {
         this.on('s.fap_id', 'r.fap_id');
         this.andOn(function () {
           this.onVal('r.user_id', id); // where the user is part of the visit
