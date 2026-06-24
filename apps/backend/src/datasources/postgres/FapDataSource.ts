@@ -1248,6 +1248,8 @@ export default class PostgresFapDataSource implements FapDataSource {
       ...chairs.map((r) => r.user_id),
       ...secretaries.map((r) => r.user_id),
       ...reviewers.map((r) => r.user_id),
+      ...chairs.map((r) => r.fap_chair_user_id),
+      ...secretaries.map((r) => r.fap_secretary_user_id),
     ];
 
     return relatedUsers;
