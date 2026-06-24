@@ -1213,14 +1213,14 @@ export default class PostgresFapDataSource implements FapDataSource {
       .from('faps as s')
       .leftJoin('fap_secretaries as fs', 'fs.fap_id', 's.fap_id')
       .leftJoin('fap_chairs as fc', 'fc.fap_id', 's.fap_id')
-      .leftJoin('fap_reviewers as r', function () {
+      .innerJoin('fap_reviewers as r', function () {
         this.on('s.fap_id', 'r.fap_id');
         this.andOn(function () {
           this.onVal('r.user_id', id); // where the user is part of the visit
           this.orOnVal('fc.user_id', id); // where the user is a chair
           this.orOnVal('fs.user_id', id); // where the user is the secretary
         });
-      }) // this gives a list of proposals that a user is related to
+      })
       .join('fap_reviewers as fr', { 'fr.fap_id': 's.fap_id' }); // this gives us all of the associated reviewers
 
     const relatedFapChairsAndSecs = await database
