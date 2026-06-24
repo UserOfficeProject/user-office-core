@@ -895,11 +895,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         .groupBy('p.proposal_pk')
         .modify((qb) => {
-            if (first) qb.limit(first);
-            if (offset) qb.offset(offset);
-          })
+          if (first) qb.limit(first);
+          if (offset) qb.offset(offset);
+        })
         .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
-          userProposals: proposals.map((proposal) => createProposalObject(proposal)),
+          userProposals: proposals.map((proposal) =>
+            createProposalObject(proposal)
+          ),
           totalCount: proposals[0]?.full_count ?? 0,
         }))
     );

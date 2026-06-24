@@ -300,7 +300,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getUserProposals(id: number) {
-    const userProposals = allProposals.filter((proposal) => proposal.proposerId === id);
+    const userProposals = allProposals.filter(
+      (proposal) => proposal.proposerId === id
+    );
 
     return { userProposals, totalCount: userProposals.length };
   }
