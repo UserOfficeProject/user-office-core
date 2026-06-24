@@ -10,7 +10,7 @@ import { Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -44,7 +44,10 @@ type ProposalTableProps = {
   /** Basic user details array to be shown in the modal. */
   search: boolean;
   /** Function for getting data. */
-  searchQuery: (page: number, pageSize: number) => Promise<UserProposalDataType>;
+  searchQuery: (
+    page: number,
+    pageSize: number
+  ) => Promise<UserProposalDataType>;
   confirm: WithConfirmType;
 };
 
@@ -203,6 +206,7 @@ const ProposalTable = ({
         data={(query) =>
           searchQuery(query.page, query.pageSize).then((result) => {
             setPartialProposalsData(result.data ?? []);
+
             return {
               data: result.data ?? [],
               page: result.page,
@@ -317,9 +321,7 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <AcceptInviteWithCode
-              onAccepted={() => refreshTableData()}
-            />
+            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
           </ButtonWithDialog>
         </ActionButtonContainer>
       )}
