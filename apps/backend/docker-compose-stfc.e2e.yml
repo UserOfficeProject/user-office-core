@@ -5,7 +5,7 @@ services:
       - "3310:3310"
 
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword

@@ -312,6 +312,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  async getRequestedTime(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<number> {
+    //Non-nullable, time is either requested for the instrument or it is zero.
+    const result = await database('proposals as p')
+      .sum({
+        total_time_requested: database.raw(
+          "(a.answer->'value'->>'timeRequested')::numeric"
+        ),
+      })
+      .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
+      .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
+      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
+      .where('p.proposal_pk', proposalPk)
+      .where('q.data_type', 'INSTRUMENT_PICKER')
+      .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
+        instrumentId.toString(),
+      ])
+      .first();
+
+    return result?.total_time_requested
+      ? Number(result.total_time_requested)
+      : 0;
+  }
+
   async create(
     proposer_id: number,
     call_id: number,
