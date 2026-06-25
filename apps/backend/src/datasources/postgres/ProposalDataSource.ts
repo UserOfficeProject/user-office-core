@@ -1117,18 +1117,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'ins.instrument_id'
       )
       .modify((query) => {
-        const instrumentIdsToFilter = Array.from(
-          new Set([
-            ...(filter?.instrumentIds || []),
-            ...(filter?.instrumentId ? [filter.instrumentId] : []),
-          ])
-        );
+        const instrumentId = filter?.instrumentFilter?.instrumentId;
 
-        if (instrumentIdsToFilter.length > 0) {
+        if (instrumentId && !isNaN(instrumentId)) {
           query.join('instrument_has_proposals as ihp', function () {
-            this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnIn(
+            this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnVal(
               'ihp.instrument_id',
-              instrumentIdsToFilter
+              '=',
+              instrumentId
             );
           });
         }

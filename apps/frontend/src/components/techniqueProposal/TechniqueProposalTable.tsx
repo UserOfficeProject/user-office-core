@@ -218,7 +218,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   console.log({ proposalStatusId });
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
-    instrumentIds,
     instrumentFilter: {
       instrumentId: instrument ? +instrument : null,
       showAllProposals: !instrument,
@@ -254,7 +253,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return prev;
       });
-      setProposalFilter((prev) => ({ ...prev, callId, instrumentIds }));
+      setProposalFilter((prev) => ({ ...prev, callId }));
       refreshTableData();
     }
   }, [callId, setSearchParams, setProposalFilter, refreshTableData]);
@@ -739,7 +738,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           callId,
           callIds,
           instrumentFilter,
-          instrumentIds,
           techniqueFilter,
           proposalStatusId,
           text,
@@ -752,41 +750,31 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
         api()
-          .getInstrumentsMinimal()
-          .then((data) => {
-            return data.instruments?.instruments.map((i) => i.id);
-          })
-          .then((fetchedInstrumentIds) => {
-            return api().getTechniqueScientistProposals({
-              filter: {
-                callId,
-                callIds,
-                instrumentFilter,
-                instrumentIds:
-                  instrumentIds != null && instrumentIds.length > 0
-                    ? instrumentIds
-                    : fetchedInstrumentIds,
-                techniqueFilter,
-                proposalStatusId,
-                text,
-                referenceNumbers,
-                dateFilter,
-                excludeProposalStatusIds:
-                  currentRole === UserRole.INSTRUMENT_SCIENTIST
-                    ? [StatusCode.EXPIRED]
-                    : [],
-              },
-              sortField: orderBy?.orderByField,
-              sortDirection:
-                orderBy?.orderDirection == PaginationSortDirection.ASC
-                  ? PaginationSortDirection.ASC
-                  : orderBy?.orderDirection == PaginationSortDirection.DESC
-                    ? PaginationSortDirection.DESC
-                    : undefined,
-              first: tableQuery.pageSize,
-              offset: tableQuery.page * tableQuery.pageSize,
-              searchText: tableQuery.search,
-            });
+          .getTechniqueScientistProposals({
+            filter: {
+              callId,
+              callIds,
+              instrumentFilter,
+              techniqueFilter,
+              proposalStatusId,
+              text,
+              referenceNumbers,
+              dateFilter,
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST
+                  ? [StatusCode.EXPIRED]
+                  : [],
+            },
+            sortField: orderBy?.orderByField,
+            sortDirection:
+              orderBy?.orderDirection == PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : orderBy?.orderDirection == PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            searchText: tableQuery.search,
           })
           .then((data) => {
             result.totalCount =
@@ -888,15 +876,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       }
     }
 
-    if (filter.instrumentFilter?.instrumentId != null) {
-      updatedFilter.instrumentIds = [
-        filter.instrumentFilter.instrumentId as number,
-      ];
-    } else {
-      updatedFilter.instrumentId = null;
-      updatedFilter.instrumentIds =
-        allInstruments?.map((instrument) => instrument.id) || [];
-    }
     setProposalFilter(updatedFilter);
     refreshTableData();
   };
@@ -920,7 +899,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       callId,
       callIds,
       instrumentFilter,
-      instrumentIds,
       techniqueFilter,
       proposalStatusId,
       text,
@@ -938,7 +916,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       .getTechniqueScientistProposalsBasic({
         filter: {
           callId,
-          instrumentIds,
           instrumentFilter,
           callIds,
           techniqueFilter,
