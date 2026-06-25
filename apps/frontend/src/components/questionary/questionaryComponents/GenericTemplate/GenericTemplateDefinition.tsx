@@ -10,6 +10,25 @@ import QuestionaryComponentGenericTemplate from './QuestionaryComponentGenericTe
 import { QuestionGenericTemplateForm } from './QuestionGenericTemplateForm';
 import { QuestionTemplateRelationGenericTemplateForm } from './QuestionTemplateRelationGenericTemplateForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+
+type GenericTemplateValidationValue = {
+  title?: string | null;
+  questionary?: {
+    isCompleted?: boolean | null;
+  } | null;
+};
+
+const getIncompleteGenericTemplatesMessage = (
+  genericTemplates: GenericTemplateValidationValue[]
+) => {
+  const genericTemplateTitles = genericTemplates
+    .filter((genericTemplate) => !genericTemplate?.questionary?.isCompleted)
+    .map((genericTemplate) => genericTemplate.title || 'Untitled sample')
+    .join(', ');
+
+  return `The following sample(s) are violating constraints: ${genericTemplateTitles}. Fix the red sections and click "Save and continue" in each sample before continuing.`;
+};
+
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE,
   name: 'Sub Template',
@@ -51,14 +70,21 @@ export const genericTemplateDefinition: QuestionaryComponentDefinition = {
       );
     }
 
-    schema = schema.test(
-      'allGenericTemplatesCompleted',
-      'All genericTemplates must be completed',
-      (value) =>
-        value?.every(
-          (genericTemplate) => genericTemplate?.questionary.isCompleted
-        ) ?? false
-    );
+    schema = schema.test('allGenericTemplatesCompleted', function (value) {
+      const genericTemplates =
+        (value as GenericTemplateValidationValue[] | undefined) ?? [];
+      const hasIncompleteGenericTemplates = genericTemplates.some(
+        (genericTemplate) => !genericTemplate?.questionary?.isCompleted
+      );
+
+      if (!hasIncompleteGenericTemplates) {
+        return true;
+      }
+
+      return this.createError({
+        message: getIncompleteGenericTemplatesMessage(genericTemplates),
+      });
+    });
 
     return schema;
   },
