@@ -29,14 +29,15 @@ export default function PeoplePage() {
         return (
           <PeopleTable
             title="Users"
-            selection={false}
             action={{
               fn: (value) => setUserData(value as BasicUserDetails),
               actionText: 'Edit user',
               actionIcon: <Edit />,
             }}
+            selection={false}
             showInvitationButtons
-            search
+            search={false}
+            customSearch={true}
             onRemove={(user: { id: number }) =>
               api({
                 toastSuccessMessage: 'User removed successfully!',
