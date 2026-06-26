@@ -255,7 +255,10 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         );
 
         if (newPrevStatusId === undefined || newNextStatusId === undefined) {
-          continue;
+          throw new GraphQLError(
+            `Could not find cloned status mapping for connection Id ${connection.workflow_status_connection_id} ` +
+              `(previous status Id: ${connection.prev_workflow_status_id}, next status Id: ${connection.next_workflow_status_id}).`
+          );
         }
 
         const [newConnection]: WorkflowConnectionRecord[] = await trx
