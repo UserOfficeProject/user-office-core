@@ -15,9 +15,12 @@ export interface DataAccessUsersDataSource {
   getDataAccessUsersWithInstitution(
     proposalPk: number
   ): Promise<UserWithInstitution[]>;
+  // add / remove users already in the system; invite flow works separately
   updateDataAccessUsers(
     proposalPk: number,
     userIds: number[]
   ): Promise<BasicUserDetails[] | Rejection>;
   isDataAccessUserOfProposal(id: number, proposalPk: number): Promise<boolean>;
+  // inviteDataAccessUser(proposalPk: number): Promise<boolean>;
+  // invite -> generate unique invite code -> create claim with user roles -> commit to DB; send email -> send success
 }
