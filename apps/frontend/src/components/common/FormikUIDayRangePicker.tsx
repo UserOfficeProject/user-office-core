@@ -104,15 +104,16 @@ export default function DayRangePicker({
     : undefined;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex' }}>
       <div style={{ flex: 1 }}>
         <TextField
+          onClick={(event) => setAnchorEl(event.currentTarget)}
           data-cy={id}
           label={label}
           fullWidth
           required={required}
           disabled={disabled}
-          placeholder="dd/mm/yyyy - dd/mm/yyyy"
+          placeholder="DD/MM/YYYY - DD/MM/YYYY"
           value={displayValue}
           error={!!error}
           helperText={error ?? helperText}
