@@ -112,6 +112,7 @@ context('Event log tests', () => {
         .find('button[aria-label="Edit user"]')
         .click();
 
+      cy.url().should('include', '/People/1');
       cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
       cy.get('[data-cy="add-role-button"]').click();
       cy.get('input[type="checkbox"]').eq(1).check();
