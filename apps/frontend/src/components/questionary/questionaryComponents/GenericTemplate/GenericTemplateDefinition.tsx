@@ -21,12 +21,15 @@ type GenericTemplateValidationValue = {
 const getIncompleteGenericTemplatesMessage = (
   genericTemplates: GenericTemplateValidationValue[]
 ) => {
-  const genericTemplateTitles = genericTemplates
-    .filter((genericTemplate) => !genericTemplate?.questionary?.isCompleted)
-    .map((genericTemplate) => genericTemplate.title || 'Untitled sample')
+  const incompleteGenericTemplates = genericTemplates.filter(
+    (genericTemplate) => !genericTemplate?.questionary?.isCompleted
+  );
+  const genericTemplateTitles = incompleteGenericTemplates
+    .map((genericTemplate) => genericTemplate.title || 'Untitled entry')
     .join(', ');
+  const verb = incompleteGenericTemplates.length === 1 ? 'is' : 'are';
 
-  return `The following sample(s) are violating constraints: ${genericTemplateTitles}. Fix the red sections and click "Save and continue" in each sample before continuing.`;
+  return `${genericTemplateTitles} ${verb} violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`;
 };
 
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {

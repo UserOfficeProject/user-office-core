@@ -762,7 +762,7 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.contains(
-        `The following sample(s) are violating constraints: ${genericTemplateTitle}. Fix the red sections and click "Save and continue" in each sample before continuing.`
+        `${genericTemplateTitle} is violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`
       );
 
       cy.contains(genericTemplateTitle).click();
@@ -967,7 +967,7 @@ context('GenericTemplates tests', () => {
       cy.contains('Save and continue').click();
 
       cy.contains(
-        `The following sample(s) are violating constraints: ${genericTemplateTitle}. Fix the red sections and click "Save and continue" in each sample before continuing.`
+        `${genericTemplateTitle} is violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`
       ).should('exist');
     });
 
