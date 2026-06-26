@@ -2168,11 +2168,11 @@ context('Technique Proposal tests', () => {
       cy.get('[role="listbox"]').contains('All').click();
       cy.finishedLoading();
 
-      cy.contains(createdProposalId1);
-      cy.contains(createdProposalId2);
-      cy.contains(createdProposalId3);
-      cy.contains(createdProposalId4);
-      cy.contains(createdProposalId5);
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+      cy.should('not.contain', proposal4.title);
+      cy.contains(proposal4.title);
     });
 
     it('Derived User Officer role can only see appropriately tagged call filter options', () => {
@@ -2253,11 +2253,11 @@ context('Technique Proposal tests', () => {
 
       cy.contains('Technique Proposals').click();
 
-      cy.contains(createdProposalId1);
-      cy.should('not.contain', createdProposalId2);
-      cy.should('not.contain', createdProposalId3);
-      cy.should('not.contain', createdProposalId4);
-      cy.should('not.contain', createdProposalId5);
+      cy.contains(proposal1.title);
+      cy.should('not.contain', proposal2.title);
+      cy.should('not.contain', proposal3.title);
+      cy.should('not.contain', proposal4.title);
+      cy.should('not.contain', proposal5.title);
     });
   });
 });
