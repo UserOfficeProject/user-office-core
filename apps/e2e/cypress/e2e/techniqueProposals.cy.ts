@@ -2172,7 +2172,7 @@ context('Technique Proposal tests', () => {
       cy.contains(proposal2.title);
       cy.contains(proposal3.title);
       cy.should('not.contain', proposal4.title);
-      cy.contains(proposal4.title);
+      cy.contains(proposal5.title);
     });
 
     it('Derived User Officer role can only see appropriately tagged call filter options', () => {
