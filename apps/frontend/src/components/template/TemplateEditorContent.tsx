@@ -9,7 +9,7 @@ import { Event } from 'models/questionary/QuestionaryEditorModel';
 import { QuestionPicker } from './QuestionPicker';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 
-interface TemplateTopicListProps {
+interface TemplateEditorContentProps {
   template: Template;
   dispatch: React.Dispatch<Event>;
   questionPickerTopicId: number | null;
@@ -19,7 +19,7 @@ interface TemplateTopicListProps {
   onDragEnd: (result: DropResult) => void;
 }
 
-export function TemplateTopicList({
+export function TemplateEditorContent({
   template,
   dispatch,
   questionPickerTopicId,
@@ -27,7 +27,7 @@ export function TemplateTopicList({
   isTopicReorderMode,
   hoveredDependency,
   onDragEnd,
-}: TemplateTopicListProps) {
+}: TemplateEditorContentProps) {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
 

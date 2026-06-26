@@ -15,9 +15,9 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import PreviewTemplateModal from './PreviewTemplateModal';
 import QuestionEditor from './QuestionEditor';
 import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
+import { TemplateEditorContent } from './TemplateEditorContent';
 import { TemplateEditorToolbar } from './TemplateEditorToolbar';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
-import { TemplateTopicList } from './TemplateTopicList';
 
 export default function TemplateEditor() {
   const { api } = useDataApiWithFeedback();
@@ -70,7 +70,7 @@ export default function TemplateEditor() {
           onToggleReorderMode={() => setIsTopicReorderMode((prev) => !prev)}
           onPreview={() => setOpenedPreviewTemplateId(state.templateId)}
         />
-        <TemplateTopicList
+        <TemplateEditorContent
           template={state}
           dispatch={dispatch}
           questionPickerTopicId={questionPickerTopicId}
