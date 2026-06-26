@@ -31,6 +31,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -193,9 +194,9 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
     instrumentFilter: {
-      instrumentId: instrument ? +instrument : null,
+      instrumentIds: parseInstrumentQuery(instrument),
       showAllProposals: !instrument,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrument === 'multi',
     },
     techniqueFilter: {
       techniqueId: technique ? +technique : null,
