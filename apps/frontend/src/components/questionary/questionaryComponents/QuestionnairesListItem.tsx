@@ -1,6 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import FileCopy from '@mui/icons-material/FileCopy';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
@@ -33,10 +34,14 @@ export function QuestionnairesListItem({
     >
       <ListItemAvatar>
         <Avatar>
-          <DescriptionIcon
-            color={record.isCompleted ? undefined : 'error'}
-            data-cy={`questionnaires-list-item-completed:${record.isCompleted}`}
-          />
+          {record.isCompleted ? (
+            <DescriptionIcon data-cy="questionnaires-list-item-completed:true" />
+          ) : (
+            <WarningAmberIcon
+              color="error"
+              data-cy="questionnaires-list-item-completed:false"
+            />
+          )}
         </Avatar>
       </ListItemAvatar>
       <ListItemText
