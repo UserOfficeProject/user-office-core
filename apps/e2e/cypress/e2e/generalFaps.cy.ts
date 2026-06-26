@@ -66,7 +66,8 @@ context('General facility access panel tests', () => {
         this.skip();
       }
       cy.contains('People').click();
-      searchMuiTableAsync(fapMembers.chair.lastName);
+      cy.get('[data-cy="people-search"]').type(fapMembers.chair.lastName);
+      cy.realPress('Enter');
       cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
@@ -82,9 +83,13 @@ context('General facility access panel tests', () => {
         variant: 'success',
       });
       cy.contains('People').click();
+      cy.get('[data-cy="people-search"]').type(fapMembers.secretary.lastName);
+      cy.realPress('Enter');
+      cy.contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('button[aria-label="Edit user"]')
+        .click();
 
-      searchMuiTableAsync(fapMembers.secretary.lastName);
-      cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
 
