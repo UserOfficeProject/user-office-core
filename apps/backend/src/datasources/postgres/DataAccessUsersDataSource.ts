@@ -90,6 +90,53 @@ export default class PostgresDataAccessUsersDataSource
     }
   }
 
+  async addDataAccessUser(
+    proposalPk: number,
+    userId: number
+  ): Promise<BasicUserDetails | Rejection> {
+    try {
+      await database.transaction(async (trx) => {
+        const insertData = {
+          proposal_pk: proposalPk,
+          user_id: userId,
+        };
+
+        await trx('data_access_user_has_proposal')
+          .insert(insertData)
+          .onConflict(['proposal_pk', 'user_id'])
+          .ignore();
+      });
+
+      const addedUser = await database
+        .select()
+        .from('users as u')
+        .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+        .join('countries as c', { 'i.country_id': 'c.country_id' })
+        .join('data_access_user_has_proposal as dauhp', {
+          'u.user_id': 'dauhp.user_id',
+        })
+        .where({ 'dauhp.proposal_pk': proposalPk, 'dauhp.user_id': userId })
+        .first()
+        .then(
+          (
+            user: (UserRecord & InstitutionRecord & CountryRecord) | undefined
+          ) => (user ? createBasicUserObject(user) : undefined)
+        );
+
+      if (!addedUser) {
+        throw new Error(`No data access user created for id ${userId}`);
+      }
+
+      return addedUser;
+    } catch (error) {
+      return new Rejection('Failed to add data access user', {
+        proposalPk,
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   async isDataAccessUserOfProposal(
     id: number,
     proposalPk: number
