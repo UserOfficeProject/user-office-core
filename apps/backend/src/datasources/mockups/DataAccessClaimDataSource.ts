@@ -1,4 +1,3 @@
-// TODO: what should go into this file?
 import { DataAccessClaim } from '../../models/DataAccessClaim';
 import { DataAccessClaimDataSource } from '../DataAccessClaimDataSource';
 

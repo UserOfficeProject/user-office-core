@@ -6,9 +6,7 @@ import { DataAccessClaimRecord } from './records';
 export default class PostgresDataAccessClaimDataSource
   implements DataAccessClaimDataSource
 {
-  // TODO: what should be the correct pk
   async findByProposalPk(proposalPk: number): Promise<DataAccessClaim[]> {
-    // TODO: change to correct database
     return database('data_access_claims')
       .where({ proposal_pk: proposalPk })
       .select('*')
