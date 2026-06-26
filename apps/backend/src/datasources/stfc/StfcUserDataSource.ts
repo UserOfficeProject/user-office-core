@@ -416,7 +416,7 @@ export class StfcUserDataSource implements UserDataSource {
       );
 
       if (newRolesToAssign.length == 0) {
-        postgresUserDataSource.removeUserRoles(id);
+        this.removeUserRoles(id);
         this.stfcRolesCache.remove(String(id));
         this.uopRolesCache.remove(String(id));
       } else if (newRolesToAssign.length > 0) {
@@ -527,7 +527,9 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async removeUserRoles(id: number): Promise<void> {
-    throw new Error('Method not implemented.');
+    await postgresUserDataSource.removeUserRoles(id);
+
+    return;
   }
 
   async me(id: number) {
