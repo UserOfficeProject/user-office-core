@@ -8,7 +8,7 @@ import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
-import { getSecondsFromAllocationTimeUnits } from './base/getSecondsFromAllocationType';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';

@@ -5,7 +5,7 @@ import {
 } from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
-import { AllocationTimeUnitConverter } from '../config/base/getSecondsFromAllocationType';
+import { AllocationTimeUnitConverter } from '../config/base/allocationTimeUnitConverter';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
