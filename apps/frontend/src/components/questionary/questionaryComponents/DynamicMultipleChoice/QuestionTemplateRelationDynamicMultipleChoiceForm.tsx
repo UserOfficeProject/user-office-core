@@ -156,7 +156,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                       paddingTop: '20px',
                     }}
                   >
-                    {`http://${serverConfig}/`}
+                    {`${serverConfig}/`}
                   </span>
                 )}
 

@@ -256,7 +256,7 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                       paddingTop: '20px',
                     }}
                   >
-                    {`http://${serverConfig}/`}
+                    {`${serverConfig}/`}
                   </span>
                 )}
 
