@@ -20,6 +20,7 @@ export const getSecondsFromAllocationTimeUnits: AllocationTimeUnitConverter = (
     case AllocationTimeUnits.Shift:
       return timeAllocation * 60 * 60 * 8;
     case AllocationTimeUnits.Week:
+    default:
       return timeAllocation * 7 * 24 * 60 * 60;
   }
 };
