@@ -572,7 +572,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         'call_has_instruments.call_id',
         'call.call_id'
       )
-      .join(
+      .leftJoin(
         'instrument_has_scientists',
         'instrument_has_scientists.instrument_id',
         'call_has_instruments.instrument_id'
@@ -582,8 +582,12 @@ export default class PostgresCallDataSource implements CallDataSource {
         'instruments.instrument_id',
         'call_has_instruments.instrument_id'
       )
-      .where('instrument_has_scientists.user_id', scientistId)
-      .orWhere('instruments.manager_user_id', scientistId);
+      .where(function () {
+        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+          'instruments.manager_user_id',
+          scientistId
+        );
+      });
 
     return records.map(createCallObject);
   }

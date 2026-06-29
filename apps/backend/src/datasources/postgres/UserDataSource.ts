@@ -180,6 +180,12 @@ export default class PostgresUserDataSource implements UserDataSource {
     });
   }
 
+  async removeAllUserRoles(id: number): Promise<void> {
+    return database.transaction(async (trx) => {
+      await trx<RoleUserRecord>('role_user').where('user_id', id).del();
+    });
+  }
+
   async me(id: number): Promise<User | null> {
     return database
       .select()

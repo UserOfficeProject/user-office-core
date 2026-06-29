@@ -485,6 +485,10 @@ export class UserDataSourceMock implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
+  async removeAllUserRoles(id: number): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [
