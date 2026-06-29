@@ -201,7 +201,7 @@ context('Role management', () => {
       cy.contains('Assign Roles').click();
     });
 
-    it.only('Officer can bulk assign roles to users', function () {
+    it('Officer can bulk assign roles to users', function () {
       // User one is on the second page
       const user2 = initialDBData.users.user2;
       const user3 = initialDBData.users.user3;

@@ -10,11 +10,6 @@ import { StrictColumn } from 'utils/utilTypes';
 
 import { MassRoleAssignment } from './MassRoleAssignment';
 
-//New query for user with roles
-//Make sure offset is like max 10
-// Only like 3 calls to uows or something
-// Check performace
-
 export type BasicUserDetailsWithRoles = {
   id: number;
   firstname: string;

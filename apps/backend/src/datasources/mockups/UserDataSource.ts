@@ -473,10 +473,15 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
   async setUserRoles(id: number, roles: number[]): Promise<void> {}
-  addUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean> {
+
+  async addUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  removeUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean> {
+
+  async removeUsersRoles(
+    userIds: number[],
+    roleIds: number[]
+  ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 
