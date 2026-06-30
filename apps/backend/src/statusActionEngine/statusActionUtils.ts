@@ -8,6 +8,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import { ProposalRejectionCommentsDataSource } from '../datasources/ProposalRejectionCommentsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -72,6 +73,7 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
+  rejectionComment?: string;
 };
 
 async function stepAnswers(
@@ -154,6 +156,8 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const templateDataSource: TemplateDataSource = container.resolve(
     Tokens.TemplateDataSource
   );
+  const ProposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource =
+    container.resolve(Tokens.ProposalRejectionCommentsDataSource);
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -184,6 +188,10 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         const questionary = await questionaryDataSource.getQuestionary(
           proposal.questionaryId
         );
+        const proposalRejectionComment =
+          await ProposalRejectionCommentsDataSource.getProposalRejectionComment(
+            proposal.primaryKey
+          );
         const templateId = questionary ? questionary?.templateId : -1;
         if (templateId == -1) {
           logger.logError('Could not fetch proposal templateId for email', {
@@ -193,7 +201,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         }
         const template = await templateDataSource.getTemplate(templateId);
         proposalTemplateName = templateId ? template?.name : '';
-
         const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatus: 'QUICK_REVIEW',
@@ -247,6 +254,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
+          rejectionComment: proposalRejectionComment?.comment,
         });
       }
     })

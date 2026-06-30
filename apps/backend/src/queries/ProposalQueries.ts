@@ -8,6 +8,7 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import TagDataSource from '../datasources/postgres/TagDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
+import { ProposalRejectionCommentsDataSource } from '../datasources/ProposalRejectionCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -34,7 +35,9 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
-    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource
+    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource,
+    @inject(Tokens.ProposalRejectionCommentsDataSource)
+    public proposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource
   ) {}
 
   @Authorized()
@@ -196,6 +199,21 @@ export default class ProposalQueries {
   ) {
     return await this.proposalInternalCommentsDataSource
       .getProposalInternalComment(proposalPk)
+      .catch((error) => {
+        return rejection(
+          `Could not get proposal scientist comment proposal: '${proposalPk}'`,
+          { agent, args: proposalPk },
+          error
+        );
+      });
+  }
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async getProposalRejectionComment(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ) {
+    return await this.proposalRejectionCommentsDataSource
+      .getProposalRejectionComment(proposalPk)
       .catch((error) => {
         return rejection(
           `Could not get proposal scientist comment proposal: '${proposalPk}'`,

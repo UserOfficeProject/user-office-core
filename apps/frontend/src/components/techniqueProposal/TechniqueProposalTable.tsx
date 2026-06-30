@@ -13,11 +13,15 @@ import {
   Select,
   IconButton,
   Tooltip,
+  Button,
+  Grid,
+  Typography,
 } from '@mui/material';
 import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
+import { Form, Formik } from 'formik';
 import { t, TFunction } from 'i18next';
 import React, {
   useCallback,
@@ -31,6 +35,9 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import PromptIfDirty from 'components/common/PromptIfDirty';
+import StyledDialog from 'components/common/StyledDialog';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -51,7 +58,11 @@ import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal'
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { useTechniqueProposalsTechniquesData } from 'hooks/technique/useTechniqueProposalsTechniquesData';
-import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import {
+  StyledButtonContainer,
+  StyledPaper,
+  StyledContainer,
+} from 'styles/StyledComponents';
 import {
   addColumns,
   fromArrayToCommaSeparated,
@@ -75,7 +86,11 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const [searchParams, setSearchParams] = useSearchParams({});
   const { currentRole } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-
+  const [isRejectionCommentModalOpen, setRejectionCommentModalOpen] =
+    useState(false);
+  const [unsuccessfullPK, setUnsuccessfullPK] = useState(0);
+  const [rejectionComment, setRejectionComment] = useState('');
+  const [unsuccessfullWorkflowID, setUnsuccessfullWorkflowID] = useState(0);
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
@@ -602,36 +617,42 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 aria-labelledby="status-select-label"
                 onChange={(e) => {
                   if (e.target.value) {
-                    confirm(
-                      () => {
-                        api()
-                          .getWorkflowStatuses({
-                            workflowId: rowData.workflowId,
-                          })
-                          .then(({ workflowStatuses }) => {
-                            const selectedWorkflowStatus =
-                              workflowStatuses?.find(
-                                (s) => s.statusId === e.target.value
+                    if (e.target.value === StatusCode.UNSUCCESSFUL) {
+                      setRejectionCommentModalOpen(true);
+                      setUnsuccessfullPK(rowData.primaryKey);
+                      setUnsuccessfullWorkflowID(rowData.workflowId);
+                    } else {
+                      confirm(
+                        () => {
+                          api()
+                            .getWorkflowStatuses({
+                              workflowId: rowData.workflowId,
+                            })
+                            .then(({ workflowStatuses }) => {
+                              const selectedWorkflowStatus =
+                                workflowStatuses?.find(
+                                  (s) => s.statusId === e.target.value
+                                );
+                              if (!selectedWorkflowStatus) {
+                                throw new Error(
+                                  'Selected workflow status not found'
+                                );
+                              }
+                              updateProposalStatus(
+                                rowData.primaryKey,
+                                selectedWorkflowStatus.workflowStatusId
                               );
-                            if (!selectedWorkflowStatus) {
-                              throw new Error(
-                                'Selected workflow status not found'
-                              );
-                            }
-                            updateProposalStatus(
-                              rowData.primaryKey,
-                              selectedWorkflowStatus.workflowStatusId
-                            );
-                          });
-                      },
-                      {
-                        title: 'Change status',
-                        description:
-                          'Are you sure you want to change this status?',
-                        confirmationText: 'Yes',
-                        cancellationText: 'Cancel',
-                      }
-                    )();
+                            });
+                        },
+                        {
+                          title: 'Change status',
+                          description:
+                            'Are you sure you want to change this status?',
+                          confirmationText: 'Yes',
+                          cancellationText: 'Cancel',
+                        }
+                      )();
+                    }
                   }
                 }}
                 value={fieldValue?.id}
@@ -854,6 +875,49 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     setProposalFilter(updatedFilter);
     refreshTableData();
   };
+  const handleUnsuccessfulStatusChange = () => {
+    if (rejectionComment != '') {
+      confirm(
+        () => {
+          api()
+            .getWorkflowStatuses({
+              workflowId: unsuccessfullWorkflowID,
+            })
+            .then(({ workflowStatuses }) => {
+              const selectedWorkflowStatus = workflowStatuses?.find(
+                (s) => s.statusId === 'UNSUCCESSFUL'
+              );
+              if (!selectedWorkflowStatus) {
+                throw new Error('Selected workflow status not found');
+              }
+              updateProposalStatus(
+                unsuccessfullPK,
+                selectedWorkflowStatus.workflowStatusId
+              );
+            });
+          api({
+            toastSuccessMessage:
+              'Proposal rejection comment successfully created',
+          }).createProposalRejectionComment({
+            proposalPk: unsuccessfullPK,
+            comment: rejectionComment ?? '',
+          });
+        },
+        {
+          title: 'Change status',
+          dialogProps: { rejectionComment },
+          description:
+            'Are you sure you want to change this status and add this rejection comment?',
+          confirmationText: 'Yes',
+          cancellationText: 'Cancel',
+        }
+      )();
+    }
+
+    setRejectionCommentModalOpen(false);
+    setUnsuccessfullPK(0);
+    setRejectionComment('');
+  };
 
   const handleSearchChange = (searchText: string) => {
     searchParams.set('search', searchText ? searchText : '');
@@ -978,6 +1042,92 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             handleFilterChange={handleFilterChange}
             filter={proposalFilter}
           />
+
+          {isRejectionCommentModalOpen && (
+            <div>
+              <StyledDialog
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+                open={isRejectionCommentModalOpen}
+                onClose={handleUnsuccessfulStatusChange}
+                maxWidth="md"
+                fullWidth
+                title="Add Proposal Rejection Comment"
+              >
+                <StyledPaper margin={[0]}>
+                  <>
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      sx={(theme) => ({
+                        marginTop: theme.spacing(2),
+                      })}
+                      gutterBottom
+                    >
+                      Proposal Rejection Comment
+                      <IconButton>
+                        <Info />
+                      </IconButton>
+                    </Typography>
+                    <Formik
+                      initialValues={{ comment: '' }}
+                      onSubmit={async (values): Promise<void> => {
+                        setRejectionComment(values.comment);
+                      }}
+                    >
+                      {({ isSubmitting, setFieldValue }) => (
+                        <Form>
+                          <PromptIfDirty />
+                          <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                              <Editor
+                                initialValue={''}
+                                id={`${unsuccessfullPK}-rejection-comment`}
+                                init={{
+                                  skin: false,
+                                  content_css: false,
+                                  plugins: [
+                                    'link',
+                                    'preview',
+                                    'code',
+                                    'charmap',
+                                    'wordcount',
+                                  ],
+                                  toolbar: 'bold italic',
+                                  branding: false,
+                                }}
+                                onEditorChange={(content) => {
+                                  setFieldValue('comment', content);
+                                }}
+                                disabled={isSubmitting}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <StyledButtonContainer>
+                                <Button
+                                  type="submit"
+                                  sx={(theme) => ({
+                                    margin: theme.spacing(3, 2, 2),
+                                  })}
+                                  data-cy="submit-proposal-rejection-comment"
+                                  onClick={() => {
+                                    handleUnsuccessfulStatusChange();
+                                  }}
+                                >
+                                  {'Update Comment'}
+                                </Button>
+                              </StyledButtonContainer>
+                            </Grid>
+                          </Grid>
+                        </Form>
+                      )}
+                    </Formik>
+                  </>
+                </StyledPaper>
+              </StyledDialog>
+            </div>
+          )}
+
           <MaterialTableCore<ProposalViewData>
             tableRef={tableRef}
             icons={tableIcons}

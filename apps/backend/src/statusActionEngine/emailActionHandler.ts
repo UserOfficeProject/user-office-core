@@ -464,6 +464,7 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
+              rejectionComment: recipientWithData,
             },
             recipients: [{ address: recipientWithData.email }],
           });

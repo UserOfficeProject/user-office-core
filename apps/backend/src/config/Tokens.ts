@@ -57,6 +57,9 @@ export const Tokens = {
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
   ),
+  ProposalRejectionCommentsDataSource: Symbol(
+    'ProposalRejectionCommentsDataSource'
+  ),
   WorkflowDataSource: Symbol('WorkflowDataSource'),
   StatusDataSource: Symbol('StatusDataSource'),
   ExperimentDataSource: Symbol('ExperimentDataSource'),

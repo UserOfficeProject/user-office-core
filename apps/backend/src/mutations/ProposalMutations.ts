@@ -12,6 +12,8 @@ import {
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import FapMutations from './FapMutations';
+import InstrumentMutations from './InstrumentMutations';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
@@ -34,19 +36,21 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CreateProposalRejectionCommentArgs } from '../resolvers/mutations/CreateProposalRejectionCommentMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
-import { ProposalScientistComment } from '../resolvers/types/ProposalView';
+import {
+  ProposalScientistComment,
+  ProposalRejectionComment,
+} from '../resolvers/types/ProposalView';
 import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
-import FapMutations from './FapMutations';
-import InstrumentMutations from './InstrumentMutations';
 
 @injectable()
 export default class ProposalMutations {
@@ -75,7 +79,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.WorkflowDataSource)
-    private workflowDataSource: WorkflowDataSource
+    private workflowDataSource: WorkflowDataSource,
+    @inject(Tokens.ProposalRejectionCommentsDataSource)
+    private ProposalRejectionCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -501,6 +507,34 @@ export default class ProposalMutations {
           error
         );
       });
+  }
+  @ValidateArgs(createProposalScientistCommentValidationSchema)
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async createProposalRejectionComment(
+    agent: UserWithRole | null,
+    args: CreateProposalRejectionCommentArgs
+  ): Promise<ProposalRejectionComment | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Could not create proposal rejection comment because proposal not found',
+        {
+          agent,
+          proposalPk: args.proposalPk,
+        }
+      );
+    }
+
+    return await this.ProposalRejectionCommentsDataSource.create(args).catch(
+      (error) => {
+        return rejection(
+          'Could not create proposal rejection comment',
+          { agent, args: args },
+          error
+        );
+      }
+    );
   }
 
   @ValidateArgs(updateProposalScientistCommentValidationSchema)
