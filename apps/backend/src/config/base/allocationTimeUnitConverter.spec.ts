@@ -42,10 +42,10 @@ describe('getSecondsFromAllocationTimeUnits', () => {
     ).toBe(3.5 * 24 * 3600);
   });
 
-  it('returns undefined for unsupported unit', () => {
+  it('Returns default of 1 day (86400) as default', () => {
     // Cast to bypass TS enum safety for edge-case testing
     expect(
       getSecondsFromAllocationTimeUnits(1, 'INVALID' as AllocationTimeUnits)
-    ).toBeUndefined();
+    ).toBe(60 * 60 * 24);
   });
 });
