@@ -38,7 +38,7 @@ export class QuestionaryResolver {
     );
   }
 
-  @FieldResolver(() => Boolean)
+  @FieldResolver(() => Boolean, { nullable: true })
   async isCompleted(
     @Root() questionary: Questionary,
     @Ctx() context: ResolverContext

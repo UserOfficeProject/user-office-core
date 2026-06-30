@@ -10,7 +10,7 @@ export class QuestionaryStep implements Partial<QuestionaryStepOrigin> {
   public topic: Topic;
 
   @Field()
-  public isCompleted: boolean;
+  public isCompleted?: boolean;
 
   @Field(() => [Answer])
   public fields: Answer[];
