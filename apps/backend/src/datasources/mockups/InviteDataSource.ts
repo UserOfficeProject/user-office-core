@@ -5,6 +5,7 @@ import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../DataAccessClaimDataSource';
 import {
   GetCoProposerInvitesFilter,
   GetInvitesFilter,
@@ -18,7 +19,9 @@ export class InviteDataSourceMock implements InviteDataSource {
 
   constructor(
     @inject(Tokens.CoProposerClaimDataSource)
-    private coProposerDataSource: CoProposerClaimDataSource
+    private coProposerDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.DataAccessClaimDataSource)
+    private dataAccessDataSource: DataAccessClaimDataSource
   ) {
     this.init();
   }
@@ -33,6 +36,18 @@ export class InviteDataSourceMock implements InviteDataSource {
 
     return invites.filter((invite) => invite !== null) as Invite[];
   }
+
+  async findDataAccessInvites(proposalPk: number): Promise<Invite[]> {
+    const dataAccessClaims =
+      await this.dataAccessDataSource.findByProposalPk(proposalPk);
+
+    const invites = await Promise.all(
+      dataAccessClaims.map((claim) => this.findById(claim.inviteId))
+    );
+
+    return invites.filter((invite) => invite !== null) as Invite[];
+  }
+
   async findVisitRegistrationInvites(
     visitId: number,
     includeExpired: boolean

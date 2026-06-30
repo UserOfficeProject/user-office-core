@@ -33,6 +33,30 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
+  findDataAccessInvites(
+    proposalPk: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('data_access_claims')
+      .where('proposal_pk', proposalPk)
+      .modify((query) => {
+        if (isClaimed !== undefined) {
+          if (isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+      })
+
+      .leftJoin('invites', 'data_access_claims.invite_id', 'invites.invite_id')
+      .catch((error: Error) => {
+        throw new Error(`Could not find invites: ${error.message}`);
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
   findVisitRegistrationInvites(
     visitId: number,
     isClaimed?: boolean

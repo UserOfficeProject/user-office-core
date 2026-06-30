@@ -8,9 +8,9 @@ export class DataAccessClaimDataSourceMock
 
   init() {
     this.invites = [
-      new DataAccessClaim(1, 1),
-      new DataAccessClaim(2, 2),
-      new DataAccessClaim(3, 3),
+      new DataAccessClaim(7, 1), // use IDs unique from coproposal invites
+      new DataAccessClaim(8, 2),
+      new DataAccessClaim(9, 3),
     ];
   }
 
