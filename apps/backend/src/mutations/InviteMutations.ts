@@ -7,6 +7,8 @@ import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../datasources/DataAccessClaimDataSource';
+import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import database from '../datasources/postgres/database';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -24,6 +26,7 @@ import { Role, Roles } from '../models/Role';
 import { SettingsId } from '../models/Settings';
 import { UserRole, UserWithRole } from '../models/User';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
+import { SetDataAccessInvitesInput } from '../resolvers/mutations/SetDataAccessInvitesMutation';
 
 @injectable()
 export default class InviteMutations {
@@ -38,6 +41,10 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.DataAccessClaimDataSource)
+    private dataAccessClaimDataSource: DataAccessClaimDataSource,
+    @inject(Tokens.DataAccessUsersDataSource)
+    private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.VisitRegistrationClaimDataSource)
     private visitRegistrationClaimDataSource: VisitRegistrationClaimDataSource,
     @inject(Tokens.VisitDataSource)
@@ -74,6 +81,7 @@ export default class InviteMutations {
 
     await this.processAcceptedRoleClaims(agent.id, invite);
     await this.processAcceptedCoProposerClaims(agent.id, invite);
+    await this.processAcceptedDataAccessClaims(agent.id, invite);
     await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
@@ -85,6 +93,7 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
+  // make this generic -> accept on signup
   @Authorized([Roles.USER])
   async acceptCoProposerInvite(agent: UserWithRole | null, proposalId: string) {
     if (!agent) {
@@ -121,6 +130,19 @@ export default class InviteMutations {
   private async getCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const existingClaims =
       await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
+
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+
+    return existingInvites;
+  }
+
+  private async getDataAccessInvites(proposalPk: number): Promise<Invite[]> {
+    const existingClaims =
+      await this.dataAccessClaimDataSource.findByProposalPk(proposalPk);
 
     const existingInvites = (await Promise.all(
       existingClaims.map((claim) =>
@@ -190,6 +212,77 @@ export default class InviteMutations {
     if (invites.length > 0) {
       await this.eventBus.publish({
         type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+        array: invites,
+        key: 'array',
+        loggedInUserId: agent?.id,
+        inputArgs: JSON.stringify(args),
+        impersonatingUserId: agent ? agent.impersonatingUserId : null,
+        proposalPKey: proposalPk,
+      } as ApplicationEvent);
+    }
+
+    return invites;
+  }
+
+  @Authorized()
+  public async setDataAccessInvites(
+    agent: UserWithRole | null,
+    args: SetDataAccessInvitesInput
+  ): Promise<Invite[] | Rejection> {
+    const { proposalPk, emails } = args;
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasWriteRights(agent, proposalPk));
+
+    if (!hasWriteRights) {
+      return rejection(
+        'User is not authorized to create data access invites for this proposal'
+      );
+    }
+
+    const existingInvites = await this.getDataAccessInvites(proposalPk);
+    const existingEmails = existingInvites.map((invite) => invite.email);
+
+    const deletedEmails = existingEmails.filter(
+      (email) => !emails.includes(email)
+    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+
+    const expirationDate = await this.getInviteExpirationDate();
+
+    const newInvites = await Promise.all(
+      newEmails.map(async (email) =>
+        this.inviteDataSource.create({
+          createdByUserId: agent!.id,
+          code: await this.generateInviteCode(),
+          email: email,
+          expiresAt: expirationDate,
+        })
+      )
+    );
+    await Promise.all(
+      newInvites.map(async (newInvite) => {
+        await this.dataAccessClaimDataSource.create(newInvite.id, proposalPk);
+        await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
+      })
+    );
+
+    const invites = [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+
+    if (invites.length > 0) {
+      await this.eventBus.publish({
+        type: Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED,
         array: invites,
         key: 'array',
         loggedInUserId: agent?.id,
@@ -334,6 +427,42 @@ export default class InviteMutations {
       });
     }
   }
+
+  private async processAcceptedDataAccessClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
+    const inviteId = invite.id;
+    const dataAccessClaim =
+      await this.dataAccessClaimDataSource.findByInviteId(inviteId);
+
+    for await (const claim of dataAccessClaim) {
+      const isDataAccessUser =
+        await this.dataAccessUsersDataSource.isDataAccessUserOfProposal(
+          claimerUserId,
+          claim.proposalPk
+        );
+      // already a data access user
+      if (isDataAccessUser) {
+        return;
+      }
+      await this.dataAccessUsersDataSource.addDataAccessUser(
+        claim.proposalPk,
+        claimerUserId
+      );
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
+      });
+    }
+  }
+
   private async processAcceptedVisitRegistrationClaims(
     claimerUserId: number,
     invite: Invite

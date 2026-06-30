@@ -38,6 +38,24 @@ export default class InviteQueries {
   }
 
   @Authorized()
+  async getDataAccessInvites(agent: UserWithRole | null, proposalPk: number) {
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      this.proposalAuth.hasReadRights(agent, proposalPk);
+
+    if (!hasReadRights) {
+      return [];
+    }
+
+    const invites = await this.dataSource.findDataAccessInvites(
+      proposalPk,
+      false
+    );
+
+    return invites;
+  }
+
+  @Authorized()
   async getVisitRegistrationInvites(
     agent: UserWithRole | null,
     visitId: number
