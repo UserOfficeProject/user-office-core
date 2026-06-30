@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
 import UserManagementTable from 'components/common/UserManagementTable';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useDataAccessUsersData } from 'hooks/remoteUser/useDataAccessUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -25,6 +25,7 @@ const DataAccessUsersModal = ({
     useDataAccessUsersData(proposalPk);
   const { proposalData } = useProposalData(proposalPk);
   const [managedUsers, setManagedUsers] = useState<BasicUserDetails[]>([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   // Update managed users when data access users data changes
@@ -33,6 +34,13 @@ const DataAccessUsersModal = ({
       setManagedUsers(dataAccessUsers);
     }
   }, [dataAccessUsers, loadingDataAccessUsers]);
+
+  // Seed existing data access invites from the proposal
+  React.useEffect(() => {
+    if (proposalData?.dataAccessInvites) {
+      setInvites(proposalData.dataAccessInvites);
+    }
+  }, [proposalData]);
 
   // Calculate excludeUserIds from proposal data (proposer + co-proposers)
   const excludeUserIds = React.useMemo(() => {
@@ -52,13 +60,17 @@ const DataAccessUsersModal = ({
     }
 
     const userIds = managedUsers.map((user) => user.id);
+    const emails = invites.map((invite) => invite.email);
 
     try {
-      await api({
-        toastSuccessMessage: 'Data access users updated successfully!',
-      }).updateDataAccessUsers({
+      await api().updateDataAccessUsers({
         proposalPk,
         userIds,
+      });
+      await api({
+        toastSuccessMessage: 'Data access users updated successfully!',
+      }).setDataAccessInvites({
+        input: { proposalPk, emails },
       });
       onClose();
     } catch (error) {
@@ -83,11 +95,12 @@ const DataAccessUsersModal = ({
             <UserManagementTable
               users={managedUsers}
               setUsers={setManagedUsers}
-              invites={[]}
-              setInvites={() => {}}
+              invites={invites}
+              setInvites={setInvites}
               title="Data access users"
               addButtonLabel="Add Data Access User"
               excludeUserIds={excludeUserIds}
+              allowInviteByEmail={true}
             />
             <ActionButtonContainer>
               <Button
