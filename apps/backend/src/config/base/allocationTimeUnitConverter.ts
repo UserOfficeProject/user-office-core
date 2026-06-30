@@ -15,12 +15,12 @@ export const getSecondsFromAllocationTimeUnits: AllocationTimeUnitConverter = (
   switch (unit) {
     case AllocationTimeUnits.Hour:
       return timeAllocation * 60 * 60;
-    case AllocationTimeUnits.Day:
-      return timeAllocation * 24 * 60 * 60;
     case AllocationTimeUnits.Shift:
       return timeAllocation * 60 * 60 * 8;
     case AllocationTimeUnits.Week:
-    default:
       return timeAllocation * 7 * 24 * 60 * 60;
+    case AllocationTimeUnits.Day:
+    default:
+      return timeAllocation * 24 * 60 * 60;
   }
 };
