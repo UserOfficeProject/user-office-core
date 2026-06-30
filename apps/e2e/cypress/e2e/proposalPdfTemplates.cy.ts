@@ -218,6 +218,26 @@ context('Proposal PDF template tests', () => {
       cy.contains(newDescription).should('exist');
     });
 
+    it('User officer opens a PDF template editor → PDF preview renders without error', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
+
+      cy.contains(createdTemplateName)
+        .parent()
+        .find("[aria-label='Edit']")
+        .click();
+
+      cy.contains(createdTemplateName).should('exist');
+
+      cy.get('[data-cy="pdf-template-preview"] canvas', {
+        timeout: 60000,
+      }).should('be.visible');
+
+      cy.get('[data-cy="pdf-template-preview-error"]').should('not.exist');
+    });
+
     it('User officer can clone PDF template', () => {
       cy.login('officer');
       cy.visit('/');
