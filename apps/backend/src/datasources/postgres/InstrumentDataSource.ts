@@ -37,6 +37,7 @@ export default class PostgresInstrumentDataSource
   constructor(
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource
   ) {}
+
   private createInstrumentObject(instrument: InstrumentRecord) {
     return new Instrument(
       instrument.instrument_id,
@@ -296,7 +297,22 @@ export default class PostgresInstrumentDataSource
           .whereIn('tag_id', tagIds)
           .select('i.*');
 
-        return instruments.map(this.createInstrumentWithAvailabilityTimeObject);
+        const managerInstruments = await database<InstrumentRecord>(
+          'instruments as i'
+        )
+          .where('i.manager_user_id', userId)
+          .select('i.*');
+
+        const allInstruments = [...instruments, ...managerInstruments];
+        const uniqueInstruments = allInstruments.filter(
+          (inst, index, self) =>
+            self.findIndex((i) => i.instrument_id === inst.instrument_id) ===
+            index
+        );
+
+        return uniqueInstruments.map(
+          this.createInstrumentWithAvailabilityTimeObject
+        );
       } else {
         const instruments =
           await database<InstrumentRecord>('instruments as i').select('i.*');
@@ -314,11 +330,12 @@ export default class PostgresInstrumentDataSource
         'manager_user_id',
       ])
       .from('instruments as i')
-      .join('instrument_has_scientists as ihs', {
+      .leftJoin('instrument_has_scientists as ihs', {
         'i.instrument_id': 'ihs.instrument_id',
       })
-      .where('ihs.user_id', userId)
-      .orWhere('i.manager_user_id', userId)
+      .where(function () {
+        this.where('ihs.user_id', userId).orWhere('i.manager_user_id', userId);
+      })
       .distinct('i.instrument_id')
       .then((instruments: InstrumentRecord[]) => {
         const result = instruments.map((instrument) =>
@@ -803,14 +820,20 @@ export default class PostgresInstrumentDataSource
       await database
         .count({ count: '*' })
         .from('instruments as i')
-        .join('instrument_has_scientists as ihs', {
-          'i.instrument_id': 'ihs.instrument_id',
+        .leftJoin('instrument_has_scientists as ihs', function () {
+          this.on('i.instrument_id', '=', 'ihs.instrument_id').andOnVal(
+            'ihs.user_id',
+            '=',
+            userId
+          );
         })
-        .where('ihs.user_id', userId)
         .where('i.instrument_id', instrumentId)
+        .andWhere(function () {
+          this.whereNotNull('ihs.user_id').orWhere('i.manager_user_id', userId);
+        })
         .first();
 
-    return result?.count === '1';
+    return Number(result?.count) >= 1;
   }
 
   async hasInstrumentScientistAccess(
@@ -821,19 +844,27 @@ export default class PostgresInstrumentDataSource
     return database
       .select([database.raw('count(*) OVER() AS count')])
       .from('proposals')
-      .join('instrument_has_scientists', {
-        'instrument_has_scientists.user_id': scientistId,
-      })
       .join('instrument_has_proposals', {
         'instrument_has_proposals.proposal_pk': 'proposals.proposal_pk',
-        'instrument_has_proposals.instrument_id':
-          'instrument_has_scientists.instrument_id',
+      })
+      .join('instruments', {
+        'instruments.instrument_id': 'instrument_has_proposals.instrument_id',
+      })
+      .leftJoin('instrument_has_scientists', {
+        'instrument_has_scientists.instrument_id': 'instruments.instrument_id',
+        'instrument_has_scientists.user_id': scientistId,
       })
       .where('proposals.proposal_pk', '=', proposalPk)
-      .where('instrument_has_scientists.instrument_id', '=', instrumentId)
+      .where('instrument_has_proposals.instrument_id', '=', instrumentId)
+      .andWhere(function () {
+        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+          'instruments.manager_user_id',
+          scientistId
+        );
+      })
       .first()
-      .then((result: undefined | { count: string }) => {
-        return result?.count === '1';
+      .then((result) => {
+        return Number(result?.count) >= 1;
       });
   }
 
