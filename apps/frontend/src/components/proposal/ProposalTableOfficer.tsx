@@ -518,7 +518,7 @@ const ProposalTableOfficer = ({
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
 
-    if (v.field === 'statusName') {
+    if (v.field === 'statusName' && !isReadOnly) {
       return {
         ...v,
         render: (rowData: ProposalViewData) => (
