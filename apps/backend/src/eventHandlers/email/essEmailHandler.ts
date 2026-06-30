@@ -350,6 +350,51 @@ export async function essEmailHandler(event: ApplicationEvent) {
       break;
     }
 
+    case Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED: {
+      const invites = event.array;
+
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
+      for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
+
+        if (!inviter) {
+          logger.logError('No inviter found when trying to send email', {
+            inviter,
+            event,
+          });
+
+          return;
+        }
+
+        await sendInviteEmail(
+          invite,
+          inviter,
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
+        ).then(async () => {
+          await eventBus.publish({
+            ...event,
+            type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+            invite,
+          });
+        });
+      }
+      break;
+    }
+
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
       const fapReviewer = await userDataSource.getUser(userID);
