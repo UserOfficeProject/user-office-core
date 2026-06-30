@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
@@ -51,6 +52,8 @@ export default class InviteMutations {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.DataAccessUsersAuthorization)
+    private dataAccessUsersAuth: DataAccessUsersAuthorization,
     @inject(Tokens.VisitAuthorization)
     private visitAuthorization: VisitAuthorization,
     @inject(Tokens.AdminDataSource)
@@ -232,7 +235,7 @@ export default class InviteMutations {
     const { proposalPk, emails } = args;
     const hasWriteRights =
       this.userAuth.isApiToken(agent) ||
-      (await this.proposalAuth.hasWriteRights(agent, proposalPk));
+      (await this.dataAccessUsersAuth.hasWriteRights(agent, proposalPk));
 
     if (!hasWriteRights) {
       return rejection(
