@@ -21,6 +21,8 @@ context('Proposal tests', () => {
   faker.seed(0);
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
+  const maxTitleLen = 175;
+  const maxAbstractLen = 1500;
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
@@ -49,6 +51,7 @@ context('Proposal tests', () => {
   let createdProposalId: string;
   let createdCallId: number;
   let createdTemplateId: number;
+  let createdFapMeetingWorkflowStatusId: number;
   const textQuestion = faker.lorem.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -122,19 +125,24 @@ context('Proposal tests', () => {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      }).then((workflowStatusResult) => {
+        if (workflowStatusResult.addStatusToWorkflow) {
+          createdFapMeetingWorkflowStatusId =
+            workflowStatusResult.addStatusToWorkflow.workflowStatusId;
+        }
+      });
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
         entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
-          cy.addWorkflowStatus({
+          cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
-            sortOrder: 1,
-            prevStatusId: 1,
-            posX: 0,
-            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -270,7 +278,26 @@ context('Proposal tests', () => {
       cy.contains('Proposal Title is required');
       cy.contains('Proposal Abstract is required');
 
+      cy.get('[data-cy=title]').type('x'.repeat(maxTitleLen + 1));
+      cy.get('[data-cy=abstract]').type('y'.repeat(maxAbstractLen + 1));
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+
+      cy.contains(`Please make title at most ${maxTitleLen} characters long`);
+      cy.contains(
+        `Please make abstract at most ${maxAbstractLen} characters long`
+      );
+
       cy.contains('New Proposal').click();
+
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Changes you recently made in this tab will be lost! Are you sure?'
+        );
+
+        return true;
+      });
+
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=save-button]').should('be.disabled');
@@ -278,26 +305,21 @@ context('Proposal tests', () => {
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
       cy.get('[data-cy=abstract] textarea').first().focus();
-      cy.get('[data-cy=save-button]').should('not.be.disabled');
+      cy.get('[data-cy=save-button]').focus().should('not.be.disabled').click();
 
-      cy.on('uncaught:exception', (err) => {
-        expect(err.message).to.include('Input validation errors');
+      cy.contains('Proposal Abstract is required');
 
-        // return false to prevent the error from
-        // failing this test
-        return false;
-      });
-
-      // Save button should be enabled after validation error
-      cy.get('[data-cy=save-button]').focus().click();
-
-      cy.finishedLoading();
-      cy.get('[data-cy=save-button]').should('not.be.disabled');
-
+      cy.get('[data-cy=title] input').clear().should('have.value', '');
       cy.get('[data-cy=abstract] textarea')
         .first()
         .type(abstract)
         .should('have.value', abstract);
+
+      cy.get('[data-cy=save-button]').focus().should('not.be.disabled').click();
+
+      cy.contains('Proposal Title is required');
+
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
       // Save button should be disabled after successful save
       cy.get('[data-cy=save-button]').focus().click();
@@ -755,10 +777,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]').contains('DRAFT').click();
 
@@ -779,10 +801,10 @@ context('Proposal tests', () => {
       cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
-        .find('#selectedStatusId-input')
+        .find('#selectedWorkflowStatusId-input')
         .should('not.have.class', 'Mui-disabled');
 
-      cy.get('@dialog').find('#selectedStatusId-input').click();
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
 
       cy.get('[role="listbox"]')
         .contains(initialDBData.proposalStatuses.fapMeeting.name)
@@ -809,7 +831,7 @@ context('Proposal tests', () => {
         proposalsToClonePk: [createdProposalPk],
       });
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapMeeting.id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
       cy.login('officer');
@@ -838,7 +860,7 @@ context('Proposal tests', () => {
         .uncheck();
 
       cy.contains(initialDBData.proposalStatuses.fapMeeting.name)
-        .parent()
+        .closest('tr')
         .find('[type="checkbox"]')
         .check();
       cy.get('[data-cy="change-proposal-status"]').click();
@@ -854,7 +876,7 @@ context('Proposal tests', () => {
       cy.get('body').trigger('keydown', { keyCode: 27 });
 
       cy.changeProposalsStatus({
-        statusId: initialDBData.proposalStatuses.fapReview.id,
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
         proposalPks: [createdProposalPk],
       });
 
@@ -1097,8 +1119,10 @@ context('Proposal tests', () => {
 
       cy.get('[index="0"] input').check();
       cy.get('[data-cy="change-proposal-status"]').click();
-      cy.get('#selectedStatusId-input').click();
-      cy.get('[role="listbox"]').contains('EDITABLE_SUBMITTED').click();
+      cy.get('#selectedWorkflowStatusId-input').click();
+      cy.get('[role="listbox"]')
+        .contains(/^EDITABLE_SUBMITTED$/)
+        .click();
       cy.get('[data-cy="submit-proposal-status-change"] ').click();
 
       cy.login('user1', initialDBData.roles.user);

@@ -67,37 +67,38 @@ context('Event log tests', () => {
         id: user.id,
         firstname: newFirstName,
         userTitle: 'Dr.',
-        lastname: 'Doe',
+        lastname: user.lastName,
         institutionId: 1,
         email: faker.internet.email(),
+      }).then(() => {
+        cy.login('officer');
+        cy.visit('/People');
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy="people-search"]').type(user.lastName);
+        cy.realPress('Enter');
+
+        cy.contains(user.lastName)
+          .parent()
+          .find('button[aria-label="Edit user"]')
+          .click();
+
+        cy.get("[name='firstname']").should('have.value', newFirstName);
+
+        cy.get('[role="tab"]').contains('Logs').click();
+
+        cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
+        cy.get('@eventLogsTable')
+          .find('tr[level="0"]')
+          .last()
+          .as('eventLogsTableLastRow');
+
+        cy.get('@eventLogsTableLastRow').invoke('text').as('lastRowText');
+
+        cy.get('@lastRowText').should('contain', 'USER_UPDATED');
+        cy.get('@lastRowText').should('contain', updateProfileDate);
       });
-
-      cy.login('officer');
-      cy.visit('/People');
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Search"]').type(user.lastName);
-
-      cy.contains(user.firstName)
-        .parent()
-        .find('button[aria-label="Edit user"]')
-        .click();
-
-      cy.get("[name='firstname']").should('have.value', newFirstName);
-
-      cy.get('[role="tab"]').contains('Logs').click();
-
-      cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
-      cy.get('@eventLogsTable')
-        .find('tr[level="0"]')
-        .last()
-        .as('eventLogsTableLastRow');
-
-      cy.get('@eventLogsTableLastRow').invoke('text').as('lastRowText');
-
-      cy.get('@lastRowText').should('contain', 'USER_UPDATED');
-      cy.get('@lastRowText').should('contain', updateProfileDate);
     });
 
     it('If user impersonates someone, it reflects in the action logs', () => {
@@ -129,7 +130,7 @@ context('Event log tests', () => {
       cy.get('[data-cy="add-participant-button"]').click();
       cy.get('input[type="checkbox"]').eq(0).check();
       cy.get('[data-cy="assign-selected-users"]').click();
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-7').click();
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-8').click();
       cy.contains('userId:2 impersonating userId:1');
     });
   });

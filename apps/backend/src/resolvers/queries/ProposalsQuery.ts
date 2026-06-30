@@ -33,8 +33,15 @@ export class QuestionFilterInput {
 
 @InputType()
 export class InstrumentFilterInput {
-  @Field(() => Int, { nullable: true })
-  public instrumentId: number;
+  /** @deprecated Use instrumentIds instead */
+  @Field(() => Int, {
+    nullable: true,
+    deprecationReason: 'Use instrumentIds instead',
+  })
+  public instrumentId?: number;
+
+  @Field(() => [Int], { nullable: true })
+  public instrumentIds?: number[];
 
   @Field(() => Boolean)
   public showMultiInstrumentProposals: boolean;
@@ -87,11 +94,11 @@ export class ProposalsFilter {
   @Field(() => InstrumentFilterInput, { nullable: true })
   public instrumentFilter?: InstrumentFilterInput;
 
-  @Field(() => Int, { nullable: true })
-  public proposalStatusId?: number;
+  @Field(() => String, { nullable: true })
+  public proposalStatusId?: string;
 
-  @Field(() => [Int], { nullable: true })
-  public excludeProposalStatusIds?: number[];
+  @Field(() => [String], { nullable: true })
+  public excludeProposalStatusIds?: string[];
 
   @Field(() => [String], { nullable: true })
   public shortCodes?: string[];

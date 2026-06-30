@@ -11,6 +11,27 @@ import { QuestionGenericTemplateForm } from './QuestionGenericTemplateForm';
 import { QuestionTemplateRelationGenericTemplateForm } from './QuestionTemplateRelationGenericTemplateForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
+type GenericTemplateValidationValue = {
+  title?: string | null;
+  questionary?: {
+    isCompleted?: boolean | null;
+  } | null;
+};
+
+const getIncompleteGenericTemplatesMessage = (
+  genericTemplates: GenericTemplateValidationValue[]
+) => {
+  const incompleteGenericTemplates = genericTemplates.filter(
+    (genericTemplate) => !genericTemplate?.questionary?.isCompleted
+  );
+  const genericTemplateTitles = incompleteGenericTemplates
+    .map((genericTemplate) => genericTemplate.title || 'Untitled entry')
+    .join(', ');
+  const verb = incompleteGenericTemplates.length === 1 ? 'is' : 'are';
+
+  return `${genericTemplateTitles} ${verb} violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`;
+};
+
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE,
   name: 'Sub Template',
@@ -27,7 +48,13 @@ export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: (answer) => {
     const config = answer.config as SubTemplateConfig;
-    let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
+    let schema = Yup.array().of(
+      Yup.object({
+        questionary: Yup.object({
+          isCompleted: Yup.boolean().required(),
+        }),
+      })
+    );
 
     if (config.required) {
       schema = schema.min(1, 'This is a required field');
@@ -46,14 +73,21 @@ export const genericTemplateDefinition: QuestionaryComponentDefinition = {
       );
     }
 
-    schema = schema.test(
-      'allGenericTemplatesCompleted',
-      'All genericTemplates must be completed',
-      (value) =>
-        value?.every(
-          (genericTemplate) => genericTemplate?.questionary.isCompleted
-        ) ?? false
-    );
+    schema = schema.test('allGenericTemplatesCompleted', function (value) {
+      const genericTemplates =
+        (value as GenericTemplateValidationValue[] | undefined) ?? [];
+      const hasIncompleteGenericTemplates = genericTemplates.some(
+        (genericTemplate) => !genericTemplate?.questionary?.isCompleted
+      );
+
+      if (!hasIncompleteGenericTemplates) {
+        return true;
+      }
+
+      return this.createError({
+        message: getIncompleteGenericTemplatesMessage(genericTemplates),
+      });
+    });
 
     return schema;
   },

@@ -19,7 +19,7 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
         .trim()
         .max(
           MAX_TITLE_LEN,
-          `Please make abstract at most ${MAX_TITLE_LEN} characters long`
+          `Please make title at most ${MAX_TITLE_LEN} characters long`
         )
         .required('Proposal Title is required'),
       abstract: Yup.string()
@@ -35,17 +35,18 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
         .when('proposer', {
           is: (proposerId: number) =>
             proposerId !== currentUser?.user.id && !isUserOfficer,
-          then: Yup.array()
-            .of(Yup.number())
-            .test(
-              'is-co-proposer',
-              'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!',
-              (value) =>
-                (currentUser?.user.id &&
-                  value?.includes(currentUser.user.id)) ||
-                false
-            ),
-          otherwise: Yup.array().of(Yup.number()),
+          then: (schema) =>
+            schema
+              .of(Yup.number())
+              .test(
+                'is-co-proposer',
+                'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!',
+                (value) =>
+                  (currentUser?.user.id &&
+                    value?.includes(currentUser.user.id)) ||
+                  false
+              ),
+          otherwise: (schema) => schema.of(Yup.number()),
         }),
     });
 

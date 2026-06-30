@@ -1,3 +1,4 @@
+import { Event } from './event.enum';
 import { Call } from '../models/Call';
 import { EmailTemplate } from '../models/EmailTemplate';
 import { ExperimentSafety } from '../models/Experiment';
@@ -15,7 +16,6 @@ import { Technique } from '../models/Technique';
 import { User } from '../models/User';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
-import { Event } from './event.enum';
 
 export interface GeneralEvent {
   type: Event;
@@ -396,6 +396,12 @@ interface VisitCreatedEvent extends GeneralEvent {
   type: Event.VISIT_CREATED;
   visit: Visit;
 }
+
+interface VisitRegistrationUpdatedEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_UPDATED;
+  visitregistration: VisitRegistration;
+}
+
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -545,6 +551,7 @@ export type ApplicationEvent =
   | InternalReviewUpdated
   | InternalReviewDeleted
   | VisitCreatedEvent
+  | VisitRegistrationUpdatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
   | UserDataAccessUpdatedEvent

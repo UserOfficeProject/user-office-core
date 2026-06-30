@@ -1,5 +1,6 @@
 import { container, injectable } from 'tsyringe';
 
+import { StfcUserDataSource } from './StfcUserDataSource';
 import { Tokens } from '../../config/Tokens';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
@@ -10,9 +11,12 @@ import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { CallDataSource } from '../CallDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
+import PostgresCallDataSource from '../postgres/CallDataSource';
 import database from '../postgres/database';
+import PostgresProposalDataSource, {
+  resolveInstrumentIds,
+} from '../postgres/ProposalDataSource';
 import {
   CallRecord,
   createCallObject,
@@ -24,35 +28,19 @@ import PostgresTagDataSource from '../postgres/TagDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
-import PostgresProposalDataSource from './../postgres/ProposalDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 const postgresProposalDataSource = new PostgresProposalDataSource(
   new PostgresWorkflowDataSource(new PostgresStatusDataSource()),
   new PostgresAdminDataSource(),
+  new PostgresCallDataSource(),
   new PostgresTagDataSource(new PostgresUserDataSource())
 );
-
-const fieldMap: { [key: string]: string } = {
-  finalStatus: 'final_status',
-  callShortCode: 'call_short_code',
-  //'instruments.name': "instruments->0->'name'",
-  statusName: 'proposal_status_id',
-  proposalId: 'proposal_id',
-  title: 'title',
-  submitted: 'submitted',
-  notified: 'notified',
-  submittedDate: 'submitted_date',
-};
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
   protected stfcUserDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
-  protected callDataSource: CallDataSource = container.resolve(
-    Tokens.CallDataSource
-  ) as CallDataSource;
 
   async getInstrumentScientistProposals(
     user: UserWithRole,
@@ -70,7 +58,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     const techniqueProposalCallIds: number[] = (
       await this.callDataSource.getCalls({
-        proposalStatusShortCode: 'QUICK_REVIEW',
+        proposalStatus: 'QUICK_REVIEW',
       })
     ).map((call) => call.id);
 
@@ -177,12 +165,22 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
           query.whereRaw('jsonb_array_length(instruments) > 1');
-        } else if (filter?.instrumentFilter?.instrumentId) {
-          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
-          query.whereRaw(
-            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter?.instrumentFilter?.instrumentId }
+        } else {
+          const effectiveInstrumentIds = resolveInstrumentIds(
+            filter?.instrumentFilter
           );
+
+          if (effectiveInstrumentIds && effectiveInstrumentIds.length > 0) {
+            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+            query.where(function () {
+              effectiveInstrumentIds.forEach((id) => {
+                this.orWhereRaw(
+                  'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+                  { instrumentId: id }
+                );
+              });
+            });
+          }
         }
 
         if (filter?.proposalStatusId) {
@@ -198,13 +196,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
 
         if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          const filteredAndPreparedShortCodes = filter.shortCodes.filter(
+            (shortCode) => shortCode
           );
+          if (filteredAndPreparedShortCodes.length > 0) {
+            query.whereIn('call_id', function () {
+              this.select('call_id')
+                .from('call')
+                .whereIn('call_short_code', filteredAndPreparedShortCodes);
+            });
+          }
         }
 
         if (filter?.questionFilter) {

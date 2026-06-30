@@ -31,6 +31,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -59,6 +60,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalScientistComment from './ProposalScientistComment';
@@ -91,7 +93,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const { calls, loadingCalls, setCallsFilter } = useCallsData(
     {
-      proposalStatusShortCode: 'QUICK_REVIEW',
+      proposalStatus: 'QUICK_REVIEW',
       instrumentIds,
     },
     {
@@ -118,7 +120,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     }
     if (instrumentIds.length > 0) {
       setCallsFilter({
-        proposalStatusShortCode: 'QUICK_REVIEW',
+        proposalStatus: 'QUICK_REVIEW',
         instrumentIds,
       });
     }
@@ -137,7 +139,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const proposalId = searchParams.get('proposalId');
   const to = searchParams.get('to');
   const from = searchParams.get('from');
-  const proposalStatusId = searchParams.get('proposalStatusId');
+  const proposalStatusId = searchParams.get('status');
   const search = searchParams.get('search');
   const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
@@ -174,29 +176,27 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   ];
 
   const techPropStatuses = proposalStatuses.filter((ps) =>
-    techPropStatusCodes.includes(ps.shortCode as StatusCode)
+    techPropStatusCodes.includes(ps.id as StatusCode)
   );
 
   // Use a consistent order representing the technique proposal flow
   techPropStatuses.sort((a, b) => {
     return (
-      techPropStatusCodes.indexOf(a.shortCode as StatusCode) -
-      techPropStatusCodes.indexOf(b.shortCode as StatusCode)
+      techPropStatusCodes.indexOf(a.id as StatusCode) -
+      techPropStatusCodes.indexOf(b.id as StatusCode)
     );
   });
 
   const excludedStatusIds = proposalStatuses
-    .filter(
-      (status) => !techPropStatusCodes.includes(status.shortCode as StatusCode)
-    )
+    .filter((status) => !techPropStatusCodes.includes(status.id as StatusCode))
     .map((status) => status.id);
-
+  console.log({ proposalStatusId });
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
     instrumentFilter: {
-      instrumentId: instrument ? +instrument : null,
+      instrumentIds: parseInstrumentQuery(instrument),
       showAllProposals: !instrument,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrument === 'multi',
     },
     techniqueFilter: {
       techniqueId: technique ? +technique : null,
@@ -208,7 +208,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       from: from ? from : null,
     },
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    proposalStatusId:
+      !proposalStatusId || proposalStatusId == 'ALL' ? null : proposalStatusId,
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
@@ -285,11 +286,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       sorting: false,
       render: (proposalView: ProposalViewData) => {
         if (proposalView.principalInvestigator?.lastname) {
-          if (proposalView.principalInvestigator?.preferredname) {
-            return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-          } else if (proposalView.principalInvestigator?.firstname) {
-            return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
-          }
+          return `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`;
         }
 
         return '';
@@ -336,12 +333,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const updateProposalStatus = async (
     proposalPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Proposal status updated successfully!',
     }).changeTechniqueProposalsStatus({
-      statusId: statusId,
+      workflowStatusId: workflowStatusId,
       proposalPks: [proposalPk],
     });
 
@@ -402,7 +399,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         const selectedStatus = proposalStatuses.find(
           (ps) => ps.name === rowData.statusName
-        )?.shortCode;
+        )?.id;
 
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
@@ -545,16 +542,16 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         } else {
           availableStatuses = techPropStatuses.filter(
             (status) =>
-              status.shortCode !== StatusCode.SUBMITTED_LOCKED &&
-              status.shortCode !== StatusCode.DRAFT &&
-              status.shortCode !== StatusCode.EXPIRED
+              status.id !== StatusCode.SUBMITTED_LOCKED &&
+              status.id !== StatusCode.DRAFT &&
+              status.id !== StatusCode.EXPIRED
           );
         }
 
         techPropStatuses.sort((a, b) => {
           return (
-            techPropStatusCodes.indexOf(a.shortCode as StatusCode) -
-            techPropStatusCodes.indexOf(b.shortCode as StatusCode)
+            techPropStatusCodes.indexOf(a.id as StatusCode) -
+            techPropStatusCodes.indexOf(b.id as StatusCode)
           );
         });
 
@@ -572,12 +569,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const isInstrumentAbsent = (rowData.instruments?.length ?? 0) === 0;
 
         const status = {
-          isDraft: fieldValue?.shortCode === StatusCode.DRAFT,
-          isSubmitted: fieldValue?.shortCode === StatusCode.SUBMITTED_LOCKED,
-          isUnsuccessful: fieldValue?.shortCode === StatusCode.UNSUCCESSFUL,
-          isApproved: fieldValue?.shortCode === StatusCode.APPROVED,
-          isFinished: fieldValue?.shortCode === StatusCode.FINISHED,
-          isExpired: fieldValue?.shortCode === StatusCode.EXPIRED,
+          isDraft: fieldValue?.id === StatusCode.DRAFT,
+          isSubmitted: fieldValue?.id === StatusCode.SUBMITTED_LOCKED,
+          isUnsuccessful: fieldValue?.id === StatusCode.UNSUCCESSFUL,
+          isApproved: fieldValue?.id === StatusCode.APPROVED,
+          isFinished: fieldValue?.id === StatusCode.FINISHED,
+          isExpired: fieldValue?.id === StatusCode.EXPIRED,
         };
 
         const shouldDisableUnderReview =
@@ -608,10 +605,25 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                   if (e.target.value) {
                     confirm(
                       () => {
-                        updateProposalStatus(
-                          rowData.primaryKey,
-                          +e.target.value
-                        );
+                        api()
+                          .getWorkflowStatuses({
+                            workflowId: rowData.workflowId,
+                          })
+                          .then(({ workflowStatuses }) => {
+                            const selectedWorkflowStatus =
+                              workflowStatuses?.find(
+                                (s) => s.statusId === e.target.value
+                              );
+                            if (!selectedWorkflowStatus) {
+                              throw new Error(
+                                'Selected workflow status not found'
+                              );
+                            }
+                            updateProposalStatus(
+                              rowData.primaryKey,
+                              selectedWorkflowStatus.workflowStatusId
+                            );
+                          });
                       },
                       {
                         title: 'Change status',
@@ -633,13 +645,13 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       value={status.id}
                       disabled={
                         !isUserOfficer &&
-                        ((status.shortCode === StatusCode.APPROVED &&
+                        ((status.id === StatusCode.APPROVED &&
                           shouldDisableApproved) ||
-                          (status.shortCode === StatusCode.FINISHED &&
+                          (status.id === StatusCode.FINISHED &&
                             shouldDisableFinished) ||
-                          (status.shortCode === StatusCode.UNDER_REVIEW &&
+                          (status.id === StatusCode.UNDER_REVIEW &&
                             shouldDisableUnderReview) ||
-                          (status.shortCode === StatusCode.UNSUCCESSFUL &&
+                          (status.id === StatusCode.UNSUCCESSFUL &&
                             shouldDisableUnsuccessful))
                       }
                     >
@@ -725,7 +737,9 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               referenceNumbers,
               dateFilter,
               excludeProposalStatusIds:
-                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
+                currentRole === UserRole.INSTRUMENT_SCIENTIST
+                  ? [StatusCode.EXPIRED]
+                  : [],
             },
             sortField: orderBy?.orderByField,
             sortDirection:
@@ -831,6 +845,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         updatedFilter.callIds = calls?.map((call) => call.id) || [];
       } else {
         updatedFilter.callIds = [filter.callId as number];
+      }
+
+      if (filter.proposalStatusId === 'ALL') {
+        updatedFilter.proposalStatusId = null;
       }
     }
 

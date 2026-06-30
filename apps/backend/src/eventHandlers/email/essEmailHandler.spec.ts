@@ -3,6 +3,8 @@ import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
+import { essEmailHandler } from './essEmailHandler';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSourceMock } from '../../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
@@ -20,8 +22,6 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
 import { Settings, SettingsId } from '../../models/Settings';
-import { EmailTemplateId } from './emailTemplateId';
-import { essEmailHandler } from './essEmailHandler';
 
 // Mock MailService
 const mockMailService = {

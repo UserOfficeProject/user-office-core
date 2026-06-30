@@ -1,4 +1,3 @@
-import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { InvitedProposal, Proposal, Proposals } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
@@ -8,9 +7,9 @@ import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/Updat
 import { UserProposalsFilter } from '../resolvers/types/User';
 import { PaginationSortDirection } from '../utils/pagination';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
-import { ProposalEventsRecord } from './postgres/records';
 
 export interface ProposalDataSource {
+  getRequestedTime(proposalPk: number, instrumentId: number): Promise<number>;
   getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -49,10 +48,6 @@ export interface ProposalDataSource {
     questionary_id: number
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
-  updateProposalStatus(
-    proposalPk: number,
-    proposalStatusId: number
-  ): Promise<Proposal>;
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<TechnicalReview[]>;
@@ -68,20 +63,10 @@ export interface ProposalDataSource {
     submittedDate: Date
   ): Promise<Proposal | null>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
-  markEventAsDoneOnProposals(
-    event: Event,
-    proposalPk: number[]
-  ): Promise<ProposalEventsRecord[] | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
-  resetProposalEvents(
-    proposalPk: number,
-    callId: number,
-    statusId: number
-  ): Promise<boolean>;
-  getProposalEvents(proposalPk: number): Promise<ProposalEventsRecord | null>;
-  changeProposalsStatus(
-    statusId: number,
+  changeProposalsWorkflowStatus(
+    workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals>;
   getRelatedUsersOnProposals(id: number): Promise<number[]>;

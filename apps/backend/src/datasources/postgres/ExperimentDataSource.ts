@@ -2,7 +2,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -52,7 +51,7 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.esi_questionary_submitted_at,
     record.created_by,
-    record.status_id,
+    record.workflow_status_id,
     record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
@@ -379,11 +378,11 @@ export default class PostgresExperimentDataSource
 
   async updateExperimentSafetyStatus(
     experimentSafetyPk: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety> {
     const result = await database('experiment_safety')
       .update({
-        status_id: statusId,
+        workflow_status_id: workflowStatusId,
       })
       .where('experiment_safety_pk', experimentSafetyPk)
       .returning('*');
@@ -416,14 +415,14 @@ export default class PostgresExperimentDataSource
     experimentPk: number,
     questionaryId: number,
     creatorId: number,
-    statusId: number
+    workflowStatusId: number
   ): Promise<ExperimentSafety | Rejection> {
     return database
       .insert({
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
         created_by: creatorId,
-        status_id: statusId,
+        workflow_status_id: workflowStatusId,
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')
@@ -578,7 +577,7 @@ export default class PostgresExperimentDataSource
     //print all arguments
 
     const query = database('experiments')
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select(['experiments.*', database.raw('count(*) OVER() AS full_count')])
       .join(
         'proposals',
         'proposals.proposal_pk',
@@ -588,16 +587,31 @@ export default class PostgresExperimentDataSource
 
     // Add instrument scientist filtering if provided
     if (filter?.instrumentScientistUserId) {
+      const instrumentScientistUserId = filter.instrumentScientistUserId;
+
       query
+        .leftJoin('instrument_has_scientists', function () {
+          this.on(
+            'experiments.instrument_id',
+            '=',
+            'instrument_has_scientists.instrument_id'
+          ).andOnVal(
+            'instrument_has_scientists.user_id',
+            '=',
+            instrumentScientistUserId
+          );
+        })
         .join(
-          'instrument_has_scientists',
+          'instruments',
           'experiments.instrument_id',
-          'instrument_has_scientists.instrument_id'
+          'instruments.instrument_id'
         )
-        .where(
-          'instrument_has_scientists.user_id',
-          filter.instrumentScientistUserId
-        );
+        .where(function () {
+          this.whereNotNull('instrument_has_scientists.user_id').orWhere(
+            'instruments.manager_user_id',
+            instrumentScientistUserId
+          );
+        });
     }
 
     return query
@@ -622,10 +636,12 @@ export default class PostgresExperimentDataSource
               'experiments.experiment_pk',
               'experiment_safety.experiment_pk'
             )
-            .where(
-              'experiment_safety.status_id',
-              filter?.experimentSafetyStatusId
-            );
+            .leftJoin(
+              'workflow_has_statuses as es_whs',
+              'experiment_safety.workflow_status_id',
+              'es_whs.workflow_status_id'
+            )
+            .where('es_whs.status_id', filter.experimentSafetyStatusId);
         }
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
@@ -703,28 +719,6 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    const dataToInsert = experimentPks.map((experimentPk) => ({
-      experiment_pk: experimentPk,
-      [event.toLowerCase()]: true,
-    }));
-    const result = await database.raw(
-      `? ON CONFLICT (experiment_pk)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('experiment_safety_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return result.rows;
-    } else {
-      return null;
-    }
-  }
   async getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null> {

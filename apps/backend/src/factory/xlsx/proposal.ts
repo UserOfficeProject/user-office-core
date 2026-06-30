@@ -2,12 +2,12 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import { stripHtml } from 'string-strip-html';
 
 import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 type ProposalXLSData = Array<string | number>;
 
@@ -89,8 +89,7 @@ export const collectProposalXLSXData = async (
     technicalReviews
       ?.map(
         (technicalReview) =>
-          stripHtml(technicalReview.publicComment ?? '').result.trim() ||
-          '<missing>'
+          stripHtml(technicalReview.publicComment ?? '').trim() || '<missing>'
       )
       .join(', ') || '<missing>',
     technicalReviews
@@ -145,10 +144,10 @@ export const collectTechniqueProposalXLSXData = async (
     ? proposal.submittedDate.toLocaleString()
     : '';
 
-  const status = await baseContext.queries.status.getStatus(
-    user,
-    proposal.statusId
-  );
+  const status =
+    await baseContext.queries.status.dataSource.getStatusByWorkflowStatusId(
+      proposal.workflowStatusId
+    );
 
   return [
     proposal.proposalId,

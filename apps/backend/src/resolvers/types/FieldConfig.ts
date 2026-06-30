@@ -3,17 +3,18 @@ import {
   Ctx,
   Field,
   FieldResolver,
+  Float,
   Int,
   ObjectType,
   Resolver,
   Root,
 } from 'type-graphql';
 
+import { Unit } from './Unit';
 import { ResolverContext } from '../../context';
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
 import { TechniqueOptionClass } from '../../models/questionTypes/TechniquePicker';
 import { Roles } from '../../models/Role';
-import { Unit } from './Unit';
 
 @ObjectType()
 export class ConfigBase {
@@ -309,6 +310,18 @@ export class NumberInputConfig extends ConfigBase {
 
   @Field(() => NumberValueConstraint, { nullable: true })
   numberValueConstraint: NumberValueConstraint | null;
+
+  @Field(() => Float, { nullable: true })
+  numberMin: number | null;
+
+  @Field(() => Boolean, { nullable: true })
+  numberMinInclusive: boolean | null;
+
+  @Field(() => Float, { nullable: true })
+  numberMax: number | null;
+
+  @Field(() => Boolean, { nullable: true })
+  numberMaxInclusive: boolean | null;
 }
 
 @ObjectType()

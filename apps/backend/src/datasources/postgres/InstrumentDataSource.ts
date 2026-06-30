@@ -3,18 +3,6 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
-import {
-  Instrument,
-  InstrumentsHasProposals,
-  InstrumentWithAvailabilityTime,
-  InstrumentWithManagementTime,
-} from '../../models/Instrument';
-import { BasicUserDetails } from '../../models/User';
-import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
-import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
-import { FapDataSource } from '../FapDataSource';
-import { InstrumentDataSource } from '../InstrumentDataSource';
 import database from './database';
 import {
   InstrumentRecord,
@@ -26,7 +14,21 @@ import {
   InstitutionRecord,
   FapProposalRecord,
   CountryRecord,
+  createTagObject,
 } from './records';
+import { Tokens } from '../../config/Tokens';
+import {
+  Instrument,
+  InstrumentsHasProposals,
+  InstrumentWithAvailabilityTime,
+  InstrumentWithManagementTime,
+} from '../../models/Instrument';
+import { Tag } from '../../models/Tag';
+import { BasicUserDetails } from '../../models/User';
+import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
+import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
+import { FapDataSource } from '../FapDataSource';
+import { InstrumentDataSource } from '../InstrumentDataSource';
 
 @injectable()
 export default class PostgresInstrumentDataSource
@@ -35,6 +37,7 @@ export default class PostgresInstrumentDataSource
   constructor(
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource
   ) {}
+
   private createInstrumentObject(instrument: InstrumentRecord) {
     return new Instrument(
       instrument.instrument_id,
@@ -156,7 +159,22 @@ export default class PostgresInstrumentDataSource
         };
       });
   }
+  async getTagsByRoleId(roleId: number): Promise<Tag[]> {
+    try {
+      const rows = await database
+        .select('t.tag_id', 't.name')
+        .from('roles_has_tags as rht')
+        .join('tag as t', 't.tag_id', 'rht.tag_id')
+        .where('rht.role_id', roleId);
 
+      return rows.map(createTagObject);
+    } catch (error) {
+      logger.logError('Failed to get tags by role id', {
+        roleId,
+      });
+      throw error;
+    }
+  }
   async getInstrumentsByCallId(
     callIds: number[],
     selectableOnly?: boolean
@@ -264,7 +282,45 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async getUserInstruments(userId: number): Promise<Instrument[]> {
+  async getUserInstruments(
+    userId: number,
+    agentId?: number
+  ): Promise<Instrument[]> {
+    const tags = agentId ? (await this.getTagsByRoleId(agentId)) ?? [] : [];
+    if (tags.length != 0) {
+      const tagIds = tags.map((tag) => tag.id);
+      if (tagIds.length != 0) {
+        const instruments = await database<InstrumentRecord>(
+          'tag_instrument as ti'
+        )
+          .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
+          .whereIn('tag_id', tagIds)
+          .select('i.*');
+
+        const managerInstruments = await database<InstrumentRecord>(
+          'instruments as i'
+        )
+          .where('i.manager_user_id', userId)
+          .select('i.*');
+
+        const allInstruments = [...instruments, ...managerInstruments];
+        const uniqueInstruments = allInstruments.filter(
+          (inst, index, self) =>
+            self.findIndex((i) => i.instrument_id === inst.instrument_id) ===
+            index
+        );
+
+        return uniqueInstruments.map(
+          this.createInstrumentWithAvailabilityTimeObject
+        );
+      } else {
+        const instruments =
+          await database<InstrumentRecord>('instruments as i').select('i.*');
+
+        return instruments.map(this.createInstrumentWithAvailabilityTimeObject);
+      }
+    }
+
     return database
       .select([
         'i.instrument_id',
@@ -274,11 +330,12 @@ export default class PostgresInstrumentDataSource
         'manager_user_id',
       ])
       .from('instruments as i')
-      .join('instrument_has_scientists as ihs', {
+      .leftJoin('instrument_has_scientists as ihs', {
         'i.instrument_id': 'ihs.instrument_id',
       })
-      .where('ihs.user_id', userId)
-      .orWhere('i.manager_user_id', userId)
+      .where(function () {
+        this.where('ihs.user_id', userId).orWhere('i.manager_user_id', userId);
+      })
       .distinct('i.instrument_id')
       .then((instruments: InstrumentRecord[]) => {
         const result = instruments.map((instrument) =>
@@ -763,14 +820,20 @@ export default class PostgresInstrumentDataSource
       await database
         .count({ count: '*' })
         .from('instruments as i')
-        .join('instrument_has_scientists as ihs', {
-          'i.instrument_id': 'ihs.instrument_id',
+        .leftJoin('instrument_has_scientists as ihs', function () {
+          this.on('i.instrument_id', '=', 'ihs.instrument_id').andOnVal(
+            'ihs.user_id',
+            '=',
+            userId
+          );
         })
-        .where('ihs.user_id', userId)
         .where('i.instrument_id', instrumentId)
+        .andWhere(function () {
+          this.whereNotNull('ihs.user_id').orWhere('i.manager_user_id', userId);
+        })
         .first();
 
-    return result?.count === '1';
+    return Number(result?.count) >= 1;
   }
 
   async hasInstrumentScientistAccess(
@@ -781,19 +844,27 @@ export default class PostgresInstrumentDataSource
     return database
       .select([database.raw('count(*) OVER() AS count')])
       .from('proposals')
-      .join('instrument_has_scientists', {
-        'instrument_has_scientists.user_id': scientistId,
-      })
       .join('instrument_has_proposals', {
         'instrument_has_proposals.proposal_pk': 'proposals.proposal_pk',
-        'instrument_has_proposals.instrument_id':
-          'instrument_has_scientists.instrument_id',
+      })
+      .join('instruments', {
+        'instruments.instrument_id': 'instrument_has_proposals.instrument_id',
+      })
+      .leftJoin('instrument_has_scientists', {
+        'instrument_has_scientists.instrument_id': 'instruments.instrument_id',
+        'instrument_has_scientists.user_id': scientistId,
       })
       .where('proposals.proposal_pk', '=', proposalPk)
-      .where('instrument_has_scientists.instrument_id', '=', instrumentId)
+      .where('instrument_has_proposals.instrument_id', '=', instrumentId)
+      .andWhere(function () {
+        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+          'instruments.manager_user_id',
+          scientistId
+        );
+      })
       .first()
-      .then((result: undefined | { count: string }) => {
-        return result?.count === '1';
+      .then((result) => {
+        return Number(result?.count) >= 1;
       });
   }
 

@@ -1,0 +1,9 @@
+mutation createWorkflowConnection(
+  $newWorkflowConnectionInput: CreateWorkflowConnectionInput!
+) {
+  createWorkflowConnection(
+    newWorkflowConnectionInput: $newWorkflowConnectionInput
+  ) {
+    ...workflowConnection
+  }
+}

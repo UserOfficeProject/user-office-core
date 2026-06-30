@@ -66,7 +66,8 @@ context('General facility access panel tests', () => {
         this.skip();
       }
       cy.contains('People').click();
-      searchMuiTableAsync(fapMembers.chair.lastName);
+      cy.get('[data-cy="people-search"]').type(fapMembers.chair.lastName);
+      cy.realPress('Enter');
       cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
@@ -82,9 +83,13 @@ context('General facility access panel tests', () => {
         variant: 'success',
       });
       cy.contains('People').click();
+      cy.get('[data-cy="people-search"]').type(fapMembers.secretary.lastName);
+      cy.realPress('Enter');
+      cy.contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('button[aria-label="Edit user"]')
+        .click();
 
-      searchMuiTableAsync(fapMembers.secretary.lastName);
-      cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
 
@@ -237,17 +242,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedChairUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedChairUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedChairUserFirstName = preferredName || cells.eq(0).text();
+          selectedChairUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
@@ -278,17 +276,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedSecretaryUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedSecretaryUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
+          selectedSecretaryUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
@@ -321,17 +312,10 @@ context('General facility access panel tests', () => {
       cy.get('[role="dialog"] table tbody tr')
         .first()
         .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedSecretaryUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedSecretaryUserLastName = element.text();
+        .then((cells) => {
+          const preferredName = cells.eq(2).text().trim();
+          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
+          selectedSecretaryUserLastName = cells.eq(1).text();
         });
 
       cy.get('[aria-label="Select user"]').first().click();
@@ -734,7 +718,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
       const fileName2 = 'pdf_3_pages.pdf';
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -767,7 +751,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName2).should('exist');
 
       // Files persist after reload
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.contains(fileName1).should('exist');
       cy.contains(fileName2).should('exist');
@@ -778,7 +762,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName2).should('not.exist');
 
       // Files removed after reload
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.contains(fileName1).should('not.exist');
       cy.contains(fileName2).should('not.exist');
@@ -803,7 +787,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -848,7 +832,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',
@@ -890,7 +874,7 @@ context('General facility access panel tests', () => {
       const fileName1 = 'pdf_5_pages.pdf';
 
       cy.login('officer');
-      cy.visit(`/FapPage/1?tab=6`);
+      cy.visit(`/FapPage/1?tab=7`);
 
       cy.intercept({
         method: 'POST',

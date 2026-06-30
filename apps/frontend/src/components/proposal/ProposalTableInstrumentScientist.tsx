@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -63,7 +64,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName } from 'utils/user';
+import { getFullUserName, getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -110,21 +111,10 @@ let columns: Column<ProposalViewData>[] = [
     title: 'Principal Investigator',
     field: 'principalInvestigator',
     emptyValue: '-',
-    render: (proposalView) => {
-      if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.preferredname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-      } else if (
-        proposalView.principalInvestigator?.lastname &&
-        proposalView.principalInvestigator?.firstname
-      ) {
-        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
-      }
-
-      return '';
-    },
+    render: (proposalView) =>
+      proposalView.principalInvestigator?.lastname
+        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+        : '',
   },
   {
     title: 'PI Email',
@@ -189,11 +179,6 @@ const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   { title: t('FAP'), field: 'fapCode', emptyValue: '-', hidden: true },
 ];
-
-const proposalStatusFilter: Record<string, number> = {
-  ALL: 0,
-  FEASIBILITY_REVIEW: 2,
-};
 
 const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
@@ -275,14 +260,10 @@ const ProposalTableInstrumentScientist = ({
   const { t } = useTranslation();
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const statusFilterValue = isInstrumentScientist
+  const statusFilter = isInstrumentScientist
     ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_STATUS_FILTER)
-        ?.settingsValue || 2
-    : 0;
-  let statusFilter = proposalStatusFilter[statusFilterValue];
-  if (statusFilter === undefined || statusFilter === null) {
-    statusFilter = isInstrumentScientist ? 2 : 0;
-  }
+        ?.settingsValue || 'FEASIBILITY_REVIEW'
+    : 'ALL';
   const reviewFilterValue = isInstrumentScientist
     ? settingsMap.get(SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER)
         ?.settingsValue || 'ME'
@@ -317,13 +298,13 @@ const ProposalTableInstrumentScientist = ({
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
     instrumentFilter: {
-      instrumentId: instrumentId != null ? +instrumentId : null,
+      instrumentIds: parseInstrumentQuery(instrumentId),
       showAllProposals: !instrumentId,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrumentId === 'multi',
     },
-    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    proposalStatusId: proposalStatusId,
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    excludeProposalStatusIds: [9],
+    excludeProposalStatusIds: ['SCHEDULING'],
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,
       dataType,
@@ -350,7 +331,10 @@ const ProposalTableInstrumentScientist = ({
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(
       {
-        proposalStatusId: proposalFilter.proposalStatusId,
+        proposalStatusId:
+          proposalFilter.proposalStatusId === 'ALL'
+            ? null
+            : proposalFilter.proposalStatusId,
         excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
         instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,
@@ -991,7 +975,7 @@ const ProposalTableInstrumentScientist = ({
               setProposalFilter={setProposalFilter}
               filter={proposalFilter}
               hiddenStatuses={
-                proposalFilter.excludeProposalStatusIds as number[]
+                proposalFilter.excludeProposalStatusIds as string[]
               }
             />
           </Grid>

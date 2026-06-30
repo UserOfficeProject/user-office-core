@@ -1,20 +1,24 @@
 import { container } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
-import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { StatusActionType } from '../models/StatusAction';
-import { getWorkflowConnectionByStatusId } from '../workflowEngine/experiment';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { emailActionHandler } from './emailActionHandler';
 import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
 import { groupProposalsByProperties } from './statusActionUtils';
+import { Tokens } from '../config/Tokens';
+import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
+import { StatusActionType } from '../models/StatusAction';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 
 export const proposalStatusActionEngine = async (
   proposals: WorkflowEngineProposalType[]
 ) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
     Tokens.StatusActionsDataSource
+  );
+
+  const workflowDataSource: WorkflowDataSource = container.resolve(
+    Tokens.WorkflowDataSource
   );
 
   // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
@@ -25,12 +29,10 @@ export const proposalStatusActionEngine = async (
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
-      const [{ workflowId, statusId, prevStatusId }] = groupedProposals;
+      const [{ workflowStatusConnectionId }] = groupedProposals;
 
-      const [currentConnection] = await getWorkflowConnectionByStatusId(
-        workflowId,
-        statusId,
-        prevStatusId
+      const currentConnection = await workflowDataSource.getWorkflowConnection(
+        workflowStatusConnectionId
       );
 
       if (!currentConnection) {
@@ -39,8 +41,7 @@ export const proposalStatusActionEngine = async (
 
       const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
-          currentConnection.id,
-          currentConnection.workflowId
+          currentConnection.id
         );
 
       if (!statusActions?.length) {

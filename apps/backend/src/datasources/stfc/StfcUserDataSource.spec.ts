@@ -1,7 +1,7 @@
-import { Role, Roles } from '../../models/Role';
+import { StfcUserDataSource } from './StfcUserDataSource';
+import { Roles, createRole } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
-import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');
@@ -145,14 +145,14 @@ describe('Role tests', () => {
     const mockGetRoles = jest.spyOn(StfcUserDataSource.prototype, 'getRoles');
     mockGetRoles.mockImplementation(() =>
       Promise.resolve([
-        new Role(1, Roles.USER, 'User', '', [], true),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
-        new Role(
+        createRole(1, Roles.USER, 'User', '', { note: '' }, true),
+        createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
+        createRole(
           3,
           Roles.INSTRUMENT_SCIENTIST,
           'Instrument Scientist',
           '',
-          [],
+          {},
           true
         ),
       ])
@@ -182,9 +182,12 @@ describe('Role tests', () => {
     const roles = await userdataSource.getUserRoles(dummyUserNumber);
 
     return expect(roles[0]).toEqual(
-      expect.objectContaining(
-        new Role(expect.any(Number), Roles.USER, 'User', '', [], true)
-      )
+      expect.objectContaining({
+        shortCode: Roles.USER,
+        title: 'User',
+        description: '',
+        isRootRole: true,
+      })
     );
   });
 
@@ -195,14 +198,14 @@ describe('Role tests', () => {
       userdataSource.getUserRoles(dummyUserNumber)
     ).resolves.toEqual(
       expect.arrayContaining([
-        new Role(1, Roles.USER, 'User', '', [], true),
-        new Role(2, Roles.USER_OFFICER, 'User Officer', '', [], true),
-        new Role(
+        createRole(1, Roles.USER, 'User', '', { note: '' }, true),
+        createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
+        createRole(
           3,
           Roles.INSTRUMENT_SCIENTIST,
           'Instrument Scientist',
           '',
-          [],
+          {},
           true
         ),
       ])
@@ -223,7 +226,7 @@ describe('Role tests', () => {
 describe('Email search tests', () => {
   const userdataSource = new StfcUserDataSource();
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPersonDetailsFromEmail = jest.spyOn(
@@ -283,7 +286,7 @@ describe('Email search tests', () => {
 describe('Searchable user tests', () => {
   const userDataSource = new StfcUserDataSource();
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPeople = jest.spyOn(

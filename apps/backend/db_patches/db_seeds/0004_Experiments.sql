@@ -6,10 +6,20 @@ DECLARE
   exp_safety_review_template_topic_id_var int;
   instrument_id_1_var int;
   instrument_id_2_var int;
+  experiment_workflow_id_var int;
   BEGIN
     -- Get instrument ids
     SELECT instrument_id INTO instrument_id_1_var FROM instruments WHERE name='Instrument 1' limit 1;
     SELECT instrument_id INTO instrument_id_2_var FROM instruments WHERE name='Instrument 2' limit 1;
+
+    INSERT INTO workflows(name, description, entity_type)
+    VALUES ('Experiment Safety Review Workflow', 'Workflow for Experiment Safety Review', 'EXPERIMENT')
+    RETURNING workflow_id INTO experiment_workflow_id_var;
+
+    UPDATE call SET experiment_workflow_id = experiment_workflow_id_var;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id)
+    VALUES (experiment_workflow_id_var, (SELECT status_id FROM statuses WHERE status_id='AWAITING_ESF'));
 
     INSERT INTO experiments(
       experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)

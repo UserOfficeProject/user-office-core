@@ -2,7 +2,9 @@ import Grid from '@mui/material/Grid';
 import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter, {
+  getInstrumentFilterIds,
+} from 'components/common/proposalFilters/InstrumentFilter';
 import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/StatusFilter';
 import {
@@ -49,7 +51,7 @@ type ProposalFilterBarProps = {
   proposalStatuses?: { data: Status[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
-  hiddenStatuses: number[];
+  hiddenStatuses: string[];
 };
 
 const ProposalFilterBar = ({
@@ -82,7 +84,7 @@ const ProposalFilterBar = ({
 
       <Grid item sm={4} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentFilter?.instrumentId}
+          instrumentIds={getInstrumentFilterIds(filter.instrumentFilter)}
           showMultiInstrumentProposals={
             filter.instrumentFilter?.showMultiInstrumentProposals
           }
@@ -101,11 +103,11 @@ const ProposalFilterBar = ({
 
       <Grid item sm={4} xs={12}>
         <ProposalStatusFilter
-          statusId={filter.proposalStatusId as number}
+          statusId={filter.proposalStatusId as string}
           statuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
-          hiddenStatuses={filter.excludeProposalStatusIds as number[]}
+          hiddenStatuses={filter.excludeProposalStatusIds as string[]}
           onChange={(proposalStatusId) => {
             setProposalFilter({
               ...filter,

@@ -5,7 +5,7 @@ services:
       - "3310:3310"
 
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -42,7 +42,7 @@ services:
       - SYS_ADMIN
 
   mockServer:
-    image: mockserver/mockserver:5.13.0
+    image: ghcr.io/userofficeproject/mockserver:6.15.0
     command: -logLevel ERROR -serverPort 1080
     ports:
       - 1080:1080

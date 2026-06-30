@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
@@ -13,6 +14,9 @@ switch (process.env.DEPENDENCY_CONFIG) {
     break;
   case 'eli':
     require('./dependencyConfigELI');
+    break;
+  case 'dls':
+    require('./dependencyConfigDLS');
     break;
   case 'test':
     require('./dependencyConfigTest');

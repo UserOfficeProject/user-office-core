@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -69,6 +69,7 @@ function QuestionaryStepView(props: {
   readonly: boolean;
   onStepComplete?: (topicId: number) => void;
   confirm: WithConfirmType;
+  showValidationErrorsOnMount?: boolean;
 }) {
   const { topicId, confirm } = props;
 
@@ -109,6 +110,14 @@ function QuestionaryStepView(props: {
     activeFields,
     state,
     api
+  );
+  const activeFieldIds = activeFields.map((field) => field.question.id);
+  const initialTouched = activeFieldIds.reduce(
+    (fields, fieldId) => ({
+      ...fields,
+      [fieldId]: true,
+    }),
+    {}
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
@@ -258,7 +267,24 @@ function QuestionaryStepView(props: {
     )();
   };
 
-  const saveHandler = () => performSave(true);
+  const validateProposalBasisFields = (
+    formikProps: FormikProps<Record<string, unknown>>
+  ): boolean => {
+    const proposal = (state as ProposalSubmissionState)?.proposal;
+    if (proposal === undefined) {
+      return true;
+    }
+
+    const missingTitle = !proposal.title?.trim();
+    const missingAbstract = !proposal.abstract?.trim();
+
+    if (missingTitle)
+      formikProps.setFieldTouched('proposal_basis.title', true, true);
+    if (missingAbstract)
+      formikProps.setFieldTouched('proposal_basis.abstract', true, true);
+
+    return !missingTitle && !missingAbstract;
+  };
 
   if (state === null || !questionaryStep) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -267,7 +293,11 @@ function QuestionaryStepView(props: {
   return (
     <Formik
       initialValues={initialValues}
+      initialTouched={
+        props.showValidationErrorsOnMount ? initialTouched : undefined
+      }
       validationSchema={Yup.object().shape(validationSchema)}
+      validateOnMount={props.showValidationErrorsOnMount ?? false}
       onSubmit={async () => {
         const isSaveSuccess = await performSave(false);
 
@@ -280,6 +310,18 @@ function QuestionaryStepView(props: {
     >
       {(formikProps) => {
         const { submitForm, setFieldValue, isSubmitting } = formikProps;
+
+        const saveHandler = async () => {
+          /*
+           * The title and abstract are non-nullable and should always be validated - even when
+           * using the save button to do a partial save that doesn't validate other questions.
+           */
+          if (!validateProposalBasisFields(formikProps)) {
+            return;
+          }
+
+          performSave(true);
+        };
 
         return (
           <form

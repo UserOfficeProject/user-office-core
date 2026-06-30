@@ -8,6 +8,7 @@ import { ValidUserInfo } from '@user-office-software/openid/lib/model/ValidUserI
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Institution } from '../models/Institution';
@@ -16,7 +17,6 @@ import { SettingsId } from '../models/Settings';
 import { AuthJwtPayload, User, UserRole } from '../models/User';
 import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 import { getInstitutionFromRor } from '../services/RorApi';
-import { UserAuthorization } from './UserAuthorization';
 
 export class OAuthAuthorization extends UserAuthorization {
   private db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
@@ -162,7 +162,7 @@ export class OAuthAuthorization extends UserAuthorization {
     return institution;
   }
 
-  private async upsertUser(
+  protected async upsertUser(
     userInfo: ValidUserInfo,
     tokenSet: ValidTokenSet
   ): Promise<User> {
@@ -233,7 +233,7 @@ export class OAuthAuthorization extends UserAuthorization {
     }
   }
 
-  private getUserRole(newUser: { id: number; email: string }): UserRole {
+  protected getUserRole(newUser: { id: number; email: string }): UserRole {
     const roleID =
       env.INITIAL_USER_OFFICER_EMAIL &&
       newUser.email === env.INITIAL_USER_OFFICER_EMAIL

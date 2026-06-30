@@ -4,6 +4,8 @@ import {
   setLogger,
 } from '@user-office-software/duo-logger';
 
+import OpentelemetryLogTransport from './opentelemetryLogTransport';
+
 function maskToken(token: string): string {
   const visibleChars = 6;
   if (token.length <= visibleChars) return '*'.repeat(token.length);
@@ -35,6 +37,11 @@ function maskSensitiveFields(
 }
 
 export function configureSTFCWinstonLogger() {
+  const transports: Winston.transport[] = [new Winston.transports.Console()];
+  if (process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
+    transports.push(new OpentelemetryLogTransport());
+  }
+
   setLogger(
     new WinstonLogger({
       level: 'info',
@@ -48,7 +55,7 @@ export function configureSTFCWinstonLogger() {
           return `[${maskedArgs.timestamp}] ${maskedArgs.level.toUpperCase()} - ${maskedArgs.message} \n ${JSON.stringify(maskedArgs)}`;
         })
       ),
-      transports: [new Winston.transports.Console()],
+      transports,
     })
   );
 }

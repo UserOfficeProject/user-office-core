@@ -325,11 +325,14 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
           })
+          .join('workflow_has_statuses as whs', {
+            'p.workflow_status_id': 'whs.workflow_status_id',
+          })
           .join('statuses as s', {
-            'p.status_id': 's.status_id',
+            'whs.status_id': 's.status_id',
           })
           .where(function () {
-            this.where('s.short_code', 'ilike', 'FAP_%');
+            this.where('s.status_id', 'ilike', 'FAP_%');
           });
 
         if (filter.callId) {
@@ -360,8 +363,11 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
           })
+          .join('workflow_has_statuses as whs', {
+            'p.workflow_status_id': 'whs.workflow_status_id',
+          })
           .join('statuses as s', {
-            'p.status_id': 's.status_id',
+            'whs.status_id': 's.status_id',
           })
           .join('call as c', {
             'p.call_id': 'c.call_id',
@@ -566,8 +572,11 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.proposal_pk': 'fp.proposal_pk',
         'p.call_id': callId,
       })
+      .join('workflow_has_statuses as whs', {
+        'p.workflow_status_id': 'whs.workflow_status_id',
+      })
       .join('statuses as s', {
-        'p.status_id': 's.status_id',
+        'whs.status_id': 's.status_id',
       })
       .where('fp.instrument_id', instrumentId)
       .modify((query) => {
@@ -647,16 +656,10 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     let shortCode: Roles;
 
-    if (
-      !!fapChairs.find((chair) => {
-        chair.user_id === userId;
-      })
-    ) {
+    if (fapChairs.find((chair) => chair.user_id === userId)) {
       shortCode = Roles.FAP_CHAIR;
     } else if (
-      !!fapSecretaries.find((secretary) => {
-        secretary.user_id === userId;
-      })
+      fapSecretaries.find((secretary) => secretary.user_id === userId)
     ) {
       shortCode = Roles.FAP_SECRETARY;
     } else {

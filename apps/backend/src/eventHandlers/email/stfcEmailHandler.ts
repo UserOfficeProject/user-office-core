@@ -1,11 +1,12 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
+import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId } from './emailTemplateId';
 
 export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
@@ -14,6 +15,10 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   }
 
   const mailService = container.resolve<MailService>(Tokens.MailService);
+
+  const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+    Tokens.EmailTemplateDataSource
+  );
 
   switch (event.type) {
     case Event.CALL_CREATED: {
@@ -33,9 +38,22 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           startCall,
           endCall,
         }))(event.call);
+
+        const template = EmailTemplateId.CALL_CREATED_EMAIL;
+        const emailTemplate =
+          await emailTemplateDataSource.getEmailTemplateByName(template);
+
+        if (!emailTemplate) {
+          logger.logError('Email template not found', {
+            template,
+          });
+
+          return;
+        }
+
         const sendMailOptions = callCreationEmail(
           eventCallPartial,
-          EmailTemplateId.CALL_CREATED_EMAIL,
+          emailTemplate.id.toString(),
           notificationEmailAddress
         );
 

@@ -1,32 +1,18 @@
-import {
-  Ctx,
-  Mutation,
-  Resolver,
-  Field,
-  Int,
-  InputType,
-  Arg,
-} from 'type-graphql';
+import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
 import { Status } from '../../types/Status';
 
 @InputType()
 export class UpdateStatusInput {
-  @Field(() => Int)
-  public id: number;
-
-  @Field(() => String, { nullable: true })
-  public shortCode?: string;
+  @Field(() => String)
+  public id: string;
 
   @Field(() => String, { nullable: true })
   public name?: string;
 
   @Field(() => String, { nullable: true })
   public description?: string;
-
-  @Field(() => Boolean, { nullable: true })
-  public isDefault?: boolean;
 }
 
 @Resolver()
