@@ -96,22 +96,6 @@ const ChangeProposalStatus = ({
       });
   }, [api, selectedProposalsWorkflowIds[0]]);
 
-  // Fetch workflow connections when the component mounts
-  useEffect(() => {
-    if (!selectedProposalsWorkflowIds[0]) return;
-
-    api()
-      .getWorkflow({
-        workflowId: selectedProposalsWorkflowIds[0],
-        entityType: WorkflowType.PROPOSAL,
-      })
-      .then((data) => {
-        if (data.workflow?.connections) {
-          setConnections(data.workflow.connections);
-        }
-      });
-  }, [api, selectedProposalsWorkflowIds[0]]);
-
   const highlightedNodes = useMemo(() => {
     const counts = selectedProposals.reduce(
       (acc, proposal) => {
@@ -235,7 +219,7 @@ const ChangeProposalStatus = ({
                 </Grid>
 
                 <Grid item xs={12} md={8}>
-                  <div style={{ height: '500px', border: '1px solid #ddd' }}>
+                  <div style={{ height: '500px' }}>
                     <WorkflowView
                       workflowId={selectedProposalsWorkflowIds[0]}
                       entityType={WorkflowType.PROPOSAL}
@@ -247,7 +231,7 @@ const ChangeProposalStatus = ({
                             values.selectedWorkflowStatusId
                         )?.status.id
                       }
-                      onNodeClicked={(statusId, workflowStatusId) => {
+                      onNodeClicked={(_statusId, workflowStatusId) => {
                         setFieldValue(
                           'selectedWorkflowStatusId',
                           workflowStatusId
