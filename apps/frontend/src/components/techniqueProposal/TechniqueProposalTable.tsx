@@ -453,6 +453,12 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           instruments = [missingInst, ...instruments];
         }
 
+        if (currentRole === UserRole.USER_OFFICER) {
+          instruments = instruments.filter((i) =>
+            techniqueInstruments.map((ti) => ti.id).includes(i.id)
+          );
+        }
+
         // Always show the current instrument at the top of the dropdown
         instruments.forEach(function (instrument, i) {
           if (fieldValue && instrument.id === fieldValue) {
