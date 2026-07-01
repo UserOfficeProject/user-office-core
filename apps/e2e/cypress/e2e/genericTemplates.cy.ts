@@ -24,6 +24,11 @@ context('GenericTemplates tests', () => {
   const copyButtonLabel = faker.lorem.words(3);
   const genericTemplateTitle = faker.lorem.words(3);
   const genericTemplateQuestionaryQuestion = twoFakes(3);
+  const genericTemplateTextMax = 50;
+  const tooLongGenericTemplateAnswer = faker.string.alpha(
+    genericTemplateTextMax + 1
+  );
+  const validGenericTemplateAnswer = faker.string.alpha(genericTemplateTextMax);
   const genericTemplateTitleAnswers = [
     faker.lorem.words(3),
     faker.lorem.words(3),
@@ -63,6 +68,7 @@ context('GenericTemplates tests', () => {
             cy.updateQuestion({
               id: createdQuestion1.id,
               question: genericTemplateQuestions[0],
+              config: `{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":${genericTemplateTextMax},"multiline":false,"placeholder":"","isCounterHidden":false,"readPermissions":[]}`,
             });
 
             cy.createQuestionTemplateRelation({
@@ -727,23 +733,50 @@ context('GenericTemplates tests', () => {
         .should('have.value', genericTemplateTitle)
         .blur();
 
+      cy.contains(genericTemplateQuestions[0])
+        .parent()
+        .find('input')
+        .clear()
+        .type(tooLongGenericTemplateAnswer)
+        .blur();
+
       cy.get(
         '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-button"]'
       ).click();
 
       cy.finishedLoading();
 
+      cy.contains(
+        `Value must be at most ${genericTemplateTextMax} characters`
+      ).should('not.exist');
+
       cy.get('body').type('{esc}');
 
       cy.finishedLoading();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+      cy.get('[data-cy="questionnaires-list-item-completed:false"]').should(
+        'exist'
+      );
 
       cy.get('[data-cy="save-and-continue-button"]').click();
 
-      cy.contains('All genericTemplates must be completed');
+      cy.contains(
+        `${genericTemplateTitle} is violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`
+      );
 
       cy.contains(genericTemplateTitle).click();
+
+      cy.contains(
+        `Value must be at most ${genericTemplateTextMax} characters`
+      ).should('exist');
+
+      cy.contains(genericTemplateQuestions[0])
+        .parent()
+        .find('input')
+        .clear()
+        .type(validGenericTemplateAnswer)
+        .blur();
 
       cy.get(
         '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-and-continue-button"]'
@@ -933,7 +966,9 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Save and continue').click();
 
-      cy.contains('All genericTemplates must be completed').should('exist');
+      cy.contains(
+        `${genericTemplateTitle} is violating constraints. Please open each entry, fix the validation errors, and click "Save and continue".`
+      ).should('exist');
     });
 
     it('Should be a character limit of 256 to the template proposal question for office user', () => {
