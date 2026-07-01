@@ -42,11 +42,11 @@ const ChangeExperimentSafetyStatus = ({
 
   const allSelectedExperimentsHaveSameWorkflowStatus =
     selectedExperimentStatuses.every(
-      (item) => item === selectedExperimentStatuses[0]
+      (workflowStatusId) => workflowStatusId === selectedExperimentStatuses[0]
     );
 
   const allExperimentsHaveSameWorkflow = selectedExperimentsWorkflowIds.every(
-    (id) => id === selectedExperimentsWorkflowIds[0]
+    (workflowId) => workflowId === selectedExperimentsWorkflowIds[0]
   );
 
   const selectedExperimentsWorkflowStatus =

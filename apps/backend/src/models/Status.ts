@@ -22,7 +22,7 @@ export enum ExperimentSafetyWorkflowStatusCodes {
   ESF_IS_REVIEW = 'ESF_IS_REVIEW',
   ESF_ESR_REVIEW = 'ESF_ESR_REVIEW',
   ESF_REJECTED = 'ESF_REJECTED',
-  ESF_APROVED = 'ESF_APROVED',
+  ESF_APPROVED = 'ESF_APPROVED',
 }
 
 export class Status {
