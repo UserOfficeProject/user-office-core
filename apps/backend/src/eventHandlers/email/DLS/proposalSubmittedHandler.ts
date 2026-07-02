@@ -115,13 +115,15 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
         submittedOn: event.proposal.submittedDate!.toLocaleString(),
         accessRoute: workflow?.name || 'N/A',
         principalInvestigator:
-          principalInvestigator.preferredname +
+          (principalInvestigator.preferredname ||
+            principalInvestigator.firstname) +
           ' ' +
           principalInvestigator.lastname,
         establishment: principalInvestigator.institution,
         alternativeContacts: '',
         coinvestigators: participants.map(
-          (partipant) => `${partipant.preferredname} ${partipant.lastname} `
+          (partipant) =>
+            `${partipant.preferredname || partipant.firstname} ${partipant.lastname} `
         ),
         requested: instruments
           .map((instrument) => {
@@ -153,7 +155,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
       ...options,
       substitution_data: {
         ...(options.substitution_data as any),
-        name: participant.preferredname,
+        name: participant.preferredname || participant.firstname,
       },
       recipients: [
         {

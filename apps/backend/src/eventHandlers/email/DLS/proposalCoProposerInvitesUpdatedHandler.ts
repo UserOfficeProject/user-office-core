@@ -59,7 +59,8 @@ export async function proposalCoProposerInvitesUpdatedHandler(
         template: emailTemplate.id.toString(),
       },
       substitution_data: {
-        sender: inviter.preferredname + ' ' + inviter.lastname,
+        sender:
+          (inviter.preferredname || inviter.firstname) + ' ' + inviter.lastname,
         redeem_code: invite.code,
         uos_instance: process.env.BASE_URL,
       },
