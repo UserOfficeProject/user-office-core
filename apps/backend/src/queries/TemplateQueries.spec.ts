@@ -156,7 +156,7 @@ describe('getDynamicMultipleChoiceOptions', () => {
   it('Should return options if selected useBaseDomain', async () => {
     process.env = {
       ...process.env,
-      BASE_URL: 'mocked.example.com',
+      BASE_URL: 'http://mocked.example.com',
     };
 
     jest
