@@ -63,7 +63,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { isDevelopment } from '../utils/helperFunctions';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -141,10 +140,7 @@ mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
-mapValue(
-  Tokens.ConfigureEnvironment,
-  isDevelopment ? configureDLSEnvironment : () => {}
-);
+mapValue(Tokens.ConfigureEnvironment, configureDLSEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
