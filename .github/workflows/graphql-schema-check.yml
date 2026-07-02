@@ -30,3 +30,15 @@ jobs:
         with:
           schema: 'http://localhost:4000/graphql'
           endpoint: 'http://localhost:4001/graphql'
+
+      
+      - name: check logs of containers on failure
+        if: failure()
+        run: |
+          echo "Checking logs of containers on failure"
+          docker compose -f docker-compose-graphql-inspection.yml logs
+
+
+      - name: bring down containers
+        run: |
+          docker compose -f docker-compose-graphql-inspection.yml down
