@@ -1,0 +1,19 @@
+name: CI
+ 
+on: [push]
+ 
+jobs:
+  test:
+    name: Check Schema
+    runs-on: ubuntu-latest
+ 
+    steps:
+
+      - name: bring up container for schema
+        run: |
+          docker compose  -f docker-compose-graphql-inspection.yml  up -d 
+            
+      - uses: graphql-hive/graphql-inspector@master
+        with:
+          schema: 'https://localhost:4000/graphql'
+          endpoint: 'https://localhost:4001/graphql'

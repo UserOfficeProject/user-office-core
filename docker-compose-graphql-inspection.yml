@@ -1,0 +1,87 @@
+services:
+  db-base:
+    image: postgres:18-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: duopassword
+      POSTGRES_USER: duouser
+      POSTGRES_DB: duo
+    volumes:
+      - ./apps/backend/db_patches/:/docker-entrypoint-initdb.d/
+
+  backend-base:
+    image: 'ghcr.io/userofficeproject/user-office-backend:develop'
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db-base:5432/duo
+      JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      JWT_TOKEN_LIFE: 7d
+      BASE_URL: localhost:33000
+      NODE_ENV: development
+      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
+      AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration
+      AUTH_CLIENT_ID: useroffice
+      AUTH_CLIENT_SECRET: useroffice
+      TZ: Europe/Stockholm
+      DATE_FORMAT: dd-MM-yyyy
+      DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+    ports:
+      - 4001:4000
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.services.backend.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/preview`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))'
+    depends_on:
+      - duo-development-authorization-server
+      - db-base
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  duo-development-authorization-server:
+    image: 'ghcr.io/userofficeproject/user-office-development-authorization-server:develop'
+    ports:
+      - 5001:5001
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db-new:5432/duo
+      PORT: 5001
+    depends_on:
+      - db-base
+
+
+  db-new:
+    image: postgres:18-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: duopassword
+      POSTGRES_USER: duouser
+      POSTGRES_DB: duo
+    volumes:
+      - ./apps/backend/db_patches/:/docker-entrypoint-initdb.d/
+
+  backend-new:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db-new:5432/duo
+      JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      JWT_TOKEN_LIFE: 7d
+      BASE_URL: localhost:33000
+      NODE_ENV: development
+      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
+      AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration
+      AUTH_CLIENT_ID: useroffice
+      AUTH_CLIENT_SECRET: useroffice
+      TZ: Europe/Stockholm
+      DATE_FORMAT: dd-MM-yyyy
+      DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+    ports:
+      - 4000:4000
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.services.backend.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.backend.rule=(Host(`localhost`) && PathPrefix(`/api`, `/preview`, `/downloads`, `/files`, `/download`, `/uploads`, `/graphql`))'
+    depends_on:
+      - duo-development-authorization-server
+      - db-new
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
