@@ -32,6 +32,13 @@ jobs:
           endpoint: 'http://localhost:4001/graphql'
 
       
+      - name: manual graphql schema check
+        if: failure()
+        run: |
+          npm i --global @graphql-inspector/cli graphql
+          graphql-inspector diff localhost:4001/graphql localhost:4001/graphql1
+
+
       - name: check logs of containers on failure
         if: failure()
         run: |
