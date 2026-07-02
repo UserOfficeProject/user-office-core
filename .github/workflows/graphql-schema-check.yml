@@ -36,7 +36,8 @@ jobs:
         if: failure()
         run: |
           echo "Checking logs of containers on failure"
-          docker compose -f docker-compose-graphql-inspection.yml logs
+          docker compose -f docker-compose-graphql-inspection.yml logs backend-base
+          docker compose -f docker-compose-graphql-inspection.yml logs backend-new
 
 
       - name: bring down containers
