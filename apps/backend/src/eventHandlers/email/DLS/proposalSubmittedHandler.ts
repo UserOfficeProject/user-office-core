@@ -115,7 +115,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
       }
 
       const timeUnit = `${call.allocationTimeUnit}${
-        formattedRequestedTime > 1 ? 's' : ''
+        formattedRequestedTime > 1 || formattedRequestedTime === 0 ? 's' : ''
       }`;
 
       return [
