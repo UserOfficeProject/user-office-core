@@ -28,7 +28,7 @@ async function setDLSColourTheme() {
     }),
     db.updateSettings({
       settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
-      settingsValue: '#202945',
+      settingsValue: '#8B008B',
     }),
     db.updateSettings({
       settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,

@@ -1,15 +1,15 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
+import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
 import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { DLSUserAuthorization } from '../auth/DLSUserAuthorization';
-import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
-import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
-import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -63,6 +63,7 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
+import { isDevelopment } from '../utils/helperFunctions';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -140,7 +141,10 @@ mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
-mapValue(Tokens.ConfigureEnvironment, configureDLSEnvironment);
+mapValue(
+  Tokens.ConfigureEnvironment,
+  isDevelopment ? configureDLSEnvironment : () => {}
+);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
