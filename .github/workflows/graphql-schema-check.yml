@@ -13,6 +13,10 @@ jobs:
       - name: bring up container for schema
         run: |
           docker compose -f docker-compose-graphql-inspection.yml up -d 
+
+          sleep(20)
+
+          docker ps
             
       - uses: graphql-hive/graphql-inspector@master
         with:
