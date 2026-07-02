@@ -10,6 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up postgress dbs
+        run: |
+          docker compose -f docker-compose-graphql-inspection.yml up -d db-base db-new
+
+          sleep 10 
+
+          docker ps
+
       - name: bring up container for schema
         run: |
           docker compose -f docker-compose-graphql-inspection.yml up -d 
