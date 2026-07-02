@@ -1,3 +1,4 @@
+import { DeepPartial } from './ProposalDataSource';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -29,7 +30,6 @@ import {
   TextInputConfig,
 } from '../../resolvers/types/FieldConfig';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
-import { DeepPartial } from './ProposalDataSource';
 
 export let dummyQuestionarySteps: QuestionaryStep[];
 export let dummyQuestionary: Questionary;
@@ -74,6 +74,7 @@ export const dummyQuestionTemplateRelationFactory = (
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
+    values?.templateId || Math.round(Math.random() * 100),
     values?.config || { ...new BooleanConfig(), readPermissions: [] },
     values?.dependencies as FieldDependency[],
     values?.dependenciesOperator as DependenciesLogicOperator
