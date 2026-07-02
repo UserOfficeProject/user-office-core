@@ -22,7 +22,7 @@ jobs:
         run: |
           docker compose -f docker-compose-graphql-inspection.yml up -d 
 
-          sleep 10 
+          sleep 20 
 
           docker ps
             
