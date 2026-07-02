@@ -125,7 +125,13 @@ export default class PostgresGenericTemplateDataSource
         return createGenericTemplateObject(records[0]);
       })
       .catch((err) => {
-        return err;
+        if (err.message.includes('value too long')) {
+          throw new GraphQLError(
+            'The title exceeds the maximum allowed length'
+          );
+        }
+
+        throw err;
       });
   }
 
