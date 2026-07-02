@@ -94,9 +94,13 @@ export default class TemplateQueries {
   @Authorized()
   async getDynamicMultipleChoiceOptions(
     user: UserWithRole | null,
-    questionId: string
+    questionId: string,
+    templateId?: number | null
   ) {
-    const question = await this.dataSource.getQuestion(questionId);
+    const question = await this.getDynamicMultipleChoiceQuestion(
+      questionId,
+      templateId
+    );
     if (!question) return [];
 
     const config = question.config as DynamicMultipleChoiceConfig;
@@ -139,6 +143,28 @@ export default class TemplateQueries {
     }
 
     return [];
+  }
+
+  private async getDynamicMultipleChoiceQuestion(
+    questionId: string,
+    templateId?: number | null
+  ): Promise<Question | null> {
+    if (templateId !== null && templateId !== undefined) {
+      const questionTemplateRelation =
+        await this.dataSource.getQuestionTemplateRelation(
+          questionId,
+          templateId
+        );
+
+      if (!questionTemplateRelation) return null;
+
+      return {
+        ...questionTemplateRelation.question,
+        config: questionTemplateRelation.config,
+      };
+    }
+
+    return this.dataSource.getQuestion(questionId);
   }
 }
 
