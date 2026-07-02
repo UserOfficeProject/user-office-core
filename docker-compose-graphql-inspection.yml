@@ -60,7 +60,7 @@ services:
   backend-new:
     build:
       context: ./
-      dockerfile: Dockerfile.dev
+      dockerfile: ./apps/backend/Dockerfile
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db-new:5432/duo
       JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
