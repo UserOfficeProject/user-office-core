@@ -23,7 +23,7 @@ export default class InviteQueries {
   async getCoProposerInvites(agent: UserWithRole | null, proposalPk: number) {
     const hasReadRights =
       this.userAuth.isApiToken(agent) ||
-      this.proposalAuth.hasReadRights(agent, proposalPk);
+      (await this.proposalAuth.hasReadRights(agent, proposalPk));
 
     if (!hasReadRights) {
       return [];
@@ -41,7 +41,7 @@ export default class InviteQueries {
   async getDataAccessInvites(agent: UserWithRole | null, proposalPk: number) {
     const hasReadRights =
       this.userAuth.isApiToken(agent) ||
-      this.proposalAuth.hasReadRights(agent, proposalPk);
+      (await this.proposalAuth.hasReadRights(agent, proposalPk));
 
     if (!hasReadRights) {
       return [];
@@ -62,7 +62,7 @@ export default class InviteQueries {
   ) {
     const hasReadRights =
       this.userAuth.isApiToken(agent) ||
-      this.visitAuth.hasReadRights(agent, visitId);
+      (await this.visitAuth.hasReadRights(agent, visitId));
 
     if (!hasReadRights) {
       return [];

@@ -9,6 +9,7 @@ export enum EmailTemplateId {
   VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
   VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',
   USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
+  USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER = 'user-office-registration-invitation-data-access-user',
   USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
   USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
   USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',

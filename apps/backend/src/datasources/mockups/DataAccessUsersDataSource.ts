@@ -126,7 +126,7 @@ export default class MockDataAccessUsersDataSource
   async addDataAccessUser(
     proposalPk: number,
     userId: number
-  ): Promise<BasicUserDetails | Rejection> {
+  ): Promise<Rejection | undefined> {
     try {
       const existingUserIds = this.mockData.get(proposalPk) || [];
 
@@ -142,7 +142,7 @@ export default class MockDataAccessUsersDataSource
         throw new Error(`No mock user found for id ${userId}`);
       }
 
-      return addedUser;
+      return;
     } catch (error) {
       return new Rejection('Failed to add data access user', {
         proposalPk,

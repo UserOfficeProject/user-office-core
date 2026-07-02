@@ -382,7 +382,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         await sendInviteEmail(
           invite,
           inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER,
           { proposalTitle: proposal.title, proposalId: proposal.proposalId }
         ).then(async () => {
           await eventBus.publish({

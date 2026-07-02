@@ -1464,9 +1464,6 @@ export interface CoProposerClaimRecord {
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
 
-// TODO: create a similar claim record for Data Access User
-// what role should they get by default?
-// apply db patch to create db table
 export interface DataAccessClaimRecord {
   readonly invite_id: number;
   readonly proposal_pk: number;
