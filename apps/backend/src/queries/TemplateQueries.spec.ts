@@ -180,6 +180,7 @@ describe('getDynamicMultipleChoiceOptions', () => {
     );
 
     expect(options).toEqual(['option1', 'option2']);
+  });
   it('should use the question template relation if a template ID is supplied', async () => {
     const templateDataSource = container.resolve<TemplateDataSourceMock>(
       Tokens.TemplateDataSource
