@@ -80,6 +80,7 @@ export class QuestionTemplateRelation {
     public question: Question,
     public topicId: number,
     public sortOrder: number,
+    public templateId: number,
     public config: typeof FieldConfigType,
     public dependencies: FieldDependency[],
     public dependenciesOperator?: DependenciesLogicOperator

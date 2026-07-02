@@ -5,6 +5,7 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
 import { Tokens } from './Tokens';
@@ -142,3 +143,5 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+
+mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
