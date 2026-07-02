@@ -607,44 +607,48 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                   if (e.target.value) {
                     confirm(
                       () => {
-                        Promise.all([
-                          api().getWorkflowStatuses({
+                        api()
+                          .getWorkflowStatuses({
                             workflowId: rowData.workflowId,
-                          }),
-                          api().getWorkflow({
-                            workflowId: rowData.workflowId,
-                            entityType: WorkflowType.PROPOSAL,
-                          }),
-                        ]).then(([{ workflowStatuses }, { workflow }]) => {
-                          const selectedWorkflowStatus = workflowStatuses?.find(
-                            (s) => s.statusId === e.target.value
-                          );
-                          if (!selectedWorkflowStatus) {
-                            throw new Error(
-                              'Selected workflow status not found'
-                            );
-                          }
+                          })
+                          .then(({ workflowStatuses }) => {
+                            const selectedWorkflowStatus =
+                              workflowStatuses?.find(
+                                (s) => s.statusId === e.target.value
+                              );
+                            if (!selectedWorkflowStatus) {
+                              throw new Error(
+                                'Selected workflow status not found'
+                              );
+                            }
 
-                          const connectionsWithActions =
-                            workflow?.connections.filter(
-                              (conn) =>
-                                conn.nextWorkflowStatusId ===
-                                  selectedWorkflowStatus.workflowStatusId &&
-                                conn.statusActions &&
-                                conn.statusActions.length > 0
-                            ) || [];
+                            return api()
+                              .getWorkflow({
+                                workflowId: rowData.workflowId,
+                                entityType: WorkflowType.PROPOSAL,
+                              })
+                              .then(({ workflow }) => {
+                                const connectionsWithActions =
+                                  workflow?.connections.filter(
+                                    (conn) =>
+                                      conn.nextWorkflowStatusId ===
+                                        selectedWorkflowStatus.workflowStatusId &&
+                                      conn.statusActions &&
+                                      conn.statusActions.length > 0
+                                  ) || [];
 
-                          const statusActionsWorkflowConnectionId =
-                            connectionsWithActions.length === 1
-                              ? connectionsWithActions[0].id
-                              : undefined;
+                                const statusActionsWorkflowConnectionId =
+                                  connectionsWithActions.length === 1
+                                    ? connectionsWithActions[0].id
+                                    : undefined;
 
-                          updateProposalStatus(
-                            rowData.primaryKey,
-                            selectedWorkflowStatus.workflowStatusId,
-                            statusActionsWorkflowConnectionId
-                          );
-                        });
+                                updateProposalStatus(
+                                  rowData.primaryKey,
+                                  selectedWorkflowStatus.workflowStatusId,
+                                  statusActionsWorkflowConnectionId
+                                );
+                              });
+                          });
                       },
                       {
                         title: 'Change status',
