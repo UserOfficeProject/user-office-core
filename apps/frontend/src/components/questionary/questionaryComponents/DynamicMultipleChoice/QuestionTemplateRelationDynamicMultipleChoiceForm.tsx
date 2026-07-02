@@ -17,6 +17,7 @@ import {
 } from 'generated/sdk';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
+import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -50,7 +51,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
         }),
       })}
     >
-      {() => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
@@ -144,6 +145,12 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 />
               </TitledContainer>
             </FormControl>
+          </TitledContainer>
+          <TitledContainer label="Dependencies">
+            <QuestionDependencyList
+              form={formikProps}
+              template={props.template}
+            />
           </TitledContainer>
         </>
       )}
