@@ -710,7 +710,10 @@ const ProposalTableOfficer = ({
     refreshTableData();
   };
 
-  const changeStatusOnProposals = async (workflowStatus: WorkflowStatus) => {
+  const changeStatusOnProposals = async (
+    workflowStatus: WorkflowStatus,
+    statusActionsWorkflowConnectionId?: number
+  ) => {
     const proposalPks = getSelectedProposalPks();
     if (workflowStatus?.workflowStatusId && proposalPks.length) {
       const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
@@ -719,6 +722,7 @@ const ProposalTableOfficer = ({
       }).changeProposalsStatus({
         proposalPks: proposalPks,
         workflowStatusId: workflowStatus.workflowStatusId,
+        statusActionsWorkflowConnectionId: statusActionsWorkflowConnectionId,
       });
       refreshTableData();
     }
