@@ -34,7 +34,6 @@ jobs:
 
       
       - name: manual graphql schema check
-        if: failure()
         run: |
           npm i --global @graphql-inspector/cli graphql
           graphql-inspector diff http://localhost:4001/graphql http://localhost:4001/graphql
