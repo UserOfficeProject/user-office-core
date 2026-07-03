@@ -36,7 +36,7 @@ jobs:
       - name: manual graphql schema check
         run: |
           npm i --global @graphql-inspector/cli graphql
-          graphql-inspector diff http://localhost:4001/graphql http://localhost:4001/graphql
+          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
 
 
       - name: check logs of containers on failure
