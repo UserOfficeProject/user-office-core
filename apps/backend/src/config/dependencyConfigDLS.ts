@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { Tokens } from './Tokens';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { DLSUserAuthorization } from '../auth/DLSUserAuthorization';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -143,3 +144,4 @@ mapValue(Tokens.ConfigureEnvironment, configureDLSEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
