@@ -8,5 +8,5 @@ export class Page implements Partial<PageOrigin> {
   public id: number;
 
   @Field({ nullable: true })
-  public content: string;
+  public BIGBREAKINGCHANGEcontent: string;
 }
