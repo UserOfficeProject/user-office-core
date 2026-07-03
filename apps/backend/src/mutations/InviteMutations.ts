@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
@@ -82,10 +83,14 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    await this.processAcceptedRoleClaims(agent.id, invite);
-    await this.processAcceptedCoProposerClaims(agent.id, invite);
-    await this.processAcceptedDataAccessClaims(agent.id, invite);
-    await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
+    try {
+      await this.processAcceptedRoleClaims(agent.id, invite);
+      await this.processAcceptedCoProposerClaims(agent.id, invite);
+      await this.processAcceptedDataAccessClaims(agent.id, invite);
+      await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
+    } catch (error) {
+      logger.logException('Error during claim processing', error);
+    }
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
@@ -447,22 +452,30 @@ export default class InviteMutations {
         );
       // already a data access user
       if (isDataAccessUser) {
-        return;
+        continue;
       }
-      await this.dataAccessUsersDataSource.addDataAccessUser(
-        claim.proposalPk,
-        claimerUserId
-      );
 
-      this.eventBus.publish({
-        type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
-        isRejection: false,
-        key: 'proposal',
-        loggedInUserId: claimerUserId,
-        invite: invite,
-        description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
-        proposalPKey: claim.proposalPk,
-      });
+      // TODO: what happens if there is an error during accept?
+      // we need graceful error handling from the database later
+      const isRejection =
+        await this.dataAccessUsersDataSource.addDataAccessUser(
+          claim.proposalPk,
+          claimerUserId
+        );
+
+      if (!isRejection) {
+        this.eventBus.publish({
+          type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+          isRejection: false,
+          key: 'proposal',
+          loggedInUserId: claimerUserId,
+          invite: invite,
+          description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
+          proposalPKey: claim.proposalPk,
+        });
+      } else {
+        // TODO: what happens if there is an error during accept?
+      }
     }
   }
 
