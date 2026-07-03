@@ -376,4 +376,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
     throw new Error('Method not implemented.');
   }
+
+  async getRequestedTime(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<number> {
+    return 32;
+  }
 }
