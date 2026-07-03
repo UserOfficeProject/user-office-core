@@ -17,6 +17,9 @@ export class QuestionTemplateRelation
   public sortOrder: number;
 
   @Field(() => Int)
+  public templateId: number;
+
+  @Field(() => Int)
   public topicId: number;
 
   @Field(() => FieldConfigType)
