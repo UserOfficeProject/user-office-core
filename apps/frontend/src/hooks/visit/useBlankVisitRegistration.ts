@@ -9,7 +9,7 @@ import {
 import { useDataApi } from 'hooks/common/useDataApi';
 import { RegistrationWithQuestionary } from 'models/questionary/visit/VisitRegistrationWithQuestionary';
 
-function createRegistrationStub(
+export function createRegistrationStub(
   userId: number,
   templateId: number,
   questionarySteps: QuestionaryStep[],
