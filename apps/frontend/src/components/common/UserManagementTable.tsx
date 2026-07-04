@@ -157,10 +157,9 @@ const UserManagementTable = ({
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
                 marginTop: 1,
                 gap: 1,
-                alignItems: 'center',
+                alignItems: 'flex-start',
               }}
               data-cy="invites-chips"
             >
@@ -170,21 +169,25 @@ const UserManagementTable = ({
                   color: 'grey',
                   paddingRight: '10px',
                   display: 'inline-block',
+                  whiteSpace: 'nowrap',
+                  mt: '4px',
                 }}
               >
                 Invited:
               </Typography>
-              {invites.map((invite) => (
-                <Chip
-                  sx={{ gap: '2px', padding: '6px' }}
-                  color="secondary"
-                  icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
-                  size="small"
-                  label={invite.email}
-                  key={invite.email}
-                  onDelete={() => handleDeleteInvite(invite)}
-                />
-              ))}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
+                {invites.map((invite) => (
+                  <Chip
+                    sx={{ gap: '2px', padding: '6px' }}
+                    color="secondary"
+                    icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
+                    size="small"
+                    label={invite.email}
+                    key={invite.email}
+                    onDelete={() => handleDeleteInvite(invite)}
+                  />
+                ))}
+              </Box>
             </Box>
           )}
           <ActionButtonContainer
