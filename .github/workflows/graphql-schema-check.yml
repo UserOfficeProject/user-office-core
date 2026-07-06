@@ -34,6 +34,8 @@ jobs:
       - name: generate base schema
         run: |
           graphql-inspector introspect http://localhost:4000/graphql base-schema.graphql
+
+          cat base-schema.graphql
       
       - name: generate new schema
         run: |
