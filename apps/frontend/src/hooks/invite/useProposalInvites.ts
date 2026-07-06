@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 
-import { GetCoProposerInvitesQuery } from 'generated/sdk';
+import {
+  GetCoProposerInvitesQuery,
+  GetPendingDataAccessInvitesQuery,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalInvites() {
   const [proposalInvites, setProposalInvites] = useState<
     NonNullable<GetCoProposerInvitesQuery['me']>['coProposerInvites']
+  >([]);
+  const [dataAccessInvites, setDataAccessInvites] = useState<
+    NonNullable<GetPendingDataAccessInvitesQuery['me']>['dataAccessInvites']
   >([]);
   const [loading, setLoading] = useState(true);
   const [processingInviteId, setProcessingInviteId] = useState<number | null>(
@@ -18,15 +24,19 @@ export function useProposalInvites() {
     let unmounted = false;
 
     setLoading(true);
-    api()
-      .getCoProposerInvites()
-      .then((data) => {
-        if (unmounted) {
-          return;
-        }
-        if (data.me) setProposalInvites(data.me.coProposerInvites);
-        setLoading(false);
-      });
+    Promise.all([
+      api().getCoProposerInvites(),
+      api().getPendingDataAccessInvites(),
+    ]).then(([coProposerData, dataAccessData]) => {
+      if (unmounted) {
+        return;
+      }
+      if (coProposerData.me)
+        setProposalInvites(coProposerData.me.coProposerInvites);
+      if (dataAccessData.me)
+        setDataAccessInvites(dataAccessData.me.dataAccessInvites);
+      setLoading(false);
+    });
 
     return () => {
       unmounted = true;
@@ -55,10 +65,35 @@ export function useProposalInvites() {
       });
   };
 
+  const acceptDataAccessInvite = (inviteId: number) => {
+    const proposalId = dataAccessInvites.find(
+      (invite) => invite.id === inviteId
+    )?.proposal?.proposalId;
+    if (!proposalId) {
+      throw new Error('Failed to accept the invitation.');
+    }
+    setProcessingInviteId(inviteId);
+    api()
+      .acceptDataAccessInvite({ proposalId })
+      .then(({ acceptDataAccessInvite }) => {
+        setDataAccessInvites((invites) =>
+          invites.filter((invite) => invite.id !== acceptDataAccessInvite.id)
+        );
+      })
+      .catch(() => {
+        throw new Error('Failed to accept the invitation.');
+      })
+      .finally(() => {
+        setProcessingInviteId(null);
+      });
+  };
+
   return {
     loading,
     proposalInvites,
+    dataAccessInvites,
     acceptCoProposerInvite,
+    acceptDataAccessInvite,
     processingInviteId,
   };
 }
