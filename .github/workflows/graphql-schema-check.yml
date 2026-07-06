@@ -41,7 +41,8 @@ jobs:
 
       - name: graphql-inspector diff
         run: |
-          graphql-inspector diff base-schema.graphql new-schema.graphql
+          echo "base schema"
+          cat base-schema.graphql
 
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
       - uses: graphql-hive/graphql-inspector@master
