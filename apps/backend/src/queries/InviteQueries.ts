@@ -90,4 +90,19 @@ export default class InviteQueries {
 
     return invites;
   }
+
+  @Authorized()
+  async getPendingDataAccessInvites(agent: UserWithRole | null) {
+    if (!agent) {
+      return [];
+    }
+
+    const invites = await this.dataSource.getDataAccessInvites({
+      email: agent.email,
+      isClaimed: false,
+      isExpired: false,
+    });
+
+    return invites;
+  }
 }

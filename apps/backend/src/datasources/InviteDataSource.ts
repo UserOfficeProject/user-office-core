@@ -8,7 +8,7 @@ export interface GetInvitesFilter {
   email?: string;
 }
 
-export interface GetCoProposerInvitesFilter extends GetInvitesFilter {
+export interface GetProposalInvitesFilter extends GetInvitesFilter {
   proposalPk?: number;
 }
 
@@ -36,7 +36,8 @@ export interface InviteDataSource {
     isClaimed?: boolean
   ): Promise<Invite[]>;
   getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
-  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]>;
+  getCoProposerInvites(filter: GetProposalInvitesFilter): Promise<Invite[]>;
+  getDataAccessInvites(filter: GetProposalInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;

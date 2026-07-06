@@ -3,11 +3,12 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
+import { DataAccessClaim } from '../../models/DataAccessClaim';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
 import { DataAccessClaimDataSource } from '../DataAccessClaimDataSource';
 import {
-  GetCoProposerInvitesFilter,
+  GetProposalInvitesFilter,
   GetInvitesFilter,
   InviteDataSource,
 } from '../InviteDataSource';
@@ -16,6 +17,7 @@ import {
 export class InviteDataSourceMock implements InviteDataSource {
   private invites: Invite[];
   private coProposerClaims: CoProposerClaim[];
+  private dataAccessClaims: DataAccessClaim[];
 
   constructor(
     @inject(Tokens.CoProposerClaimDataSource)
@@ -106,9 +108,22 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date('2022-01-01'),
         EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
       ),
+      new Invite(
+        4,
+        'data-invite',
+        'test_dau@example.com',
+        new Date(),
+        3,
+        new Date(),
+        null,
+        false,
+        new Date('2022-01-01'),
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER
+      ),
     ];
 
     this.coProposerClaims = [new CoProposerClaim(2, 1)];
+    this.dataAccessClaims = [new DataAccessClaim(4, 1)];
   }
 
   async findByCode(code: string): Promise<Invite | null> {
@@ -200,7 +215,8 @@ export class InviteDataSourceMock implements InviteDataSource {
 
     return invite;
   }
-  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]> {
+
+  getCoProposerInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
     return new Promise((resolve) => {
       const filteredInvites = this.invites.filter((invite) => {
         if (filter.createdBefore) {
@@ -238,6 +254,59 @@ export class InviteDataSourceMock implements InviteDataSource {
 
         if (filter.proposalPk) {
           const inviteIds = this.coProposerClaims
+            .filter((claim) => claim.proposalPk === filter.proposalPk)
+            .map((claim) => claim.inviteId);
+
+          if (!inviteIds.includes(invite.id)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      resolve(filteredInvites);
+    });
+  }
+
+  getDataAccessInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
+    return new Promise((resolve) => {
+      const filteredInvites = this.invites.filter((invite) => {
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
+            return false;
+          }
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (invite.claimedAt === null && filter.isClaimed) {
+            return false;
+          }
+          if (invite.claimedAt !== null && !filter.isClaimed) {
+            return false;
+          }
+        }
+
+        if (filter.isExpired) {
+          if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return false;
+          }
+        }
+
+        if (filter.email) {
+          if (invite.email !== filter.email) {
+            return false;
+          }
+        }
+
+        if (filter.proposalPk) {
+          const inviteIds = this.dataAccessClaims
             .filter((claim) => claim.proposalPk === filter.proposalPk)
             .map((claim) => claim.inviteId);
 

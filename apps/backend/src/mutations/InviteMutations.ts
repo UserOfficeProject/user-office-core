@@ -101,7 +101,6 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
-  // make this generic -> accept on signup
   @Authorized([Roles.USER])
   async acceptCoProposerInvite(agent: UserWithRole | null, proposalId: string) {
     if (!agent) {
@@ -125,6 +124,39 @@ export default class InviteMutations {
 
     await this.processAcceptedRoleClaims(agent.id, invite);
     await this.processAcceptedCoProposerClaims(agent.id, invite);
+
+    const updatedInvite = await this.inviteDataSource.update({
+      id: invite.id,
+      claimedAt: new Date(),
+      claimedByUserId: agent.id,
+    });
+
+    return updatedInvite;
+  }
+
+  @Authorized([Roles.USER])
+  async acceptDataAccessInvite(agent: UserWithRole | null, proposalId: string) {
+    if (!agent) {
+      return rejection('User not found', { proposalId });
+    }
+
+    const proposal = await this.proposalDataSource.getProposalById(proposalId);
+    if (!proposal) {
+      return rejection('Proposal not found', { proposalId });
+    }
+
+    const [invite] = await this.inviteDataSource.getDataAccessInvites({
+      proposalPk: proposal.primaryKey,
+      email: agent.email,
+      isClaimed: false,
+      isExpired: false,
+    });
+    if (!invite) {
+      return rejection('Invite not found', { proposalId });
+    }
+
+    await this.processAcceptedRoleClaims(agent.id, invite);
+    await this.processAcceptedDataAccessClaims(agent.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,

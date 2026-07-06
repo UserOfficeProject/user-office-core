@@ -2,7 +2,7 @@
 
 import { Invite } from '../../models/Invite';
 import {
-  GetCoProposerInvitesFilter,
+  GetProposalInvitesFilter,
   GetInvitesFilter,
   InviteDataSource,
 } from '../InviteDataSource';
@@ -135,7 +135,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
 
-  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]> {
+  getCoProposerInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
     return database
       .select('*')
       .from('invites')
@@ -171,6 +171,47 @@ export default class PostgresInviteDataSource implements InviteDataSource {
 
         if (filter.proposalPk) {
           query.where('co_proposer_claims.proposal_pk', filter.proposalPk);
+        }
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
+
+  getDataAccessInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('invites')
+      .join(
+        'data_access_claims',
+        'invites.invite_id',
+        'data_access_claims.invite_id'
+      )
+      .modify((query) => {
+        if (filter.createdBefore) {
+          query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (filter.isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+
+        if (filter.isExpired) {
+          query.where('expires_at', '<', new Date());
+        }
+
+        if (filter.email) {
+          query.whereRaw('lower(email) = ?', filter.email.toLowerCase());
+        }
+
+        if (filter.proposalPk) {
+          query.where('data_access_claims.proposal_pk', filter.proposalPk);
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));

@@ -414,4 +414,43 @@ describe('Test Invite Mutations', () => {
     expect(invite).toBeInstanceOf(Rejection);
     expect((invite as Rejection).reason).toBe('Invite not found');
   });
+
+  test('A user can accept valid data access invite without code', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      { ...dummyUserWithRole, email: 'test_dau@example.com' },
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Invite);
+  });
+
+  test('A user can not accept data access invite without code if email does not match', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      { ...dummyUserWithRole, email: 'mismatch@example.com' },
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
+  });
+
+  test('A user can not accept data access invite without code if proposal is invalid', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      dummyUserWithRole,
+      'invalid-short-code'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Proposal not found');
+  });
+
+  test('A user cannot accept a non-existent data access invite for an existing proposal without code', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      dummyUserWithRole,
+      'no-invite'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
+  });
 });
