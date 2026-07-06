@@ -40,7 +40,7 @@ const pathNameValidationSchema = Yup.string()
     /^(?!http|www)/i,
     'Provide a valid pathname, the base domain is already provided'
   )
-  .matches(/^(?!\/).+$/, 'Leading slash should not be included')
+  .matches(/^(?!\/)/, 'Leading slash should not be included')
   .required('Pathname is required');
 
 export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
