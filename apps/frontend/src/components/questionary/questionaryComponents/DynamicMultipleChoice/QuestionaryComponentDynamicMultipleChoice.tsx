@@ -8,11 +8,12 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { getIn } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
 import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
 import { toArray } from 'utils/helperFunctions';
@@ -28,13 +29,17 @@ export function QuestionaryComponentDynamicMultipleChoice(
   const {
     question: { id, question, naturalKey },
   } = answer;
+  const { state } = useContext(QuestionaryContext);
 
   const config = answer.config as DynamicMultipleChoiceConfig;
 
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
 
-  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(id);
+  const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(
+    id,
+    state?.questionary.templateId
+  );
   const [stateValue, setStateValue] = useState<Array<string>>([]);
 
   useEffect(() => {

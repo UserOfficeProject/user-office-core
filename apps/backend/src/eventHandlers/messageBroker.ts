@@ -5,6 +5,7 @@ import {
 } from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
+import { AllocationTimeUnitConverter } from '../config/base/allocationTimeUnitConverter';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
@@ -24,7 +25,6 @@ import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
-import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
@@ -169,11 +169,14 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     throw new Error('Call not found');
   }
 
+  const ConvertAllocationTimeUnits: AllocationTimeUnitConverter =
+    container.resolve(Tokens.ConvertAllocationTimeUnits);
+
   const instruments = maybeInstruments?.length
     ? maybeInstruments.map((instr) => ({
         id: instr.id,
         shortCode: instr.shortCode,
-        allocatedTime: getSecondsPerAllocationTimeUnit(
+        allocatedTime: ConvertAllocationTimeUnits(
           instr.managementTimeAllocation,
           call.allocationTimeUnit
         ),
@@ -289,21 +292,6 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
   };
 
   return JSON.stringify(messageData);
-};
-
-const getSecondsPerAllocationTimeUnit = (
-  timeAllocation: number,
-  unit: AllocationTimeUnits
-) => {
-  // NOTE: Default AllocationTimeUnit is 'Day'. The UI supports Days and Hours.
-  switch (unit) {
-    case AllocationTimeUnits.Hour:
-      return timeAllocation * 60 * 60;
-    case AllocationTimeUnits.Week:
-      return timeAllocation * 7 * 24 * 60 * 60;
-    default:
-      return timeAllocation * 24 * 60 * 60;
-  }
 };
 
 export async function createPostToRabbitMQHandler() {
