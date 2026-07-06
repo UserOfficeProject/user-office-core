@@ -1,4 +1,4 @@
-name: CI
+name: Graphql Schema Check
  
 on: [push]
  
@@ -38,6 +38,10 @@ jobs:
       - name: generate new schema
         run: |
           graphql-inspector introspect http://localhost:4001/graphql > new-schema.graphql
+
+      - name: graphql-inspector diff
+        run: |
+          graphql-inspector diff base-schema.graphql new-schema.graphql
 
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
       - uses: graphql-hive/graphql-inspector@master
