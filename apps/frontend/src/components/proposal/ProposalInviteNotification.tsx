@@ -151,8 +151,8 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                           Principal Investigator: {invite.proposal.proposerName}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                          Invited on:
-                          {new Date(invite.createdAt).toLocaleDateString()}
+                          {new Date(invite.createdAt).toLocaleDateString()}{' '}
+                          (Co-Proposer)
                         </Typography>
                       </div>
                       <div style={{ display: 'flex', gap: 8 }}>
@@ -198,15 +198,12 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                         <Typography variant="subtitle1" fontWeight="bold">
                           {invite.proposal.title || 'No Title'}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          Data access invitation
-                        </Typography>
                         <Typography variant="body1" color="textSecondary">
                           Principal Investigator: {invite.proposal.proposerName}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                          Invited on:
-                          {new Date(invite.createdAt).toLocaleDateString()}
+                          {new Date(invite.createdAt).toLocaleDateString()}{' '}
+                          (Data Access User)
                         </Typography>
                       </div>
                       <div style={{ display: 'flex', gap: 8 }}>
