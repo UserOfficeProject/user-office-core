@@ -18,4 +18,5 @@ export enum EmailTemplateId {
   CALL_CREATED_EMAIL = 'call-created-email',
   FEEDBACK_REQUEST = 'feedback-request',
   CO_PROPOSER_INVITE = 'co-proposer-invite',
+  DATA_ACCESS_USER_ADDED = 'data-access-user-added',
 }

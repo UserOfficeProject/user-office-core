@@ -417,6 +417,12 @@ interface UserDataAccessUpdatedEvent extends GeneralEvent {
   proposalPKey: number;
 }
 
+interface DataAccessUserAddedEvent extends GeneralEvent {
+  type: Event.DATA_ACCESS_USER_ADDED;
+  proposalPKey: number;
+  invitedUserIds: number[];
+}
+
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
   extends GeneralEvent {
   type: Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS;
@@ -555,6 +561,7 @@ export type ApplicationEvent =
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
   | UserDataAccessUpdatedEvent
+  | DataAccessUserAddedEvent
   | ExperimentESFApprovedByIsEvent
   | ExperimentESFApprovedByESREvent
   | ExperimentESFRejectedByIsEvent
