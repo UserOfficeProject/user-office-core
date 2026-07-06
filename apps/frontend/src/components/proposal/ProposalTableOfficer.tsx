@@ -518,7 +518,7 @@ const ProposalTableOfficer = ({
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
 
-    if (v.field === 'statusName') {
+    if (v.field === 'statusName' && !isReadOnly) {
       return {
         ...v,
         render: (rowData: ProposalViewData) => (
@@ -710,7 +710,10 @@ const ProposalTableOfficer = ({
     refreshTableData();
   };
 
-  const changeStatusOnProposals = async (workflowStatus: WorkflowStatus) => {
+  const changeStatusOnProposals = async (
+    workflowStatus: WorkflowStatus,
+    statusActionsWorkflowConnectionId?: number
+  ) => {
     const proposalPks = getSelectedProposalPks();
     if (workflowStatus?.workflowStatusId && proposalPks.length) {
       const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
@@ -719,6 +722,7 @@ const ProposalTableOfficer = ({
       }).changeProposalsStatus({
         proposalPks: proposalPks,
         workflowStatusId: workflowStatus.workflowStatusId,
+        statusActionsWorkflowConnectionId: statusActionsWorkflowConnectionId,
       });
       refreshTableData();
     }
