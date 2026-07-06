@@ -144,7 +144,7 @@ async function enableDefaultDLSFeatures() {
 
 async function configureDLSEnvironment() {
   if (isDevelopment) {
-    await setDLSColourTheme('#d4225d');
+    await setDLSColourTheme('#b3022b');
   }
   if (isStaging) {
     await setDLSColourTheme('#8B008B');
