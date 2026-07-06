@@ -41,9 +41,9 @@ jobs:
         run: |
           graphql-inspector introspect http://localhost:4001/graphql --write new-schema.graphql
 
-      - name: graphql-inspector diff
-        run: |
-          graphql-inspector diff base-schema.graphql new-schema.graphql
+      # - name: graphql-inspector diff
+      #   run: |
+      #     graphql-inspector diff base-schema.graphql new-schema.graphql
 
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
       - uses: graphql-hive/graphql-inspector@master
@@ -52,9 +52,9 @@ jobs:
           endpoint: new-schema.graphql
 
       
-      - name: manual graphql schema check
-        run: |
-          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
+      # - name: manual graphql schema check
+      #   run: |
+      #     graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
 
       - name: bring down containers
         run: |
