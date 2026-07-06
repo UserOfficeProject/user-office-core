@@ -350,7 +350,13 @@ export async function essEmailHandler(event: ApplicationEvent) {
       break;
     }
 
-    case Event.DATA_ACCESS_USER_ADDED: {
+    case Event.DATA_ACCESS_USERS_UPDATED: {
+      // Only newly added users are notified; a pure removal or no-op update
+      // carries an empty list and sends nothing.
+      if (event.invitedUserIds.length === 0) {
+        return;
+      }
+
       const proposal = await proposalDataSource.get(event.proposalPKey);
       if (!proposal) {
         logger.logError('No proposal found when trying to send email', {

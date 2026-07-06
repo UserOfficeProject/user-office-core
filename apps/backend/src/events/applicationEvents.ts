@@ -415,11 +415,8 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
 interface UserDataAccessUpdatedEvent extends GeneralEvent {
   type: Event.DATA_ACCESS_USERS_UPDATED;
   proposalPKey: number;
-}
-
-interface DataAccessUserAddedEvent extends GeneralEvent {
-  type: Event.DATA_ACCESS_USER_ADDED;
-  proposalPKey: number;
+  // Users newly added as data access users in this update (empty on removals
+  // or no-op updates). Used to notify only the freshly invited users by email.
   invitedUserIds: number[];
 }
 
@@ -561,7 +558,6 @@ export type ApplicationEvent =
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent
   | UserDataAccessUpdatedEvent
-  | DataAccessUserAddedEvent
   | ExperimentESFApprovedByIsEvent
   | ExperimentESFApprovedByESREvent
   | ExperimentESFRejectedByIsEvent

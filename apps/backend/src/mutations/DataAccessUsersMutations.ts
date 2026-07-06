@@ -80,21 +80,11 @@ export default class DataAccessUsersMutations {
         await eventBus.publish({
           type: Event.DATA_ACCESS_USERS_UPDATED,
           proposalPKey: proposalPk,
+          invitedUserIds,
           key: 'proposalPk',
           loggedInUserId: agent ? agent.id : null,
           isRejection: false,
         });
-
-        if (invitedUserIds.length > 0) {
-          await eventBus.publish({
-            type: Event.DATA_ACCESS_USER_ADDED,
-            proposalPKey: proposalPk,
-            invitedUserIds,
-            key: 'proposalPk',
-            loggedInUserId: agent ? agent.id : null,
-            isRejection: false,
-          });
-        }
       }
 
       return result;
