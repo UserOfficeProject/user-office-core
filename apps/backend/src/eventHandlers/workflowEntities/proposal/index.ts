@@ -68,7 +68,12 @@ const proposalWorkflowEntity: WorkFlowEntity = {
 
     const allProposals = await Promise.all(
       entities.map(async (entity) => {
-        const { entityId, prevStatusId, nextStatusId } = entity;
+        const {
+          entityId,
+          prevStatusId,
+          nextStatusId,
+          workflowStatusConnectionId,
+        } = entity;
 
         const proposal = await proposalDataSource.get(entityId);
 
@@ -94,12 +99,10 @@ const proposalWorkflowEntity: WorkFlowEntity = {
           description: `From "${previousWorkflowStatus?.statusId}" to "${nextWorkflowStatus?.statusId}"`,
         });
 
-        return proposal;
+        return { proposal, workflowStatusConnectionId };
       })
     );
-    const validProposals = allProposals.filter(
-      (proposal): proposal is NonNullable<typeof proposal> => proposal != null
-    );
+    const validProposals = allProposals.filter((proposal) => proposal !== null);
     await proposalStatusActionEngine(validProposals);
   },
 };

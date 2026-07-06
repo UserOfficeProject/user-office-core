@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container } from 'tsyringe';
 
+import { ProposalWithWorkflowStatusConnectionId } from './statusActionEngine';
 import { Tokens } from '../../../config/Tokens';
 import { CallDataSource } from '../../../datasources/CallDataSource';
 import { FapDataSource } from '../../../datasources/FapDataSource';
@@ -27,17 +28,19 @@ import {
 } from '../../../resolvers/types/StatusActionConfig';
 
 interface GroupedObjectType {
-  [key: string]: Proposal[];
+  [key: string]: ProposalWithWorkflowStatusConnectionId[];
 }
 
 export const groupProposalsByProperties = (
-  proposals: Proposal[],
+  proposals: ProposalWithWorkflowStatusConnectionId[],
   props: string[]
 ) => {
-  const getProposalGroups = (item: Proposal) => {
+  const getProposalGroups = (item: ProposalWithWorkflowStatusConnectionId) => {
     const groupItemsArray = [];
     for (let i = 0; i < props.length; i++) {
-      groupItemsArray.push(item[props[i] as keyof Proposal]);
+      groupItemsArray.push(
+        item[props[i] as keyof ProposalWithWorkflowStatusConnectionId]
+      );
     }
 
     return groupItemsArray;

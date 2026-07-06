@@ -9,7 +9,6 @@ import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../../../events';
 import { Event } from '../../../events/event.enum';
-import { ExperimentSafety } from '../../../models/Experiment';
 import { WorkflowEngineType } from '../../../workflowEngine';
 import { WorkFlowEntity } from '../../workflowHandler';
 
@@ -105,23 +104,28 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
 
     const experimentSafeties = await Promise.all(
       entities.map(async (entity) => {
-        const experimentSafety = await experimentDataSource.getExperimentSafety(
-          entity.entityId
-        );
+        const {
+          entityId,
+          prevStatusId,
+          nextStatusId,
+          workflowStatusConnectionId,
+        } = entity;
+
+        const experimentSafety =
+          await experimentDataSource.getExperimentSafety(entityId);
 
         if (!experimentSafety) {
           logger.logError('Experiment not found for workflow status change', {
-            entityId: entity.entityId,
+            entityId,
           });
 
           return;
         }
 
         const previousWorkflowStatus =
-          await workflowDataSource.getWorkflowStatus(entity.prevStatusId);
-        const nextWorkflowStatus = await workflowDataSource.getWorkflowStatus(
-          entity.nextStatusId
-        );
+          await workflowDataSource.getWorkflowStatus(prevStatusId);
+        const nextWorkflowStatus =
+          await workflowDataSource.getWorkflowStatus(nextStatusId);
 
         await eventBus.publish({
           type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
@@ -132,12 +136,12 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
           description: `From "${previousWorkflowStatus?.statusId}" to "${nextWorkflowStatus?.statusId}"`,
         });
 
-        return experimentSafety;
+        return { experimentSafety, workflowStatusConnectionId };
       })
     );
 
     const validExperimentSafeties = experimentSafeties.filter(
-      (item): item is ExperimentSafety => item != null
+      (experimentSafety) => experimentSafety != null
     );
     await experimentSafetyStatusActionEngine(validExperimentSafeties);
   },

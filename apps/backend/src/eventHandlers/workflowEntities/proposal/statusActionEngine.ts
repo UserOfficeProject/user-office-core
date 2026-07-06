@@ -10,7 +10,14 @@ import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { Proposal } from '../../../models/Proposal';
 import { StatusActionType } from '../../../models/StatusAction';
 
-export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
+export interface ProposalWithWorkflowStatusConnectionId {
+  proposal: Proposal;
+  workflowStatusConnectionId: number;
+}
+
+export const proposalStatusActionEngine = async (
+  proposals: ProposalWithWorkflowStatusConnectionId[]
+) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
     Tokens.StatusActionsDataSource
   );
@@ -26,11 +33,10 @@ export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
-      const [{ workflowStatusId }] = groupedProposals;
-      const currentConnection =
-        await workflowDataSource.getWorkflowConnectionByNextStatusId(
-          workflowStatusId
-        );
+      const [{ workflowStatusConnectionId }] = groupedProposals;
+      const currentConnection = await workflowDataSource.getWorkflowConnection(
+        workflowStatusConnectionId
+      );
       if (!currentConnection) {
         return;
       }
@@ -50,15 +56,24 @@ export const proposalStatusActionEngine = async (proposals: Proposal[]) => {
 
           switch (statusAction.type) {
             case StatusActionType.EMAIL:
-              emailActionHandler(statusAction, groupedProposals);
+              emailActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             case StatusActionType.RABBITMQ:
-              rabbitMQActionHandler(statusAction, groupedProposals);
+              rabbitMQActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             case StatusActionType.PROPOSALDOWNLOAD:
-              pdfDownloadActionHandler(statusAction, groupedProposals);
+              pdfDownloadActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             default:

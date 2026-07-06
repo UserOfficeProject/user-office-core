@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
+import { ExperimentSafetyWithWorkflowStatusConnectionId } from './statusActionEngine';
 import { Tokens } from '../../../config/Tokens';
 import { ExperimentDataSource } from '../../../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
@@ -16,19 +17,26 @@ import {
 } from '../../../resolvers/types/StatusActionConfig';
 
 export const groupExperimentSafetiesByProperties = (
-  experimentSafeties: ExperimentSafety[],
+  experimentSafeties: ExperimentSafetyWithWorkflowStatusConnectionId[],
   props: string[]
-): ExperimentSafety[][] => {
-  const getExperimentSafetyGroups = (item: ExperimentSafety) => {
+): ExperimentSafetyWithWorkflowStatusConnectionId[][] => {
+  const getExperimentSafetyGroups = (
+    item: ExperimentSafetyWithWorkflowStatusConnectionId
+  ) => {
     const groupItemsArray = [];
     for (let i = 0; i < props.length; i++) {
-      groupItemsArray.push(item[props[i] as keyof ExperimentSafety]);
+      groupItemsArray.push(
+        item[props[i] as keyof ExperimentSafetyWithWorkflowStatusConnectionId]
+      );
     }
 
     return groupItemsArray;
   };
 
-  const experimentSafetyGroups: Record<string, ExperimentSafety[]> = {};
+  const experimentSafetyGroups: Record<
+    string,
+    ExperimentSafetyWithWorkflowStatusConnectionId[]
+  > = {};
 
   for (let i = 0; i < experimentSafeties.length; i++) {
     const item = experimentSafeties[i];
