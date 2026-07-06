@@ -29,7 +29,10 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
-import { proposalStatusActionEngine } from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
+import {
+  proposalStatusActionEngine,
+  ProposalWithWorkflowStatusConnectionId,
+} from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
@@ -545,7 +548,11 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    const { workflowStatusId: statusId, proposalPks } = args;
+    const {
+      workflowStatusId: statusId,
+      proposalPks,
+      statusActionsWorkflowConnectionId,
+    } = args;
 
     const result = await this.proposalDataSource.changeProposalsWorkflowStatus(
       statusId,
@@ -553,43 +560,47 @@ export default class ProposalMutations {
     );
 
     if (result.proposals.length === proposalPks.length) {
-      const fullProposals = await Promise.all(
-        proposalPks.map(async (proposalPk) => {
-          const fullProposal = result.proposals.find(
-            (updatedProposal) => updatedProposal.primaryKey === proposalPk
-          );
-
-          if (!fullProposal) {
-            return null;
-          }
-
-          const proposalWorkflow =
-            await this.callDataSource.getProposalWorkflowByCall(
-              fullProposal.callId
+      // Only run status actions if a specific workflow connection was provided
+      if (statusActionsWorkflowConnectionId) {
+        const fullProposals = await Promise.all(
+          proposalPks.map(async (proposalPk) => {
+            const fullProposal = result.proposals.find(
+              (updatedProposal) => updatedProposal.primaryKey === proposalPk
             );
 
-          if (!proposalWorkflow) {
-            return rejection(
-              `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
-              {
-                agent,
-                args,
-              }
-            );
-          }
+            if (!fullProposal) {
+              return null;
+            }
 
-          return {
-            ...fullProposal,
-          };
-        })
-      );
+            const proposalWorkflow =
+              await this.callDataSource.getProposalWorkflowByCall(
+                fullProposal.callId
+              );
 
-      const statusEngineReadyProposals = fullProposals.filter(
-        (item): item is Proposal => !!item
-      );
+            if (!proposalWorkflow) {
+              return rejection(
+                `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
+                {
+                  agent,
+                  args,
+                }
+              );
+            }
 
-      // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      proposalStatusActionEngine(statusEngineReadyProposals);
+            return {
+              proposal: fullProposal,
+              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
+            };
+          })
+        );
+
+        const statusEngineReadyProposals = fullProposals.filter(
+          (item): item is ProposalWithWorkflowStatusConnectionId => !!item
+        );
+
+        // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
+        proposalStatusActionEngine(statusEngineReadyProposals);
+      }
     } else {
       return rejection(
         'Could not change statuses to all of the selected proposals',
@@ -842,12 +853,12 @@ export default class ProposalMutations {
         true
       );
 
-      const defaultWfStatus =
+      const defaultWorkflowStatus =
         await this.workflowDataSource.getInitialWorkflowStatus(
           call.proposalWorkflowId
         );
 
-      if (!defaultWfStatus) {
+      if (!defaultWorkflowStatus) {
         return rejection(
           'Could not clone the proposal because the call has misconfigured workflow statuses',
           { call, sourceProposal }
@@ -860,7 +871,7 @@ export default class ProposalMutations {
         title: `Copy of ${clonedProposal.title}`,
         abstract: clonedProposal.abstract,
         proposerId: sourceProposal.proposerId,
-        workflowStatusId: defaultWfStatus.workflowStatusId,
+        workflowStatusId: defaultWorkflowStatus.workflowStatusId,
         created: new Date(),
         updated: new Date(),
         proposalId: clonedProposal.proposalId,

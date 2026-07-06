@@ -458,6 +458,7 @@
                 "variant": "dropdown",
                 "url": "",
                 "jsonPath": "",
+                "useBaseDomain": false,
                 "isMultipleSelect": true,
                 "apiCallRequestHeaders": [],
                 "readPermissions": []
@@ -473,6 +474,7 @@
               "variant": "dropdown",
               "url": "",
               "jsonPath": "",
+              "useBaseDomain": false,
               "isMultipleSelect": true,
               "apiCallRequestHeaders": [],
               "readPermissions": []
@@ -785,6 +787,7 @@
           "variant": "dropdown",
           "url": "",
           "jsonPath": "",
+          "useBaseDomain": false,
           "isMultipleSelect": true,
           "apiCallRequestHeaders": [],
           "readPermissions": []
@@ -1171,6 +1174,7 @@
                     "variant": "dropdown",
                     "url": "",
                     "jsonPath": "",
+                    "useBaseDomain": false,
                     "isMultipleSelect": true,
                     "apiCallRequestHeaders": [],
                     "readPermissions": []
@@ -1186,6 +1190,7 @@
                   "variant": "dropdown",
                   "url": "",
                   "jsonPath": "",
+                  "useBaseDomain": false,
                   "isMultipleSelect": true,
                   "apiCallRequestHeaders": [],
                   "readPermissions": []
@@ -1403,6 +1408,7 @@
               "variant": "dropdown",
               "url": "",
               "jsonPath": "",
+              "useBaseDomain": false,
               "isMultipleSelect": true,
               "apiCallRequestHeaders": [],
               "readPermissions": []
