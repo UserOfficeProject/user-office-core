@@ -25,27 +25,26 @@ jobs:
           sleep 20 
 
           docker ps
-            
+      
+      - name: download graphql-inspector
+        run: |
+          npm i --global @graphql-inspector/cli graphql
+
+
+      - name: generate base schema
+        run: |
+          graphql-inspector introspect http://localhost:4000/graphql > base-schema.graphql
+      
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
-      # - uses: graphql-hive/graphql-inspector@master
-      #   with:
-      #     schema: 'http://localhost:4000/graphql'
-      #     endpoint: 'http://localhost:4001/graphql'
+      - uses: graphql-hive/graphql-inspector@master
+        with:
+          schema: base-schema.graphql
+          endpoint: 'http://localhost:4001/graphql'
 
       
       - name: manual graphql schema check
         run: |
-          npm i --global @graphql-inspector/cli graphql
           graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
-
-
-      - name: check logs of containers on failure
-        if: failure()
-        run: |
-          echo "Checking logs of containers on failure"
-          docker compose -f docker-compose-graphql-inspection.yml logs backend-base
-          docker compose -f docker-compose-graphql-inspection.yml logs backend-new
-
 
       - name: bring down containers
         run: |
