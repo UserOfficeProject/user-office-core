@@ -35,11 +35,15 @@ jobs:
         run: |
           graphql-inspector introspect http://localhost:4000/graphql > base-schema.graphql
       
+      - name: generate new schema
+        run: |
+          graphql-inspector introspect http://localhost:4001/graphql > new-schema.graphql
+
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
       - uses: graphql-hive/graphql-inspector@master
         with:
           schema: base-schema.graphql
-          endpoint: 'http://localhost:4001/graphql'
+          endpoint: new-schema.graphql
 
       
       - name: manual graphql schema check
