@@ -24,7 +24,7 @@ import { Role, Roles } from '../models/Role';
 import { SettingsId } from '../models/Settings';
 import { UserRole, UserWithRole } from '../models/User';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
-
+//hihi
 @injectable()
 export default class InviteMutations {
   constructor(
@@ -156,6 +156,10 @@ export default class InviteMutations {
     const newEmails = emails.filter((email) => !existingEmails.includes(email));
 
     const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    const deletedInvite1s = existingInvites.filter((invite) =>
       deletedEmails.includes(invite.email)
     );
 
