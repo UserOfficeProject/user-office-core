@@ -162,6 +162,10 @@ export default function AssignRolesView() {
       <Button
         onClick={() => setShowMassRoleAssignment(true)}
         data-cy="update-roles"
+        sx={{
+          marginTop: '1rem',
+        }}
+        disabled={selectedUsers.size === 0}
       >
         Update Roles
       </Button>
