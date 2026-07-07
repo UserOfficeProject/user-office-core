@@ -12,7 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-
       - name: Get PR labels
         id: pr-labels
         uses: joerick/pr-labels-action@v1.0.8
