@@ -65,7 +65,7 @@ export default class DataAccessUsersMutations {
       const existingUserIds = new Set(
         existingDataAccessUsers.map((user) => user.id)
       );
-      const invitedUserIds = userIds.filter(
+      const newlyAddedUserIds = userIds.filter(
         (userId) => !existingUserIds.has(userId)
       );
 
@@ -80,7 +80,7 @@ export default class DataAccessUsersMutations {
         await eventBus.publish({
           type: Event.DATA_ACCESS_USERS_UPDATED,
           proposalPKey: proposalPk,
-          invitedUserIds,
+          newlyAddedUserIds: newlyAddedUserIds,
           key: 'proposalPk',
           loggedInUserId: agent ? agent.id : null,
           isRejection: false,

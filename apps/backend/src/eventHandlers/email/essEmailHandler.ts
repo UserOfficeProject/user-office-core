@@ -353,7 +353,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
     case Event.DATA_ACCESS_USERS_UPDATED: {
       // Only newly added users are notified; a pure removal or no-op update
       // carries an empty list and sends nothing.
-      if (event.invitedUserIds.length === 0) {
+      if (event.newlyAddedUserIds.length === 0) {
         return;
       }
 
@@ -368,7 +368,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
 
       const invitedUsers = await userDataSource.getBasicUsersInfo(
-        event.invitedUserIds
+        event.newlyAddedUserIds
       );
 
       for (const user of invitedUsers) {

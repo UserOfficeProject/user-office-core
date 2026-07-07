@@ -417,7 +417,7 @@ interface UserDataAccessUpdatedEvent extends GeneralEvent {
   proposalPKey: number;
   // Users newly added as data access users in this update (empty on removals
   // or no-op updates). Used to notify only the freshly invited users by email.
-  invitedUserIds: number[];
+  newlyAddedUserIds: number[];
 }
 
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
