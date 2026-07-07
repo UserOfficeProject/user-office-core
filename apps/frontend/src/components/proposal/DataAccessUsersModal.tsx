@@ -87,6 +87,7 @@ const DataAccessUsersModal = ({
               setInvites={() => {}}
               title="Data access users"
               addButtonLabel="Add Data Access User"
+              addModalTitle="Add Data Access User"
               excludeUserIds={excludeUserIds}
             />
             <ActionButtonContainer>
