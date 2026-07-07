@@ -4,7 +4,7 @@ import Link from '@mui/material/Link';
 import React, { useMemo, useState } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
-import { Proposal, ProposalFragment, TemplateCategoryId } from 'generated/sdk';
+import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
 import {
   ProposalsDataQuantity,
   useProposalsData,
@@ -55,7 +55,7 @@ function ProposalList({
 
   const { proposalsData } = useProposalsData(
     { questionaryIds },
-    ProposalsDataQuantity.FULL
+    ProposalsDataQuantity.MINIMAL
   );
 
   const proposalsDataWithId = proposalsData
@@ -79,20 +79,28 @@ function ProposalList({
               variant="outlined"
               data-cy="remove-question-from-proposal-btn"
               onClick={async () => {
-                const proposal = rowData as Proposal;
-                if (!proposal.questionaryId) {
-                  return;
-                }
-
-                const { questionary } = await api().getQuestionary({
-                  questionaryId: proposal.questionaryId,
+                const dataApi = api({
+                  toastErrorMessage: 'Failed to remove question from proposal',
+                  toastSuccessMessage: 'Question removed from proposal',
                 });
 
-                const stepWithQuestion = questionary?.steps.find((step) =>
+                const { proposal } = await dataApi.getProposal({
+                  primaryKey: rowData.primaryKey,
+                });
+
+                if (!proposal?.questionary) {
+                  throw new Error(
+                    `Questionary was not found for proposal ${rowData.proposalId}`
+                  );
+                }
+
+                const stepWithQuestion = proposal.questionary.steps.find((step) =>
                   step.fields.some((field) => field.question.id === question.id)
                 );
                 if (!stepWithQuestion) {
-                  return;
+                  throw new Error(
+                    `Question ${question.id} is not part of proposal ${rowData.proposalId}`
+                  );
                 }
 
                 const answers = stepWithQuestion.fields
@@ -102,10 +110,8 @@ function ProposalList({
                     value: JSON.stringify({ value: field.value ?? null }),
                   }));
 
-                await api({
-                  toastSuccessMessage: 'Question removed from proposal',
-                }).answerTopic({
-                  questionaryId: proposal.questionaryId,
+                await dataApi.answerTopic({
+                  questionaryId: proposal.questionary.questionaryId,
                   topicId: stepWithQuestion.topic.id,
                   answers,
                   isPartialSave: true,
