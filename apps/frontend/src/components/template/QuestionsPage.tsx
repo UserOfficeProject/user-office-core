@@ -107,7 +107,12 @@ function QuestionsPage() {
           title="Answers to the Question"
           data-cy="open-answer-details-btn"
         >
-          <AnswerCountDetails question={rowData} />
+          <AnswerCountDetails
+            question={rowData}
+            onQuestionUsageChanged={() =>
+              tableRef.current && tableRef.current.onQueryChange({})
+            }
+          />
         </ButtonWithDialog>
       ),
     },
@@ -120,7 +125,12 @@ function QuestionsPage() {
           title="Templates using the question"
           data-cy="open-template-details-btn"
         >
-          <TemplateCountDetails question={rowData} />
+          <TemplateCountDetails
+            question={rowData}
+            onQuestionUsageChanged={() =>
+              tableRef.current && tableRef.current.onQueryChange({})
+            }
+          />
         </ButtonWithDialog>
       ),
     },

@@ -294,4 +294,56 @@ context('Questions tests', () => {
 
     cy.contains(`${initialDBData.proposal.title}`);
   });
+
+  it('Officer can remove question from template usage dialog', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get('[placeholder="Search"]')
+      .click()
+      .clear()
+      .type(`${initialDBData.questions.boolean.text}{enter}`);
+
+    cy.get('[data-cy=open-template-details-btn]').first().click();
+    cy.finishedLoading();
+
+    cy.get('[role=dialog] tbody tr')
+      .its('length')
+      .then((initialRowCount) => {
+        cy.get('[data-cy=remove-question-from-template-btn]').first().click();
+        cy.finishedLoading();
+        cy.get('[role=dialog] tbody tr').should(
+          'have.length',
+          initialRowCount - 1
+        );
+      });
+  });
+
+  it('Officer can remove question from proposal usage dialog', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get('[placeholder="Search"]')
+      .click()
+      .clear()
+      .type(`${initialDBData.questions.boolean.text}{enter}`);
+
+    cy.get('[data-cy=open-answer-details-btn]').first().click();
+    cy.finishedLoading();
+
+    cy.get('[role=dialog] tbody tr')
+      .its('length')
+      .then((initialRowCount) => {
+        cy.get('[data-cy=remove-question-from-proposal-btn]').first().click();
+        cy.finishedLoading();
+        cy.get('[role=dialog] tbody tr').should(
+          'have.length',
+          initialRowCount - 1
+        );
+      });
+  });
 });

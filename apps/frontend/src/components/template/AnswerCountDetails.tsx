@@ -1,9 +1,10 @@
 import MaterialTable from '@material-table/core';
+import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
-import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
+import { Proposal, ProposalFragment, TemplateCategoryId } from 'generated/sdk';
 import {
   ProposalsDataQuantity,
   useProposalsData,
@@ -12,6 +13,7 @@ import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQues
 import { useShipments } from 'hooks/shipment/useShipments';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const proposalListColumns = [
   {
@@ -35,25 +37,93 @@ const proposalListColumns = [
   },
 ];
 
-function ProposalList({ question }: { question: QuestionWithUsage }) {
+function ProposalList({
+  question,
+  onQuestionUsageChanged,
+}: {
+  question: QuestionWithUsage;
+  onQuestionUsageChanged?: () => void;
+}) {
   const questionaryIds = useMemo(
     () => question.answers.map((answer) => answer.questionaryId),
     [question]
   );
+  const [removedProposalPrimaryKeys, setRemovedProposalPrimaryKeys] = useState<
+    number[]
+  >([]);
+  const { api } = useDataApiWithFeedback();
+
   const { proposalsData } = useProposalsData(
     { questionaryIds },
-    ProposalsDataQuantity.MINIMAL
+    ProposalsDataQuantity.FULL
   );
 
-  const proposalsDataWithId = proposalsData.map((proposal) =>
-    Object.assign(proposal, { id: proposal.primaryKey })
-  );
+  const proposalsDataWithId = proposalsData
+    .filter((proposal) => !removedProposalPrimaryKeys.includes(proposal.primaryKey))
+    .map((proposal) =>
+      Object.assign(proposal, { id: proposal.primaryKey })
+    );
 
   return (
     <MaterialTable
       style={{ width: '100%' }}
       icons={tableIcons}
-      columns={proposalListColumns}
+      columns={[
+        ...proposalListColumns,
+        {
+          title: '',
+          sorting: false,
+          render: (rowData: ProposalFragment) => (
+            <Button
+              color="error"
+              variant="outlined"
+              data-cy="remove-question-from-proposal-btn"
+              onClick={async () => {
+                const proposal = rowData as Proposal;
+                if (!proposal.questionaryId) {
+                  return;
+                }
+
+                const { questionary } = await api().getQuestionary({
+                  questionaryId: proposal.questionaryId,
+                });
+
+                const stepWithQuestion = questionary?.steps.find((step) =>
+                  step.fields.some((field) => field.question.id === question.id)
+                );
+                if (!stepWithQuestion) {
+                  return;
+                }
+
+                const answers = stepWithQuestion.fields
+                  .filter((field) => field.question.id !== question.id)
+                  .map((field) => ({
+                    questionId: field.question.id,
+                    value: JSON.stringify({ value: field.value ?? null }),
+                  }));
+
+                await api({
+                  toastSuccessMessage: 'Question removed from proposal',
+                }).answerTopic({
+                  questionaryId: proposal.questionaryId,
+                  topicId: stepWithQuestion.topic.id,
+                  answers,
+                  isPartialSave: true,
+                });
+
+                setRemovedProposalPrimaryKeys((proposalPrimaryKeys) =>
+                  proposalPrimaryKeys.includes(proposal.primaryKey)
+                    ? proposalPrimaryKeys
+                    : [...proposalPrimaryKeys, proposal.primaryKey]
+                );
+                onQuestionUsageChanged?.();
+              }}
+            >
+              Remove
+            </Button>
+          ),
+        },
+      ]}
       data={proposalsDataWithId}
       title="Proposals"
       options={{ paging: false }}
@@ -113,11 +183,19 @@ function ShipmentList({ question }: { question: QuestionWithUsage }) {
   );
 }
 
-function AnswerCountDetails(props: { question: QuestionWithUsage | null }) {
+function AnswerCountDetails(props: {
+  question: QuestionWithUsage | null;
+  onQuestionUsageChanged?: () => void;
+}) {
   const question = props.question;
   switch (question?.categoryId) {
     case TemplateCategoryId.PROPOSAL_QUESTIONARY:
-      return <ProposalList question={question} />;
+      return (
+        <ProposalList
+          question={question}
+          onQuestionUsageChanged={props.onQuestionUsageChanged}
+        />
+      );
     case TemplateCategoryId.SAMPLE_DECLARATION:
       return <SampleList question={question} />;
     case TemplateCategoryId.SHIPMENT_DECLARATION:
