@@ -28,7 +28,7 @@ export default class StatusActionQueries {
     public emailTemplateDataSource: EmailTemplateDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getStatusAction(agent: UserWithRole | null, actionId: number) {
     const statusAction = await this.dataSource.getStatusAction(actionId);
 
@@ -42,7 +42,7 @@ export default class StatusActionQueries {
     return statusActions;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getConnectionStatusActions(
     agent: UserWithRole | null,
     { workflowConnectionId }: { workflowConnectionId: number }
@@ -50,7 +50,7 @@ export default class StatusActionQueries {
     return this.dataSource.getConnectionStatusActions(workflowConnectionId);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getStatusActionConfig(
     agent: UserWithRole | null,
     statusAction: StatusAction
