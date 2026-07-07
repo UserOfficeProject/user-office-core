@@ -12,6 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+
+      - name: Get PR labels
+        id: pr-labels
+        uses: joerick/pr-labels-action@v1.0.8
+
       - name: Set up postgress dbs
         run: |
           docker compose -f docker-compose-graphql-inspection.yml up -d db-base db-new
@@ -27,36 +32,22 @@ jobs:
           sleep 20 
 
           docker ps
-      
-      - name: download graphql-inspector
-        run: |
-          npm i --global @graphql-inspector/cli graphql
-
-
-      - name: generate base schema
-        run: |
-          graphql-inspector introspect http://localhost:4000/graphql --write base-schema.graphql
-
-          cat base-schema.graphql
-      
-      - name: generate new schema
-        run: |
-          graphql-inspector introspect http://localhost:4001/graphql --write new-schema.graphql
-
-      # - name: graphql-inspector diff
-      #   run: |
-      #     graphql-inspector diff base-schema.graphql new-schema.graphql
 
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
-      - uses: graphql-hive/graphql-inspector@master
-        with:
-          schema: http://localhost:4001/graphql
-          endpoint: http://localhost:4000/graphql
+      # - uses: graphql-hive/graphql-inspector@master
+      #   with:
+      #     schema: http://localhost:4001/graphql
+      #     endpoint: http://localhost:4000/graphql
       
-      # - name: manual graphql schema check
-      #   run: |
-      #     graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
+      - name: manual graphql schema check
+        run: |
+          if [ -n "$GITHUB_PR_LABEL_BREAKING:CHANGE" ]; then
+            exit 0
+          fi
+          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
 
       - name: bring down containers
+        if: always()
         run: |
           docker compose -f docker-compose-graphql-inspection.yml down
+
