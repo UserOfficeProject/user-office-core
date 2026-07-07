@@ -51,6 +51,8 @@ jobs:
           if [ -n "$GITHUB_PR_LABEL_BREAKING:CHANGE" ]; then
             exit 0
           fi
+          echo "Breaking changes detected, but no label was found."
+          echo "Please make sure to label this PR as breaking and inform teams in the collaboration"
           exit 1
 
       - name: bring down containers
