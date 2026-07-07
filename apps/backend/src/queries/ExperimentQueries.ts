@@ -4,13 +4,11 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { Authorized } from '../decorators';
+import { ExperimentTableSortField } from '../models/Experiment';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ExperimentSampleArgs } from '../resolvers/queries/ExperimentSampleQuery';
-import {
-  ExperimentsFilter,
-  ExperimentTableSortField,
-} from '../resolvers/queries/ExperimentsQuery';
+import { ExperimentsFilter } from '../resolvers/queries/ExperimentsQuery';
 import { Experiment } from '../resolvers/types/Experiment';
 import { ExperimentHasSample } from '../resolvers/types/ExperimentHasSample';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';

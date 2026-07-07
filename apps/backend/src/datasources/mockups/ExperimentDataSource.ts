@@ -3,6 +3,7 @@ import {
   ExperimentSafety,
   ExperimentHasSample,
   ExperimentStatus,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../../models/Experiment';
@@ -12,7 +13,6 @@ import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExpe
 import {
   UserExperimentsFilter,
   ExperimentsFilter,
-  ExperimentTableSortField,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { ExperimentDataSource } from '../ExperimentDataSource';

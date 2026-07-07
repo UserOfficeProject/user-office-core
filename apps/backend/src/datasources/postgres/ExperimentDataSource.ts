@@ -7,13 +7,13 @@ import {
   ExperimentHasSample,
   ExperimentSafety,
   ExperimentSafetyReviewerDecisionEnum,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsFilter,
-  ExperimentTableSortField,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';

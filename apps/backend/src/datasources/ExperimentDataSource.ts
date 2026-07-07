@@ -2,6 +2,7 @@ import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
@@ -11,7 +12,6 @@ import { ExperimentSafetyEventsRecord } from './postgres/records';
 import {
   ExperimentsFilter,
   UserExperimentsFilter,
-  ExperimentTableSortField,
 } from '../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../utils/pagination';
 

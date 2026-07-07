@@ -8,11 +8,13 @@ import {
   Int,
   InputType,
   ObjectType,
-  registerEnumType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ExperimentStatus } from '../../models/Experiment';
+import {
+  ExperimentStatus,
+  ExperimentTableSortField,
+} from '../../models/Experiment';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { Experiment } from '../types/Experiment';
 
@@ -24,18 +26,6 @@ class TimeSpan {
   @Field({ nullable: true })
   to?: Date;
 }
-
-export enum ExperimentTableSortField {
-  experimentId = 'experimentId',
-  proposalId = 'proposalId',
-  startsAt = 'startsAt',
-  endsAt = 'endsAt',
-}
-
-registerEnumType(ExperimentTableSortField, {
-  name: 'ExperimentTableSortField',
-  description: 'Experiment table columns that support sorting',
-});
 
 @InputType()
 export class ExperimentsFilter {
