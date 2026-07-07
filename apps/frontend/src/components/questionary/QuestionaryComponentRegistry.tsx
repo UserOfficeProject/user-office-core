@@ -18,6 +18,7 @@ import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmis
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
+import { dateRangeDefinition } from './questionaryComponents/DateRangePicker/DateRangePickerDefinition';
 import { dynamicMultipleChoiceDefinition } from './questionaryComponents/DynamicMultipleChoice/DynamicMultipleChoiceDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
 import { experimentSafetyReviewBasisDefinition } from './questionaryComponents/ExperimentSafetyReviewBasis/experimentSafetyReviewBasisDefinition';
@@ -163,6 +164,7 @@ export interface QuestionaryComponentDefinition {
 const registry = [
   booleanDefinition,
   dateDefinition,
+  dateRangeDefinition,
   embellishmentDefinition,
   feedbackBasisDefinition,
   fileUploadDefinition,

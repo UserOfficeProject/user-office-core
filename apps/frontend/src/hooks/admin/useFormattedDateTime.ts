@@ -24,7 +24,7 @@ export function useFormattedDateTime(params?: {
     });
 
     if (!format) {
-      // IF format is not provided with the settings return some default one from luxon
+      // If format is not provided with the settings return some default one from luxon
       return dateTime.toLocaleString(DateTime.DATETIME_SHORT);
     }
 
