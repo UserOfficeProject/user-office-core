@@ -120,7 +120,10 @@ export default function ExperimentSafetyContainer(
   props: ExperimentSafetyContainerProps
 ) {
   const [initialState] = useState(
-    new ExperimentSafetySubmissionState(props.experimentSafety)
+    new ExperimentSafetySubmissionState(
+      props.experimentSafety,
+      props.previewMode
+    )
   );
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL_ESI);
 

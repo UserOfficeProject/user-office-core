@@ -7,8 +7,11 @@ import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ExperimentSafetySubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public experimentSafety: ExperimentSafetyWithQuestionary) {
-    super(TemplateGroupId.PROPOSAL_ESI, experimentSafety);
+  constructor(
+    public experimentSafety: ExperimentSafetyWithQuestionary,
+    public previewMode: boolean | undefined
+  ) {
+    super(TemplateGroupId.PROPOSAL_ESI, experimentSafety, previewMode);
     this.stepIndex = this.getInitialStepIndex();
   }
 
