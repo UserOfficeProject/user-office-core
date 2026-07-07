@@ -28,10 +28,10 @@ const toDateTime = (value: unknown): DateTime | undefined => {
   }
 
   if (typeof value === 'string') {
-    return DateTime.fromISO(value);
-  }
+    const parsed = DateTime.fromISO(value);
 
-  return undefined;
+    return parsed.isValid ? parsed : undefined;
+  }
 };
 
 function QuestionaryComponentVisitBasis({

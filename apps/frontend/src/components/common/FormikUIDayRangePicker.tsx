@@ -1,5 +1,5 @@
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import { Button, IconButton } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
@@ -104,8 +104,8 @@ export default function DayRangePicker({
     : undefined;
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 1 }}>
+    <Box style={{ display: 'flex' }}>
+      <Box style={{ flex: 1 }}>
         <TextField
           onClick={(event) => setAnchorEl(event.currentTarget)}
           data-cy={id}
@@ -120,7 +120,7 @@ export default function DayRangePicker({
           InputLabelProps={{ shrink: true }}
           InputProps={{ readOnly: true }}
         />
-      </div>
+      </Box>
       <IconButton
         onClick={(event) => setAnchorEl(event.currentTarget)}
         disabled={disabled}
@@ -145,7 +145,7 @@ export default function DayRangePicker({
             disabled={disabledDays}
           />
         </StyledPickerWrapper>
-        <div
+        <Box
           style={{
             display: 'flex',
             justifyContent: 'flex-end',
@@ -160,8 +160,8 @@ export default function DayRangePicker({
           >
             Done
           </Button>
-        </div>
+        </Box>
       </Popover>
-    </div>
+    </Box>
   );
 }
