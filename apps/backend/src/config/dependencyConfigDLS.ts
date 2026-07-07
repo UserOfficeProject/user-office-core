@@ -1,15 +1,15 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
+import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
 import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { DLSUserAuthorization } from '../auth/DLSUserAuthorization';
-import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
-import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
-import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';

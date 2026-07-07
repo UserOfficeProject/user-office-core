@@ -66,6 +66,7 @@ const dynamicMultipleChoiceQuestion = {
   title: faker.lorem.words(2),
   url: 'http://localhost:9000',
   jsonPath: '$.*.item',
+  useBaseDomain: false,
   answers: {
     arrayString: [
       faker.lorem.words(3),

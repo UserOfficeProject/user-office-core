@@ -29,6 +29,7 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.variant = 'radio';
       config.url = '';
       config.jsonPath = '';
+      config.useBaseDomain = false;
       config.isMultipleSelect = false;
       config.apiCallRequestHeaders = [];
       config.readPermissions = [];
