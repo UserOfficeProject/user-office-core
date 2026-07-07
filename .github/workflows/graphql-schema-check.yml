@@ -41,10 +41,11 @@ jobs:
       
       - name: manual graphql schema check
         run: |
+          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
+  
           if [ -n "$GITHUB_PR_LABEL_BREAKING:CHANGE" ]; then
             exit 0
           fi
-          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
 
       - name: bring down containers
         if: always()
