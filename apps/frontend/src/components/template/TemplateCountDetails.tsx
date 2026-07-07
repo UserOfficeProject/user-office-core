@@ -62,10 +62,10 @@ function TemplateCountDetails({
               questionId: question.id,
             });
 
-            setRemovedTemplateIds((templateIds) =>
-              templateIds.includes(rowData.templateId)
-                ? templateIds
-                : [...templateIds, rowData.templateId]
+            setRemovedTemplateIds((prevTemplateIds) =>
+              prevTemplateIds.includes(rowData.templateId)
+                ? prevTemplateIds
+                : [...prevTemplateIds, rowData.templateId]
             );
             onQuestionUsageChanged?.();
           }}

@@ -90,7 +90,7 @@ function ProposalList({
 
                 if (!proposal?.questionary) {
                   throw new Error(
-                    `Questionary was not found for proposal ${rowData.proposalId}`
+                    `Questionary was not found for proposal ${rowData.primaryKey}`
                   );
                 }
 
@@ -107,6 +107,7 @@ function ProposalList({
                   .filter((field) => field.question.id !== question.id)
                   .map((field) => ({
                     questionId: field.question.id,
+                    // answerTopic expects answer payload in shape { value: ... }
                     value: JSON.stringify({ value: field.value ?? null }),
                   }));
 
@@ -117,10 +118,10 @@ function ProposalList({
                   isPartialSave: true,
                 });
 
-                setRemovedProposalPrimaryKeys((proposalPrimaryKeys) =>
-                  proposalPrimaryKeys.includes(proposal.primaryKey)
-                    ? proposalPrimaryKeys
-                    : [...proposalPrimaryKeys, proposal.primaryKey]
+                setRemovedProposalPrimaryKeys((prevProposalPrimaryKeys) =>
+                  prevProposalPrimaryKeys.includes(proposal.primaryKey)
+                    ? prevProposalPrimaryKeys
+                    : [...prevProposalPrimaryKeys, proposal.primaryKey]
                 );
                 onQuestionUsageChanged?.();
               }}
