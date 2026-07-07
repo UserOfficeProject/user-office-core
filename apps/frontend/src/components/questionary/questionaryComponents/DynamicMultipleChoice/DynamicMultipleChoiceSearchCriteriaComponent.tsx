@@ -10,10 +10,12 @@ function DynamicMultipleChoiceSearchCriteriaComponent({
   onChange,
   questionTemplateRelation,
   searchCriteria,
+  templateId,
 }: SearchCriteriaInputProps) {
   const [value, setValue] = useState(searchCriteria?.value ?? '');
   const { options, loadingOptions } = useGetDynamicMultipleChoiceOptions(
-    questionTemplateRelation.question.id
+    questionTemplateRelation.question.id,
+    templateId
   );
 
   return (

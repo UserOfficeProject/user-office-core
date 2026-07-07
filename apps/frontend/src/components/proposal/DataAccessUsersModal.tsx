@@ -99,6 +99,7 @@ const DataAccessUsersModal = ({
               setInvites={setInvites}
               title="Data access users"
               addButtonLabel="Add Data Access User"
+              addModalTitle="Add Data Access User"
               excludeUserIds={excludeUserIds}
               allowInviteByEmail={true}
             />
