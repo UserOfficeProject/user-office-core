@@ -40,14 +40,19 @@ jobs:
       #     endpoint: http://localhost:4000/graphql
       
       - name: manual graphql schema check
+        continue-on-error: true
         run: |
           npm install -g @graphql-inspector/cli
 
           graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
   
+      - name: check if breaking changes are anticipated
+        if: failure()
+        run: |
           if [ -n "$GITHUB_PR_LABEL_BREAKING:CHANGE" ]; then
             exit 0
           fi
+          exit 1
 
       - name: bring down containers
         if: always()
