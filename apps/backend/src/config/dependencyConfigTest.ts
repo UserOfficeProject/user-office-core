@@ -2,11 +2,13 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { Tokens } from './Tokens';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
@@ -54,7 +56,6 @@ import { createApplicationEventBus } from '../events';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
-import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.RoleDataSource, RoleDataSourceMock);
@@ -130,3 +131,4 @@ mapValue(Tokens.ConfigureLogger, () =>
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
+mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);

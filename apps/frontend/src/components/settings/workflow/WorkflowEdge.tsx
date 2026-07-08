@@ -112,10 +112,11 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: data?.isReadOnly ? 'none' : 'all',
           }}
           className="nodrag nopan"
         >
-          {!data?.isReadOnly && events.length > 0 && (
+          {events.length > 0 && (
             <List
               data-cy={`edge-label-events-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >
@@ -124,7 +125,7 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
               ))}
             </List>
           )}
-          {!data?.isReadOnly && statusActions.length > 0 && (
+          {statusActions.length > 0 && (
             <ActionList
               data-cy={`edge-label-actions-list-${data?.sourceStatusId}-${data?.targetStatusId}`}
             >

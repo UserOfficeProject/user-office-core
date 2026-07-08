@@ -42,8 +42,17 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
         height: '1000px',
       }}
       ref={setContainerRef}
+      data-cy="pdf-template-preview"
     >
-      <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>
+      <Document
+        file={fileUrl}
+        onLoadSuccess={onDocumentLoadSuccess}
+        error={
+          <div data-cy="pdf-template-preview-error">
+            Failed to load PDF file.
+          </div>
+        }
+      >
         {Array.from(new Array(numPages), (_el, index) => (
           <Page
             key={`page_${index + 1}`}
