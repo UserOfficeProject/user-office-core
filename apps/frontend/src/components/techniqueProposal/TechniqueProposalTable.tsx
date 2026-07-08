@@ -31,6 +31,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -193,9 +194,9 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
     instrumentFilter: {
-      instrumentId: instrument ? +instrument : null,
+      instrumentIds: parseInstrumentQuery(instrument),
       showAllProposals: !instrument,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrument === 'multi',
     },
     techniqueFilter: {
       techniqueId: technique ? +technique : null,
@@ -332,13 +333,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const updateProposalStatus = async (
     proposalPk: number,
-    workflowStatusId: number
+    workflowStatusId: number,
+    statusActionsWorkflowConnectionId?: number
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Proposal status updated successfully!',
     }).changeTechniqueProposalsStatus({
       workflowStatusId: workflowStatusId,
       proposalPks: [proposalPk],
+      statusActionsWorkflowConnectionId,
     });
 
     refreshTableData();
@@ -618,10 +621,33 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                                 'Selected workflow status not found'
                               );
                             }
-                            updateProposalStatus(
-                              rowData.primaryKey,
-                              selectedWorkflowStatus.workflowStatusId
-                            );
+
+                            return api()
+                              .getWorkflow({
+                                workflowId: rowData.workflowId,
+                                entityType: WorkflowType.PROPOSAL,
+                              })
+                              .then(({ workflow }) => {
+                                const connectionsWithActions =
+                                  workflow?.connections.filter(
+                                    (conn) =>
+                                      conn.nextWorkflowStatusId ===
+                                        selectedWorkflowStatus.workflowStatusId &&
+                                      conn.statusActions &&
+                                      conn.statusActions.length > 0
+                                  ) || [];
+
+                                const statusActionsWorkflowConnectionId =
+                                  connectionsWithActions.length === 1
+                                    ? connectionsWithActions[0].id
+                                    : undefined;
+
+                                updateProposalStatus(
+                                  rowData.primaryKey,
+                                  selectedWorkflowStatus.workflowStatusId,
+                                  statusActionsWorkflowConnectionId
+                                );
+                              });
                           });
                       },
                       {

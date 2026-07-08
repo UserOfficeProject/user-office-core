@@ -21,7 +21,7 @@ services:
       - 'traefik.http.routers.traefik.entrypoints=web'
       - 'traefik.http.routers.traefik.service=api@internal'
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -62,7 +62,7 @@ services:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
       JWT_TOKEN_LIFE: 7d
-      BASE_URL: localhost:33000
+      BASE_URL: http://localhost:33000
       NODE_ENV: development
       USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
       AUTH_DISCOVERY_URL: http://host.docker.internal:5001/.well-known/openid-configuration

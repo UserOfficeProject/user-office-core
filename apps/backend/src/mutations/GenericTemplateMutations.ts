@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql/error/GraphQLError';
 import { container, inject, injectable } from 'tsyringe';
 
 import { GenericTemplateAuthorization } from '../auth/GenericTemplateAuthorization';
@@ -92,6 +93,10 @@ export default class GenericTemplateMutations {
         );
       })
       .catch((error) => {
+        if (error instanceof GraphQLError) {
+          throw error;
+        }
+
         return rejection(
           'Can not create genericTemplate because an error occurred',
           { agent, args },
