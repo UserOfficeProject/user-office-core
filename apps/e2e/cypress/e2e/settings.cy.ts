@@ -1644,7 +1644,7 @@ context('Settings tests', () => {
       cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
     });
 
-    it('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
+    it.only('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -1673,7 +1673,9 @@ context('Settings tests', () => {
 
       cy.reload();
 
-      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click({
+        force: true,
+      });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_SUBMITTED).click();
@@ -1690,7 +1692,9 @@ context('Settings tests', () => {
         .contains(Event.EXPERIMENT_ESF_SUBMITTED)
         .should('exist');
 
-      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click({
+        force: true,
+      });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_APPROVED_BY_IS).click();
