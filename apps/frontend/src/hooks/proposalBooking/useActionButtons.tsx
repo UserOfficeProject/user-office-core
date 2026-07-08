@@ -79,7 +79,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
-    if (isPiOrCoProposer(user, event)) {
+    if (isPiOrCoProposer(user, event) || isTeamlead(user, event)) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
