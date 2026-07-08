@@ -8,11 +8,10 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
-function searchMuiTableAsync(search: string) {
-  cy.get('[data-cy="co-proposers"] [aria-label="Search"]').type(search);
-
-  cy.get('[role="progressbar"]').should('exist');
-  cy.get('[role="progressbar"]').should('not.exist');
+function addUserThroughModal(search: string) {
+  cy.get('[data-cy="invite-user-autocomplete"]').type(search);
+  cy.get('[role="presentation"]').contains(search).click();
+  cy.get('[data-cy="invite-user-submit-button"]').should('be.enabled').click();
 }
 
 const fapMembers = {
@@ -219,11 +218,6 @@ context('General facility access panel tests', () => {
           roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
         });
       }
-      let selectedChairUserFirstName = '';
-      let selectedChairUserLastName = '';
-      let selectedSecretaryUserFirstName = '';
-      let selectedSecretaryUserLastName = '';
-
       cy.visit('/Faps');
       cy.finishedLoading();
       cy.contains(fap1.code)
@@ -237,18 +231,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.chair.lastName);
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .then((cells) => {
-          const preferredName = cells.eq(2).text().trim();
-          selectedChairUserFirstName = preferredName || cells.eq(0).text();
-          selectedChairUserLastName = cells.eq(1).text();
-        });
-
-      cy.get('[aria-label="Select user"]').first().click();
+      addUserThroughModal(fapMembers.chair.lastName);
 
       cy.notification({
         variant: 'success',
@@ -261,9 +244,7 @@ context('General facility access panel tests', () => {
 
       cy.get('input[id="FapChair-' + fapMembers.chair.id + '"]').should(
         (element) => {
-          expect(element.val()).to.equal(
-            `${selectedChairUserFirstName} ${selectedChairUserLastName}`
-          );
+          expect(element.val()).to.contain(fapMembers.chair.lastName);
         }
       );
 
@@ -271,18 +252,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.secretary.lastName);
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .then((cells) => {
-          const preferredName = cells.eq(2).text().trim();
-          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
-          selectedSecretaryUserLastName = cells.eq(1).text();
-        });
-
-      cy.get('[aria-label="Select user"]').first().click();
+      addUserThroughModal(fapMembers.secretary.lastName);
 
       cy.notification({
         variant: 'success',
@@ -297,9 +267,7 @@ context('General facility access panel tests', () => {
 
       cy.get('input[id="FapSecretary-' + fapMembers.secretary.id + '"]').should(
         (element) => {
-          expect(element.val()).to.contain(
-            `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
-          );
+          expect(element.val()).to.contain(fapMembers.secretary.lastName);
         }
       );
 
@@ -307,18 +275,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.reviewer.lastName);
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .then((cells) => {
-          const preferredName = cells.eq(2).text().trim();
-          selectedSecretaryUserFirstName = preferredName || cells.eq(0).text();
-          selectedSecretaryUserLastName = cells.eq(1).text();
-        });
-
-      cy.get('[aria-label="Select user"]').first().click();
+      addUserThroughModal(fapMembers.reviewer.lastName);
 
       cy.notification({
         variant: 'success',
@@ -327,9 +284,7 @@ context('General facility access panel tests', () => {
 
       cy.get('input[id="FapSecretary-' + fapMembers.reviewer.id + '"]').should(
         (element) => {
-          expect(element.val()).to.contain(
-            `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
-          );
+          expect(element.val()).to.contain(fapMembers.reviewer.lastName);
         }
       );
     });
@@ -403,11 +358,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.reviewer.lastName);
-
-      cy.get('input[type="checkbox"]').eq(1).click();
-
-      cy.contains('Update').click();
+      addUserThroughModal(fapMembers.reviewer.lastName);
 
       cy.notification({
         variant: 'success',
@@ -544,11 +495,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.reviewer.lastName);
-
-      cy.get('input[type="checkbox"]').eq(1).click();
-
-      cy.contains('Update').click();
+      addUserThroughModal(fapMembers.reviewer.lastName);
 
       cy.notification({
         variant: 'success',
@@ -672,11 +619,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(fapMembers.reviewer.lastName);
-
-      cy.get('input[type="checkbox"]').eq(1).click();
-
-      cy.contains('Update').click();
+      addUserThroughModal(fapMembers.reviewer.lastName);
 
       cy.notification({
         variant: 'success',
