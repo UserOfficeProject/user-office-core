@@ -329,12 +329,18 @@ jobs:
       fail-fast: false
       matrix:
         pattern:
+          - id: calls
+            files: cypress/e2e/calls.cy.ts
+          - id: experimentSafetyReview
+            files: cypress/e2e/experimentSafetyReview.cy.ts
           - id: ae
-            files: cypress/e2e/[a-e]*.ts
+            files: cypress/e2e/[a-e]!(alls|xperimentSafetyReview)*.ts
           - id: fh
             files: cypress/e2e/[f-h]*.ts
+          - id: instruments
+            files: cypress/e2e/instruments.cy.ts
           - id: io
-            files: cypress/e2e/[i-o]*.ts
+            files: cypress/e2e/[i-o]!(nstruments)*.ts
           - id: p-am
             files: cypress/e2e/p[a-m]*.ts
           - id: p-nz
@@ -343,10 +349,14 @@ jobs:
             files: cypress/e2e/proposals*.ts
           - id: rs
             files: cypress/e2e/[r-s]*.ts
+          - id: techniqueProposals
+            files: cypress/e2e/techniqueProposals.cy.ts
+          - id: templateDeleteAndArchive
+            files: cypress/e2e/templateDeleteAndArchive.cy.ts
+          - id: templatesBasic
+            files: cypress/e2e/templatesBasic.cy.ts
           - id: t
-            files: cypress/e2e/t!(emplatesBasic).ts
-          - id: templateDelete
-            files: cypress/e2e/templatesBasic*.ts
+            files: cypress/e2e/t!(echniqueProposals|emplateDeleteAndArchive|emplatesBasic).ts
           - id: uz
             files: cypress/e2e/[u-z]*.ts
           - id: AZ
