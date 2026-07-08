@@ -106,7 +106,9 @@ export class VisitAuthorization {
       proposal
     );
 
-    if (isMemberOfProposal === false) {
+    const isTeamLead = agent.id === visit.teamLeadUserId;
+
+    if (!isMemberOfProposal && !isTeamLead) {
       logger.logWarn('User tried to update visit without having write rights', {
         agent,
         visit,
