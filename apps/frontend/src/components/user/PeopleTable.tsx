@@ -5,8 +5,11 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import SearchIcon from '@mui/icons-material/Search';
+import { Grid, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
@@ -61,6 +64,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   isFreeAction?: boolean;
   data?: T[];
   search?: boolean;
+  customSearch?: boolean;
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [T[]]>;
   emailInvite?: boolean;
@@ -148,6 +152,7 @@ const PeopleTable = ({
   mtOptions,
   onRemove,
   search,
+  customSearch,
   title,
   persistUrlQueryParams = false,
 }: PeopleTableProps) => {
@@ -158,18 +163,17 @@ const PeopleTable = ({
     subtractUsers: selectedUsers ? selectedUsers : [],
     userRole: userRole ? userRole : null,
   });
-
   const featureContext = useContext(FeatureContext);
   const isEmailSearchEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
 
   const api = useDataApi();
-
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchName, setSearchName] = useState('');
   const tableRef =
     React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
 
@@ -185,6 +189,11 @@ const PeopleTable = ({
     tableRef.current && tableRef.current.onQueryChange({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.length]);
+
+  useEffect(() => {
+    tableRef.current && tableRef.current.onQueryChange({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.get('search')]);
 
   const actionArray = [];
   action &&
@@ -270,7 +279,7 @@ const PeopleTable = ({
                 : orderBy?.orderDirection == PaginationSortDirection.DESC
                   ? PaginationSortDirection.DESC
                   : undefined,
-            searchText: tableQuery.search,
+            searchText: searchParams.get('search') ?? tableQuery.search,
           })
           .then(({ users }) => {
             const filteredData = data
@@ -320,210 +329,269 @@ const PeopleTable = ({
       }
     });
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      setSearchParams((searchParams) => {
+        if (searchName) {
+          searchParams.set('search', searchName);
+        } else {
+          searchParams.delete('search');
+        }
+
+        return searchParams;
+      });
+    } else {
+      return searchParams;
+    }
+  };
+
   return (
-    <Formik
-      initialValues={{
-        email: '',
-      }}
-      onSubmit={async (values, { setFieldError, setFieldValue }) => {
-        // If there is an email and it has not already been searched
-        if (values.email && !tableEmails.includes(values.email)) {
-          const userDetails = await getUserByEmail(values.email, api);
+    <Box>
+      <Formik
+        initialValues={{
+          email: '',
+        }}
+        onSubmit={async (values, { setFieldError, setFieldValue }) => {
+          // If there is an email and it has not already been searched
+          if (values.email && !tableEmails.includes(values.email)) {
+            const userDetails = await getUserByEmail(values.email, api);
 
-          if (!userDetails) {
-            setFieldError('email', 'No user found for the given email');
+            if (!userDetails) {
+              setFieldError('email', 'No user found for the given email');
 
-            return;
-          }
-
-          if (selectedUsers?.includes(userDetails.id)) {
-            setFieldError('email', 'User has already been added');
-
-            return;
-          }
-
-          if (invitedUsers.every((user) => user.id !== userDetails.id)) {
-            //Add users to the table
-            setInvitedUsers([userDetails].concat(invitedUsers));
-            setTableEmails(tableEmails.concat([values.email]));
-            setFieldValue('email', '');
-
-            //If we are selecting multiple users add the user as pre selected.
-            if (selection) {
-              setSelectedParticipants?.(
-                selectedParticipants?.concat([userDetails]) || []
-              );
+              return;
             }
 
-            setQuery({
-              ...query,
-              subtractUsers: (query.subtractUsers as number[]).concat(
-                userDetails.id
-              ),
-            });
-            tableRef.current && tableRef.current.onQueryChange({});
+            if (selectedUsers?.includes(userDetails.id)) {
+              setFieldError('email', 'User has already been added');
+
+              return;
+            }
+
+            if (invitedUsers.every((user) => user.id !== userDetails.id)) {
+              //Add users to the table
+              setInvitedUsers([userDetails].concat(invitedUsers));
+              setTableEmails(tableEmails.concat([values.email]));
+              setFieldValue('email', '');
+
+              //If we are selecting multiple users add the user as pre selected.
+              if (selection) {
+                setSelectedParticipants?.(
+                  selectedParticipants?.concat([userDetails]) || []
+                );
+              }
+
+              setQuery({
+                ...query,
+                subtractUsers: (query.subtractUsers as number[]).concat(
+                  userDetails.id
+                ),
+              });
+              tableRef.current && tableRef.current.onQueryChange({});
+            } else {
+              setFieldError('email', 'Could not add user to Proposal');
+            }
+          } else if (tableEmails.includes(values.email)) {
+            setFieldError(
+              'email',
+              'User has already been added, possibly use filter instead'
+            );
           } else {
-            setFieldError('email', 'Could not add user to Proposal');
+            setFieldError('email', 'Please enter a email');
           }
-        } else if (tableEmails.includes(values.email)) {
-          setFieldError(
-            'email',
-            'User has already been added, possibly use filter instead'
-          );
-        } else {
-          setFieldError('email', 'Please enter a email');
-        }
-      }}
-    >
-      <Box
-        data-cy="co-proposers"
-        sx={{
-          '& .MuiToolbar-gutters': {
-            paddingLeft: '0',
-          },
         }}
       >
-        <MaterialTable
-          tableRef={tableRef}
-          icons={tableIcons}
-          title={
-            <Typography variant="h6" component="h1">
-              {title}
-            </Typography>
-          }
-          columns={setSortDirectionOnSortField(
-            columns ? columns : localColumns,
-            persistUrlQueryParams ? searchParams.get('sortField') : '',
-            sortDirection === PaginationSortDirection.ASC
-              ? PaginationSortDirection.ASC
-              : sortDirection === PaginationSortDirection.DESC
-                ? PaginationSortDirection.DESC
-                : undefined
+        <Box
+          data-cy="co-proposers"
+          sx={{
+            '& .MuiToolbar-gutters': {
+              paddingLeft: '0',
+            },
+          }}
+        >
+          {customSearch && (
+            <Grid
+              container
+              direction={'row'}
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: '-30px',
+                marginBottom: '-10px',
+              }}
+            >
+              <Tooltip title="Filter Found Users">
+                <SearchIcon
+                  sx={(theme) => ({
+                    marginRight: theme.spacing(1),
+                    alignSelf: 'center',
+                    fontSize: 'large',
+                    color: theme.palette.primary.main,
+                  })}
+                ></SearchIcon>
+              </Tooltip>
+              <TextField
+                id="people-search"
+                data-cy="people-search"
+                label="Filter found users"
+                type="search"
+                variant="standard"
+                onKeyDown={handleKeyDown}
+                value={searchName}
+                helperText={'Press Enter to search'}
+                onChange={(e) => setSearchName(e.target.value)}
+                sx={(theme) => ({
+                  flex: 1,
+                  alignSelf: 'center',
+                  maxWidth: 260,
+                  marginRight: theme.spacing(3),
+                })}
+              />
+            </Grid>
           )}
-          onSelectionChange={handleColumnSelectionChange}
-          data={fetchRemoteUsersData}
-          onPageChange={(page) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                searchParams.set('page', page.toString());
 
-                return searchParams;
-              });
-          }}
-          onRowsPerPageChange={(pageSize) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                searchParams.set('pageSize', pageSize.toString());
-                searchParams.set('page', '0');
-
-                return searchParams;
-              });
-          }}
-          onSearchChange={(searchText) => {
-            persistUrlQueryParams &&
-              setSearchParams((searchParams) => {
-                if (searchText) {
-                  searchParams.set('search', searchText);
-                  searchParams.set('page', '0');
-                } else {
-                  searchParams.delete('search');
-                }
-
-                return searchParams;
-              });
-          }}
-          onOrderCollectionChange={(orderByCollection) => {
-            const [orderBy] = orderByCollection;
-
-            if (!orderBy) {
-              persistUrlQueryParams &&
-                setSearchParams((searchParams) => {
-                  searchParams.delete('sortField');
-                  searchParams.delete('sortDirection');
-
-                  return searchParams;
-                });
-            } else {
-              persistUrlQueryParams &&
-                setSearchParams((searchParams) => {
-                  searchParams.set('sortField', orderBy.orderByField);
-                  searchParams.set('sortDirection', orderBy.orderDirection);
-
-                  return searchParams;
-                });
+          <MaterialTable
+            tableRef={tableRef}
+            icons={tableIcons}
+            title={
+              <Typography variant="h6" component="h1">
+                {title}
+              </Typography>
             }
-          }}
-          options={{
-            search: search,
-            searchText: persistUrlQueryParams
-              ? searchParams.get('search') || undefined
-              : undefined,
-            debounceInterval: 400,
-            selection: selection,
-            headerSelectionProps: {
-              inputProps: { 'aria-label': 'Select All Rows' },
-            },
-            pageSize:
-              persistUrlQueryParams && searchParams.get('pageSize')
-                ? +searchParams.get('pageSize')!
+            columns={setSortDirectionOnSortField(
+              columns ? columns : localColumns,
+              persistUrlQueryParams ? searchParams.get('sortField') : '',
+              sortDirection === PaginationSortDirection.ASC
+                ? PaginationSortDirection.ASC
+                : sortDirection === PaginationSortDirection.DESC
+                  ? PaginationSortDirection.DESC
+                  : undefined
+            )}
+            onSelectionChange={handleColumnSelectionChange}
+            data={fetchRemoteUsersData}
+            onPageChange={(page) => {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.set('page', page.toString());
+
+                  return searchParams;
+                });
+            }}
+            onRowsPerPageChange={(pageSize) => {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  searchParams.set('pageSize', pageSize.toString());
+                  searchParams.set('page', '0');
+
+                  return searchParams;
+                });
+            }}
+            onSearchChange={(searchText) => {
+              persistUrlQueryParams &&
+                setSearchParams((searchParams) => {
+                  if (searchText) {
+                    searchParams.set('search', searchText);
+                    searchParams.set('page', '0');
+                  } else {
+                    searchParams.delete('search');
+                  }
+
+                  return searchParams;
+                });
+            }}
+            onOrderCollectionChange={(orderByCollection) => {
+              const [orderBy] = orderByCollection;
+
+              if (!orderBy) {
+                persistUrlQueryParams &&
+                  setSearchParams((searchParams) => {
+                    searchParams.delete('sortField');
+                    searchParams.delete('sortDirection');
+
+                    return searchParams;
+                  });
+              } else {
+                persistUrlQueryParams &&
+                  setSearchParams((searchParams) => {
+                    searchParams.set('sortField', orderBy.orderByField);
+                    searchParams.set('sortDirection', orderBy.orderDirection);
+
+                    return searchParams;
+                  });
+              }
+            }}
+            options={{
+              search: search,
+              searchText: persistUrlQueryParams
+                ? searchParams.get('search') || undefined
                 : undefined,
-            initialPage:
-              persistUrlQueryParams && searchParams.get('page')
-                ? +searchParams.get('page')!
-                : 0,
-            ...mtOptions,
-            selectionProps: (rowdata: BasicUserDetails) => ({
-              inputProps: {
-                'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
+              debounceInterval: 400,
+              selection: selection,
+              headerSelectionProps: {
+                inputProps: { 'aria-label': 'Select All Rows' },
               },
-            }),
-          }}
-          actions={actionArray}
-          editable={
-            onRemove
-              ? {
-                  onRowDelete: (oldData) =>
-                    new Promise<void>((resolve) => {
-                      resolve();
-                      (onRemove as FunctionType)(oldData);
-                    }),
-                  isDeletable: (rowData) => {
-                    return getCurrentUser()?.user.id !== rowData.id;
-                  },
-                }
-              : {}
-          }
-          localization={{
-            body: { emptyDataSourceMessage: 'No Users' },
-            toolbar: {
-              nRowsSelected: '{0} User(s) Selected',
-              searchPlaceholder: 'Filter found users',
-              searchTooltip: 'Filter found users',
-            },
-          }}
-          components={{
-            Toolbar:
-              isEmailSearchEnabled && emailSearch
-                ? EmailSearchBar
-                : MTableToolbar,
-          }}
-        />
-        {showInvitationButtons && (
-          <ActionButtonContainer>
-            {invitationButtons.map((item: InvitationButtonProps, i) => (
-              <Button
-                type="button"
-                onClick={() => item.action()}
-                data-cy={item['data-cy']}
-                key={i}
-              >
-                {item.title}
-              </Button>
-            ))}
-          </ActionButtonContainer>
-        )}
-      </Box>
-    </Formik>
+              pageSize:
+                persistUrlQueryParams && searchParams.get('pageSize')
+                  ? +searchParams.get('pageSize')!
+                  : undefined,
+              initialPage:
+                persistUrlQueryParams && searchParams.get('page')
+                  ? +searchParams.get('page')!
+                  : 0,
+              ...mtOptions,
+              selectionProps: (rowdata: BasicUserDetails) => ({
+                inputProps: {
+                  'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
+                },
+              }),
+            }}
+            actions={actionArray}
+            editable={
+              onRemove
+                ? {
+                    onRowDelete: (oldData) =>
+                      new Promise<void>((resolve) => {
+                        resolve();
+                        (onRemove as FunctionType)(oldData);
+                      }),
+                    isDeletable: (rowData) => {
+                      return getCurrentUser()?.user.id !== rowData.id;
+                    },
+                  }
+                : {}
+            }
+            localization={{
+              body: { emptyDataSourceMessage: 'No Users' },
+              toolbar: {
+                nRowsSelected: '{0} User(s) Selected',
+                searchPlaceholder: 'Filter found users',
+                searchTooltip: 'Filter found users',
+              },
+            }}
+            components={{
+              Toolbar:
+                isEmailSearchEnabled && emailSearch
+                  ? EmailSearchBar
+                  : MTableToolbar,
+            }}
+          />
+          {showInvitationButtons && (
+            <ActionButtonContainer>
+              {invitationButtons.map((item: InvitationButtonProps, i) => (
+                <Button
+                  type="button"
+                  onClick={() => item.action()}
+                  data-cy={item['data-cy']}
+                  key={i}
+                >
+                  {item.title}
+                </Button>
+              ))}
+            </ActionButtonContainer>
+          )}
+        </Box>
+      </Formik>
+    </Box>
   );
 };
 

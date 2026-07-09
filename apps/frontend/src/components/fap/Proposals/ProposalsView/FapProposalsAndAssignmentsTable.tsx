@@ -21,6 +21,7 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import {
   FapProposalType,
   FapProposalAssignmentType,
@@ -34,6 +35,7 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type FapProposalsAndAssignmentsTableProps = {
@@ -82,6 +84,18 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     field: 'proposal.title',
   },
   {
+    title: 'Principal Investigator',
+    render: (rowData) => {
+      return getFullUserName(rowData.proposal.proposer);
+    },
+    customSort(a, b) {
+      const name1 = getFullUserName(a.proposal.proposer);
+      const name2 = getFullUserName(b.proposal.proposer);
+
+      return name1 < name2 ? -1 : 1;
+    },
+  },
+  {
     title: 'Status',
     field: 'proposal.status.name',
   },
@@ -92,6 +106,8 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Reviewers',
     render: (data) => data.assignments?.length,
+    customSort: (a, b) =>
+      (a.assignments?.length || 0) - (b.assignments?.length || 0),
   },
   {
     title: 'Reviews',
@@ -104,6 +120,29 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       const countReviews = gradedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
+    },
+    customSort: (a, b) => {
+      const totalReviewsA = a.assignments?.length || 0;
+      const totalReviewsB = b.assignments?.length || 0;
+      const gradedProposalsA =
+        a.assignments?.filter(
+          (assignment) =>
+            assignment.review !== null && assignment.review.grade !== null
+        ).length || 0;
+      const gradedProposalsB =
+        b.assignments?.filter(
+          (assignment) =>
+            assignment.review !== null && assignment.review.grade !== null
+        ).length || 0;
+
+      const incompleteReviewsA = totalReviewsA - gradedProposalsA;
+      const incompleteReviewsB = totalReviewsB - gradedProposalsB;
+
+      if (incompleteReviewsA === incompleteReviewsB) {
+        return totalReviewsB - totalReviewsA;
+      }
+
+      return incompleteReviewsA - incompleteReviewsB;
     },
   },
   {
@@ -182,6 +221,10 @@ const FapProposalsAndAssignmentsTable = ({
     UserRole.USER_OFFICER,
   ]);
   const { t } = useTranslation();
+  const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
+    '[data-cy="fap-assignments-table"]',
+    [loadingFapProposals]
+  );
 
   const translatedColumns = FapProposalColumns.map((column) =>
     column.title === 'Instrument'
@@ -431,6 +474,7 @@ const FapProposalsAndAssignmentsTable = ({
       />
       <div data-cy="fap-assignments-table">
         <MaterialTable
+          tableRef={tableRef}
           icons={tableIcons}
           columns={translatedColumns}
           title={
@@ -453,6 +497,7 @@ const FapProposalsAndAssignmentsTable = ({
           ]}
           actions={tableActions}
           options={{
+            columnsButton: true,
             search: true,
             selection: true,
             pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
@@ -495,6 +540,7 @@ const FapProposalsAndAssignmentsTable = ({
           }}
         />
       </div>
+      {expandCollapseAllButton}
     </>
   );
 };
