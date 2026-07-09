@@ -94,7 +94,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
         }),
       })}
     >
-      {({ setFieldValue }) => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
@@ -183,7 +183,7 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const checked = e.target.checked;
                     setUseBaseDomain(checked);
-                    setFieldValue('config.useBaseDomain', checked);
+                    formikProps.setFieldValue('config.useBaseDomain', checked);
                   }}
                 />
                 <InputAdornment
