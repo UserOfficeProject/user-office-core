@@ -9,19 +9,20 @@ import React from 'react';
 import DatePicker from 'components/common/FormikUIDatePicker';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { DateConfig, SettingsId } from 'generated/sdk';
+import { DateRangeConfig, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-import Hint from '../Hint';
-
-export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
+//This is what appears to the user when filling in this question type
+export function QuestionaryComponentDateRangePicker(
+  props: BasicComponentProps
+) {
   const theme = useTheme();
   const { answer, onComplete } = props;
   const {
     question: { id, question },
   } = answer;
-  const { tooltip, required, minDate, maxDate, includeTime } =
-    answer.config as DateConfig;
+  const { required, minDate, maxDate, includeTime } =
+    answer.config as DateRangeConfig;
   const { format } = useFormattedDateTime({
     settingsFormatToUse: includeTime
       ? SettingsId.DATE_TIME_FORMAT
@@ -42,8 +43,32 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
           required={required}
-          id={`${id}-id`}
-          name={id}
+          id={`${id}-start`}
+          name={`${id}-start`}
+          label={question}
+          format={format}
+          component={component}
+          inputProps={{ placeholder: format }}
+          ampm={false}
+          onChange={(date: DateTime) =>
+            date &&
+            onComplete(
+              includeTime ? date.startOf('minute') : date.startOf('day')
+            )
+          }
+          textField={{
+            'data-cy': `${id}.value`,
+            required: required,
+            margin: 'none',
+          }}
+          minDate={fieldMinDate}
+          maxDate={fieldMaxDate}
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
+        />
+        <Field
+          required={required}
+          id={`${id}-end`}
+          name={`${id}-end`}
           label={question}
           format={format}
           component={component}
@@ -65,7 +90,6 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
       </LocalizationProvider>
-      <Hint>{tooltip}</Hint>
     </FormControl>
   );
 }

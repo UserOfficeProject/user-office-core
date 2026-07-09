@@ -5,18 +5,18 @@ import React from 'react';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
-import DateAnswerRenderer from './DateRangeAnswerRenderer';
+import DateRangeAnswerRenderer from './DateRangeAnswerRenderer';
 import DateSearchCriteriaInput from './DateRangeSearchCriteriaInput';
 import { preSubmitDateTransform } from './preSubmitDateRangeTransform';
-import { QuestionaryComponentDatePicker } from './QuestionaryComponentDateRangePicker';
+import { QuestionaryComponentDateRangePicker } from './QuestionaryComponentDateRangePicker';
 import { QuestionDateForm } from './QuestionDateRangeForm';
 import { QuestionTemplateRelationDateForm } from './QuestionTemplateRelationDateRangeForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const dateRangeDefinition: QuestionaryComponentDefinition = {
-  dataType: DataType.DATE,
+  dataType: DataType.DATE_RANGE_PICKER,
   name: 'Date Range',
-  questionaryComponent: QuestionaryComponentDatePicker,
+  questionaryComponent: QuestionaryComponentDateRangePicker,
   questionForm: () => QuestionDateForm,
   questionTemplateRelationForm: () => QuestionTemplateRelationDateForm,
   readonly: false,
@@ -24,7 +24,7 @@ export const dateRangeDefinition: QuestionaryComponentDefinition = {
   icon: <TodayIcon />,
   renderers: {
     questionRenderer: defaultRenderer.questionRenderer,
-    answerRenderer: DateAnswerRenderer,
+    answerRenderer: DateRangeAnswerRenderer,
   },
   createYupValidationSchema: dateQuestionValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value,

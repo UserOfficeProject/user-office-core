@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import {
-  DateConfig,
+  DateRangeConfig,
   FieldConfig,
   Maybe,
   Scalars,
@@ -18,7 +18,7 @@ const DateAnswerValueRenderer = ({
   config: FieldConfig;
   value: Maybe<Scalars['IntStringDateBoolArray']['input']>;
 }) => {
-  const settingsFormatToUse = (config as DateConfig).includeTime
+  const settingsFormatToUse = (config as DateRangeConfig).includeTime
     ? SettingsId.DATE_TIME_FORMAT
     : SettingsId.DATE_FORMAT;
   const { toFormattedDateTime } = useFormattedDateTime({

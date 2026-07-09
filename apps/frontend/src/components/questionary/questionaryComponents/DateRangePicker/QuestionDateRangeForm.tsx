@@ -12,12 +12,13 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { DateConfig, SettingsId } from 'generated/sdk';
+import { DateRangeConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
+//This defines what the UI shows when adding this question parent template
 export const QuestionDateForm = (props: QuestionFormProps) => {
   const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
@@ -39,35 +40,18 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
       })}
     >
       {(formikProps) => {
-        const { minDate, maxDate, defaultDate, includeTime } = formikProps
-          .values.config as DateConfig;
-
-        const {
-          defaultFieldMaxDate,
-          defaultFieldMinDate,
-          isDefaultAfterMaxDate,
-          isDefaultBeforeMinDate,
-          isMinAfterMaxDate,
-        } = minMaxDateTimeCalculations({
-          minDate,
-          maxDate,
-          defaultDate,
-          includeTime,
-        });
+        const { minDate, maxDate, includeTime } = formikProps.values
+          .config as DateRangeConfig;
+        const defaultDate = null;
+        const { defaultFieldMaxDate, defaultFieldMinDate, isMinAfterMaxDate } =
+          minMaxDateTimeCalculations({
+            minDate,
+            maxDate,
+            defaultDate,
+            includeTime,
+          });
 
         if (formikProps.isValid) {
-          if (isDefaultBeforeMinDate) {
-            formikProps.setFieldError(
-              'config.defaultDate',
-              'Default should be after "Min" date'
-            );
-          }
-          if (isDefaultAfterMaxDate) {
-            formikProps.setFieldError(
-              'config.defaultDate',
-              'Default should be before "Max" date'
-            );
-          }
           if (isMinAfterMaxDate) {
             formikProps.setFieldError(
               'config.minDate',
@@ -159,22 +143,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   textField={{
                     fullWidth: true,
                     'data-cy': 'maxDate',
-                  }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
-                />
-                <Field
-                  name="config.defaultDate"
-                  id="Default-Time-Input"
-                  label="Default"
-                  format={inputFormat}
-                  ampm={false}
-                  component={component}
-                  inputProps={{ placeholder: inputFormat }}
-                  minDate={defaultFieldMinDate}
-                  maxDate={defaultFieldMaxDate}
-                  textField={{
-                    fullWidth: true,
-                    'data-cy': 'defaultDate',
                   }}
                   desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />

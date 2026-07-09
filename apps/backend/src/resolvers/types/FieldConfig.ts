@@ -95,6 +95,18 @@ export class DateConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class DateRangeConfig extends ConfigBase {
+  @Field(() => String, { nullable: true })
+  minDate: string | null;
+
+  @Field(() => String, { nullable: true })
+  maxDate: string | null;
+
+  @Field(() => Boolean)
+  includeTime: boolean;
+}
+
+@ObjectType()
 export class EmbellishmentConfig {
   @Field(() => Boolean)
   omitFromPdf: boolean;
@@ -386,6 +398,7 @@ export const FieldConfigType = createUnionType({
   types: () => [
     BooleanConfig,
     DateConfig,
+    DateRangeConfig,
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,

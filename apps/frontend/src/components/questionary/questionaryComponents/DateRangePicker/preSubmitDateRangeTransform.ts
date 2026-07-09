@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
-import { DateConfig } from 'generated/sdk';
+import { DateRangeConfig } from 'generated/sdk';
 
 export const preSubmitDateTransform: QuestionaryComponentDefinition['preSubmitTransform'] =
   (answer) => {
     const ifNotRequiredDateCanBeNull =
-      !(answer.config as DateConfig).required && answer.value === null;
+      !(answer.config as DateRangeConfig).required && answer.value === null;
 
     return {
       ...answer,
