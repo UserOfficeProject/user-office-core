@@ -15,6 +15,9 @@ faker.seed(1);
 context('visits tests', () => {
   const coProposer = initialDBData.users.user2;
   const visitor = initialDBData.users.user3;
+  // A second plain visitor (neither PI nor co-proposer) used to verify that
+  // non-team-lead visitors cannot edit the visit.
+  const otherVisitor = initialDBData.users.user4;
   const PI = initialDBData.users.user1;
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
@@ -462,6 +465,68 @@ context('visits tests', () => {
       cy.get('body').type('{esc}');
 
       cy.testActionButton(cyTagRegisterVisit, 'invisible');
+    });
+
+    it('Team lead should be able to update the visit', () => {
+      // The team lead is a plain visitor (not the PI or a co-proposer).
+      cy.createVisit({
+        team: [visitor.id],
+        teamLeadUserId: visitor.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(visitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // The team lead can access the define-visit action even though they are
+      // only a visitor.
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      // Add another visitor to the team.
+      cy.get('[data-cy=add-participant-button]').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(coProposer.email);
+      cy.get('[role=presentation][data-popper-placement]')
+        .contains(coProposer.lastName)
+        .click();
+      cy.finishedLoading();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy=create-update-visit-button]').click();
+
+      cy.notification({ text: 'Visit updated', variant: 'success' });
+    });
+
+    it('Visitor who is not the team lead should not be able to update the visit', () => {
+      cy.createVisit({
+        team: [visitor.id, otherVisitor.id],
+        teamLeadUserId: visitor.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(otherVisitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // Only the team lead (or the PI / a co-proposer) may edit the visitors.
+      cy.testActionButton(cyTagDefineVisit, 'invisible');
     });
   });
 });

@@ -273,6 +273,13 @@ export default {
       email: 'david@teleworm.us',
       password: 'Test1234!',
     },
+    user4: {
+      id: 997,
+      firstName: 'Laerke',
+      lastName: 'Sorensen',
+      email: 'lksorensen@foodplanet.co.dk',
+      password: 'Abcd1234!',
+    },
     reviewer: {
       id: 3,
       firstName: 'Nils',
