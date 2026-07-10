@@ -8,6 +8,7 @@ import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../../../events';
 import { Event } from '../../../events/event.enum';
+import { Proposal } from '../../../models/Proposal';
 import { WorkflowEngineType } from '../../../workflowEngine';
 import { WorkFlowEntity } from '../../workflowHandler';
 
@@ -102,7 +103,12 @@ const proposalWorkflowEntity: WorkFlowEntity = {
         return { proposal, workflowStatusConnectionId };
       })
     );
-    const validProposals = allProposals.filter((proposal) => proposal !== null);
+    const validProposals = allProposals.filter(
+      (
+        item
+      ): item is { proposal: Proposal; workflowStatusConnectionId: number } =>
+        item !== null
+    );
     await proposalStatusActionEngine(validProposals);
   },
 };

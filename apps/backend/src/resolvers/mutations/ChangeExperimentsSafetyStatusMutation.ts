@@ -18,6 +18,14 @@ export class ChangeExperimentsSafetyStatusInput {
 
   @Field(() => [Int])
   public experimentSafetyPks: number[];
+
+  /**
+   * The workflow connection whose status actions (emails, RabbitMQ messages,
+   * PDF generation) should run after the status change. Omit to change the
+   * experiment safety status WITHOUT running any status actions.
+   */
+  @Field(() => Int, { nullable: true })
+  public statusActionsWorkflowConnectionId?: number;
 }
 
 @Resolver()

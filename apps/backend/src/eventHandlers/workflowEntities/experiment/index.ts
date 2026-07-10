@@ -9,6 +9,7 @@ import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
 import { resolveApplicationEventBus } from '../../../events';
 import { Event } from '../../../events/event.enum';
+import { ExperimentSafety } from '../../../models/Experiment';
 import { WorkflowEngineType } from '../../../workflowEngine';
 import { WorkFlowEntity } from '../../workflowHandler';
 
@@ -141,7 +142,12 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
     );
 
     const validExperimentSafeties = experimentSafeties.filter(
-      (experimentSafety) => experimentSafety != null
+      (
+        item
+      ): item is {
+        experimentSafety: ExperimentSafety;
+        workflowStatusConnectionId: number;
+      } => item != null
     );
     await experimentSafetyStatusActionEngine(validExperimentSafeties);
   },

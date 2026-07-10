@@ -1,26 +1,46 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import WorkflowView from 'components/settings/workflow/WorkflowView';
-import { Experiment, WorkflowStatus, WorkflowType } from 'generated/sdk';
+import {
+  Experiment,
+  GetWorkflowQuery,
+  WorkflowStatus,
+  WorkflowType,
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useWorkflowStatusesData } from 'hooks/settings/useWorkflowStatusesData';
+
+type WorkflowConnectionWithDetails = NonNullable<
+  GetWorkflowQuery['workflow']
+>['connections'][0];
 
 const ChangeExperimentSafetyStatusValidationSchema = yup.object().shape({
   selectedWorkflowStatusId: yup
-    .string()
+    .number()
+    .nullable()
     .required('You must select experiment safety status'),
 });
 
 type ChangeExperimentSafetyStatusProps = {
   close: () => void;
-  changeStatusOnExperiments: (workflowStatus: WorkflowStatus) => Promise<void>;
+  changeStatusOnExperiments: (
+    workflowStatus: WorkflowStatus,
+    statusActionsWorkflowConnectionId?: number
+  ) => Promise<void>;
   selectedExperiments: Experiment[];
 };
 
@@ -35,10 +55,34 @@ const ChangeExperimentSafetyStatus = ({
   const selectedExperimentsWorkflowIds = selectedExperiments
     .map((experiment) => experiment.proposal.call?.experimentWorkflowId)
     .filter((id): id is number => !!id);
+  const api = useDataApi();
   const {
     statuses: experimentStatuses,
     loadingStatuses: loadingExperimentStatuses,
   } = useWorkflowStatusesData(selectedExperimentsWorkflowIds[0]);
+
+  const [runStatusActions, setRunStatusActions] = useState(false);
+  const [connections, setConnections] = useState<
+    WorkflowConnectionWithDetails[]
+  >([]);
+  const [selectedConnectionId, setSelectedConnectionId] = useState<
+    number | null
+  >(null);
+
+  useEffect(() => {
+    if (!selectedExperimentsWorkflowIds[0]) return;
+
+    api()
+      .getWorkflow({
+        workflowId: selectedExperimentsWorkflowIds[0],
+        entityType: WorkflowType.EXPERIMENT,
+      })
+      .then((data) => {
+        if (data.workflow?.connections) {
+          setConnections(data.workflow.connections);
+        }
+      });
+  }, [api, selectedExperimentsWorkflowIds[0]]);
 
   const allSelectedExperimentsHaveSameWorkflowStatus =
     selectedExperimentStatuses.every(
@@ -53,6 +97,25 @@ const ChangeExperimentSafetyStatus = ({
     allSelectedExperimentsHaveSameWorkflowStatus
       ? selectedExperimentStatuses[0]
       : null;
+
+  const getConnectionsToStatus = (
+    workflowStatusId: number | null
+  ): WorkflowConnectionWithDetails[] => {
+    if (!workflowStatusId) return [];
+
+    return connections.filter(
+      (conn) => conn.nextWorkflowStatusId === workflowStatusId
+    );
+  };
+
+  const getConnectionLabel = (conn: WorkflowConnectionWithDetails): string => {
+    const actionTypes = conn.statusActions
+      ?.map((a) => a.action.type)
+      .join(', ');
+    const actionSummary = actionTypes ? ` [${actionTypes}]` : ' [no actions]';
+
+    return `From "${conn.prevStatus.status.name}"${actionSummary}`;
+  };
 
   const highlightedNodes = useMemo(() => {
     const counts = selectedExperiments.reduce(
@@ -106,7 +169,7 @@ const ChangeExperimentSafetyStatus = ({
     <Container component="main" maxWidth="lg">
       <Formik
         initialValues={{
-          selectedWorkflowStatusId: selectedExperimentsWorkflowStatus ?? '',
+          selectedWorkflowStatusId: selectedExperimentsWorkflowStatus ?? null,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedStatus = experimentStatuses.find(
@@ -120,95 +183,201 @@ const ChangeExperimentSafetyStatus = ({
             return;
           }
 
-          await changeStatusOnExperiments(selectedStatus);
+          await changeStatusOnExperiments(
+            selectedStatus,
+            runStatusActions && selectedConnectionId
+              ? selectedConnectionId
+              : undefined
+          );
           close();
         }}
         validationSchema={ChangeExperimentSafetyStatusValidationSchema}
       >
-        {({ isSubmitting, values, setFieldValue }): JSX.Element => (
-          <Form>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography
-                  variant="h6"
-                  component="h1"
-                  sx={{
-                    fontSize: '18px',
-                    padding: '22px 0 0',
-                  }}
-                >
-                  Change experiment(s) safety status
-                </Typography>
-              </Grid>
+        {({ isSubmitting, values, setFieldValue }): JSX.Element => {
+          const incomingConnections = getConnectionsToStatus(
+            values.selectedWorkflowStatusId
+          );
+          const connectionsWithActions = incomingConnections.filter(
+            (conn) => conn.statusActions && conn.statusActions.length > 0
+          );
 
-              <Grid item xs={12} md={8}>
-                <div style={{ height: '500px', border: '1px solid #ddd' }}>
-                  <WorkflowView
-                    workflowId={selectedExperimentsWorkflowIds[0]}
-                    entityType={WorkflowType.EXPERIMENT}
-                    highlightedNodes={highlightedNodes}
-                    selectedStatusId={
-                      experimentStatuses.find(
-                        (s) =>
-                          s.workflowStatusId ===
-                          (values.selectedWorkflowStatusId ||
-                            selectedExperimentsWorkflowStatus)
-                      )?.status.id
-                    }
-                    onNodeClicked={(statusId, workflowStatusId) => {
-                      setFieldValue(
-                        'selectedWorkflowStatusId',
-                        workflowStatusId
-                      );
+          return (
+            <Form>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography
+                    variant="h6"
+                    component="h1"
+                    sx={{
+                      fontSize: '18px',
+                      padding: '22px 0 0',
                     }}
-                  />
-                </div>
-              </Grid>
+                  >
+                    Change experiment(s) safety status
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={12} md={4}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <FormikUIAutocomplete
-                      name="selectedWorkflowStatusId"
-                      label="Select experiment status"
-                      loading={loadingExperimentStatuses}
-                      items={experimentStatuses.map((status) => ({
-                        value: status.workflowStatusId,
-                        text: status.status.name,
-                      }))}
-                      required
-                      disabled={isSubmitting}
-                      data-cy="status-selection"
+                <Grid item xs={12} md={8}>
+                  <div style={{ height: '500px' }}>
+                    <WorkflowView
+                      workflowId={selectedExperimentsWorkflowIds[0]}
+                      entityType={WorkflowType.EXPERIMENT}
+                      highlightedNodes={highlightedNodes}
+                      selectedStatusId={
+                        experimentStatuses.find(
+                          (s) =>
+                            s.workflowStatusId ===
+                            values.selectedWorkflowStatusId
+                        )?.status.id
+                      }
+                      onNodeClicked={(_statusId, workflowStatusId) => {
+                        setFieldValue(
+                          'selectedWorkflowStatusId',
+                          workflowStatusId
+                        );
+                        setRunStatusActions(false);
+                        setSelectedConnectionId(null);
+                      }}
                     />
-                  </Grid>
+                  </div>
+                </Grid>
 
-                  <Grid item xs={12}>
-                    {!values.selectedWorkflowStatusId && (
-                      <Alert
-                        severity="warning"
-                        data-cy="experiment-different-statuses-change"
+                <Grid item xs={12} md={4}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <FormikUIAutocomplete
+                        name="selectedWorkflowStatusId"
+                        label="Select experiment status"
+                        loading={loadingExperimentStatuses}
+                        items={experimentStatuses.map((status) => ({
+                          value: status.workflowStatusId,
+                          text: status.status.name,
+                        }))}
+                        required
+                        disabled={isSubmitting}
+                        data-cy="status-selection"
+                        onChange={(_: React.SyntheticEvent, value: number) => {
+                          setFieldValue('selectedWorkflowStatusId', value);
+                          setRunStatusActions(false);
+                          setSelectedConnectionId(null);
+                        }}
+                      />
+                    </Grid>
+
+                    {values.selectedWorkflowStatusId &&
+                      connectionsWithActions.length > 0 && (
+                        <Grid item xs={12}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={runStatusActions}
+                                onChange={(e) => {
+                                  setRunStatusActions(e.target.checked);
+                                  if (!e.target.checked) {
+                                    setSelectedConnectionId(null);
+                                  } else if (
+                                    connectionsWithActions.length === 1
+                                  ) {
+                                    setSelectedConnectionId(
+                                      connectionsWithActions[0].id
+                                    );
+                                  }
+                                }}
+                                data-cy="run-status-actions-checkbox"
+                              />
+                            }
+                            label="Run status actions"
+                          />
+
+                          {runStatusActions &&
+                            connectionsWithActions.length > 1 && (
+                              <FormControl fullWidth sx={{ mt: 1 }}>
+                                <InputLabel id="connection-select-label">
+                                  Select transition
+                                </InputLabel>
+                                <Select
+                                  labelId="connection-select-label"
+                                  value={selectedConnectionId ?? ''}
+                                  label="Select transition"
+                                  onChange={(e) => {
+                                    setSelectedConnectionId(
+                                      e.target.value
+                                        ? Number(e.target.value)
+                                        : null
+                                    );
+                                  }}
+                                  disabled={isSubmitting}
+                                  data-cy="connection-selection"
+                                >
+                                  {connectionsWithActions.map((conn) => (
+                                    <MenuItem key={conn.id} value={conn.id}>
+                                      {getConnectionLabel(conn)}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            )}
+
+                          {runStatusActions && selectedConnectionId && (
+                            <Alert severity="info" sx={{ mt: 1 }}>
+                              {(() => {
+                                const conn = connectionsWithActions.find(
+                                  (c) => c.id === selectedConnectionId
+                                );
+                                if (!conn?.statusActions?.length) return null;
+
+                                return (
+                                  <>
+                                    Actions to execute:
+                                    <ul
+                                      style={{
+                                        margin: '4px 0',
+                                        paddingLeft: '20px',
+                                      }}
+                                    >
+                                      {conn.statusActions.map((action) => (
+                                        <li key={action.actionId}>
+                                          {action.action.name} (
+                                          {action.action.type})
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </>
+                                );
+                              })()}
+                            </Alert>
+                          )}
+                        </Grid>
+                      )}
+
+                    <Grid item xs={12}>
+                      {!values.selectedWorkflowStatusId && (
+                        <Alert
+                          severity="warning"
+                          data-cy="experiment-different-statuses-change"
+                        >
+                          Be aware that selected experiments have different
+                          statuses and changing status will affect all of them.
+                        </Alert>
+                      )}
+                      <Button
+                        type="submit"
+                        fullWidth
+                        sx={(theme) => ({
+                          margin: theme.spacing(3, 0, 2),
+                        })}
+                        disabled={loadingExperimentStatuses || isSubmitting}
+                        data-cy="submit-experiment-status-change"
                       >
-                        Be aware that selected experiments have different
-                        statuses and changing status will affect all of them.
-                      </Alert>
-                    )}
-                    <Button
-                      type="submit"
-                      fullWidth
-                      sx={(theme) => ({
-                        margin: theme.spacing(3, 0, 2),
-                      })}
-                      disabled={loadingExperimentStatuses || isSubmitting}
-                      data-cy="submit-experiment-status-change"
-                    >
-                      Change status
-                    </Button>
+                        Change status
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </Form>
-        )}
+            </Form>
+          );
+        }}
       </Formik>
     </Container>
   );

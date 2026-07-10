@@ -314,7 +314,8 @@ export default function ExperimentsTable({
   }
 
   const changeStatusOnExperimentSafety = async (
-    workflowStatus: WorkflowStatus
+    workflowStatus: WorkflowStatus,
+    statusActionsWorkflowConnectionId?: number
   ) => {
     const selectedExperimentsData = getSelectedExperimentsData();
     const experimentSafetyPks = selectedExperimentsData
@@ -337,6 +338,7 @@ export default function ExperimentsTable({
       }).changeExperimentsSafetyStatus({
         experimentSafetyPks: experimentSafetyPks,
         workflowStatusId: workflowStatus.workflowStatusId,
+        statusActionsWorkflowConnectionId: statusActionsWorkflowConnectionId,
       });
       refreshTableData();
     }

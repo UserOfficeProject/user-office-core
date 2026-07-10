@@ -36,7 +36,7 @@ import {
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
-import { rejection, Rejection } from '../models/Rejection';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
@@ -595,7 +595,8 @@ export default class ProposalMutations {
         );
 
         const statusEngineReadyProposals = fullProposals.filter(
-          (item): item is ProposalWithWorkflowStatusConnectionId => !!item
+          (item): item is ProposalWithWorkflowStatusConnectionId =>
+            item !== null && !isRejection(item)
         );
 
         // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.

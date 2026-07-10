@@ -20,7 +20,7 @@ import {
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
-import { isRejection, rejection, Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
@@ -524,95 +524,83 @@ export default class ExperimentMutations {
     );
 
     if (result.length === experimentSafetyPks.length) {
-      // Only run status actions if a specific workflow connection was provided
-      if (statusActionsWorkflowConnectionId) {
-        const fullExperimentsSafety = await Promise.all(
-          experimentSafetyPks.map(async (experimentSafetyPk) => {
-            const fullExperimentSafety = result.find(
-              (updateExperimentSafety) =>
-                updateExperimentSafety.experimentSafetyPk === experimentSafetyPk
-            );
-
-            if (!fullExperimentSafety) {
-              logger.logError(
-                'Full experiment safety not found after status change',
-                { experimentSafetyPk, statusId }
-              );
-
-              return null;
-            }
-
-            const experiment = await this.dataSource.getExperiment(
-              fullExperimentSafety.experimentPk
-            );
-
-            if (!experiment) {
-              logger.logError('Experiment not found for experiment safety', {
-                experimentSafetyPk,
-                experimentPk: fullExperimentSafety.experimentPk,
-              });
-
-              return null;
-            }
-
-            const proposal = await this.proposalDataSource.get(
-              experiment.proposalPk
-            );
-
-            if (!proposal) {
-              logger.logError('Proposal not found for experiment', {
-                experimentSafetyPk,
-                experimentPk: experiment.experimentPk,
-                proposalPk: experiment.proposalPk,
-              });
-
-              return null;
-            }
-
-            const experimentSafetyWorkflow =
-              await this.callDataSource.getExperimentWorkflowByCall(
-                proposal.callId
-              );
-
-            if (!experimentSafetyWorkflow) {
-              return rejection(
-                `No experiment workflow found for the specific proposal call with id: ${proposal.callId}`,
-                {
-                  agent,
-                  args,
-                }
-              );
-            }
-
-            return {
-              experimentSafety: fullExperimentSafety,
-              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
-            };
-          })
-        );
-
-        const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
-          (
-            item
-          ): item is {
-            experimentSafety: ExperimentSafety;
-            workflowStatusConnectionId: number;
-          } => item != null && !isRejection(item)
-        );
-
-        if (
-          statusEngineReadyExperimentsSafety.length !==
-          experimentSafetyPks.length
-        ) {
-          return rejection(
-            'Could not fetch required data for all experiment safeties after status change',
-            { experimentSafetyPks, fullExperimentsSafety }
+      const fullExperimentsSafety = await Promise.all(
+        experimentSafetyPks.map(async (experimentSafetyPk) => {
+          const fullExperimentSafety = result.find(
+            (updateExperimentSafety) =>
+              updateExperimentSafety.experimentSafetyPk === experimentSafetyPk
           );
-        }
 
-        // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
-        experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);
+          if (!fullExperimentSafety) {
+            logger.logError(
+              'Full experiment safety not found after status change',
+              { experimentSafetyPk, statusId }
+            );
+
+            return null;
+          }
+
+          const experiment = await this.dataSource.getExperiment(
+            fullExperimentSafety.experimentPk
+          );
+
+          if (!experiment) {
+            logger.logError('Experiment not found for experiment safety', {
+              experimentSafetyPk,
+              experimentPk: fullExperimentSafety.experimentPk,
+            });
+
+            return null;
+          }
+
+          const proposal = await this.proposalDataSource.get(
+            experiment.proposalPk
+          );
+
+          if (!proposal) {
+            logger.logError('Proposal not found for experiment', {
+              experimentSafetyPk,
+              experimentPk: experiment.experimentPk,
+              proposalPk: experiment.proposalPk,
+            });
+
+            return null;
+          }
+
+          const experimentSafetyWorkflow =
+            await this.callDataSource.getExperimentWorkflowByCall(
+              proposal.callId
+            );
+
+          if (!experimentSafetyWorkflow) {
+            return rejection(
+              `No experiment workflow found for the specific proposal call with id: ${proposal.callId}`,
+              {
+                agent,
+                args,
+              }
+            );
+          }
+
+          return fullExperimentSafety;
+        })
+      );
+
+      const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
+        (item): item is ExperimentSafety => !!item
+      );
+
+      if (
+        statusEngineReadyExperimentsSafety.length !== experimentSafetyPks.length
+      ) {
+        return rejection(
+          'Could not fetch required data for all experiment safeties after status change',
+          { experimentSafetyPks, fullExperimentsSafety }
+        );
       }
+
+      // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
+      experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);
     } else {
       return rejection(
         'Could not change statuses to all of the selected experiment safeties',
