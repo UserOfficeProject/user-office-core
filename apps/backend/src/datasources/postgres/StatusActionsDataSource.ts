@@ -119,6 +119,11 @@ export default class PostgresStatusActionsDataSource
       .first();
 
     if (!statusActionRecord) {
+      logger.logInfo(
+        `Status action not found statusActionId: ${statusActionId} workflowConnectionId: ${workflowConnectionId}`,
+        {}
+      );
+
       return null;
     }
 

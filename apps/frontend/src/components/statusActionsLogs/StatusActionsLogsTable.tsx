@@ -358,7 +358,7 @@ const StatusActionsLogsTable = ({
               ),
               tooltip: rowData.connectionStatusAction
                 ? 'Replay status action'
-                : 'This status action can no longer be replayed because its connection/action configuration no longer exists',
+                : 'This status action can no longer be replayed',
               onClick: (_event: unknown, rowData: unknown): void => {
                 const statusActionsLog = rowData as StatusActionsLog;
                 if (!statusActionsLog.connectionStatusAction) {
