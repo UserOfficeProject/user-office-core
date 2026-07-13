@@ -635,7 +635,7 @@ export default class FapMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   @EventBus(Event.PROPOSAL_FAP_MEETING_REORDER)
   async reorderFapMeetingDecisionProposals(
     agent: UserWithRole | null,
