@@ -23,9 +23,6 @@ export interface WorkflowDataSource {
   getWorkflowConnection(
     connectionId: WorkflowConnection['id']
   ): Promise<WorkflowConnection | null>;
-  getWorkflowConnectionByNextStatusId(
-    nextWorkflowStatusId: number
-  ): Promise<WorkflowConnection | null>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnection[]>;
