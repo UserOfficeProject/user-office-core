@@ -12,50 +12,55 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Get PR labels
-        id: pr-labels
-        uses: joerick/pr-labels-action@v1.0.8
+      # - name: Get PR labels
+      #   id: pr-labels
+      #   uses: joerick/pr-labels-action@v1.0.8
 
-      - name: Set up postgress dbs
-        run: |
-          docker compose -f docker-compose-graphql-inspection.yml up -d db-base db-new
+      # - name: Set up postgress dbs
+      #   run: |
+      #     docker compose -f docker-compose-graphql-inspection.yml up -d db-base db-new
 
-          sleep 10 
+      #     sleep 10 
 
-          docker ps
+      #     docker ps
 
-      - name: bring up container for schema
-        run: |
-          docker compose -f docker-compose-graphql-inspection.yml up -d 
+      # - name: bring up container for schema
+      #   run: |
+      #     docker compose -f docker-compose-graphql-inspection.yml up -d 
 
-          sleep 20 
+      #     sleep 20 
 
-          docker ps
+      #     docker ps
 
       # This doesn't work see https://github.com/graphql-hive/graphql-inspector/issues/2876
       # - uses: graphql-hive/graphql-inspector@master
       #   with:
       #     schema: http://localhost:4001/graphql
       #     endpoint: http://localhost:4000/graphql
-      
-      - name: manual graphql schema check
-        continue-on-error: true
-        run: |
-          npm install -g @graphql-inspector/cli
 
-          graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
+      # - name: manual graphql schema check
+      #   continue-on-error: true
+      #   run: |
+      #     npm install -g @graphql-inspector/cli
+
+      #     graphql-inspector diff http://localhost:4001/graphql http://localhost:4000/graphql
   
-      - name: check if breaking changes are anticipated
-        run: |
-          if [ -n "${GITHUB_PR_LABEL_BREAKING:CHANGE}" ]; then
-            exit 0
-          fi
-          echo "Breaking changes detected, but no label was found."
-          echo "Please make sure to label this PR as breaking and inform teams in the collaboration"
-          exit 1
+      # - name: check if breaking changes are anticipated
+      #   run: |
+      #     if [ -n "${GITHUB_PR_LABEL_BREAKING:CHANGE}" ]; then
+      #       exit 0
+      #     fi
+      #     echo "Breaking changes detected, but no label was found."
+      #     echo "Please make sure to label this PR as breaking and inform teams in the collaboration"
+      #     exit 1
 
-      - name: bring down containers
-        if: always()
-        run: |
-          docker compose -f docker-compose-graphql-inspection.yml down
+      # - name: bring down containers
+      #   if: always()
+      #   run: |
+      #     docker compose -f docker-compose-graphql-inspection.yml down
+
+
+      - uses: graphql-hive/graphql-inspector@master
+        with:
+          schema: 'graphql-schema-change-check:schema.graphql'
 
