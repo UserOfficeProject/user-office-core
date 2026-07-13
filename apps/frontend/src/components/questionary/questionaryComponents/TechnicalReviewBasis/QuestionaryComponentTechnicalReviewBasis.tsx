@@ -153,6 +153,45 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 }}
               />
             </Grid>
+            <Grid item xs={12}>
+              <InputLabel
+                htmlFor="publicComment"
+                margin="dense"
+                sx={{ fontWeight: 'bold', color: 'text.primary' }}
+              >
+                {`Comments to be seen by the ${t('FAP')} panels`}
+              </InputLabel>
+              <Editor
+                id="publicComment"
+                initialValue={state?.technicalReview.publicComment || ''}
+                value={localPublicComment}
+                init={{
+                  skin: false,
+                  content_css: false,
+                  plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
+                  toolbar: 'bold italic',
+                  branding: false,
+                }}
+                onEditorChange={(content, editor) => {
+                  const isStartContentDifferentThanCurrent =
+                    editor.startContent !==
+                    editor.contentDocument.body.innerHTML;
+
+                  if (isStartContentDifferentThanCurrent || editor.isDirty()) {
+                    setLocalPublicComment(content);
+                  }
+                }}
+                onBlur={() =>
+                  dispatch({
+                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                    itemWithQuestionary: {
+                      publicComment: localPublicComment,
+                    },
+                  })
+                }
+                disabled={shouldDisableForm}
+              />
+            </Grid>
             {(isUserOfficer ||
               isInstrumentScientist ||
               fapSecOrChairCanEdit) && (
@@ -251,45 +290,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 />
               </Grid>
             )}
-            <Grid item xs={12}>
-              <InputLabel
-                htmlFor="publicComment"
-                margin="dense"
-                sx={{ fontWeight: 'bold', color: 'text.primary' }}
-              >
-                {`Comments be seen by the ${t('FAP')} panels`}
-              </InputLabel>
-              <Editor
-                id="publicComment"
-                initialValue={state?.technicalReview.publicComment || ''}
-                value={localPublicComment}
-                init={{
-                  skin: false,
-                  content_css: false,
-                  plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
-                  toolbar: 'bold italic',
-                  branding: false,
-                }}
-                onEditorChange={(content, editor) => {
-                  const isStartContentDifferentThanCurrent =
-                    editor.startContent !==
-                    editor.contentDocument.body.innerHTML;
-
-                  if (isStartContentDifferentThanCurrent || editor.isDirty()) {
-                    setLocalPublicComment(content);
-                  }
-                }}
-                onBlur={() =>
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: {
-                      publicComment: localPublicComment,
-                    },
-                  })
-                }
-                disabled={shouldDisableForm}
-              />
-            </Grid>
           </Grid>
         </Box>
       </div>
