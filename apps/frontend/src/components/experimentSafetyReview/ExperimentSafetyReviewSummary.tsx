@@ -88,7 +88,7 @@ function ExperimentSafetyReviewSummary({
 
   // Poll API every 5 seconds to check if experiment safety review is approved
   useEffect(() => {
-    if (!state?.experimentSafety.experimentSafetyPk) {
+    if (!state?.experimentSafety.experimentSafetyPk || isDownloadEnabled) {
       return;
     }
 
@@ -110,7 +110,7 @@ function ExperimentSafetyReviewSummary({
     }, 5000);
 
     return () => clearInterval(pollInterval);
-  }, [state?.experimentSafety.experimentSafetyPk, api]);
+  }, [state?.experimentSafety.experimentSafetyPk, api, isDownloadEnabled]);
 
   if (!state?.experimentSafety) {
     throw new Error('Experiment safety review not found');

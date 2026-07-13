@@ -405,7 +405,7 @@ export default function ExperimentsTable({
           if (selectedItems.length) {
             setSearchParams((searchParams) => {
               searchParams.delete('selection');
-              selectedItems.map((selectedItem) =>
+              selectedItems.forEach((selectedItem) =>
                 searchParams.append(
                   'selection',
                   selectedItem.experimentPk.toString()

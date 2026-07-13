@@ -30,7 +30,8 @@ export const experimentSafetyStatusActionEngine = async (
     experimentSafeties,
     groupByProperties
   );
-  Promise.all(
+
+  return Promise.all(
     groupResult.map(async (groupedExperimentSafeties) => {
       const [{ workflowStatusConnectionId }] = groupedExperimentSafeties;
       const currentConnection = await workflowDataSource.getWorkflowConnection(

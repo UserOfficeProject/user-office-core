@@ -32,7 +32,7 @@ const extractEntityFromEvent = (
 
   for (const key of entityKeys) {
     entity = searchObjectByKey(event, key);
-    if (entity && entity[key as keyof object]) {
+    if (entity && entity[key]) {
       entityKey = key;
 
       return { entity, entityKey };
