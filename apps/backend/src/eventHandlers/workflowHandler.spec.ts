@@ -322,13 +322,13 @@ describe('startWorkflow', () => {
     expect(result).toEqual(updatedEntities);
   });
 
-  test('should call onWorkflowStatusChange with an empty array when no statuses changed', async () => {
+  test('should not call onWorkflowStatusChange when no statuses changed', async () => {
     const event = createProposalEvent();
     runSpy.mockResolvedValue([]);
 
     const result = await startWorkflow(event, 1, proposalWorkflowEntity);
 
-    expect(proposalStatusChangeSpy).toHaveBeenCalledWith([]);
+    expect(proposalStatusChangeSpy).not.toHaveBeenCalled();
     expect(result).toEqual([]);
   });
 });
@@ -402,13 +402,13 @@ describe('experimentSafetyWorkflowEntity.onWorkflowStatusChange', () => {
     ]);
 
     expect(mockPublish).not.toHaveBeenCalled();
-    expect(statusActionEngineSpy).toHaveBeenCalledWith([]);
+    expect(statusActionEngineSpy).not.toHaveBeenCalled();
   });
 
   test('should not publish anything when there are no updated entities', async () => {
     await experimentSafetyWorkflowEntity.onWorkflowStatusChange([]);
 
     expect(mockPublish).not.toHaveBeenCalled();
-    expect(statusActionEngineSpy).toHaveBeenCalledWith([]);
+    expect(statusActionEngineSpy).not.toHaveBeenCalled();
   });
 });
