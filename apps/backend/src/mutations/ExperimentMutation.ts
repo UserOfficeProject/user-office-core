@@ -633,12 +633,6 @@ export default class ExperimentMutations {
     agent: UserWithRole | null,
     args: ChangeExperimentsSafetyStatusInput
   ): Promise<ExperimentSafety[] | Rejection> {
-    return new Rejection('This mutation is not implemented yet', {
-      agent,
-      args,
-    });
-    throw new Error('This mutation is not implemented yet');
-
     return this.processExperimentsSafetyStatusChange(agent, args);
   }
 }
