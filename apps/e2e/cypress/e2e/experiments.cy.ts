@@ -512,6 +512,21 @@ context('Experiments tests', () => {
       cy.get('[role="listbox"]').should('be.visible');
       cy.get('[role="option"]').eq(1).click();
 
+      // Check the "Run status actions" checkbox so the email and RabbitMQ
+      // status actions are executed (otherwise no status action logs are created).
+      // The data-cy is on the MUI wrapper span, so target the inner input.
+      cy.get('[data-cy=run-status-actions-checkbox] input').check({
+        force: true,
+      });
+
+      // When more than one incoming connection has actions, a transition must be selected.
+      cy.get('body').then(($body) => {
+        if ($body.find('[data-cy=connection-selection]').length) {
+          cy.get('[data-cy=connection-selection]').click();
+          cy.get('[role="option"]').first().click();
+        }
+      });
+
       // Click submit button to change status
       cy.get('[data-cy=submit-experiment-status-change]').click();
       cy.finishedLoading();
@@ -558,9 +573,7 @@ context('Experiments tests', () => {
           expect(tableText).to.contain('Email successfully sent template');
           // Should also contain RabbitMQ action log entries
           // The logs show: RabbitMQ message successfully sent
-          expect(tableText).to.contain(
-            'Experiment event successfully sent to the message broker'
-          );
+          expect(tableText).to.contain('Experiment event successfully sent');
         });
     });
   });

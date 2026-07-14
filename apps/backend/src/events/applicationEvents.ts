@@ -460,7 +460,7 @@ interface ExperimentSafetyStatusChangedByWorkflowEvent extends GeneralEvent {
 }
 interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER;
-  experimentsafety: ExperimentSafety;
+  array: ExperimentSafety[];
 }
 
 interface ExperimentESFSubmittedEvent extends GeneralEvent {
