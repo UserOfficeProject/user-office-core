@@ -1,95 +1,80 @@
 import FormControl from '@mui/material/FormControl';
-import useTheme from '@mui/material/styles/useTheme';
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Field } from 'formik';
+import { styled } from '@mui/material/styles';
 import { DateTime } from 'luxon';
-import React from 'react';
+import React, { useState } from 'react';
+import { DayPicker, DateRange } from 'react-day-picker';
 
-import DatePicker from 'components/common/FormikUIDatePicker';
-import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { DateRangeConfig, SettingsId } from 'generated/sdk';
-import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+
+const StyledPickerWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  '.rdp-range_start': {
+    background: `linear-gradient(90deg, transparent 50%, ${theme.palette.primary.main} 50%)`,
+    border: 'none',
+  },
+  '.rdp-range_end': {
+    background: `linear-gradient(90deg, ${theme.palette.primary.main} 50%, transparent 50%)`,
+    border: 'none',
+  },
+  '.rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    border: 'none',
+  },
+  '.rdp-range_middle .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    borderColor: theme.palette.primary.main,
+    color: 'white',
+  },
+  '.rdp-day': {
+    padding: 0,
+    width: '100%',
+    height: '100%',
+  },
+  '.rdp-nav svg': {
+    fill: theme.palette.primary.dark,
+  },
+}));
 
 //This is what appears to the user when filling in this question type
 export function QuestionaryComponentDateRangePicker(
   props: BasicComponentProps
 ) {
-  const theme = useTheme();
   const { answer, onComplete } = props;
   const {
-    question: { id, question },
+    question: { id },
   } = answer;
-  const { required, minDate, maxDate, includeTime } =
-    answer.config as DateRangeConfig;
-  const { format } = useFormattedDateTime({
-    settingsFormatToUse: includeTime
-      ? SettingsId.DATE_TIME_FORMAT
-      : SettingsId.DATE_FORMAT,
-  });
 
-  const fieldMinDate = minDate
-    ? DateTime.fromISO(minDate).startOf(includeTime ? 'minute' : 'day')
-    : null;
-  const fieldMaxDate = maxDate
-    ? DateTime.fromISO(maxDate).startOf(includeTime ? 'minute' : 'day')
-    : null;
-
-  const component = includeTime ? DateTimePicker : DatePicker;
+  const [range, setRange] = useState<DateRange | undefined>();
 
   return (
     <FormControl margin="dense">
-      <LocalizationProvider dateAdapter={DateAdapter}>
-        <Field
-          required={required}
-          id={`${id}-start`}
-          name={`${id}-start`}
-          label={question}
-          format={format}
-          component={component}
-          inputProps={{ placeholder: format }}
-          ampm={false}
-          onChange={(date: DateTime) =>
-            date &&
-            onComplete(
-              includeTime ? date.startOf('minute') : date.startOf('day')
-            )
-          }
-          textField={{
-            'data-cy': `${id}.value`,
-            required: required,
-            margin: 'none',
+      <StyledPickerWrapper>
+        <DayPicker
+          ISOWeek
+          id={`${id}-id`}
+          mode="range"
+          selected={range}
+          onSelect={(value) => {
+            setRange(value);
+            if (value?.from && value?.to) {
+              //const newAnswer = `${DateTime.fromJSDate(new Date('2001-03-11'))}-${DateTime.fromJSDate(new Date('2001-03-11'))}`
+
+              // const newValue1 = {
+              //   from: DateTime.fromJSDate(new Date('2001-03-11')),
+              //  to:DateTime.fromJSDate(new Date('2001-03-11'))
+              // }
+              // onComplete([newValue]);
+
+              // const newValue = {
+              //   from: new Date('2001-03-11'),
+              //   to: new Date('2001-03-11'),
+              // };
+              onComplete(DateTime.fromJSDate(new Date('2001-03-11')));
+            }
           }}
-          minDate={fieldMinDate}
-          maxDate={fieldMaxDate}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
-        <Field
-          required={required}
-          id={`${id}-end`}
-          name={`${id}-end`}
-          label={question}
-          format={format}
-          component={component}
-          inputProps={{ placeholder: format }}
-          ampm={false}
-          onChange={(date: DateTime) =>
-            date &&
-            onComplete(
-              includeTime ? date.startOf('minute') : date.startOf('day')
-            )
-          }
-          textField={{
-            'data-cy': `${id}.value`,
-            required: required,
-            margin: 'none',
-          }}
-          minDate={fieldMinDate}
-          maxDate={fieldMaxDate}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
-        />
-      </LocalizationProvider>
+      </StyledPickerWrapper>
     </FormControl>
   );
 }

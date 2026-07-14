@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import * as Yup from 'yup';
 
-function normalizeDate(date: string, includeTime: boolean) {
+export function normalizeDate(date: string, includeTime: boolean) {
   let normalizedDate = DateTime.fromISO(date);
 
   if (includeTime) {
