@@ -44,22 +44,49 @@ type ChangeExperimentSafetyStatusProps = {
   selectedExperiments: Experiment[];
 };
 
-const ChangeExperimentSafetyStatus = ({
+type ChangeExperimentSafetyStatusFormProps =
+  ChangeExperimentSafetyStatusProps & {
+    workflowId: number;
+  };
+
+const StatusChangeErrorMessage = ({
+  message,
+  close,
+}: {
+  message: string;
+  close: () => void;
+}) => (
+  <Container component="main" maxWidth="xs">
+    <Alert severity="error" sx={{ mt: 4 }}>
+      {message}
+    </Alert>
+    <Button
+      fullWidth
+      sx={(theme) => ({
+        margin: theme.spacing(3, 0, 2),
+      })}
+      onClick={close}
+      data-cy="close-experiment-status-change-error"
+    >
+      Close
+    </Button>
+  </Container>
+);
+
+const ChangeExperimentSafetyStatusForm = ({
   close,
   changeStatusOnExperiments,
   selectedExperiments,
-}: ChangeExperimentSafetyStatusProps) => {
+  workflowId,
+}: ChangeExperimentSafetyStatusFormProps) => {
   const selectedExperimentStatuses = selectedExperiments.map(
     (experiment) => experiment.experimentSafety?.workflowStatusId
   );
-  const selectedExperimentsWorkflowIds = selectedExperiments
-    .map((experiment) => experiment.proposal.call?.experimentWorkflowId)
-    .filter((id): id is number => !!id);
   const api = useDataApi();
   const {
     statuses: experimentStatuses,
     loadingStatuses: loadingExperimentStatuses,
-  } = useWorkflowStatusesData(selectedExperimentsWorkflowIds[0]);
+  } = useWorkflowStatusesData(workflowId);
 
   const [runStatusActions, setRunStatusActions] = useState(false);
   const [connections, setConnections] = useState<
@@ -70,11 +97,9 @@ const ChangeExperimentSafetyStatus = ({
   >(null);
 
   useEffect(() => {
-    if (!selectedExperimentsWorkflowIds[0]) return;
-
     api()
       .getWorkflow({
-        workflowId: selectedExperimentsWorkflowIds[0],
+        workflowId,
         entityType: WorkflowType.EXPERIMENT,
       })
       .then((data) => {
@@ -82,16 +107,11 @@ const ChangeExperimentSafetyStatus = ({
           setConnections(data.workflow.connections);
         }
       });
-  }, [api, selectedExperimentsWorkflowIds[0]]);
-
+  }, [api, workflowId]);
   const allSelectedExperimentsHaveSameWorkflowStatus =
     selectedExperimentStatuses.every(
       (workflowStatusId) => workflowStatusId === selectedExperimentStatuses[0]
     );
-
-  const allExperimentsHaveSameWorkflow = selectedExperimentsWorkflowIds.every(
-    (workflowId) => workflowId === selectedExperimentsWorkflowIds[0]
-  );
 
   const selectedExperimentsWorkflowStatus =
     allSelectedExperimentsHaveSameWorkflowStatus
@@ -143,27 +163,6 @@ const ChangeExperimentSafetyStatus = ({
       entities,
     }));
   }, [selectedExperiments, experimentStatuses]);
-
-  if (!allExperimentsHaveSameWorkflow) {
-    return (
-      <Container component="main" maxWidth="xs">
-        <Alert severity="error" sx={{ mt: 4 }}>
-          All selected experiments must belong to the same workflow in order to
-          change their status.
-        </Alert>
-        <Button
-          fullWidth
-          sx={(theme) => ({
-            margin: theme.spacing(3, 0, 2),
-          })}
-          onClick={close}
-          data-cy="close-experiment-status-change-error"
-        >
-          Close
-        </Button>
-      </Container>
-    );
-  }
 
   return (
     <Container component="main" maxWidth="lg">
@@ -220,7 +219,7 @@ const ChangeExperimentSafetyStatus = ({
                 <Grid item xs={12} md={8}>
                   <div style={{ height: '500px' }}>
                     <WorkflowView
-                      workflowId={selectedExperimentsWorkflowIds[0]}
+                      workflowId={workflowId}
                       entityType={WorkflowType.EXPERIMENT}
                       highlightedNodes={highlightedNodes}
                       selectedStatusId={
@@ -380,6 +379,48 @@ const ChangeExperimentSafetyStatus = ({
         }}
       </Formik>
     </Container>
+  );
+};
+
+const ChangeExperimentSafetyStatus = ({
+  close,
+  changeStatusOnExperiments,
+  selectedExperiments,
+}: ChangeExperimentSafetyStatusProps) => {
+  const selectedExperimentsWorkflowIds = selectedExperiments
+    .map((experiment) => experiment.proposal.call?.experimentWorkflowId)
+    .filter((id): id is number => !!id);
+
+  if (selectedExperimentsWorkflowIds.length === 0) {
+    return (
+      <StatusChangeErrorMessage
+        message="Selected experiments do not have an associated workflow, so their status cannot be changed."
+        close={close}
+      />
+    );
+  }
+
+  const [workflowId] = selectedExperimentsWorkflowIds;
+  const allExperimentsHaveSameWorkflow = selectedExperimentsWorkflowIds.every(
+    (id) => id === workflowId
+  );
+
+  if (!allExperimentsHaveSameWorkflow) {
+    return (
+      <StatusChangeErrorMessage
+        message="All selected experiments must belong to the same workflow in order to change their status."
+        close={close}
+      />
+    );
+  }
+
+  return (
+    <ChangeExperimentSafetyStatusForm
+      close={close}
+      changeStatusOnExperiments={changeStatusOnExperiments}
+      selectedExperiments={selectedExperiments}
+      workflowId={workflowId}
+    />
   );
 };
 
