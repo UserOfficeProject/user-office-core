@@ -7,6 +7,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Institution } from '../models/Institution';
@@ -34,6 +35,10 @@ export abstract class UserAuthorization {
 
   protected adminDataSource: AdminDataSource = container.resolve(
     Tokens.AdminDataSource
+  );
+
+  protected roleDataSource: RoleDataSource = container.resolve(
+    Tokens.RoleDataSource
   );
 
   protected getUniqueId(user: ValidUserInfo) {
@@ -195,6 +200,12 @@ export abstract class UserAuthorization {
     const readableUsers = await this.listReadableUsers(agent, [id]);
 
     return readableUsers.includes(id);
+  }
+
+  async getCurrentRoleTags(agent: UserWithRole | null) {
+    return agent?.currentRole?.id == null
+      ? []
+      : this.roleDataSource.getTagsByRoleId(agent.currentRole.id);
   }
 
   abstract externalTokenLogin(
