@@ -57,6 +57,11 @@ export const startWorkflow = async (
     },
     workflowEntity
   );
+
+  if (!updatedEntities || updatedEntities.length === 0) {
+    return updatedEntities;
+  }
+
   await workflowEntity.onWorkflowStatusChange(updatedEntities);
 
   return updatedEntities;

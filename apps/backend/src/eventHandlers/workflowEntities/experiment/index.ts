@@ -149,7 +149,10 @@ const experimentSafetyWorkflowEntity: WorkFlowEntity = {
         workflowStatusConnectionId: number;
       } => item != null
     );
-    await experimentSafetyStatusActionEngine(validExperimentSafeties);
+
+    if (validExperimentSafeties.length > 0) {
+      await experimentSafetyStatusActionEngine(validExperimentSafeties);
+    }
   },
 };
 
