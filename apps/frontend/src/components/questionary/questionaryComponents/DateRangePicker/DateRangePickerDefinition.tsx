@@ -8,7 +8,6 @@ import { DataType } from 'generated/sdk';
 
 import DateRangeAnswerRenderer from './DateRangeAnswerRenderer';
 import DateSearchCriteriaInput from './DateRangeSearchCriteriaInput';
-import { preSubmitDateTransform } from './preSubmitDateRangeTransform';
 import { QuestionaryComponentDateRangePicker } from './QuestionaryComponentDateRangePicker';
 import { QuestionDateForm } from './QuestionDateRangeForm';
 import { QuestionTemplateRelationDateForm } from './QuestionTemplateRelationDateRangeForm';
@@ -68,5 +67,4 @@ export const dateRangeDefinition: QuestionaryComponentDefinition = {
   createYupValidationSchema: null,
   getYupInitialValue: ({ answer }) => answer.value,
   searchCriteriaComponent: DateSearchCriteriaInput,
-  preSubmitTransform: preSubmitDateTransform,
 };

@@ -1,6 +1,5 @@
 import FormControl from '@mui/material/FormControl';
 import { styled } from '@mui/material/styles';
-import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 
@@ -58,19 +57,7 @@ export function QuestionaryComponentDateRangePicker(
           onSelect={(value) => {
             setRange(value);
             if (value?.from && value?.to) {
-              //const newAnswer = `${DateTime.fromJSDate(new Date('2001-03-11'))}-${DateTime.fromJSDate(new Date('2001-03-11'))}`
-
-              // const newValue1 = {
-              //   from: DateTime.fromJSDate(new Date('2001-03-11')),
-              //  to:DateTime.fromJSDate(new Date('2001-03-11'))
-              // }
-              // onComplete([newValue]);
-
-              // const newValue = {
-              //   from: new Date('2001-03-11'),
-              //   to: new Date('2001-03-11'),
-              // };
-              onComplete(DateTime.fromJSDate(new Date('2001-03-11')));
+              onComplete([range]);
             }
           }}
         />
