@@ -11,7 +11,7 @@ export interface StatusActionsDataSource {
   getConnectionStatusAction(
     workflowConnectionId: number,
     statusActionId: number
-  ): Promise<ConnectionHasStatusAction>;
+  ): Promise<ConnectionHasStatusAction | null>;
   hasEmailTemplateIdConnectionStatusAction(
     emailTemplateId: number
   ): Promise<boolean>;

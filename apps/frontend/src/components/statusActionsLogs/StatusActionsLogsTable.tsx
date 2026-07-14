@@ -48,9 +48,6 @@ const StatusActionsLogsTable = ({
   const [selectedCallName, setSelectedCallName] = useState<string | undefined>(
     undefined
   );
-  const ReplayIcon = (): JSX.Element => (
-    <Replay data-cy="replay_status_action_icon" />
-  );
   const ReplayAllIcon = (): JSX.Element => (
     <ReplayCircleFilledIcon data-cy="replay_all_status_action_icon" />
   );
@@ -342,11 +339,31 @@ const StatusActionsLogsTable = ({
             },
           }}
           actions={[
-            {
-              icon: ReplayIcon,
-              tooltip: 'Replay status action',
+            (rowData: StatusActionsLog) => ({
+              icon: () => (
+                <Replay
+                  data-cy="replay_status_action_icon"
+                  sx={(theme) => ({
+                    opacity: rowData.connectionStatusAction
+                      ? 1
+                      : theme.palette.action.disabledOpacity,
+                    color: rowData.connectionStatusAction
+                      ? undefined
+                      : theme.palette.action.disabled,
+                    cursor: rowData.connectionStatusAction
+                      ? 'pointer'
+                      : 'not-allowed',
+                  })}
+                />
+              ),
+              tooltip: rowData.connectionStatusAction
+                ? 'Replay status action'
+                : 'This status action can no longer be replayed',
               onClick: (_event: unknown, rowData: unknown): void => {
                 const statusActionsLog = rowData as StatusActionsLog;
+                if (!statusActionsLog.connectionStatusAction) {
+                  return;
+                }
                 if (statusActionsLog.statusActionsLogId) {
                   confirm(
                     () =>
@@ -387,7 +404,7 @@ const StatusActionsLogsTable = ({
                   )();
                 }
               },
-            },
+            }),
             {
               icon: RefreshIcon,
               tooltip: 'Refresh status actions log data',
