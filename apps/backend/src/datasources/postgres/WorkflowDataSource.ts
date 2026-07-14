@@ -20,6 +20,7 @@ import {
   WorkflowStatusRecord,
   WorkflowStructure,
 } from './records';
+import { AddStatusToWorkflowInput } from '../../resolvers/mutations/settings/AddStatusToWorkflowMutation';
 
 @injectable()
 export default class PostgresWorkflowDataSource implements WorkflowDataSource {
@@ -247,13 +248,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       ? this.createWorkflowConnectionObject(workflowConnection)
       : null;
   }
-
-  async addStatusToWorkflow(newWorkflowStatusInput: {
-    workflowId: number;
-    statusId: string;
-    posX: number;
-    posY: number;
-  }): Promise<WorkflowStatus> {
+  async addStatusToWorkflow(
+    newWorkflowStatusInput: AddStatusToWorkflowInput
+  ): Promise<WorkflowStatus> {
     const workflow = await this.getWorkflow(newWorkflowStatusInput.workflowId);
 
     if (!workflow) {
@@ -484,6 +481,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     if (!workflow) {
       throw new GraphQLError(`Workflow not found with id: ${workflowId}`);
     }
+
     const cacheEntry = this.workflowStructureCache.get(workflowId);
     if (
       cacheEntry &&
@@ -526,6 +524,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         statusChangingEvents: string[];
       }
     >();
+
     workflowConnections.forEach((wc) => {
       const existingConnection = normalizedWorkflowConnectionsMap.get(
         wc.workflowStatusConnectionId
