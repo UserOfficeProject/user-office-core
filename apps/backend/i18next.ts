@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'path';
 
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
@@ -8,7 +8,10 @@ i18next.use(Backend).init({
   lng: 'override',
   fallbackLng: 'override',
   backend: {
-    loadPath: path.join(__dirname, '/locales/{{lng}}/translation.json'),
+    loadPath: path.resolve(
+      process.env.TRANSLATION_PATH || '',
+      '{{lng}}/translation.json'
+    ),
   },
 });
 
