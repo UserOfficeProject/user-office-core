@@ -424,29 +424,11 @@ jobs:
           path: apps/frontend/build
           key: frontend-build-${{ github.sha }}-${{ github.run_id }}
 
-      # TODO: See how to proceed with e2e caching because there is some error:
-      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
-      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v5
-      #   with:
-      #     path: apps/e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
-
       - name: Install e2e dependencies
         env:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
-
-      - name: Download required repositories
-        run: |
-          cd "$GITHUB_WORKSPACE/.."
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
@@ -539,6 +521,15 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:start -- --dns-result-order=ipv4first
+
+      - name: Factory logs
+        if: failure()
+        run: |
+          cd apps/backend
+          echo "===== factory logs (stfc) ====="
+          docker compose -f docker-compose-stfc.e2e.yml logs --no-color factory || true
+          echo "===== factory logs ====="
+          docker compose -f docker-compose.e2e.yml logs --no-color factory || true
 
       - name: Upload cypres screenshots
         if: failure()
