@@ -26,9 +26,7 @@ export const proposalStatusActionEngine = async (
     Tokens.WorkflowDataSource
   );
 
-  // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
-  const groupByProperties = ['workflowId', 'statusId'];
-  // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
+  const groupByProperties = ['workflowStatusConnectionId'];
   const groupResult = groupProposalsByProperties(proposals, groupByProperties);
   Promise.all(
     groupResult.map(async (groupedProposals) => {
