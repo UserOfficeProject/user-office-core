@@ -55,12 +55,12 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
+import { DLSFapDataColumns } from '../factory/xlsx/dls/DLSFapDataColumns';
 import {
-  callFapPopulateRow,
-  getDataRow,
-  populateRow,
-} from '../factory/xlsx/FapDataRow';
+  callFapDLSPopulateRow,
+  getDLSDataRow,
+  populateDLSRow,
+} from '../factory/xlsx/dls/DLSFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
@@ -127,10 +127,10 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 
-mapValue(Tokens.FapDataColumns, FapDataColumns);
-mapValue(Tokens.FapDataRow, getDataRow);
-mapValue(Tokens.PopulateRow, populateRow);
-mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
+mapValue(Tokens.FapDataColumns, DLSFapDataColumns);
+mapValue(Tokens.FapDataRow, getDLSDataRow);
+mapValue(Tokens.PopulateRow, populateDLSRow);
+mapValue(Tokens.PopulateCallRow, callFapDLSPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, DLSEmailHandler);
 mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
