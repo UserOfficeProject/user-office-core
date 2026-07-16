@@ -13,7 +13,6 @@ export const DLSFapDataColumns = [
 ];
 
 export const DLSCallExtraFapDataColumns = [
-  'FAP Time Allocation', // Investigate if duplicate of FAP Recommended/Allocated Time
   'FAP Meeting Recommendation',
   'FAP Meeting Comment for User',
   'FAP Meeting Internal Comment',

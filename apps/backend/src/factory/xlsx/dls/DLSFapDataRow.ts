@@ -64,7 +64,6 @@ export function callFapDLSPopulateRow(
 ): (string | number)[] {
   return [
     ...populateDLSRow(row),
-    row.fapTimeAllocation ?? row.timeRequested ?? '<missing>',
     nullFieldHelper(row.fapMeetingDecision),
     nullFieldHelper(row.fapMeetingInComment),
     nullFieldHelper(row.fapMeetingExComment),
