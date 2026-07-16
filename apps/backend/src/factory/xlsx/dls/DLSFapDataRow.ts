@@ -1,13 +1,14 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
+import { ProposalDataSource } from '../../../datasources/ProposalDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
-import { getDataRow } from '../FapDataRow';
+import { FapDataRowInput, getDataRow } from '../FapDataRow';
 
 type DLSFapRowObj = RowObj & {
-  //piInstitution: string | null | undefined;
+  instrumentRequestedTime: number | null | undefined;
 };
 
 function nullFieldHelper(
@@ -17,19 +18,9 @@ function nullFieldHelper(
 }
 
 export async function getDLSDataRow(
-  proposalPk: number,
-  piName: string,
-  proposalAverageScore: number,
-  instrumentName: string,
-  instrumentAvailabilityTime: number,
-  fapTimeAllocation: number | null,
-  proposalTitle: string,
-  proposalId: number | null,
-  techReviewTimeAllocation: number | null,
-  technicalReviewComment: string | null,
-  propFapRankOrder: number | null,
-  proposerId: number | null
+  input: FapDataRowInput
 ): Promise<DLSFapRowObj> {
+  const { proposalPk, proposerId, instrumentId } = input;
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -37,21 +28,18 @@ export async function getDLSDataRow(
     ? await userDataSource.getBasicUserInfo(proposerId)
     : null;
 
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const instrumentRequestedTime = await proposalDataSource.getRequestedTime(
+    proposalPk,
+    instrumentId
+  );
+
   return {
-    ...getDataRow(
-      proposalPk,
-      piName,
-      proposalAverageScore,
-      instrumentName,
-      instrumentAvailabilityTime,
-      fapTimeAllocation,
-      proposalTitle,
-      proposalId,
-      techReviewTimeAllocation,
-      technicalReviewComment,
-      propFapRankOrder
-    ),
+    ...getDataRow(input),
     piOrg: pi?.institution,
+    instrumentRequestedTime,
   };
 }
 
@@ -77,8 +65,9 @@ export function callFapDLSPopulateRow(
   return [
     ...populateDLSRow(row),
     row.fapTimeAllocation ?? row.timeRequested ?? '<missing>',
-    row.fapMeetingDecision ?? '<missing>',
-    row.fapMeetingInComment ?? '<missing>',
-    row.fapMeetingExComment ?? '<missing>',
+    nullFieldHelper(row.fapMeetingDecision),
+    nullFieldHelper(row.fapMeetingInComment),
+    nullFieldHelper(row.fapMeetingExComment),
+    nullFieldHelper(row.instrumentRequestedTime),
   ].concat(row.reviews ? row.reviews.flatMap((review) => review) : []);
 }

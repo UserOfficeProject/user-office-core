@@ -17,4 +17,5 @@ export const DLSCallExtraFapDataColumns = [
   'FAP Meeting Recommendation',
   'FAP Meeting Comment for User',
   'FAP Meeting Internal Comment',
+  'Instrument Requested Time',
 ];

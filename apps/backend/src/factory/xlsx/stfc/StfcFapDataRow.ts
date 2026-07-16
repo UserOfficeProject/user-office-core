@@ -2,29 +2,13 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
-import { QuestionaryStep } from '../../../models/Questionary';
-import { Review } from '../../../models/Review';
 import { stripHtml } from '../../../utils/stringStripHtml';
 import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
-import { getDataRow } from '../FapDataRow';
+import { FapDataRowInput, getDataRow } from '../FapDataRow';
 
-export async function getStfcDataRow(
-  proposalPk: number,
-  piName: string,
-  proposalAverageScore: number,
-  instrument: string,
-  instrumentAvailabilityTime: number,
-  fapTimeAllocation: number | null,
-  proposalTitle: string,
-  proposalId: number | null,
-  technicalReviewTimeAllocation: number | null,
-  technicalReviewComment: string | null,
-  propFapRankOrder: number | null,
-  proposer_id: number | null,
-  proposalAnswers: QuestionaryStep[] | null,
-  reviews: Review[] | null
-) {
+export async function getStfcDataRow(input: FapDataRowInput) {
+  const { proposerId, proposalAnswers, reviews } = input;
   const stfcUserDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
@@ -65,31 +49,19 @@ export async function getStfcDataRow(
     )?.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
-    proposer_id?.toString() ?? '',
+    proposerId?.toString() ?? '',
   ]);
 
   const piCountry = piDetails.find(
-    (user) => user.userNumber === proposer_id?.toString()
+    (user) => user.userNumber === proposerId?.toString()
   )?.country;
 
   const piOrg = piDetails.find(
-    (user) => user.userNumber === proposer_id?.toString()
+    (user) => user.userNumber === proposerId?.toString()
   )?.orgName;
 
   return {
-    ...getDataRow(
-      proposalPk,
-      piName,
-      proposalAverageScore,
-      instrument,
-      instrumentAvailabilityTime,
-      fapTimeAllocation,
-      proposalTitle,
-      proposalId,
-      technicalReviewTimeAllocation,
-      technicalReviewComment,
-      propFapRankOrder
-    ),
+    ...getDataRow(input),
     accessRoute,
     timeRequested,
     reviews: individualReviews,
