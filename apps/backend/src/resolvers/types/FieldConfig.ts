@@ -207,6 +207,9 @@ export class InstrumentPickerConfig extends ConfigBase {
 
   @Field(() => Boolean)
   requestTime: boolean;
+
+  @Field(() => Boolean)
+  multiJustificationRequired: boolean;
 }
 
 @ObjectType()
