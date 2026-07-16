@@ -4,10 +4,17 @@ export const DLSFapDataColumns = [
   'Principal Investigator',
   'Institution',
   'Instrument',
-  'Instrument available time',
-  'Technical review allocated time',
-  'Fap allocated time',
+  'Instrument available Time',
+  'TA Recommended Time',
+  'FAP Recommended Time',
   'Average Score',
-  'Current rank',
+  'Current Rank',
   'Is in availability zone',
+];
+
+export const DLSCallExtraFapDataColumns = [
+  'FAP Time Allocation', // Investigate if duplicate of FAP Recommended/Allocated Time
+  'FAP Meeting Recommendation',
+  'FAP Meeting Comment for User',
+  'FAP Meeting Internal Comment',
 ];

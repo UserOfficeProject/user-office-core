@@ -6,16 +6,16 @@
     "Principal Investigator": "Carl Carlsson",
     "Institution": "Other",
     "Instrument": "Central lavender",
-    "Instrument available time": 20,
-    "Technical review allocated time": 25,
-    "Fap allocated time": 25,
+    "Instrument available Time": 20,
+    "TA Recommended Time": 25,
+    "FAP Recommended Time": 25,
     "Average Score": 3,
-    "Current rank": "<missing>",
+    "Current Rank": "<missing>",
     "Is in availability zone": "no",
-    "Fap Time allocation": "<missing>",
-    "Fap Meeting Decision": "Accepted",
-    "Fap Meeting Comment for User": "test",
-    "Fap Meeting Internal Comment": "test"
+    "FAP Time Allocation": "<missing>",
+    "FAP Meeting Recommendation": "Accepted",
+    "FAP Meeting Comment for User": "test",
+    "FAP Meeting Internal Comment": "test"
   },
   {
     "Proposal Reference Number": "701367",
@@ -23,15 +23,15 @@
     "Principal Investigator": "Carl Carlsson",
     "Institution": "Other",
     "Instrument": "Central lavender",
-    "Instrument available time": 20,
-    "Technical review allocated time": 5,
-    "Fap allocated time": 5,
+    "Instrument available Time": 20,
+    "TA Recommended Time": 5,
+    "FAP Recommended Time": 5,
     "Average Score": 3,
-    "Current rank": "<missing>",
+    "Current Rank": "<missing>",
     "Is in availability zone": "no",
-    "Fap Time allocation": "<missing>",
-    "Fap Meeting Decision": "Accepted",
-    "Fap Meeting Comment for User": "test2",
-    "Fap Meeting Internal Comment": "test2"
+    "FAP Time Allocation": "<missing>",
+    "FAP Meeting Recommendation": "Accepted",
+    "FAP Meeting Comment for User": "test2",
+    "FAP Meeting Internal Comment": "test2"
   }
 ]

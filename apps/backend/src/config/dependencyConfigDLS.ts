@@ -55,7 +55,10 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { DLSFapDataColumns } from '../factory/xlsx/dls/DLSFapDataColumns';
+import {
+  DLSCallExtraFapDataColumns,
+  DLSFapDataColumns,
+} from '../factory/xlsx/dls/DLSFapDataColumns';
 import {
   callFapDLSPopulateRow,
   getDLSDataRow,
@@ -128,6 +131,7 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.FapDataColumns, DLSFapDataColumns);
+mapValue(Tokens.CallExtraFapDataColumns, DLSCallExtraFapDataColumns);
 mapValue(Tokens.FapDataRow, getDLSDataRow);
 mapValue(Tokens.PopulateRow, populateDLSRow);
 mapValue(Tokens.PopulateCallRow, callFapDLSPopulateRow);
