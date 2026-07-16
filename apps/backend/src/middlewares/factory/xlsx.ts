@@ -1,7 +1,7 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
-import i18next from '../../../i18next'; //needed?
+import i18next from '../../../i18next';
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
 import callFactoryService, {
