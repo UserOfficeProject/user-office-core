@@ -125,8 +125,6 @@ context('User login tests', () => {
 
       cy.contains('Dashboard');
       cy.contains('Assigned Roles').should('not.exist');
-
-      expect(true, 'forced failure').to.eq(false);
     });
   });
 });
