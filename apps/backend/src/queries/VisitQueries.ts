@@ -91,8 +91,8 @@ export default class VisitQueries {
   @Authorized()
   async getVisitByExperimentPk(
     agent: UserWithRole | null,
-    experimentId: number
+    experimentPk: number
   ) {
-    return this.dataSource.getVisitByExperimentPk(experimentId);
+    return this.dataSource.getVisitByExperimentPk(experimentPk);
   }
 }
