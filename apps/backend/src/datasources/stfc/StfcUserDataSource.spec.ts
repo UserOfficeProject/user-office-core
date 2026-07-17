@@ -1,6 +1,7 @@
 import { StfcUserDataSource } from './StfcUserDataSource';
 import { Roles, createRole } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
+import RoleDataSource from '../postgres/RoleDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
@@ -163,6 +164,12 @@ describe('Role tests', () => {
       'getUserRoles'
     );
     mockGetUserRoles.mockImplementation(() => Promise.resolve([]));
+
+    const mockGetTagsByRoleId = jest.spyOn(
+      RoleDataSource.prototype,
+      'getTagsByRoleId'
+    );
+    mockGetTagsByRoleId.mockImplementation(() => Promise.resolve([]));
 
     const mockEnsureDummyUserExists = jest.spyOn(
       StfcUserDataSource.prototype,
