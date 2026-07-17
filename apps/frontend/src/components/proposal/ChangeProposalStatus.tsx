@@ -10,10 +10,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import i18n from 'i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
+
+import i18n from 'i18n';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import WorkflowView from 'components/settings/workflow/WorkflowView';

@@ -1,9 +1,10 @@
 import { Column } from '@material-table/core';
 import { AssignmentInd } from '@mui/icons-material';
 import { Dialog, DialogContent, Typography } from '@mui/material';
-import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';

@@ -187,6 +187,7 @@ describe('Role tests', () => {
         title: 'User',
         description: '',
         isRootRole: true,
+        tags: [],
       })
     );
   });
@@ -198,16 +199,25 @@ describe('Role tests', () => {
       userdataSource.getUserRoles(dummyUserNumber)
     ).resolves.toEqual(
       expect.arrayContaining([
-        createRole(1, Roles.USER, 'User', '', { note: '' }, true),
-        createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
-        createRole(
-          3,
-          Roles.INSTRUMENT_SCIENTIST,
-          'Instrument Scientist',
-          '',
-          {},
-          true
-        ),
+        {
+          ...createRole(1, Roles.USER, 'User', '', { note: '' }, true),
+          tags: [],
+        },
+        {
+          ...createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
+          tags: [],
+        },
+        {
+          ...createRole(
+            3,
+            Roles.INSTRUMENT_SCIENTIST,
+            'Instrument Scientist',
+            '',
+            {},
+            true
+          ),
+          tags: [],
+        },
       ])
     );
   });

@@ -10,10 +10,11 @@ import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import i18n from 'i18n';
 import React, { useCallback, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';

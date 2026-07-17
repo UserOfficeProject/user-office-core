@@ -18,7 +18,6 @@ import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
-import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, {
   useCallback,
@@ -29,6 +28,8 @@ import React, {
   useState,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import i18n from 'i18n';
 
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import UOLoader from 'components/common/UOLoader';
