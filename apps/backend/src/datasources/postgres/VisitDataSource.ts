@@ -35,6 +35,7 @@ class PostgresVisitDataSource implements VisitDataSource {
         visits.map((visit) => createVisitObject(visit))
       );
   }
+
   getVisit(visitId: number): Promise<Visit | null> {
     return database('visits')
       .select('*')
@@ -195,35 +196,56 @@ class PostgresVisitDataSource implements VisitDataSource {
       .then((results) => results.length > 0);
   }
 
+  // current user -> get related visits -> get related users for each of those visits
   async getRelatedUsersOnVisits(id: number): Promise<number[]> {
-    const relatedVisitors = await database
-      .select('ou.user_id')
-      .distinct()
+    // Visits the user is related to: as creator, team lead, visitor,
+    // or as a member (PI, co-proposer, data access user) of the visit's proposal
+    const relatedVisitIds = database
+      .select('v.visit_id')
       .from('visits as v')
-      .leftJoin('visits_has_users as u', function () {
-        this.on('u.visit_id', 'v.visit_id');
-        this.andOn(function () {
-          this.onVal('u.user_id', id); // where the user is part of the visit
-          this.orOnVal('v.creator_id', id); // where the user is a creator of the visit
-        });
-      }) // this gives a list of proposals that a user is related to
-      .join('visits_has_users as ou', { 'ou.visit_id': 'u.visit_id' }); // this gives us all of the associated coIs
+      .leftJoin('visits_has_users as vhu', 'vhu.visit_id', 'v.visit_id')
+      .where('v.creator_id', id)
+      .orWhere('v.team_lead_user_id', id)
+      .orWhere('vhu.user_id', id)
+      .orWhereIn(
+        'v.proposal_pk',
+        database
+          .select('proposal_pk')
+          .from('proposals')
+          .where('proposer_id', id)
+      )
+      .orWhereIn(
+        'v.proposal_pk',
+        database
+          .select('proposal_pk')
+          .from('proposal_user')
+          .where('user_id', id)
+      )
+      .orWhereIn(
+        'v.proposal_pk',
+        database
+          .select('proposal_pk')
+          .from('data_access_user_has_proposal')
+          .where('user_id', id)
+      );
 
-    const relatedVisitCreators = await database
-      .select('v.creator_id')
-      .distinct()
-      .from('visits as v')
-      .leftJoin('visits_has_users as u', {
-        'u.visit_id': 'v.visit_id',
-        'u.user_id': id,
-      }); // this gives a list of proposals that a user is related to
+    // Everyone participating in those visits: creators, team leads and visitors
+    const relatedUsers: { user_id: number }[] = await database
+      .select('creator_id as user_id')
+      .from('visits')
+      .whereIn('visit_id', relatedVisitIds)
+      .union([
+        database
+          .select('team_lead_user_id as user_id')
+          .from('visits')
+          .whereIn('visit_id', relatedVisitIds),
+        database
+          .select('user_id')
+          .from('visits_has_users')
+          .whereIn('visit_id', relatedVisitIds),
+      ]);
 
-    const relatedUsers = [
-      ...relatedVisitors.map((r) => r.user_id),
-      ...relatedVisitCreators.map((r) => r.creator_id),
-    ];
-
-    return relatedUsers;
+    return relatedUsers.map((r) => r.user_id);
   }
 }
 
