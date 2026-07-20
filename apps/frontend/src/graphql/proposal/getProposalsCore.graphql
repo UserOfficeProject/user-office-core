@@ -56,6 +56,7 @@ query getProposalsCore(
       workflowId
       allocationTimeUnit
       principalInvestigator {
+        id
         firstname
         lastname
         preferredname
