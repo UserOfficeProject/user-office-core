@@ -1435,6 +1435,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where('invite_id', inviteId);
 
-    return proposals ? createInvitedProposalObject(proposals[0]) : null;
+    return proposals?.[0] ? createInvitedProposalObject(proposals[0]) : null;
   }
 }
