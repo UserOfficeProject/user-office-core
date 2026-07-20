@@ -138,7 +138,11 @@ const FapsTable = () => {
   return (
     <div data-cy="Faps-table">
       <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12
+          }}>
           <FapStatusFilter
             fapStatus={fapStatus || FapStatus.ACTIVE}
             onChange={handleStatusFilterChange}

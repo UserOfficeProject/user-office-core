@@ -135,7 +135,11 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             </ToggleButtonGroup>
           )}
 
-          <Box marginTop={1} width={150}>
+          <Box
+            sx={{
+              marginTop: 1,
+              width: 150
+            }}>
             <Field
               name={gradeFieldId}
               label={
