@@ -207,7 +207,7 @@ const ChangeProposalStatus = ({
           return (
             <Form>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Typography
                     variant="h6"
                     component="h1"
@@ -220,7 +220,11 @@ const ChangeProposalStatus = ({
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12} md={8}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 8
+                  }}>
                   <div style={{ height: '500px' }}>
                     <WorkflowView
                       workflowId={selectedProposalsWorkflowIds[0]}
@@ -245,9 +249,13 @@ const ChangeProposalStatus = ({
                   </div>
                 </Grid>
 
-                <Grid item xs={12} md={4}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 4
+                  }}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <FormikUIAutocomplete
                         name="selectedWorkflowStatusId"
                         label="Select proposal status"
@@ -269,7 +277,7 @@ const ChangeProposalStatus = ({
 
                     {values.selectedWorkflowStatusId &&
                       connectionsWithActions.length > 0 && (
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -353,7 +361,7 @@ const ChangeProposalStatus = ({
                         </Grid>
                       )}
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       {proposalStatuses.find(
                         (status) =>
                           status.workflowStatusId ===

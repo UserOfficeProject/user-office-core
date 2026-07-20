@@ -276,13 +276,15 @@ function ProposalPeopleSelectorModal({
     }
   };
 
-  const getOptionLabel = (option: UserOrEmail) =>
-    isValidEmail(option)
-      ? option
-      : getFullUserNameWithInstitution(option) || '';
+  const getOptionLabel = (option: UserOrEmail | UserOrEmail[]) =>
+    Array.isArray(option)
+      ? ''
+      : isValidEmail(option)
+        ? option
+        : getFullUserNameWithInstitution(option) || '';
 
-  const getOptionKey = (option: UserOrEmail) =>
-    isValidEmail(option) ? option : option.id;
+  const getOptionKey = (option: UserOrEmail | UserOrEmail[]) =>
+    Array.isArray(option) ? '' : isValidEmail(option) ? option : option.id;
 
   const isLoading = loading || isPendingSearch.current;
 
@@ -352,16 +354,20 @@ function ProposalPeopleSelectorModal({
                   event.stopPropagation();
                 }
               }}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {isLoading && (
-                      <CircularProgress color="inherit" size={20} />
-                    )}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
+              slotProps={{
+                ...params.slotProps,
+
+                input: {
+                  ...params.slotProps.input,
+                  endAdornment: (
+                    <>
+                      {isLoading && (
+                        <CircularProgress color="inherit" size={20} />
+                      )}
+                      {params.slotProps.input.endAdornment}
+                    </>
+                  ),
+                },
               }}
             />
           )}

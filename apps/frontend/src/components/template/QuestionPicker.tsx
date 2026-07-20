@@ -207,7 +207,9 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             keepMounted
             open={open}
             onClose={() => setAnchorEl(null)}
-            TransitionComponent={Fade}
+            slots={{
+              transition: Fade
+            }}
           >
             {getQuestionaryComponentDefinitions()
               .filter((definition) => definition.creatable)
@@ -250,8 +252,6 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
       <Droppable droppableId="questionPicker" type="field">
         {(provided, snapshot) => (
           <Grid
-            item
-            xs={12}
             ref={provided.innerRef}
             className="tinyScroll"
             sx={{
@@ -262,7 +262,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             }}
             style={getListStyle(snapshot.isDraggingOver)}
             data-cy="question-list"
-          >
+            size={12}>
             {getItems()}
             {provided.placeholder}
           </Grid>

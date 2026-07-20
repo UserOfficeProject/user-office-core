@@ -26,7 +26,6 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety';
 import { useProposalData } from 'hooks/proposal/useProposalData';
-import { getFullUserNameWithEmail } from 'utils/user';
 
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
@@ -60,7 +59,9 @@ const ExperimentSafetyFormTab = ({
 
   if (!experimentSafety) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
         <h2>Experiment Safety not found</h2>
       </Box>
     );
@@ -211,7 +212,13 @@ const ProposalInformationTab = ({ proposalPk }: { proposalPk: number }) => {
       {proposalData ? (
         <GeneralInformation data={proposalData} />
       ) : (
-        <Box display="flex" flexDirection="column" alignItems="center">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
           <h2>Proposal not found</h2>
         </Box>
       )}
@@ -241,7 +248,9 @@ const ExperimentReviewContent = ({
 
   if (!experiment) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
         <h2>Experiment not found</h2>
       </Box>
     );
@@ -259,12 +268,6 @@ const ExperimentReviewContent = ({
         value: toFormattedDateTime(experiment.endsAt),
       },
       {
-        label: 'Local Contact',
-        value: experiment.localContact
-          ? getFullUserNameWithEmail(experiment.localContact)
-          : 'Not assigned',
-      },
-      {
         label: 'Experiment Safety Review Status',
         value: experiment.experimentSafety?.status?.name ?? 'ESF Not Started',
       },
@@ -280,7 +283,13 @@ const ExperimentReviewContent = ({
           experimentSafetyPk={experiment.experimentSafety.experimentSafetyPk}
         />
       ) : (
-        <Box display="flex" flexDirection="column" alignItems="center">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
           <h2>Experiment Safety not found</h2>
         </Box>
       )}
@@ -318,7 +327,13 @@ const ExperimentReviewContent = ({
                 }
               />
             ) : (
-              <Box display="flex" flexDirection="column" alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
                 <h2>Experiment Safety Not Submitted by the User</h2>
               </Box>
             )}

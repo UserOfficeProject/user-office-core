@@ -77,7 +77,12 @@ const ProposalReviewContent = ({
 
   if (!proposalData) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}>
         <h2>Proposal not found</h2>
         <Button variant="text" onClick={() => console.log('Not implemented')}>
           Retry

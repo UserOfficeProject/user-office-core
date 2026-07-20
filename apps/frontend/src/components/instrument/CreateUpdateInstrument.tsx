@@ -110,7 +110,9 @@ const CreateUpdateInstrument = ({
     const { values, setFieldError } = formikProps;
 
     return isUserSurnameSearchEnabled ? (
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{
+        alignItems: "baseline"
+      }}>
         <Field
           id="surname"
           name="surname"

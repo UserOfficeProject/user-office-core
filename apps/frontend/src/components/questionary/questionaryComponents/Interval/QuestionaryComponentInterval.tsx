@@ -114,8 +114,10 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container alignItems="flex-end">
-        <Grid item xs={12}>
+      <Grid container sx={{
+        alignItems: "flex-end"
+      }}>
+        <Grid size={12}>
           <FormLabel>
             <>
               {question}
@@ -129,12 +131,10 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           </FormLabel>
         </Grid>
         <Grid
-          item
-          xs={3}
           sx={{
             paddingRight: theme.spacing(1),
           }}
-        >
+          size={3}>
           <TextField
             label="Min"
             id={`${id}-Min`}
@@ -164,12 +164,10 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
         </Grid>
 
         <Grid
-          item
-          xs={3}
           sx={{
             paddingRight: theme.spacing(1),
           }}
-        >
+          size={3}>
           <TextField
             label="Max"
             id={`${id}-Max`}
@@ -208,22 +206,20 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           />
         </Grid>
         <Grid
-          item
-          xs={6}
           sx={{
             paddingRight: theme.spacing(1),
           }}
-        >
+          size={6}>
           {getUnits()}
         </Grid>
 
-        <Grid item xs={3}>
+        <Grid size={3}>
           {isError && <FormHelperText>{fieldError.min}</FormHelperText>}
         </Grid>
-        <Grid item xs={3}>
+        <Grid size={3}>
           {isError && <FormHelperText>{fieldError.max}</FormHelperText>}
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>

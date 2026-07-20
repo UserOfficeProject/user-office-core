@@ -114,7 +114,7 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
               <Form>
                 <PromptIfDirty />
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
                         This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
                         It works when we use onBlur on Editor but it is problematic to test that with Cypress,
@@ -151,7 +151,7 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                       disabled={isSubmitting}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <StyledButtonContainer>
                       <Button
                         variant="outlined"
