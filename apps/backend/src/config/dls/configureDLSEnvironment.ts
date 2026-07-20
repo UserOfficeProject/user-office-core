@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { isDevelopment, isStaging } from '../../utils/helperFunctions';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
 import { updateOIDCSettings } from '../updateOIDCSettings';
@@ -16,7 +17,7 @@ function getBaseURL() {
   return url;
 }
 
-async function setDLSColourTheme() {
+async function setDLSColourTheme(primaryMainColour: string) {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
 
   await db.waitForDBUpgrade();
@@ -28,7 +29,7 @@ async function setDLSColourTheme() {
     }),
     db.updateSettings({
       settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
-      settingsValue: '#202945',
+      settingsValue: primaryMainColour,
     }),
     db.updateSettings({
       settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,
@@ -142,13 +143,20 @@ async function enableDefaultDLSFeatures() {
 }
 
 async function configureDLSEnvironment() {
-  await Promise.all([
-    setDLSColourTheme(),
-    enableDefaultDLSFeatures(),
-    setTimezone(),
-    setDateTimeFormats(),
-    updateOIDCSettings(),
-  ]);
+  if (isDevelopment) {
+    await setDLSColourTheme('#b3022b');
+  }
+  if (isStaging) {
+    await setDLSColourTheme('#8B008B');
+  }
+  if (isDevelopment) {
+    await Promise.all([
+      enableDefaultDLSFeatures(),
+      setTimezone(),
+      setDateTimeFormats(),
+      updateOIDCSettings(),
+    ]);
+  }
 }
 
 export { configureDLSEnvironment, getBaseURL };

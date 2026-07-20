@@ -126,6 +126,20 @@ const dummyTemplateStepsFactory = () => {
       config: {
         url: '',
         jsonPath: '',
+        useBaseDomain: false,
+      } as DynamicMultipleChoiceConfig,
+    }),
+  });
+
+  const dmcQuestionWithBaseDomain = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      id: 'dmcQuestionWithBaseDomain',
+      naturalKey: 'dmcQuestionWithBaseDomain',
+      dataType: DataType.DYNAMIC_MULTIPLE_CHOICE,
+      config: {
+        url: 'getListOfCountries',
+        useBaseDomain: true,
+        jsonPath: '',
       } as DynamicMultipleChoiceConfig,
     }),
   });
@@ -138,6 +152,7 @@ const dummyTemplateStepsFactory = () => {
       config: {
         url: 'api-url',
         jsonPath: '',
+        useBaseDomain: false,
         apiCallRequestHeaders: [
           {
             name: 'header1',
@@ -160,6 +175,7 @@ const dummyTemplateStepsFactory = () => {
       config: {
         url: 'api-url',
         jsonPath: '$..option',
+        useBaseDomain: false,
       } as DynamicMultipleChoiceConfig,
     }),
   });
@@ -175,6 +191,7 @@ const dummyTemplateStepsFactory = () => {
       dmcQuestionEmptyUrl,
       dmcQuestionEmptyJsonPath,
       dmcQuestionWithUrlAndJsonPath,
+      dmcQuestionWithBaseDomain,
     ]),
   ];
 };

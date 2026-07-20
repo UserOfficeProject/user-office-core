@@ -323,6 +323,7 @@ context('Template Basic tests', () => {
         {
           url: dynamicMultipleChoiceQuestion.url,
           isMultipleSelect: true,
+          useBaseDomain: false,
         }
       );
 
@@ -1547,6 +1548,7 @@ context('Template Basic tests', () => {
           jsonPath: '$.[*].item',
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
 
@@ -1567,6 +1569,7 @@ context('Template Basic tests', () => {
           jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
       createProposalAndClickDropdownBehavior();
@@ -1589,6 +1592,7 @@ context('Template Basic tests', () => {
           url: dynamicMultipleChoiceQuestion.url,
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
       createProposalAndClickDropdownBehavior();
@@ -1614,6 +1618,7 @@ context('Template Basic tests', () => {
           isMultipleSelect: true,
           firstTopic: true,
           headers: { Authorization: 'Bearer 1234', 'Content-Type': 'text/' },
+          useBaseDomain: false,
         }
       );
 
