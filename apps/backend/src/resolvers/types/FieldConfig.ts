@@ -103,6 +103,9 @@ export class DateRangeConfig extends ConfigBase {
         to?: Date | undefined;
       }[]
     | null;
+
+  @Field(() => Boolean)
+  includeTime: boolean;
 }
 
 @ObjectType()

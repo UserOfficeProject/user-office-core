@@ -1,32 +1,17 @@
-import useTheme from '@mui/material/styles/useTheme';
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import React, { useContext } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
-import DatePicker from 'components/common/FormikUIDatePicker';
-import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SettingsContext } from 'context/SettingsContextProvider';
-import { DateRangeConfig, SettingsId } from 'generated/sdk';
-import { minMaxDateTimeCalculations } from 'utils/Time';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
 //This defines what the UI shows when adding this question parent template
 export const QuestionDateForm = (props: QuestionFormProps) => {
-  const theme = useTheme();
-  const { settingsMap } = useContext(SettingsContext);
-
-  const dateTimeFormat = settingsMap.get(
-    SettingsId.DATE_TIME_FORMAT
-  )?.settingsValue;
-  const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
   const field = props.question;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
@@ -39,30 +24,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
         question: Yup.string().required('Question is required'),
       })}
     >
-      {(formikProps) => {
-        const { minDate, maxDate, includeTime } = formikProps.values
-          .config as DateRangeConfig;
-        const defaultDate = null;
-        const { defaultFieldMaxDate, defaultFieldMinDate, isMinAfterMaxDate } =
-          minMaxDateTimeCalculations({
-            minDate,
-            maxDate,
-            defaultDate,
-            includeTime,
-          });
-
-        if (formikProps.isValid) {
-          if (isMinAfterMaxDate) {
-            formikProps.setFieldError(
-              'config.minDate',
-              '"Min" date should be before "Max" date'
-            );
-          }
-        }
-
-        const component = includeTime ? DateTimePicker : DatePicker;
-        const inputFormat = includeTime ? dateTimeFormat : dateFormat;
-
+      {() => {
         return (
           <>
             <Field
@@ -93,15 +55,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               }}
               inputProps={{ 'data-cy': 'includeTime' }}
             />
-            <Field
-              name="config.tooltip"
-              id="Tooltip-Input"
-              label="Tooltip"
-              type="text"
-              component={TextField}
-              fullWidth
-              inputProps={{ 'data-cy': 'tooltip' }}
-            />
 
             <TitledContainer label="Constraints">
               <Field
@@ -114,39 +67,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                 }}
                 data-cy="required"
               />
-              <LocalizationProvider dateAdapter={DateAdapter}>
-                <Field
-                  name="config.minDate"
-                  id="Min-Time-Input"
-                  label="Min"
-                  format={inputFormat}
-                  ampm={false}
-                  component={component}
-                  showToolbar
-                  inputProps={{ placeholder: inputFormat }}
-                  maxDate={defaultFieldMaxDate}
-                  textField={{
-                    fullWidth: true,
-                    'data-cy': 'minDate',
-                  }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
-                />
-                <Field
-                  name="config.maxDate"
-                  id="Max-Time-Input"
-                  label="Max"
-                  format={inputFormat}
-                  ampm={false}
-                  component={component}
-                  inputProps={{ placeholder: inputFormat }}
-                  minDate={defaultFieldMinDate}
-                  textField={{
-                    fullWidth: true,
-                    'data-cy': 'maxDate',
-                  }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
-                />
-              </LocalizationProvider>
             </TitledContainer>
           </>
         );

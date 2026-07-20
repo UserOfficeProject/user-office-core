@@ -22,7 +22,7 @@ export const dateRangeDefinition: Question<DataType.DATE_RANGE_PICKER> = {
     config.required = false;
     config.tooltip = '';
     config.readPermissions = [];
-    config.defaultDate = null;
+    config.includeTime = false;
 
     return config;
   },

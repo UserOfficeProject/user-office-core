@@ -21,8 +21,6 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     readPermissions
-    minDate
-    maxDate
     includeTime
   }
   ... on EmbellishmentConfig {
