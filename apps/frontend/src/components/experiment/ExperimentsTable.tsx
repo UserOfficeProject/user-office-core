@@ -5,7 +5,6 @@ import MaterialTable, {
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
-<<<<<<< HEAD
 import {
   Dialog,
   DialogContent,
@@ -16,25 +15,16 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-
-import ListStatusIcon from 'components/common/icons/ListStatusIcon';
-=======
-import { IconButton, Tooltip, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import RoleBasedLink from 'components/common/RoleBasedLink';
->>>>>>> origin/develop
+import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import {
   Experiment,
   PaginationSortDirection,
   SettingsId,
   UserRole,
-<<<<<<< HEAD
   WorkflowStatus,
-=======
->>>>>>> origin/develop
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
