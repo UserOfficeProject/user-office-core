@@ -151,7 +151,11 @@ const FinalRankingForm = ({
                 {`${t('Fap')} Meeting form`}
               </Typography>
               <Grid container spacing={3}>
-                <Grid item sm={6} xs={12}>
+                <Grid
+                  size={{
+                    sm: 6,
+                    xs: 12
+                  }}>
                   <InputLabel htmlFor="commentForUser" shrink margin="dense">
                     Comment for user
                   </InputLabel>
@@ -210,7 +214,11 @@ const FinalRankingForm = ({
                     />
                   </FormControl>
                 </Grid>
-                <Grid item sm={6} xs={12}>
+                <Grid
+                  size={{
+                    sm: 6,
+                    xs: 12
+                  }}>
                   <InputLabel
                     htmlFor="commentForManagement"
                     shrink
@@ -255,12 +263,12 @@ const FinalRankingForm = ({
                       <>
                         {isSubmitting && (
                           <Box
-                            display="flex"
-                            alignItems="center"
-                            sx={(theme) => ({
+                            sx={[{
+                              display: "flex",
+                              alignItems: "center"
+                            }, (theme) => ({
                               margin: theme.spacing(0, 0, 0, 1),
-                            })}
-                          >
+                            })]}>
                             <UOLoader buttonSized />
                           </Box>
                         )}

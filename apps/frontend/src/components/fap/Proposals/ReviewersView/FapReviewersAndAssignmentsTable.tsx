@@ -228,11 +228,11 @@ const FapReviewersAndAssignmentsTable = ({
 
     const fapMemberUsersToAssign: FapAssignedMember[] = membersToAssign.map(
       (member) =>
-        ({
+        (({
           ...member.user.user,
           role: member.user.role,
-          rank: null,
-        }) as FapAssignedMember
+          rank: null
+        }) as FapAssignedMember)
     );
     setMembersToAssign(fapMemberUsersToAssign);
   };

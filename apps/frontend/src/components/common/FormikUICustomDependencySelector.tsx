@@ -192,7 +192,7 @@ const FormikUICustomDependencySelector = ({
 
   return (
     <Grid container>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <FormControl fullWidth>
           <InputLabel htmlFor="dependency-id" shrink>
             Field
@@ -232,8 +232,7 @@ const FormikUICustomDependencySelector = ({
           </Select>
         </FormControl>
       </Grid>
-
-      <Grid item xs={2}>
+      <Grid size={2}>
         <FormControl fullWidth>
           <InputLabel shrink htmlFor="operator">
             Compare
@@ -254,8 +253,7 @@ const FormikUICustomDependencySelector = ({
           </Select>
         </FormControl>
       </Grid>
-
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControl fullWidth>
           <InputLabel shrink htmlFor="dependencyValue">
             Value

@@ -31,23 +31,25 @@ const TextFieldWithCounter = (
       <TextField
         {...other}
         onChange={handleChange}
-        InputProps={{
-          endAdornment: !isCounterHidden && (
-            <InputAdornment
-              position="end"
-              sx={(theme) => ({
-                ...(other.multiline && {
-                  alignSelf: 'flex-end',
-                  alignItems: 'flex-end',
-                  marginBottom: -theme.spacing(0.5),
-                }),
-                ...(maxLen &&
-                  textLen > maxLen && { color: theme.palette.error.main }),
-              })}
-            >
-              {counter}
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: !isCounterHidden && (
+              <InputAdornment
+                position="end"
+                sx={(theme) => ({
+                  ...(other.multiline && {
+                    alignSelf: 'flex-end',
+                    alignItems: 'flex-end',
+                    marginBottom: -theme.spacing(0.5),
+                  }),
+                  ...(maxLen &&
+                    textLen > maxLen && { color: theme.palette.error.main }),
+                })}
+              >
+                {counter}
+              </InputAdornment>
+            ),
+          }
         }}
       />
     </div>

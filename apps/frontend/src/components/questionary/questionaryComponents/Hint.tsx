@@ -9,12 +9,13 @@ import React from 'react';
 function Hint(props: BoxProps) {
   return (
     <Box
-      fontSize={12}
-      fontStyle="italic"
-      color="#888"
-      marginTop="4px"
       {...props}
-    >
+      sx={[{
+        fontSize: 12,
+        fontStyle: "italic",
+        color: "#888",
+        marginTop: "4px"
+      }, ...(Array.isArray(props.sx) ? props.sx : [props.sx])]}>
       {props.children}
     </Box>
   );
