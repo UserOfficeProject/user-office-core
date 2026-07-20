@@ -110,8 +110,10 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container alignItems="flex-end">
-        <Grid item xs={12}>
+      <Grid container sx={{
+        alignItems: "flex-end"
+      }}>
+        <Grid size={12}>
           <FormLabel>
             <>
               {question}
@@ -124,7 +126,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             </>
           </FormLabel>
         </Grid>
-        <Grid item xs={2} sx={(theme) => ({ paddingRight: theme.spacing(1) })}>
+        <Grid sx={(theme) => ({ paddingRight: theme.spacing(1) })} size={2}>
           <TextField
             id={`${id}-value`}
             onChange={(event) => {
@@ -160,14 +162,14 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid item xs={10}>
+        <Grid size={10}>
           {getUnits()}
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid size={2}>
           {isError && <FormHelperText>{fieldError.value}</FormHelperText>}
         </Grid>
-        <Grid item xs={10}>
+        <Grid size={10}>
           {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>

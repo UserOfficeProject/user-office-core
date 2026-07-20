@@ -1,9 +1,9 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ClosedCaption from '@mui/icons-material/ClosedCaption';
 import ClosedCaptionOutlinedIcon from '@mui/icons-material/ClosedCaptionOutlined';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import ErrorIcon from '@mui/icons-material/Error';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
@@ -65,8 +65,13 @@ export function FileEntry(props: {
   };
 
   return (
-    <Grid container alignItems="center">
-      <Grid item xs={1} sx={{ maxWidth: '50px' }}>
+    <Grid
+      container
+      sx={{
+        alignItems: 'center',
+      }}
+    >
+      <Grid sx={{ maxWidth: '50px' }} size={1}>
         <ListItemAvatar>
           <Avatar
             sx={{
@@ -78,8 +83,13 @@ export function FileEntry(props: {
           </Avatar>
         </ListItemAvatar>
       </Grid>
-      <Grid item xs={6}>
-        <Box display="flex" alignItems="center">
+      <Grid size={6}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <ListItemText
             primary={props.metaData.originalFileName}
             secondary={formatBytes(props.metaData.sizeInBytes)}
@@ -98,7 +108,11 @@ export function FileEntry(props: {
             }}
           />
 
-          <Box display="inline-flex">
+          <Box
+            sx={{
+              display: 'inline-flex',
+            }}
+          >
             {props.metaData.mimeType.startsWith('image') && (
               <Tooltip title="Add image caption">
                 <IconButton
@@ -140,11 +154,10 @@ export function FileEntry(props: {
           </Box>
         </Box>
       </Grid>
-
-      <Grid item xs={5}>
+      <Grid size={5}>
         <Grid container spacing={1}>
           {props.metaData.mimeType.startsWith('image') && (
-            <Grid item xs={6}>
+            <Grid size={6}>
               <TextField
                 label="Figure"
                 data-cy="image-figure"
@@ -159,27 +172,29 @@ export function FileEntry(props: {
                     figure: e.target.value,
                   })
                 }
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Tooltip title="Use figure to reference the image inside the rich text editor">
-                        <InfoOutlined
-                          sx={{
-                            fill: 'rgba(0, 0, 0, 0.54)',
-                            width: '20px',
-                            cursor: 'auto',
-                          }}
-                        />
-                      </Tooltip>
-                    </InputAdornment>
-                  ),
-                }}
                 fullWidth
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Tooltip title="Use figure to reference the image inside the rich text editor">
+                          <InfoOutlined
+                            sx={{
+                              fill: 'rgba(0, 0, 0, 0.54)',
+                              width: '20px',
+                              cursor: 'auto',
+                            }}
+                          />
+                        </Tooltip>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             </Grid>
           )}
           {(showCaption || props.caption) && (
-            <Grid item xs={6}>
+            <Grid size={6}>
               <TextField
                 label="Image caption"
                 data-cy="image-caption"
@@ -440,7 +455,12 @@ export function FileUploadComponent(props: {
 
   const amountFilesInfo =
     maxFiles > 1 ? (
-      <Box component="span" display="block">
+      <Box
+        component="span"
+        sx={{
+          display: 'block',
+        }}
+      >
         Maximum {maxFiles} file(s)
       </Box>
     ) : null;
@@ -451,7 +471,12 @@ export function FileUploadComponent(props: {
 
   const pdfPageLimitInfo =
     fileType.includes('.pdf') && pdfPageLimit > 0 ? (
-      <Box component="span" display="block">
+      <Box
+        component="span"
+        sx={{
+          display: 'block',
+        }}
+      >
         Maximum {pdfPageLimit} PDF page(s) per file
       </Box>
     ) : null;

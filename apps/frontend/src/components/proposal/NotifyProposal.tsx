@@ -48,7 +48,7 @@ const NotifyProposal = ({
             </DialogContent>
 
             <Grid container spacing={6}>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Field
                   id="ignoreNotifiedFlag"
                   name="ignoreNotifiedFlag"

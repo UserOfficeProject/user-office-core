@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
-import { TransitionProps } from '@mui/material/transitions/transition';
+import { TransitionProps } from '@mui/material/transitions';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
@@ -69,7 +69,9 @@ const ProposalReviewModal = ({
         open={proposalReviewModalOpen}
         fullScreen
         onClose={(): Promise<void> => handleClose()}
-        TransitionComponent={Transition}
+        slots={{
+          transition: Transition
+        }}
       >
         <AppBar sx={{ position: 'relative' }}>
           <Toolbar>

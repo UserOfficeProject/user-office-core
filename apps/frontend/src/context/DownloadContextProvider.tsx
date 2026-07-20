@@ -79,10 +79,6 @@ export const DownloadMonitorDialog = ({
                   <ListItemText
                     data-cy="preparing-download-dialog-item"
                     sx={{ flexBasis: 0 }}
-                    primaryTypographyProps={{
-                      noWrap: true,
-                      variant: 'caption',
-                    }}
                     primary={
                       item.total > 1 ? (
                         <i>{item.total} selected items</i>
@@ -90,6 +86,12 @@ export const DownloadMonitorDialog = ({
                         item.name
                       )
                     }
+                    slotProps={{
+                      primary: {
+                        noWrap: true,
+                        variant: 'caption',
+                      }
+                    }}
                   />
                   {cancel && (
                     <Button variant="text" onClick={() => cancel(item.id)}>

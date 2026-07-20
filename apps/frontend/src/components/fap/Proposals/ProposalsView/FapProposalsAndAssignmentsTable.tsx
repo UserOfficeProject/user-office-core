@@ -1,6 +1,6 @@
 import { Action, Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';

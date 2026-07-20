@@ -38,8 +38,14 @@ function DateSearchCriteriaInput({
   }, [searchCriteria?.value]);
 
   return (
-    <Grid container spacing={2} alignItems="end">
-      <Grid item xs={6}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        alignItems: 'end',
+      }}
+    >
+      <Grid size={6}>
         <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
@@ -72,7 +78,7 @@ function DateSearchCriteriaInput({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
             format={format || undefined}
@@ -81,8 +87,10 @@ function DateSearchCriteriaInput({
                 margin: 'none',
                 size: 'small',
                 fullWidth: true,
-                InputLabelProps: {
-                  shrink: value ? true : undefined,
+                slotProps: {
+                  inputLabel: {
+                    shrink: value ? true : undefined,
+                  },
                 },
                 id: 'date-value',
               },
