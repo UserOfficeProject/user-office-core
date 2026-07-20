@@ -97,13 +97,12 @@ export class DateConfig extends ConfigBase {
 @ObjectType()
 export class DateRangeConfig extends ConfigBase {
   @Field(() => String, { nullable: true })
-  minDate: string | null;
-
-  @Field(() => String, { nullable: true })
-  maxDate: string | null;
-
-  @Field(() => Boolean)
-  includeTime: boolean;
+  defaultDate:
+    | {
+        from: Date | undefined;
+        to?: Date | undefined;
+      }[]
+    | null;
 }
 
 @ObjectType()

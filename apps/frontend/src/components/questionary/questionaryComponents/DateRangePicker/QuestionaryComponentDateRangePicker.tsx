@@ -7,31 +7,83 @@ import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 
 const StyledPickerWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  '.rdp-range_start': {
-    background: `linear-gradient(90deg, transparent 50%, ${theme.palette.primary.main} 50%)`,
-    border: 'none',
+  borderRadius: theme.shape.borderRadius * 2,
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[2],
+
+  '.rdp-month_caption': {
+    fontSize: '1.5rem',
+    fontWeight: 600,
+    marginBottom: theme.spacing(1),
   },
-  '.rdp-range_end': {
-    background: `linear-gradient(90deg, ${theme.palette.primary.main} 50%, transparent 50%)`,
-    border: 'none',
+
+  '.rdp-weekday': {
+    fontWeight: 600,
   },
-  '.rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button': {
-    backgroundColor: theme.palette.primary.main,
-    border: 'none',
-  },
-  '.rdp-range_middle .rdp-day_button': {
-    backgroundColor: theme.palette.primary.main,
-    borderColor: theme.palette.primary.main,
-    color: 'white',
-  },
+
   '.rdp-day': {
     padding: 0,
-    width: '100%',
-    height: '100%',
   },
+
+  '.rdp-day_button': {
+    width: 40,
+    height: 40,
+    borderRadius: '50%',
+    border: 'none',
+    transition: 'all 0.15s ease',
+  },
+
+  '.rdp-day_button:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+
+  // Range background
+  '.rdp-range_middle': {
+    backgroundColor: theme.palette.primary.light,
+  },
+
+  '.rdp-range_middle .rdp-day_button': {
+    backgroundColor: 'transparent',
+    color: theme.palette.primary.contrastText,
+    borderRadius: 0,
+  },
+
+  // Start of range
+  '.rdp-range_start': {
+    background: `linear-gradient(
+      90deg,
+      transparent 50%,
+      ${theme.palette.primary.light} 50%
+    )`,
+  },
+
+  '.rdp-range_start .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    borderRadius: '50%',
+  },
+
+  // End of range
+  '.rdp-range_end': {
+    background: `linear-gradient(
+      90deg,
+      ${theme.palette.primary.light} 50%,
+      transparent 50%
+    )`,
+  },
+
+  '.rdp-range_end .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    borderRadius: '50%',
+  },
+
+  '.rdp-nav_button': {
+    borderRadius: '50%',
+  },
+
   '.rdp-nav svg': {
-    fill: theme.palette.primary.dark,
+    fill: theme.palette.primary.main,
   },
 }));
 
@@ -57,7 +109,7 @@ export function QuestionaryComponentDateRangePicker(
           onSelect={(value) => {
             setRange(value);
             if (value?.from && value?.to) {
-              onComplete([range]);
+              onComplete([value]);
             }
           }}
         />
