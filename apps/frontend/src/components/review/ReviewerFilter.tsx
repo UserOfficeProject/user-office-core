@@ -50,7 +50,9 @@ const ReviewerFilterComponent = ({
         value={reviewer}
         data-cy="reviewer-filter"
         // NOTE: We can't use data-cy here for options and this works as well to define a property on the menulist component
-        MenuProps={{ MenuListProps: { property: 'reviewer-filter-options' } }}
+        MenuProps={{
+          slotProps: { list: { property: 'reviewer-filter-options' } },
+        }}
       >
         <MenuItem value={ReviewerFilter.ME}>My proposals</MenuItem>
         <MenuItem value={ReviewerFilter.ALL}>All proposals</MenuItem>

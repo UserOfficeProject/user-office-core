@@ -295,7 +295,9 @@ const CallGeneralInfo = ({
                   title="Reference Number Format"
                 >
                   <DialogContent dividers>
-                    <Typography gutterBottom color="inherit" variant="body1">
+                    <Typography gutterBottom variant="body1" sx={{
+                      color: "inherit"
+                    }}>
                       A reference number format determines how reference numbers
                       are generated. It consists of a <strong>prefix </strong>
                       and <strong> digits parameter</strong>.<br></br>

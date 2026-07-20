@@ -180,9 +180,10 @@ const StatusNode: React.FC<StatusNodeProps> = ({
               <Typography
                 variant="subtitle1"
                 color="textPrimary"
-                fontWeight={600}
-                fontSize={'14px'}
-              >
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '14px'
+                }}>
                 {data.workflowStatus.status.name}
               </Typography>
               {data.isReadOnly &&
