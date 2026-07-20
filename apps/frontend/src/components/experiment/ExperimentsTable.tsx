@@ -5,6 +5,7 @@ import MaterialTable, {
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
+<<<<<<< HEAD
 import {
   Dialog,
   DialogContent,
@@ -18,12 +19,22 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
+=======
+import { IconButton, Tooltip, Typography } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
+
+import RoleBasedLink from 'components/common/RoleBasedLink';
+>>>>>>> origin/develop
 import {
   Experiment,
   PaginationSortDirection,
   SettingsId,
   UserRole,
+<<<<<<< HEAD
   WorkflowStatus,
+=======
+>>>>>>> origin/develop
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -75,6 +86,8 @@ export default function ExperimentsTable({
   const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const from = encodeURIComponent(location.pathname + location.search);
   const [tableData, setTableData] = useState<Experiment[]>([]);
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment>();
   const [
@@ -216,6 +229,16 @@ export default function ExperimentsTable({
     {
       title: 'Proposal ID',
       field: 'proposal.proposalId',
+      render: (rowData: Experiment) => (
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
+            [UserRole.INSTRUMENT_SCIENTIST]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
+          }}
+        >
+          {rowData.proposal.proposalId}
+        </RoleBasedLink>
+      ),
     },
     {
       title: 'Start',
