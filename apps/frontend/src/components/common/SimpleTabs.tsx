@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { useTheme } from '@mui/material/styles';
+import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -13,6 +13,7 @@ interface TabPanelProps {
   value: number;
   padding?: number | string;
   orientation: 'horizontal' | 'vertical';
+  sx?: SxProps<Theme>;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -24,11 +25,24 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`${orientation}-tab-${index}`}
       aria-labelledby={`${orientation}-tabpanel-${index}`}
-      width="100%"
-      overflow="auto"
       {...other}
+      sx={[
+        {
+          width: '100%',
+          overflow: 'auto',
+        },
+        ...(Array.isArray(other.sx) ? other.sx : [other.sx]),
+      ]}
     >
-      {value === index && <Box p={padding}>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            p: padding,
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -162,15 +176,16 @@ const SimpleTabs = ({
           <Tab key={i} label={tabName} {...a11yProps(i, orientation)} />
         ))}
       </Tabs>
-
       {noItems ? (
         <Box
-          display="flex"
-          width="100%"
-          height="100%"
-          justifyContent="center"
-          alignItems="center"
-          padding={1}
+          sx={{
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 1,
+          }}
         >
           {noItemsText}
         </Box>

@@ -355,8 +355,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
       setUserData(
         (usersData) =>
-          ({
+          (({
             ...usersData,
+
             reviews: usersData?.reviews.map((review) => {
               const submittedReview = submitProposalReviewsInput.find(
                 (submittedReviewItem) =>
@@ -373,8 +374,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
                   ...review,
                 };
               }
-            }),
-          }) as UserWithReviewsQuery['me']
+            })
+          }) as UserWithReviewsQuery['me'])
       );
     }
   };
@@ -434,20 +435,32 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     <>
       <Grid container spacing={2}>
         {isFapReviewer && (
-          <Grid item sm={3} xs={12}>
+          <Grid
+            size={{
+              sm: 3,
+              xs: 12
+            }}>
             <ReviewerFilterComponent
               reviewer={reviewer}
               onChange={handleReviewerFilterChange}
             />
           </Grid>
         )}
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12
+          }}>
           <ReviewStatusFilter
             reviewStatus={reviewStatus}
             onChange={handleStatusFilterChange}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12
+          }}>
           <CallFilter
             shouldShowAll
             calls={calls}
@@ -459,7 +472,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             }}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12
+          }}>
           <InstrumentFilter
             shouldShowAll
             instruments={instruments}

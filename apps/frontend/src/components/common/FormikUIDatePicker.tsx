@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { TextFieldProps } from '@mui/material/TextField';
-import { PickerValidDate } from '@mui/x-date-pickers';
 import {
   DatePicker as MuiDatePicker,
   DatePickerProps as MuiDatePickerProps,
@@ -13,7 +12,7 @@ import { createFormikErrorHandler } from 'utils/errorHandler';
 
 export interface DatePickerProps
   extends FieldProps,
-    Omit<MuiDatePickerProps<PickerValidDate>, 'name' | 'value' | 'error'> {
+    Omit<MuiDatePickerProps, 'name' | 'value' | 'error'> {
   textField?: TextFieldProps;
 }
 
@@ -33,15 +32,14 @@ export function fieldToDatePicker({
   onChange,
   onError,
   ...props
-}: DatePickerProps): MuiDatePickerProps<PickerValidDate> {
+}: DatePickerProps): MuiDatePickerProps {
   const fieldError = getIn(errors, field.name);
   const showError = getIn(touched, field.name) && !!fieldError;
   const isStringValue = typeof value === 'string';
 
   return {
     slotProps: {
-      textField: (textFieldProps) => ({
-        ...textFieldProps,
+      textField: {
         error: showError,
         helperText: showError ? fieldError : helperText,
         label: label,
@@ -51,7 +49,7 @@ export function fieldToDatePicker({
             setFieldTouched(field.name, true, true);
           },
         ...textField,
-      }),
+      } as NonNullable<MuiDatePickerProps['slotProps']>['textField'],
     },
     disabled: disabled ?? isSubmitting,
     onChange:

@@ -68,7 +68,7 @@ export const getProposalStatus = (
 };
 
 export const fromProposalToProposalView = (proposal: Proposal) =>
-  ({
+  (({
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
     principalInvestigatorId: proposal.proposer?.id,
@@ -81,6 +81,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+
     instruments: proposal.instruments?.map((instrument) => ({
       id: instrument?.id,
       name: instrument?.name,
@@ -88,6 +89,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
       managementTimeAllocation: instrument?.managementTimeAllocation,
       multipleTechReviewsEnabled: instrument?.multipleTechReviewsEnabled,
     })),
+
     technicalReviews:
       proposal.technicalReviews.map((tr) => ({
         id: tr.id,
@@ -101,6 +103,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
           lastname: tr.technicalReviewAssignee?.lastname,
         },
       })) || null,
+
     faps: proposal.faps,
     fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
@@ -109,13 +112,14 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
     submittedDate: proposal.submittedDate,
+
     techniques: proposal.techniques?.map((technique) => ({
       id: technique?.id,
       name: technique?.name,
       shortCode: technique?.shortCode,
       description: technique?.description,
-    })),
-  }) as ProposalViewData;
+    }))
+  }) as ProposalViewData);
 
 export const capitalize = (s: string) =>
   s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
