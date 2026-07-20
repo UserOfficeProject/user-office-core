@@ -18,7 +18,12 @@ const EmailSearchBar = (props: Options<object>) => (
     </Box>
     <div>
       <Form>
-        <Box display="flex" justifyContent="flex-end" alignItems="baseline">
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "baseline"
+          }}>
           <Field
             name="email"
             label="E-mail"
