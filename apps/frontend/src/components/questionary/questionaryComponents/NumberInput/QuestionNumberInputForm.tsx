@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { DialogContent } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';

@@ -6,7 +6,7 @@ import Check from '@mui/icons-material/Check';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import Clear from '@mui/icons-material/Clear';
-import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import Edit from '@mui/icons-material/Edit';
 import FilterList from '@mui/icons-material/FilterList';
 import FirstPage from '@mui/icons-material/FirstPage';

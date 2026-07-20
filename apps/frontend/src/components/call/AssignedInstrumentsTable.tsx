@@ -86,12 +86,14 @@ const AvailabilityTimeEditComponent = (
     onChange={(e: ChangeEvent<HTMLInputElement>) =>
       props.onChange(e.target.value)
     }
-    InputProps={{ inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }}
     required
     fullWidth
     error={props.error}
     helperText={props.helperText}
     margin="none"
+    slotProps={{
+      input: { inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }
+    }}
   />
 );
 

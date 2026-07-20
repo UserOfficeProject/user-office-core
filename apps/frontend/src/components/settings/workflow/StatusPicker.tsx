@@ -36,10 +36,11 @@ const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
       <Typography variant="h6" component="h2" gutterBottom>
         Available Statuses
       </Typography>
-      <Typography variant="body2" color="textSecondary" paragraph>
+      <Typography variant="body2" color="textSecondary" sx={{
+        marginBottom: "16px"
+      }}>
         Drag a status into the diagram to add it to the workflow.
       </Typography>
-
       <TextField
         fullWidth
         size="small"
@@ -49,7 +50,6 @@ const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
         style={{ marginBottom: '10px' }}
         variant="outlined"
       />
-
       <List dense style={{ maxHeight: '400px', overflow: 'auto' }}>
         {filteredStatuses.map((status) => (
           <ListItemButton
@@ -74,9 +74,10 @@ const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
             <ListItemText
               primary={status.name}
               secondary={status.description}
-              primaryTypographyProps={{ variant: 'subtitle2' }}
-              secondaryTypographyProps={{ variant: 'caption' }}
-            />
+              slotProps={{
+                primary: { variant: 'subtitle2' },
+                secondary: { variant: 'caption' }
+              }} />
           </ListItemButton>
         ))}
         {filteredStatuses.length === 0 && searchTerm && (

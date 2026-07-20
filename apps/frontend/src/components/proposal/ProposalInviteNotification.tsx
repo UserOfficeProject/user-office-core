@@ -84,7 +84,6 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           {loading ? 'Loading...' : 'View Invitations'}
         </Button>
       </Box>
-
       <Dialog
         data-testid="proposal-invite-dialog"
         open={isDialogOpen}
@@ -122,7 +121,9 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                     }}
                   >
                     <div>
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      <Typography variant="subtitle1" sx={{
+                        fontWeight: "bold"
+                      }}>
                         {invite.proposal.title || 'No Title'}
                       </Typography>
                       <Typography variant="body1" color="textSecondary">

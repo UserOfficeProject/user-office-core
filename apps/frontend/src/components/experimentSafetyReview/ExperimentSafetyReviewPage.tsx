@@ -251,7 +251,11 @@ function ExperimentSafetyReviewPage() {
       <StyledContainer maxWidth={false}>
         <StyledPaper>
           <Grid container spacing={2}>
-            <Grid item sm={3} xs={12}>
+            <Grid
+              size={{
+                sm: 3,
+                xs: 12
+              }}>
               <CallFilter
                 callId={selectedCallId}
                 calls={calls}

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import MuiAutocomplete, {
   AutocompleteProps as MuiAutocompleteProps,
+  AutocompleteRenderInputParams,
 } from '@mui/material/Autocomplete';
 import { InputProps } from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -137,30 +138,33 @@ const FormikUIAutocomplete = ({
 
         return foundOption?.text || '';
       }}
-      renderInput={(params: MUITextFieldProps) => (
+      renderInput={(params: AutocompleteRenderInputParams) => (
         <MuiTextField
           {...params}
           {...TextFieldProps}
           label={label}
           required={required}
           disabled={disabled}
-          InputProps={{
-            ...params.InputProps,
-            ...InputProps,
-            endAdornment: (
-              <InputAdornment position="start">
-                {InputProps?.endAdornment && adornmentVisible
-                  ? InputProps.endAdornment
-                  : null}{' '}
-                {params.InputProps?.endAdornment}
-              </InputAdornment>
-            ),
-          }}
           onFocus={() => {
             setAdornmentVisible(true);
           }}
           onBlur={() => {
             setAdornmentVisible(false);
+          }}
+          slotProps={{
+            ...params.slotProps,
+            input: {
+              ...params.slotProps.input,
+              ...InputProps,
+              endAdornment: (
+                <InputAdornment position="start">
+                  {InputProps?.endAdornment && adornmentVisible
+                    ? InputProps.endAdornment
+                    : null}{' '}
+                  {params.slotProps.input?.endAdornment}
+                </InputAdornment>
+              ),
+            },
           }}
         />
       )}

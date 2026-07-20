@@ -17,7 +17,7 @@ function MultipleChoiceSearchCriteriaComponent({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         {/* TODO here it should me made clear that in case of multiple question, the answer will be "one of" */}
         <Autocomplete
           id="answer"
