@@ -1,12 +1,9 @@
 name: Build and Push Test Image
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "Image tag"
-        required: true
-        default: "test"
+  push:
+    branch:
+      - update-duo-message-broker-version-to-make-it-compatible-with-rabbitmq4.x
 
 env:
   NODE_VERSION: 22.x
@@ -54,7 +51,7 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: |
-            ghcr.io/userofficeproject/user-office-backend:${{ github.event.inputs.tag }}
+            ghcr.io/userofficeproject/user-office-backend:rmq-test
 
       - name: Build and push frontend
         uses: docker/build-push-action@v7
@@ -64,4 +61,4 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: |
-            ghcr.io/userofficeproject/user-office-frontend:${{ github.event.inputs.tag }}
+            ghcr.io/userofficeproject/user-office-frontend:rmq-test
