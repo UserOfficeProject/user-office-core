@@ -11,6 +11,9 @@ query getFapProposals($fapId: Int!, $callId: Int, $instrumentId: Int, $legacy: B
       proposalId
       proposer {
         id
+        firstname
+        lastname
+        preferredname
         institutionId
       }
       status {

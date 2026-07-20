@@ -1,11 +1,13 @@
 mutation changeTechniqueProposalsStatus(
   $proposalPks: [Int!]!
   $workflowStatusId: Int!
+  $statusActionsWorkflowConnectionId: Int
 ) {
   changeTechniqueProposalsStatus(
     changeProposalsStatusInput: {
       proposalPks: $proposalPks
       workflowStatusId: $workflowStatusId
+      statusActionsWorkflowConnectionId: $statusActionsWorkflowConnectionId
     }
   )
 }

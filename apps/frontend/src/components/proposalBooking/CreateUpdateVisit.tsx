@@ -93,6 +93,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           </Typography>
           <UserManagementTable
             title="Visitors"
+            addModalTitle="Add Visitors"
             setInvites={setVisitInvites}
             invites={visitInvites}
             setUsers={(team: BasicUserDetails[]) => {

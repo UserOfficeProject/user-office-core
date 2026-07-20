@@ -10,8 +10,38 @@ import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSourc
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
+import { getTopicActiveAnswers } from '../../../models/ProposalModelFunctions';
+import { Answer, QuestionaryStep } from '../../../models/Questionary';
+import { DataType } from '../../../models/Template';
 import { MailService } from '../../MailService/MailService';
 import { EmailTemplateId } from '../emailTemplateId';
+
+type InstrumentPickerAnswerValue = {
+  instrumentId: number | string;
+  timeRequested?: number | string | null;
+};
+
+const getInstrumentPickerAnswers = (
+  questionarySteps: QuestionaryStep[]
+): Answer[] =>
+  questionarySteps
+    .flatMap((step) => getTopicActiveAnswers(questionarySteps, step.topic.id))
+    .filter(
+      (answer) => answer.question.dataType === DataType.INSTRUMENT_PICKER
+    );
+
+const getInstrumentPickerAnswerValues = (
+  value: unknown
+): InstrumentPickerAnswerValue[] => {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+
+  return values.filter(
+    (instrumentAnswer): instrumentAnswer is InstrumentPickerAnswerValue =>
+      typeof instrumentAnswer === 'object' &&
+      instrumentAnswer !== null &&
+      'instrumentId' in instrumentAnswer
+  );
+};
 
 export async function proposalSubmittedHandler(event: ApplicationEvent) {
   if (event.type != Event.PROPOSAL_SUBMITTED) return;
@@ -54,28 +84,49 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
     event.proposal.callId
   );
 
-  const instruments = await instrumentSource.getInstrumentsByProposalPk(
-    event.proposal.primaryKey
+  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+    event.proposal.questionaryId
   );
 
-  // Postgres implementation doesn't match interface - impliementation wants questionaryId, not proposalId
-  const answer = await questionaryDataSource.getAnswer(
-    event.proposal.questionaryId,
-    'instrument_picker'
+  const instrumentPickerAnswers = getInstrumentPickerAnswers(questionarySteps);
+  const instrumentPickerAnswerValues = instrumentPickerAnswers.flatMap(
+    (answer) => getInstrumentPickerAnswerValues(answer.value)
+  );
+  const instrumentIds = Array.from(
+    new Set(
+      instrumentPickerAnswerValues
+        .map((instrumentAnswer) => Number(instrumentAnswer.instrumentId))
+        .filter((instrumentId) => Number.isFinite(instrumentId))
+    )
   );
 
-  (
-    answer?.answer as {
-      value: { instrumentId: number; timeRequested: number }[];
-    }
-  )?.value.forEach((instrumentAnswer: any) => {
-    const instrument = instruments.find(
-      (inst) => inst.id === Number(instrumentAnswer.instrumentId)
-    );
-    if (instrument) {
-      instrument.managementTimeAllocation = instrumentAnswer.timeRequested || 0;
-    }
-  });
+  const instruments = await instrumentSource.getInstrumentsByIds(instrumentIds);
+  const requested = instrumentPickerAnswerValues
+    .map((instrumentAnswer) => {
+      const requestedTime = Number(instrumentAnswer.timeRequested ?? 0);
+      const formattedRequestedTime = Number.isFinite(requestedTime)
+        ? requestedTime
+        : 0;
+      const instrument = instruments.find(
+        (inst) => inst.id === Number(instrumentAnswer.instrumentId)
+      );
+      if (!instrument) {
+        return null;
+      }
+
+      const timeUnit = `${call.allocationTimeUnit}${
+        formattedRequestedTime > 1 || formattedRequestedTime === 0 ? 's' : ''
+      }`;
+
+      return [
+        `${instrument.name}:`,
+        instrument.description,
+        formattedRequestedTime,
+        timeUnit,
+      ].join(' ');
+    })
+    .filter((request): request is string => request !== null)
+    .join(', ');
 
   const shortDateFormat = new Intl.DateTimeFormat('en-GB', {
     month: 'short',
@@ -115,19 +166,17 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
         submittedOn: event.proposal.submittedDate!.toLocaleString(),
         accessRoute: workflow?.name || 'N/A',
         principalInvestigator:
-          principalInvestigator.preferredname +
+          (principalInvestigator.preferredname ||
+            principalInvestigator.firstname) +
           ' ' +
           principalInvestigator.lastname,
         establishment: principalInvestigator.institution,
         alternativeContacts: '',
         coinvestigators: participants.map(
-          (partipant) => `${partipant.preferredname} ${partipant.lastname} `
+          (partipant) =>
+            `${partipant.preferredname || partipant.firstname} ${partipant.lastname} `
         ),
-        requested: instruments
-          .map((instrument) => {
-            return `${instrument.name}: ${instrument.description} ${instrument.managementTimeAllocation} ${call.allocationTimeUnit}${instrument.managementTimeAllocation > 1 ? 's' : ''}`;
-          })
-          .join(', '),
+        requested,
       },
       allocationPeriod: allocationPeriod,
       deadline: longDateFormat.format(call.endCall),
@@ -153,7 +202,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
       ...options,
       substitution_data: {
         ...(options.substitution_data as any),
-        name: participant.preferredname,
+        name: participant.preferredname || participant.firstname,
       },
       recipients: [
         {

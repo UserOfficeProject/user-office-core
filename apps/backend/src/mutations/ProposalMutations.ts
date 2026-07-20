@@ -541,7 +541,11 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    const { workflowStatusId: statusId, proposalPks } = args;
+    const {
+      workflowStatusId: statusId,
+      proposalPks,
+      statusActionsWorkflowConnectionId,
+    } = args;
 
     const result = await this.proposalDataSource.changeProposalsWorkflowStatus(
       statusId,
@@ -549,43 +553,48 @@ export default class ProposalMutations {
     );
 
     if (result.proposals.length === proposalPks.length) {
-      const fullProposals = await Promise.all(
-        proposalPks.map(async (proposalPk) => {
-          const fullProposal = result.proposals.find(
-            (updatedProposal) => updatedProposal.primaryKey === proposalPk
-          );
-
-          if (!fullProposal) {
-            return null;
-          }
-
-          const proposalWorkflow =
-            await this.callDataSource.getProposalWorkflowByCall(
-              fullProposal.callId
+      // Only run status actions if a specific workflow connection was provided
+      if (statusActionsWorkflowConnectionId) {
+        const fullProposals = await Promise.all(
+          proposalPks.map(async (proposalPk) => {
+            const fullProposal = result.proposals.find(
+              (updatedProposal) => updatedProposal.primaryKey === proposalPk
             );
 
-          if (!proposalWorkflow) {
-            return rejection(
-              `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
-              {
-                agent,
-                args,
-              }
-            );
-          }
+            if (!fullProposal) {
+              return null;
+            }
 
-          return {
-            ...fullProposal,
-          };
-        })
-      );
+            const proposalWorkflow =
+              await this.callDataSource.getProposalWorkflowByCall(
+                fullProposal.callId
+              );
 
-      const statusEngineReadyProposals = fullProposals.filter(
-        (item): item is WorkflowEngineProposalType => !!item
-      );
+            if (!proposalWorkflow) {
+              return rejection(
+                `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
+                {
+                  agent,
+                  args,
+                }
+              );
+            }
 
-      // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      proposalStatusActionEngine(statusEngineReadyProposals);
+            return {
+              ...fullProposal,
+              prevStatusId: fullProposal.workflowStatusId,
+              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
+            };
+          })
+        );
+
+        const statusEngineReadyProposals = fullProposals.filter(
+          (item): item is WorkflowEngineProposalType => !!item
+        );
+
+        // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
+        proposalStatusActionEngine(statusEngineReadyProposals);
+      }
     } else {
       rejection('Could not change statuses to all of the selected proposals', {
         result,
