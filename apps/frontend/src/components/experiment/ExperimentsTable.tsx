@@ -6,9 +6,15 @@ import MaterialTable, {
 import { Visibility } from '@mui/icons-material';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import React, { useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-import { Experiment, PaginationSortDirection, SettingsId } from 'generated/sdk';
+import RoleBasedLink from 'components/common/RoleBasedLink';
+import {
+  Experiment,
+  PaginationSortDirection,
+  SettingsId,
+  UserRole,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -52,6 +58,8 @@ export default function ExperimentsTable({
 
   const { api } = useDataApiWithFeedback();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const from = encodeURIComponent(location.pathname + location.search);
   const [tableData, setTableData] = useState<Experiment[]>([]);
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment>();
 
@@ -168,6 +176,16 @@ export default function ExperimentsTable({
     {
       title: 'Proposal ID',
       field: 'proposal.proposalId',
+      render: (rowData: Experiment) => (
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
+            [UserRole.INSTRUMENT_SCIENTIST]: `/Proposals?reviewModal=${rowData.proposal.primaryKey}&from=${from}`,
+          }}
+        >
+          {rowData.proposal.proposalId}
+        </RoleBasedLink>
+      ),
     },
     {
       title: 'Start',
