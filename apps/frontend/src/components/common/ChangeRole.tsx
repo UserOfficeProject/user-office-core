@@ -22,14 +22,14 @@ const ChangeRole = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-    >
-      <UOLoader />
-      Changing role...
-    </Box>
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh"
+      }}>
+      <UOLoader />Changing role...
+          </Box>
   );
 };
 

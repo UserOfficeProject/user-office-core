@@ -64,7 +64,9 @@ export const MultiRankAssignmentDialog = ({
           variant="body2"
           color="textSecondary"
           gutterBottom
-          margin={2}
+          sx={{
+            margin: 2
+          }}
         >
           Please assign a unique rank to each user, Ranks must be whole numbers
           and greater than 1.
@@ -103,9 +105,6 @@ export const MultiRankAssignmentDialog = ({
                       type="number"
                       variant="outlined"
                       data-cy={`rank-${row.lastname}`}
-                      InputProps={{
-                        inputProps: { min: 1, step: 1 },
-                      }}
                       error={
                         usersWithRank.some(
                           (user) =>
@@ -134,6 +133,11 @@ export const MultiRankAssignmentDialog = ({
                       required
                       fullWidth
                       margin="none"
+                      slotProps={{
+                        input: {
+                          inputProps: { min: 1, step: 1 },
+                        }
+                      }}
                     />
                   </TableCell>
                 </TableRow>
