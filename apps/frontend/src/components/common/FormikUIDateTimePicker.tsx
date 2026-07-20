@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { TextFieldProps } from '@mui/material/TextField';
-import { PickerValidDate } from '@mui/x-date-pickers';
 import {
   DateTimePicker as MuiDateTimePicker,
   DateTimePickerProps as MuiDateTimePickerProps,
@@ -13,7 +12,7 @@ import { createFormikErrorHandler } from 'utils/errorHandler';
 
 export interface DateTimePickerProps
   extends FieldProps,
-    Omit<MuiDateTimePickerProps<PickerValidDate>, 'name' | 'value' | 'error'> {
+    Omit<MuiDateTimePickerProps, 'name' | 'value' | 'error'> {
   textField?: TextFieldProps;
 }
 
@@ -33,15 +32,14 @@ export function fieldToDateTimePicker({
   onChange,
   onError,
   ...props
-}: DateTimePickerProps): MuiDateTimePickerProps<PickerValidDate> {
+}: DateTimePickerProps): MuiDateTimePickerProps {
   const fieldError = getIn(errors, field.name);
   const showError = getIn(touched, field.name) && !!fieldError;
   const isStringValue = typeof value === 'string';
 
   return {
     slotProps: {
-      textField: (textFieldProps) => ({
-        ...textFieldProps,
+      textField: {
         error: showError,
         helperText: showError ? fieldError : helperText,
         label: label,
@@ -51,7 +49,7 @@ export function fieldToDateTimePicker({
             setFieldTouched(field.name, true, true);
           },
         ...textField,
-      }),
+      } as NonNullable<MuiDateTimePickerProps['slotProps']>['textField'],
     },
     disabled: disabled ?? isSubmitting,
     onChange:
