@@ -5,6 +5,7 @@ fragment experimentSafety on ExperimentSafety {
   esiQuestionarySubmittedAt
   createdBy
   statusId
+  workflowStatusId
   safetyReviewQuestionaryId
   reviewedBy
   createdAt
