@@ -9,7 +9,32 @@ import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVis
 import { VisitsFilter } from '../../resolvers/queries/VisitsQuery';
 import { VisitDataSource } from '../VisitDataSource';
 import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation';
-import { dummyUserWithRole } from './UserDataSource';
+import {
+  dummyPrincipalInvestigatorWithRole,
+  dummyProposalMemberWithRole,
+  dummySecondVisitorWithRole,
+  dummyThirdVisitorWithRole,
+  dummyUserWithRole,
+  dummyVisitorWithRole,
+  dummyVisitTeamLeadWithRole,
+} from './UserDataSource';
+
+/*
+ * Who counts as a member of each proposal, mirroring the proposal fixtures:
+ * proposal 1 is proposed by the principal investigator with a co-proposer, plus
+ * a member who is deliberately neither a FAP member nor an internal reviewer so
+ * that visit-based read access can be tested without a broader role granting it.
+ */
+const proposalMembers = new Map<number, number[]>([
+  [
+    1,
+    [
+      dummyPrincipalInvestigatorWithRole.id,
+      dummyUserWithRole.id,
+      dummyProposalMemberWithRole.id,
+    ],
+  ],
+]);
 
 export class VisitDataSourceMock implements VisitDataSource {
   private visits: Visit[];
@@ -30,6 +55,12 @@ export class VisitDataSourceMock implements VisitDataSource {
       new Visit(1, 1, 1, dummyUserWithRole.id, new Date(), 1),
       new Visit(3, 3, 3, dummyUserWithRole.id, new Date(), 3),
       new Visit(4, 4, 4, dummyUserWithRole.id, new Date(), 4),
+      /*
+       * Visit 5 is on proposal 1 but its team lead and visitors are not members
+       * of that proposal, which keeps the team lead and visitor authorization
+       * paths distinguishable from proposal membership.
+       */
+      new Visit(5, 1, 1, dummyVisitTeamLeadWithRole.id, new Date(), 5),
     ];
 
     this.visitsHasVisitors = [
@@ -47,6 +78,42 @@ export class VisitDataSourceMock implements VisitDataSource {
         1,
         2,
         2,
+        new Date(),
+        new Date(),
+        VisitRegistrationStatus.DRAFTED
+      ),
+      new VisitRegistration(
+        this.createRegistrationId(),
+        5,
+        dummyVisitTeamLeadWithRole.id,
+        null,
+        new Date(),
+        new Date(),
+        VisitRegistrationStatus.DRAFTED
+      ),
+      new VisitRegistration(
+        this.createRegistrationId(),
+        5,
+        dummyVisitorWithRole.id,
+        null,
+        new Date(),
+        new Date(),
+        VisitRegistrationStatus.DRAFTED
+      ),
+      new VisitRegistration(
+        this.createRegistrationId(),
+        5,
+        dummySecondVisitorWithRole.id,
+        null,
+        new Date(),
+        new Date(),
+        VisitRegistrationStatus.SUBMITTED
+      ),
+      new VisitRegistration(
+        this.createRegistrationId(),
+        5,
+        dummyThirdVisitorWithRole.id,
+        null,
         new Date(),
         new Date(),
         VisitRegistrationStatus.DRAFTED
@@ -189,7 +256,31 @@ export class VisitDataSourceMock implements VisitDataSource {
       : false;
   }
 
+  /*
+   * Mirrors the Postgres implementation: a user is related to a visit if they
+   * created it, lead it, are on its visitor list, or are a member of its
+   * proposal. They can then read everyone taking part in those visits.
+   */
   async getRelatedUsersOnVisits(id: number): Promise<number[]> {
-    return [];
+    const usersOnVisit = (visitId: number) =>
+      this.visitsHasVisitors
+        .filter((registration) => registration.visitId === visitId)
+        .map((registration) => registration.userId);
+
+    const relatedVisits = this.visits.filter(
+      (visit) =>
+        visit.creatorId === id ||
+        visit.teamLeadUserId === id ||
+        usersOnVisit(visit.id).includes(id) ||
+        (proposalMembers.get(visit.proposalPk) ?? []).includes(id)
+    );
+
+    const relatedUsers = relatedVisits.flatMap((visit) => [
+      visit.creatorId,
+      visit.teamLeadUserId,
+      ...usersOnVisit(visit.id),
+    ]);
+
+    return [...new Set(relatedUsers)];
   }
 }

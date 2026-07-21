@@ -280,6 +280,33 @@ export default {
       email: 'lksorensen@foodplanet.co.dk',
       password: 'Abcd1234!',
     },
+    // Seeded by 0009_VisitTeamLeadUser.sql. None of these are the PI or a
+    // co-proposer of the seeded proposal, so they isolate the team lead and
+    // visitor authorization paths from proposal membership.
+    visitTeamLead: {
+      id: 990,
+      firstName: 'Tomas',
+      lastName: 'Toivonen',
+      preferredName: 'Tomas',
+      email: 'ttoivonen@foodplanet.co.dk',
+      password: 'Abcd1234!',
+    },
+    visitor1: {
+      id: 991,
+      firstName: 'Miriam',
+      lastName: 'Mikkola',
+      preferredName: 'Miriam',
+      email: 'mmikkola@foodplanet.co.dk',
+      password: 'Abcd1234!',
+    },
+    visitor2: {
+      id: 992,
+      firstName: 'Alex',
+      lastName: 'Aalto',
+      preferredName: 'Alex',
+      email: 'aaalto@foodplanet.co.dk',
+      password: 'Abcd1234!',
+    },
     reviewer: {
       id: 3,
       firstName: 'Nils',
