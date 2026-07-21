@@ -66,11 +66,12 @@ export class VisitAuthorization {
      * User can read the visit if he is a participant of a proposal
      * or on the visitor list
      */
-    return (
-      visit.creatorId === agent.id ||
-      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk) ||
-      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
-    );
+    const [isProposalMember, isVisitVisitor] = await Promise.all([
+      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk),
+      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id),
+    ]);
+
+    return visit.creatorId === agent.id || isProposalMember || isVisitVisitor;
   }
 
   async hasWriteRights(
