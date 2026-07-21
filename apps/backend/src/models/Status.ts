@@ -16,6 +16,15 @@ export enum ProposalStatusDefaultShortCodes {
   FAP_AND_FEASIBILITY_REVIEW = 'FAP_AND_FEASIBILITY_REVIEW',
 }
 
+// Default experiment safety workflow status short codes
+export enum ExperimentSafetyWorkflowStatusCodes {
+  AWAITING_ESF = 'AWAITING_ESF',
+  ESF_IS_REVIEW = 'ESF_IS_REVIEW',
+  ESF_ESR_REVIEW = 'ESF_ESR_REVIEW',
+  ESF_REJECTED = 'ESF_REJECTED',
+  ESF_APPROVED = 'ESF_APPROVED',
+}
+
 export class Status {
   constructor(
     public id: string,
