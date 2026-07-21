@@ -39,8 +39,7 @@ export const dateRangeDefinition: Question<DataType.DATE_RANGE_PICKER> = {
 
     return config;
   },
-  getDefaultAnswer: (relation: QuestionTemplateRelation) =>
-    (relation.config as DateRangeConfig).defaultDate || null,
+  getDefaultAnswer: (relation: QuestionTemplateRelation) => null,
   filterQuery: (queryBuilder, filter) => {
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.EQUALS:

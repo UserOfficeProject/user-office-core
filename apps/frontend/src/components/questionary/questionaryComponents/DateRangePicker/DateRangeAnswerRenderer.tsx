@@ -1,39 +1,37 @@
 import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
-import {
-  DateRangeConfig,
-  FieldConfig,
-  Maybe,
-  Scalars,
-  SettingsId,
-} from 'generated/sdk';
+import { Maybe, Scalars, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 // NOTE: This is additional component because of some react warning with hooks when we use the useFormattedDateTime inside default DateAnswerRenderer component.
-const DateAnswerValueRenderer = ({
-  config,
+const DateRangeAnswerValueRenderer = ({
   value,
 }: {
-  config: FieldConfig;
   value: Maybe<Scalars['IntStringDateBoolArray']['input']>;
 }) => {
-  const settingsFormatToUse = (config as DateRangeConfig).includeTime
-    ? SettingsId.DATE_TIME_FORMAT
-    : SettingsId.DATE_FORMAT;
+  const settingsFormatToUse = SettingsId.DATE_FORMAT;
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse,
   });
+  if (value?.dateRanges?.[0]?.from && value?.dateRanges?.[0]?.to) {
+    return (
+      <span>
+        {toFormattedDateTime(value.dateRanges[0].from)} :{' '}
+        {toFormattedDateTime(value.dateRanges[0].to)}
+      </span>
+    );
+  }
 
-  return <span>{toFormattedDateTime(value)}</span>;
+  return <span>Invalid date range</span>;
 };
 
-const DateAnswerRenderer: AnswerRenderer = ({ config, value }) => {
+const DateAnswerRenderer: AnswerRenderer = ({ value }) => {
   if (!value) {
     return <span>Left blank</span>;
   }
 
-  return <DateAnswerValueRenderer config={config} value={value} />;
+  return <DateRangeAnswerValueRenderer value={value} />;
 };
 
 export default DateAnswerRenderer;
