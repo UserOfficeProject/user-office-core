@@ -19,7 +19,7 @@
     "build:validation": "npm --prefix ../../validation ci && npm --prefix ../../validation run build",
     "build": "npm run build:validation && npm run generate:uows && rm -rf ./build && tsc",
     "postinstall": "npm run build:validation",
-    "dev": "docker compose up -d --remove-orphans && ts-node-dev --inspect=9229 -r tsconfig-paths/register --respawn -T ./index.ts",
+    "dev": "docker compose up -d --remove-orphans && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "start:e2e": "docker compose -f docker-compose.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && node ./build/index.js",
     "start:e2e:stfc": "docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && node ./build/index.js",
     "dev:docker": "npm install && ts-node-dev --inspect=0.0.0.0:9229 --respawn -T ./index.ts",
