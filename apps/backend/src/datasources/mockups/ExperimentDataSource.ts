@@ -416,4 +416,21 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
     return experimentSafety;
   }
+
+  async changeExperimentSafetyWorkflowStatus(
+    workflowStatusId: number,
+    experimentSafetyPks: number[]
+  ): Promise<ExperimentSafety[]> {
+    const updatedSafeties: ExperimentSafety[] = [];
+
+    for (const pk of experimentSafetyPks) {
+      const updatedSafety = await this.updateExperimentSafetyStatus(
+        pk,
+        workflowStatusId
+      );
+      updatedSafeties.push(updatedSafety);
+    }
+
+    return updatedSafeties;
+  }
 }
