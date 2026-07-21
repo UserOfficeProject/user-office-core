@@ -7,7 +7,8 @@ export class EsiWizardStep extends QuestionaryWizardStep {
     const registrationState = state as ExperimentSafetySubmissionState;
 
     return (
-      registrationState.experimentSafety.esiQuestionarySubmittedAt === null
+      registrationState.experimentSafety.esiQuestionarySubmittedAt === null ||
+      registrationState.experimentSafety.statusId === 'AWAITING_ESF'
     );
   }
 }
