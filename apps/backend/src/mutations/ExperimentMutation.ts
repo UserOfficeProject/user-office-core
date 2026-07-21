@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { ExperimentSafetyAuthorization } from '../auth/ExperimentSafetyAuthorization';
@@ -11,6 +12,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { experimentSafetyStatusActionEngine } from '../eventHandlers/workflowEntities/experiment/statusActionEngine';
 import { Event } from '../events/event.enum';
 import {
   ExperimentHasSample,
@@ -18,7 +20,7 @@ import {
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
-import { rejection, Rejection } from '../models/Rejection';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
@@ -31,6 +33,7 @@ import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
 import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
+import { ChangeExperimentsSafetyStatusInput } from '../resolvers/mutations/ChangeExperimentsSafetyStatusMutation';
 
 @injectable()
 export default class ExperimentMutations {
@@ -299,7 +302,6 @@ export default class ExperimentMutations {
     if (!experiment) {
       return rejection('No experiment found');
     }
-
     const proposal = await this.proposalDataSource.get(experiment.proposalPk);
     if (!proposal) {
       return rejection('No proposal found', { args });
@@ -320,7 +322,6 @@ export default class ExperimentMutations {
     if (!experimentSafety) {
       return rejection('No experiment safety found', { args });
     }
-
     const hasAccessRights =
       this.userAuth.isApiToken(agent) ||
       (await this.experimentSafetyAuth.hasWriteRights(
@@ -350,19 +351,16 @@ export default class ExperimentMutations {
     if (!questionTemplateRel) {
       return rejection('No question found', { args });
     }
-
     const templateId = (questionTemplateRel.config as SampleDeclarationConfig)
       .esiTemplateId;
     if (!templateId) {
       return rejection('Esi template is not defined', { args });
     }
-
     // Creating a new Questionary for the Sample using the ESI Template
     const newQuestionary = await this.questionaryDataSource.create(
       agent!.id,
       templateId!
     );
-
     // Copying the answers from the Sample Questionary to the new Sample ESI Questionary
     await this.questionaryDataSource.copyAnswers(
       sample.questionaryId,
@@ -508,5 +506,133 @@ export default class ExperimentMutations {
         title: args.newSampleTitle,
       },
     });
+  }
+
+  private async processExperimentsSafetyStatusChange(
+    agent: UserWithRole | null,
+    args: ChangeExperimentsSafetyStatusInput
+  ): Promise<ExperimentSafety[] | Rejection> {
+    const {
+      workflowStatusId: statusId,
+      experimentSafetyPks,
+      statusActionsWorkflowConnectionId,
+    } = args;
+
+    const result = await this.dataSource.changeExperimentSafetyWorkflowStatus(
+      statusId,
+      experimentSafetyPks
+    );
+
+    if (result.length === experimentSafetyPks.length) {
+      // Only run status actions if a specific workflow connection was provided
+      if (statusActionsWorkflowConnectionId) {
+        const fullExperimentsSafety = await Promise.all(
+          experimentSafetyPks.map(async (experimentSafetyPk) => {
+            const fullExperimentSafety = result.find(
+              (updateExperimentSafety) =>
+                updateExperimentSafety.experimentSafetyPk === experimentSafetyPk
+            );
+
+            if (!fullExperimentSafety) {
+              logger.logError(
+                'Full experiment safety not found after status change',
+                { experimentSafetyPk, statusId }
+              );
+
+              return null;
+            }
+
+            const experiment = await this.dataSource.getExperiment(
+              fullExperimentSafety.experimentPk
+            );
+
+            if (!experiment) {
+              logger.logError('Experiment not found for experiment safety', {
+                experimentSafetyPk,
+                experimentPk: fullExperimentSafety.experimentPk,
+              });
+
+              return null;
+            }
+
+            const proposal = await this.proposalDataSource.get(
+              experiment.proposalPk
+            );
+
+            if (!proposal) {
+              logger.logError('Proposal not found for experiment', {
+                experimentSafetyPk,
+                experimentPk: experiment.experimentPk,
+                proposalPk: experiment.proposalPk,
+              });
+
+              return null;
+            }
+
+            const experimentSafetyWorkflow =
+              await this.callDataSource.getExperimentWorkflowByCall(
+                proposal.callId
+              );
+
+            if (!experimentSafetyWorkflow) {
+              return rejection(
+                `No experiment workflow found for the specific proposal call with id: ${proposal.callId}`,
+                {
+                  agent,
+                  args,
+                }
+              );
+            }
+
+            return {
+              experimentSafety: fullExperimentSafety,
+              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
+            };
+          })
+        );
+
+        const statusEngineReadyExperimentsSafety = fullExperimentsSafety.filter(
+          (
+            item
+          ): item is {
+            experimentSafety: ExperimentSafety;
+            workflowStatusConnectionId: number;
+          } => item != null && !isRejection(item)
+        );
+
+        if (
+          statusEngineReadyExperimentsSafety.length !==
+          experimentSafetyPks.length
+        ) {
+          return rejection(
+            'Could not fetch required data for all experiment safeties after status change',
+            { experimentSafetyPks, fullExperimentsSafety }
+          );
+        }
+
+        // NOTE: After experiment safety status change we need to run the status engine and execute the actions on the selected status.
+        experimentSafetyStatusActionEngine(statusEngineReadyExperimentsSafety);
+      }
+    } else {
+      return rejection(
+        'Could not change statuses to all of the selected experiment safeties',
+        {
+          result,
+        }
+      );
+    }
+
+    return (
+      result || rejection('Can not change experiment safety status', { result })
+    );
+  }
+
+  @EventBus(Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER)
+  @Authorized([Roles.USER_OFFICER])
+  async changeExperimentsSafetyStatus(
+    agent: UserWithRole | null,
+    args: ChangeExperimentsSafetyStatusInput
+  ): Promise<ExperimentSafety[] | Rejection> {
+    return this.processExperimentsSafetyStatusChange(agent, args);
   }
 }

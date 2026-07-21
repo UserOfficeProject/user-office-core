@@ -52,9 +52,9 @@ export const checkAllReviewsSubmittedOnProposal = (
 };
 
 export const searchObjectByKey = (
-  object: object,
+  object: Record<string, any>,
   originalKey: string
-): object | null => {
+): Record<string, any> | null => {
   if (object !== null) {
     for (const key of Object.keys(object)) {
       if (key === originalKey) {
