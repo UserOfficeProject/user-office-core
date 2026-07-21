@@ -1,17 +1,22 @@
 import { container } from 'tsyringe';
 
 import { emailActionHandler } from './emailActionHandler';
-import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
+import { pdfDownloadActionHandler } from './pdfDownloadActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
-import { groupProposalsByProperties } from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
-import { StatusActionType } from '../models/StatusAction';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { groupProposalsByProperties } from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { StatusActionsDataSource } from '../../../datasources/StatusActionsDataSource';
+import { WorkflowDataSource } from '../../../datasources/WorkflowDataSource';
+import { Proposal } from '../../../models/Proposal';
+import { StatusActionType } from '../../../models/StatusAction';
+
+export interface ProposalWithWorkflowStatusConnectionId {
+  proposal: Proposal;
+  workflowStatusConnectionId: number;
+}
 
 export const proposalStatusActionEngine = async (
-  proposals: WorkflowEngineProposalType[]
+  proposals: ProposalWithWorkflowStatusConnectionId[]
 ) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
     Tokens.StatusActionsDataSource
@@ -21,29 +26,22 @@ export const proposalStatusActionEngine = async (
     Tokens.WorkflowDataSource
   );
 
-  // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
-  const groupByProperties = ['workflowId', 'statusId'];
-  // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
+  const groupByProperties = ['workflowStatusConnectionId'];
   const groupResult = groupProposalsByProperties(proposals, groupByProperties);
-
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
       const [{ workflowStatusConnectionId }] = groupedProposals;
-
       const currentConnection = await workflowDataSource.getWorkflowConnection(
         workflowStatusConnectionId
       );
-
       if (!currentConnection) {
         return;
       }
-
       const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id
         );
-
       if (!statusActions?.length) {
         return;
       }
@@ -56,15 +54,24 @@ export const proposalStatusActionEngine = async (
 
           switch (statusAction.type) {
             case StatusActionType.EMAIL:
-              emailActionHandler(statusAction, groupedProposals);
+              emailActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             case StatusActionType.RABBITMQ:
-              rabbitMQActionHandler(statusAction, groupedProposals);
+              rabbitMQActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             case StatusActionType.PROPOSALDOWNLOAD:
-              proposalDownloadActionHandler(statusAction, groupedProposals);
+              pdfDownloadActionHandler(
+                statusAction,
+                groupedProposals.map((proposal) => proposal.proposal)
+              );
               break;
 
             default:
