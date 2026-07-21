@@ -109,7 +109,7 @@ export function QuestionaryComponentDateRangePicker(
           onSelect={(value) => {
             setRange(value);
             if (value?.from && value?.to) {
-              onComplete([value]);
+              onComplete({ dateRanges: [value] });
             }
           }}
         />
