@@ -2,7 +2,11 @@ module.exports = {
   roots: ['<rootDir>/src'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.js$': ['ts-jest', { diagnostics: false }],
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!.*(htmlparser2|dom-serializer|domelementtype|domhandler|domutils|entities))',
+  ],
   moduleNameMapper: {
     '^@user-office-software/duo-validation/lib/(.*)$':
       '<rootDir>/../../validation/lib/$1',
