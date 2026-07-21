@@ -130,10 +130,11 @@ mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 mapClass(Tokens.MailService, SparkPostMailService);
 
-mapValue(
-  Tokens.MailService,
-  isDevelopment ? new SMTPMailService() : SparkPostMailService
-);
+if (isDevelopment) {
+  mapValue(Tokens.MailService, new SMTPMailService());
+} else {
+  mapClass(Tokens.MailService, SparkPostMailService);
+}
 
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
