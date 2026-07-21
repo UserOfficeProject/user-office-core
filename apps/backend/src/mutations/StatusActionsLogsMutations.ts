@@ -7,6 +7,8 @@ import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import StatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { Authorized } from '../decorators';
+import { emailActionHandler } from '../eventHandlers/workflowEntities/proposal/emailActionHandler';
+import { pdfDownloadActionHandler } from '../eventHandlers/workflowEntities/proposal/pdfDownloadActionHandler';
 import { Proposal } from '../models/Proposal';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -18,9 +20,6 @@ import {
   ReplayStatusLogFailure,
 } from '../resolvers/mutations/ReplayStatusActionsLogMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
-import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
-import { proposalDownloadActionHandler } from '../statusActionEngine/proposalDownloadActionHandler';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 
 @injectable()
 export default class StatusActionsLogsMutations {
@@ -37,7 +36,7 @@ export default class StatusActionsLogsMutations {
 
   private async getStatusEngineReadyProposals(
     proposals: Proposal[]
-  ): Promise<WorkflowEngineProposalType[]> {
+  ): Promise<Proposal[]> {
     if (proposals.length < 1) {
       return [];
     }
@@ -58,9 +57,9 @@ export default class StatusActionsLogsMutations {
       })
     );
 
-    return fullProposals.filter(
-      (item): item is WorkflowEngineProposalType => !!item
-    );
+    const filteredProposals = fullProposals.filter((item) => item !== null);
+
+    return filteredProposals as Proposal[];
   }
   private async executeStatusActionsLog(
     statusActionsLog: StatusActionsLog,
@@ -118,14 +117,10 @@ export default class StatusActionsLogsMutations {
 
         break;
       case StatusActionType.PROPOSALDOWNLOAD:
-        await proposalDownloadActionHandler(
-          statusAction,
-          workflowEngineProposals,
-          {
-            statusActionsLogId: statusActionsLog.statusActionsLogId,
-            loggedInUserId: agent?.id,
-          }
-        );
+        await pdfDownloadActionHandler(statusAction, workflowEngineProposals, {
+          statusActionsLogId: statusActionsLog.statusActionsLogId,
+          loggedInUserId: agent?.id,
+        });
 
         break;
       default:
