@@ -366,15 +366,20 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       sort_order: item.sort_order,
     }));
 
-    api().updateCallOrder({
-      data: callOrderList,
-    });
-
-    setCallsQueryParams((prev) => ({
-      ...prev,
-      sortField: 'sort_order',
-      sortDirection: PaginationSortDirection.ASC,
-    }));
+    api()
+      .updateCallOrder({
+        data: callOrderList,
+      })
+      .then(() => {
+        setCallsQueryParams((prev) => ({
+          ...prev,
+          sortField: 'sort_order',
+          sortDirection: PaginationSortDirection.ASC,
+        }));
+      })
+      .catch(() => {
+        throw new Error('Failed to update call order');
+      });
   };
 
   const getCallOrder = (): void => {
