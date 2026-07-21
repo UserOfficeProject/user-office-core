@@ -10,7 +10,7 @@ import callFactoryService, {
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
-  CallExtraFapDataColumns,
+  DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
@@ -25,7 +25,7 @@ const callExtraFapDataColumns = container.isRegistered(
   Tokens.CallExtraFapDataColumns
 )
   ? container.resolve<string[]>(Tokens.CallExtraFapDataColumns)
-  : CallExtraFapDataColumns;
+  : DefaultCallExtraFapDataColumns;
 
 const router = express.Router();
 
