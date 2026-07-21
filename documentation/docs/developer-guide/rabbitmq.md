@@ -34,7 +34,7 @@ The `rabbitMQActionHandler` function in the backend is responsible for sending m
 
     export const rabbitMQActionHandler = async (
       statusAction: ConnectionHasStatusAction,
-      proposals: WorkflowEngineProposalType[]
+      proposals: Proposal[]
     ) => {
       const config = statusAction.config as RabbitMQActionConfig;
       if (!config.exchanges?.length) {

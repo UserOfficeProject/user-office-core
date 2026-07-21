@@ -12,8 +12,12 @@ import {
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import FapMutations from './FapMutations';
+import InstrumentMutations from './InstrumentMutations';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -25,10 +29,14 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import {
+  proposalStatusActionEngine,
+  ProposalWithWorkflowStatusConnectionId,
+} from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
-import { rejection, Rejection } from '../models/Rejection';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
@@ -40,13 +48,7 @@ import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
-import { CallDataSource } from './../datasources/CallDataSource';
-import { CloneUtils } from './../utils/CloneUtils';
-import FapMutations from './FapMutations';
-import InstrumentMutations from './InstrumentMutations';
+import { CloneUtils } from '../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
@@ -166,8 +168,13 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const { proposalPk, title, abstract, users, proposerId, created } = args;
 
-    proposal.title = title;
-    proposal.abstract = abstract;
+    if (title !== undefined) {
+      proposal.title = title;
+    }
+
+    if (abstract !== undefined) {
+      proposal.abstract = abstract;
+    }
 
     if (created !== undefined) {
       proposal.created = created;
@@ -581,24 +588,27 @@ export default class ProposalMutations {
             }
 
             return {
-              ...fullProposal,
-              prevStatusId: fullProposal.workflowStatusId,
+              proposal: fullProposal,
               workflowStatusConnectionId: statusActionsWorkflowConnectionId,
             };
           })
         );
 
         const statusEngineReadyProposals = fullProposals.filter(
-          (item): item is WorkflowEngineProposalType => !!item
+          (item): item is ProposalWithWorkflowStatusConnectionId =>
+            item !== null && !isRejection(item)
         );
 
         // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
         proposalStatusActionEngine(statusEngineReadyProposals);
       }
     } else {
-      rejection('Could not change statuses to all of the selected proposals', {
-        result,
-      });
+      return rejection(
+        'Could not change statuses to all of the selected proposals',
+        {
+          result,
+        }
+      );
     }
 
     return result || rejection('Can not change proposal status', { result });
