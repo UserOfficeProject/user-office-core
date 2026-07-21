@@ -8,31 +8,31 @@
       
       
       
-        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/user-guide/user-officer/templates/sampleESI_template/">
+        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/error_handling/">
       
       
-        <link rel="prev" href="../proposalESI_template/">
+        <link rel="prev" href="../dependency_injection/">
       
       
-        <link rel="next" href="../../settings/proposal_workflow/">
+        <link rel="next" href="../email/">
       
       
         
       
       
-      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Sample ESI templates - User Office Documentation</title>
+        <title>Error Handling - User Office Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +51,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sample-esi-templates" class="md-skip">
+        <a href="#error-handling" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="User Office Documentation" class="md-header__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
+    <a href="../.." title="User Office Documentation" class="md-header__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sample ESI templates
+              Error Handling
             
           </span>
         </div>
@@ -183,7 +183,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -204,11 +204,31 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../quick_start/" class="md-tabs__link">
+        <a href="../../quick_start/" class="md-tabs__link">
           
   
   
   Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/overview/" class="md-tabs__link">
+          
+  
+  
+  User Guide
 
         </a>
       </li>
@@ -226,27 +246,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../overview/" class="md-tabs__link">
-          
-  
-  
-  User Guide
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../../developer-guide/CONTRIBUTING/" class="md-tabs__link">
+        <a href="../CONTRIBUTING/" class="md-tabs__link">
           
   
   
@@ -264,7 +264,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../faq/" class="md-tabs__link">
+      <a href="../../faq/" class="md-tabs__link">
         
   
   
@@ -283,7 +283,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../glossary/" class="md-tabs__link">
+      <a href="../../glossary/" class="md-tabs__link">
         
   
   
@@ -324,7 +324,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="User Office Documentation" class="md-nav__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
+    <a href="../.." title="User Office Documentation" class="md-nav__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -342,7 +342,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -419,7 +419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../quick_start/" class="md-nav__link">
+      <a href="../../quick_start/" class="md-nav__link">
         
   
   
@@ -451,29 +451,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -491,7 +486,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -509,7 +504,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../overview/" class="md-nav__link">
+      <a href="../../user-guide/overview/" class="md-nav__link">
         
   
   
@@ -534,8 +529,6 @@
                 
   
   
-    
-  
   
   
     
@@ -546,11 +539,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -571,7 +564,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -589,7 +582,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-officer/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/user-officer/" class="md-nav__link">
         
   
   
@@ -617,7 +610,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../creating_call/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_call/" class="md-nav__link">
         
   
   
@@ -645,7 +638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../creating_workflow/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_workflow/" class="md-nav__link">
         
   
   
@@ -673,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../creating_templates/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_templates/" class="md-nav__link">
         
   
   
@@ -701,7 +694,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../proposal/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/proposal/" class="md-nav__link">
         
   
   
@@ -729,7 +722,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fap/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/fap/" class="md-nav__link">
         
   
   
@@ -757,7 +750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fap_review/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/fap_review/" class="md-nav__link">
         
   
   
@@ -785,7 +778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../feasibility_review/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/feasibility_review/" class="md-nav__link">
         
   
   
@@ -813,7 +806,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../roles/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/roles/" class="md-nav__link">
         
   
   
@@ -841,7 +834,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../page/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/page/" class="md-nav__link">
         
   
   
@@ -869,7 +862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../questions/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/questions/" class="md-nav__link">
         
   
   
@@ -894,8 +887,6 @@
                 
   
   
-    
-  
   
   
     
@@ -906,11 +897,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_12" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_12" >
         
           
           <label class="md-nav__link" for="__nav_3_2_12" id="__nav_3_2_12_label" tabindex="0">
@@ -931,7 +922,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_12_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_12_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2_12">
             <span class="md-nav__icon md-icon"></span>
             
@@ -949,7 +940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../proposal_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/proposal_template/" class="md-nav__link">
         
   
   
@@ -977,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fap_review_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/fap_review_template/" class="md-nav__link">
         
   
   
@@ -1005,7 +996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pdf_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/pdf_template/" class="md-nav__link">
         
   
   
@@ -1033,7 +1024,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../feedback_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/feedback_template/" class="md-nav__link">
         
   
   
@@ -1061,7 +1052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sampledec_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/sampledec_template/" class="md-nav__link">
         
   
   
@@ -1089,7 +1080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sub_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/sub_template/" class="md-nav__link">
         
   
   
@@ -1117,7 +1108,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../shipment_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/shipment_template/" class="md-nav__link">
         
   
   
@@ -1145,7 +1136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../visit_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/visit_template/" class="md-nav__link">
         
   
   
@@ -1173,7 +1164,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../proposalESI_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/proposalESI_template/" class="md-nav__link">
         
   
   
@@ -1198,37 +1189,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sample ESI templates
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../user-guide/user-officer/templates/sampleESI_template/" class="md-nav__link">
         
   
   
@@ -1244,37 +1208,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-are-sample-esi-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What are sample ESI templates?
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1345,7 +1278,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../settings/proposal_workflow/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/settings/proposal_workflow/" class="md-nav__link">
         
   
   
@@ -1373,7 +1306,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../settings/features/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/settings/features/" class="md-nav__link">
         
   
   
@@ -1417,7 +1350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../scheduler/" class="md-nav__link">
+      <a href="../../user-guide/scheduler/" class="md-nav__link">
         
   
   
@@ -1449,24 +1382,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -1484,7 +1422,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1502,7 +1440,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/CONTRIBUTING/" class="md-nav__link">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
         
   
   
@@ -1530,7 +1468,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -1558,7 +1496,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/step-by-step/" class="md-nav__link">
+      <a href="../step-by-step/" class="md-nav__link">
         
   
   
@@ -1586,7 +1524,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/running_locally/" class="md-nav__link">
+      <a href="../running_locally/" class="md-nav__link">
         
   
   
@@ -1614,7 +1552,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/tech_stack/" class="md-nav__link">
+      <a href="../tech_stack/" class="md-nav__link">
         
   
   
@@ -1642,7 +1580,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -1670,7 +1608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/rabbitmq/" class="md-nav__link">
+      <a href="../rabbitmq/" class="md-nav__link">
         
   
   
@@ -1698,7 +1636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/kubernetes/" class="md-nav__link">
+      <a href="../kubernetes/" class="md-nav__link">
         
   
   
@@ -1726,7 +1664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/dependency_injection/" class="md-nav__link">
+      <a href="../dependency_injection/" class="md-nav__link">
         
   
   
@@ -1751,10 +1689,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../../developer-guide/error_handling/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1770,6 +1735,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-kinds-of-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two kinds of errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#central-logging-with-apollo-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Central logging with Apollo plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hiding-details-from-the-client-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hiding details from the client in production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-an-error-yourself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging an error yourself
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outside-graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outside GraphQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1782,7 +1822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/email/" class="md-nav__link">
+      <a href="../email/" class="md-nav__link">
         
   
   
@@ -1810,7 +1850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/documentation_changes/" class="md-nav__link">
+      <a href="../documentation_changes/" class="md-nav__link">
         
   
   
@@ -1838,7 +1878,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/technique_proposals/" class="md-nav__link">
+      <a href="../technique_proposals/" class="md-nav__link">
         
   
   
@@ -1866,7 +1906,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../developer-guide/roles/" class="md-nav__link">
+      <a href="../roles/" class="md-nav__link">
         
   
   
@@ -1901,7 +1941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../faq/" class="md-nav__link">
+      <a href="../../faq/" class="md-nav__link">
         
   
   
@@ -1928,7 +1968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../glossary/" class="md-nav__link">
+      <a href="../../glossary/" class="md-nav__link">
         
   
   
@@ -1975,10 +2015,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-are-sample-esi-templates" class="md-nav__link">
+  <a href="#two-kinds-of-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What are sample ESI templates?
+        Two kinds of errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#central-logging-with-apollo-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Central logging with Apollo plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hiding-details-from-the-client-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hiding details from the client in production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-an-error-yourself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging an error yourself
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outside-graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outside GraphQL
       
     </span>
   </a>
@@ -2002,10 +2086,43 @@
 
 
 
-<h1 id="sample-esi-templates">Sample ESI templates</h1>
+<h1 id="error-handling">Error Handling</h1>
 <hr />
-<h2 id="what-are-sample-esi-templates">What are sample ESI templates?</h2>
-<p>Sample Experiment Safety Input (ESI) templates are predefined forms used to collect safety-related information about the samples involved in an experiment. These templates ensure that all safety considerations are thoroughly documented and assessed as part of the proposal submission process.</p>
+<p>As a rule of thumb, errors in the backend are not handled where they happen. Datasources and mutations let errors travel up to Apollo Server, which logs them in one central place and strips sensitive details before the response reaches the client.</p>
+<h2 id="two-kinds-of-errors">Two kinds of errors</h2>
+<p><strong>Expected failures</strong> — a missing record, a permission problem, invalid input most often occuring in the Mutation layer. Return a <code>Rejection</code> instead of throwing:</p>
+<pre><code>if (!invite) {
+  return rejection('Invite code not found', { invite: code });
+}
+</code></pre>
+<p><code>Rejection</code> extends <code>GraphQLError</code>, and GraphQL turns any <code>Error</code> a resolver returns into an entry in the response's <code>errors</code> array. So a returned rejection reaches the client without a <code>throw</code>.</p>
+<p><strong>Unexpected failures</strong> — a failing query, a bug. Just let them throw. Datasources can add a bit of context to the message and re-throw if needed:</p>
+<pre><code>.catch((error: Error) =&gt; {
+  throw new Error(`Could not find invites: ${error.message}`);
+})
+</code></pre>
+<p>Note. A caught error returns a success response, so the client believes the operation worked.</p>
+<hr />
+<h2 id="central-logging-with-apollo-plugin">Central logging with Apollo plugin</h2>
+<p>An Apollo plugin in <code>src/middlewares/graphql.ts</code> hooks <code>didEncounterErrors</code> and logs every error in the response, along with the requesting user's id:</p>
+<pre><code>logger.logError('GraphQL response contained error(s)', {
+  errors: filteredErrors,
+  context,
+});
+</code></pre>
+<p>Expired JWTs and invalid external tokens are filtered out first and logged as a warning and an info respectively, since they are routine and would otherwise drown out real errors.</p>
+<p>Because this plugin exists, resolvers, mutations and datasources do not need to log errors themselves.</p>
+<h2 id="hiding-details-from-the-client-in-production">Hiding details from the client in production</h2>
+<p><code>formatError</code>, in the same file, deletes <code>extensions.context</code> and <code>extensions.exception</code> when running in production. The full detail stays in the server log; the client only sees the message.</p>
+<hr />
+<h2 id="logging-an-error-yourself">Logging an error yourself</h2>
+<p>Use <code>logException</code> when you have an <code>Error</code> object, and <code>logError</code> when you do not:</p>
+<pre><code>logger.logException('Could not download file', e, { req });
+logger.logError('Something went wrong', { someId });
+</code></pre>
+<p>Both log at <code>ERROR</code> level. The difference is that <code>logException</code> takes the error as a separate argument and copies its <code>name</code>, <code>message</code> and <code>stack</code> into the log context. This matters: an <code>Error</code> passed into <code>logError</code> directly serialises to <code>{}</code> and its message and stack trace are lost.</p>
+<h2 id="outside-graphql">Outside GraphQL</h2>
+<p>The file and PDF factory endpoints are plain Express routes and never reach the Apollo plugin. They use their own handlers (<code>exceptionHandler.ts</code>, <code>factory.ts</code>), which log the exception and return a 500.</p>
 <hr />
 
 
@@ -2057,10 +2174,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
