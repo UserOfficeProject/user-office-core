@@ -87,7 +87,7 @@ const FapMeetingProposalViewModal = ({
         onClose={(): void => handleClose()}
         data-cy="Fap-meeting-modal"
         slots={{
-          transition: Transition
+          transition: Transition,
         }}
       >
         <AppBar

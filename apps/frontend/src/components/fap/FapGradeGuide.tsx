@@ -20,8 +20,9 @@ const FapGradeGuide: React.FC<FapGradeGuideProps> = ({ fap, onFapUpdate }) => {
     <Grid
       size={{
         sm: 25,
-        xs: 12
-      }}>
+        xs: 12,
+      }}
+    >
       <Editor
         initialValue={fap.gradeGuide || ''}
         init={{

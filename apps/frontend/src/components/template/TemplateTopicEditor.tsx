@@ -296,7 +296,7 @@ export default function QuestionaryEditorTopic(props: {
                     open={open}
                     onClose={() => setAnchorEl(null)}
                     slots={{
-                      transition: Fade
+                      transition: Fade,
                     }}
                   >
                     <MenuItem
@@ -391,7 +391,8 @@ export default function QuestionaryEditorTopic(props: {
                   height: 'calc(100% - 36px)',
                   padding: '1px',
                 }}
-                size={12}>
+                size={12}
+              >
                 {getItems()}
                 {provided.placeholder}
               </Grid>

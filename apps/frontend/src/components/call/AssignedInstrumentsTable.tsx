@@ -93,7 +93,7 @@ const AvailabilityTimeEditComponent = (
     helperText={props.helperText}
     margin="none"
     slotProps={{
-      input: { inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } }
+      input: { inputProps: { max: MAX_32_BIT_INTEGER - 1, min: 1 } },
     }}
   />
 );

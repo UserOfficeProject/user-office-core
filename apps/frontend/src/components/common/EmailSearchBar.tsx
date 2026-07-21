@@ -20,10 +20,11 @@ const EmailSearchBar = (props: Options<JSX.Element>) => (
       <Form>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "baseline"
-          }}>
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'baseline',
+          }}
+        >
           <Field
             name="email"
             label="E-mail"

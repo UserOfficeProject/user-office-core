@@ -290,7 +290,7 @@ const TemplatesTable = ({
             },
           },
           {
-            icon: ShareIcon,
+            icon: () => <ShareIcon />,
             tooltip: 'Export',
             onClick: (event, data) => {
               api()

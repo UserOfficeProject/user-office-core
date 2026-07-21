@@ -182,8 +182,9 @@ const StatusNode: React.FC<StatusNodeProps> = ({
                 color="textPrimary"
                 sx={{
                   fontWeight: 600,
-                  fontSize: '14px'
-                }}>
+                  fontSize: '14px',
+                }}
+              >
                 {data.workflowStatus.status.name}
               </Typography>
               {data.isReadOnly &&

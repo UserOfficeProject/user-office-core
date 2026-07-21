@@ -121,9 +121,12 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                     }}
                   >
                     <div>
-                      <Typography variant="subtitle1" sx={{
-                        fontWeight: "bold"
-                      }}>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 'bold',
+                        }}
+                      >
                         {invite.proposal.title || 'No Title'}
                       </Typography>
                       <Typography variant="body1" color="textSecondary">

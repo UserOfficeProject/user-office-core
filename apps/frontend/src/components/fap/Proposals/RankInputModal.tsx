@@ -87,7 +87,7 @@ const RankInputModal: React.FC<RankInputModalProps> = ({
           error={invalidError}
           data-cy="rank-input"
           slotProps={{
-            htmlInput: { min: 1, max: totalReviewers, step: 1 }
+            htmlInput: { min: 1, max: totalReviewers, step: 1 },
           }}
         />
         {invalidError && (

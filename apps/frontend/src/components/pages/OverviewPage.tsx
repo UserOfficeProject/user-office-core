@@ -1,13 +1,12 @@
 import parse from 'html-react-parser';
-import React, { useContext } from 'react';
+import React from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
 import ProposalTableReader from 'components/proposal/ProposalTableReader';
 import BasicCard from 'components/proposalBooking/BasicCard';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
-import { FeatureContext } from 'context/FeatureContextProvider';
-import { PageName, UserRole, FeatureId } from 'generated/sdk';
+import { PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -28,8 +27,6 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
-  const { featuresMap } = useContext(FeatureContext);
-  const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
 
   let roleBasedOverView = null;
 

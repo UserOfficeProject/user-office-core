@@ -15,8 +15,9 @@ const UserListItem: React.FC<UserListItemProps> = ({ user }) => {
       secondary={`${user?.institution || ''} , ${user?.country || ''}`}
       slotProps={{
         primary: { variant: 'body2' },
-        secondary: { variant: 'caption' }
-      }} />
+        secondary: { variant: 'caption' },
+      }}
+    />
   );
 };
 

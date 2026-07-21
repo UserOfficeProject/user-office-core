@@ -1,4 +1,4 @@
-query getExperiments(
+query getAllExperiments(
   $filter: ExperimentsFilter
   $first: Int
   $offset: Int
@@ -20,6 +20,11 @@ query getExperiments(
         ...proposal
         proposer {
           ...basicUserDetails
+        }
+        call {
+          id
+          shortCode
+          experimentWorkflowId
         }
       }
       experimentSafety {

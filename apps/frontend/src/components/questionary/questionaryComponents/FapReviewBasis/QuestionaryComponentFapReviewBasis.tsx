@@ -138,8 +138,9 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           <Box
             sx={{
               marginTop: 1,
-              width: 150
-            }}>
+              width: 150,
+            }}
+          >
             <Field
               name={gradeFieldId}
               label={

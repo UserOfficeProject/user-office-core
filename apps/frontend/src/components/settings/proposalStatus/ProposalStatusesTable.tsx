@@ -85,7 +85,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
         actions={[
           (rowActionData) => {
             return {
-              icon: Delete,
+              icon: () => <Delete />,
               tooltip: 'Delete',
               onClick: (event, rowData) =>
                 confirm(

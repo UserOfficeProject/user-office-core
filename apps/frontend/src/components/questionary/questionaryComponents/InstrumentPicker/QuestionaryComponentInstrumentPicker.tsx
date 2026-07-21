@@ -174,36 +174,44 @@ export function QuestionaryComponentInstrumentPicker(
       ? requestTimeForInstrument
       : [requestTimeForInstrument];
 
-    return (requestTimeForInstrument && (<Stack direction="row" spacing={3} sx={{
-      marginTop: 3
-    }}>
-      {requestTime.map((value: InstrumentIdNameAndTime) => {
-        if (value.instrumentId)
-          return (
-            <TextField
-              key={value.instrumentId}
-              value={value.timeRequested === '0' ? '' : value.timeRequested}
-              required={config.required}
-              error={isError}
-              label={`Request Time`}
-              type="number"
-              data-time-request={value.instrumentId + '-time-request'}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                handleTimeInput(e.target.value, value.instrumentId);
-              }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {value.instrumentName}:
-                    </InputAdornment>
-                  ),
-                }
-              }}
-            />
-          );
-      })}
-    </Stack>));
+    return (
+      requestTimeForInstrument && (
+        <Stack
+          direction="row"
+          spacing={3}
+          sx={{
+            marginTop: 3,
+          }}
+        >
+          {requestTime.map((value: InstrumentIdNameAndTime) => {
+            if (value.instrumentId)
+              return (
+                <TextField
+                  key={value.instrumentId}
+                  value={value.timeRequested === '0' ? '' : value.timeRequested}
+                  required={config.required}
+                  error={isError}
+                  label={`Request Time`}
+                  type="number"
+                  data-time-request={value.instrumentId + '-time-request'}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    handleTimeInput(e.target.value, value.instrumentId);
+                  }}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {value.instrumentName}:
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              );
+          })}
+        </Stack>
+      )
+    );
   };
 
   const DisplayErrorMessage = () => {

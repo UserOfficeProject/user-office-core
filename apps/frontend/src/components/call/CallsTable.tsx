@@ -386,8 +386,9 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallStatusFilter
             show={isArchivedTab && !isCallReorderMode}
             callStatus={callStatus ?? CallStatus.ALL}
@@ -486,13 +487,13 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
               position: 'row',
             },
             (rowData) => ({
-              icon: rowData.isActive ? Archive : Unarchive,
+              icon: () => (rowData.isActive ? <Archive /> : <Unarchive />),
               tooltip: `${rowData.isActive ? 'Archive' : 'Unarchive'} call`,
               onClick: (): void => changeCallActiveStatus(rowData as Call),
               position: 'row',
             }),
             (rowData) => ({
-              icon: GridOnIcon,
+              icon: () => <GridOnIcon />,
               tooltip: `Export ${t('Fap')} Data`,
               onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
               position: 'row',

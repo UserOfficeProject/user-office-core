@@ -40,8 +40,9 @@ const FapMeetingComponentsView = ({
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallFilter
             calls={calls}
             isLoading={loadingCalls}

@@ -254,8 +254,9 @@ function ExperimentSafetyReviewPage() {
             <Grid
               size={{
                 sm: 3,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <CallFilter
                 callId={selectedCallId}
                 calls={calls}
@@ -279,7 +280,7 @@ function ExperimentSafetyReviewPage() {
             }}
             actions={[
               {
-                icon: GetAppIcon,
+                icon: () => <GetAppIcon />,
                 tooltip: 'Download sample',
                 onClick: (event, rowData) =>
                   downloadPDFSample(

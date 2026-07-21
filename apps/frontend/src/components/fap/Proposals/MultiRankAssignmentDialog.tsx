@@ -65,7 +65,7 @@ export const MultiRankAssignmentDialog = ({
           color="textSecondary"
           gutterBottom
           sx={{
-            margin: 2
+            margin: 2,
           }}
         >
           Please assign a unique rank to each user, Ranks must be whole numbers
@@ -136,7 +136,7 @@ export const MultiRankAssignmentDialog = ({
                       slotProps={{
                         input: {
                           inputProps: { min: 1, step: 1 },
-                        }
+                        },
                       }}
                     />
                   </TableCell>
