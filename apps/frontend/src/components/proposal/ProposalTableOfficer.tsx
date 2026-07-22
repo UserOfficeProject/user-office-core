@@ -812,11 +812,22 @@ const ProposalTableOfficer = ({
   const reviewModal = searchParams.get('reviewModal');
   const proposalId = searchParams.get('proposalId');
 
+  const parsedReviewModalPk = reviewModal != null ? parseInt(reviewModal) : NaN;
+  const reviewModalPk = Number.isInteger(parsedReviewModalPk)
+    ? parsedReviewModalPk
+    : null;
+
+  // when we receive a link redirect, this table may not have the proposal data
   const proposalToReview = tableData.find(
     (proposal) =>
-      (reviewModal != null && proposal.primaryKey === +reviewModal) ||
+      (reviewModalPk != null && proposal.primaryKey === reviewModalPk) ||
       (proposalId != null && proposal.proposalId === proposalId)
   );
+
+  // The proposal can live outside the currently loaded page of results, so fall
+  // back to the primary key from the URL. ProposalReviewContent fetches the
+  // proposal by primary key itself, it does not rely on the table data.
+  const proposalPkToReview = proposalToReview?.primaryKey ?? reviewModalPk;
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -1255,8 +1266,12 @@ const ProposalTableOfficer = ({
         handleClose={handleClose}
       />
       <ProposalReviewModal
-        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!proposalToReview}
+        title={
+          proposalToReview
+            ? `View proposal: ${proposalToReview.title} (${proposalToReview.proposalId})`
+            : 'View proposal'
+        }
+        proposalReviewModalOpen={proposalPkToReview != null}
         setProposalReviewModalOpen={() => {
           const from = searchParams.get('from');
 
@@ -1287,7 +1302,7 @@ const ProposalTableOfficer = ({
         }}
       >
         <ProposalReviewContent
-          proposalPk={proposalToReview?.primaryKey as number}
+          proposalPk={proposalPkToReview}
           tabNames={userOfficerProposalReviewTabs}
         />
       </ProposalReviewModal>
