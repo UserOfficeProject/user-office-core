@@ -27,7 +27,7 @@ export default function VisitRegistrationContainer(
   props: VisitRegistrationContainerProps
 ) {
   const [initialState] = useState(
-    new VisitRegistrationSubmissionState(props.registration)
+    new VisitRegistrationSubmissionState(props.registration, props.previewMode)
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.VISIT_REGISTRATION);
