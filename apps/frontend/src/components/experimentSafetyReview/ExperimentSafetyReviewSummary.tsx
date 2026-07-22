@@ -6,7 +6,7 @@ import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
@@ -85,6 +85,32 @@ function ExperimentSafetyReviewSummary({
   );
 
   const downloadExperimentSafety = useDownloadPDFExperimentSafety();
+
+  // Poll API every 5 seconds to check if experiment safety review is approved
+  useEffect(() => {
+    if (!state?.experimentSafety.experimentSafetyPk || isDownloadEnabled) {
+      return;
+    }
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const { experimentSafety } = await api().getExperimentSafety({
+          experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+        });
+
+        if (experimentSafety) {
+          setIsDownloadEnabled(experimentSafety.status?.id === 'ESF_APPROVED');
+        }
+      } catch (error) {
+        // Silently fail on polling errors to not interrupt user experience
+        api().addClientLog({
+          error: `Error polling experiment safety status: ${String(error)}`,
+        });
+      }
+    }, 5000);
+
+    return () => clearInterval(pollInterval);
+  }, [state?.experimentSafety.experimentSafetyPk, api, isDownloadEnabled]);
 
   if (!state?.experimentSafety) {
     throw new Error('Experiment safety review not found');
