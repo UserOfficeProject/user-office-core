@@ -29,11 +29,14 @@ const GenericTemplateQuestionaryStepView = ({
   const isLastStep = (wizardStep: WizardStep) =>
     state.wizardSteps[state.wizardSteps.length - 1] === wizardStep;
 
+  const shouldShowValidationErrorsOnMount = state.genericTemplate.id > 0;
+
   return (
     <div>
       <QuestionaryStepView
         readonly={isReadonly}
         topicId={topicId}
+        showValidationErrorsOnMount={shouldShowValidationErrorsOnMount}
         onStepComplete={() => {
           if (isLastStep(wizardStep)) {
             dispatch({

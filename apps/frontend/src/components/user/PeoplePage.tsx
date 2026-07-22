@@ -31,7 +31,8 @@ export default function PeoplePage() {
           }}
           selection={false}
           showInvitationButtons
-          search
+          search={false}
+          customSearch={true}
           onRemove={(user: { id: number }) =>
             api({
               toastSuccessMessage: 'User removed successfully!',

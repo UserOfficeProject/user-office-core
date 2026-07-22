@@ -1,8 +1,17 @@
+import { Help } from '@mui/icons-material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  IconButton,
+  InputAdornment,
+} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
@@ -15,8 +24,10 @@ import {
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
 } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { urlValidationSchema } from 'utils/helperFunctions';
 
+import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -25,12 +36,25 @@ const columns = [
   { title: 'Value', field: 'value' },
 ];
 
+const pathNameValidationSchema = Yup.string()
+  .matches(
+    /^(?!http|www)/i,
+    'Provide a valid pathname, the base domain is already provided'
+  )
+  .matches(/^(?!\/)/, 'Leading slash should not be included')
+  .required('Pathname is required');
+
 export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
   const config = props.questionRel.config as DynamicMultipleChoiceConfig;
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
+  const [useBaseDomain, setUseBaseDomain] = useState(
+    config.useBaseDomain ?? false
+  );
+  const [isBaseURLCheckBoxPopupOpen, setIsBaseURLCheckBoxPopupOpen] =
+    useState(false);
 
   const availableVariantOptions = [
     { label: 'Radio', value: 'radio' },
@@ -39,6 +63,22 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
 
   const urlValidation = urlValidationSchema();
 
+  const api = useDataApi();
+  const [serverConfig, setServerConfig] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const { ServerConfig } = await api().getServerConfig();
+        setServerConfig(ServerConfig.baseURL);
+      } catch (err) {
+        console.error('Failed to fetch server config', err);
+      }
+    };
+
+    fetchConfig();
+  }, [api]);
+
   return (
     <QuestionTemplateRelationFormShell
       {...props}
@@ -46,11 +86,15 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
         config: Yup.object({
           required: Yup.bool(),
           variant: Yup.string().required('Variant is required'),
-          url: urlValidation,
+          url: Yup.string().when('useBaseDomain', {
+            is: true,
+            then: (schema) => schema.concat(pathNameValidationSchema),
+            otherwise: (schema) => schema.concat(urlValidation),
+          }),
         }),
       })}
     >
-      {() => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
@@ -103,17 +147,94 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               <InputLabel htmlFor="config.url" shrink>
                 Link
               </InputLabel>
-              <Field
-                name="config.url"
-                id="config.url"
-                type="text"
-                component={TextField}
-                fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url' }}
-              />
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {useBaseDomain && (
+                  <span
+                    style={{
+                      whiteSpace: 'nowrap',
+                      color: 'grey',
+                      paddingTop: '20px',
+                    }}
+                  >
+                    {`${serverConfig}/`}
+                  </span>
+                )}
+
+                <Field
+                  name="config.url"
+                  id="config.url"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex' }}>
+                <Field
+                  name="config.useBaseDomain"
+                  id="config.useBaseDomain"
+                  type="checkbox"
+                  component={CheckboxWithLabel}
+                  Label={{ label: 'Use base domain for dynamic URL' }}
+                  checked={useBaseDomain}
+                  data-cy="use-base-domain"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const checked = e.target.checked;
+                    setUseBaseDomain(checked);
+                    formikProps.setFieldValue('config.useBaseDomain', checked);
+                  }}
+                />
+                <InputAdornment
+                  position="start"
+                  style={{
+                    paddingTop: '20px',
+                  }}
+                >
+                  <IconButton
+                    onClick={() => setIsBaseURLCheckBoxPopupOpen(true)}
+                  >
+                    <Help />
+                  </IconButton>
+                  <Dialog
+                    open={isBaseURLCheckBoxPopupOpen}
+                    onClose={() => setIsBaseURLCheckBoxPopupOpen(false)}
+                    aria-labelledby="customized-dialog-title"
+                  >
+                    <DialogContent>
+                      <div>
+                        Instead of providing a full URL to retrieve a list for
+                        your question, this option allows you to use the current
+                        server&#39;s domain and specify only the relative path.
+                      </div>
+                      <div>
+                        This is particularly useful for GraphQL queries that
+                        access the database. Please note that while the domain
+                        displayed in the UI reflects the current deployment, it
+                        is not stored. At runtime, the system will automatically
+                        resolve and apply the current servers domain.
+                      </div>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        variant="text"
+                        onClick={() => setIsBaseURLCheckBoxPopupOpen(false)}
+                      >
+                        CLOSE
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </InputAdornment>
+              </div>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="config.jsonPath" shrink>
+
+            <FormControl fullWidth style={{ paddingTop: '30px' }}>
+              <InputLabel
+                htmlFor="config.jsonPath"
+                shrink
+                style={{ paddingTop: '40px' }}
+              >
                 JsonPath
               </InputLabel>
               <Field
@@ -144,6 +265,12 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 />
               </TitledContainer>
             </FormControl>
+          </TitledContainer>
+          <TitledContainer label="Dependencies">
+            <QuestionDependencyList
+              form={formikProps}
+              template={props.template}
+            />
           </TitledContainer>
         </>
       )}

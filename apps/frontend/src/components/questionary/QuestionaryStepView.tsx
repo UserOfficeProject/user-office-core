@@ -69,6 +69,7 @@ function QuestionaryStepView(props: {
   readonly: boolean;
   onStepComplete?: (topicId: number) => void;
   confirm: WithConfirmType;
+  showValidationErrorsOnMount?: boolean;
 }) {
   const { topicId, confirm } = props;
 
@@ -109,6 +110,14 @@ function QuestionaryStepView(props: {
     activeFields,
     state,
     api
+  );
+  const activeFieldIds = activeFields.map((field) => field.question.id);
+  const initialTouched = activeFieldIds.reduce(
+    (fields, fieldId) => ({
+      ...fields,
+      [fieldId]: true,
+    }),
+    {}
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
@@ -284,7 +293,11 @@ function QuestionaryStepView(props: {
   return (
     <Formik
       initialValues={initialValues}
+      initialTouched={
+        props.showValidationErrorsOnMount ? initialTouched : undefined
+      }
       validationSchema={Yup.object().shape(validationSchema)}
+      validateOnMount={props.showValidationErrorsOnMount ?? false}
       onSubmit={async () => {
         const isSaveSuccess = await performSave(false);
 

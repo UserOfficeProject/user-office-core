@@ -6,6 +6,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -149,3 +150,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
+mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);

@@ -22,10 +22,12 @@ import TechnicalReviewQuestionary, {
   createTechnicalReviewStub,
 } from 'components/review/TechnicalReviewQuestionary';
 import ShipmentContainer from 'components/shipments/ShipmentContainer';
+import VisitRegistrationContainer from 'components/visit/VisitRegistrationContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, TemplateGroupId } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
 import { createShipmentStub } from 'hooks/shipment/useBlankShipment';
+import { createRegistrationStub } from 'hooks/visit/useBlankVisitRegistration';
 
 type PreviewTemplateModalProps = {
   templateId: number | null;
@@ -78,8 +80,19 @@ const PreviewTemplateModal = ({
             previewMode={true}
           />
         );
-      case TemplateGroupId.FEEDBACK:
       case TemplateGroupId.VISIT_REGISTRATION:
+        return (
+          <VisitRegistrationContainer
+            registration={createRegistrationStub(
+              user?.id ?? 0,
+              templateId,
+              questionarySteps,
+              0
+            )}
+            previewMode={true}
+          />
+        );
+      case TemplateGroupId.FEEDBACK:
       case TemplateGroupId.GENERIC_TEMPLATE:
         return (
           <GenericTemplateContainer

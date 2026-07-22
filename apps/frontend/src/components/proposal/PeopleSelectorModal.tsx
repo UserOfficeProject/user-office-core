@@ -68,6 +68,7 @@ const PeopleSelectorModal = ({
     invitationUserRole: invitationUserRole || userRole,
     setPrincipalInvestigator: setPrincipalInvestigator,
     search: true,
+    customSearch: false,
   };
 
   const peopleTablesProps = {

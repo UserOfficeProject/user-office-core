@@ -19,7 +19,7 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
         .trim()
         .max(
           MAX_TITLE_LEN,
-          `Please make abstract at most ${MAX_TITLE_LEN} characters long`
+          `Please make title at most ${MAX_TITLE_LEN} characters long`
         )
         .required('Proposal Title is required'),
       abstract: Yup.string()

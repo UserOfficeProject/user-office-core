@@ -3,7 +3,9 @@ import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import DateFilter from 'components/common/proposalFilters/DateFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter, {
+  getInstrumentFilterIds,
+} from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/StatusFilter';
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
 import {
@@ -68,7 +70,7 @@ const TechniqueProposalFilterBar = ({
 
       <Grid item sm={3} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentFilter?.instrumentId}
+          instrumentIds={getInstrumentFilterIds(filter.instrumentFilter)}
           showMultiInstrumentProposals={
             filter.instrumentFilter?.showMultiInstrumentProposals
           }

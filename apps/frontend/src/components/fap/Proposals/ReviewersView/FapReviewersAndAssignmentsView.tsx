@@ -3,7 +3,9 @@ import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter, {
+  parseInstrumentQuery,
+} from 'components/common/proposalFilters/InstrumentFilter';
 import { Fap } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { FapProposals } from 'hooks/fap/useFapProposalsData';
@@ -67,7 +69,7 @@ const FapReviewersAndAssignments = ({
             instruments={instruments}
             isLoading={loadingInstruments}
             shouldShowAll={true}
-            instrumentId={instrument ? +instrument : null}
+            instrumentIds={parseInstrumentQuery(instrument) ?? undefined}
             data-cy="instrument-filter"
           />
         </Grid>

@@ -2,9 +2,11 @@ import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   DataType,
+  EmailStatusActionRecipients,
   FeatureId,
   ProposalEndStatus,
   SettingsId,
+  StatusActionType,
   TemplateCategoryId,
   TemplateGroupId,
   WorkflowType,
@@ -21,6 +23,8 @@ context('Proposal tests', () => {
   faker.seed(0);
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
+  const maxTitleLen = 175;
+  const maxAbstractLen = 1500;
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
@@ -141,6 +145,7 @@ context('Proposal tests', () => {
           cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -276,7 +281,26 @@ context('Proposal tests', () => {
       cy.contains('Proposal Title is required');
       cy.contains('Proposal Abstract is required');
 
+      cy.get('[data-cy=title]').type('x'.repeat(maxTitleLen + 1));
+      cy.get('[data-cy=abstract]').type('y'.repeat(maxAbstractLen + 1));
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+
+      cy.contains(`Please make title at most ${maxTitleLen} characters long`);
+      cy.contains(
+        `Please make abstract at most ${maxAbstractLen} characters long`
+      );
+
       cy.contains('New Proposal').click();
+
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Changes you recently made in this tab will be lost! Are you sure?'
+        );
+
+        return true;
+      });
+
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=save-button]').should('be.disabled');
@@ -873,6 +897,79 @@ context('Proposal tests', () => {
           'have.text',
           'Be aware that selected proposals have different statuses and changing status will affect all of them.'
         );
+    });
+
+    it('User officer should be able to opt-in to run status actions when changing status', () => {
+      const statusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.PI,
+              description: '',
+            },
+            emailTemplate: {
+              id: initialDBData.emailTemplates.template1.id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            combineEmails: true,
+          },
+        ],
+      };
+
+      // Add a status with a connection from DRAFT and attach a status action
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+      }).then((result) => {
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(statusActionConfig),
+            },
+          ],
+          connectionId: result.createWorkflowConnection.id,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains(newProposalTitle).parent().find('[type="checkbox"]').check();
+
+      cy.get('[data-cy="change-proposal-status"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
+
+      // Select the status that has a connection with actions
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
+      cy.get('[role="listbox"]')
+        .contains(initialDBData.proposalStatuses.feasibilityReview.name)
+        .click();
+
+      // The run status actions checkbox should appear and be unchecked
+      cy.get('[data-cy="run-status-actions-checkbox"] input')
+        .should('exist')
+        .should('not.be.checked');
+
+      // Check it to opt-in to running status actions
+      cy.get('[data-cy="run-status-actions-checkbox"] input').check();
+
+      // Should be able to submit the status change
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'status changed successfully',
+      });
     });
 
     it('Should be able to delete proposal', () => {

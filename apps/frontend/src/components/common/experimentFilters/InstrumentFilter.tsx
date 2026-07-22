@@ -26,13 +26,13 @@ type InstrumentFilterProps = {
   shouldShowAll?: boolean;
   shouldShowMultiple?: boolean;
   showMultiInstrumentProposals?: boolean;
-  instrumentId?: number | null;
+  instrumentIds?: number[] | null;
 };
 
 const InstrumentFilter = ({
   instruments,
   isLoading,
-  instrumentId,
+  instrumentIds,
   onChange,
   shouldShowAll,
   shouldShowMultiple,
@@ -63,7 +63,7 @@ const InstrumentFilter = ({
             aria-labelledby="instrument-select-label"
             onChange={(e) => {
               const newValue: InstrumentFilterInput = {
-                instrumentId: null,
+                instrumentIds: null,
                 showMultiInstrumentProposals: false,
                 showAllProposals: false,
               };
@@ -83,20 +83,20 @@ const InstrumentFilter = ({
                 e.target.value === InstrumentFilterEnum.ALL ||
                 e.target.value === InstrumentFilterEnum.MULTI
               ) {
-                newValue.instrumentId = null;
+                newValue.instrumentIds = null;
                 newValue.showMultiInstrumentProposals =
                   e.target.value === InstrumentFilterEnum.MULTI;
                 newValue.showAllProposals =
                   e.target.value === InstrumentFilterEnum.ALL;
               } else {
-                newValue.instrumentId = +e.target.value;
+                newValue.instrumentIds = [+e.target.value];
               }
               onChange?.(newValue);
             }}
             value={
               showMultiInstrumentProposals
                 ? InstrumentFilterEnum.MULTI
-                : instrumentId || InstrumentFilterEnum.ALL
+                : instrumentIds?.[0] || InstrumentFilterEnum.ALL
             }
             data-cy="instrument-filter"
           >

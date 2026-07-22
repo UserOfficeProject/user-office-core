@@ -52,6 +52,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { createSkipLoggingHandler } from '../eventHandlers/logging';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
   createSkipListeningHandler,
@@ -156,3 +157,4 @@ mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);

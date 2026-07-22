@@ -475,6 +475,9 @@ export class UserDataSourceMock implements UserDataSource {
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     // Do something here or remove the function.
   }
+  async removeUserRoles(id: number): Promise<void> {
+    return;
+  }
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [

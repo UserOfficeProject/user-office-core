@@ -44,6 +44,7 @@ let proposal1Id: string;
 let proposal2Id: string;
 let testEmailTemplate1Id: string;
 let testEmailTemplate2Id: string;
+let statusActionsConnectionId: number;
 
 context('Status actions tests', () => {
   beforeEach(function () {
@@ -783,6 +784,7 @@ context('Status actions tests', () => {
       }).then((result) => {
         const connection = result.createWorkflowConnection;
         if (connection) {
+          statusActionsConnectionId = connection.id;
           cy.setStatusChangingEventsOnConnection({
             workflowConnectionId: connection.id,
             statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
@@ -876,6 +878,32 @@ context('Status actions tests', () => {
         variant: 'success',
         text: 'Status action replay successfully sent.',
       });
+    });
+
+    it('User Officer should see status actions logs whose connection configuration was later removed, with replay disabled', () => {
+      cy.addConnectionStatusActions({
+        actions: [],
+        connectionId: statusActionsConnectionId,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Email');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length.greaterThan', 0);
+
+      cy.get('[data-cy="replay_status_action_icon"]')
+        .first()
+        .click({ force: true });
+
+      cy.get('[data-cy="confirm-ok"]').should('not.exist');
     });
 
     it('User Officer should be able to replay all email status actions in a call', () => {

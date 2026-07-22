@@ -33,8 +33,15 @@ export class QuestionFilterInput {
 
 @InputType()
 export class InstrumentFilterInput {
-  @Field(() => Int, { nullable: true })
-  public instrumentId: number;
+  /** @deprecated Use instrumentIds instead */
+  @Field(() => Int, {
+    nullable: true,
+    deprecationReason: 'Use instrumentIds instead',
+  })
+  public instrumentId?: number;
+
+  @Field(() => [Int], { nullable: true })
+  public instrumentIds?: number[];
 
   @Field(() => Boolean)
   public showMultiInstrumentProposals: boolean;

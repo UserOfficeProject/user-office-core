@@ -577,7 +577,7 @@ export default class PostgresExperimentDataSource
     //print all arguments
 
     const query = database('experiments')
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select(['experiments.*', database.raw('count(*) OVER() AS full_count')])
       .join(
         'proposals',
         'proposals.proposal_pk',
@@ -587,16 +587,31 @@ export default class PostgresExperimentDataSource
 
     // Add instrument scientist filtering if provided
     if (filter?.instrumentScientistUserId) {
+      const instrumentScientistUserId = filter.instrumentScientistUserId;
+
       query
+        .leftJoin('instrument_has_scientists', function () {
+          this.on(
+            'experiments.instrument_id',
+            '=',
+            'instrument_has_scientists.instrument_id'
+          ).andOnVal(
+            'instrument_has_scientists.user_id',
+            '=',
+            instrumentScientistUserId
+          );
+        })
         .join(
-          'instrument_has_scientists',
+          'instruments',
           'experiments.instrument_id',
-          'instrument_has_scientists.instrument_id'
+          'instruments.instrument_id'
         )
-        .where(
-          'instrument_has_scientists.user_id',
-          filter.instrumentScientistUserId
-        );
+        .where(function () {
+          this.whereNotNull('instrument_has_scientists.user_id').orWhere(
+            'instruments.manager_user_id',
+            instrumentScientistUserId
+          );
+        });
     }
 
     return query
@@ -718,5 +733,23 @@ export default class PostgresExperimentDataSource
     }
 
     return result;
+  }
+
+  async changeExperimentSafetyWorkflowStatus(
+    workflowStatusId: number,
+    experimentSafetyPks: number[]
+  ): Promise<ExperimentSafety[]> {
+    const result = await database('experiment_safety')
+      .update({
+        workflow_status_id: workflowStatusId,
+      })
+      .whereIn('experiment_safety_pk', experimentSafetyPks)
+      .returning('*');
+
+    if (!result || result.length === 0) {
+      throw new Error('Could not update experiment safety status');
+    }
+
+    return result.map((item) => createExperimentSafetyObject(item));
   }
 }

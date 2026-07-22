@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useGetDynamicMultipleChoiceOptions(questionId: string) {
+export function useGetDynamicMultipleChoiceOptions(
+  questionId: string,
+  templateId?: number | null
+) {
   const [options, setOptions] = useState<string[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
@@ -13,7 +16,7 @@ export function useGetDynamicMultipleChoiceOptions(questionId: string) {
 
     setLoadingOptions(true);
     api()
-      .getDynamicMultipleChoiceOptions({ questionId })
+      .getDynamicMultipleChoiceOptions({ questionId, templateId })
       .then(({ options }) => {
         if (unmounted) {
           return;
@@ -29,7 +32,7 @@ export function useGetDynamicMultipleChoiceOptions(questionId: string) {
     return () => {
       unmounted = true;
     };
-  }, [api, questionId]);
+  }, [api, questionId, templateId]);
 
   return {
     options,

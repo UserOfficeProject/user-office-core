@@ -77,9 +77,11 @@ nav:
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
       - Depencency Injection: developer-guide/dependency_injection.md
+      - Error Handling: developer-guide/error_handling.md
       - Email Service: developer-guide/email.md
       - Documentation Changes: developer-guide/documentation_changes.md
       - Technique Proposals: developer-guide/technique_proposals.md
+      - Roles: developer-guide/roles.md
   - FAQ: faq.md
   - Glossary: glossary.md
   

@@ -20,6 +20,8 @@ import {
   UpdateQuestionMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateProposalPdfTemplateMutation,
+  UpdateProposalPdfTemplateMutationVariables,
   UpdateTopicMutation,
   UpdateTopicMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -69,6 +71,15 @@ const setActiveTemplate = (
 ) => {
   const api = getE2EApi();
   const request = api.setActiveTemplate(setActiveTemplateInput);
+
+  return cy.wrap(request);
+};
+
+const updateProposalPdfTemplate = (
+  updateProposalPdfTemplateInput: UpdateProposalPdfTemplateMutationVariables
+): Cypress.Chainable<UpdateProposalPdfTemplateMutation> => {
+  const api = getE2EApi();
+  const request = api.updateProposalPdfTemplate(updateProposalPdfTemplateInput);
 
   return cy.wrap(request);
 };
@@ -810,3 +821,5 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('setActiveTemplate', setActiveTemplate);
+
+Cypress.Commands.add('updateProposalPdfTemplate', updateProposalPdfTemplate);

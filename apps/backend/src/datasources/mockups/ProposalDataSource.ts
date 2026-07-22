@@ -334,15 +334,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    const proposals = allProposals.map((p) => {
-      return {
-        ...p,
-        workflowStatusId,
-        statusId: dummyWorkflowStatuses.find(
-          (ws) => ws.workflowStatusId === workflowStatusId
-        )?.statusId as string,
-      };
-    });
+    const proposals = allProposals
+      .filter((proposal) => proposalPks.includes(proposal.primaryKey))
+      .map((p) => {
+        return {
+          ...p,
+          workflowStatusId,
+          statusId: dummyWorkflowStatuses.find(
+            (ws) => ws.workflowStatusId === workflowStatusId
+          )?.statusId as string,
+        };
+      });
 
     return { proposals: proposals };
   }
@@ -373,5 +375,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
     throw new Error('Method not implemented.');
+  }
+
+  async getRequestedTime(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<number> {
+    return 32;
   }
 }

@@ -86,16 +86,16 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -108,7 +108,7 @@ jobs:
 
       - name: Cache backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -119,7 +119,7 @@ jobs:
 
       - name: Cache validation node_modules
         id: cached-node-modules-validation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/node_modules
           key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -130,7 +130,7 @@ jobs:
 
       - name: Cache validation build
         id: cached-validation-build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/lib
           key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
@@ -141,7 +141,7 @@ jobs:
 
       - name: Cache UOWS
         id: cached-UOWS
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
@@ -154,7 +154,7 @@ jobs:
 
       - name: Cache frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -165,7 +165,7 @@ jobs:
 
       - name: Cache frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -182,58 +182,58 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation node_modules
         id: cached-node-modules-validation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/node_modules
           key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation build
         id: cached-validation-build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/lib
           key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend UOWS
         id: cached-UOWS
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -251,13 +251,13 @@ jobs:
           SPARKPOST_TOKEN: wrong_token_for_test
 
       - name: Cache backend build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/build
           key: backend-build-${{ github.sha }}-${{ github.run_id }}
 
       - name: Cache frontend build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/build
           key: frontend-build-${{ github.sha }}-${{ github.run_id }}
@@ -267,37 +267,37 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation node_modules
         id: cached-node-modules-validation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/node_modules
           key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation build
         id: cached-validation-build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/lib
           key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend UOWS
         id: cached-UOWS
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
@@ -353,58 +353,58 @@ jobs:
             files: cypress/e2e/[A-Z]*.ts
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Restore node_modules
         id: cached-node-modules-root
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend node_modules
         id: cached-node-modules-backend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore backend UOWS
         id: cached-UOWS
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/node_modules
           key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation node_modules
         id: cached-node-modules-validation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/node_modules
           key: node-modules-validation-${{ hashFiles('validation/package-lock.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore validation build
         id: cached-validation-build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: validation/lib
           key: validation-build-${{ hashFiles('validation/src/**', 'validation/tsconfig.json', 'validation/package.json') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend SDK
         id: cached-sdk-frontend
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
@@ -413,13 +413,13 @@ jobs:
             sdk-frontend-
 
       - name: Restore backend build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/backend/build
           key: backend-build-${{ github.sha }}-${{ github.run_id }}
 
       - name: Restore frontend build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: apps/frontend/build
           key: frontend-build-${{ github.sha }}-${{ github.run_id }}
@@ -432,7 +432,7 @@ jobs:
       #   env:
       #     CYPRESS_CACHE_FOLDER: cache/Cypress
       #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v4
+      #   uses: actions/cache@v5
       #   with:
       #     path: apps/e2e/node_modules
       #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
@@ -449,7 +449,7 @@ jobs:
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -542,7 +542,7 @@ jobs:
 
       - name: Upload cypres screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cypress-screenshots-${{ matrix.pattern.id }}
           path: apps/e2e/cypress/screenshots

@@ -3,6 +3,7 @@ fragment questionTemplateRelation on QuestionTemplateRelation {
     ...question
   }
   sortOrder
+  templateId
   topicId
   config {
     ...fieldConfig

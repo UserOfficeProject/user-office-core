@@ -42,6 +42,7 @@ type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
   proposalAverageScore: number | string;
   proposalDeviation: number | string;
   isInAvailabilityZone: boolean;
+  timeRequested: number;
   tableData?: { index: number; id: number };
 };
 
@@ -152,7 +153,7 @@ const FapInstrumentProposalsTable = ({
       },
     },
     {
-      title: 'Principal Investigator',
+      title: 'Principal investigator',
       render: (rowData: FapProposal) => {
         return getFullUserName(rowData.proposal.proposer);
       },
@@ -184,6 +185,10 @@ const FapInstrumentProposalsTable = ({
 
         return rankOrder || '-';
       },
+    },
+    {
+      title: 'Time requested',
+      field: 'timeRequested',
     },
     {
       title: 'Time allocation',
@@ -223,13 +228,16 @@ const FapInstrumentProposalsTable = ({
   ];
 
   // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
-  const columns = assignmentColumns.map((column) => ({
-    ...column,
-    title:
-      column.field === 'timeAllocation'
-        ? `${column.title} (${selectedCall?.allocationTimeUnit}s)`
-        : column.title,
-  }));
+  const columns = assignmentColumns.map((column) => {
+    if (column.field === 'timeAllocation' || column.field === 'timeRequested') {
+      return {
+        ...column,
+        title: `${column.title} (${selectedCall?.allocationTimeUnit}s)`,
+      };
+    }
+
+    return column;
+  });
 
   const DragState = {
     row: -1,
@@ -272,17 +280,24 @@ const FapInstrumentProposalsTable = ({
     useState<FapProposalWithAverageScoreAndAvailabilityZone[]>([]);
 
   useEffect(() => {
-    const sortByRankOrAverageScore = (data: FapProposal[]) => {
+    const sortByRankOrAverageScore = async (data: FapProposal[]) => {
       let allocationTimeSum = 0;
 
-      return data
-        .map((proposalData) => {
+      const returnData = await Promise.all(
+        data.map(async (proposalData) => {
           const proposalAverageScore = average(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
           const proposalDeviation = standardDeviation(
             getGradesFromReviews(proposalData.proposal.reviews ?? [])
           );
+
+          const result = await api().getProposalTimeRequested({
+            proposalPk: proposalData.proposal.primaryKey,
+            instrumentId: fapInstrument.id,
+          });
+
+          const timeRequested = result.proposalTimeRequested;
 
           return {
             ...proposalData,
@@ -292,8 +307,12 @@ const FapInstrumentProposalsTable = ({
             proposalDeviation: isNaN(proposalDeviation)
               ? '-'
               : proposalDeviation,
+            timeRequested,
           };
         })
+      );
+
+      const sortedData = await returnData
         .sort((a, b) => {
           if (
             typeof a.proposalDeviation === 'number' &&
@@ -343,10 +362,20 @@ const FapInstrumentProposalsTable = ({
             };
           }
         });
+
+      return sortedData;
     };
 
-    const sortedProposals = sortByRankOrAverageScore(instrumentProposalsData);
-    setSortedProposalsWithAverageScore(sortedProposals);
+    const run = async () => {
+      const sortedProposals = await sortByRankOrAverageScore(
+        instrumentProposalsData
+      );
+      setSortedProposalsWithAverageScore(sortedProposals);
+    };
+
+    if (instrumentProposalsData.length) {
+      run();
+    }
   }, [instrumentProposalsData, fapInstrument.availabilityTime]);
 
   const ProposalTimeAllocationColumn = (

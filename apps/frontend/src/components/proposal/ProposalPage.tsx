@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import { ProposalsFilter, WorkflowType } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
@@ -40,9 +41,9 @@ export default function ProposalPage() {
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
     instrumentFilter: {
-      instrumentId: instrumentId != null ? +instrumentId : null,
+      instrumentIds: parseInstrumentQuery(instrumentId),
       showAllProposals: !instrumentId,
-      showMultiInstrumentProposals: false,
+      showMultiInstrumentProposals: instrumentId === 'multi',
     },
     proposalStatusId: proposalStatusId ?? undefined,
     referenceNumbers: proposalId ? [proposalId] : undefined,

@@ -269,7 +269,7 @@ You can navigate between the sections by clicking on the headings or `NEXT` and 
 
     * **Proposal workflow:** The workflow that the Proposal will follow.
 
-    * **Allocation time unit:** The unit of time the allocation will be in (Hours, Days or Weeks) 
+    * **Allocation time unit:** The unit of time the allocation will be in (Hours, Days, Weeks or Shifts (8h by default)) 
 
     * **Title (public):** The name of the Call which will be publicly displayed
 

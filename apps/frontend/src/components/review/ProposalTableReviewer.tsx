@@ -14,7 +14,9 @@ import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter, {
+  parseInstrumentQuery,
+} from 'components/common/proposalFilters/InstrumentFilter';
 import { UserContext } from 'context/UserContextProvider';
 import {
   PaginationSortDirection,
@@ -107,14 +109,15 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const [selectedCallId, setSelectedCallId] = useState<number>(
     call ? +call : 0
   );
-  const [selectedInstrumentId, setSelectedInstrumentId] = useState<
-    number | null | undefined
-  >(instrument ? +instrument : null);
+  const [selectedInstrumentIds, setSelectedInstrumentIds] = useState<number[]>(
+    parseInstrumentQuery(instrument) ?? []
+  );
 
   const { loading, userData, setUserData, setUserWithReviewsFilter } =
     useUserWithReviewsData({
       callId: selectedCallId,
-      instrumentId: selectedInstrumentId,
+      instrumentId:
+        selectedInstrumentIds.length > 0 ? selectedInstrumentIds[0] : null,
       status: getFilterStatus(reviewStatus),
       reviewer: getFilterReviewer(reviewer),
       active: true,
@@ -461,12 +464,15 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             shouldShowAll
             instruments={instruments}
             isLoading={loadingInstruments}
-            instrumentId={selectedInstrumentId}
+            instrumentIds={selectedInstrumentIds}
             onChange={(instrumentFilter) => {
-              setSelectedInstrumentId(instrumentFilter.instrumentId);
-              setUserWithReviewsFilter((filters) => ({
-                ...filters,
-                instrumentId: instrumentFilter.instrumentId,
+              const selectedIds = instrumentFilter.instrumentIds ?? [];
+              setSelectedInstrumentIds(selectedIds);
+              const firstSelectedId =
+                selectedIds.length > 0 ? selectedIds[0] : null;
+              setUserWithReviewsFilter((currentFilters) => ({
+                ...currentFilters,
+                instrumentId: firstSelectedId,
               }));
             }}
           />

@@ -91,14 +91,18 @@ function ExperimentFilterBar({
       </Grid>
       <Grid item sm={4} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentId}
+          instrumentIds={
+            filter.instrumentId ? [filter.instrumentId] : undefined
+          }
           instruments={instruments?.data}
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
           onChange={(instrumentFilterValue) => {
+            const [selectedInstrumentId] =
+              instrumentFilterValue.instrumentIds ?? [];
             setExperimentFilter({
               ...filter,
-              instrumentId: instrumentFilterValue.instrumentId,
+              instrumentId: selectedInstrumentId,
             });
           }}
         />

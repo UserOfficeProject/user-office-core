@@ -124,7 +124,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
         isArchivedTab
       ),
     },
-    {},
+    { sortField: 'sort_order', sortDirection: PaginationSortDirection.ASC },
     CallsDataQuantity.EXTENDED
   );
 
@@ -348,24 +348,38 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
 
   const onDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
-    const callsWithUpdatedOrder = reorder(
+    const reorderedCalls = reorder(
       calls,
       result.source.index,
       result.destination.index
     );
-    setCalls(
-      callsWithUpdatedOrder.sort((a, b) =>
-        a.sort_order > b.sort_order ? -1 : 1
-      )
-    );
-    const callOrderList = callsWithUpdatedOrder.map((item, index) => ({
-      callId: item.id,
+
+    const updatedCalls = reorderedCalls.map((item, index) => ({
+      ...item,
       sort_order: index,
     }));
 
-    api().updateCallOrder({
-      data: callOrderList,
-    });
+    setCalls(updatedCalls);
+
+    const callOrderList = updatedCalls.map((item) => ({
+      callId: item.id,
+      sort_order: item.sort_order,
+    }));
+
+    api()
+      .updateCallOrder({
+        data: callOrderList,
+      })
+      .then(() => {
+        setCallsQueryParams((prev) => ({
+          ...prev,
+          sortField: 'sort_order',
+          sortDirection: PaginationSortDirection.ASC,
+        }));
+      })
+      .catch(() => {
+        throw new Error('Failed to update call order');
+      });
   };
 
   const getCallOrder = (): void => {

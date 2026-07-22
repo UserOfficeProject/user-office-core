@@ -2,7 +2,9 @@ import Grid from '@mui/material/Grid';
 import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import InstrumentFilter, {
+  getInstrumentFilterIds,
+} from 'components/common/proposalFilters/InstrumentFilter';
 import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/StatusFilter';
 import {
@@ -82,7 +84,7 @@ const ProposalFilterBar = ({
 
       <Grid item sm={4} xs={12}>
         <InstrumentFilter
-          instrumentId={filter.instrumentFilter?.instrumentId}
+          instrumentIds={getInstrumentFilterIds(filter.instrumentFilter)}
           showMultiInstrumentProposals={
             filter.instrumentFilter?.showMultiInstrumentProposals
           }

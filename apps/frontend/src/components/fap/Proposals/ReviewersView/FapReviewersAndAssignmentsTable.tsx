@@ -4,6 +4,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Fap } from 'generated/sdk';
+import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import { FapMember, useFapMembersData } from 'hooks/fap/useFapMembersData';
 import {
   FapProposalAssignmentType,
@@ -121,6 +122,11 @@ const FapReviewersAndAssignmentsTable = ({
 
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
+
+  const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
+    '[data-cy="fap-reviewers-assignments-table"]',
+    [loadingMembers, loadingFapProposals]
+  );
 
   const reviewersAndProposals: ReviewerAndProposals[] = FapMembersData.map(
     (member) => {
@@ -253,46 +259,50 @@ const FapReviewersAndAssignmentsTable = ({
         fapProposalsData={FapProposalsData}
         assignProposalsToReviewer={handleMemberAssignmentToFapProposals}
       />
-      <MaterialTable
-        title="Reviewers and Assignments"
-        columns={FapReviewersAndAssignmentsTableColumns}
-        actions={tableActions}
-        detailPanel={(rowData) => (
-          <FapAssignedProposalsTable
-            assignedProposals={rowData.rowData.assignedProposals}
-            fapSecs={fap.fapSecretaries.map((s) => s.id)}
-            removeAssignedReviewer={removeAssignedReviewer}
-            updateView={updateFapProposalAssignmentsView}
-          />
-        )}
-        data={reviewersAndProposals}
-        isLoading={loadingMembers || loadingFapProposals}
-        options={{
-          pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
-          selection: true,
-          initialPage: page ? +page : 0,
-          pageSizeOptions: pageSizeOptions,
-        }}
-        localization={{
-          toolbar: {
-            nRowsSelected: (rowCount) => `${rowCount} reviewer(s) selected`,
-          },
-        }}
-        onSelectionChange={(selectedItems) => {
-          const selectedReviewers = selectedItems.map(
-            (item) => item.user.userId
-          );
-
-          setSearchParams((searchParams) => {
-            searchParams.delete('selection');
-            selectedReviewers.forEach((pk) =>
-              searchParams.append('selection', pk.toString())
+      <div data-cy="fap-reviewers-assignments-table">
+        <MaterialTable
+          tableRef={tableRef}
+          title="Reviewers and Assignments"
+          columns={FapReviewersAndAssignmentsTableColumns}
+          actions={tableActions}
+          detailPanel={(rowData) => (
+            <FapAssignedProposalsTable
+              assignedProposals={rowData.rowData.assignedProposals}
+              fapSecs={fap.fapSecretaries.map((s) => s.id)}
+              removeAssignedReviewer={removeAssignedReviewer}
+              updateView={updateFapProposalAssignmentsView}
+            />
+          )}
+          data={reviewersAndProposals}
+          isLoading={loadingMembers || loadingFapProposals}
+          options={{
+            pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
+            selection: true,
+            initialPage: page ? +page : 0,
+            pageSizeOptions: pageSizeOptions,
+          }}
+          localization={{
+            toolbar: {
+              nRowsSelected: (rowCount) => `${rowCount} reviewer(s) selected`,
+            },
+          }}
+          onSelectionChange={(selectedItems) => {
+            const selectedReviewers = selectedItems.map(
+              (item) => item.user.userId
             );
 
-            return searchParams;
-          });
-        }}
-      />
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+              selectedReviewers.forEach((pk) =>
+                searchParams.append('selection', pk.toString())
+              );
+
+              return searchParams;
+            });
+          }}
+        />
+      </div>
+      {expandCollapseAllButton}
     </>
   );
 };

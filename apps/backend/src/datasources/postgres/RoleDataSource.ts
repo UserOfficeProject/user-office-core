@@ -23,7 +23,7 @@ function defaultConfig(shortCode: string): unknown {
         hasAdminAccess: false,
       };
     default:
-      return {};
+      return { note: '' };
   }
 }
 

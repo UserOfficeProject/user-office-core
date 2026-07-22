@@ -21,12 +21,13 @@ export interface VisitRegistrationContextType extends QuestionaryContextType {
 export interface VisitRegistrationContainerProps {
   registration: RegistrationWithQuestionary;
   onSubmitted?: (registration: RegistrationWithQuestionary) => void;
+  previewMode?: boolean;
 }
 export default function VisitRegistrationContainer(
   props: VisitRegistrationContainerProps
 ) {
   const [initialState] = useState(
-    new VisitRegistrationSubmissionState(props.registration)
+    new VisitRegistrationSubmissionState(props.registration, props.previewMode)
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.VISIT_REGISTRATION);
@@ -48,7 +49,10 @@ export default function VisitRegistrationContainer(
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <Questionary title={'Visit the facility'} />
+      <Questionary
+        title={'Visit the facility'}
+        previewMode={props.previewMode}
+      />
     </QuestionaryContext.Provider>
   );
 }

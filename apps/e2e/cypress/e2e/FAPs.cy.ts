@@ -481,7 +481,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
-    it.only('Table selection and parameters should be saved between tab navigation', () => {
+    it('Table selection and parameters should be saved between tab navigation', () => {
       for (let index = 0; index < 6; index++) {
         cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
           const createdProposal = result.createProposal;
@@ -573,6 +573,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy=instrument-filter]').click();
       cy.get('[role=presentation]').contains(instrument.name).click();
+      cy.get('body').type('{esc}');
 
       cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
       cy.get('[data-cy="fap-assignments-table"]').contains(

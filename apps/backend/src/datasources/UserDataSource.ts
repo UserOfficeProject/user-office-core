@@ -75,6 +75,7 @@ export interface UserDataSource {
   ): Promise<number>;
   update(user: UpdateUserByIdArgs): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
+  removeUserRoles(id: number, roles: number[]): Promise<void>;
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
