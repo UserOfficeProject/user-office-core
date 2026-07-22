@@ -26,7 +26,9 @@ export function SampleDeclarationContainer(props: {
   sampleEditDone?: () => void;
   previewMode?: boolean;
 }) {
-  const [initialState] = useState(new SampleSubmissionState(props.sample));
+  const [initialState] = useState(
+    new SampleSubmissionState(props.sample, props.previewMode)
+  );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.SAMPLE);
 

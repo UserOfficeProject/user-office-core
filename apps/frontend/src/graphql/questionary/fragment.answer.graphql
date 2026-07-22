@@ -4,6 +4,7 @@ fragment answer on Answer {
     ...question
   }
   sortOrder
+  templateId
   topicId
   config {
     ...fieldConfig

@@ -94,16 +94,21 @@ export default class TemplateQueries {
   @Authorized()
   async getDynamicMultipleChoiceOptions(
     user: UserWithRole | null,
-    questionId: string
+    questionId: string,
+    templateId?: number | null
   ) {
-    const question = await this.dataSource.getQuestion(questionId);
+    const question = await this.getDynamicMultipleChoiceQuestion(
+      questionId,
+      templateId
+    );
     if (!question) return [];
 
     const config = question.config as DynamicMultipleChoiceConfig;
-    if (config.url === '') return [];
+    const dynamicURL = constructDynamicURL(config.url, config.useBaseDomain);
+    if (dynamicURL === '') return [];
 
     try {
-      const response = await fetch(config.url, {
+      const response = await fetch(dynamicURL, {
         headers: config.apiCallRequestHeaders?.reduce(
           (acc, header) => ({
             ...acc,
@@ -139,4 +144,34 @@ export default class TemplateQueries {
 
     return [];
   }
+
+  private async getDynamicMultipleChoiceQuestion(
+    questionId: string,
+    templateId?: number | null
+  ): Promise<Question | null> {
+    if (templateId !== null && templateId !== undefined) {
+      const questionTemplateRelation =
+        await this.dataSource.getQuestionTemplateRelation(
+          questionId,
+          templateId
+        );
+
+      if (!questionTemplateRelation) return null;
+
+      return {
+        ...questionTemplateRelation.question,
+        config: questionTemplateRelation.config,
+      };
+    }
+
+    return this.dataSource.getQuestion(questionId);
+  }
+}
+
+function constructDynamicURL(url: string, useBaseURL: boolean): string {
+  if (useBaseURL) {
+    return `${process.env.BASE_URL}/${url}`;
+  }
+
+  return url;
 }

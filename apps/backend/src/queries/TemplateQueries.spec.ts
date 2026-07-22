@@ -152,4 +152,65 @@ describe('getDynamicMultipleChoiceOptions', () => {
 
     expect(options).toEqual(['option1', 'option2']);
   });
+
+  it('Should return options if selected useBaseDomain', async () => {
+    process.env = {
+      ...process.env,
+      BASE_URL: 'http://mocked.example.com',
+    };
+
+    jest
+      .spyOn(global, 'fetch')
+      .mockImplementation((input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input.toString();
+
+        if (url === 'http://mocked.example.com/getListOfCountries') {
+          return Promise.resolve({
+            json: () => Promise.resolve(['option1', 'option2']),
+            ok: true,
+          } as Response);
+        } else {
+          return Promise.reject(new Error('Unknown URL'));
+        }
+      });
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionWithBaseDomain'
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+  });
+  it('should use the question template relation if a template ID is supplied', async () => {
+    const templateDataSource = container.resolve<TemplateDataSourceMock>(
+      Tokens.TemplateDataSource
+    );
+    const getQuestionSpy = jest.spyOn(templateDataSource, 'getQuestion');
+    const getQuestionTemplateRelationSpy = jest.spyOn(
+      templateDataSource,
+      'getQuestionTemplateRelation'
+    );
+    jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(['option1', 'option2']),
+        ok: true,
+      } as Response)
+    );
+
+    const options = await templateQueries.getDynamicMultipleChoiceOptions(
+      dummyUserWithRole,
+      'dmcQuestionEmptyJsonPath',
+      1
+    );
+
+    expect(options).toEqual(['option1', 'option2']);
+    expect(getQuestionTemplateRelationSpy).toHaveBeenCalledWith(
+      'dmcQuestionEmptyJsonPath',
+      1
+    );
+    expect(getQuestionSpy).not.toHaveBeenCalled();
+
+    getQuestionSpy.mockRestore();
+    getQuestionTemplateRelationSpy.mockRestore();
+  });
 });

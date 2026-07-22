@@ -151,6 +151,7 @@ fragment fieldConfig on FieldConfig {
     readPermissions
     url
     jsonPath
+    useBaseDomain
     apiCallRequestHeaders {
       name
       value

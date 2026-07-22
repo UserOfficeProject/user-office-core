@@ -15,4 +15,5 @@ export interface SearchCriteriaInputProps {
   ) => unknown;
   questionTemplateRelation: QuestionTemplateRelationFragment;
   callId?: InputMaybe<Call['id']>;
+  templateId?: number;
 }

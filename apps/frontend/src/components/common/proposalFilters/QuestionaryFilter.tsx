@@ -159,6 +159,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
               }}
               questionTemplateRelation={selectedQuestion}
               callId={callId}
+              templateId={selectedQuestion.templateId}
             />
           )}
         </Collapse>
