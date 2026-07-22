@@ -1,4 +1,5 @@
 import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
 import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
@@ -91,22 +92,27 @@ const StyledPickerWrapper = styled('div')(({ theme }) => ({
 export function QuestionaryComponentDateRangePicker(
   props: BasicComponentProps
 ) {
-  const { answer, onComplete } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors },
+  } = props;
   const {
     question: { id },
   } = answer;
-
   const [range, setRange] = useState<DateRange | undefined>();
+  const isError = errors[id] ? true : false;
 
   return (
-    <FormControl margin="dense">
+    <FormControl margin="dense" error={isError}>
       <StyledPickerWrapper>
         <DayPicker
           ISOWeek
+          required
           id={`${id}-id`}
           mode="range"
           selected={range}
-          onSelect={(value) => {
+          onSelect={(value: DateRange | undefined) => {
             setRange(value);
             if (value?.from && value?.to) {
               onComplete({ dateRanges: [value] });
@@ -114,6 +120,7 @@ export function QuestionaryComponentDateRangePicker(
           }}
         />
       </StyledPickerWrapper>
+      {isError && <FormHelperText>{errors[id]?.toString()}</FormHelperText>}
     </FormControl>
   );
 }

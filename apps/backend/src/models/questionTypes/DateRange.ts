@@ -8,17 +8,22 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
 //TODO add validation script to duo-validation
-const dateRangeQuestionValidationSchema = (field: QuestionTemplateRelation) =>
-  Yup.object({
-    dateRanges: Yup.array()
-      .of(
-        Yup.object({
-          from: Yup.date().required(),
-          to: Yup.date().required(),
-        })
-      )
-      .required(),
-  });
+export const dateRangeQuestionValidationSchema = (answer: any) => {
+  const config = answer.config;
+  let dateRangeSchema = Yup.array()
+    .of(
+      Yup.object({
+        from: Yup.date().required(),
+        to: Yup.date().required(),
+      })
+    )
+    .required();
+  if (config.required) {
+    dateRangeSchema = dateRangeSchema.min(1, 'A daterange is reqruired');
+  }
+
+  return Yup.object({ dateRanges: dateRangeSchema });
+};
 
 export const dateRangeDefinition: Question<DataType.DATE_RANGE_PICKER> = {
   dataType: DataType.DATE_RANGE_PICKER,
