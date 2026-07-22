@@ -33,7 +33,7 @@ export function GenericTemplateContainer(props: {
   previewMode?: boolean;
 }) {
   const [initialState] = useState(
-    new GenericTemplateSubmissionState(props.genericTemplate)
+    new GenericTemplateSubmissionState(props.genericTemplate, props.previewMode)
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.GENERIC_TEMPLATE);
