@@ -3,7 +3,11 @@ import { injectable } from 'tsyringe';
 
 import database from './database';
 import { StatusRecord } from './records';
-import { Status } from '../../models/Status';
+import {
+  Status,
+  ProposalStatusDefaultShortCodes,
+  ExperimentSafetyWorkflowStatusCodes,
+} from '../../models/Status';
 import { WorkflowType } from '../../models/Workflow';
 import { UpdateStatusInput } from '../../resolvers/mutations/settings/UpdateStatusMutation';
 import { StatusDataSource } from '../StatusDataSource';
@@ -110,7 +114,9 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     entityType: Status['entityType']
   ): Promise<Status | null> {
     const statusId =
-      entityType === WorkflowType.PROPOSAL ? 'DRAFT' : 'AWAITING_ESF';
+      entityType === WorkflowType.PROPOSAL
+        ? ProposalStatusDefaultShortCodes.DRAFT
+        : ExperimentSafetyWorkflowStatusCodes.AWAITING_ESF;
 
     const status: StatusRecord = await database
       .select()
