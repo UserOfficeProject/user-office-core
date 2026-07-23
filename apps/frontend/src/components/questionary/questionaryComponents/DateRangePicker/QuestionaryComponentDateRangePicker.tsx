@@ -5,6 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { DateRangeConfig } from 'generated/sdk';
+
+import Hint from '../Hint';
 
 const StyledPickerWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
@@ -100,6 +103,7 @@ export function QuestionaryComponentDateRangePicker(
   const {
     question: { id },
   } = answer;
+  const { tooltip } = answer.config as DateRangeConfig;
   const [range, setRange] = useState<DateRange | undefined>();
   const isError = errors[id] ? true : false;
   useEffect(() => {
@@ -125,6 +129,7 @@ export function QuestionaryComponentDateRangePicker(
           }}
         />
       </StyledPickerWrapper>
+      <Hint>{tooltip}</Hint>
       {isError && <FormHelperText>{errors[id]?.toString()}</FormHelperText>}
     </FormControl>
   );
