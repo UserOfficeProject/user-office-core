@@ -3,7 +3,6 @@ import { GraphQLScalarType, Kind } from 'graphql';
 export type AnswerType = number | string | Date | boolean | number[] | unknown;
 
 const coerce = (value: AnswerType) => {
-  //console.log(`Coercing: ${JSON.stringify(value)}`);
   if (typeof value === 'number' && Number.isInteger(value)) {
     return value;
   }

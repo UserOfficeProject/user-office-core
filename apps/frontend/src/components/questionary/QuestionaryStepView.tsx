@@ -340,9 +340,6 @@ function QuestionaryStepView(props: {
                     answer: field,
                     formikProps,
                     onComplete: (newValue: Answer['value']) => {
-                      console.log(
-                        `Executing onComplete with ${JSON.stringify(newValue)}`
-                      );
                       if (field.value !== newValue) {
                         dispatch({
                           type: 'FIELD_CHANGED',
