@@ -4,7 +4,6 @@ import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegis
 import { Maybe, Scalars, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-// NOTE: This is additional component because of some react warning with hooks when we use the useFormattedDateTime inside default DateAnswerRenderer component.
 const DateRangeAnswerValueRenderer = ({
   value,
 }: {
