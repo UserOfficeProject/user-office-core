@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import * as Yup from 'yup';
 
 import { DateRangeConfig } from '../../resolvers/types/FieldConfig';
-import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -46,17 +45,6 @@ export const dateRangeDefinition: Question<DataType.DATE_RANGE_PICKER> = {
   },
   getDefaultAnswer: (relation: QuestionTemplateRelation) => null,
   filterQuery: (queryBuilder, filter) => {
-    switch (filter.compareOperator) {
-      case QuestionFilterCompareOperator.EQUALS:
-        return true;
-      case QuestionFilterCompareOperator.GREATER_THAN:
-        return true;
-      case QuestionFilterCompareOperator.LESS_THAN:
-        return true;
-      default:
-        throw new GraphQLError(
-          `Unsupported comparator for TextInput ${filter.compareOperator}`
-        );
-    }
+    throw new GraphQLError(`Unsupported comparator ${filter.compareOperator}`);
   },
 };
