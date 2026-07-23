@@ -44,8 +44,6 @@ export class UpdateQuestionaryMutation {
     args: AnswerTopicArgs,
     @Ctx() context: ResolverContext
   ) {
-    //console.log(`backend answerTopic called with ${JSON.stringify(args)}`);
-
     return context.mutations.questionary.answerTopic(context.user, args);
   }
 }

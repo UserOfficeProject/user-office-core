@@ -25,15 +25,6 @@ export const QuestionTemplateRelationDateForm = (
           <>
             <QuestionExcerpt question={props.questionRel.question} />
             <Field
-              name="config.includeTime"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Include time',
-              }}
-              inputProps={{ 'data-cy': 'includeTime' }}
-            />
-            <Field
               name="config.tooltip"
               label="Tooltip"
               id="tooltip-input"

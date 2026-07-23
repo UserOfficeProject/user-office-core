@@ -45,16 +45,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            <Field
-              name="config.includeTime"
-              id="Include-time-Input"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: 'Include time',
-              }}
-              inputProps={{ 'data-cy': 'includeTime' }}
-            />
 
             <TitledContainer label="Constraints">
               <Field

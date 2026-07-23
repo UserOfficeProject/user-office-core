@@ -1,7 +1,7 @@
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import { styled } from '@mui/material/styles';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -102,6 +102,11 @@ export function QuestionaryComponentDateRangePicker(
   } = answer;
   const [range, setRange] = useState<DateRange | undefined>();
   const isError = errors[id] ? true : false;
+  useEffect(() => {
+    if (answer?.value?.dateRanges?.[0]) {
+      setRange(answer.value.dateRanges[0]);
+    }
+  }, []);
 
   return (
     <FormControl margin="dense" error={isError}>
