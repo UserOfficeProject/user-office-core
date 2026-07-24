@@ -337,6 +337,19 @@ context('Template Basic tests', () => {
       cy.contains('Save').click();
       /* --- */
 
+      /* Date range */
+      cy.createDateRangeQuestion('When to plant foxgloves?');
+
+      cy.contains('When to plant foxgloves?')
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
+      cy.contains('When to plant foxgloves?').click();
+      cy.get('[data-cy=natural-key]').click();
+      cy.contains('Save').click();
+      /* --- */
+
       /* Date */
       cy.createDateQuestion(dateQuestion.title, {
         includeTime: false,

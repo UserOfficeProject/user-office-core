@@ -477,6 +477,36 @@ function createDynamicMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
+function createDateRangeQuestion(
+  question: string,
+  options?: {
+    key?: string;
+    firstTopic?: boolean;
+  }
+) {
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic ?? true,
+  });
+
+  cy.contains('Add Date Range').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
+
+  cy.get('[data-cy=question]').clear().type(question);
+
+  cy.contains('Save').click({ force: true });
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+}
+
 function createFileUploadQuestion(question: string, fileTypes: string[]) {
   openQuestionsMenu();
 
@@ -804,6 +834,8 @@ Cypress.Commands.add(
   'createDynamicMultipleChoiceQuestion',
   createDynamicMultipleChoiceQuestion
 );
+
+Cypress.Commands.add('createDateRangeQuestion', createDateRangeQuestion);
 
 Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);
 
