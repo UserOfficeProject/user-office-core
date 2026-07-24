@@ -162,10 +162,22 @@ export class VisitDataSourceMock implements VisitDataSource {
       ) || null
     );
   }
-  getRegistrations(
+  async getRegistrations(
     filter: GetRegistrationsFilter
   ): Promise<VisitRegistration[]> {
-    throw new Error('Method not implemented');
+    return this.visitsHasVisitors.filter((registration) => {
+      const matchesVisit =
+        filter.visitId === undefined ||
+        registration.visitId === filter.visitId;
+      const matchesQuestionary =
+        filter.questionaryIds === undefined ||
+        (registration.registrationQuestionaryId !== null &&
+          filter.questionaryIds.includes(
+            registration.registrationQuestionaryId
+          ));
+
+      return matchesVisit && matchesQuestionary;
+    });
   }
 
   async createVisit(
@@ -256,11 +268,7 @@ export class VisitDataSourceMock implements VisitDataSource {
       : false;
   }
 
-  /*
-   * Mirrors the Postgres implementation: a user is related to a visit if they
-   * created it, lead it, are on its visitor list, or are a member of its
-   * proposal. They can then read everyone taking part in those visits.
-   */
+  // NOTE: Keep in sync with VisitAuthorization.ts
   async getRelatedUsersOnVisits(id: number): Promise<number[]> {
     const usersOnVisit = (visitId: number) =>
       this.visitsHasVisitors
@@ -271,8 +279,7 @@ export class VisitDataSourceMock implements VisitDataSource {
       (visit) =>
         visit.creatorId === id ||
         visit.teamLeadUserId === id ||
-        usersOnVisit(visit.id).includes(id) ||
-        (proposalMembers.get(visit.proposalPk) ?? []).includes(id)
+        usersOnVisit(visit.id).includes(id)
     );
 
     const relatedUsers = relatedVisits.flatMap((visit) => [

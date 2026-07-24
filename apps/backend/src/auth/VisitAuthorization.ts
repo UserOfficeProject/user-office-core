@@ -35,6 +35,7 @@ export class VisitAuthorization {
     return visit;
   }
 
+  // NOTE: Keep constraints in sync with VisitDataSource.ts
   async hasReadRights(
     agent: UserWithRole | null,
     visit: Visit
@@ -63,17 +64,21 @@ export class VisitAuthorization {
     }
 
     /*
-     * User can read the visit if he is a participant of a proposal
+     * User can read the visit if he is a PI
      * or on the visitor list
      */
-    const [isProposalMember, isVisitVisitor] = await Promise.all([
-      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk),
+    const [isPI, isVisitVisitor] = await Promise.all([
+      this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
+        agent,
+        visit.proposalPk
+      ),
       this.visitDataSource.isVisitorOfVisit(agent.id, visit.id),
     ]);
 
-    return visit.creatorId === agent.id || isProposalMember || isVisitVisitor;
+    return visit.creatorId === agent.id || isPI || isVisitVisitor;
   }
 
+  // NOTE: Keep constraints in sync with VisitDataSource.ts
   async hasWriteRights(
     agent: UserWithRole | null,
     visit: Visit
@@ -101,15 +106,14 @@ export class VisitAuthorization {
       return false;
     }
 
-    const proposal = await this.proposalDataSource.get(visit.proposalPk);
-    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+    const isPI = await this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
       agent,
-      proposal
+      visit.proposalPk
     );
 
     const isTeamLead = agent.id === visit.teamLeadUserId;
 
-    if (!isMemberOfProposal && !isTeamLead) {
+    if (!isPI && !isTeamLead) {
       logger.logWarn('User tried to update visit without having write rights', {
         agent,
         visit,
