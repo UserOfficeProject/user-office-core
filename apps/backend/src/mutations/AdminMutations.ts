@@ -66,15 +66,15 @@ export default class AdminMutations {
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,
-    { id, text }: { id: number; text: string }
+    { pageId, text, tagId }: { pageId: number; text: string, tagId?: number }
   ): Promise<Page | Rejection> {
     return this.dataSource
-      .setPageText(id, text)
+      .setPageText(pageId, text, tagId)
       .then((page) => {
         return page;
       })
       .catch((error) => {
-        return rejection('Could not set page text', { agent, id }, error);
+        return rejection('Could not set page text', { agent, pageId, tagId }, error);
       });
   }
 

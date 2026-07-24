@@ -7,12 +7,16 @@ import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { TagFilter } from './PageEditor';
+import { useSearchParams } from 'react-router-dom';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
+  tagFilter: TagFilter
 }) {
-  const [loading, pageContent] = useGetPageContent(props.pageName);
+
+  const [loading, pageContent] = useGetPageContent(props.pageName, props.tagFilter.tagId);
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
@@ -50,11 +54,13 @@ export default function PageInputBox(props: {
             marginTop: '25px',
             marginLeft: '10px',
           }}
-          onClick={() =>
+          onClick={() =>{
             api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
-              id: props.pageName,
+              pageId: props.pageName,
               text: content,
+              tagId: props.tagFilter.tagId !== 0 ? props.tagFilter.tagId : undefined,
             })
+          }
           }
         >
           Update

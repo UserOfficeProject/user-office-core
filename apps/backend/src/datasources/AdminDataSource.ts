@@ -29,8 +29,8 @@ export interface AdminDataSource {
   getInstitutionByName(institutionName: string): Promise<Institution | null>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
-  get(id: number): Promise<string | null>;
-  setPageText(id: number, text: string): Promise<Page>;
+  get(pageId: number, tagId?: number): Promise<string | null>
+  setPageText(id: number, text: string, tagId?: number): Promise<Page>;
   resetDB(includeSeeds: boolean): Promise<string[]>;
   applyPatches(): Promise<string[]>;
   getFeatures(): Promise<Feature[]>;

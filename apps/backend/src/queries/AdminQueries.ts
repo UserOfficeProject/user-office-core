@@ -10,14 +10,19 @@ import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
 import { getContextKeys } from '../utils/helperFunctions';
 
+type GetPageTextArgs = {
+  pageId: number;
+  tagId?: number;
+};
+
 @injectable()
 export default class AdminQueries {
   constructor(
     @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
   ) {}
 
-  async getPageText(id: number): Promise<string | null> {
-    return await this.dataSource.get(id);
+  async getPageText({ pageId, tagId }: GetPageTextArgs): Promise<string | null> {
+    return await this.dataSource.get(pageId, tagId);
   }
 
   async getCountries() {

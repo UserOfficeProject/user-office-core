@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { PageName } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useGetPageContent(pageName: PageName) {
+export function useGetPageContent(pageName: PageName, tagId?: number) {
   const [pageContent, setPageContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -11,27 +11,25 @@ export function useGetPageContent(pageName: PageName) {
 
   useEffect(() => {
     let unmounted = false;
-
     setLoading(true);
     api()
       .getPageContent({
         pageId: pageName,
+        tagId: tagId === 0 ? undefined : tagId
       })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.pageContent) {
-          setPageContent(data.pageContent);
-        }
+        setPageContent(data.pageContent ?? "");
         setLoading(false);
       });
 
     return () => {
       unmounted = true;
     };
-  }, [pageName, api]);
+  }, [pageName, tagId, api]);
 
   return [loading, pageContent] as const;
 }
