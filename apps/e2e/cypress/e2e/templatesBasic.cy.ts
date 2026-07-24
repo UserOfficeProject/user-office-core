@@ -1644,6 +1644,39 @@ context('Template Basic tests', () => {
     });
   });
 
+  describe('Date range picker tests', () => {
+    const createProposalAndOpenDateRangeQuestion = () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+    };
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
+    });
+
+    it.only('Should display date range selector', () => {
+      cy.createDateRangeQuestion(
+        'What range of years do osprey come to Britain?'
+      );
+
+      createProposalAndOpenDateRangeQuestion();
+
+      cy.contains('What range of years do osprey come to Britain?').should(
+        'exist'
+      );
+    });
+  });
+
   describe('File upload tests', () => {
     beforeEach(() => {
       cy.login('officer');

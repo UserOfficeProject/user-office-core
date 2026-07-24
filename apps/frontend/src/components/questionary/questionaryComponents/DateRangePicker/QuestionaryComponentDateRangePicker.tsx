@@ -1,5 +1,6 @@
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import FormLabel from '@mui/material/FormLabel';
 import { styled } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
@@ -101,7 +102,7 @@ export function QuestionaryComponentDateRangePicker(
     formikProps: { errors },
   } = props;
   const {
-    question: { id },
+    question: { id, question },
   } = answer;
   const { tooltip } = answer.config as DateRangeConfig;
   const [range, setRange] = useState<DateRange | undefined>();
@@ -115,6 +116,15 @@ export function QuestionaryComponentDateRangePicker(
   return (
     <FormControl margin="dense" error={isError}>
       <StyledPickerWrapper>
+        <FormLabel
+          sx={{
+            mb: 1,
+            fontWeight: 500,
+            color: 'text.primary',
+          }}
+        >
+          {question}
+        </FormLabel>
         <DayPicker
           ISOWeek
           required
