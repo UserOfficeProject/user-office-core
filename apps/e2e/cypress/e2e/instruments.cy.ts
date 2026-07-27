@@ -4,7 +4,6 @@ import {
   TechnicalReviewStatus,
   FeatureId,
   SettingsId,
-  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -61,18 +60,6 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
-
-    cy.createStatus({
-      id: 'FEASIBILITY',
-      name: 'Feasibility',
-      description: 'Feasibility status',
-      entityType: WorkflowType.PROPOSAL,
-    });
-
-    cy.addStatusToWorkflow({
-      workflowId: initialDBData.workflows.defaultWorkflow.id,
-      statusId: 'FEASIBILITY',
-    });
 
     if (
       settings

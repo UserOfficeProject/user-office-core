@@ -98,4 +98,8 @@ export interface ExperimentDataSource {
   getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null>;
+  changeExperimentSafetyWorkflowStatus(
+    workflowStatusId: number,
+    experimentSafetyPks: number[]
+  ): Promise<ExperimentSafety[]>;
 }
