@@ -38,7 +38,7 @@ export default function UserUpcomingExperimentsTable() {
   const {
     loading: experimentsLoading,
     userExperiments,
-    setUserUpcomingExperiments,
+    setUserExperiments,
   } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -64,7 +64,7 @@ export default function UserUpcomingExperimentsTable() {
           ? updatedExperiment
           : experiment
       );
-      setUserUpcomingExperiments(updatedExperiments);
+      setUserExperiments(updatedExperiments);
     },
   });
 
