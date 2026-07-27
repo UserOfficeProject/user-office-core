@@ -130,6 +130,9 @@ export interface Question<T extends DataType> {
    */
   readonly validateConfig?: (config: any) => void;
 
+  /**
+   * Defines the Yup schema used to validate the config before writing to database
+   */
   readonly customYupSchema?: Yup.ObjectSchema<any>;
   /**
    * Question can contain configuration, e.g. isRequired, maxValue, etc,
