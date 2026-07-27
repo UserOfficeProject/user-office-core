@@ -96,9 +96,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
-    // only PI and visitors can see the button, Co-PI cannot.
-    // assuming lead is always a visitor
-    if (isPi(user, event) || isVisitor(user, event)) {
+    const { readable, writeable, createable } = event.visitPerms;
+
+    // the PI can create a visit; PI/visitors can read an existing one.
+    // Co-PIs can do neither, so the button is hidden for them
+    if (createable || readable) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
@@ -117,14 +119,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'invisible';
     }
 
-    // by default, the table is readonly
-    // since the table is only shown to PI, teamlead, visitors
-    // it is readonly for visitors who are not teamlead
-    let readonly = true;
-
-    if (isPi(user, event) || isTeamlead(user, event)) {
-      readonly = false;
-    }
+    // editing an existing visit needs write rights; creating one needs create rights
+    const readonly = event.visit !== null ? !writeable : !createable;
 
     return createActionButton(
       `Define who is coming ${stateReason ? '(' + stateReason + ')' : ''}`,
