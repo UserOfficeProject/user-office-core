@@ -440,6 +440,7 @@ context('visits tests', () => {
 
       cy.get('[data-cy=add-participant-button]').should('be.disabled');
       cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
     });
 
     it('Visitor should be able to register for a visit', () => {
@@ -678,6 +679,7 @@ context('visits tests', () => {
 
       cy.get('[data-cy=add-participant-button]').should('be.disabled');
       cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
     });
 
     it('Visitor who is not the team lead should see the team read only', () => {
@@ -711,7 +713,8 @@ context('visits tests', () => {
       // ... but nothing on it can be changed.
       cy.get('[data-cy=add-participant-button]').should('be.disabled');
       cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
-      cy.get('[data-cy=team-lead-user-dropdown]').should('be.disabled');
+      // the data-cy tag sits on the input wrapper, so check the input itself
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
 
       /*
        * The actions column is dropped entirely rather than being disabled, so
