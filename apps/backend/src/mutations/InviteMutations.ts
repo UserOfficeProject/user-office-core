@@ -444,7 +444,7 @@ export default class InviteMutations {
       );
       // already a co-proposer
       if (proposalHasUser) {
-        return;
+        continue;
       }
       await this.proposalDataSource.addProposalUser(
         claim.proposalPk,
