@@ -90,30 +90,20 @@ export default class PostgresDataAccessUsersDataSource
     }
   }
 
-  async addDataAccessUser(
-    proposalPk: number,
-    userId: number
-  ): Promise<undefined | Rejection> {
-    try {
-      await database.transaction(async (trx) => {
-        const insertData = {
-          proposal_pk: proposalPk,
-          user_id: userId,
-        };
-
-        await database('data_access_user_has_proposal')
-          .insert(insertData)
-          .onConflict(['proposal_pk', 'user_id'])
-          .ignore();
-      });
-    } catch (error) {
-      return new Rejection('Failed to add data access user', {
-        proposalPk,
-        userId,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
+  async addDataAccessUser(proposalPk: number, userId: number): Promise<undefined | Rejection> {
+  try {
+    await database('data_access_user_has_proposal')
+      .insert({ proposal_pk: proposalPk, user_id: userId })
+      .onConflict(['proposal_pk', 'user_id'])
+      .ignore();
+  } catch (error) {
+        return new Rejection('Failed to update data access users', {
+            proposalPk,
+            userIds,
+            error: error instanceof Error ? error.message : String(error),
+        });
   }
+}
 
   async isDataAccessUserOfProposal(
     id: number,
