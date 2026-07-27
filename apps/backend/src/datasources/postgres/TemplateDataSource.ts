@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import * as Yup from 'yup';
 
 import {
   ComparisonStatus,
@@ -1302,21 +1303,27 @@ async function validateConfigBeforeWrite(newConfig: any, questionId: string) {
 
   const questionDef = getQuestionDefinition(questionType.data_type as DataType);
 
-  const newConfigKeys = JSON.stringify(Object.keys(newConfigObject).sort());
-  const defaultQuestionKeys = JSON.stringify(
-    Object.keys(questionDef.createBlankConfig()).sort()
-  );
-  if (newConfigKeys !== defaultQuestionKeys) {
-    throw new GraphQLError(
-      'Keys of new config type do not match keys in database.'
-    );
+  const configBaseYupSchema = Yup.object({
+    small_label: Yup.string(),
+    required: Yup.boolean().required(),
+    tooltip: Yup.string(),
+    readPermissions: Yup.array().of(Yup.string().required()).required(),
+  });
+
+  try {
+    //When all configs have their own schemas written this will no longer be optional.
+    if (questionDef.customYupSchema) {
+      const combinedYupSchema = configBaseYupSchema
+        .concat(questionDef.customYupSchema)
+        .noUnknown(true, 'Unknown field');
+      await combinedYupSchema.validate(newConfigObject);
+    }
+  } catch (error) {
+    throw new GraphQLError('Config schema not valid');
   }
 
-  const isValidConfig = questionDef.validateConfig
-    ? questionDef.validateConfig(newConfigObject)
-    : true;
-  if (!isValidConfig) {
-    throw new GraphQLError('Invalid config for question.');
+  if (questionDef.validateConfig) {
+    questionDef.validateConfig(newConfigObject);
   }
 
   return;
