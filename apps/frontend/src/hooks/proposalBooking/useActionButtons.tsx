@@ -22,45 +22,12 @@ import {
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const getParticipationRole = (
-  user: UserJwt,
-  event: UserExperiment
-): 'PI' | 'co-proposer' | 'visitor' | null => {
-  if (event.proposal?.proposer?.id === user.id) {
-    return 'PI';
-  } else if (event.proposal?.users.map((user) => user.id).includes(user.id)) {
-    return 'co-proposer';
-  } else if (
-    event.visit?.registrations
-      .map((registration) => registration.userId)
-      .includes(user.id)
-  ) {
-    return 'visitor';
-  } else {
-    return null;
-  }
-};
-
-const isPi = (user: UserJwt, event: UserExperiment) => {
-  const role = getParticipationRole(user, event);
-
-  return role === 'PI';
-};
-
-const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) => {
-  const role = getParticipationRole(user, event);
-
-  return role === 'PI' || role === 'co-proposer';
-};
-
-const isVisitor = (user: UserJwt, event: UserExperiment) => {
-  const role = getParticipationRole(user, event);
-
-  return role === 'visitor';
-};
+const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) =>
+  event.proposal?.proposer?.id === user.id ||
+  event.proposal?.users.some((coProposer) => coProposer.id === user.id);
 
 const isTeamlead = (user: UserJwt, event: UserExperiment) =>
-  event.visit && event.visit.teamLead.id === user.id;
+  event.visit !== null && event.visit.teamLead.id === user.id;
 
 //---------------------------------------------------------------------
 
