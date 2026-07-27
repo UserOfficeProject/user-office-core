@@ -277,7 +277,10 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
+      // no visit exists yet, so the PI only gets the disabled hint
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because visit is not defined)"]'
+      ).should('exist');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -324,7 +327,10 @@ context('visits tests', () => {
 
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
+      // no visit exists yet, so the PI only gets the disabled hint
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because visit is not defined)"]'
+      ).should('exist');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
