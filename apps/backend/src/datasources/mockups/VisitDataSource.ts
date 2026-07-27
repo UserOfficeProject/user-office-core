@@ -167,8 +167,7 @@ export class VisitDataSourceMock implements VisitDataSource {
   ): Promise<VisitRegistration[]> {
     return this.visitsHasVisitors.filter((registration) => {
       const matchesVisit =
-        filter.visitId === undefined ||
-        registration.visitId === filter.visitId;
+        filter.visitId === undefined || registration.visitId === filter.visitId;
       const matchesQuestionary =
         filter.questionaryIds === undefined ||
         (registration.registrationQuestionaryId !== null &&
