@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
@@ -83,14 +82,10 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    try {
-      await this.processAcceptedRoleClaims(agent.id, invite);
-      await this.processAcceptedCoProposerClaims(agent.id, invite);
-      await this.processAcceptedDataAccessClaims(agent.id, invite);
-      await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
-    } catch (error) {
-      logger.logException('Error during claim processing', error);
-    }
+    await this.processAcceptedRoleClaims(agent.id, invite);
+    await this.processAcceptedCoProposerClaims(agent.id, invite);
+    await this.processAcceptedDataAccessClaims(agent.id, invite);
+    await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
