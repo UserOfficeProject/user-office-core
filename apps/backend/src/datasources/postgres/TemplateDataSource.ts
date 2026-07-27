@@ -1288,7 +1288,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 }
 
-async function validateConfigBeforeWrite(newConfig: any, questionId: string) {
+export async function validateConfigBeforeWrite(
+  newConfig: any,
+  questionId: string
+) {
   let newConfigObject;
   try {
     newConfigObject = JSON.parse(newConfig);
