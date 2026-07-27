@@ -125,4 +125,11 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         }
       );
     },
+    validateConfig: (config) => {
+      if (config?.variant === 'radio' && config?.isMultipleSelect) {
+        return false;
+      }
+
+      return true;
+    },
   };

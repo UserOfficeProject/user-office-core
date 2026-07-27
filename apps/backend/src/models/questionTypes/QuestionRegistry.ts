@@ -125,6 +125,11 @@ export interface Question<T extends DataType> {
   ) => Promise<boolean>;
 
   /**
+   * Performs validation on the config submitted before persisting data into the database
+   */
+  readonly validateConfig?: (config: any) => boolean;
+
+  /**
    * Question can contain configuration, e.g. isRequired, maxValue, etc,
    * This function returns configuration for newly created questions
    */

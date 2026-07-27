@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
-import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   ComparisonStatus,
   ConflictResolutionStrategy,
@@ -59,6 +58,8 @@ import {
   TemplateRecord,
   TopicRecord,
 } from './records';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 
 const EXPORT_VERSION = '1.2.0';
 const MIN_SUPPORTED_VERSION = '1.2.0';
@@ -681,6 +682,22 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       config,
       dependenciesOperator,
     } = args;
+
+    const questionType = await database('questions')
+      .select('data_type')
+      .where('question_id', questionId)
+      .first();
+    const questionDef = getQuestionDefinition(
+      questionType.data_type as DataType
+    );
+    if (config) {
+      const isValidConfig = questionDef.validateConfig
+        ? questionDef.validateConfig(JSON.parse(config))
+        : true;
+      if (!isValidConfig) {
+        throw new GraphQLError('Invalid config for question.');
+      }
+    }
 
     await database('templates_has_questions')
       .update({
