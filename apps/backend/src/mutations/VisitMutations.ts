@@ -188,6 +188,23 @@ export default class VisitMutations {
       );
     }
 
+    // Preserve the invariant that the team lead is always part of the team,
+    // established in createVisit and relied on by VisitAuthorization.hasReadRights.
+    // args.team / args.teamLeadUserId are partial, so validate the resulting state.
+    const effectiveTeamLeadUserId = args.teamLeadUserId ?? visit.teamLeadUserId;
+    const effectiveTeam =
+      args.team ??
+      (await this.dataSource.getRegistrations({ visitId: visit.id })).map(
+        (registration) => registration.userId
+      );
+
+    if (!effectiveTeam.includes(effectiveTeamLeadUserId)) {
+      return rejection(
+        'Can not update visit because team lead is not part of the team',
+        { args, agent }
+      );
+    }
+
     return this.dataSource.updateVisit(args);
   }
 

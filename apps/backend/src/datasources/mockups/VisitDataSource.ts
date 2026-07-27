@@ -124,6 +124,7 @@ export class VisitDataSourceMock implements VisitDataSource {
   async getVisit(visitId: number): Promise<Visit | null> {
     return this.visits.find((visit) => visit.id === visitId) ?? null;
   }
+
   async getVisits(filter?: VisitsFilter): Promise<Visit[]> {
     return this.visits.reduce((matchingVisits, currentVisit) => {
       if (filter?.creatorId && currentVisit.creatorId === filter.creatorId) {
@@ -227,6 +228,7 @@ export class VisitDataSourceMock implements VisitDataSource {
 
     return (await this.getVisit(args.visitId))!;
   }
+
   async updateRegistration(
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration> {
@@ -242,6 +244,7 @@ export class VisitDataSourceMock implements VisitDataSource {
       throw new Error('Registration not found');
     }
   }
+
   async deleteVisit(visitId: number): Promise<Visit> {
     return this.visits.splice(
       this.visits.findIndex((visit) => visit.id == visitId),

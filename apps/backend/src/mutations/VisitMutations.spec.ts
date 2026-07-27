@@ -55,6 +55,22 @@ test('User can not create visit for someone elses proposal', async () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
+// Enforces the invariant relied on by VisitAuthorization.hasReadRights: a team
+// lead is always a visitor (part of the team). If this rejection is ever
+// removed, the team-lead read path silently breaks.
+test('User can not create visit when the team lead is not part of the team', async () => {
+  const result = await mutations.createVisit(dummyUserWithRole, {
+    experimentPk: 2,
+    teamLeadUserId: 1,
+    team: [dummyUserWithRole.id], // team lead (1) is not in the team
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect((result as Rejection).reason).toEqual(
+    'Can not create visit because team lead is not part of the team'
+  );
+});
+
 test('User can not delete visit for someone elses proposal', async () => {
   const result = await mutations.deleteVisit(dummyUserNotOnProposalWithRole, 1);
 
@@ -72,12 +88,54 @@ test('User can update visit', async () => {
     team: [dummyUserWithRole.id],
   })) as Visit;
 
-  await mutations.updateVisit(dummyUserWithRole, {
+  const updated = (await mutations.updateVisit(dummyUserWithRole, {
+    visitId: visit.id,
+    teamLeadUserId: 1,
+    team: [1], // new team lead is part of the new team
+  })) as Visit;
+
+  expect(updated.teamLeadUserId).toEqual(1);
+});
+
+// Same invariant as createVisit, enforced on update: the team lead must stay
+// part of the team, otherwise it is silently dropped from the visitor list and
+// loses read access (VisitAuthorization.hasReadRights).
+test('User can not update visit to a team lead who is not in the given team', async () => {
+  const visit = (await mutations.createVisit(dummyUserWithRole, {
+    experimentPk: 2,
+    teamLeadUserId: dummyUserWithRole.id,
+    team: [dummyUserWithRole.id],
+  })) as Visit;
+
+  const result = await mutations.updateVisit(dummyUserWithRole, {
+    visitId: visit.id,
+    teamLeadUserId: 1, // user 1 is not in the given team
+    team: [dummyUserWithRole.id],
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect((result as Rejection).reason).toEqual(
+    'Can not update visit because team lead is not part of the team'
+  );
+});
+
+test('User can not change only the team lead to someone not on the existing team', async () => {
+  const visit = (await mutations.createVisit(dummyUserWithRole, {
+    experimentPk: 2,
+    teamLeadUserId: dummyUserWithRole.id,
+    team: [dummyUserWithRole.id],
+  })) as Visit;
+
+  // No team passed: the new team lead is checked against the current team.
+  const result = await mutations.updateVisit(dummyUserWithRole, {
     visitId: visit.id,
     teamLeadUserId: 1,
   });
 
-  expect(visit.teamLeadUserId).toEqual(1);
+  expect(result).toBeInstanceOf(Rejection);
+  expect((result as Rejection).reason).toEqual(
+    'Can not update visit because team lead is not part of the team'
+  );
 });
 
 test('User can not himself approve visit registration', async () => {
