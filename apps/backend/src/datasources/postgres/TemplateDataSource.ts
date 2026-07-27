@@ -683,21 +683,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       dependenciesOperator,
     } = args;
 
-    const questionType = await database('questions')
-      .select('data_type')
-      .where('question_id', questionId)
-      .first();
-    const questionDef = getQuestionDefinition(
-      questionType.data_type as DataType
-    );
-    if (config) {
-      const isValidConfig = questionDef.validateConfig
-        ? questionDef.validateConfig(JSON.parse(config))
-        : true;
-      if (!isValidConfig) {
-        throw new GraphQLError('Invalid config for question.');
-      }
-    }
+    await validateConfigBeforeWrite(config, questionId);
 
     await database('templates_has_questions')
       .update({
@@ -1299,4 +1285,39 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     return newTemplate;
   }
+}
+
+async function validateConfigBeforeWrite(newConfig: any, questionId: string) {
+  let newConfigObject;
+  try {
+    newConfigObject = JSON.parse(newConfig);
+  } catch {
+    throw new GraphQLError('Invalid JSON for config.');
+  }
+
+  const questionType = await database('questions')
+    .select('data_type')
+    .where('question_id', questionId)
+    .first();
+
+  const questionDef = getQuestionDefinition(questionType.data_type as DataType);
+
+  const newConfigKeys = JSON.stringify(Object.keys(newConfigObject).sort());
+  const defaultQuestionKeys = JSON.stringify(
+    Object.keys(questionDef.createBlankConfig()).sort()
+  );
+  if (newConfigKeys !== defaultQuestionKeys) {
+    throw new GraphQLError(
+      'Keys of new config type do not match keys in database.'
+    );
+  }
+
+  const isValidConfig = questionDef.validateConfig
+    ? questionDef.validateConfig(newConfigObject)
+    : true;
+  if (!isValidConfig) {
+    throw new GraphQLError('Invalid config for question.');
+  }
+
+  return;
 }
