@@ -26,6 +26,8 @@ const visitDataSource = container.resolve<VisitDataSourceMock>(
  */
 const VISIT_ID = 5;
 const NON_EXISTENT_VISIT_ID = 999;
+// Proposal that visit 5 sits on; its principal investigator is user 1.
+const PROPOSAL_PK = 1;
 
 beforeEach(() => {
   visitDataSource.init();
@@ -45,10 +47,10 @@ describe('VisitAuthorization', () => {
       ).resolves.toEqual(true);
     });
 
-    test('A co-proposer can edit the visitor list', async () => {
+    test('A co-proposer can not edit the visitor list', async () => {
       return expect(
         visitAuth.hasWriteRights(dummyUserWithRole, VISIT_ID)
-      ).resolves.toEqual(true);
+      ).resolves.toEqual(false);
     });
 
     test('The team lead can edit the visitor list even though they are not a member of the proposal', async () => {
@@ -101,11 +103,10 @@ describe('VisitAuthorization', () => {
       ).resolves.toEqual(true);
     });
 
-    // backend-only assertion
-    test('A co-proposer can read the visitor list', async () => {
+    test('A co-proposer can not read the visitor list', async () => {
       return expect(
         visitAuth.hasReadRights(dummyUserWithRole, VISIT_ID)
-      ).resolves.toEqual(true);
+      ).resolves.toEqual(false);
     });
 
     test('The team lead can read the visitor list', async () => {
@@ -141,6 +142,54 @@ describe('VisitAuthorization', () => {
     test('Nobody can read the visitor list of a visit that does not exist', async () => {
       return expect(
         visitAuth.hasReadRights(dummyUserWithRole, NON_EXISTENT_VISIT_ID)
+      ).resolves.toEqual(false);
+    });
+  });
+
+  describe('hasCreateRights', () => {
+    test('The principal investigator can create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(
+          dummyPrincipalInvestigatorWithRole,
+          PROPOSAL_PK
+        )
+      ).resolves.toEqual(true);
+    });
+
+    // A user officer is intentionally NOT granted create rights.
+    test('A user officer can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(dummyUserOfficerWithRole, PROPOSAL_PK)
+      ).resolves.toEqual(false);
+    });
+
+    test('The team lead can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(dummyVisitTeamLeadWithRole, PROPOSAL_PK)
+      ).resolves.toEqual(false);
+    });
+
+    test('A visitor can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(dummyVisitorWithRole, PROPOSAL_PK)
+      ).resolves.toEqual(false);
+    });
+
+    test('A co-proposer can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(dummyUserWithRole, PROPOSAL_PK)
+      ).resolves.toEqual(false);
+    });
+
+    test('A user unrelated to the proposal can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(dummyUserNotOnProposalWithRole, PROPOSAL_PK)
+      ).resolves.toEqual(false);
+    });
+
+    test('An unauthenticated agent can not create a visit', async () => {
+      return expect(
+        visitAuth.hasCreateRights(null, PROPOSAL_PK)
       ).resolves.toEqual(false);
     });
   });

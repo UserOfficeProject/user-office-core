@@ -6,6 +6,7 @@ import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { Proposal } from '../models/Proposal';
 import { UserWithRole } from '../models/User';
 import { Visit } from '../models/Visit';
 
@@ -36,14 +37,6 @@ export class VisitAuthorization {
   }
 
   // NOTE: Keep constraints in sync with VisitDataSource.ts
-  async hasReadRights(
-    agent: UserWithRole | null,
-    visit: Visit
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
-    visitId: number
-  ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
     visitOrVisitId: Visit | number
@@ -81,16 +74,8 @@ export class VisitAuthorization {
   // NOTE: Keep constraints in sync with VisitDataSource.ts
   async hasWriteRights(
     agent: UserWithRole | null,
-    visit: Visit
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    visitId: number
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
     visitOrVisitId: number | Visit
-  ) {
+  ): Promise<boolean> {
     if (!agent) {
       return false;
     }
@@ -123,5 +108,29 @@ export class VisitAuthorization {
     }
 
     return true;
+  }
+
+  // NOTE: Keep constraints in sync with VisitDataSource.ts
+  async hasCreateRights(
+    agent: UserWithRole | null,
+    proposalOrProposalPk: Proposal | number
+  ): Promise<boolean> {
+    // Note: User Officer Does NOT have create access
+
+    const proposalPk =
+      proposalOrProposalPk instanceof Proposal
+        ? proposalOrProposalPk.primaryKey
+        : proposalOrProposalPk;
+
+    const isPi = await this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
+      agent,
+      proposalPk
+    );
+
+    if (isPi) {
+      return true;
+    }
+
+    return false;
   }
 }
