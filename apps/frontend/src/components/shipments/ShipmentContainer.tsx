@@ -24,7 +24,9 @@ export default function ShipmentContainer(props: {
   onDirtyStateChange?: (isDirty: boolean) => void;
   previewMode?: boolean;
 }) {
-  const [initialState] = useState(new ShipmentSubmissionState(props.shipment));
+  const [initialState] = useState(
+    new ShipmentSubmissionState(props.shipment, props.previewMode)
+  );
   const eventHandlers = useEventHandlers(TemplateGroupId.SHIPMENT);
   const customEventHandlers =
     createCustomEventHandlers<ShipmentSubmissionState>((state, action) => {
