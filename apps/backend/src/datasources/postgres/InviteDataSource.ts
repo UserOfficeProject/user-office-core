@@ -124,8 +124,14 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          query.where('expires_at', '<', new Date());
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
         }
 
         if (filter.email) {
@@ -161,8 +167,14 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          query.where('expires_at', '<', new Date());
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
         }
 
         if (filter.email) {
@@ -202,8 +214,14 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          query.where('expires_at', '<', new Date());
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
         }
 
         if (filter.email) {
