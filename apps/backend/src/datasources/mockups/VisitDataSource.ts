@@ -281,7 +281,8 @@ export class VisitDataSourceMock implements VisitDataSource {
       (visit) =>
         visit.creatorId === id ||
         visit.teamLeadUserId === id ||
-        usersOnVisit(visit.id).includes(id)
+        usersOnVisit(visit.id).includes(id) ||
+        (proposalMembers.get(visit.proposalPk) ?? []).includes(id)
     );
 
     const relatedUsers = relatedVisits.flatMap((visit) => [

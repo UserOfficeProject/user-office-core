@@ -199,14 +199,17 @@ class PostgresVisitDataSource implements VisitDataSource {
   // current user -> get related visits -> get related users for each of those visits
   async getRelatedUsersOnVisits(id: number): Promise<number[]> {
     // Visits the user is related to: as creator, team lead, visitor,
-    // or as a PI of the visit's proposal
+    // or as a member (PI or co-proposer) of the visit's proposal
     const relatedVisitIds = database
       .select('v.visit_id')
       .from('visits as v')
       .leftJoin('visits_has_users as vhu', 'vhu.visit_id', 'v.visit_id')
-      .where('v.creator_id', id) // assume PI is always the creator of visit
+      .where('v.creator_id', id)
       .orWhere('v.team_lead_user_id', id)
-      .orWhere('vhu.user_id', id);
+      .orWhere('vhu.user_id', id)
+      .orWhereIn('v.proposal_pk', function () {
+        this.select('proposal_pk').from('proposals').where('proposer_id', id);
+      });
 
     // Everyone participating in those visits: creators, team leads and visitors
     const relatedUsers: { user_id: number }[] = await database
