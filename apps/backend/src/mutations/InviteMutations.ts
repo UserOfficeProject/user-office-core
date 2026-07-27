@@ -482,27 +482,26 @@ export default class InviteMutations {
         continue;
       }
 
-      // TODO: what happens if there is an error during accept?
-      // we need graceful error handling from the database later
-      const isRejection =
-        await this.dataAccessUsersDataSource.addDataAccessUser(
-          claim.proposalPk,
-          claimerUserId
-        );
+      const failure = await this.dataAccessUsersDataSource.addDataAccessUser(
+        claim.proposalPk,
+        claimerUserId
+      );
 
-      if (!isRejection) {
-        this.eventBus.publish({
-          type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
-          isRejection: false,
-          key: 'proposal',
-          loggedInUserId: claimerUserId,
-          invite: invite,
-          description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
-          proposalPKey: claim.proposalPk,
-        });
-      } else {
-        // TODO: what happens if there is an error during accept?
+      // Rejection extends GraphQLError, so throwing aborts the accept before
+      // the invite is stamped as claimed.
+      if (failure) {
+        throw failure;
       }
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
+      });
     }
   }
 
