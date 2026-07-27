@@ -92,7 +92,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         const principalInvestigator = await userDataSource.getUser(
@@ -107,7 +107,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         const claimer = await userDataSource.getUser(loggedInUserId);
@@ -120,7 +120,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         mailService
@@ -286,7 +286,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             event,
           });
 
-          return;
+          continue;
         }
 
         await sendInviteEmail(
@@ -331,7 +331,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             event,
           });
 
-          return;
+          continue;
         }
 
         await sendInviteEmail(
@@ -376,7 +376,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             event,
           });
 
-          return;
+          continue;
         }
 
         await sendInviteEmail(
