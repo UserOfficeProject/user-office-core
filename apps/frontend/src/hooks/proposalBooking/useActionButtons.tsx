@@ -165,45 +165,41 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState = 'invisible';
     let stateReason: string | null = null;
 
-    // the PI (createable) sees the disabled hint before a visit exists;
-    // participants (readable) get their registration's state
-    if (event.visitPerms.createable || event.visitPerms.readable) {
-      if (event.visit !== null) {
-        const registration = event.visit.registrations.find(
-          (registration) => registration.userId === user.id
-        );
+    // the button reflects the user's own registration; anyone without read
+    // rights never sees the visit at all (the backend resolves it to null)
+    const registration = event.visit?.registrations.find(
+      (registration) => registration.userId === user.id
+    );
 
-        // currently, PI is not on the list of registrations so this block isn't entered and the visit button is invisible
-        if (registration) {
-          switch (registration.status) {
-            case VisitRegistrationStatus.DRAFTED:
-              buttonState = 'active';
-              break;
-            case VisitRegistrationStatus.CHANGE_REQUESTED:
-              buttonState = 'active';
-              stateReason = 'Changes are requested for your registration';
-              break;
-            case VisitRegistrationStatus.SUBMITTED:
-              buttonState = 'pending';
-              stateReason = 'The registration is pending approval';
-              break;
-            case VisitRegistrationStatus.APPROVED:
-              buttonState = 'completed';
-              break;
-            case VisitRegistrationStatus.CANCELLED_BY_USER:
-            case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-              buttonState = 'cancelled';
-              stateReason =
-                'This action is disabled because your registration for visit is cancelled';
-              break;
-            default:
-              console.log(buttonState);
-          }
-        }
-      } else {
-        buttonState = 'inactive';
-        stateReason = 'This action is disabled because visit is not defined';
+    if (registration) {
+      switch (registration.status) {
+        case VisitRegistrationStatus.DRAFTED:
+          buttonState = 'active';
+          break;
+        case VisitRegistrationStatus.CHANGE_REQUESTED:
+          buttonState = 'active';
+          stateReason = 'Changes are requested for your registration';
+          break;
+        case VisitRegistrationStatus.SUBMITTED:
+          buttonState = 'pending';
+          stateReason = 'The registration is pending approval';
+          break;
+        case VisitRegistrationStatus.APPROVED:
+          buttonState = 'completed';
+          break;
+        case VisitRegistrationStatus.CANCELLED_BY_USER:
+        case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
+          buttonState = 'cancelled';
+          stateReason =
+            'This action is disabled because your registration for visit is cancelled';
+          break;
+        default:
+          console.log(buttonState);
       }
+    } else if (event.visit === null && event.visitPerms.createable) {
+      // the hint is aimed at the person who can define the visit
+      buttonState = 'inactive';
+      stateReason = 'This action is disabled because visit is not defined';
     }
 
     return createActionButton(
