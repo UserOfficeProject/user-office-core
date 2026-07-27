@@ -734,4 +734,22 @@ export default class PostgresExperimentDataSource
 
     return result;
   }
+
+  async changeExperimentSafetyWorkflowStatus(
+    workflowStatusId: number,
+    experimentSafetyPks: number[]
+  ): Promise<ExperimentSafety[]> {
+    const result = await database('experiment_safety')
+      .update({
+        workflow_status_id: workflowStatusId,
+      })
+      .whereIn('experiment_safety_pk', experimentSafetyPks)
+      .returning('*');
+
+    if (!result || result.length === 0) {
+      throw new Error('Could not update experiment safety status');
+    }
+
+    return result.map((item) => createExperimentSafetyObject(item));
+  }
 }
