@@ -114,10 +114,10 @@ export class InviteDataSourceMock implements InviteDataSource {
         'test_dau@example.com',
         new Date(),
         3,
-        new Date(),
+        null,
         null,
         false,
-        new Date('2022-01-01'),
+        null,
         EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER
       ),
     ];
