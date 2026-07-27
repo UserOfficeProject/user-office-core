@@ -70,12 +70,12 @@ const FapMembers = ({
   onFapUpdate,
   confirm,
 }: FapMembersProps) => {
-  const [openModal, setOpenModal] = useState<OpenModal | null>(null);
-  const closeModal = () => setOpenModal(null);
+  const [modalOpen, setModalOpen] = useState<OpenModal | null>(null);
+  const closeModal = () => setModalOpen(null);
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const { loadingMembers, FapReviewersData, setFapReviewersData } =
-    useFapReviewersData(fapData.id, openModal !== null);
+    useFapReviewersData(fapData.id, modalOpen !== null);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -279,7 +279,7 @@ const FapMembers = ({
                             <IconButton
                               edge="start"
                               onClick={() =>
-                                setOpenModal(isChair ? 'chair' : 'secretary')
+                                setModalOpen(isChair ? 'chair' : 'secretary')
                               }
                             >
                               <Person />
@@ -307,7 +307,7 @@ const FapMembers = ({
   return (
     <>
       <ProposalPeopleSelectorModal
-        modalOpen={openModal === 'reviewer'}
+        modalOpen={modalOpen === 'reviewer'}
         onClose={closeModal}
         onAddParticipants={addMember}
         excludeUserIds={alreadySelectedMembers}
@@ -316,7 +316,7 @@ const FapMembers = ({
         multiple
       />
       <ProposalPeopleSelectorModal
-        modalOpen={openModal === 'chair'}
+        modalOpen={modalOpen === 'chair'}
         onClose={closeModal}
         onAddParticipants={assignChairOrSecretary(UserRole.FAP_CHAIR)}
         excludeUserIds={alreadySelectedMembers}
@@ -325,7 +325,7 @@ const FapMembers = ({
         multiple={false}
       />
       <ProposalPeopleSelectorModal
-        modalOpen={openModal === 'secretary'}
+        modalOpen={modalOpen === 'secretary'}
         onClose={closeModal}
         onAddParticipants={assignChairOrSecretary(UserRole.FAP_SECRETARY)}
         excludeUserIds={alreadySelectedMembers}
@@ -353,14 +353,14 @@ const FapMembers = ({
           marginBottom={'10px'}
         >
           <Button
-            onClick={() => setOpenModal('chair')}
+            onClick={() => setModalOpen('chair')}
             aria-label={`Add New ${t('Fap')} Chair Button`}
             data-cy="add-chair-button"
           >
             Add Chair
           </Button>
           <Button
-            onClick={() => setOpenModal('secretary')}
+            onClick={() => setModalOpen('secretary')}
             aria-label={`Add New ${t('Fap')} Secretary Button`}
             data-cy="add-secretary-button"
           >
@@ -403,7 +403,7 @@ const FapMembers = ({
             <ActionButtonContainer>
               <Button
                 variant="outlined"
-                onClick={() => setOpenModal('reviewer')}
+                onClick={() => setModalOpen('reviewer')}
                 data-cy="add-participant-button"
                 startIcon={<AddPersonIcon />}
               >
