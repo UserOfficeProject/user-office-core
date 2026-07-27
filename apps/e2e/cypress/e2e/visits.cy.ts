@@ -410,6 +410,36 @@ context('visits tests', () => {
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
+    it('Co-proposer who is also a visitor should see the team and their own registration', () => {
+      cy.createVisit({
+        team: [teamLead.id, coProposer.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(coProposer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // being on the team makes the visit readable, but not writeable
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+      // their own registration drives the register action
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      cy.get('[data-cy=add-participant-button]').should('be.disabled');
+      cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+    });
+
     it('Visitor should be able to register for a visit', () => {
       const pastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
