@@ -198,8 +198,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState = 'invisible';
     let stateReason: string | null = null;
 
-    // only PI or visitor (incl. team lead) should be able to register their own visit timings
-    if (isPi(user, event) || isVisitor(user, event)) {
+    // the PI (createable) sees the disabled hint before a visit exists;
+    // participants (readable) get their registration's state
+    if (event.visitPerms.createable || event.visitPerms.readable) {
       if (event.visit !== null) {
         const registration = event.visit.registrations.find(
           (registration) => registration.userId === user.id
