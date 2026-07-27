@@ -1419,7 +1419,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
-    const proposals: InvitedProposalRecord[] = await database
+    return await database
       .select(
         'proposals.proposal_id',
         'proposer.firstname as proposer_name',
@@ -1440,10 +1440,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .from('data_access_claims')
               .where('invite_id', inviteId);
           });
-      });
-
-    return proposals.length > 0
-      ? createInvitedProposalObject(proposals[0])
-      : null;
+      })
+      .first()
+      .then((proposal: InvitedProposalRecord | undefined) =>
+        proposal ? createInvitedProposalObject(proposal) : null
+      );
   }
 }

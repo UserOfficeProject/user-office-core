@@ -214,6 +214,27 @@ export default function createLoggingHandler() {
             })
           );
           break;
+        case Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER:
+          await Promise.all(
+            event.array.map(async (experimentSafety) => {
+              const experimentStatus =
+                await statusDataSource.getStatusByWorkflowStatusId(
+                  experimentSafety.workflowStatusId
+                );
+
+              const description = `Status changed to: ${experimentStatus?.name}`;
+
+              return eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                experimentSafety.experimentPk.toString(),
+                description,
+                event.impersonatingUserId
+              );
+            })
+          );
+          break;
         case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED:
         case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED:
           const [instrumentId] = event.instrumentshasproposals.instrumentIds;

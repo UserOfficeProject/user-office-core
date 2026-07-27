@@ -6,8 +6,11 @@ import { SampleWithQuestionary } from './SampleWithQuestionary';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 export class SampleSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public sample: SampleWithQuestionary) {
-    super(TemplateGroupId.SAMPLE, sample);
+  constructor(
+    public sample: SampleWithQuestionary,
+    public previewMode: boolean | undefined
+  ) {
+    super(TemplateGroupId.SAMPLE, sample, previewMode);
     this.stepIndex = this.getInitialStepIndex();
   }
 
