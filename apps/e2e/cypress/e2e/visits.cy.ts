@@ -171,6 +171,8 @@ context('visits tests', () => {
 
       cy.finishedLoading();
 
+      cy.testActionButton(cyTagRegisterVisit, 'completed');
+
       cy.get('[data-cy="register-visit-icon"]').closest('button').click();
       cy.get('[data-cy="registration-more-options"]').should('not.exist');
     });
