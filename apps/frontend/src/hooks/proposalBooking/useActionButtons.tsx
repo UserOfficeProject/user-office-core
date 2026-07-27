@@ -63,7 +63,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
-    const { readable, writeable, createable } = event.visitPerms;
+    const { readable, createable } = event.visitPerms;
 
     // the PI can create a visit; PI/visitors can read an existing one.
     // Co-PIs can do neither, so the button is hidden for them
@@ -86,9 +86,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'invisible';
     }
 
-    // editing an existing visit needs write rights; creating one needs create rights
-    const readonly = event.visit !== null ? !writeable : !createable;
-
     return createActionButton(
       `Define who is coming ${stateReason ? '(' + stateReason + ')' : ''}`,
       <GroupIcon data-cy="define-visit-icon" />,
@@ -96,7 +93,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       () => {
         openModal(
           <CreateUpdateVisit
-            readonly={readonly}
             event={event}
             close={(updatedEvent) => {
               eventUpdated(updatedEvent);

@@ -18,13 +18,11 @@ import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 interface CreateUpdateVisitProps {
   event: UserExperiment;
   close: (updatedEvent: UserExperiment) => void;
-  readonly: boolean; // prop is required here for the Visit modal specifically, although optional for the more generic PeopleSelectorModal
 }
 
 function CreateUpdateVisit({
   event,
   close,
-  readonly,
   confirm,
 }: CreateUpdateVisitProps & WithConfirmProps) {
   const { user } = useContext(UserContext);
@@ -34,6 +32,11 @@ function CreateUpdateVisit({
   );
 
   const { visit } = event;
+
+  // editing an existing visit needs write rights; creating one needs create rights
+  const readonly = visit
+    ? !event.visitPerms.writeable
+    : !event.visitPerms.createable;
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
