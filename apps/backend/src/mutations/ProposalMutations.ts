@@ -22,6 +22,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import ProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
+import ProposalRejectionCommentsDataSource from '../datasources/postgres/ProposalRejectionCommentsDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -83,7 +84,7 @@ export default class ProposalMutations {
     @inject(Tokens.WorkflowDataSource)
     private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.ProposalRejectionCommentsDataSource)
-    private ProposalRejectionCommentsDataSource: ProposalInternalCommentsDataSource
+    private ProposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -515,7 +516,7 @@ export default class ProposalMutations {
         );
       });
   }
-  @ValidateArgs(createProposalScientistCommentValidationSchema)
+
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async createProposalRejectionComment(
     agent: UserWithRole | null,

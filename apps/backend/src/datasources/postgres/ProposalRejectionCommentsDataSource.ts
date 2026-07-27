@@ -15,6 +15,9 @@ export default class PostgresProposalRejectionCommentsDataSource
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     try {
+      await database('proposal_rejection_comments')
+        .where('proposal_pk', args.proposalPk)
+        .del();
       const [proposalRejectionComment]: ProposalInternalCommentRecord[] =
         await database('proposal_rejection_comments')
           .insert({
@@ -30,7 +33,7 @@ export default class PostgresProposalRejectionCommentsDataSource
 
       return createProposalInternalCommentObject(proposalRejectionComment);
     } catch (error) {
-      throw new GraphQLError('Error while creating proposal internal comment');
+      throw new GraphQLError('Error while creating proposal rejection comment');
     }
   }
   async getProposalRejectionComment(
