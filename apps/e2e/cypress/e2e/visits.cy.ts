@@ -317,6 +317,20 @@ context('visits tests', () => {
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
+    it('Co-proposer should not see the form team or visit registration actions before a visit is defined', () => {
+      cy.login(coProposer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // only the PI may create the visit, so the co-proposer sees no actions
+      cy.testActionButton(cyTagDefineVisit, 'invisible');
+      cy.testActionButton(cyTagRegisterVisit, 'invisible');
+      cy.testActionButton(cyTagDeclareShipment, 'neutral');
+    });
+
     it('PI should be able to form team', () => {
       cy.login(PI);
       cy.visit('/');
