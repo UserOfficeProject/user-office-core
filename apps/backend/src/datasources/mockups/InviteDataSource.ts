@@ -154,8 +154,11 @@ export class InviteDataSourceMock implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          if (invite.expiresAt && invite.expiresAt < new Date()) {
+        if (filter.isExpired !== undefined) {
+          const isExpired =
+            invite.expiresAt !== null && invite.expiresAt < new Date();
+
+          if (isExpired !== filter.isExpired) {
             return false;
           }
         }
@@ -240,8 +243,11 @@ export class InviteDataSourceMock implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          if (invite.expiresAt && invite.expiresAt < new Date()) {
+        if (filter.isExpired !== undefined) {
+          const isExpired =
+            invite.expiresAt !== null && invite.expiresAt < new Date();
+
+          if (isExpired !== filter.isExpired) {
             return false;
           }
         }
@@ -293,8 +299,11 @@ export class InviteDataSourceMock implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          if (invite.expiresAt && invite.expiresAt < new Date()) {
+        if (filter.isExpired !== undefined) {
+          const isExpired =
+            invite.expiresAt !== null && invite.expiresAt < new Date();
+
+          if (isExpired !== filter.isExpired) {
             return false;
           }
         }
