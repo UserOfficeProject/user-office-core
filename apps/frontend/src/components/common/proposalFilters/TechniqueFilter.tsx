@@ -46,14 +46,14 @@ const TechniqueFilter = ({
 
   const currentRoleTags = roles.find((r) => currentRoleId === r.id)!.tags;
   const currentRoleFirstTagName = currentRoleTags?.length
-    ? currentRoleTags[0].name
+    ? `${currentRoleTags[0].name}.`
     : '';
 
   return (
     <>
       <FormControl fullWidth>
         <InputLabel id="technique-select-label" shrink>
-          {t(`${currentRoleFirstTagName}.Technique`)}
+          {t(`${currentRoleFirstTagName}Technique`)}
         </InputLabel>
         {isLoading ? (
           <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>
