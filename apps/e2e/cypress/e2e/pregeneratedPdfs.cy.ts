@@ -718,11 +718,18 @@ context('Pregenerated PDF tests', () => {
 
       cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-      cy.get('[data-cy="replay_status_action_icon"]')
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
         .last()
-        .click({ force: true });
+        .find('input[type="checkbox"]')
+        .check();
 
-      cy.contains('unexpected behaviour').should('exist');
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'Any selected status action log(s) that can no longer be replayed will be skipped.'
+      ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
 

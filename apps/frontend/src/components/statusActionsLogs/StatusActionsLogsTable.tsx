@@ -5,7 +5,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Replay, Refresh } from '@mui/icons-material';
+import { Refresh } from '@mui/icons-material';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import { Badge, Grid, Typography, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
@@ -53,8 +53,6 @@ const StatusActionsLogsTable = ({
     <ReplayCircleFilledIcon data-cy="replay_all_status_action_icon" />
   );
   const RefreshIcon = (): JSX.Element => <Refresh />;
-  const [selectedStatusActionsLog, setStatusActionsLog] =
-    useState<StatusActionsLog | null>(null);
   const [currentPageLogIds, setCurrentPageLogIds] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams({
     statusActionsLogStatus: StatusActionsLogStatus.ALL,
@@ -302,9 +300,9 @@ const StatusActionsLogsTable = ({
           }),
       {
         title: 'Are you sure?',
-        description: `You are about to send a status action replay request for ${selectedStatusActionsLogIds.length} selected item(s).`,
+        description: `You are about to send a status action replay request for ${selectedStatusActionsLogIds.length} selected status action log(s).`,
         alertText:
-          'Any selected item(s) that can no longer be replayed will be skipped.',
+          'Any selected status action log(s) that can no longer be replayed will be skipped.',
         confirmationText: 'Replay',
         shouldEnableOKWithAlert: true,
       }
@@ -377,9 +375,6 @@ const StatusActionsLogsTable = ({
               })()}
             </Typography>
           }
-          onRowClick={() => {
-            setStatusActionsLog(null);
-          }}
           columns={columns}
           data={fetchStatusActionsLogsData}
           options={{
@@ -391,93 +386,22 @@ const StatusActionsLogsTable = ({
             pageSize: pageSize ? +pageSize : 20,
             initialPage: page ? +page : 0,
             idSynonym: 'statusActionsLogId',
-            rowStyle: (rowdata: StatusActionsLog): React.CSSProperties => {
-              const style = rowdata.statusActionsSuccessful
+            rowStyle: (rowdata: StatusActionsLog): React.CSSProperties =>
+              rowdata.statusActionsSuccessful
                 ? { color: theme.palette.success.main }
-                : { color: theme.palette.error.main };
-
-              if (
-                selectedStatusActionsLog &&
-                rowdata.statusActionsLogId ===
-                  selectedStatusActionsLog.statusActionsLogId
-              ) {
-                return {
-                  ...style,
-                  backgroundColor: theme.palette.grey[100],
-                };
-              }
-
-              return style;
-            },
+                : { color: theme.palette.error.main },
+            selectionProps: (rowData: StatusActionsLog) => ({
+              disabled: !rowData.connectionStatusAction,
+              title: rowData.connectionStatusAction
+                ? undefined
+                : 'This status action can no longer be replayed',
+              sx: rowData.connectionStatusAction
+                ? undefined
+                : { pointerEvents: 'auto !important' },
+            }),
           }}
           actions={[
             ...tableActions,
-            (rowData: StatusActionsLog) => ({
-              icon: () => (
-                <Replay
-                  data-cy="replay_status_action_icon"
-                  sx={(theme) => ({
-                    opacity: rowData.connectionStatusAction
-                      ? 1
-                      : theme.palette.action.disabledOpacity,
-                    color: rowData.connectionStatusAction
-                      ? undefined
-                      : theme.palette.action.disabled,
-                    cursor: rowData.connectionStatusAction
-                      ? 'pointer'
-                      : 'not-allowed',
-                  })}
-                />
-              ),
-              tooltip: rowData.connectionStatusAction
-                ? 'Replay status action'
-                : 'This status action can no longer be replayed',
-              onClick: (_event: unknown, rowData: unknown): void => {
-                const statusActionsLog = rowData as StatusActionsLog;
-                if (!statusActionsLog.connectionStatusAction) {
-                  return;
-                }
-                if (statusActionsLog.statusActionsLogId) {
-                  confirm(
-                    () =>
-                      api({
-                        toastSuccessMessage:
-                          'Status action replay successfully sent.',
-                      })
-                        .replayStatusActionsLog({
-                          statusActionsLogId:
-                            statusActionsLog.statusActionsLogId,
-                        })
-                        .then((result) => {
-                          if (result.replayStatusActionsLog) {
-                            setStatusActionsLog(statusActionsLog);
-                          }
-                        }),
-                    {
-                      title: 'Are you sure?',
-                      description: `You are about to send a status action replay request.`,
-                      alertText: (() => {
-                        if (!statusActionsLog.statusActionsSuccessful) {
-                          return '';
-                        }
-
-                        if (
-                          statusActionsLog?.connectionStatusAction?.action.name
-                            .toLowerCase()
-                            .includes('email')
-                        ) {
-                          return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
-                        } else {
-                          return 'This status action was already successful. Replaying it might lead to unexpected behaviour or redundant processes.';
-                        }
-                      })(),
-                      confirmationText: 'Replay',
-                      shouldEnableOKWithAlert: true,
-                    }
-                  )();
-                }
-              },
-            }),
             {
               icon: RefreshIcon,
               tooltip: 'Refresh status actions log data',

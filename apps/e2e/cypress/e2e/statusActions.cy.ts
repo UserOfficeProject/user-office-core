@@ -840,17 +840,26 @@ context('Status actions tests', () => {
       cy.wait(2000); // wait until status actions are executed
     });
 
-    it('User Officer should be able to view and replay email status actions', () => {
+    it('User Officer should be able to select and replay an email status action', () => {
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToStatusActionLogsSubmenu('Email');
 
-      cy.get('[data-cy="replay_status_action_icon"]')
-        .first()
-        .click({ force: true });
+      cy.finishedLoading();
 
-      cy.contains('duplicate emails').should('exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'Any selected status actions log(s) that can no longer be replayed will be skipped.'
+      ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -860,17 +869,26 @@ context('Status actions tests', () => {
       });
     });
 
-    it('User Officer should be able to view and replay proposal download status actions', () => {
+    it('User Officer should be able to select and replay a proposal download status action(s)', () => {
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-      cy.get('[data-cy="replay_status_action_icon"]')
-        .first()
-        .click({ force: true });
+      cy.finishedLoading();
 
-      cy.contains('unexpected behaviour').should('exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'Any selected status action log(s) that can no longer be replayed will be skipped.'
+      ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -880,7 +898,7 @@ context('Status actions tests', () => {
       });
     });
 
-    it('User Officer should see status actions logs whose connection configuration was later removed, with replay disabled', () => {
+    it('User Officer should see status actions logs whose connection configuration was later removed, with selection disabled', () => {
       cy.addConnectionStatusActions({
         actions: [],
         connectionId: statusActionsConnectionId,
@@ -899,11 +917,29 @@ context('Status actions tests', () => {
         .filter(':contains("SUCCESSFUL")')
         .should('have.length.greaterThan', 0);
 
-      cy.get('[data-cy="replay_status_action_icon"]')
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
         .first()
-        .click({ force: true });
+        .find('input[type="checkbox"]')
+        .should('be.disabled');
 
-      cy.get('[data-cy="confirm-ok"]').should('not.exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('.MuiCheckbox-root')
+        .should(
+          'have.attr',
+          'title',
+          'This status action can no longer be replayed'
+        );
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check({ force: true });
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
     });
 
     it('User Officer should be able to replay all email status actions in a call', () => {
@@ -926,7 +962,7 @@ context('Status actions tests', () => {
         .click({ force: true });
 
       cy.contains(
-        `all failed status actions in call '${initialDBData.call.shortCode}'`
+        `all failed status action logs in call '${initialDBData.call.shortCode}'`
       ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
