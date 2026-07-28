@@ -16,9 +16,9 @@ export async function DLSEmailHandler(event: ApplicationEvent) {
 
   const handler = handlers[event.type];
 
-  if (!handler) {
-    throw new Error(`No handler for event type ${event.type}`);
+  if (handler) {
+    return await handler(event);
   }
 
-  return await handler(event);
+  return;
 }
