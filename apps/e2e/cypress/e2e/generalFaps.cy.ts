@@ -7,12 +7,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
-
-function addUserThroughModal(search: string) {
-  cy.get('[data-cy="invite-user-autocomplete"]').type(search);
-  cy.get('[role="presentation"]').contains(search).click();
-  cy.get('[data-cy="invite-user-submit-button"]').should('be.enabled').click();
-}
+import { addUserThroughModal } from '../support/peopleSelector';
 
 const fapMembers = {
   chair: initialDBData.users.user2,
