@@ -274,7 +274,7 @@ const ProposalTable = ({
             const isPI = rowData.proposerId === userContext.user.id;
 
             return {
-              icon: PeopleIcon,
+              icon: () => <PeopleIcon data-cy="view-data-access-users-icon" />,
               tooltip: 'View data access users',
               hidden:
                 isDataAccessUsersEnabled === false ||
