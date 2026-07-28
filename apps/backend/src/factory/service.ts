@@ -110,6 +110,7 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
               });
               span.setStatus({ code: 2, message: String(err) });
             }
+            throw err;
           } finally {
             span.end();
           }
