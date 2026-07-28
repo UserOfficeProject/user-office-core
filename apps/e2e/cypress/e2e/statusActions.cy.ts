@@ -1153,6 +1153,112 @@ context('Status actions tests', () => {
       assertProposalPresentInTable(String(proposal2Id));
     });
 
+    it('User Officer should be able to persist row selection across page changes', () => {
+      cy.login('officer');
+      cy.visit('/EmailStatusActionsLogs?pageSize=2');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+
+      cy.get('button[aria-label="Next Page"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('exist');
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '1');
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '2');
+
+      cy.get('button[aria-label="Previous Page"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('exist');
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '2');
+
+      cy.get('button[aria-label="Next Page"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+    });
+
+    it('User Officer should be able to replay multiple selected email status actions', () => {
+      cy.login('officer');
+      cy.visit('/EmailStatusActionsLogs');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(0)
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(1)
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.contains('2 row(s) selected').should('exist');
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'You are about to send a status action replay request for 2 selected item(s).'
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Status action replay successfully sent.',
+      });
+
+      cy.contains('row(s) selected').should('not.exist');
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(0)
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
+    });
+
     it('User Officer should be able to access the proposal from the link in status actions logs', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
