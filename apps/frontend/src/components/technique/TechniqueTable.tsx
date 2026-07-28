@@ -254,9 +254,9 @@ const TechniqueTable = () => {
 
   return (
     <>
-      {isUserOfficer && (
+      {isUserOfficer && !!assigningTechniqueScientistsId && (
         <PeopleSelectorModal
-          modalOpen={!!assigningTechniqueScientistsId}
+          modalOpen
           onClose={(): void => {
             setSelectedTechnique(null);
             setAssigningTechniqueScientistsId(null);

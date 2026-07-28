@@ -244,10 +244,16 @@ function PeopleSelectorModal({
   };
 
   const handleClose = () => {
+    const discardAndClose = () => {
+      setQuery('');
+      setSelectedItems(preset);
+      onClose?.();
+    };
+
     if (isSameParticipants(selectedItems, preset || []) === false) {
       confirm(
         async () => {
-          onClose?.();
+          discardAndClose();
 
           return;
         },
@@ -260,9 +266,7 @@ function PeopleSelectorModal({
 
       return;
     }
-    setQuery('');
-    setSelectedItems([]);
-    onClose?.();
+    discardAndClose();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -285,7 +289,11 @@ function PeopleSelectorModal({
         setExactEmailMatch(undefined);
       } else if (options.length === 1) {
         addToSelectedItems(options[0]);
-      } else if (isValidEmail(query) && !isEmailSearchOnly) {
+      } else if (
+        allowInviteByEmail &&
+        isValidEmail(query) &&
+        !isEmailSearchOnly
+      ) {
         addValidEmailToSelection(query);
       }
     }

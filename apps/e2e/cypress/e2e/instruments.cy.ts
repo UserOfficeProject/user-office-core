@@ -8,6 +8,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { addUserThroughModal } from '../support/peopleSelector';
 import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
@@ -307,11 +308,7 @@ context('Instrument tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.get('[data-cy="invite-user-autocomplete"]').type(scientist2.lastName);
-      cy.get('[role="presentation"]').contains(scientist2.lastName).click();
-      cy.get('[data-cy="invite-user-submit-button"]')
-        .should('be.enabled')
-        .click();
+      addUserThroughModal(scientist2.lastName);
 
       cy.notification({
         variant: 'success',

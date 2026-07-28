@@ -9,6 +9,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { addUserThroughModal } from '../support/peopleSelector';
 
 context('Technique tests', () => {
   const title = faker.word.words(5);
@@ -659,11 +660,7 @@ context('Technique tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.get('[data-cy="invite-user-autocomplete"]').type(scientist2.lastName);
-      cy.get('[role="presentation"]').contains(scientist2.lastName).click();
-      cy.get('[data-cy="invite-user-submit-button"]')
-        .should('be.enabled')
-        .click();
+      addUserThroughModal(scientist2.lastName);
 
       cy.notification({
         variant: 'success',

@@ -149,9 +149,9 @@ const InstrumentTable = () => {
 
   return (
     <>
-      {isUserOfficer && (
+      {isUserOfficer && !!assigningInstrumentId && (
         <PeopleSelectorModal
-          modalOpen={!!assigningInstrumentId}
+          modalOpen
           onClose={(): void => setAssigningInstrumentId(null)}
           onAddParticipants={assignScientistsToInstrument}
           excludeUserIds={instrumentAssignments?.scientists.map(
