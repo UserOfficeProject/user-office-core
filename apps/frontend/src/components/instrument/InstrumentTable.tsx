@@ -14,12 +14,10 @@ import { FunctionType } from 'utils/utilTypes';
 
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
-import {
-  BasicUserDetails,
-  InstrumentFragment,
-  UserRole,
-} from '../../generated/sdk';
-import PeopleSelectorModal from '../proposal/PeopleSelectorModal';
+import { InstrumentFragment, UserRole } from '../../generated/sdk';
+import PeopleSelectorModal, {
+  AddParticipantsData,
+} from '../proposal/PeopleSelectorModal';
 
 const columns: Column<InstrumentFragment>[] = [
   {
@@ -65,9 +63,9 @@ const InstrumentTable = () => {
     }
   };
 
-  const assignScientistsToInstrument = async (
-    scientists: BasicUserDetails[]
-  ) => {
+  const assignScientistsToInstrument = async ({
+    users: scientists,
+  }: AddParticipantsData) => {
     await api({
       toastSuccessMessage: `Scientist assigned to ${i18n.format(
         t('instrument'),
@@ -153,16 +151,15 @@ const InstrumentTable = () => {
     <>
       {isUserOfficer && (
         <PeopleSelectorModal
-          show={!!assigningInstrumentId}
-          close={(): void => setAssigningInstrumentId(null)}
-          addParticipants={assignScientistsToInstrument}
-          selectedUsers={instrumentAssignments?.scientists.map(
+          modalOpen={!!assigningInstrumentId}
+          onClose={(): void => setAssigningInstrumentId(null)}
+          onAddParticipants={assignScientistsToInstrument}
+          excludeUserIds={instrumentAssignments?.scientists.map(
             (scientist) => scientist.id
           )}
-          selection={true}
-          userRole={UserRole.INSTRUMENT_SCIENTIST}
-          title={t('instrumentSci')}
-          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+          filterRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={`Assign ${t('instrumentSci')}`}
+          multiple
         />
       )}
       <div data-cy="instruments-table">

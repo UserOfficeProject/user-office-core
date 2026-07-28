@@ -659,9 +659,11 @@ context('Technique tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.contains(scientist2.lastName).parent().find('[type=checkbox]').click();
-
-      cy.contains('Update').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(scientist2.lastName);
+      cy.get('[role="presentation"]').contains(scientist2.lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
 
       cy.notification({
         variant: 'success',

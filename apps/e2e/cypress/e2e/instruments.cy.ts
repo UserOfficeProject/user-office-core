@@ -307,13 +307,11 @@ context('Instrument tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.get('[data-cy="co-proposers"]')
-        .contains(scientist2.lastName)
-        .parent()
-        .find('input[type="checkbox"]')
-        .check();
-
-      cy.get('.MuiDialog-root [data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(scientist2.lastName);
+      cy.get('[role="presentation"]').contains(scientist2.lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
 
       cy.notification({
         variant: 'success',
