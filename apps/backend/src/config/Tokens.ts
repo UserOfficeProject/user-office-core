@@ -27,6 +27,9 @@ export const Tokens = {
   ),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
+  ProposalEmailActionSubstitutionDataDecorator: Symbol(
+    'ProposalEmailActionSubstitutionDataDecorator'
+  ),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
   ProposalSettingsDataSource: Symbol('ProposalSettingsDataSource'),
   StatusActionsDataSource: Symbol('StatusActionsDataSource'),

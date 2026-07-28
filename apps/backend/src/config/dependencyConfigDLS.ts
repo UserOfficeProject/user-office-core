@@ -48,6 +48,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { DLSEmailHandler } from '../eventHandlers/email/DLS/DLSEmailHandler';
+import { decorateDLSProposalEmailActionSubstitutionData } from '../eventHandlers/email/DLS/DLSProposalEmailActionSubstitutionDataDecorator';
 import createLoggingHandler from '../eventHandlers/logging';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
 import {
@@ -87,6 +88,10 @@ mapClass(
   PostgresExperimentSafetyPdfTemplateDataSource
 );
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
+mapValue(
+  Tokens.ProposalEmailActionSubstitutionDataDecorator,
+  decorateDLSProposalEmailActionSubstitutionData
+);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSource

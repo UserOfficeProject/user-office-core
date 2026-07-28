@@ -91,6 +91,7 @@ export const emailStatusActionRecipient = async (
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
   const emailTemplateId = recipientWithTemplate.emailTemplate.id;
+  const emailTemplateName = recipientWithTemplate.emailTemplate.name;
   const successfulMessage = statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
@@ -116,6 +117,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -141,6 +143,7 @@ export const emailStatusActionRecipient = async (
           successfulMessage,
           failMessage,
           emailTemplateId,
+          emailTemplateName,
           loggedInUserId
         ));
 
@@ -165,6 +168,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -189,6 +193,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -214,6 +219,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -289,6 +295,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -314,6 +321,7 @@ export const emailStatusActionRecipient = async (
         successfulMessage,
         failMessage,
         emailTemplateId,
+        emailTemplateName,
         loggedInUserId
       );
 
@@ -347,6 +355,7 @@ export const emailStatusActionRecipient = async (
           successfulMessage,
           failMessage,
           emailTemplateId,
+          emailTemplateName,
           loggedInUserId
         );
       }
@@ -367,6 +376,7 @@ const sendMail = async (
   successfulMessage: string,
   failMessage: string,
   emailTemplateId: string,
+  emailTemplateName: string,
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -389,23 +399,48 @@ const sendMail = async (
     const mailServiceResponse = await Promise.all(
       recipientsWithData.map(async (recipientWithData) => {
         try {
+          const defaultSubstitutionData = {
+            proposals: recipientWithData.proposals,
+            pi: recipientWithData.pi,
+            coProposers: recipientWithData.coProposers,
+            instruments: recipientWithData.instruments,
+            firstName: recipientWithData.firstName,
+            lastName: recipientWithData.lastName,
+            preferredName: recipientWithData.preferredName,
+            techniques: recipientWithData.techniques,
+            proposalTemplate: recipientWithData.proposalTemplate,
+            samples: recipientWithData.samples,
+            hazards: recipientWithData.hazards,
+          };
+          let additionalSubstitutionData: Record<string, unknown> = {};
+
+          if (
+            container.isRegistered(
+              Tokens.ProposalEmailActionSubstitutionDataDecorator
+            )
+          ) {
+            const decorateSubstitutionData = container.resolve<
+              (
+                emailTemplateName: string,
+                recipientWithData: EmailReadyType
+              ) => Promise<Record<string, unknown>>
+            >(Tokens.ProposalEmailActionSubstitutionDataDecorator);
+            additionalSubstitutionData = await decorateSubstitutionData(
+              emailTemplateName,
+              recipientWithData
+            );
+          }
+
+          const substitutionData = {
+            ...defaultSubstitutionData,
+            ...additionalSubstitutionData,
+          };
+
           const res = await mailService.sendMail({
             content: {
               template: emailTemplateId,
             },
-            substitution_data: {
-              proposals: recipientWithData.proposals,
-              pi: recipientWithData.pi,
-              coProposers: recipientWithData.coProposers,
-              instruments: recipientWithData.instruments,
-              firstName: recipientWithData.firstName,
-              lastName: recipientWithData.lastName,
-              preferredName: recipientWithData.preferredName,
-              techniques: recipientWithData.techniques,
-              proposalTemplate: recipientWithData.proposalTemplate,
-              samples: recipientWithData.samples,
-              hazards: recipientWithData.hazards,
-            },
+            substitution_data: substitutionData,
             recipients: [{ address: recipientWithData.email }],
           });
           logger.logInfo('Email sent:', {
