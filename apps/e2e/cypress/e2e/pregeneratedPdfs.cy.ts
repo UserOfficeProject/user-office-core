@@ -718,8 +718,11 @@ context('Pregenerated PDF tests', () => {
 
       cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
-        .last()
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .contains(proposalId1)
+        .parents('tr')
         .find('input[type="checkbox"]')
         .check();
 

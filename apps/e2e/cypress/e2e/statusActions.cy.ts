@@ -858,7 +858,7 @@ context('Status actions tests', () => {
       });
 
       cy.contains(
-        'Any selected status actions log(s) that can no longer be replayed will be skipped.'
+        'Any selected status action log(s) that can no longer be replayed will be skipped.'
       ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -930,16 +930,6 @@ context('Status actions tests', () => {
           'title',
           'This status action can no longer be replayed'
         );
-
-      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
-        .first()
-        .find('input[type="checkbox"]')
-        .check({ force: true });
-
-      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
-        .first()
-        .find('input[type="checkbox"]')
-        .should('not.be.checked');
     });
 
     it('User Officer should be able to replay all email status actions in a call', () => {
@@ -962,7 +952,7 @@ context('Status actions tests', () => {
         .click({ force: true });
 
       cy.contains(
-        `all failed status action logs in call '${initialDBData.call.shortCode}'`
+        `all failed status actions in call '${initialDBData.call.shortCode}'`
       ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1277,7 +1267,7 @@ context('Status actions tests', () => {
       });
 
       cy.contains(
-        'You are about to send a status action replay request for 2 selected item(s).'
+        'You are about to send a status action replay request for 2 selected status action log(s).'
       ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
