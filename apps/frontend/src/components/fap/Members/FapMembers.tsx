@@ -22,10 +22,10 @@ import React, { useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import UOLoader from 'components/common/UOLoader';
 import PeopleSelectorModal, {
   AddParticipantsData,
-} from 'components/proposal/PeopleSelectorModal';
+} from 'components/common/PeopleSelectorModal';
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';

@@ -17,7 +17,7 @@ import CreateUpdateInstrument from './CreateUpdateInstrument';
 import { InstrumentFragment, UserRole } from '../../generated/sdk';
 import PeopleSelectorModal, {
   AddParticipantsData,
-} from '../proposal/PeopleSelectorModal';
+} from '../common/PeopleSelectorModal';
 
 const columns: Column<InstrumentFragment>[] = [
   {

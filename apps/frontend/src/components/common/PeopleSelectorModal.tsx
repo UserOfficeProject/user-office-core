@@ -26,7 +26,7 @@ import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
-import NoOptionsText from './NoOptionsText';
+import NoOptionsText from '../proposal/NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 export type AddParticipantsData = {

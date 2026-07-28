@@ -7,11 +7,11 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import SimpleTabs from 'components/common/SimpleTabs';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import PeopleSelectorModal, {
   AddParticipantsData,
-} from 'components/proposal/PeopleSelectorModal';
+} from 'components/common/PeopleSelectorModal';
+import SimpleTabs from 'components/common/SimpleTabs';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer } from 'styles/StyledComponents';

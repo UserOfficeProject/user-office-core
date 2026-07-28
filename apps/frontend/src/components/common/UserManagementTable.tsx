@@ -14,7 +14,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 
-import PeopleSelectorModal from '../proposal/PeopleSelectorModal';
+import PeopleSelectorModal from './PeopleSelectorModal';
 
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */

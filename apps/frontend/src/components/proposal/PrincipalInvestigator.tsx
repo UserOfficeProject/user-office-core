@@ -13,8 +13,8 @@ import {
 import { BasicUserDetails } from 'generated/sdk';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
-import PeopleSelectorModal from './PeopleSelectorModal';
 import { ProposalContextType } from './ProposalContainer';
+import PeopleSelectorModal from '../common/PeopleSelectorModal';
 
 interface PrincipalInvestigatorProps {
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
