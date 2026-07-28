@@ -32,7 +32,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
 
   const handleAcceptCoProposerInvite = async (inviteId: number) => {
     try {
-      acceptCoProposerInvite(inviteId);
+      await acceptCoProposerInvite(inviteId);
       enqueueSnackbar(
         `Invitation for the Proposal "${proposalInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}" accepted successfully.`,
         {
@@ -52,7 +52,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
 
   const handleAcceptDataAccessInvite = async (inviteId: number) => {
     try {
-      acceptDataAccessInvite(inviteId);
+      await acceptDataAccessInvite(inviteId);
       enqueueSnackbar(
         `Data access invitation for the Proposal "${dataAccessInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}" accepted successfully.`,
         {

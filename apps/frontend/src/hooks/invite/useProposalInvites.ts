@@ -43,29 +43,26 @@ export function useProposalInvites() {
     };
   }, [api]);
 
-  const acceptCoProposerInvite = (inviteId: number) => {
+  const acceptCoProposerInvite = async (inviteId: number) => {
     const proposalId = proposalInvites.find((invite) => invite.id === inviteId)
       ?.proposal?.proposalId;
     if (!proposalId) {
       throw new Error('Failed to accept the invitation.');
     }
     setProcessingInviteId(inviteId);
-    api()
-      .acceptCoProposerInvite({ proposalId })
-      .then(({ acceptCoProposerInvite }) => {
-        setProposalInvites((invites) =>
-          invites.filter((invite) => invite.id !== acceptCoProposerInvite.id)
-        );
-      })
-      .catch(() => {
-        throw new Error('Failed to accept the invitation.');
-      })
-      .finally(() => {
-        setProcessingInviteId(null);
-      });
+    try {
+      const { acceptCoProposerInvite: accepted } =
+        await api().acceptCoProposerInvite({ proposalId });
+
+      setProposalInvites((invites) =>
+        invites.filter((invite) => invite.id !== accepted.id)
+      );
+    } finally {
+      setProcessingInviteId(null);
+    }
   };
 
-  const acceptDataAccessInvite = (inviteId: number) => {
+  const acceptDataAccessInvite = async (inviteId: number) => {
     const proposalId = dataAccessInvites.find(
       (invite) => invite.id === inviteId
     )?.proposal?.proposalId;
@@ -73,19 +70,16 @@ export function useProposalInvites() {
       throw new Error('Failed to accept the invitation.');
     }
     setProcessingInviteId(inviteId);
-    api()
-      .acceptDataAccessInvite({ proposalId })
-      .then(({ acceptDataAccessInvite }) => {
-        setDataAccessInvites((invites) =>
-          invites.filter((invite) => invite.id !== acceptDataAccessInvite.id)
-        );
-      })
-      .catch(() => {
-        throw new Error('Failed to accept the invitation.');
-      })
-      .finally(() => {
-        setProcessingInviteId(null);
-      });
+    try {
+      const { acceptDataAccessInvite: accepted } =
+        await api().acceptDataAccessInvite({ proposalId });
+
+      setDataAccessInvites((invites) =>
+        invites.filter((invite) => invite.id !== accepted.id)
+      );
+    } finally {
+      setProcessingInviteId(null);
+    }
   };
 
   return {
