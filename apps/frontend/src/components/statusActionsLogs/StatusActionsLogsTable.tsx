@@ -1,4 +1,5 @@
 import MaterialTableCore, {
+  Action,
   Column,
   OrderByCollection,
   Query,
@@ -6,7 +7,7 @@ import MaterialTableCore, {
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
-import { Grid, Typography, useTheme } from '@mui/material';
+import { Badge, Grid, Typography, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
@@ -54,6 +55,7 @@ const StatusActionsLogsTable = ({
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
     useState<StatusActionsLog | null>(null);
+  const [currentPageLogIds, setCurrentPageLogIds] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams({
     statusActionsLogStatus: StatusActionsLogStatus.ALL,
   });
@@ -64,6 +66,7 @@ const StatusActionsLogsTable = ({
   const search = searchParams.get('search');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
+  const selectedStatusActionsLogIds = searchParams.getAll('selection');
   let columns: Column<StatusActionsLog>[] = [
     ...(statusActionType === StatusActionType.EMAIL
       ? [
@@ -193,6 +196,7 @@ const StatusActionsLogsTable = ({
             offset: tableQuery.page * tableQuery.pageSize,
           })
           .then((results) => {
+            const selection = new Set(searchParams.getAll('selection'));
             const data: StatusActionsLog[] =
               results.statusActionsLogs?.statusActionsLogs.map(
                 (statusActionsLog) => {
@@ -201,9 +205,19 @@ const StatusActionsLogsTable = ({
                     statusActionsTstamp: toFormattedDateTime(
                       statusActionsLog.statusActionsTstamp
                     ),
-                  } as StatusActionsLog;
+                    tableData: {
+                      checked: selection.has(
+                        statusActionsLog.statusActionsLogId.toString()
+                      ),
+                    },
+                  } as unknown as StatusActionsLog;
                 }
               ) || [];
+            setCurrentPageLogIds(
+              data.map((statusActionsLog) =>
+                statusActionsLog.statusActionsLogId.toString()
+              )
+            );
             resolve({
               data: data,
               page: tableQuery.page,
@@ -263,6 +277,64 @@ const StatusActionsLogsTable = ({
     );
   };
 
+  const handleBulkReplayStatusActionsLogs = (): void => {
+    if (!selectedStatusActionsLogIds.length) {
+      return;
+    }
+
+    confirm(
+      () =>
+        api({
+          toastSuccessMessage: 'Status action replay successfully sent.',
+        })
+          .replayStatusActionsLogs({
+            statusActionsLogIds: selectedStatusActionsLogIds.map(
+              (logId) => +logId
+            ),
+          })
+          .then(() => {
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+
+              return searchParams;
+            });
+            tableRef.current && tableRef.current.onQueryChange({});
+          }),
+      {
+        title: 'Are you sure?',
+        description: `You are about to send a status action replay request for ${selectedStatusActionsLogIds.length} selected item(s).`,
+        alertText:
+          'Any selected item(s) that can no longer be replayed will be skipped.',
+        confirmationText: 'Replay',
+        shouldEnableOKWithAlert: true,
+      }
+    )();
+  };
+
+  const bulkReplayAction = {
+    icon: () => (
+      <Badge
+        data-cy="replay_selected_status_actions_count"
+        badgeContent={selectedStatusActionsLogIds.length}
+        color="primary"
+      >
+        <ReplayAllIcon />
+      </Badge>
+    ),
+    tooltip: `Replay ${selectedStatusActionsLogIds.length} selected status action(s)`,
+    onClick: handleBulkReplayStatusActionsLogs,
+    hidden: selectedStatusActionsLogIds.length === 0,
+  };
+
+  // material-table only ever renders 'toolbar' actions OR 'toolbarOnSelect'
+  // actions, switching based on whether the current page has rows checked,
+  // so this action is registered under both positions to stay visible
+  // regardless of whether anything is checked on the currently viewed page.
+  const tableActions: Action<StatusActionsLog>[] = [
+    { ...bulkReplayAction, isFreeAction: true, position: 'toolbar' },
+    { ...bulkReplayAction, position: 'toolbarOnSelect' },
+  ];
+
   return (
     <>
       <Grid container spacing={2}>
@@ -312,7 +384,7 @@ const StatusActionsLogsTable = ({
           data={fetchStatusActionsLogsData}
           options={{
             search: true,
-            selection: false,
+            selection: true,
             searchText: search || undefined,
             debounceInterval: 600,
             columnsButton: true,
@@ -339,6 +411,7 @@ const StatusActionsLogsTable = ({
             },
           }}
           actions={[
+            ...tableActions,
             (rowData: StatusActionsLog) => ({
               icon: () => (
                 <Replay
@@ -449,6 +522,29 @@ const StatusActionsLogsTable = ({
               },
             },
           ]}
+          localization={{
+            toolbar: {
+              nRowsSelected: () =>
+                `${selectedStatusActionsLogIds.length} row(s) selected`,
+            },
+          }}
+          onSelectionChange={(selectedItems: StatusActionsLog[]) => {
+            setSearchParams((searchParams) => {
+              const otherPagesSelection = searchParams
+                .getAll('selection')
+                .filter((logId) => !currentPageLogIds.includes(logId));
+              const currentPageSelection = selectedItems.map((selectedItem) =>
+                selectedItem.statusActionsLogId.toString()
+              );
+
+              searchParams.delete('selection');
+              [...otherPagesSelection, ...currentPageSelection].forEach(
+                (logId) => searchParams.append('selection', logId)
+              );
+
+              return searchParams;
+            });
+          }}
           onChangeColumnHidden={(columnChange) => {
             const proposalColumns = columns.map(
               (statusActionLogsColumn: Column<StatusActionsLog>) => ({
