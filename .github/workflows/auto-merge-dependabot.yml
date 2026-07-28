@@ -19,86 +19,12 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      # When a PR bumps several dependencies at once, Dependabot writes only
-      # `dependency-version` into the commit trailer and omits `update-type`. The metadata
-      # action derives update-type from the "bumps X from A to B" PR title, which those PRs
-      # do not have either, so it reports an empty update-type and the semver check below
-      # never matches. Those PRs then sit with auto-merge enabled and no approval forever.
-      # Work out the semver level ourselves by comparing each direct dependency's new major
-      # against the one currently pinned on the base branch.
-      - name: Resolve update type for multi-dependency PRs
-        id: resolve-update-type
-        if: ${{ steps.dependabot-metadata.outputs.update-type == '' }}
-        env:
-          UPDATED: ${{ steps.dependabot-metadata.outputs.updated-dependencies-json }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          echo "Updated dependencies:"
-          jq -r '.[] | "  \(.dependencyName) [\(.dependencyType)] -> \(.newVersion // "?") (\(.directory))"' <<< "$UPDATED"
-
-          # Only direct dependencies are pinned in a package.json we can compare against.
-          # Indirect entries are transitive resolutions pulled in by those direct bumps and
-          # stay within the direct dependency's declared range, so they are not gated here.
-          DIRECT=$(jq -c '[.[] | select((.dependencyType // "") | startswith("direct:"))]' <<< "$UPDATED")
-
-          RESULT=version-update:semver-minor
-
-          if [ "$(jq 'length' <<< "$DIRECT")" -eq 0 ]; then
-            echo "Only indirect dependencies changed; treating as a minor update."
-          fi
-
-          while IFS=$'\t' read -r name dir new; do
-            [ -n "$name" ] || continue
-
-            path="${dir#/}"
-            path="${path:+$path/}package.json"
-
-            if ! manifest=$(gh api "repos/$GITHUB_REPOSITORY/contents/$path?ref=$BASE_SHA" \
-                              -H "Accept: application/vnd.github.raw"); then
-              echo "::warning::Could not read $path on the base branch; not auto-approving."
-              RESULT=unknown
-              break
-            fi
-
-            old=$(jq -r --arg n "$name" '
-              (.dependencies[$n] // .devDependencies[$n]
-               // .optionalDependencies[$n] // .peerDependencies[$n]) // ""
-            ' <<< "$manifest")
-
-            # Drop any range prefix (^, ~, >=) and keep the major, matching how Dependabot
-            # itself classifies a bump. Anything unparseable (workspace:*, *) stays unknown.
-            old_major=$(sed -E 's/^[^0-9]*//; s/\..*$//' <<< "$old")
-            new_major=$(sed -E 's/^[^0-9]*//; s/\..*$//' <<< "$new")
-
-            if [ -z "$old_major" ] || [ -z "$new_major" ]; then
-              echo "::warning::Cannot compare versions for $name ('$old' -> '$new'); not auto-approving."
-              RESULT=unknown
-              break
-            fi
-
-            echo "  $name: $old -> $new"
-
-            if [ "$old_major" != "$new_major" ]; then
-              echo "$name crosses a major version; leaving this PR for a human reviewer."
-              RESULT=version-update:semver-major
-              break
-            fi
-          done < <(jq -r '.[] | [.dependencyName, .directory, .newVersion] | @tsv' <<< "$DIRECT")
-
-          echo "Resolved update type: $RESULT"
-          echo "update-type=$RESULT" >> "$GITHUB_OUTPUT"
-
       # NOTE: This step is only required if the repository has been configured to Require approval
       # Checks if update-type is patch or minor, then approve if the PR status is not approved yet.
       - name: Auto approve patch and minor updates
         uses: hmarr/auto-approve-action@v4
-        if: >-
-          contains(fromJSON('["version-update:semver-patch","version-update:semver-minor"]'), steps.dependabot-metadata.outputs.update-type)
-          || contains(fromJSON('["version-update:semver-patch","version-update:semver-minor"]'), steps.resolve-update-type.outputs.update-type)
-
+        if: ${{steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor'}}
+      
       # NOTE: Requirements for merge has to be configured in the Branch protection rule page.
       # To do so, go to repository > Settings > Branches > Edit
       - name: Enable auto-merge for Dependabot PRs
