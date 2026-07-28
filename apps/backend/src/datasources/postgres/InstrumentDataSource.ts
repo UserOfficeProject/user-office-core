@@ -147,8 +147,11 @@ export default class PostgresInstrumentDataSource
       instruments = await database
         .select(['i.*', database.raw('count(*) OVER() AS full_count')])
         .from('instruments as i')
-        .join('tag_instrument as ti', 'i.instrument_id', 'ti.instrument_id')
-        .whereIn('ti.tag_id', tagIds)
+        .whereIn('i.instrument_id', function () {
+          this.select('ti.instrument_id')
+            .from('tag_instrument as ti')
+            .whereIn('ti.tag_id', tagIds);
+        })
         .orderBy('i.instrument_id', 'desc')
         .modify((query) => {
           if (first) {
