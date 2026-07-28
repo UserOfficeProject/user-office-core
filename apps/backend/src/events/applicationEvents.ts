@@ -420,6 +420,9 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
 interface UserDataAccessUpdatedEvent extends GeneralEvent {
   type: Event.DATA_ACCESS_USERS_UPDATED;
   proposalPKey: number;
+  // Users newly added as data access users in this update (empty on removals
+  // or no-op updates). Used to notify only the freshly invited users by email.
+  newlyAddedUserIds: number[];
 }
 
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
