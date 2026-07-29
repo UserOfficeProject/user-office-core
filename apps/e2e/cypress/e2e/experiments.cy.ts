@@ -6,6 +6,33 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
+// Clicks through each sortable column of the Experiments table and asserts that
+// the sort state lands in the URL. Those `sortField`/`sortDirection` params are
+// what get forwarded as the getExperiments query variables, so this catches a
+// regression in the column -> sort-field wiring, not just a header that stops
+// toggling visually.
+const assertExperimentsTableColumnsAreSortable = () => {
+  const sortableColumns = [
+    { draggableId: '1', sortField: 'experimentId' },
+    { draggableId: '2', sortField: 'proposal.proposalId' },
+    { draggableId: '3', sortField: 'startsAt' },
+    { draggableId: '4', sortField: 'endsAt' },
+  ];
+
+  sortableColumns.forEach(({ draggableId, sortField }) => {
+    cy.get(
+      `div[data-rfd-draggable-id="${draggableId}"] [data-testid="mtableheader-sortlabel"]`
+    ).click();
+    cy.url().should('include', `sortField=${sortField}`);
+    cy.url().should('include', 'sortDirection=asc');
+
+    cy.get('span[aria-sort="ascending"]').click();
+    cy.url().should('include', 'sortDirection=desc');
+
+    cy.get('span[aria-sort="descending"]').click();
+  });
+};
+
 context('Experiments tests', () => {
   const instrumentScientist1 = initialDBData.users.instrumentScientist1;
 
@@ -84,6 +111,36 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
+    it('Columns in Experiments Table are sortable - Officer', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.finishedLoading();
+
+      assertExperimentsTableColumnsAreSortable();
+    });
+
+    it('Columns in Experiments Table are sortable - Instrument Scientist', () => {
+      cy.login(instrumentScientist1);
+      cy.visit('/');
+
+      cy.contains('Experiments').click();
+      cy.finishedLoading();
+
+      assertExperimentsTableColumnsAreSortable();
+    });
+
+    it('Columns in Experiments Table are sortable - Experiment Safety Reviewer', () => {
+      cy.login('experimentSafetyReviewer1');
+      cy.visit('/');
+
+      cy.contains('Experiments').click();
+      cy.finishedLoading();
+
+      assertExperimentsTableColumnsAreSortable();
+    });
+
     it('Can view visits', () => {
       cy.login('officer');
       cy.visit('/');
@@ -117,7 +174,7 @@ context('Experiments tests', () => {
           tableValue = [...tableValue, $el.text().toString()];
         })
         .then(() => {
-          // Explanation: The table has 7 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
+          // Explanation: The table has 6 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
           // tableColumns: Array of objects. Each object contains the title of the column and the data of the column in original, ascending and descending order.
           const tableColumns = [
             {
