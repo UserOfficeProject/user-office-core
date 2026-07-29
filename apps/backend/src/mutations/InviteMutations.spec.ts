@@ -8,6 +8,7 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import { DataAccessClaimDataSourceMock } from '../datasources/mockups/DataAccessClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import {
@@ -36,6 +37,9 @@ describe('Test Invite Mutations', () => {
       .init();
     container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .init();
+    container
+      .resolve<DataAccessClaimDataSourceMock>(Tokens.DataAccessClaimDataSource)
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
     container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();

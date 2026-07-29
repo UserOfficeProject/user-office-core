@@ -7,11 +7,8 @@ export class DataAccessClaimDataSourceMock
   private invites: DataAccessClaim[] = [];
 
   init() {
-    this.invites = [
-      new DataAccessClaim(7, 1), // use IDs unique from coproposal invites
-      new DataAccessClaim(8, 2),
-      new DataAccessClaim(9, 3),
-    ];
+    // Invite 4 in InviteDataSourceMock is the data access invite on proposal 1
+    this.invites = [new DataAccessClaim(4, 1)];
   }
 
   async findByProposalPk(proposalPk: number): Promise<DataAccessClaim[]> {
