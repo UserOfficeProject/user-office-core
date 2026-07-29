@@ -23,7 +23,8 @@ const DataAccessUsersModal = ({
 }: DataAccessUsersModalProps) => {
   const { dataAccessUsers, loadingDataAccessUsers } =
     useDataAccessUsersData(proposalPk);
-  const { proposalData } = useProposalData(proposalPk);
+  const { proposalData, loading: loadingProposal } =
+    useProposalData(proposalPk);
   const [managedUsers, setManagedUsers] = useState<BasicUserDetails[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -88,7 +89,7 @@ const DataAccessUsersModal = ({
       title="Data access users"
     >
       <DialogContent>
-        {loadingDataAccessUsers ? (
+        {loadingDataAccessUsers || loadingProposal ? (
           <Typography>Loading...</Typography>
         ) : (
           <>
