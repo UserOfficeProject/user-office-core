@@ -24,26 +24,12 @@ export class InviteDataSourceMock implements InviteDataSource {
     this.init();
   }
 
-  async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    const coProposerClaims =
-      await this.coProposerDataSource.findByProposalPk(proposalPk);
-
-    const invites = await Promise.all(
-      coProposerClaims.map((claim) => this.findById(claim.inviteId))
-    );
-
-    return invites.filter((invite) => invite !== null) as Invite[];
+  async findPendingCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    return this.getCoProposerInvites({ proposalPk, isClaimed: false });
   }
 
-  async findDataAccessInvites(proposalPk: number): Promise<Invite[]> {
-    const dataAccessClaims =
-      await this.dataAccessDataSource.findByProposalPk(proposalPk);
-
-    const invites = await Promise.all(
-      dataAccessClaims.map((claim) => this.findById(claim.inviteId))
-    );
-
-    return invites.filter((invite) => invite !== null) as Invite[];
+  async findPendingDataAccessInvites(proposalPk: number): Promise<Invite[]> {
+    return this.getDataAccessInvites({ proposalPk, isClaimed: false });
   }
 
   async findVisitRegistrationInvites(

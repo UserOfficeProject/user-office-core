@@ -29,10 +29,8 @@ export default class InviteQueries {
       return [];
     }
 
-    const invites = await this.dataSource.findCoProposerInvites(
-      proposalPk,
-      false
-    );
+    const invites =
+      await this.dataSource.findPendingCoProposerInvites(proposalPk);
 
     return invites;
   }
@@ -47,10 +45,8 @@ export default class InviteQueries {
       return [];
     }
 
-    const invites = await this.dataSource.findDataAccessInvites(
-      proposalPk,
-      false
-    );
+    const invites =
+      await this.dataSource.findPendingDataAccessInvites(proposalPk);
 
     return invites;
   }

@@ -162,24 +162,6 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
-  private async getPendingCoProposerInvites(
-    proposalPk: number
-  ): Promise<Invite[]> {
-    return this.inviteDataSource.getCoProposerInvites({
-      proposalPk,
-      isClaimed: false,
-    });
-  }
-
-  private async getPendingDataAccessInvites(
-    proposalPk: number
-  ): Promise<Invite[]> {
-    return this.inviteDataSource.getDataAccessInvites({
-      proposalPk,
-      isClaimed: false,
-    });
-  }
-
   @Authorized()
   public async setCoProposerInvites(
     agent: UserWithRole | null,
@@ -196,7 +178,8 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites = await this.getPendingCoProposerInvites(proposalPk);
+    const existingInvites =
+      await this.inviteDataSource.findPendingCoProposerInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
@@ -267,7 +250,8 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites = await this.getPendingDataAccessInvites(proposalPk);
+    const existingInvites =
+      await this.inviteDataSource.findPendingDataAccessInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
