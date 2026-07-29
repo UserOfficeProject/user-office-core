@@ -12,6 +12,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
+import { useIsTabletOrMobile } from 'hooks/common/useResponsive';
 
 import AccountActionButton from './AccountActionButton';
 const drawerWidth = 250;
@@ -27,7 +28,7 @@ type AppToolbarProps = {
 const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   const { settingsMap } = useContext(SettingsContext);
   const location = useLocation();
-  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
+  const isTabletOrMobile = useIsTabletOrMobile();
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
   const [logo, setLogo] = useState('');
   const theme = useTheme();

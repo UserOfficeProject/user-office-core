@@ -1,4 +1,3 @@
-import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
@@ -14,7 +13,6 @@ import {
 } from 'generated/sdk';
 
 const CallCycleInfo = () => {
-  const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
 
@@ -38,7 +36,6 @@ const CallCycleInfo = () => {
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -54,7 +51,6 @@ const CallCycleInfo = () => {
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -70,7 +66,6 @@ const CallCycleInfo = () => {
             'data-cy': 'start-cycle',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -87,7 +82,6 @@ const CallCycleInfo = () => {
             'data-cy': 'end-cycle',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
       </LocalizationProvider>

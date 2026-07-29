@@ -1,4 +1,3 @@
-import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -22,7 +21,6 @@ import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActi
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
-  const theme = useTheme();
   const { dispatch, state } = useContext(
     QuestionaryContext
   ) as VisitRegistrationContextType;
@@ -62,7 +60,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
           });
         }}
         // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-        desktopModeMediaQuery={theme.breakpoints.up('sm')}
       />
       <Field
         name={`${id}.endsAt`}
@@ -88,7 +85,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
           });
         }}
         // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-        desktopModeMediaQuery={theme.breakpoints.up('sm')}
       />
     </LocalizationProvider>
   );

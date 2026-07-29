@@ -271,7 +271,6 @@ const CallGeneralInfo = ({
             'data-cy': 'start-end-date',
           }}
           // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -520,7 +519,6 @@ const CallGeneralInfo = ({
             }}
             // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
             // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
-            desktopModeMediaQuery={theme.breakpoints.up('sm')}
             minDate={startEndDate.to}
             required
           />

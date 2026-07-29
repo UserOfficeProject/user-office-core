@@ -63,32 +63,71 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
     },
   };
 
-  // NOTE: If DatePicker/DateTimePicker are added here later we can add the desktopModeMediaQuery as default to fix this:
-  // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
+  const baseTheme = createTheme({
+    palette: palette,
+    components: {
+      MuiTextField: {
+        defaultProps: {
+          variant: 'standard',
+          margin: 'normal',
+        },
+      },
+      MuiButton: {
+        defaultProps: {
+          variant: 'contained',
+        },
+      },
+      MuiSelect: {
+        defaultProps: {
+          variant: 'standard',
+        },
+      },
+      MuiFormControl: {
+        defaultProps: {
+          variant: 'standard',
+          margin: 'none',
+        },
+      },
+    },
+  });
+
+  // NOTE: the picker component keys below are not type-checked. Registering them
+  // properly needs `import '@mui/x-date-pickers/themeAugmentation'`, which makes
+  // `tsc` run out of heap on this codebase, and the second argument of
+  // `createTheme(base, ...)` is typed as a plain object. Each key is verified to
+  // be read via `useDefaultProps` in @mui/x-date-pickers v9; if you rename one,
+  // nothing will complain — it will just silently stop applying.
   const theme = responsiveFontSizes(
-    createTheme({
-      palette: palette,
+    createTheme(baseTheme, {
       components: {
-        MuiTextField: {
-          defaultProps: {
-            variant: 'standard',
-            margin: 'normal',
-          },
-        },
-        MuiButton: {
-          defaultProps: {
-            variant: 'contained',
-          },
-        },
-        MuiSelect: {
+        // Since @mui/x-date-pickers v8 the pickers render their own
+        // PickersTextField rather than a Material UI TextField, so they do not
+        // inherit the MuiTextField defaults above and would fall back to the
+        // `outlined` variant. Mirror the defaults here to keep every field
+        // looking the same.
+        MuiPickersTextField: {
           defaultProps: {
             variant: 'standard',
           },
         },
-        MuiFormControl: {
+        // Forces the desktop (popover) picker rather than the mobile (modal)
+        // one from `sm` upwards. Previously repeated at every picker call site.
+        // Also keeps Cypress able to drive the pickers:
+        // https://stackoverflow.com/a/69986695/5619063 and
+        // https://github.com/cypress-io/cypress/issues/970
+        MuiDatePicker: {
           defaultProps: {
-            variant: 'standard',
-            margin: 'none',
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
+          },
+        },
+        MuiDateTimePicker: {
+          defaultProps: {
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
+          },
+        },
+        MuiTimePicker: {
+          defaultProps: {
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
           },
         },
       },

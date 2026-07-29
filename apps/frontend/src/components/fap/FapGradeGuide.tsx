@@ -16,13 +16,13 @@ const FapGradeGuide: React.FC<FapGradeGuideProps> = ({ fap, onFapUpdate }) => {
 
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
+  // NOTE: this was `sm={25}` before the Grid v2 migration. The legacy Grid
+  // silently ignored out-of-range values (it emitted a `MuiGrid-grid-sm-25`
+  // class that does not exist), but Grid v2 computes
+  // `width: calc(100% * 25 / 12)`, which overflows the container. The editor is
+  // meant to span the full row at every breakpoint.
   return (
-    <Grid
-      size={{
-        sm: 25,
-        xs: 12,
-      }}
-    >
+    <Grid size={12}>
       <Editor
         initialValue={fap.gradeGuide || ''}
         init={{
