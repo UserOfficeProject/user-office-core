@@ -162,17 +162,13 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
-  private async getCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    const existingClaims =
-      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
-
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
-
-    return existingInvites;
+  private async getPendingCoProposerInvites(
+    proposalPk: number
+  ): Promise<Invite[]> {
+    return this.inviteDataSource.getCoProposerInvites({
+      proposalPk,
+      isClaimed: false,
+    });
   }
 
   private async getPendingDataAccessInvites(
@@ -200,7 +196,7 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites = await this.getCoProposerInvites(proposalPk);
+    const existingInvites = await this.getPendingCoProposerInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
