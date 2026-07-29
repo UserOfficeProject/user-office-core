@@ -174,7 +174,9 @@ export class InviteDataSourceMock implements InviteDataSource {
     const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     const newInvite = new Invite(
-      this.invites.length + 1, // Generate new ID
+      // Sequential from the highest id ever used: length + 1 hands out an id
+      // that is already taken once anything has been deleted
+      Math.max(0, ...this.invites.map((invite) => invite.id)) + 1,
       code,
       email,
       new Date(),
