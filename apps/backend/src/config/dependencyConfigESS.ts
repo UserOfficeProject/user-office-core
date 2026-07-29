@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
@@ -66,6 +65,7 @@ import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironmen
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+import { SMTPMailService } from '../eventHandlers/MailService/SMTP/SMTPMailService';
 
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
@@ -131,6 +131,12 @@ mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 mapClass(Tokens.MailService, SparkPostMailService);
+
+if (isDevelopment) {
+  mapValue(Tokens.MailService, new SMTPMailService());
+} else {
+  mapClass(Tokens.MailService, SparkPostMailService);
+}
 
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
