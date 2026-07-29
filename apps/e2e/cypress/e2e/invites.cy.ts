@@ -41,7 +41,7 @@ context('Invites tests', () => {
         'contain.text',
         'john@example.com'
       );
-      cy.get('[data-testid="CancelIcon"]').click();
+      cy.get('[data-cy="delete-invite-chip"]').click();
       cy.get('[data-cy="invites-chips"]').should('not.exist');
     });
 
@@ -249,7 +249,7 @@ context('Invites tests', () => {
         cy.get('#code').type(response.setCoProposerInvites[0].code ?? '');
         cy.get('[data-cy="invitation-submit"]').click();
         cy.get('[data-testid="VisibilityIcon"]').first().click();
-        cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+        cy.get('.MuiTabs-list > #horizontal-tab-1').click();
         cy.get('[data-cy=questionary-details-view]').should(
           'contain.text',
           initialDBData.users.user3.lastName

@@ -199,7 +199,7 @@ const TemplatesTable = ({
   };
 
   const customActions = actions || [];
-  const EditIconComponent = () => <Edit />;
+  const EditIconComponent = () => <Edit data-testid="EditIcon" />;
   const FileCopyIconComponent = () => <FileCopy />;
 
   const templatesWithId = templates.map((template) =>

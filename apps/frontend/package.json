@@ -56,7 +56,8 @@
   },
   "overrides": {
     "@mui/material": "$@mui/material",
-    "@mui/system": "$@mui/system"
+    "@mui/system": "$@mui/system",
+    "react-is": "^18.3.1"
   },
   "proxy": "http://localhost:4000",
   "scripts": {

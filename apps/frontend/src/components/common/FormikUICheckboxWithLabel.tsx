@@ -21,6 +21,17 @@ export interface CheckboxProps
       | 'type'
     > {
   type?: string;
+  /**
+   * @deprecated Material UI v9 removed `inputProps` from Checkbox in favour of
+   * `slotProps.input`. Accepted here and translated below so the existing call
+   * sites keep applying their `data-cy` attributes to the real input element.
+   */
+  inputProps?: Record<string, unknown>;
+  /**
+   * @deprecated Material UI v9 removed `InputProps` from Checkbox. Checkbox has
+   * no such slot; the call sites that pass it mean the html input.
+   */
+  InputProps?: Record<string, unknown>;
 }
 
 export function fieldToCheckbox({
@@ -28,9 +39,20 @@ export function fieldToCheckbox({
   field: { onBlur: fieldOnBlur, ...field },
   form: { isSubmitting },
   onBlur,
+  inputProps,
+  InputProps,
+  slotProps,
   ...props
 }: CheckboxProps): MuiCheckboxProps {
   const indeterminate = !Array.isArray(field.value) && field.value == null;
+
+  const legacyInputProps = { ...InputProps, ...inputProps };
+  const mergedSlotProps = {
+    ...slotProps,
+    ...(Object.keys(legacyInputProps).length
+      ? { input: { ...legacyInputProps, ...(slotProps?.input as object) } }
+      : {}),
+  } as MuiCheckboxProps['slotProps'];
 
   return {
     disabled: disabled ?? isSubmitting,
@@ -40,6 +62,7 @@ export function fieldToCheckbox({
       function (e) {
         fieldOnBlur(e ?? field.name);
       },
+    slotProps: mergedSlotProps,
     ...field,
     ...props,
   };

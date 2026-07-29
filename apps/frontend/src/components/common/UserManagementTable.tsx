@@ -1,5 +1,6 @@
 import MaterialTable from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
+import CancelIcon from '@mui/icons-material/Cancel';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
 import { Chip, Tooltip } from '@mui/material';
@@ -188,6 +189,13 @@ const UserManagementTable = ({
                     label={invite.email}
                     key={invite.email}
                     onDelete={() => handleDeleteInvite(invite)}
+                    // Material UI v7+ strips the automatic `data-testid` from
+                    // icons in production builds, and the e2e suite runs against
+                    // a production build. Chip's default delete icon is a
+                    // CancelIcon, so pass it explicitly to keep it selectable.
+                    deleteIcon={
+                      <CancelIcon data-cy="delete-invite-chip" role="button" />
+                    }
                   />
                 ))}
               </Box>

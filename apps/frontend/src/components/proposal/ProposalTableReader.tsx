@@ -95,7 +95,7 @@ const ProposalTableReader = () => {
         }}
         actions={[
           (rowData: ProposalViewData) => ({
-            icon: () => <Visibility />,
+            icon: () => <Visibility data-testid="VisibilityIcon" />,
             tooltip: 'View proposal',
             onClick: () =>
               setEditProposalPk((rowData as ProposalViewData).primaryKey),

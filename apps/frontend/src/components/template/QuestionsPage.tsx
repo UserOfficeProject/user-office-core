@@ -204,7 +204,7 @@ function QuestionsPage() {
             }}
             actions={[
               {
-                icon: () => <Edit />,
+                icon: () => <Edit data-testid="EditIcon" />,
                 tooltip: 'Edit Question',
                 onClick: (event, data) => {
                   setIsEditQuestionModalOpen(true);

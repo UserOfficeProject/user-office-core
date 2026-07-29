@@ -93,8 +93,10 @@ const FapsTable = () => {
     return <Navigate to={`/FapPage/${editFapID}`} />;
   }
 
-  const EditIcon = (): JSX.Element => <Edit />;
-  const ViewIcon = (): JSX.Element => <Visibility />;
+  const EditIcon = (): JSX.Element => <Edit data-testid="EditIcon" />;
+  const ViewIcon = (): JSX.Element => (
+    <Visibility data-testid="VisibilityIcon" />
+  );
 
   const deleteFap = async (id: number | string) => {
     try {

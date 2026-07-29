@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { TextFieldProps } from '@mui/material/TextField';
 import {
   DatePicker as MuiDatePicker,
   DatePickerProps as MuiDatePickerProps,
 } from '@mui/x-date-pickers/DatePicker';
+import { PickersTextFieldProps } from '@mui/x-date-pickers/PickersTextField';
 import { FieldProps, getIn } from 'formik';
 import { DateTime } from 'luxon';
 import * as React from 'react';
@@ -13,7 +13,10 @@ import { createFormikErrorHandler } from 'utils/errorHandler';
 export interface DatePickerProps
   extends FieldProps,
     Omit<MuiDatePickerProps, 'name' | 'value' | 'error'> {
-  textField?: TextFieldProps;
+  // Pickers v9 narrowed the `textField` slot to PickersTextFieldProps; it no
+  // longer accepts Material UI's TextFieldProps. Typing it correctly here
+  // removes the need for the cast that previously hid the mismatch.
+  textField?: Partial<PickersTextFieldProps>;
 }
 
 export function fieldToDatePicker({
@@ -49,7 +52,7 @@ export function fieldToDatePicker({
             setFieldTouched(field.name, true, true);
           },
         ...textField,
-      } as NonNullable<MuiDatePickerProps['slotProps']>['textField'],
+      },
     },
     disabled: disabled ?? isSubmitting,
     onChange:

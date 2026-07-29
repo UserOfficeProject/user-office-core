@@ -139,7 +139,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   ampm={false}
                   component={component}
                   showToolbar
-                  inputProps={{ placeholder: inputFormat }}
                   maxDate={defaultFieldMaxDate}
                   textField={{
                     fullWidth: true,
@@ -154,7 +153,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   format={inputFormat}
                   ampm={false}
                   component={component}
-                  inputProps={{ placeholder: inputFormat }}
                   minDate={defaultFieldMinDate}
                   textField={{
                     fullWidth: true,
@@ -169,7 +167,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   format={inputFormat}
                   ampm={false}
                   component={component}
-                  inputProps={{ placeholder: inputFormat }}
                   minDate={defaultFieldMinDate}
                   maxDate={defaultFieldMaxDate}
                   textField={{

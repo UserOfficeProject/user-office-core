@@ -72,8 +72,8 @@ const WorkflowsTable = ({
     }
   };
 
-  const EditIcon = (): JSX.Element => <Edit />;
-  const FileCopyIcon = (): JSX.Element => <FileCopy />;
+  const EditIcon = (): JSX.Element => <Edit data-testid="EditIcon" />;
+  const FileCopyIcon = (): JSX.Element => <FileCopy data-testid="FileCopyIcon" />;
 
   return (
     <div data-cy="workflows-table">

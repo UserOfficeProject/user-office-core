@@ -248,7 +248,9 @@ const ProposalTable = ({
             const readOnly = callHasEnded || getProposalReadonlyStatus(rowData);
 
             return {
-              icon: readOnly ? () => <Visibility /> : () => <Edit />,
+              icon: readOnly
+                ? () => <Visibility data-testid="VisibilityIcon" />
+                : () => <Edit data-testid="EditIcon" />,
               tooltip: readOnly ? 'View proposal' : 'Edit proposal',
               onClick: (event, rowData) =>
                 setEditProposalPk(

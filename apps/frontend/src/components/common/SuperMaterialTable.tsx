@@ -144,7 +144,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
     }
   };
 
-  const EditIcon = (): JSX.Element => <Edit />;
+  const EditIcon = (): JSX.Element => <Edit data-testid="EditIcon" />;
   let localActions: (
     | import('@material-table/core').Action<Entry>
     | ((rowData: Entry) => import('@material-table/core').Action<Entry>)
