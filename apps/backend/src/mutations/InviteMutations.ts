@@ -175,17 +175,13 @@ export default class InviteMutations {
     return existingInvites;
   }
 
-  private async getDataAccessInvites(proposalPk: number): Promise<Invite[]> {
-    const existingClaims =
-      await this.dataAccessClaimDataSource.findByProposalPk(proposalPk);
-
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
-
-    return existingInvites;
+  private async getPendingDataAccessInvites(
+    proposalPk: number
+  ): Promise<Invite[]> {
+    return this.inviteDataSource.getDataAccessInvites({
+      proposalPk,
+      isClaimed: false,
+    });
   }
 
   @Authorized()
@@ -275,7 +271,7 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites = await this.getDataAccessInvites(proposalPk);
+    const existingInvites = await this.getPendingDataAccessInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
