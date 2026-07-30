@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { renderPdf } from '../renderPdf';
+import { renderPdf, renderPdfCollection } from '../renderPdf';
 
 /**
  * End-to-end tests over the pipeline, using the templates the frontend seeds a
@@ -70,8 +70,8 @@ describe('renderPdf', () => {
       title: string;
     };
 
-    expect(result.html).toContain(proposal.proposalId);
-    expect(result.html).toContain(proposal.title);
+    expect(result.html[0]).toContain(proposal.proposalId);
+    expect(result.html[0]).toContain(proposal.title);
     expect(result.typst).toContain('#set page(');
     expect(result.typst).toContain('#heading(');
   });
@@ -79,7 +79,7 @@ describe('renderPdf', () => {
   it('embeds the header logo as a Typst image rather than dropping it', () => {
     const result = renderPdf({ templates, data });
 
-    expect(result.typst).toContain('image("/assets/header/image0.png"');
+    expect(result.typst).toContain('image("/assets/d0/header/image0.png"');
   });
 
   it('translates the footer page counters', () => {
@@ -119,6 +119,59 @@ describe('renderPdf', () => {
   it('rejects a request without a body template', () => {
     expect(() => renderPdf({ templates: { body: '' }, data: {} })).toThrow(
       /body template is required/
+    );
+  });
+});
+
+describe('renderPdfCollection', () => {
+  it('renders several entities into one PDF, each on its own page', () => {
+    const result = renderPdfCollection({
+      documents: [
+        { templates: { body: '<h1>First</h1>' }, data: {} },
+        { templates: { body: '<h1>Second</h1>' }, data: {} },
+      ],
+    });
+
+    expect(isPdf(result.pdf)).toBe(true);
+    expect(result.html).toHaveLength(2);
+    expect(countPages(result.pdf)).toBe(2);
+  });
+
+  it('keeps a separate running header per entity', () => {
+    const result = renderPdfCollection({
+      documents: [
+        {
+          templates: { body: '<p>a</p>', header: '<p>{{id}}</p>' },
+          data: { id: 'PROP-1' },
+        },
+        {
+          templates: { body: '<p>b</p>', header: '<p>{{id}}</p>' },
+          data: { id: 'PROP-2' },
+        },
+      ],
+    });
+
+    expect(result.typst).toContain('PROP-1');
+    expect(result.typst).toContain('PROP-2');
+  });
+
+  it('renders the real proposal template for several proposals', () => {
+    const result = renderPdfCollection({
+      documents: [
+        { templates, data },
+        { templates, data },
+      ],
+      page: { size: 'a4', numbering: '1' },
+      fontPaths: [FONTS],
+    });
+
+    expect(isPdf(result.pdf)).toBe(true);
+    expect(countPages(result.pdf)).toBeGreaterThan(1);
+  });
+
+  it('rejects an empty collection', () => {
+    expect(() => renderPdfCollection({ documents: [] })).toThrow(
+      /At least one document is required/
     );
   });
 });

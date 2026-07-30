@@ -106,6 +106,18 @@ jobs:
         # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
         run: npm ci --ignore-scripts
 
+      - name: Cache pdf-renderer node_modules
+        id: cached-node-modules-pdf-renderer
+        uses: actions/cache@v5
+        with:
+          path: apps/pdf-renderer/node_modules
+          key: node-modules-pdf-renderer-${{ hashFiles('apps/pdf-renderer/package-lock.json') }}-${{ env.NODE_VERSION }}
+
+      # The backend depends on the built renderer through a file: dependency, so
+      # it has to be installed and built before the backend installs.
+      - name: Install and build pdf-renderer
+        run: npm run install:pdf-renderer
+
       - name: Cache backend node_modules
         id: cached-node-modules-backend
         uses: actions/cache@v5

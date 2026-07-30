@@ -58,8 +58,8 @@ export interface PageOptions {
   fontFamily?: string[];
 }
 
-/** One render request: templates in, PDF out. */
-export interface RenderRequest {
+/** One document: a set of templates and the data to fill them with. */
+export interface DocumentRequest {
   templates: DocumentTemplates;
   /** Root context handed to every template. */
   data: Record<string, unknown>;
@@ -68,16 +68,27 @@ export interface RenderRequest {
    * after the body.
    */
   sections?: Record<string, unknown>[];
+}
+
+/** One render request: templates in, PDF out. */
+export interface RenderRequest extends DocumentRequest {
   page?: PageOptions;
   /** Directories searched for fonts, in addition to system fonts. */
+  fontPaths?: string[];
+}
+
+/** Several documents rendered into a single PDF. */
+export interface CollectionRenderRequest {
+  documents: DocumentRequest[];
+  page?: PageOptions;
   fontPaths?: string[];
 }
 
 /** Result of a render, with the intermediate stages kept for debugging. */
 export interface RenderResult {
   pdf: Buffer;
-  /** HTML produced by Handlebars. */
-  html: string;
+  /** Body HTML produced by Handlebars, one entry per document. */
+  html: string[];
   /** Typst source handed to the compiler. */
   typst: string;
 }

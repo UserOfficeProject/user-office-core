@@ -56,9 +56,13 @@ function fontList(fonts: string[]): string {
  * an image in the body.
  */
 export function buildTypstDocument(
-  parts: DocumentParts,
+  documents: DocumentParts[],
   page: PageOptions = {}
 ): TypstDocument {
+  if (documents.length === 0) {
+    throw new Error('At least one document is required');
+  }
+
   const size = page.size ?? DEFAULT_PAGE_SIZE;
   const { widthPt, heightPt } = PAGE_DIMENSIONS_PT[size];
   const canvasWidthPx = page.canvasWidthPx ?? DEFAULT_CANVAS_WIDTH_PX;
@@ -97,18 +101,6 @@ export function buildTypstDocument(
     pageSettings.push(`numbering: "${page.numbering.replace(/"/g, '')}"`);
   }
 
-  if (parts.header) {
-    pageSettings.push(
-      `header: ${contentBlock(convert(parts.header, 'header'))}`
-    );
-  }
-
-  if (parts.footer) {
-    pageSettings.push(
-      `footer: ${contentBlock(convert(parts.footer, 'footer'))}`
-    );
-  }
-
   const preamble = [
     `#set page(${pageSettings.join(', ')})`,
     `#set par(justify: ${page.justify ? 'true' : 'false'})`,
@@ -117,15 +109,45 @@ export function buildTypstDocument(
     })`,
   ];
 
-  const body = [convert(parts.body, 'body')];
+  const blocks = documents.map((parts, documentIndex) => {
+    const prefix = `d${documentIndex}`;
 
-  (parts.sections ?? []).forEach((section, index) => {
-    body.push('#pagebreak(weak: true)');
-    body.push(convert(section, `section${index}`));
+    // Each document gets its own header and footer, scoped to a content block
+    // so a collection of entities keeps its per-entity running header. This is
+    // what the previous engine achieved by merging separate PDFs.
+    const scoped = [];
+
+    if (parts.header) {
+      scoped.push(
+        `header: ${contentBlock(convert(parts.header, `${prefix}/header`))}`
+      );
+    }
+
+    if (parts.footer) {
+      scoped.push(
+        `footer: ${contentBlock(convert(parts.footer, `${prefix}/footer`))}`
+      );
+    }
+
+    const content = [convert(parts.body, `${prefix}/body`)];
+
+    (parts.sections ?? []).forEach((section, index) => {
+      content.push('#pagebreak(weak: true)');
+      content.push(convert(section, `${prefix}/section${index}`));
+    });
+
+    const inner = [
+      ...(scoped.length ? [`#set page(${scoped.join(', ')})`] : []),
+      ...content,
+    ].join('\n\n');
+
+    return `#[\n${inner}\n]`;
   });
 
   return {
-    source: `${preamble.join('\n')}\n\n${body.join('\n\n')}\n`,
+    source: `${preamble.join('\n')}\n\n${blocks.join(
+      '\n\n#pagebreak(weak: true)\n\n'
+    )}\n`,
     assets,
   };
 }

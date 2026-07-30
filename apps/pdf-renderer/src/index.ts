@@ -9,7 +9,7 @@
  * `renderPdf` is the only thing most callers need. The individual stages are
  * exported so they can be tested and debugged on their own.
  */
-export { renderPdf } from './renderPdf';
+export { renderPdf, renderPdfCollection } from './renderPdf';
 
 export {
   createTemplateEngine,
@@ -46,6 +46,8 @@ export {
 } from './typst/pageSizes';
 
 export type {
+  CollectionRenderRequest,
+  DocumentRequest,
   DocumentTemplates,
   PageOptions,
   PageSize,

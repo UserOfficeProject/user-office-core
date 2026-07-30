@@ -3,8 +3,8 @@ import { container } from 'tsyringe';
 
 import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
 import { FullProposalPDFData } from '../../../factory/pdf/proposal';
-import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
-import callFactoryService from '../../../factory/service';
+import sendPdf from '../../../factory/pdf/sendPdf';
+import { PDFType, MetaBase } from '../../../factory/service';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
@@ -84,8 +84,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       throw new Error('Invalid request');
     }
 
-    callFactoryService<FullProposalPDFData, MetaBase>(
-      DownloadType.PDF,
+    sendPdf<FullProposalPDFData, MetaBase>(
       PDFType.PROPOSAL,
       payload,
       req,
@@ -147,8 +146,7 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
     if (!payload) {
       throw new Error('Invalid request');
     }
-    callFactoryService<ExperimentSafetyPDFData, MetaBase>(
-      DownloadType.PDF,
+    sendPdf<ExperimentSafetyPDFData, MetaBase>(
       PDFType.EXPERIMENT_SAFETY,
       payload,
       req,

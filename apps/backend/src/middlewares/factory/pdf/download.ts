@@ -11,6 +11,7 @@ import {
   ProposalPDFData,
 } from '../../../factory/pdf/proposal';
 import { collectSamplePDFData } from '../../../factory/pdf/sample';
+import sendPdf from '../../../factory/pdf/sendPdf';
 import { collectShipmentPDFData } from '../../../factory/pdf/shipmentLabel';
 import callFactoryService, {
   PDFType,
@@ -153,8 +154,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    callFactoryService<ProposalPDFData, MetaBase>(
-      DownloadType.PDF,
+    sendPdf<ProposalPDFData, MetaBase>(
       PDFType.PROPOSAL,
       { data, meta, userRole },
       req,
@@ -290,8 +290,7 @@ router.get(
         throw new Error('Could not get Experiment details');
       }
       const userRole = req.user.currentRole;
-      callFactoryService<ExperimentSafetyPDFData, MetaBase>(
-        DownloadType.PDF,
+      sendPdf<ExperimentSafetyPDFData, MetaBase>(
         PDFType.EXPERIMENT_SAFETY,
         { data, meta, userRole },
         req,

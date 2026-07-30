@@ -110,7 +110,7 @@ function main(argv: string[]): number {
   }
 
   if (single['dump-html']) {
-    writeFileSync(single['dump-html'], result.html);
+    writeFileSync(single['dump-html'], result.html.join('\n'));
   }
 
   console.log(`Wrote ${single.out} (${result.pdf.length} bytes)`);
