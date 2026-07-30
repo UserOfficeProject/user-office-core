@@ -1,0 +1,16 @@
+<style>
+  .logo { max-height: 54px; max-width: 150px; padding: 0; }
+  .proposal-header-title{ font-size: 13px; float: right; color: rgb(0, 163,
+  218); } .flex{ display: flex; padding-left: 10px; padding-right: 10px;
+  justify-content: space-between; align-items: center; } .border{ border-bottom:
+  2px solid rgb(0, 163, 218); width: 80%; }
+</style>
+
+<div class='border' style='width: 80%;margin: -13px auto 0 auto;'>
+  <div class='flex'>
+    <img src='{{{$readAsBase64 logoPath}}}' class='logo' />
+    {{#if proposal.proposalId}}<p class='proposal-header-title'>Proposal
+        <br />{{proposal.proposalId}}</p>
+    {{/if}}
+  </div>
+</div>
