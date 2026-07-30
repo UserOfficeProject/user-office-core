@@ -30,8 +30,10 @@ export const tableIcons: Icons<never> = {
   Delete: forwardRef<SVGSVGElement | null>((props, ref) => (
     <DeleteOutline {...props} ref={ref} />
   )),
+  // Material UI v7+ only emits the automatic `data-testid` outside production,
+  // and the e2e suite runs against a production build, so set it explicitly.
   DetailPanel: forwardRef<SVGSVGElement | null>((props, ref) => (
-    <ChevronRight {...props} ref={ref} />
+    <ChevronRight {...props} data-testid="ChevronRightIcon" ref={ref} />
   )),
   Edit: forwardRef<SVGSVGElement | null>((props, ref) => (
     <Edit {...props} ref={ref} />
