@@ -81,7 +81,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   if (options?.selection) {
     options.headerSelectionProps = {
-      inputProps: { 'aria-label': 'Select All Rows' },
+      slotProps: { input: { 'aria-label': 'Select All Rows' } },
     };
   }
 

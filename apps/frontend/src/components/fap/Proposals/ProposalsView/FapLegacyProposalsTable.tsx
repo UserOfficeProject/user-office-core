@@ -394,9 +394,11 @@ const FapLegacyProposalsTable = ({
             initialPage: page ? +page : 0,
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
-              inputProps: {
-                'aria-label': 'Select all rows',
-                id: 'select-all-table-rows',
+              slotProps: {
+                input: {
+                  'aria-label': 'Select all rows',
+                  id: 'select-all-table-rows',
+                },
               },
             },
           }}

@@ -1026,13 +1026,15 @@ const ProposalTableInstrumentScientist = ({
           searchText: search || undefined,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           debounceInterval: 600,
           columnsButton: true,
           selectionProps: (rowData: ProposalViewData) => ({
-            inputProps: {
-              'aria-label': `${rowData.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.title}-select`,
+              },
             },
           }),
           pageSize: 20,

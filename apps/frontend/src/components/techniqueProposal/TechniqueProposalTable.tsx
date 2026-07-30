@@ -1015,13 +1015,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               searchText: search || undefined,
               selection: true,
               headerSelectionProps: {
-                inputProps: { 'aria-label': 'Select All Rows' },
+                slotProps: { input: { 'aria-label': 'Select All Rows' } },
               },
               debounceInterval: 600,
               columnsButton: true,
               selectionProps: (rowdata: ProposalViewData) => ({
-                inputProps: {
-                  'aria-label': `${rowdata.title}-select`,
+                slotProps: {
+                  input: {
+                    'aria-label': `${rowdata.title}-select`,
+                  },
                 },
               }),
               pageSize: pageSize ? +pageSize : 5,

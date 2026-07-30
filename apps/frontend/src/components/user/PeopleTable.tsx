@@ -528,7 +528,7 @@ const PeopleTable = ({
               debounceInterval: 400,
               selection: selection,
               headerSelectionProps: {
-                inputProps: { 'aria-label': 'Select All Rows' },
+                slotProps: { input: { 'aria-label': 'Select All Rows' } },
               },
               pageSize:
                 persistUrlQueryParams && searchParams.get('pageSize')
@@ -540,8 +540,10 @@ const PeopleTable = ({
                   : 0,
               ...mtOptions,
               selectionProps: (rowdata: BasicUserDetails) => ({
-                inputProps: {
-                  'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
+                slotProps: {
+                  input: {
+                    'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.institution}-select`,
+                  },
                 },
               }),
             }}

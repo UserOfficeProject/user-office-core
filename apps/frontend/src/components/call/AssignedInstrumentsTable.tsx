@@ -324,7 +324,7 @@ const AssignedInstrumentsTable = ({
             paging: false,
             headerStyle: { backgroundColor: '#fafafa' },
             headerSelectionProps: {
-              inputProps: { 'aria-label': 'Select All Rows' },
+              slotProps: { input: { 'aria-label': 'Select All Rows' } },
             },
             debounceInterval: 400,
           }}

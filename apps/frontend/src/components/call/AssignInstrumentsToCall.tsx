@@ -147,12 +147,14 @@ const AssignInstrumentsToCall = ({
           search: true,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           debounceInterval: 400,
           selectionProps: (rowData) => ({
-            inputProps: {
-              'aria-label': `${rowData.name}-${rowData.shortCode}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.name}-${rowData.shortCode}-select`,
+              },
             },
           }),
         }}
