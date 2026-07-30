@@ -2,6 +2,7 @@ import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
@@ -87,7 +88,7 @@ export interface ExperimentDataSource {
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{
