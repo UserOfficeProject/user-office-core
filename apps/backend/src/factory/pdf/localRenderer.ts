@@ -1,10 +1,6 @@
 import { join } from 'path';
 
-import {
-  DocumentRequest,
-  PageSize,
-  renderPdfCollection,
-} from '@user-office-core/pdf-renderer';
+import type { DocumentRequest, PageSize } from '@user-office-core/pdf-renderer';
 import { logger } from '@user-office-software/duo-logger';
 
 import { extractAnswerMap } from './answerMap';
@@ -24,6 +20,53 @@ import { PDFType } from '../service';
  */
 
 export type PdfEngine = 'typst' | 'factory';
+
+type Renderer = typeof import('@user-office-core/pdf-renderer');
+
+/**
+ * `undefined` means not tried yet, `null` means it could not be loaded.
+ */
+let renderer: Renderer | null | undefined;
+
+/**
+ * Loads the renderer on first use rather than at import time.
+ *
+ * The renderer is a workspace package that has to be built, and it pulls in two
+ * native addons. Importing it at module scope made the whole backend fail to
+ * start when either was missing, because this module is reached from
+ * `index.ts` through the factory middleware. Failing to render a PDF should
+ * cost a PDF, not the API.
+ */
+function loadRenderer(): Renderer | null {
+  if (renderer === undefined) {
+    try {
+      // A static import would be hoisted and run at boot, which is exactly what
+      // this function exists to avoid. The renderer is synchronous, so a dynamic
+      // import() is not an option either.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      renderer = require('@user-office-core/pdf-renderer') as Renderer;
+      logger.logInfo('Local typst PDF renderer is available', {});
+    } catch (error) {
+      renderer = null;
+      logger.logException(
+        'Local typst PDF renderer could not be loaded, PDFs will use the factory service. Run "npm run build:pdf-renderer" from the repository root.',
+        error
+      );
+    }
+  }
+
+  return renderer;
+}
+
+/** Whether the renderer could be loaded. */
+export function isRendererAvailable(): boolean {
+  return loadRenderer() !== null;
+}
+
+/** Forgets the cached load result. Exposed for tests. */
+export function resetRenderer(): void {
+  renderer = undefined;
+}
 
 /** Fonts bundled with the backend, so a template can name Calibri. */
 const FONT_PATHS = [join(process.cwd(), 'fonts')];
@@ -62,12 +105,13 @@ function hasTemplate(entity: unknown): entity is {
 }
 
 /**
- * Whether every entity in the request carries a template this renderer can use.
+ * Whether the request itself is one the local engine covers: a supported type,
+ * where every entity carries a usable template.
  *
  * All or nothing on purpose: a PDF that silently mixed two engines would be
  * harder to explain than one that falls back wholesale.
  */
-export function canRenderLocally(type: PDFType, data: unknown[]): boolean {
+export function isLocallyRenderable(type: PDFType, data: unknown[]): boolean {
   if (getPdfEngine() !== 'typst') {
     return false;
   }
@@ -77,6 +121,31 @@ export function canRenderLocally(type: PDFType, data: unknown[]): boolean {
   }
 
   return data.length > 0 && data.every(hasTemplate);
+}
+
+/**
+ * Whether this request should be rendered locally: the request has to be
+ * supported and the renderer has to have loaded.
+ */
+export function canRenderLocally(type: PDFType, data: unknown[]): boolean {
+  return isLocallyRenderable(type, data) && isRendererAvailable();
+}
+
+/**
+ * Every template gets these on top of the entity data.
+ *
+ * `factoryBaseUrl` exists because templates written against the factory service
+ * put it in a `<base href>`. Nothing here fetches a remote asset, so its only
+ * job is to keep such a template rendering the same as before.
+ */
+function commonContext(): Record<string, unknown> {
+  return {
+    factoryBaseUrl: process.env.FACTORY_BASE_URL ?? '',
+    logoPath: HEADER_LOGO_PATH,
+    // Attachments are not appended by this engine, so no file metadata is
+    // resolved. The $attachment helper then points the reader at the website.
+    attachmentsFileMeta: [],
+  };
 }
 
 function toDocument(
@@ -106,12 +175,9 @@ function proposalDocument(
     entity as FullProposalPDFData & { pdfTemplate: StoredPdfTemplate },
     {
       ...entity,
+      ...commonContext(),
       userRole,
       answers: extractAnswerMap(entity),
-      logoPath: HEADER_LOGO_PATH,
-      // Attachments are not appended by this engine, so no file metadata is
-      // resolved. The $attachment helper then points the reader at the website.
-      attachmentsFileMeta: [],
     },
     entity.samples as unknown as Record<string, unknown>[]
   );
@@ -125,9 +191,8 @@ function experimentSafetyDocument(
     entity as ExperimentSafetyPDFData & { pdfTemplate: StoredPdfTemplate },
     {
       ...entity,
+      ...commonContext(),
       userRole,
-      logoPath: HEADER_LOGO_PATH,
-      attachmentsFileMeta: [],
     },
     entity.experimentSamples as unknown as Record<string, unknown>[]
   );
@@ -144,6 +209,12 @@ export function renderLocalPdf(
   data: unknown[],
   userRole: Role
 ): Buffer {
+  const pdfRenderer = loadRenderer();
+
+  if (!pdfRenderer) {
+    throw new Error('The local PDF renderer is not available');
+  }
+
   const documents =
     type === PDFType.PROPOSAL
       ? (data as FullProposalPDFData[]).map((entity) =>
@@ -154,7 +225,7 @@ export function renderLocalPdf(
         );
 
   const started = Date.now();
-  const { pdf } = renderPdfCollection({
+  const { pdf } = pdfRenderer.renderPdfCollection({
     documents,
     page: { size: PAGE_SIZE, numbering: '1' },
     fontPaths: FONT_PATHS,

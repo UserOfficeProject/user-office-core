@@ -236,3 +236,26 @@ conversion or the Typst compile.
 
 Run them with `npm run test:pdf-renderer` and `npm run test:backend` from the
 repository root.
+
+---
+
+## Local setup
+
+The renderer is a `file:` dependency of the backend, so it has to be built
+before the backend can load it:
+
+```sh
+npm run build:pdf-renderer   # or npm run install:pdf-renderer for a clean install
+```
+
+`npm run install:backend` on its own does not do this. The root `postinstall`
+and the CI workflow both build the renderer first.
+
+If the build is missing the backend still starts, logs
+
+```
+Local typst PDF renderer could not be loaded, PDFs will use the factory service.
+```
+
+and sends every PDF to the factory service. Check for that line first if PDFs
+suddenly need the factory again.
