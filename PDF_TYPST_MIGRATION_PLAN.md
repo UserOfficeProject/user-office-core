@@ -45,11 +45,11 @@ Two features, deliberately separated.
 
 ## 3. Library choices (verified against live registries and a local smoke test)
 
-| Stage | Library | Version | Why |
-| --- | --- | --- | --- |
-| Handlebars -> HTML | `handlebars` | 4.7.x | same engine the factory uses, so stored templates keep working |
-| HTML -> Typst markup | `dom-typst` | 0.1.14 | napi-rs native addon, prebuilt binaries, MIT, purpose-built for this direction |
-| Typst -> PDF | `@myriaddreamin/typst-ts-node-compiler` | 0.7.0 | official typst.ts Node binding, in-process, prebuilt binaries, Apache-2.0 |
+| Stage                | Library                                 | Version | Why                                                                            |
+| -------------------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------ |
+| Handlebars -> HTML   | `handlebars`                            | 4.7.x   | same engine the factory uses, so stored templates keep working                 |
+| HTML -> Typst markup | `dom-typst`                             | 0.1.14  | napi-rs native addon, prebuilt binaries, MIT, purpose-built for this direction |
+| Typst -> PDF         | `@myriaddreamin/typst-ts-node-compiler` | 0.7.0   | official typst.ts Node binding, in-process, prebuilt binaries, Apache-2.0      |
 
 Smoke test already run in `/tmp/typst-probe`: HTML with headings, emphasis and a table
 converted to Typst and compiled to a 16 kB `%PDF-1.7` file with no browser present.
@@ -59,35 +59,75 @@ Rejected: `typst` npm package (last release 2023, CLI shell-out), `html2typst`
 
 ## 4. Steps
 
-1. TODO — create branch `feat/typst-pdf-pipeline` off `develop`.
-2. TODO — scaffold `apps/pdf-renderer` (package.json, tsconfig, jest, eslint, prettier
+1. DONE — branch `feat/typst-pdf-pipeline` off `develop`.
+2. DONE — scaffolded `apps/pdf-renderer` (package.json, tsconfig, jest, eslint, prettier
    matching the other apps).
-3. TODO — install and pin the three libraries.
-4. TODO — port the Handlebars helper set from the factory so existing templates render
-   identically: `$eq`, `$notEq`, `$in`, `$sum`, `$join`, `$or`, `$readableDate`,
-   `$readAsBase64`, `$utcDate`, `$attachment`, `$barcode`, `$debug`.
-5. TODO — stage 1: `renderHtml(template, data)` — Handlebars compile.
-6. TODO — stage 2: `htmlToTypst(html, options)` — `dom-typst` wrapper with page size,
-   canvas width and root font size options.
-7. TODO — stage 3: `buildTypstDocument(...)` — assemble the `.typ` source: preamble,
-   page setup, running header/footer, then the converted body.
-8. TODO — stage 4: `compileTypst(typ)` — `NodeCompiler.pdf()` wrapper returning a Buffer.
-9. TODO — `renderPdf(request)` — the single public entry point chaining 1-4.
-10. TODO — CLI entry point so the pipeline can run with no server at all:
-    `pdf-renderer --body body.hbs --data data.json --out out.pdf`.
-11. TODO — unit tests per stage plus an end-to-end test that asserts a real PDF header
-    and page count.
-12. TODO — backend adapter `apps/backend/src/factory/localPdf.ts`: render in-process and
-    stream, preserving `Content-Disposition` and `x-download-filename`.
-13. TODO — route proposal and experiment-safety PDF download/preview through the adapter
-    when a custom template exists; keep the factory call as the fallback path.
-14. TODO — `PDF_ENGINE` env switch (`typst` default, `factory` to revert) documented in
-    the example env files.
-15. TODO — backend unit tests for the routing decision and the adapter.
-16. TODO — architecture report `documentation/docs/developer-guide/pdf-generation.md`
-    with the pipeline diagram and the library used at each step; add to mkdocs nav.
-17. TODO — run lint, typecheck and the unit suites for both packages.
-18. TODO — commit at each checkpoint.
+3. DONE — installed and pinned the three libraries.
+4. DONE — ported the Handlebars helper set from the factory: `$eq`, `$notEq`, `$in`,
+   `$sum`, `$join`, `$or`, `$readableDate`, `$readAsBase64`, `$utcDate`, `$attachment`,
+   `$debug`. Registered on an isolated environment rather than the global Handlebars
+   singleton. `$barcode` was skipped: it only appears in shipment-label templates, which
+   stay on the factory service, and it would pull in `jsbarcode` plus the deprecated
+   `xmldom`.
+5. DONE — stage 1: `renderHtml(template, data)`. Parses eagerly so a template syntax
+   error is reported separately from a data or helper error.
+6. DONE — stage 2: `htmlToTypst(html, options)`. Needed more than a thin wrapper, see
+   section 7.
+7. DONE — stage 3: `buildTypstDocument(documents, page)`. Takes a list of documents, not
+   one, so a multi-proposal download is a single Typst document with a per-entity running
+   header instead of a merge of separate PDFs.
+8. DONE — stage 4: `compileTypst(source, options)`. Compilers are cached per font
+   configuration; assets are mapped as shadow files and unmapped afterwards.
+9. DONE — `renderPdf` and `renderPdfCollection`.
+10. DONE — CLI at `src/cli.ts`, with `--dump-typst` and `--dump-html` for debugging.
+11. DONE — 71 tests: per stage, plus end-to-end renders of the real default templates
+    taken as fixtures from `PdfTemplateDefaultData.tsx`.
+12. DONE — `apps/backend/src/factory/pdf/sendPdf.ts` is the single dispatch point, and
+    `localRenderer.ts` builds the render request from proposal or experiment safety data.
+    `answerMap.ts` ports the `answers` map from the factory.
+13. DONE — proposal and experiment safety download and preview go through `sendPdf`.
+    Sample, shipment label, XLSX and ZIP still call `callFactoryService` directly.
+14. DONE — `PDF_ENGINE` (`typst` default, `factory` to revert) and `PDF_PAGE_SIZE`,
+    documented in `apps/backend/example.development.env`.
+15. DONE — 23 backend tests for the engine decision, the filename headers and the
+    fallback, plus the answer map.
+16. DONE — report at `documentation/docs/developer-guide/pdf_generation.md`, added to the
+    mkdocs nav, and the factory description in `architecture.md` corrected.
+17. DONE — lint, typecheck and both unit suites pass.
+18. DONE — committed per checkpoint.
+
+Build wiring, which was not in the original plan:
+
+- the renderer is a `file:../pdf-renderer` dependency of the backend, so it must be
+  installed and built first. Added `install:pdf-renderer`, `build:pdf-renderer`,
+  `lint:pdf-renderer` and `test:pdf-renderer` to the root scripts, and put the renderer
+  first in `postinstall`.
+- `apps/backend/Dockerfile` builds the renderer as a sibling directory in the build stage
+  and copies its `build/` and `node_modules/` into the runtime stage, because the two
+  native addons cannot be hoisted.
+- `.github/workflows/test-build.yml` installs and builds the renderer before the backend.
+
+## 4a. Problems found and how they were handled
+
+Recorded because they are the parts a reviewer is most likely to question.
+
+- `dom-typst` loses colour channels when a colour function with spaces appears in a CSS
+  shorthand: `border-bottom: 2px solid rgb(0, 163, 218)` becomes `rgb(0,,`, which is not
+  valid Typst. It also mis-parses a declaration split across lines, which the default
+  header template has. Both are fixed by a CSS normalisation pre-pass that collapses
+  whitespace and tightens colour functions. Covered by tests.
+- `<img>` is converted to the alt text, so a logo would be lost. Data URL images are now
+  extracted before conversion, passed to the compiler as shadow files, and referenced
+  with `#image(...)`. Width comes from the `width`/`height` attributes, then inline style,
+  then the intrinsic size read out of the PNG, JPEG or GIF header. Without that last
+  fallback Typst scales an image to the full page width.
+- `<span class="pageNumber">` and `<span class="totalPages">` were filled in by Chromium.
+  They are now translated to `#context counter(page).display()` and
+  `#context counter(page).final().first()`.
+- `<title>` text leaked into the body, because the converter strips the tag but keeps its
+  text. `<title>`, `<script>` and `<noscript>` are removed first.
+- All of these work through alphanumeric text tokens. Anything with punctuation gets
+  escaped by the converter.
 
 ## 5. Explicitly out of scope
 
@@ -103,7 +143,21 @@ Recorded so the reviewer knows what still needs the factory service.
 
 ## 6. Checkpoints
 
-- C1: package scaffolded and libraries installed.
-- C2: three render stages plus public API, with tests passing.
-- C3: backend wired up with tests.
+- C1: package scaffolded and libraries installed. Commit `026ce0f`.
+- C2: render stages plus public API, with tests passing. Commit `c72086c`.
+- C3: backend wired up with tests. Commit `8340b36`.
 - C4: report and docs.
+
+## 7. Follow-up work this leaves open
+
+- Appending user-uploaded attachments to a proposal PDF. Needs the file datasource and a
+  merge step; `pdf-lib` would keep it browser-free.
+- Table of contents and PDF outline. Typst can produce both natively from headings, which
+  would be cleaner than the old `data-book-index` scraping, but it needs a template
+  convention rather than a code change alone.
+- Porting the sample and shipment-label templates out of the factory image, which would
+  let those types move over too.
+- Translating CSS page-break properties, so existing templates that rely on
+  `break-before: page` keep their layout.
+- Once nothing needs it, dropping the factory service from `docker-compose.yml` and from
+  the CI image resolution in `test-build.yml`.

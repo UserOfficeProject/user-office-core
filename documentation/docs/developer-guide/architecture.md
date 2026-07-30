@@ -19,7 +19,12 @@ The User Office application leverages a modular architecture with several interc
 
 **User Office Factory**
 
-- Generates PDF and Excel files for the frontend, supporting data export and reporting functionalities.
+- Generates Excel files and ZIP attachment bundles for the frontend, supporting data export and reporting functionalities.
+- Also generates the PDF types the core backend does not render itself. See [PDF generation](pdf_generation.md) for which is which.
+
+**PDF renderer**
+
+- A library inside the core repository that renders proposal and experiment safety PDFs in the backend process, with no browser involved. See [PDF generation](pdf_generation.md).
 
 **User Office Cron**
 

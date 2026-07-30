@@ -70,6 +70,7 @@ nav:
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
       - Architecture: developer-guide/architecture.md
+      - PDF generation: developer-guide/pdf_generation.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
       - Running Locally: developer-guide/running_locally.md
       - Tech Stack: developer-guide/tech_stack.md
