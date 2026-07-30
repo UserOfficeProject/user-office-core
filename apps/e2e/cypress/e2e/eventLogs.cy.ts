@@ -112,12 +112,12 @@ context('Event log tests', () => {
         .find('button[aria-label="Edit user"]')
         .click();
 
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+      cy.get('.MuiTabs-list > #horizontal-tab-1').click();
       cy.get('[data-cy="add-role-button"]').click();
       cy.get('input[type="checkbox"]').eq(1).check();
       cy.get('[data-cy="assign-role-to-user"]').click();
 
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-0').click();
+      cy.get('.MuiTabs-list > #horizontal-tab-0').click();
       cy.get('[data-cy="impersonate-user-button"]').click();
 
       cy.get('[data-cy="profile-page-btn"]').click();
@@ -126,11 +126,11 @@ context('Event log tests', () => {
 
       cy.get('[href="/Faps"]').click();
       cy.get('[aria-label="Edit"]').click();
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+      cy.get('.MuiTabs-list > #horizontal-tab-1').click();
       cy.get('[data-cy="add-participant-button"]').click();
       cy.get('input[type="checkbox"]').eq(0).check();
       cy.get('[data-cy="assign-selected-users"]').click();
-      cy.get('.MuiTabs-flexContainer > #horizontal-tab-8').click();
+      cy.get('.MuiTabs-list > #horizontal-tab-8').click();
       cy.contains('userId:2 impersonating userId:1');
     });
   });

@@ -168,7 +168,11 @@ const FormikUIAutocomplete = ({
           }}
         />
       )}
-      ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
+      // Material UI v9 removed `ListboxProps` in favour of `slotProps.listbox`.
+      // Passed the old way it is silently dropped, so the `-options` hook that
+      // every Autocomplete dropdown assertion in the e2e suite relies on never
+      // reached the listbox element.
+      slotProps={{ listbox: { 'data-cy': props['data-cy'] + '-options' } }}
       data-cy={props['data-cy']}
       {...(props.onChange && { onChange: props.onChange })}
     />
