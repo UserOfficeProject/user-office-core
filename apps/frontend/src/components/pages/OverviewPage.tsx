@@ -1,12 +1,14 @@
 import parse from 'html-react-parser';
-import React from 'react';
+import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
 import ProposalTableReader from 'components/proposal/ProposalTableReader';
-import BasicCard from 'components/proposalBooking/BasicCard';
+import ProposalTableUser from 'components/proposal/ProposalTableUser';
+import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
-import { PageName, UserRole } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -27,6 +29,8 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
+  const { featuresMap } = useContext(FeatureContext);
+  const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
 
   let roleBasedOverView = null;
 
@@ -34,7 +38,14 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     case UserRole.USER:
       roleBasedOverView = (
         <>
-          <BasicCard />
+          {isSchedulerEnabled && (
+            <Paper>
+              <UserUpcomingExperimentsTable />
+            </Paper>
+          )}
+          <Paper>
+            <ProposalTableUser />
+          </Paper>
         </>
       );
       break;
