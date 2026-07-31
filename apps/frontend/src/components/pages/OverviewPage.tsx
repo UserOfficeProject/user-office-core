@@ -4,7 +4,8 @@ import React, { useContext } from 'react';
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
 import ProposalTableReader from 'components/proposal/ProposalTableReader';
-import BasicCard from 'components/proposalBooking/BasicCard';
+import ProposalTableUser from 'components/proposal/ProposalTableUser';
+import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
@@ -37,7 +38,14 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     case UserRole.USER:
       roleBasedOverView = (
         <>
-          <BasicCard />
+          {isSchedulerEnabled && (
+            <Paper>
+              <UserUpcomingExperimentsTable />
+            </Paper>
+          )}
+          <Paper>
+            <ProposalTableUser />
+          </Paper>
         </>
       );
       break;
