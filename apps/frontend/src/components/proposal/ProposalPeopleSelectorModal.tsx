@@ -6,7 +6,7 @@ import {
   CircularProgress,
   DialogContent,
   IconButton,
-  MenuItem,
+  ListItemButton,
   TextField,
   Tooltip,
 } from '@mui/material';
@@ -371,11 +371,21 @@ function ProposalPeopleSelectorModal({
               }}
             />
           )}
-          renderOption={(props, option) => (
-            <MenuItem {...props} key={getOptionKey(option)}>
-              {getOptionLabel(option)}
-            </MenuItem>
-          )}
+          renderOption={(props, option) => {
+            // Must not be a MenuItem. Material UI v9 makes MenuItem throw
+            // ("MenuListContext is missing") when rendered outside a Menu or
+            // MenuList, and Autocomplete renders its listbox as a plain <ul>.
+            // `props` already carries the correct role, id and event handlers.
+            return (
+              <ListItemButton
+                {...props}
+                component="li"
+                key={getOptionKey(option)}
+              >
+                {getOptionLabel(option)}
+              </ListItemButton>
+            );
+          }}
           noOptionsText={
             !isLoading ? (
               <NoOptionsText
