@@ -73,7 +73,9 @@ export const QuestionTemplateRelationIntervalForm = (
                 Label={{
                   label: 'Is required',
                 }}
-                InputProps={{ 'data-cy': 'required' }}
+                slotProps={{
+                  input: { 'data-cy': 'required' },
+                }}
               />
 
               <Autocomplete

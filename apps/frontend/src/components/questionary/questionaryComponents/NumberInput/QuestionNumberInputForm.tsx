@@ -141,7 +141,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               Label={{
                 label: 'Is required',
               }}
-              InputProps={{ 'data-cy': 'required' }}
+              slotProps={{
+                input: { 'data-cy': 'required' },
+              }}
             />
             <FormControl fullWidth>
               <Autocomplete
@@ -253,7 +255,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 Label={{
                   label: 'Minimum is inclusive',
                 }}
-                inputProps={{ 'data-cy': 'numberMinInclusive' }}
+                slotProps={{
+                  input: { 'data-cy': 'numberMinInclusive' },
+                }}
               />
             )}
             <Field
@@ -285,7 +289,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 Label={{
                   label: 'Maximum is inclusive',
                 }}
-                inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+                slotProps={{
+                  input: { 'data-cy': 'numberMaxInclusive' },
+                }}
               />
             )}
           </TitledContainer>

@@ -100,7 +100,9 @@ export const QuestionTemplateRelationNumberForm = (
                 Label={{
                   label: 'Is required',
                 }}
-                InputProps={{ 'data-cy': 'required' }}
+                slotProps={{
+                  input: { 'data-cy': 'required' },
+                }}
               />
 
               <Autocomplete
@@ -182,7 +184,9 @@ export const QuestionTemplateRelationNumberForm = (
                   Label={{
                     label: 'Minimum is inclusive',
                   }}
-                  inputProps={{ 'data-cy': 'numberMinInclusive' }}
+                  slotProps={{
+                    input: { 'data-cy': 'numberMinInclusive' },
+                  }}
                 />
               )}
               <Field
@@ -218,7 +222,9 @@ export const QuestionTemplateRelationNumberForm = (
                   Label={{
                     label: 'Maximum is inclusive',
                   }}
-                  inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+                  slotProps={{
+                    input: { 'data-cy': 'numberMaxInclusive' },
+                  }}
                 />
               )}
             </TitledContainer>

@@ -131,7 +131,6 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 id="customGradeGuide"
                 name="customGradeGuide"
                 component={CheckboxWithLabel}
-                inputProps={{ 'aria-label': 'primary checkbox' }}
                 type="checkbox"
                 checked={values.customGradeGuide}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +142,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }}
                 data-cy="custom-grade-guide"
                 disabled={!hasAccessRights || isExecutingCall}
+                slotProps={{
+                  input: { 'aria-label': 'primary checkbox' },
+                }}
               />
             </Grid>
             <Grid
