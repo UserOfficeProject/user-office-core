@@ -168,9 +168,11 @@ const FormikUIAutocomplete = ({
           }}
         />
       )}
-      ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
       data-cy={props['data-cy']}
       {...(props.onChange && { onChange: props.onChange })}
+      slotProps={{
+        listbox: { 'data-cy': props['data-cy'] + '-options' },
+      }}
     />
   );
 };
