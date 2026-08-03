@@ -96,10 +96,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           data-cy="title"
           margin="dense"
           id="title-input"
-          InputLabelProps={{
-            shrink: true,
-          }}
           slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+
             htmlInput: {
               onChange: (event: ChangeEvent<HTMLInputElement>) =>
                 setLocalTitle(event.target.value),
@@ -124,15 +125,16 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           data-cy="abstract"
           margin="dense"
           id="abstract-input"
-          InputLabelProps={{
-            shrink: true,
-          }}
           helperText={
             hasInvalidChars
               ? 'Non-printable characters have been removed from your input.'
               : 'Only printable ASCII characters are allowed.'
           }
           slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+
             htmlInput: {
               onChange: (event: ChangeEvent<HTMLInputElement>) => {
                 const value = event.target.value;
