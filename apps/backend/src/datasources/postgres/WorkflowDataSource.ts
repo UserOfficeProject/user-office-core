@@ -15,6 +15,7 @@ import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
   StatusChangingEventRecord,
+  WorkflowConnectionHasActionsRecord,
   WorkflowConnectionRecord,
   WorkflowRecord,
   WorkflowStatusRecord,
@@ -176,6 +177,163 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         return this.createWorkflowObject(workflows[0]);
       });
   }
+
+  async cloneWorkflow(workflowId: number): Promise<Workflow> {
+    return database.transaction(async (trx) => {
+      // fetch source workflow
+      const sourceWorkflow: WorkflowRecord | undefined = await trx
+        .select('*')
+        .from('workflows')
+        .where('workflow_id', workflowId)
+        .first();
+
+      if (!sourceWorkflow) {
+        throw new GraphQLError(
+          `Could not find workflow with id: ${workflowId}`
+        );
+      }
+
+      // create new cloned workflow
+      const clonedName = `Copy of ${sourceWorkflow.name}`;
+      const [newWorkflowRecord]: WorkflowRecord[] = await trx
+        .insert({
+          name: clonedName,
+          description: sourceWorkflow.description,
+          entity_type: sourceWorkflow.entity_type,
+          connection_line_type: sourceWorkflow.connection_line_type,
+        })
+        .into('workflows')
+        .returning('*');
+
+      if (!newWorkflowRecord) {
+        throw new GraphQLError('Could not create cloned workflow');
+      }
+
+      const newWorkflowId = newWorkflowRecord.workflow_id;
+
+      // clone workflow statuses and build status mapping
+      const sourceStatuses: WorkflowStatusRecord[] = await trx
+        .select('*')
+        .from('workflow_has_statuses')
+        .where('workflow_id', workflowId);
+
+      const statusIdMap = new Map<number, number>();
+
+      for (const status of sourceStatuses) {
+        const [newStatus]: WorkflowStatusRecord[] = await trx
+          .insert({
+            workflow_id: newWorkflowId,
+            status_id: status.status_id,
+            pos_x: status.pos_x,
+            pos_y: status.pos_y,
+          })
+          .into('workflow_has_statuses')
+          .returning('*');
+
+        if (newStatus) {
+          statusIdMap.set(
+            status.workflow_status_id,
+            newStatus.workflow_status_id
+          );
+        }
+      }
+
+      // clone workflow connections and build connection mapping
+      const sourceConnections: WorkflowConnectionRecord[] = await trx
+        .select('*')
+        .from('workflow_status_connections')
+        .where('workflow_id', workflowId);
+
+      const connectionIdMap = new Map<number, number>();
+
+      for (const connection of sourceConnections) {
+        const newPrevStatusId = statusIdMap.get(
+          connection.prev_workflow_status_id
+        );
+        const newNextStatusId = statusIdMap.get(
+          connection.next_workflow_status_id
+        );
+
+        if (newPrevStatusId === undefined || newNextStatusId === undefined) {
+          throw new GraphQLError(
+            `Could not find cloned status mapping for connection Id ${connection.workflow_status_connection_id} ` +
+              `(previous status Id: ${connection.prev_workflow_status_id}, next status Id: ${connection.next_workflow_status_id}).`
+          );
+        }
+
+        const [newConnection]: WorkflowConnectionRecord[] = await trx
+          .insert({
+            workflow_id: newWorkflowId,
+            prev_workflow_status_id: newPrevStatusId,
+            next_workflow_status_id: newNextStatusId,
+            source_handle: connection.source_handle,
+            target_handle: connection.target_handle,
+          })
+          .into('workflow_status_connections')
+          .returning('*');
+
+        if (newConnection) {
+          connectionIdMap.set(
+            connection.workflow_status_connection_id,
+            newConnection.workflow_status_connection_id
+          );
+        }
+      }
+
+      // clone status changing events based on connections
+      if (sourceConnections.length > 0) {
+        const sourceConnectionIds = sourceConnections.map(
+          (c) => c.workflow_status_connection_id
+        );
+
+        const sourceEvents: StatusChangingEventRecord[] = await trx
+          .select('*')
+          .from('workflow_status_connection_has_events')
+          .whereIn('workflow_status_connection_id', sourceConnectionIds);
+
+        for (const event of sourceEvents) {
+          const newConnectionId = connectionIdMap.get(
+            Number(event.workflow_status_connection_id)
+          );
+
+          if (newConnectionId !== undefined) {
+            await trx
+              .insert({
+                workflow_status_connection_id: newConnectionId,
+                status_changing_event: event.status_changing_event,
+              })
+              .into('workflow_status_connection_has_events');
+          }
+        }
+
+        // clone status actions based on connections
+        const sourceActions: WorkflowConnectionHasActionsRecord[] = await trx
+          .select('*')
+          .from('workflow_status_connection_has_actions')
+          .whereIn('workflow_status_connection_id', sourceConnectionIds);
+
+        for (const action of sourceActions) {
+          const newConnectionId = connectionIdMap.get(
+            action.workflow_status_connection_id
+          );
+
+          if (newConnectionId !== undefined) {
+            await trx
+              .insert({
+                workflow_status_connection_id: newConnectionId,
+                workflow_status_action_id: action.workflow_status_action_id,
+                workflow_id: newWorkflowId,
+                config: action.config,
+              })
+              .into('workflow_status_connection_has_actions');
+          }
+        }
+      }
+
+      return this.createWorkflowObject(newWorkflowRecord);
+    });
+  }
+
   async getWorkflowConnections(
     workflowId: number
   ): Promise<WorkflowConnection[]> {
