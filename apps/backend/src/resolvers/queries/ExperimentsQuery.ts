@@ -11,7 +11,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ExperimentStatus } from '../../models/Experiment';
+import {
+  ExperimentStatus,
+  ExperimentTableSortField,
+} from '../../models/Experiment';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { Experiment } from '../types/Experiment';
 
@@ -59,8 +62,8 @@ export class ExperimentsArgs {
   @Field(() => Int, { nullable: true })
   public offset?: number;
 
-  @Field({ nullable: true })
-  public sortField?: string;
+  @Field(() => ExperimentTableSortField, { nullable: true })
+  public sortField?: ExperimentTableSortField;
 
   @Field(() => PaginationSortDirection, { nullable: true })
   public sortDirection?: PaginationSortDirection;
