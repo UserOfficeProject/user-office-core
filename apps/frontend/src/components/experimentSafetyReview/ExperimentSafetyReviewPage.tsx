@@ -74,13 +74,14 @@ function ExperimentSafetyReviewDialog(props: {
                 label="Status"
                 select
                 component={TextField}
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 fullWidth
                 required={true}
                 disabled={isSubmitting}
                 slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+
                   input: { 'data-cy': 'safety-status' },
                 }}
               >
