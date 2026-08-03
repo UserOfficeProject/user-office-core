@@ -1682,6 +1682,10 @@ context('Technique Proposal tests', () => {
     });
 
     it('Scientist should be able to add a rejection comment when changing status to unsuccessful', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      });
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
@@ -1709,6 +1713,10 @@ context('Technique Proposal tests', () => {
     });
 
     it('Scientist should be able to not add a rejection comment when changing status to unsuccessful', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      });
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
