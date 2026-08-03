@@ -86,7 +86,9 @@ export const QuestionTemplateRelationDateForm = (
               Label={{
                 label: 'Include time',
               }}
-              inputProps={{ 'data-cy': 'includeTime' }}
+              slotProps={{
+                input: { 'data-cy': 'includeTime' },
+              }}
             />
             <Field
               name="config.tooltip"
