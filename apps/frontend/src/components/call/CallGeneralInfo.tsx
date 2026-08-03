@@ -251,10 +251,12 @@ const CallGeneralInfo = ({
         id="short-code-input"
         type="text"
         component={TextField}
-        inputProps={{ maxLength: '20' }}
         fullWidth
         required
         data-cy="short-code"
+        slotProps={{
+          htmlInput: { maxLength: '20' },
+        }}
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
@@ -541,8 +543,10 @@ const CallGeneralInfo = ({
         type="text"
         component={TextField}
         fullWidth
-        inputProps={{ maxLength: '100' }}
         data-cy="title"
+        slotProps={{
+          htmlInput: { maxLength: '100' },
+        }}
       />
       <Field
         name="description"
