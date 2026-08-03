@@ -1,7 +1,6 @@
 import {
   addNextStatusEventsValidationSchema,
   addStatusActionsToConnectionValidationSchema,
-  cloneWorkflowValidationSchema,
   createWorkflowValidationSchema,
   deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
@@ -77,7 +76,7 @@ export default class WorkflowMutations {
     });
   }
 
-  @ValidateArgs(cloneWorkflowValidationSchema)
+  @ValidateArgs(createWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async cloneWorkflow(
     agent: UserWithRole | null,
