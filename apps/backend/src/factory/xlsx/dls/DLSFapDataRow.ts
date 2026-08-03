@@ -65,8 +65,8 @@ export function callFapDLSPopulateRow(
   return [
     ...populateDLSRow(row),
     nullFieldHelper(row.fapMeetingDecision),
-    nullFieldHelper(row.fapMeetingInComment),
     nullFieldHelper(row.fapMeetingExComment),
+    nullFieldHelper(row.fapMeetingInComment),
     nullFieldHelper(row.instrumentRequestedTime),
   ].concat(row.reviews ? row.reviews.flatMap((review) => review) : []);
 }

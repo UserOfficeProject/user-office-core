@@ -5,7 +5,7 @@ export const DLSFapDataColumns = [
   'Institution',
   'Instrument',
   'Instrument available Time',
-  'TA Recommended Time',
+  'Technical Review Recommended Time',
   'FAP Recommended Time',
   'Average Score',
   'Current Rank',
