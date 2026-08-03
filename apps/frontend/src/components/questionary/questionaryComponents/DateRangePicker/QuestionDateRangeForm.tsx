@@ -10,7 +10,6 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-//This defines what the UI shows when adding this question parent template
 export const QuestionDateForm = (props: QuestionFormProps) => {
   const field = props.question;
 

@@ -11,7 +11,6 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-//This defines what the user looks at when they create this question. It is the instanciation (child)
 export const QuestionTemplateRelationDateForm = (
   props: QuestionTemplateRelationFormProps
 ) => {

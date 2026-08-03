@@ -78,8 +78,9 @@ const StyledPickerWrapper = styled('div')(({ theme }) => ({
   },
 
   '.rdp-range_end .rdp-day_button': {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.common.white,
+    color: `${theme.palette.primary.main} !important`,
+    border: `2px solid ${theme.palette.primary.main}`,
     borderRadius: '50%',
   },
 
@@ -92,7 +93,6 @@ const StyledPickerWrapper = styled('div')(({ theme }) => ({
   },
 }));
 
-//This is what appears to the user when filling in this question type
 export function QuestionaryComponentDateRangePicker(
   props: BasicComponentProps
 ) {
