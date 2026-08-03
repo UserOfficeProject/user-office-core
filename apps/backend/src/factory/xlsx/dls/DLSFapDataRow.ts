@@ -43,7 +43,7 @@ export async function getDLSDataRow(
   };
 }
 
-export function populateDLSRow(row: DLSFapRowObj): (string | number)[] {
+export function populateDLSRow(row: RowObj): (string | number)[] {
   return [
     nullFieldHelper(row.propShortCode),
     nullFieldHelper(row.propTitle),
