@@ -34,7 +34,6 @@ const CallCycleInfo = () => {
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
@@ -51,7 +50,6 @@ const CallCycleInfo = () => {
           minDate={startNotify}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
@@ -66,7 +64,6 @@ const CallCycleInfo = () => {
           format={dateFormat}
           ampm={false}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -84,7 +81,6 @@ const CallCycleInfo = () => {
           ampm={false}
           minDate={startCycle}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
