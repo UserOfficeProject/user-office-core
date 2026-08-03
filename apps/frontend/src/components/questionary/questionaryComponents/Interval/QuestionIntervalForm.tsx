@@ -84,7 +84,9 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
               Label={{
                 label: 'Is required',
               }}
-              InputProps={{ 'data-cy': 'required' }}
+              slotProps={{
+                input: { 'data-cy': 'required' },
+              }}
             />
 
             <Autocomplete
