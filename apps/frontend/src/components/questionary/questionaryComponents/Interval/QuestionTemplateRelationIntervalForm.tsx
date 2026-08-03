@@ -61,7 +61,9 @@ export const QuestionTemplateRelationIntervalForm = (
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'small-label' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'small-label' },
+              }}
             />
             <TitledContainer label="Constraints">
               <Field

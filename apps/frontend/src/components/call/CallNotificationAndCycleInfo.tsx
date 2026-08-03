@@ -104,7 +104,9 @@ const CallCycleInfo = () => {
         required
         fullWidth
         data-cy="cycle-comment"
-        inputProps={{ maxLength: '100' }}
+        slotProps={{
+          htmlInput: { maxLength: '100' },
+        }}
       />
       <Field
         name="submissionMessage"
