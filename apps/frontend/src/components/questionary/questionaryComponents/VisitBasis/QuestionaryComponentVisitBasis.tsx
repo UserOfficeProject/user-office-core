@@ -43,7 +43,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         label="Visit start"
         format={format}
         component={DatePicker}
-        inputProps={{ placeholder: format }}
         variant="inline"
         disableToolbar
         autoOk={true}
@@ -68,7 +67,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         label="Visit end"
         format={format}
         component={DatePicker}
-        inputProps={{ placeholder: format }}
         variant="inline"
         disableToolbar
         autoOk={true}
