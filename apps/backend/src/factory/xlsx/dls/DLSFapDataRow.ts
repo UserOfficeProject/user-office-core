@@ -52,7 +52,7 @@ export function populateDLSRow(row: DLSFapRowObj): (string | number)[] {
     nullFieldHelper(row.instrName),
     nullFieldHelper(row.instrAvailTime),
     nullFieldHelper(row.techReviewTimeAllocation),
-    nullFieldHelper(row.fapTimeAllocation ?? row.techReviewTimeAllocation),
+    nullFieldHelper(row.fapTimeAllocation),
     nullFieldHelper(row.propReviewAvgScore),
     nullFieldHelper(row.propFapRankOrder),
     nullFieldHelper(row.inAvailZone),
