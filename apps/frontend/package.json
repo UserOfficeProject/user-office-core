@@ -24,7 +24,7 @@
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
     "@mui/system": "^9.2.0",
-    "@mui/x-date-pickers": "^9.9.0",
+    "@mui/x-date-pickers": "^9.10.1",
     "@tinymce/tinymce-react": "^6.3.0",
     "@types/mime": "^2.0.3",
     "@uiw/react-codemirror": "^4.22.1",
