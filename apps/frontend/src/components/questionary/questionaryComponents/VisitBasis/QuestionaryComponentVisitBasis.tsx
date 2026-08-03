@@ -52,9 +52,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         textField={{
           fullWidth: true,
           required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
+          slotProps: { inputLabel: { shrink: true } },
         }}
         onChange={(startsAt: DateTime) => {
           dispatch({
@@ -79,9 +77,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         textField={{
           fullWidth: true,
           required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
+          slotProps: { inputLabel: { shrink: true } },
         }}
         onChange={(endsAt: DateTime) => {
           dispatch({
