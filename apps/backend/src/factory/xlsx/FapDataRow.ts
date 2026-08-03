@@ -45,9 +45,9 @@ export function getDataRow({
     instrAvailTime: instrumentAvailabilityTime,
     techReviewTimeAllocation: techReviewTimeAllocation,
     techReviewComment: technicalReviewComment,
-    fapTimeAllocation: fapTimeAllocation ?? null,
-    propReviewAvgScore: proposalAverageScore ?? 0,
-    propFapRankOrder: propFapRankOrder ?? null,
+    fapTimeAllocation: fapTimeAllocation,
+    propReviewAvgScore: proposalAverageScore,
+    propFapRankOrder: propFapRankOrder,
     inAvailZone: null,
   };
 }
