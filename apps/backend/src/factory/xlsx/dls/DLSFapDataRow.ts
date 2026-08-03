@@ -24,7 +24,7 @@ export async function getDLSDataRow(
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const pi = proposerId
+  const principleInvestigator = proposerId
     ? await userDataSource.getBasicUserInfo(proposerId)
     : null;
 
@@ -38,7 +38,7 @@ export async function getDLSDataRow(
 
   return {
     ...getDataRow(input),
-    piOrg: pi?.institution,
+    piOrg: principleInvestigator?.institution,
     instrumentRequestedTime,
   };
 }
