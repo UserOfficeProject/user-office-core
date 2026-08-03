@@ -49,7 +49,6 @@ const CallReviewAndNotification = () => {
           format={dateFormat}
           ampm={false}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -67,7 +66,6 @@ const CallReviewAndNotification = () => {
           ampm={false}
           minDate={startReview}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -84,7 +82,6 @@ const CallReviewAndNotification = () => {
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
           }}
@@ -99,7 +96,6 @@ const CallReviewAndNotification = () => {
           allowSameDateSelection
           minDate={startFapReview}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
           }}
