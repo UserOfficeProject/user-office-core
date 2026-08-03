@@ -47,7 +47,6 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           label={question}
           format={format}
           component={component}
-          inputProps={{ placeholder: format }}
           ampm={false}
           onChange={(date: DateTime) =>
             date &&
