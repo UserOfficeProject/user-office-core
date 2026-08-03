@@ -66,9 +66,11 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
             type="text"
             component={TextField}
             fullWidth
-            InputProps={{ 'data-cy': 'unit-id' }}
             disabled={isExecutingCall}
             required
+            slotProps={{
+              input: { 'data-cy': 'unit-id' },
+            }}
           />
 
           <Field
@@ -77,9 +79,11 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
             type="text"
             component={TextField}
             fullWidth
-            InputProps={{ 'data-cy': 'unit-name' }}
             disabled={isExecutingCall}
             required
+            slotProps={{
+              input: { 'data-cy': 'unit-name' },
+            }}
           />
           <FormikUIAutocomplete
             name="quantity"
@@ -96,9 +100,11 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
             type="text"
             component={TextField}
             fullWidth
-            InputProps={{ 'data-cy': 'unit-symbol' }}
             disabled={isExecutingCall}
             required
+            slotProps={{
+              input: { 'data-cy': 'unit-symbol' },
+            }}
           />
           <Field
             name="siConversionFormula"
@@ -106,9 +112,11 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
             type="text"
             component={TextField}
             fullWidth
-            InputProps={{ 'data-cy': 'unit-siConversionFormula' }}
             disabled={isExecutingCall}
             required
+            slotProps={{
+              input: { 'data-cy': 'unit-siConversionFormula' },
+            }}
           />
           <Button
             type="submit"
