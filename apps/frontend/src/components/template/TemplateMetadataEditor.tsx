@@ -115,7 +115,9 @@ export function TemplateMetadataEditor(props: {
             value={values.name}
             onChange={handleChange}
             fullWidth
-            InputProps={{ 'data-cy': 'template-name' }}
+            slotProps={{
+              input: { 'data-cy': 'template-name' },
+            }}
           />
 
           <Field
@@ -128,7 +130,9 @@ export function TemplateMetadataEditor(props: {
             value={values.description}
             onChange={handleChange}
             fullWidth
-            InputProps={{ 'data-cy': 'template-description' }}
+            slotProps={{
+              input: { 'data-cy': 'template-description' },
+            }}
           />
           <ActionButtonContainer sx={{ margin: `${theme.spacing(1)} 0 0 0` }}>
             <IconButton
