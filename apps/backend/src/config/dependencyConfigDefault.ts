@@ -32,7 +32,6 @@ import PostgresPredefinedMessageDataSource from '../datasources/postgres/Predefi
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/ProposalPdfTemplateDataSource';
-import PostgresProposalRejectionCommentsDataSource from '../datasources/postgres/ProposalRejectionCommentsDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
@@ -99,10 +98,6 @@ mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSource
-);
-mapClass(
-  Tokens.ProposalRejectionCommentsDataSource,
-  PostgresProposalRejectionCommentsDataSource
 );
 mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);

@@ -22,7 +22,6 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import ProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
-import ProposalRejectionCommentsDataSource from '../datasources/postgres/ProposalRejectionCommentsDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -82,9 +81,7 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.WorkflowDataSource)
-    private workflowDataSource: WorkflowDataSource,
-    @inject(Tokens.ProposalRejectionCommentsDataSource)
-    private ProposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource
+    private workflowDataSource: WorkflowDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -507,7 +504,7 @@ export default class ProposalMutations {
     }
 
     return await this.proposalInternalCommentsDataSource
-      .create(args)
+      .createInternalComment(args)
       .catch((error) => {
         return rejection(
           'Could not create proposal scientist comment',
@@ -534,15 +531,15 @@ export default class ProposalMutations {
       );
     }
 
-    return await this.ProposalRejectionCommentsDataSource.create(args).catch(
-      (error) => {
+    return await this.proposalInternalCommentsDataSource
+      .createRejectionComment(args)
+      .catch((error) => {
         return rejection(
           'Could not create proposal rejection comment',
           { agent, args: args },
           error
         );
-      }
-    );
+      });
   }
 
   @ValidateArgs(updateProposalScientistCommentValidationSchema)
@@ -552,7 +549,7 @@ export default class ProposalMutations {
     args: UpdateProposalScientistCommentArgs
   ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
-      .update(args)
+      .updateInternalComment(args)
       .catch((error) => {
         return rejection(
           `Could not update proposal scientist comment: '${args.commentId}'`,

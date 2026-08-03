@@ -9,7 +9,7 @@ import { FapDataSource } from '../../../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../../../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
-import { ProposalRejectionCommentsDataSource } from '../../../datasources/ProposalRejectionCommentsDataSource';
+import { ProposalInternalCommentsDataSource } from '../../../datasources/ProposalInternalCommentsDataSource';
 import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
 import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
@@ -159,8 +159,8 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const templateDataSource: TemplateDataSource = container.resolve(
     Tokens.TemplateDataSource
   );
-  const ProposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource =
-    container.resolve(Tokens.ProposalRejectionCommentsDataSource);
+  const proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource =
+    container.resolve(Tokens.ProposalInternalCommentsDataSource);
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -192,7 +192,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposal.questionaryId
         );
         const proposalRejectionComment =
-          await ProposalRejectionCommentsDataSource.getProposalRejectionComment(
+          await proposalInternalCommentsDataSource.getProposalRejectionComment(
             proposal.primaryKey
           );
         const templateId = questionary ? questionary?.templateId : -1;

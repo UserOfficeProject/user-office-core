@@ -8,7 +8,6 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import TagDataSource from '../datasources/postgres/TagDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
-import { ProposalRejectionCommentsDataSource } from '../datasources/ProposalRejectionCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -35,9 +34,7 @@ export default class ProposalQueries {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
-    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource,
-    @inject(Tokens.ProposalRejectionCommentsDataSource)
-    public proposalRejectionCommentsDataSource: ProposalRejectionCommentsDataSource
+    @inject(Tokens.TagDataSource) public tagDataSource: TagDataSource
   ) {}
 
   @Authorized()
@@ -212,7 +209,7 @@ export default class ProposalQueries {
     agent: UserWithRole | null,
     proposalPk: number
   ) {
-    return await this.proposalRejectionCommentsDataSource
+    return await this.proposalInternalCommentsDataSource
       .getProposalRejectionComment(proposalPk)
       .catch((error) => {
         return rejection(
