@@ -77,10 +77,12 @@ function ExperimentSafetyReviewDialog(props: {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                InputProps={{ 'data-cy': 'safety-status' }}
                 fullWidth
                 required={true}
                 disabled={isSubmitting}
+                slotProps={{
+                  input: { 'data-cy': 'safety-status' },
+                }}
               >
                 <MenuItem
                   key={SampleStatus.PENDING_EVALUATION}
@@ -138,10 +140,12 @@ function ExperimentSafetyReviewDialog(props: {
                 multiline
                 fullWidth
                 disabled={isSubmitting}
-                InputProps={{
-                  minRows: 4,
-                  maxRows: 10,
-                  'data-cy': 'safety-comment',
+                slotProps={{
+                  input: {
+                    minRows: 4,
+                    maxRows: 10,
+                    'data-cy': 'safety-comment',
+                  },
                 }}
               />
 

@@ -148,9 +148,11 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                 component={TextField}
                 fullWidth
                 required
-                InputProps={{ inputProps: { min: 0 } }}
                 data-cy="max_files"
                 helperText="Use 0 for unlimited files"
+                slotProps={{
+                  input: { inputProps: { min: 0 } },
+                }}
               />
               {fileType.includes('.pdf') && (
                 <Field
@@ -161,9 +163,11 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                   component={TextField}
                   fullWidth
                   required
-                  InputProps={{ inputProps: { min: 0 } }}
                   data-cy="pdf_page_limit"
                   helperText="Use 0 for unlimited pages"
+                  slotProps={{
+                    input: { inputProps: { min: 0 } },
+                  }}
                 />
               )}
             </TitledContainer>

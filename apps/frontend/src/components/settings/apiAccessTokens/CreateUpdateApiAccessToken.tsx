@@ -343,24 +343,26 @@ const CreateUpdateApiAccessToken = ({
               },
             }}
             fullWidth
-            InputProps={{
-              endAdornment: values.accessToken && (
-                <>
-                  <Tooltip title="Copy">
-                    <IconButton
-                      edge="start"
-                      onClick={() =>
-                        navigator.clipboard.writeText(values.accessToken)
-                      }
-                    >
-                      <FileCopyIcon />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              ),
-            }}
             data-cy="accessToken"
             disabled
+            slotProps={{
+              input: {
+                endAdornment: values.accessToken && (
+                  <>
+                    <Tooltip title="Copy">
+                      <IconButton
+                        edge="start"
+                        onClick={() =>
+                          navigator.clipboard.writeText(values.accessToken)
+                        }
+                      >
+                        <FileCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+              },
+            }}
           />
           <Grid
             container
