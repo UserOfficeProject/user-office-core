@@ -161,19 +161,21 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                             });
                           }
                         }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              {instrument?.name}:
-                            </InputAdornment>
-                          ),
-                          inputProps: { min: 0, max: 1e5 },
-                        }}
                         fullWidth
                         autoComplete="off"
                         data-cy={`managementTimeAllocation-${instrument?.id}`}
                         disabled={!isUserOfficer || isSubmitting}
                         required
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                {instrument?.name}:
+                              </InputAdornment>
+                            ),
+                            inputProps: { min: 0, max: 1e5 },
+                          },
+                        }}
                       />
                     ))
                   }
