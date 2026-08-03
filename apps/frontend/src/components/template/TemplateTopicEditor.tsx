@@ -126,7 +126,6 @@ export default function QuestionaryEditorTopic(props: {
                 name="title"
                 id="title"
                 type="text"
-                inputProps={{ maxLength: '32' }}
                 component={TextField}
                 sx={{ margin: '3px 8px', flex: 1 }}
                 value={values.title}
@@ -149,6 +148,9 @@ export default function QuestionaryEditorTopic(props: {
                   if (e.key === 'Enter') {
                     e.currentTarget.blur();
                   }
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: '32' },
                 }}
               />
               <IconButton
