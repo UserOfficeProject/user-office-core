@@ -1695,6 +1695,10 @@ context('Technique Proposal tests', () => {
 
       cy.contains(proposal1.title)
         .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
         .should('contain', unsuccessfulStatus.name)
         .click();
 
@@ -1726,6 +1730,10 @@ context('Technique Proposal tests', () => {
 
       cy.contains(proposal1.title)
         .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
         .should('contain', unsuccessfulStatus.name)
         .click();
       cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
