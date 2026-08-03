@@ -266,7 +266,6 @@ const CallGeneralInfo = ({
           format={dateTimeFormat}
           ampm={false}
           component={DayTimeRangePicker}
-          inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -519,7 +518,6 @@ const CallGeneralInfo = ({
             ampm={false}
             allowSameDateSelection
             component={DateTimePicker}
-            inputProps={{ placeholder: dateTimeFormat }}
             textField={{
               fullWidth: true,
               required: true,
