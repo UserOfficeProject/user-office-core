@@ -131,7 +131,6 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
               id="Min-input"
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="number"
-              inputProps={{ min: 0 }}
               component={TextField}
               fullWidth
               data-cy="min-entries"
@@ -146,13 +145,15 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                 (formikProps.values.config as SampleDeclarationConfig)
                   .minEntries ?? ''
               }
+              slotProps={{
+                htmlInput: { min: 0 },
+              }}
             />
             <Field
               name="config.maxEntries"
               label="Max entries"
               id="Max-input"
               type="number"
-              inputProps={{ min: 1 }}
               component={TextField}
               fullWidth
               data-cy="max-entries"
@@ -167,6 +168,9 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                 (formikProps.values.config as SampleDeclarationConfig)
                   .maxEntries ?? ''
               }
+              slotProps={{
+                htmlInput: { min: 1 },
+              }}
             />
           </TitledContainer>
           <TitledContainer label="Dependencies">

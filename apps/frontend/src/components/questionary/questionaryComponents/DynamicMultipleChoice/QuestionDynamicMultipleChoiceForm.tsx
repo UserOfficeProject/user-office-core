@@ -181,7 +181,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -190,7 +192,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
 
           <TitledContainer label="Constraints">
@@ -266,7 +270,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                   type="text"
                   component={TextField}
                   fullWidth
-                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                  slotProps={{
+                    htmlInput: { 'data-cy': 'dynamic-url' },
+                  }}
                 />
               </div>
               <div style={{ display: 'flex' }}>
@@ -340,7 +346,6 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                 type="text"
                 component={TextField}
                 fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -457,6 +462,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                       </Dialog>
                     </InputAdornment>
                   ),
+                }}
+                slotProps={{
+                  htmlInput: { 'data-cy': 'dynamic-url-jsonPath' },
                 }}
               />
             </FormControl>
