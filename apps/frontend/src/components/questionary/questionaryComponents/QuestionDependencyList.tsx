@@ -148,8 +148,6 @@ const QuestionDependencyList = ({
                       template={template}
                       dependency={dependency}
                       currentQuestionId={currentQuestionId}
-                      fullWidth
-                      inputProps={{ 'data-cy': 'dependencies' }}
                     />
                   </Grid>
                   <Grid size={1}>
