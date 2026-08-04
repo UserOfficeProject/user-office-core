@@ -533,9 +533,9 @@ context('Samples tests', () => {
         .click();
       /* ==== Generated with Cypress Studio ==== */
       cy.get('[data-cy="toggle-edit-proposal"]').click();
-      cy.get(
-        ':nth-child(3) > .MuiButtonBase-root > .MuiStepLabel-root > .MuiStepLabel-labelContainer > .MuiStepLabel-label > span'
-      ).click();
+      cy.get('[data-cy="questionary-stepper"]')
+        .contains('new topic', { matchCase: false })
+        .click();
       cy.get('[data-cy="add-button"]').click();
 
       const newSampleTitle = faker.lorem.words(3);
