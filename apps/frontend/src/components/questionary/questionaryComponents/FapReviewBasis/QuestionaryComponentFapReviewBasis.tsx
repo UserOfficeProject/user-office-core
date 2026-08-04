@@ -25,6 +25,13 @@ import { FapReviewBasisConfig } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 
+// Whole-number grades are always 1 to 10 and do not depend on the config, so
+// the list is built once rather than on every render.
+const WHOLE_NUMBER_GRADES = Array.from({ length: 10 }, (_, i) => ({
+  text: (i + 1).toString(),
+  value: (i + 1).toString(),
+}));
+
 function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const {
     answer: {
@@ -71,8 +78,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
 
-  // A classification, or a whole-number grade, is picked from a list; anything
-  // else is typed into a numeric field.
+  // A classification, or a whole-number grade, is picked from a list;
+  // anything else is typed into a numeric field.
   const isGradePickedFromList =
     gradeType === 'Classification' || config.decimalPoints === 0;
 
@@ -95,6 +102,16 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           },
         },
       };
+
+  // Only the list-backed variants have options; the numeric field has none.
+  const gradeOptions = !isGradePickedFromList
+    ? undefined
+    : gradeType === 'Classification'
+      ? config.nonNumericOptions.map((option) => ({
+          text: option,
+          value: option,
+        }))
+      : WHOLE_NUMBER_GRADES;
 
   return (
     <div>
@@ -188,19 +205,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               {...gradeInputProps}
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
-              options={
-                gradeType === 'Classification'
-                  ? config.nonNumericOptions.map((option) => ({
-                      text: option,
-                      value: option,
-                    }))
-                  : config.decimalPoints === 0
-                    ? [...Array(10)].map((e, i) => ({
-                        text: (i + 1).toString(),
-                        value: (i + 1).toString(),
-                      }))
-                    : undefined
-              }
+              options={gradeOptions}
             />
           </Box>
         </TitledContainer>
