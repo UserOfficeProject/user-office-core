@@ -399,8 +399,9 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Visit start date is required/i).should('exist');
 
-      // NOTE: Fills only the first section so the date stays incomplete and the
-      // required-field validation still fires.
+      // NOTE: Fills only the day section. An incomplete picker reports no value
+      // at all, so the required-field validation still fires. This replaces a
+      // partial free-text date, which the accessible field cannot represent.
       cy.setDatePickerValue('input[name="visit_basis.startsAt"]', '10');
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Visit start date is required/i).should('exist');

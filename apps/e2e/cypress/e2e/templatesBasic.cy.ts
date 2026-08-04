@@ -606,9 +606,9 @@ context('Template Basic tests', () => {
 
       cy.get('[data-cy=question]').clear().type(dateQuestion.title);
 
-      cy.get('[data-cy="minDate"] input').type(minDate);
-      cy.get('[data-cy="maxDate"] input').type(maxDate);
-      cy.get('[data-cy="defaultDate"] input').type(defaultDate);
+      cy.setDatePickerValue('[data-cy="minDate"] input', minDate);
+      cy.setDatePickerValue('[data-cy="maxDate"] input', maxDate);
+      cy.setDatePickerValue('[data-cy="defaultDate"] input', defaultDate);
 
       cy.contains('Save').click();
 
@@ -632,9 +632,9 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="maxDate"] input').should('have.value', maxDate);
       cy.get('[data-cy="defaultDate"] input').should('have.value', defaultDate);
 
-      cy.get('[data-cy="minDate"] input').clear().type(minDate);
-      cy.get('[data-cy="maxDate"] input').clear().type(maxDate);
-      cy.get('[data-cy="defaultDate"] input').clear().type(defaultDate);
+      cy.setDatePickerValue('[data-cy="minDate"] input', minDate);
+      cy.setDatePickerValue('[data-cy="maxDate"] input', maxDate);
+      cy.setDatePickerValue('[data-cy="defaultDate"] input', defaultDate);
 
       cy.contains('Update').click();
 
