@@ -214,7 +214,7 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
-      cy.get('[name="endReview"]').clear();
+      cy.clearDatePickerValue('[name="endReview"]');
 
       cy.get('[data-cy="next-step"]').click();
 
