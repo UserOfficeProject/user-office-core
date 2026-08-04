@@ -137,44 +137,34 @@ export default class PostgresInstrumentDataSource
     offset?: number,
     agentRoleId?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
-    let instruments: InstrumentRecord[];
     const tags = agentRoleId
       ? (await this.getTagsByRoleId(agentRoleId)) ?? []
       : [];
-    if (tags.length > 0) {
-      const tagIds = tags.map((tag) => tag.id);
 
-      instruments = await database
-        .select(['i.*', database.raw('count(*) OVER() AS full_count')])
-        .from('instruments as i')
-        .whereIn('i.instrument_id', function () {
-          this.select('ti.instrument_id')
-            .from('tag_instrument as ti')
-            .whereIn('ti.tag_id', tagIds);
-        })
-        .orderBy('i.instrument_id', 'desc')
-        .modify((query) => {
-          if (first) {
-            query.limit(first);
-          }
-          if (offset) {
-            query.offset(offset);
-          }
-        });
-    } else {
-      instruments = await database
-        .select(['*', database.raw('count(*) OVER() AS full_count')])
-        .from('instruments')
-        .orderBy('instrument_id', 'desc')
-        .modify((query) => {
-          if (first) {
-            query.limit(first);
-          }
-          if (offset) {
-            query.offset(offset);
-          }
-        });
-    }
+    const tagIds = tags.map((tag) => tag.id);
+
+    const instruments: InstrumentRecord[] = await database
+      .select(['i.*', database.raw('count(*) OVER() AS full_count')])
+      .from('instruments as i')
+      .modify((query) => {
+        if (tags.length > 0) {
+          query.whereIn('i.instrument_id', function () {
+            this.select('ti.instrument_id')
+              .from('tag_instrument as ti')
+              .whereIn('ti.tag_id', tagIds);
+          });
+        }
+      })
+      .orderBy('i.instrument_id', 'desc')
+      .modify((query) => {
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      });
+
     const result = instruments.map((instrument) =>
       this.createInstrumentObject(instrument)
     );
