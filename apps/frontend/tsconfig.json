@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
+    // Silences the TS 7 removal warnings for `target`, `moduleResolution` and
+    // `baseUrl`. Remove once those move to es2020 / bundler / `paths`.
+    "ignoreDeprecations": "6.0",
+    // TS 6 stopped including `@types/*` automatically.
+    "types": ["node", "vite/client"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,

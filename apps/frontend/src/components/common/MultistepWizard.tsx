@@ -159,6 +159,6 @@ export const WizardStep = ({
   children,
 }: {
   title: string;
-  validationSchema: Yup.AnyObjectSchema;
+  validationSchema: Yup.ISchema<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   children: React.ReactNode;
 }) => <>{children}</>;
