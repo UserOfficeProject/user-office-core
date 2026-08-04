@@ -159,15 +159,14 @@ export default function ProposalContainer(props: ProposalContainerProps) {
 
   const { submitted, proposalId } = state.proposal;
 
-  let info: JSX.Element | string =
-    (
-      <CopyToClipboard
-        text={proposalId}
-        successMessage={`'${proposalId}' copied to clipboard`}
-      >
-        {proposalId ? `Proposal ID: ${proposalId}` : ''}
-      </CopyToClipboard>
-    ) || 'DRAFT';
+  let info: JSX.Element | string = (
+    <CopyToClipboard
+      text={proposalId}
+      successMessage={`'${proposalId}' copied to clipboard`}
+    >
+      {proposalId ? `Proposal ID: ${proposalId}` : ''}
+    </CopyToClipboard>
+  );
 
   if (!submitted && hasReferenceNumberFormat && proposalId) {
     info = (
