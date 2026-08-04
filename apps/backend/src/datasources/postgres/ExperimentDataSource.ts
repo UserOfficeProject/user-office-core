@@ -735,6 +735,16 @@ export default class PostgresExperimentDataSource
       );
   }
 
+  async getExperimentByVisitId(visitId: number): Promise<Experiment | null> {
+    return database
+      .select('e.*')
+      .from('visits as v')
+      .join('experiments as e', 'v.experiment_pk', 'e.experiment_pk')
+      .where('v.visit_id', visitId)
+      .first()
+      .then((experiment) => createExperimentObject(experiment));
+  }
+
   async getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null> {
