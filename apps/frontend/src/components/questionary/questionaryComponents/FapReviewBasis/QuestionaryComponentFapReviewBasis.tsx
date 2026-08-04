@@ -83,25 +83,15 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const isGradePickedFromList =
     gradeType === 'Classification' || config.decimalPoints === 0;
 
-  // The two components take input attributes by different names. Material UI v9
-  // removed `inputProps` from TextField in favour of `slotProps.htmlInput`
-  // (9.0.0-alpha.4), but left Select on `inputProps`, which is still its
-  // documented API. Passing the wrong one is silent: it lands on the root
-  // FormControl and never reaches the element.
-  const gradeInputProps = isGradePickedFromList
-    ? { inputProps: { id: 'grade-proposal' } }
-    : {
-        slotProps: {
-          htmlInput: {
-            id: 'grade-proposal',
-            step: Math.pow(10, -config.decimalPoints).toString(),
-            inputMode: 'decimal',
-            type: 'number',
-            min: '1',
-            max: '10',
-          },
-        },
-      };
+  const gradeLabel =
+    gradeType === 'Classification' ? 'Classification' : 'Grade';
+
+  const handleGradeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { grade: event.target.value },
+    });
+  };
 
   // Only the list-backed variants have options; the numeric field has none.
   const gradeOptions = !isGradePickedFromList
@@ -183,30 +173,44 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               width: 150,
             }}
           >
-            <Field
-              name={gradeFieldId}
-              label={
-                gradeType === 'Classification' ? 'Classification' : 'Grade'
-              }
-              value={localGrade || ''}
-              component={isGradePickedFromList ? Select : TextField}
-              MenuProps={{ 'data-cy': 'grade-proposal-options' }}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: { grade: event.target.value },
-                });
-              }}
-              formControl={{
-                fullWidth: true,
-                required: true,
-                margin: 'normal',
-              }}
-              {...gradeInputProps}
-              data-cy="grade-proposal"
-              labelId="grade-proposal-label"
-              options={gradeOptions}
-            />
+            {isGradePickedFromList ? (
+              <Field
+                name={gradeFieldId}
+                label={gradeLabel}
+                value={localGrade || ''}
+                component={Select}
+                onChange={handleGradeChange}
+                formControl={{
+                  fullWidth: true,
+                  required: true,
+                  margin: 'normal',
+                }}
+                inputProps={{ id: 'grade-proposal' }}
+                MenuProps={{ 'data-cy': 'grade-proposal-options' }}
+                labelId="grade-proposal-label"
+                options={gradeOptions}
+                data-cy="grade-proposal"
+              />
+            ) : (
+              <Field
+                name={gradeFieldId}
+                label={gradeLabel}
+                value={localGrade || ''}
+                component={TextField}
+                onChange={handleGradeChange}
+                slotProps={{
+                  htmlInput: {
+                    id: 'grade-proposal',
+                    step: Math.pow(10, -config.decimalPoints).toString(),
+                    inputMode: 'decimal',
+                    type: 'number',
+                    min: '1',
+                    max: '10',
+                  },
+                }}
+                data-cy="grade-proposal"
+              />
+            )}
           </Box>
         </TitledContainer>
       </Box>
