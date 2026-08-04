@@ -71,6 +71,31 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
 
+  // A classification, or a whole-number grade, is picked from a list; anything
+  // else is typed into a numeric field.
+  const isGradePickedFromList =
+    gradeType === 'Classification' || config.decimalPoints === 0;
+
+  // The two components take input attributes by different names. Material UI v9
+  // removed `inputProps` from TextField in favour of `slotProps.htmlInput`
+  // (9.0.0-alpha.4), but left Select on `inputProps`, which is still its
+  // documented API. Passing the wrong one is silent: it lands on the root
+  // FormControl and never reaches the element.
+  const gradeInputProps = isGradePickedFromList
+    ? { inputProps: { id: 'grade-proposal' } }
+    : {
+        slotProps: {
+          htmlInput: {
+            id: 'grade-proposal',
+            step: Math.pow(10, -config.decimalPoints).toString(),
+            inputMode: 'decimal',
+            type: 'number',
+            min: '1',
+            max: '10',
+          },
+        },
+      };
+
   return (
     <div>
       <Box sx={{ margin: theme.spacing(2, 0) }}>
@@ -147,11 +172,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                 gradeType === 'Classification' ? 'Classification' : 'Grade'
               }
               value={localGrade || ''}
-              component={
-                gradeType === 'Classification' || config.decimalPoints === 0
-                  ? Select
-                  : TextField
-              }
+              component={isGradePickedFromList ? Select : TextField}
               MenuProps={{ 'data-cy': 'grade-proposal-options' }}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 dispatch({
@@ -164,20 +185,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                 required: true,
                 margin: 'normal',
               }}
-              inputProps={
-                gradeType === 'Classification' || config.decimalPoints === 0
-                  ? {
-                      id: 'grade-proposal',
-                    }
-                  : {
-                      id: 'grade-proposal',
-                      step: Math.pow(10, -config.decimalPoints).toString(),
-                      inputMode: 'decimal',
-                      type: 'number',
-                      min: '1',
-                      max: '10',
-                    }
-              }
+              {...gradeInputProps}
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
               options={
