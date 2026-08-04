@@ -4,6 +4,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable, container } from 'tsyringe';
 
+import { UserAuthorization } from './UserAuthorization';
 import {
   BasicPersonDetailsDTO,
   LoginDTO,
@@ -15,6 +16,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
   StfcBasicPersonDetails,
   toStfcBasicPersonDetails,
+  StfcUserDataSource,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
 import { Institution } from '../models/Institution';
@@ -24,8 +26,6 @@ import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { GetOrCreateInstitutionInput } from '../resolvers/mutations/UpsertUserMutation';
 import { Cache } from '../utils/Cache';
-import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
-import { UserAuthorization } from './UserAuthorization';
 
 const UOWSClient = createUOWSClient();
 

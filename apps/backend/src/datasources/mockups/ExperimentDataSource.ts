@@ -3,6 +3,7 @@ import {
   ExperimentSafety,
   ExperimentHasSample,
   ExperimentStatus,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../../models/Experiment';
@@ -121,7 +122,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
@@ -415,5 +416,22 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     experimentSafety.workflowStatusId = workflowStatusId;
 
     return experimentSafety;
+  }
+
+  async changeExperimentSafetyWorkflowStatus(
+    workflowStatusId: number,
+    experimentSafetyPks: number[]
+  ): Promise<ExperimentSafety[]> {
+    const updatedSafeties: ExperimentSafety[] = [];
+
+    for (const pk of experimentSafetyPks) {
+      const updatedSafety = await this.updateExperimentSafetyStatus(
+        pk,
+        workflowStatusId
+      );
+      updatedSafeties.push(updatedSafety);
+    }
+
+    return updatedSafeties;
   }
 }

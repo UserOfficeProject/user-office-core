@@ -25,6 +25,7 @@ export function createExperimentSafetyStub(
   return {
     experimentSafetyPk: 0,
     experimentPk: 0,
+    workflowStatusId: 0,
     esiQuestionaryId: 0,
     esiQuestionarySubmittedAt: 0,
     createdBy: 0,
@@ -120,7 +121,10 @@ export default function ExperimentSafetyContainer(
   props: ExperimentSafetyContainerProps
 ) {
   const [initialState] = useState(
-    new ExperimentSafetySubmissionState(props.experimentSafety)
+    new ExperimentSafetySubmissionState(
+      props.experimentSafety,
+      props.previewMode
+    )
   );
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL_ESI);
 
