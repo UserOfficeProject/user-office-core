@@ -692,7 +692,7 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="unit-symbol"]').clear().type(numberQuestion);
       cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
       cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
-      cy.get('[data-tag-index=0] > span').should(
+      cy.get('[data-item-index=0] > span').should(
         'include.text',
         numberQuestion
       );

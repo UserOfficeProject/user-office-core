@@ -46,9 +46,6 @@ context('visits tests', () => {
     });
   });
 
-  const startQuestion = 'Visit start';
-  const endQuestion = 'Visit end';
-
   const cyTagDefineVisit = 'define-visit-icon';
   const cyTagRegisterVisit = 'register-visit-icon';
   const cyTagDeclareShipment = 'declare-shipment-icon';
@@ -127,8 +124,8 @@ context('visits tests', () => {
         initialDBData.getFormats().dateFormat
       );
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', startDate);
+      cy.setDatePickerValue('input[name="visit_basis.endsAt"]', endDate);
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.get('[data-cy="submit-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -217,8 +214,8 @@ context('visits tests', () => {
       //click the tab New visit
       cy.get('button').contains('New visit').click({ force: true });
 
-      cy.get('input[name="visit_basis.startsAt"]').clear().type(startDate);
-      cy.get('input[name="visit_basis.endsAt"]').clear().type(endDate);
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', startDate);
+      cy.setDatePickerValue('input[name="visit_basis.endsAt"]', endDate);
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
@@ -402,17 +399,19 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Visit start date is required/i).should('exist');
 
-      cy.contains(startQuestion).parent().click().clear().type('101010');
+      // NOTE: Fills only the first section so the date stays incomplete and the
+      // required-field validation still fires.
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', '10');
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Visit start date is required/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(pastDate);
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', nowDate);
+      cy.setDatePickerValue('input[name="visit_basis.endsAt"]', pastDate);
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', nowDate);
+      cy.setDatePickerValue('input[name="visit_basis.endsAt"]', futureDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
