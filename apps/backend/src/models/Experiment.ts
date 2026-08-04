@@ -4,6 +4,15 @@ export enum ExperimentStatus {
   COMPLETED = 'COMPLETED',
 }
 
+// Experiment table columns that support sorting. Lives in the model so it can
+// be reused across queries/datasources without importing from the resolver layer.
+export enum ExperimentTableSortField {
+  experimentId = 'experimentId',
+  proposalId = 'proposalId',
+  startsAt = 'startsAt',
+  endsAt = 'endsAt',
+}
+
 export class Experiment {
   constructor(
     public experimentPk: number,
