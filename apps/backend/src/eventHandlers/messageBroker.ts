@@ -704,7 +704,7 @@ export async function createListenToRabbitMQHandler() {
           const jsonMessage = await getExperimentMessageData(experiment);
           await rabbitMQ.sendMessageToExchange(
             EXCHANGE_NAME,
-            'EXPERIMENT_UPDATED',
+            Event.EXPERIMENT_UPDATED,
             jsonMessage
           );
         } catch (error) {
