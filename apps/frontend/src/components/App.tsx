@@ -142,7 +142,7 @@ class App extends React.Component<Record<string, never>, AppState> {
     }
   }
 
-  render(): JSX.Element {
+  render() {
     return <RouterProvider router={router} />;
   }
 }

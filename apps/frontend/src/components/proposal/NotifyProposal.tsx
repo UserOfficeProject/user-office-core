@@ -28,7 +28,7 @@ const NotifyProposal = ({
           close();
         }}
       >
-        {({ isSubmitting }): JSX.Element => (
+        {({ isSubmitting }) => (
           <Form>
             <Typography
               variant="h6"
