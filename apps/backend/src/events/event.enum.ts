@@ -733,4 +733,8 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     Event.EMAIL_TEMPLATE_DELETED,
     { label: 'Event occurs when email template is deleted' },
   ],
+  [
+    Event.EXPERIMENT_UPDATED,
+    { label: 'Event occurs when experiment is updated' },
+  ],
 ]);
