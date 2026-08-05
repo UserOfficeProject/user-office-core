@@ -37,12 +37,14 @@ const RoleTable = ({ add, activeRoles }: RoleTableProps) => {
           search: true,
           pageSize: 10,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           selection: true,
           selectionProps: (rowData: Role) => ({
-            inputProps: {
-              'aria-label': `${rowData.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.title}-select`,
+              },
             },
           }),
         }}

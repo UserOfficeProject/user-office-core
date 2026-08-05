@@ -84,12 +84,14 @@ const FeaturesTable = ({ confirm }: { confirm: WithConfirmType }) => {
           search: true,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           debounceInterval: 400,
           selectionProps: (rowData: Feature) => ({
-            inputProps: {
-              'aria-label': `${rowData.id}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.id}-select`,
+              },
             },
           }),
           pageSize: 20,
