@@ -1428,7 +1428,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
-    const proposals: InvitedProposalRecord[] | undefined = await database
+    return await database
       .select(
         'proposals.proposal_id',
         'proposer.firstname as proposer_name',
@@ -1442,8 +1442,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .join('users as proposer', {
         'proposals.proposer_id': 'proposer.user_id',
       })
-      .where('invite_id', inviteId);
-
-    return proposals ? createInvitedProposalObject(proposals[0]) : null;
+      .where('invite_id', inviteId)
+      .first()
+      .then((proposal: InvitedProposalRecord | undefined) =>
+        proposal ? createInvitedProposalObject(proposal) : null
+      );
   }
 }

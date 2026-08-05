@@ -7,8 +7,11 @@ import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class VisitRegistrationSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public registration: RegistrationWithQuestionary) {
-    super(TemplateGroupId.VISIT_REGISTRATION, registration);
+  constructor(
+    public registration: RegistrationWithQuestionary,
+    public isPreviewMode: boolean | undefined
+  ) {
+    super(TemplateGroupId.VISIT_REGISTRATION, registration, isPreviewMode);
     this.stepIndex = this.getInitialStepIndex();
   }
 
