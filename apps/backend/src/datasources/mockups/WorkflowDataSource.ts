@@ -105,6 +105,10 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return dummyWorkflow;
   }
 
+  async cloneWorkflow(workflowId: number): Promise<Workflow> {
+    return dummyWorkflow;
+  }
+
   async getWorkflowConnections(
     workflowId: number
   ): Promise<WorkflowConnection[]> {
