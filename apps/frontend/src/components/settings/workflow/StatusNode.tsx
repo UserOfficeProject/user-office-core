@@ -133,12 +133,7 @@ interface StatusNodeProps extends WithConfirmProps {
   selected: boolean;
 }
 
-const StatusNode: React.FC<StatusNodeProps> = ({
-  id,
-  data,
-  confirm,
-  selected,
-}) => {
+const StatusNode = ({ id, data, confirm, selected }: StatusNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const isConnecting = !!connectionNodeId;
