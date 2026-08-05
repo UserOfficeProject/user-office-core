@@ -5,15 +5,18 @@ import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
+import {
+  DRAWER_WIDTH,
+  useIsPortrait,
+  useIsTabletOrMobile,
+} from 'hooks/common/useResponsive';
 
 import AccountActionButton from './AccountActionButton';
-const drawerWidth = 250;
 
 type AppToolbarProps = {
   /** Content of the information modal. */
@@ -26,8 +29,8 @@ type AppToolbarProps = {
 const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   const { settingsMap } = useContext(SettingsContext);
   const location = useLocation();
-  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
-  const isPortraitMode = useMediaQuery('(orientation: portrait)');
+  const isTabletOrMobile = useIsTabletOrMobile();
+  const isPortraitMode = useIsPortrait();
   const [logo, setLogo] = useState('');
   const theme = useTheme();
 
@@ -55,8 +58,8 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
           duration: theme.transitions.duration.leavingScreen,
         }),
         ...(open && {
-          marginLeft: isTabletOrMobile ? 0 : drawerWidth,
-          width: isTabletOrMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
+          marginLeft: isTabletOrMobile ? 0 : DRAWER_WIDTH,
+          width: isTabletOrMobile ? '100%' : `calc(100% - ${DRAWER_WIDTH}px)`,
           transition: isTabletOrMobile
             ? 'none'
             : theme.transitions.create(['width', 'margin'], {

@@ -3,11 +3,11 @@ import Step from '@mui/material/Step';
 import Stepper from '@mui/material/Stepper';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useContext, useRef, useEffect } from 'react';
 
 import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import {
@@ -30,7 +30,7 @@ function Questionary({
   previewMode = false,
   confirm,
 }: QuestionaryProps) {
-  const isMobile = useMediaQuery('(max-width: 500px)');
+  const isMobile = useIsMobile();
 
   const theme = useTheme();
   const { state, dispatch } = useContext(QuestionaryContext);
