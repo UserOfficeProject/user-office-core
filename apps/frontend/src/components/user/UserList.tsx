@@ -23,12 +23,12 @@ const StyledList = styled(List)(() => ({
   },
 }));
 
-const UserList: React.FC<UserListProps> = ({
+const UserList = ({
   users,
   invitedEmails = [],
   initVisibleItems = 4,
   'data-cy': dataCy = 'user-list',
-}) => {
+}: UserListProps) => {
   const [showAll, setShowAll] = useState(false);
 
   if ((!users || users.length === 0) && invitedEmails.length === 0) {
