@@ -4,7 +4,9 @@ import { TFunction } from 'i18next';
 import React, { useState, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { rowComponents } from 'components/common/MaterialTableCardRow';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -34,12 +36,20 @@ const columns: (
   },
 ];
 
-export default function UserUpcomingExperimentsTable() {
+type UserUpcomingExperimentsTableProps = {
+  /** Render nothing at all when there are no upcoming experiments. */
+  hideIfEmpty?: boolean;
+};
+
+export default function UserUpcomingExperimentsTable({
+  hideIfEmpty = true,
+}: UserUpcomingExperimentsTableProps) {
   const {
     loading: experimentsLoading,
     userExperiments,
     setUserUpcomingExperiments,
   } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
+  const isMobile = useIsMobile();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -68,9 +78,7 @@ export default function UserUpcomingExperimentsTable() {
     },
   });
 
-  // if there are no upcoming experiments
-  // just hide the whole table altogether
-  if (userExperiments.length === 0) {
+  if (hideIfEmpty && userExperiments.length === 0) {
     return null;
   }
 
@@ -97,12 +105,14 @@ export default function UserUpcomingExperimentsTable() {
         isLoading={experimentsLoading}
         columns={columns(t)}
         data={userExperimentsWithFormattedDates}
+        components={rowComponents(isMobile)}
         options={{
           search: false,
           padding: 'dense',
           emptyRowsWhenPaging: false,
           paging: false,
           actionsColumnIndex: -1,
+          header: !isMobile,
         }}
       />
       <Dialog
