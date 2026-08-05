@@ -45,9 +45,11 @@ export default function ShipmentContainer(props: {
     customEventHandlers,
   ]);
 
+  const { onDirtyStateChange } = props;
+
   useEffect(() => {
-    props.onDirtyStateChange?.(state.isDirty);
-  }, [state.isDirty, props.onDirtyStateChange]);
+    onDirtyStateChange?.(state.isDirty);
+  }, [state.isDirty, onDirtyStateChange]);
 
   return (
     <QuestionaryContext value={{ state, dispatch }}>
