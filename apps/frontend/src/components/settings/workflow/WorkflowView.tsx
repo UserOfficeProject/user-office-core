@@ -16,13 +16,13 @@ interface WorkflowViewProps {
   selectedStatusId?: string; // To highlight selected status
 }
 
-const WorkflowView: React.FC<WorkflowViewProps> = ({
+const WorkflowView = ({
   workflowId,
   entityType,
   highlightedNodes,
   onNodeClicked,
   selectedStatusId,
-}) => {
+}: WorkflowViewProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);

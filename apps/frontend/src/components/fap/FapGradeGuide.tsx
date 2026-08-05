@@ -11,7 +11,7 @@ type FapGradeGuideProps = {
   onFapUpdate: (updatedFap: Fap) => void;
 };
 
-const FapGradeGuide: React.FC<FapGradeGuideProps> = ({ fap, onFapUpdate }) => {
+const FapGradeGuide = ({ fap, onFapUpdate }: FapGradeGuideProps) => {
   const { isExecutingCall } = useDataApiWithFeedback();
 
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
