@@ -46,7 +46,7 @@ type WorkflowCanvasProps = React.ComponentProps<typeof ReactFlow> & {
   connectionLineType: ConnectionLineType;
 };
 
-const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
+const WorkflowCanvas = ({
   nodes,
   edges,
   onNodesChange,
@@ -60,7 +60,7 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onNodeDragStop,
   reactFlowWrapper,
   ...rest
-}) => {
+}: WorkflowCanvasProps) => {
   return (
     <div
       ref={reactFlowWrapper}

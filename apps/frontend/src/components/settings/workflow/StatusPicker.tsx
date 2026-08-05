@@ -16,10 +16,7 @@ interface StatusPickerProps {
   onDragStart: (status: Status) => void;
 }
 
-const StatusPicker: React.FC<StatusPickerProps> = ({
-  statuses,
-  onDragStart,
-}) => {
+const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Filter statuses based on search term
