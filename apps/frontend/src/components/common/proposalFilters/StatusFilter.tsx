@@ -3,7 +3,6 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -86,14 +85,6 @@ const StatusFilter = ({
       </FormControl>
     </>
   );
-};
-
-StatusFilter.propTypes = {
-  statuses: PropTypes.array,
-  isLoading: PropTypes.bool,
-  onChange: PropTypes.func,
-  shouldShowAll: PropTypes.bool,
-  statusId: PropTypes.string,
 };
 
 export default StatusFilter;

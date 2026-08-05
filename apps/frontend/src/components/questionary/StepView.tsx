@@ -7,7 +7,7 @@ import * as React from 'react';
 
 export interface StepViewProps {
   title: string;
-  content: JSX.Element;
+  content: React.ReactNode;
 }
 
 export function StepView(props: StepViewProps) {

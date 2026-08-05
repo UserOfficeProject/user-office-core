@@ -1,5 +1,4 @@
 import Grid from '@mui/material/Grid';
-import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -54,10 +53,6 @@ const FapMeetingComponentsView = ({
       ) : null}
     </>
   );
-};
-
-FapMeetingComponentsView.propTypes = {
-  fapId: PropTypes.number.isRequired,
 };
 
 export default FapMeetingComponentsView;

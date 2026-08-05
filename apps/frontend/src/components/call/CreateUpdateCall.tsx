@@ -4,7 +4,6 @@ import {
   updateCallValidationSchemas,
 } from '@user-office-software/duo-validation/lib/Call';
 import { DateTime } from 'luxon';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
@@ -245,11 +244,6 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
       </Wizard>
     </>
   );
-};
-
-CreateUpdateCall.propTypes = {
-  close: PropTypes.func.isRequired,
-  call: PropTypes.any,
 };
 
 export default CreateUpdateCall;

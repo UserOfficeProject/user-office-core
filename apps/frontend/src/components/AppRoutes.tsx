@@ -135,7 +135,7 @@ const EmailTemplatePage = lazy(() => import('./template/EmailTemplatePage'));
 
 const PrivateOutlet = () => (
   <UserContext.Consumer>
-    {({ roles, token, currentRole, handleRole }): JSX.Element => {
+    {({ roles, token, currentRole, handleRole }) => {
       if (!token) {
         const { queryParams, pathName } = getCurrentUrlValues();
         const redirectPath = queryParams.size
