@@ -2,9 +2,8 @@ import { groupBy } from 'lodash';
 import { container } from 'tsyringe';
 
 import { collectCallFapXLSXData } from './callFaps';
-import { getDataRow } from './FapDataRow';
+import { FapDataRow, FapDataRowInput } from './FapDataRow';
 import baseContext from '../../buildContext';
-import { getStfcDataRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { UserWithRole } from '../../models/User';
@@ -36,9 +35,7 @@ export type RowObj = {
   accessRoute?: string | null;
 };
 
-const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
-  Tokens.FapDataRow
-);
+const fapDataRow = container.resolve<FapDataRow>(Tokens.FapDataRow);
 
 const populateRow = container.resolve<(row: RowObj) => (string | number)[]>(
   Tokens.PopulateRow
@@ -118,22 +115,25 @@ export const collectFapXLSXRowData = async (
           { proposalPk: proposal.proposal_pk, fapId: fapId }
         );
 
-        return fapDataRow(
-          proposal.proposal_pk,
-          piFullName,
-          proposal.average_grade,
-          proposal.instrument_name,
-          proposal.availability_time,
-          proposal.fap_time_allocation,
-          proposal.title,
-          proposal.proposal_id,
-          proposal.time_allocation,
-          stripHtml(proposal.comment ?? ''),
-          proposal.rank_order,
-          proposal.proposer_id,
+        const rowInput: FapDataRowInput = {
+          proposalPk: proposal.proposal_pk,
+          piName: piFullName,
+          proposalAverageScore: proposal.average_grade,
+          instrumentName: proposal.instrument_name,
+          instrumentAvailabilityTime: proposal.availability_time,
+          fapTimeAllocation: proposal.fap_time_allocation,
+          proposalTitle: proposal.title,
+          proposalId: proposal.proposal_id,
+          techReviewTimeAllocation: proposal.time_allocation,
+          technicalReviewComment: stripHtml(proposal.comment ?? ''),
+          propFapRankOrder: proposal.rank_order,
+          proposerId: proposal.proposer_id,
           proposalAnswers,
-          reviews
-        );
+          reviews,
+          instrumentId: proposal.instrument_id,
+        };
+
+        return fapDataRow(rowInput);
       })
     );
 
