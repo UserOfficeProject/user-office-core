@@ -39,7 +39,7 @@ interface EntryID {
   id: number | string;
 }
 
-export function SuperMaterialTable<Entry extends EntryID>({
+function SuperMaterialTable<Entry extends EntryID>({
   hasAccess = {
     create: true,
     remove: true,
