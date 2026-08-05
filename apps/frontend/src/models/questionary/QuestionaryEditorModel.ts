@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { produce } from 'immer';
-import { Reducer, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -177,7 +177,7 @@ export default function QuestionaryEditorModel(
     });
   }
 
-  const [state, dispatch] = useReducerWithMiddleWares<Reducer<Template, Event>>(
+  const [state, dispatch] = useReducerWithMiddleWares<Template, Event>(
     reducer,
     blankInitTemplate,
     middlewares || []

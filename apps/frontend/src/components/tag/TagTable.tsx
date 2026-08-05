@@ -88,9 +88,9 @@ const TagTable = () => {
     setAssigningCallTagId(null);
   };
 
-  const AssignInstrumentIcon = (): JSX.Element => <ScienceIcon />;
+  const AssignInstrumentIcon = () => <ScienceIcon />;
 
-  const AssignCallIcon = (): JSX.Element => <CalendarTodayIcon />;
+  const AssignCallIcon = () => <CalendarTodayIcon />;
 
   const instrumentsAssignments = tags?.find(
     (tag) => tag.id === assigningInstrumentTagId

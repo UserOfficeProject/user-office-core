@@ -46,7 +46,7 @@ function ExternalAuth() {
   const { handleLogin } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
-  const [View, setView] = React.useState<JSX.Element | null>(null);
+  const [View, setView] = React.useState<React.ReactNode>(null);
 
   useEffect(() => {
     if (!isFirstRun.current) {
