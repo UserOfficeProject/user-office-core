@@ -1,4 +1,4 @@
-import { default as React, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -50,12 +50,12 @@ export default function ShipmentContainer(props: {
   }, [state.isDirty, props.onDirtyStateChange]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={state.shipment.title || 'New Shipment'}
         info={state.shipment.status}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }
