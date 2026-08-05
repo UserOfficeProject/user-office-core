@@ -39,7 +39,7 @@ export function useStatusesData(entityType: WorkflowType): {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, entityType]);
 
   return {
     loadingStatuses,
