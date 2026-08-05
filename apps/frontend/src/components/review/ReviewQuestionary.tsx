@@ -144,12 +144,12 @@ export default function ReviewQuestionary(props: ReviewQuestionaryProps) {
   ]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <StyledContainer>
         <StyledPaper elevation={elevation}>
           <Questionary title="Review" previewMode={previewMode} />
         </StyledPaper>
       </StyledContainer>
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }

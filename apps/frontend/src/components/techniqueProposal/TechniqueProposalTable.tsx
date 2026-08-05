@@ -81,7 +81,7 @@ import TechniqueProposalNotice from './TechniqueProposalNotice';
 import { useTechniqueProposalInstrumentsData } from './useTechniqueProposalInstrumentsData';
 
 const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
-  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>(undefined);
   const refreshTableData = useCallback(() => {
     tableRef.current?.onQueryChange({});
   }, []);
@@ -983,7 +983,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     []
   );
 
-  const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  const ExportIcon = () => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
 
   const fetchProposalCoreBasicData = async () => {

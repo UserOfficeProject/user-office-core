@@ -2,7 +2,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { createWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow';
 import { Field, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
@@ -87,10 +86,6 @@ const CreateWorkflow = ({ close, entityType, title }: CreateWorkflowProps) => {
       )}
     </Formik>
   );
-};
-
-CreateWorkflow.propTypes = {
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateWorkflow;

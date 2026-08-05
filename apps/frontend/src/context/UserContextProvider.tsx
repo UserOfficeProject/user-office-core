@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jwtDecode } from 'jwt-decode';
-import PropTypes from 'prop-types';
 import React, { useCallback, useContext } from 'react';
 
 import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
@@ -21,7 +20,7 @@ interface UserContextData {
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => Promise<void>;
   handleSessionExpired: () => Promise<void>;
-  handleRole: React.Dispatch<string | null | undefined>;
+  handleRole: (role: string) => void;
 }
 
 interface DecodedTokenData
@@ -198,9 +197,7 @@ const reducer = (
   }
 };
 
-export const UserContextProvider = (props: {
-  children: React.ReactNode;
-}): JSX.Element => {
+export const UserContextProvider = (props: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
@@ -246,7 +243,7 @@ export const UserContextProvider = (props: {
   }
 
   return (
-    <UserContext.Provider
+    <UserContext
       value={{
         ...state,
         handleLogin: (data): void =>
@@ -262,8 +259,6 @@ export const UserContextProvider = (props: {
       }}
     >
       {props.children}
-    </UserContext.Provider>
+    </UserContext>
   );
 };
-
-UserContextProvider.propTypes = { children: PropTypes.node.isRequired };

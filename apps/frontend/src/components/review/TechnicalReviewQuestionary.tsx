@@ -179,9 +179,9 @@ export default function TechnicalReviewQuestionary(
 
   return (
     <>
-      <QuestionaryContext.Provider value={{ state, dispatch }}>
+      <QuestionaryContext value={{ state, dispatch }}>
         <Questionary title="Technical Review" previewMode={previewMode} />
-      </QuestionaryContext.Provider>
+      </QuestionaryContext>
     </>
   );
 }

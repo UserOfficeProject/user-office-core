@@ -194,7 +194,7 @@ const ChangeProposalStatus = ({
         }}
         validationSchema={changeProposalStatusValidationSchema}
       >
-        {({ isSubmitting, values, setFieldValue }): JSX.Element => {
+        {({ isSubmitting, values, setFieldValue }) => {
           const incomingConnections = getConnectionsToStatus(
             values.selectedWorkflowStatusId
           );
