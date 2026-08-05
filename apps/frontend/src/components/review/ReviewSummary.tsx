@@ -87,9 +87,11 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
     isSubmitting ||
     (fapReview.status === ReviewStatus.SUBMITTED && !isUserOfficer);
 
+  const callId = fapReview.proposal?.callId;
+
   useEffect(() => {
     async function initializeSubmissionMessage() {
-      if (!fapReview.proposal?.callId || submitDisabled) {
+      if (!callId || submitDisabled) {
         setLoadingSubmitMessage(false);
 
         return;
@@ -101,7 +103,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
       setLoadingSubmitMessage(false);
     }
     initializeSubmissionMessage();
-  }, [api, submitDisabled]);
+  }, [callId, submitDisabled]);
 
   if (loadingSubmitMessage) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
