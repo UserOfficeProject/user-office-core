@@ -18,10 +18,12 @@ import { Navigate } from 'react-router-dom';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { rowComponents } from 'components/common/MaterialTableCardRow';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -93,6 +95,7 @@ const ProposalTable = ({
   const featureContext = useContext(FeatureContext);
   const tableRef =
     React.useRef<MaterialTableCore<PartialProposalsDataType>>(undefined);
+  const isMobile = useIsMobile();
   const { api } = useDataApiWithFeedback();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
@@ -228,9 +231,11 @@ const ProposalTable = ({
             };
           });
         }}
+        components={rowComponents(isMobile)}
         options={{
           search: search,
           debounceInterval: 400,
+          header: !isMobile,
           defaultOrderByCollection: [
             {
               orderBy: 4,
