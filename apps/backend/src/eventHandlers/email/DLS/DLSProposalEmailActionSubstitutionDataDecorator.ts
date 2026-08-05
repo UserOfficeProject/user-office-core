@@ -6,7 +6,13 @@ import { CallDataSource } from '../../../datasources/CallDataSource';
 import { FapDataSource } from '../../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
-import { TechnicalReviewStatus } from '../../../models/TechnicalReview';
+import { Call } from '../../../models/Call';
+import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
+import { Instrument } from '../../../models/Instrument';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../../models/TechnicalReview';
 import { stripHtml } from '../../../utils/stringStripHtml';
 import { EmailReadyType } from '../../workflowEntities/proposal/utils';
 import { EmailTemplateId } from '../emailTemplateId';
@@ -16,11 +22,98 @@ const allocationPeriodDateFormatter = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
 });
 
+const deadlineDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
 const technicalReviewStatusLabels: Record<TechnicalReviewStatus, string> = {
   [TechnicalReviewStatus.FEASIBLE]: 'Feasible',
   [TechnicalReviewStatus.PARTIALLY_FEASIBLE]: 'Partially feasible',
   [TechnicalReviewStatus.UNFEASIBLE]: 'Not feasible',
 };
+
+function resolveProposalEmailDataSources() {
+  return {
+    callDataSource: container.resolve<CallDataSource>(Tokens.CallDataSource),
+    fapDataSource: container.resolve<FapDataSource>(Tokens.FapDataSource),
+    instrumentDataSource: container.resolve<InstrumentDataSource>(
+      Tokens.InstrumentDataSource
+    ),
+    reviewDataSource: container.resolve<ReviewDataSource>(
+      Tokens.ReviewDataSource
+    ),
+  };
+}
+
+function isRapidAccessWorkflow(workflow: { name: string } | null): boolean {
+  return workflow?.name.toLowerCase().includes('rapid') ?? false;
+}
+
+function getCommentsToUser(fapMeetingDecisions: FapMeetingDecision[]): string {
+  return stripHtml(
+    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
+      ?.commentForUser ?? ''
+  );
+}
+
+function getRequestedFacilities(instruments: Instrument[]) {
+  return instruments.map(({ name, description }) => ({ name, description }));
+}
+
+function getTechnicalAssessments(
+  technicalReviews: TechnicalReview[] | null,
+  instruments: Instrument[]
+) {
+  return (technicalReviews ?? []).flatMap((technicalReview) => {
+    const instrument = instruments.find(
+      ({ id }) => id === technicalReview.instrumentId
+    );
+
+    if (!instrument) {
+      return [];
+    }
+
+    return [
+      {
+        facility: {
+          name: instrument.name,
+          description: instrument.description,
+        },
+        feasibility:
+          technicalReview.status === null
+            ? ''
+            : technicalReviewStatusLabels[technicalReview.status] ?? '',
+        assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
+      },
+    ];
+  });
+}
+
+function getFormattedAllocationPeriod(call: Call) {
+  return {
+    startAt: allocationPeriodDateFormatter.format(call.startCycle),
+    endAt: allocationPeriodDateFormatter.format(call.endCycle),
+  };
+}
+
+function getNextCallDeadline(call: Call, calls: Call[]): string | null {
+  // TODO: Confirm whether this is the best way to identify the next call
+  const now = Date.now();
+  const nextCall = calls
+    .filter(
+      (candidateCall) =>
+        candidateCall.id !== call.id &&
+        candidateCall.proposalWorkflowId === call.proposalWorkflowId &&
+        candidateCall.endCall.getTime() > now
+    )
+    .sort((firstCall, secondCall) => {
+      return firstCall.endCall.getTime() - secondCall.endCall.getTime();
+    })[0];
+
+  return nextCall ? deadlineDateFormatter.format(nextCall.endCall) : null;
+}
 
 export const decorateDLSProposalEmailActionSubstitutionData = async (
   emailTemplateName: string,
@@ -51,16 +144,12 @@ async function proposalAcceptedHandler(
     return {};
   }
 
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
-  );
+  const {
+    callDataSource,
+    fapDataSource,
+    instrumentDataSource,
+    reviewDataSource,
+  } = resolveProposalEmailDataSources();
   const [
     call,
     proposalWorkflow,
@@ -79,12 +168,8 @@ async function proposalAcceptedHandler(
     return {};
   }
 
-  const isRapidAccess =
-    proposalWorkflow?.name.toLowerCase().includes('rapid') ?? false;
-  const commentsToUser = stripHtml(
-    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
-      ?.commentForUser ?? ''
-  );
+  const isRapidAccess = isRapidAccessWorkflow(proposalWorkflow);
+  const commentsToUser = getCommentsToUser(fapMeetingDecisions);
   const instrumentIds = Array.from(
     new Set([
       ...fapProposals
@@ -114,30 +199,9 @@ async function proposalAcceptedHandler(
       ? [{ numberOfShifts, facility: instrument.name }]
       : [];
   });
-  const technicalAssessments = (technicalReviews ?? []).flatMap(
-    (technicalReview) => {
-      const instrument = instruments.find(
-        ({ id }) => id === technicalReview.instrumentId
-      );
-
-      if (!instrument) {
-        return [];
-      }
-
-      return [
-        {
-          facility: {
-            name: instrument.name,
-            description: instrument.description,
-          },
-          feasibility:
-            technicalReview.status === null
-              ? ''
-              : technicalReviewStatusLabels[technicalReview.status] ?? '',
-          assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
-        },
-      ];
-    }
+  const technicalAssessments = getTechnicalAssessments(
+    technicalReviews,
+    instruments
   );
 
   return {
@@ -151,9 +215,8 @@ async function proposalAcceptedHandler(
     commentsToUser,
     technicalAssessments,
     call: {
+      ...getFormattedAllocationPeriod(call),
       referenceNumber: call.shortCode.replace(/^AP\s*/i, ''),
-      startAt: allocationPeriodDateFormatter.format(call.startCycle),
-      endAt: allocationPeriodDateFormatter.format(call.endCycle),
     },
   };
 }
@@ -167,16 +230,12 @@ async function proposalRejectedHandler(
     return {};
   }
 
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
-  );
+  const {
+    callDataSource,
+    fapDataSource,
+    instrumentDataSource,
+    reviewDataSource,
+  } = resolveProposalEmailDataSources();
   const [
     call,
     proposalWorkflow,
@@ -197,66 +256,13 @@ async function proposalRejectedHandler(
     return {};
   }
 
-  const allocationPeriodDateFormatter = new Intl.DateTimeFormat('en-GB', {
-    month: 'short',
-    year: 'numeric',
-  });
-  const deadlineDateFormatter = new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-  const technicalReviewStatusLabels: Record<TechnicalReviewStatus, string> = {
-    [TechnicalReviewStatus.FEASIBLE]: 'Feasible',
-    [TechnicalReviewStatus.PARTIALLY_FEASIBLE]: 'Partially feasible',
-    [TechnicalReviewStatus.UNFEASIBLE]: 'Not feasible',
-  };
-  const isRapidAccess =
-    proposalWorkflow?.name.toLowerCase().includes('rapid') ?? false;
-  const commentsToUser = stripHtml(
-    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
-      ?.commentForUser ?? ''
+  const isRapidAccess = isRapidAccessWorkflow(proposalWorkflow);
+  const commentsToUser = getCommentsToUser(fapMeetingDecisions);
+  const requestedFacilities = getRequestedFacilities(requestedInstruments);
+  const technicalAssessments = getTechnicalAssessments(
+    technicalReviews,
+    requestedInstruments
   );
-  const requestedFacilities = requestedInstruments.map(
-    ({ name, description }) => ({ name, description })
-  );
-  const technicalAssessments = (technicalReviews ?? []).flatMap(
-    (technicalReview) => {
-      const instrument = requestedInstruments.find(
-        ({ id }) => id === technicalReview.instrumentId
-      );
-
-      if (!instrument) {
-        return [];
-      }
-
-      return [
-        {
-          facility: {
-            name: instrument.name,
-            description: instrument.description,
-          },
-          feasibility:
-            technicalReview.status === null
-              ? ''
-              : technicalReviewStatusLabels[technicalReview.status],
-          assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
-        },
-      ];
-    }
-  );
-  // TODO: Figre out if this is the best way to figure out when the next call is
-  const now = Date.now();
-  const nextCall = calls
-    .filter(
-      (candidateCall) =>
-        candidateCall.id !== call.id &&
-        candidateCall.proposalWorkflowId === call.proposalWorkflowId &&
-        candidateCall.endCall.getTime() > now
-    )
-    .sort((firstCall, secondCall) => {
-      return firstCall.endCall.getTime() - secondCall.endCall.getTime();
-    })[0];
 
   return {
     proposal,
@@ -264,13 +270,8 @@ async function proposalRejectedHandler(
     requestedFacilities,
     commentsToUser,
     technicalAssessments,
-    nextCallDeadline: nextCall
-      ? deadlineDateFormatter.format(nextCall.endCall)
-      : null,
-    call: {
-      startAt: allocationPeriodDateFormatter.format(call.startCycle),
-      endAt: allocationPeriodDateFormatter.format(call.endCycle),
-    },
+    nextCallDeadline: getNextCallDeadline(call, calls),
+    call: getFormattedAllocationPeriod(call),
   };
 }
 
@@ -283,16 +284,12 @@ async function proposalReservedHandler(
     return {};
   }
 
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
-  );
+  const {
+    callDataSource,
+    fapDataSource,
+    instrumentDataSource,
+    reviewDataSource,
+  } = resolveProposalEmailDataSources();
   const [
     call,
     requestedInstruments,
@@ -311,76 +308,19 @@ async function proposalReservedHandler(
     return {};
   }
 
-  const allocationPeriodDateFormatter = new Intl.DateTimeFormat('en-GB', {
-    month: 'short',
-    year: 'numeric',
-  });
-  const deadlineDateFormatter = new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-  const technicalReviewStatusLabels: Record<TechnicalReviewStatus, string> = {
-    [TechnicalReviewStatus.FEASIBLE]: 'Feasible',
-    [TechnicalReviewStatus.PARTIALLY_FEASIBLE]: 'Partially feasible',
-    [TechnicalReviewStatus.UNFEASIBLE]: 'Not feasible',
-  };
-  const requestedFacilities = requestedInstruments.map(
-    ({ name, description }) => ({ name, description })
+  const requestedFacilities = getRequestedFacilities(requestedInstruments);
+  const commentsToUser = getCommentsToUser(fapMeetingDecisions);
+  const technicalAssessments = getTechnicalAssessments(
+    technicalReviews,
+    requestedInstruments
   );
-  const commentsToUser = stripHtml(
-    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
-      ?.commentForUser ?? ''
-  );
-  const technicalAssessments = (technicalReviews ?? []).flatMap(
-    (technicalReview) => {
-      const instrument = requestedInstruments.find(
-        ({ id }) => id === technicalReview.instrumentId
-      );
-
-      if (!instrument) {
-        return [];
-      }
-
-      return [
-        {
-          facility: {
-            name: instrument.name,
-            description: instrument.description,
-          },
-          feasibility:
-            technicalReview.status === null
-              ? ''
-              : technicalReviewStatusLabels[technicalReview.status],
-          assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
-        },
-      ];
-    }
-  );
-  // TODO: Figure out if this is the best way to identify the next call
-  const now = Date.now();
-  const nextCall = calls
-    .filter(
-      (candidateCall) =>
-        candidateCall.id !== call.id &&
-        candidateCall.proposalWorkflowId === call.proposalWorkflowId &&
-        candidateCall.endCall.getTime() > now
-    )
-    .sort((firstCall, secondCall) => {
-      return firstCall.endCall.getTime() - secondCall.endCall.getTime();
-    })[0];
 
   return {
     proposal,
     requestedFacilities,
     commentsToUser,
     technicalAssessments,
-    nextCallDeadline: nextCall
-      ? deadlineDateFormatter.format(nextCall.endCall)
-      : null,
-    call: {
-      startAt: allocationPeriodDateFormatter.format(call.startCycle),
-      endAt: allocationPeriodDateFormatter.format(call.endCycle),
-    },
+    nextCallDeadline: getNextCallDeadline(call, calls),
+    call: getFormattedAllocationPeriod(call),
   };
 }
