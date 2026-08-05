@@ -5,7 +5,6 @@ import {
   updateStatusValidationSchema,
 } from '@user-office-software/duo-validation/lib/Statuses';
 import { Field, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
@@ -130,11 +129,6 @@ const CreateUpdateProposalStatus = ({
       )}
     </Formik>
   );
-};
-
-CreateUpdateProposalStatus.propTypes = {
-  proposalStatus: PropTypes.any,
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUpdateProposalStatus;
