@@ -8,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import parse from 'html-react-parser';
 import React, { Suspense, useContext, useEffect } from 'react';
 
@@ -16,6 +15,12 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, SettingsId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import {
+  DRAWER_WIDTH,
+  TOOLBAR_HEIGHT_SM,
+  TOOLBAR_HEIGHT_XS,
+  useIsTabletOrMobile,
+} from 'hooks/common/useResponsive';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import MenuItems from './menu/MenuItems';
@@ -49,9 +54,8 @@ const PageLayout = ({
   header: string;
   children: React.ReactNode;
 }) => {
-  const drawerWidth = 250;
   const theme = useTheme();
-  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
+  const isTabletOrMobile = useIsTabletOrMobile();
   const [open, setOpen] = React.useState(
     localStorage.drawerOpen
       ? localStorage.drawerOpen === '1'
@@ -62,7 +66,7 @@ const PageLayout = ({
   const { settingsMap } = useContext(SettingsContext);
 
   const drawer = {
-    width: drawerWidth,
+    width: DRAWER_WIDTH,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     '.MuiDrawer-paper': {
@@ -70,7 +74,7 @@ const PageLayout = ({
     },
   };
   const drawerOpen = () => ({
-    width: drawerWidth,
+    width: DRAWER_WIDTH,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -178,9 +182,15 @@ const PageLayout = ({
           component="main"
           sx={{
             flexGrow: 1,
-            height: 'calc(100vh - 64px)',
-            marginTop: '64px',
-            width: `calc(100% - ${drawerWidth}px)`,
+            marginTop: {
+              xs: `${TOOLBAR_HEIGHT_XS}px`,
+              sm: `${TOOLBAR_HEIGHT_SM}px`,
+            },
+            height: {
+              xs: `calc(100vh - ${TOOLBAR_HEIGHT_XS}px)`,
+              sm: `calc(100vh - ${TOOLBAR_HEIGHT_SM}px)`,
+            },
+            minWidth: 0,
           }}
         >
           <Suspense
