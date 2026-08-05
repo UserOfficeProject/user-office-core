@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Draft, produce } from 'immer';
-import { Reducer } from 'react';
 
 import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
@@ -298,7 +297,7 @@ export function QuestionarySubmissionModel<
     });
   }
 
-  const [modelState, dispatch] = useReducerWithMiddleWares<Reducer<T, Event>>(
+  const [modelState, dispatch] = useReducerWithMiddleWares<T, Event>(
     reducer,
     initialState,
     middlewares || []

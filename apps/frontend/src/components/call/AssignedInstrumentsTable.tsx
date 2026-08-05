@@ -1,7 +1,6 @@
 import { Column, EditComponentProps } from '@material-table/core';
 import { Autocomplete, Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -332,12 +331,6 @@ const AssignedInstrumentsTable = ({
       </Box>
     </>
   );
-};
-
-AssignedInstrumentsTable.propTypes = {
-  call: PropTypes.any.isRequired,
-  removeAssignedInstrumentFromCall: PropTypes.func.isRequired,
-  setInstrumentAvailabilityTime: PropTypes.func.isRequired,
 };
 
 export default AssignedInstrumentsTable;
