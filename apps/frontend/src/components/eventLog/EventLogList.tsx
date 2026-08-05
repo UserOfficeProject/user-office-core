@@ -1,6 +1,5 @@
 import { Column } from '@material-table/core';
 import { Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -78,11 +77,6 @@ const EventLogList = ({
       />
     </div>
   );
-};
-
-EventLogList.propTypes = {
-  changedObjectId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  eventType: PropTypes.string,
 };
 
 export default EventLogList;

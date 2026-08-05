@@ -1,4 +1,4 @@
-import { default as React, useState } from 'react';
+import React, { useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -59,11 +59,11 @@ export function SampleDeclarationContainer(props: {
   ]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={state.sample.title || 'New Sample'}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }
