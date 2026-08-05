@@ -89,7 +89,7 @@ function removeElement(
     : elements;
 }
 
-export const FormikUICustomTable = ({
+const FormikUICustomTable = ({
   columns,
   dataTransforms,
   field,
