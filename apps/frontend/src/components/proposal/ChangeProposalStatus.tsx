@@ -80,13 +80,15 @@ const ChangeProposalStatus = ({
     (id) => id === selectedProposalsWorkflowIds[0]
   );
 
+  const primaryWorkflowId = selectedProposalsWorkflowIds[0];
+
   // Fetch workflow connections when the component mounts
   useEffect(() => {
-    if (!selectedProposalsWorkflowIds[0]) return;
+    if (!primaryWorkflowId) return;
 
     api()
       .getWorkflow({
-        workflowId: selectedProposalsWorkflowIds[0],
+        workflowId: primaryWorkflowId,
         entityType: WorkflowType.PROPOSAL,
       })
       .then((data) => {
@@ -94,7 +96,7 @@ const ChangeProposalStatus = ({
           setConnections(data.workflow.connections);
         }
       });
-  }, [api, selectedProposalsWorkflowIds[0]]);
+  }, [api, primaryWorkflowId]);
 
   const highlightedNodes = useMemo(() => {
     const counts = selectedProposals.reduce(
