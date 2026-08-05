@@ -39,7 +39,7 @@ export function useEventsData(entityType: WorkflowType): {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, entityType]);
 
   return {
     loadingEvents,
