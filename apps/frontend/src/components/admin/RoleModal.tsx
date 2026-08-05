@@ -34,12 +34,7 @@ interface RoleModalProps {
   onSubmit: () => void;
 }
 
-const RoleModal: React.FC<RoleModalProps> = ({
-  open,
-  onClose,
-  role,
-  onSubmit,
-}) => {
+const RoleModal = ({ open, onClose, role, onSubmit }: RoleModalProps) => {
   const isEditMode = !!role;
   const [shortCode, setShortCode] = useState('');
   const [title, setTitle] = useState('');

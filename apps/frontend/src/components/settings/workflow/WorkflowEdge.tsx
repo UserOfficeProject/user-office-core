@@ -47,7 +47,7 @@ const ActionList = styled(List)(({ theme }) => ({
   border: `1px solid ${theme.palette.secondary.dark}`,
 }));
 
-const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
+const WorkflowEdge = ({
   id,
   data,
   sourceX,
@@ -58,7 +58,7 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   targetPosition,
   style = {},
   markerEnd,
-}) => {
+}: EdgeProps<WorkflowEdgeData>) => {
   // Get the appropriate path based on edge type
   const getPath = () => {
     const pathProps = {
