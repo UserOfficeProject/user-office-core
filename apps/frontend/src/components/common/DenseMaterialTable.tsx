@@ -7,7 +7,7 @@ import { denseTableColumns } from 'utils/helperFunctions';
  * This wrapper component improves the space usage in the MaterialTable by limiting row content to one line
  * and showing indicator(three dots) if there is more content to be shown on hover.
  */
-export function DenseMaterialTable<RowData extends object>(
+function DenseMaterialTable<RowData extends object>(
   props: MaterialTableProps<RowData>
 ) {
   // NOTE: Using useMemo() with an empty dependencies array will calculate the value only once, on mount.
