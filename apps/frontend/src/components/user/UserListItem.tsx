@@ -8,7 +8,7 @@ interface UserListItemProps {
   user?: BasicUserDetails | null;
 }
 
-const UserListItem: React.FC<UserListItemProps> = ({ user }) => {
+const UserListItem = ({ user }: UserListItemProps) => {
   return (
     <ListItemText
       primary={getFullUserNameWithEmail(user)}
