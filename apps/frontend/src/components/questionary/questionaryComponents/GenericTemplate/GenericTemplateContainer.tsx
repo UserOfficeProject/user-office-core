@@ -1,4 +1,4 @@
-import { default as React, useState } from 'react';
+import React, { useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -63,11 +63,11 @@ export function GenericTemplateContainer(props: {
   ]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={truncateString(state.genericTemplate.title || props.title, 30)}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }

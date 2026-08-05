@@ -21,14 +21,13 @@ import FinalRankingForm from './FinalRankingForm';
 import ProposalDetails from './ProposalDetails';
 import TechnicalReviewInfo from './TechnicalReviewInfo';
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = ({
+  ref,
+  ...props
+}: TransitionProps & {
+  children: React.ReactElement;
+  ref?: React.Ref<unknown>;
+}) => <Slide direction="up" ref={ref} {...props} />;
 
 type FapMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;

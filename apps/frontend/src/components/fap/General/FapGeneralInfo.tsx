@@ -70,7 +70,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
         handleChange,
         setFieldValue,
         setValues,
-      }): JSX.Element => (
+      }) => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
             {`${fap.code} ${t('Facility access panel')}`}

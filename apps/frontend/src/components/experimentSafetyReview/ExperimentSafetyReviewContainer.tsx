@@ -1,4 +1,4 @@
-import { default as React, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -92,11 +92,11 @@ export default function ExperimentSafetyReviewContainer(
   );
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={'Experiment Safety Review'}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }

@@ -52,7 +52,7 @@ const isTeamlead = (user: UserJwt, event: UserExperiment) =>
 
 const createActionButton = (
   tooltip: string,
-  icon: JSX.Element,
+  icon: React.ReactNode,
   state: ActionButtonState,
   onClick: () => void | undefined
 ): Action<UserExperiment> => ({

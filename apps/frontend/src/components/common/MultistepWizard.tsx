@@ -24,6 +24,13 @@ interface WizardProps
   shouldCreate: boolean;
 }
 
+type WizardStepProps = {
+  title: string;
+  validationSchema: Yup.ISchema<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onSubmit?: FormikConfig<FormikValues>['onSubmit'];
+  children: React.ReactNode;
+};
+
 export const Wizard = ({
   children,
   initialValues,
@@ -34,7 +41,7 @@ export const Wizard = ({
   const [stepNumber, setStepNumber] = useState(0);
   const steps = React.Children.toArray(
     children as ReactNode
-  ) as React.ReactElement[];
+  ) as React.ReactElement<WizardStepProps>[];
   const [snapshot, setSnapshot] = useState(initialValues);
 
   const step = steps[stepNumber];
@@ -155,10 +162,4 @@ export const Wizard = ({
   );
 };
 
-export const WizardStep = ({
-  children,
-}: {
-  title: string;
-  validationSchema: Yup.ISchema<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-  children: React.ReactNode;
-}) => <>{children}</>;
+export const WizardStep = ({ children }: WizardStepProps) => <>{children}</>;
