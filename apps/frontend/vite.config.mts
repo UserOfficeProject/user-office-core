@@ -38,11 +38,6 @@ export default ({ mode }): UserConfig => {
     resolve: {
       preserveSymlinks: true,
       alias: {
-        // @material-table/core@6.4.4 internally imports the `DeleteOutline`
-        // icon, which was removed in @mui/icons-material v9 (renamed to
-        // `DeleteOutlined`). Map it so the dependency keeps working.
-        '@mui/icons-material/DeleteOutline':
-          '@mui/icons-material/DeleteOutlined',
         context: '/src/context',
         hooks: '/src/hooks',
         utils: '/src/utils',
