@@ -35,12 +35,6 @@ function renderColumnValue<RowData extends object>(
   return columnDef.render ? columnDef.render(data) : (value as React.ReactNode);
 }
 
-/**
- * Renders a material-table row as a card, for use as the `Row` component slot
- * on narrow viewports. The card stays inside a TableRow/TableCell so the
- * surrounding table markup, toolbar, loading overlay and pagination keep
- * working unchanged.
- */
 export default function MaterialTableCardRow<RowData extends object>({
   data,
   columns,
@@ -107,11 +101,7 @@ export default function MaterialTableCardRow<RowData extends object>({
 const CARD_ROW = { Row: MaterialTableCardRow };
 const DEFAULT_ROW = { Row: MTableBodyRow };
 
-/**
- * material-table merges `components` into a store and ignores a falsy value,
- * so it never falls back to the default Row once one has been supplied. Both
- * states have to be named explicitly, and the references have to be stable or
- * every parent render writes to that store again.
- */
+// material-table ignores a falsy `components`, so it never reverts to the
+// default Row. Both states must be named, and the references must be stable.
 export const rowComponents = (asCards: boolean) =>
   asCards ? CARD_ROW : DEFAULT_ROW;
