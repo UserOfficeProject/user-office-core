@@ -64,9 +64,12 @@ export default class PostgresProposalInternalCommentsDataSource
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     try {
-      await database('proposal_rejection_comments')
-        .where('proposal_pk', args.proposalPk)
-        .del();
+      database.transaction(async (trx) => {
+        await trx<ProposalInternalCommentRecord>('proposal_rejection_comments')
+          .where('proposal_pk', args.proposalPk)
+          .del();
+      });
+
       const [proposalRejectionComment]: ProposalInternalCommentRecord[] =
         await database('proposal_rejection_comments')
           .insert({

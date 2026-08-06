@@ -349,16 +349,20 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     proposalPk: number,
     workflowStatusId: number,
     statusActionsWorkflowConnectionId?: number
-  ): Promise<void> => {
-    await api({
+  ) => {
+    return await api({
       toastSuccessMessage: 'Proposal status updated successfully!',
-    }).changeTechniqueProposalsStatus({
-      workflowStatusId: workflowStatusId,
-      proposalPks: [proposalPk],
-      statusActionsWorkflowConnectionId,
-    });
+    })
+      .changeTechniqueProposalsStatus({
+        workflowStatusId: workflowStatusId,
+        proposalPks: [proposalPk],
+        statusActionsWorkflowConnectionId,
+      })
+      .then((results) => {
+        refreshTableData();
 
-    refreshTableData();
+        return results;
+      });
   };
 
   const handleStatusChange = (
@@ -369,8 +373,8 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   ) => {
     if (value) {
       confirm(
-        () => {
-          api()
+        async () => {
+          await api()
             .getWorkflowStatuses({
               workflowId: workflowId,
             })
@@ -381,21 +385,43 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               if (!selectedWorkflowStatus) {
                 throw new Error('Selected workflow status not found');
               }
-              updateProposalStatus(
-                primaryKey,
-                selectedWorkflowStatus.workflowStatusId
-              );
-            });
 
-          if (value === StatusCode.UNSUCCESSFUL && comment != '') {
-            api({
-              toastSuccessMessage:
-                'Proposal rejection comment successfully created',
-            }).createProposalRejectionComment({
-              proposalPk: unsuccessfullPK,
-              comment: comment ?? '',
+              return api()
+                .getWorkflow({
+                  workflowId: workflowId,
+                  entityType: WorkflowType.PROPOSAL,
+                })
+                .then(({ workflow }) => {
+                  const connectionsWithActions =
+                    workflow?.connections.filter(
+                      (conn) =>
+                        conn.nextWorkflowStatusId ===
+                          selectedWorkflowStatus.workflowStatusId &&
+                        conn.statusActions &&
+                        conn.statusActions.length > 0
+                    ) || [];
+
+                  const statusActionsWorkflowConnectionId =
+                    connectionsWithActions.length === 1
+                      ? connectionsWithActions[0].id
+                      : undefined;
+                  updateProposalStatus(
+                    primaryKey,
+                    selectedWorkflowStatus.workflowStatusId,
+                    statusActionsWorkflowConnectionId
+                  ).then(() => {
+                    if (value === StatusCode.UNSUCCESSFUL && comment != '') {
+                      api({
+                        toastSuccessMessage:
+                          'Proposal rejection comment successfully created',
+                      }).createProposalRejectionComment({
+                        proposalPk: unsuccessfullPK,
+                        comment: comment ?? '',
+                      });
+                    }
+                  });
+                });
             });
-          }
         },
         {
           title: 'Change status',
