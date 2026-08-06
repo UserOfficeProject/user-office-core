@@ -69,6 +69,9 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isCallUpcoming?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public excludeTechniqueCalls?: boolean;
 }
 
 @ArgsType()

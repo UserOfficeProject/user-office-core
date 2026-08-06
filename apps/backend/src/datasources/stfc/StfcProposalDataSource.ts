@@ -259,8 +259,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           ).users.map((ids) => ids.id),
         ]
       : [];
+
     const proposals = await super.getProposalsFromView(
-      filter,
+      { ...filter, excludeTechniqueProposals: true },
       first,
       offset,
       sortField,

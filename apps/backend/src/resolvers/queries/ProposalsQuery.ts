@@ -117,6 +117,9 @@ export class ProposalsFilter {
 
   @Field(() => DateFilterInput, { nullable: true })
   public dateFilter?: DateFilterInput;
+
+  @Field(() => Boolean, { nullable: true })
+  public excludeTechniqueProposals?: boolean;
 }
 
 @ArgsType()

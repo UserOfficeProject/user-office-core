@@ -455,11 +455,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     let instrumentFilter: number[] | undefined;
     let callFilter: number[] | undefined;
+    let techniqueCalls: number[] | undefined;
 
     if (tags) {
       const { instrumentIds, callIds } = await this.resolveTagConstraints(tags);
       instrumentFilter = instrumentIds;
       callFilter = callIds;
+    }
+
+    if (filter?.excludeTechniqueProposals) {
+      techniqueCalls = (
+        await this.callDataSource.getCalls({
+          proposalStatus: 'QUICK_REVIEW',
+        })
+      ).map((call) => call.id);
     }
 
     return database
@@ -498,6 +507,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (callIdsToFilter.length > 0) {
           query.whereIn('call_id', callIdsToFilter);
+        }
+
+        if (filter?.excludeTechniqueProposals && techniqueCalls) {
+          query.whereNotIn('call_id', techniqueCalls);
         }
 
         // If either instrumentFilter (ids) or callFilter is provided,

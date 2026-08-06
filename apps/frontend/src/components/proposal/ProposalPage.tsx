@@ -54,7 +54,7 @@ export default function ProposalPage() {
       value,
     }),
   });
-  const { calls, loadingCalls } = useCallsData();
+  const { calls, loadingCalls } = useCallsData({ excludeTechniqueCalls: true });
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const {
     statuses: proposalStatuses,
