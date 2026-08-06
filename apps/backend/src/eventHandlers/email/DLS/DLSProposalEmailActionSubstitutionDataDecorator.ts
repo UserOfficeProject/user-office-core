@@ -216,8 +216,6 @@ async function proposalAcceptedHandler(
     uos_instance: getBaseURL(),
     proposal,
     isRapidAccess,
-    badDatesUri: '<BAD_DATES_URI>',
-    preferredDateDeadlineDate: 'xx/xx/xxxx',
     machineRequired: true,
     awardedShifts,
     commentsToUser,
