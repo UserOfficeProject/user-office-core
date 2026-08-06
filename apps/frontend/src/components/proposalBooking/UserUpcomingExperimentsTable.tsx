@@ -39,7 +39,6 @@ const columns: (
 ];
 
 type UserUpcomingExperimentsTableProps = {
-  /** Render nothing at all when there are no upcoming experiments. */
   hideIfEmpty?: boolean;
 };
 
