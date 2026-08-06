@@ -131,8 +131,6 @@ export const decorateDLSProposalEmailActionSubstitutionData = async (
     [EmailTemplateId.RESERVED_PROPOSAL]: proposalReservedHandler,
   };
 
-  logger.logInfo('******** Got emailTemplateName ' + emailTemplateName, {});
-
   const handler = handlers[emailTemplateName as EmailTemplateId];
 
   return handler ? handler(recipientWithData) : {};
@@ -145,7 +143,7 @@ async function proposalAcceptedHandler(
 
   if (!proposal) {
     logger.logInfo(
-      '******** Substitution data decorator: No proposal found for recipientWithData',
+      'DLS Substitution data decorator: No proposal found for recipientWithData',
       {}
     );
 
@@ -173,10 +171,7 @@ async function proposalAcceptedHandler(
   ]);
 
   if (!call) {
-    logger.logInfo(
-      '******** Substitution data decorator: No call found for recipientWithData',
-      {}
-    );
+    logger.logInfo('DLS Substitution data decorator: No call found', {});
 
     return {};
   }
@@ -240,6 +235,8 @@ async function proposalRejectedHandler(
   const proposal = recipientWithData.proposals[0];
 
   if (!proposal) {
+    logger.logInfo('DLS Substitution data decorator: No proposal found', {});
+
     return {};
   }
 
@@ -266,6 +263,8 @@ async function proposalRejectedHandler(
   ]);
 
   if (!call) {
+    logger.logInfo('DLS Substitution data decorator: No call found', {});
+
     return {};
   }
 
@@ -294,6 +293,8 @@ async function proposalReservedHandler(
   const proposal = recipientWithData.proposals[0];
 
   if (!proposal) {
+    logger.logInfo('DLS Substitution data decorator: No proposal found', {});
+
     return {};
   }
 
@@ -318,6 +319,8 @@ async function proposalReservedHandler(
   ]);
 
   if (!call) {
+    logger.logInfo('DLS Substitution data decorator: No call found', {});
+
     return {};
   }
 
