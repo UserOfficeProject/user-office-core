@@ -1,19 +1,41 @@
 import { CallRowObj } from './callFaps';
 import { RowObj } from './fap';
+import { QuestionaryStep } from '../../models/Questionary';
+import { Review } from '../../models/Review';
 
-export function getDataRow(
-  proposalPk: number,
-  piName: string,
-  proposalAverageScore: number,
-  instrumentName: string,
-  instrumentAvailabilityTime: number,
-  fapTimeAllocation: number | null,
-  proposalTitle: string,
-  proposalId: number | null,
-  techReviewTimeAllocation: number | null,
-  technicalReviewComment: string | null,
-  propFapRankOrder: number | null
-): RowObj {
+export type FapDataRowInput = {
+  proposalPk: number;
+  piName: string;
+  proposalAverageScore: number;
+  instrumentName: string;
+  instrumentAvailabilityTime: number;
+  fapTimeAllocation: number | null;
+  proposalTitle: string;
+  proposalId: number | null;
+  techReviewTimeAllocation: number | null;
+  technicalReviewComment: string | null;
+  propFapRankOrder: number | null;
+  proposerId: number | null;
+  proposalAnswers: QuestionaryStep[] | null;
+  reviews: Review[] | null;
+  instrumentId: number;
+};
+
+export type FapDataRow = (input: FapDataRowInput) => RowObj | Promise<RowObj>;
+
+export function getDataRow({
+  proposalPk,
+  piName,
+  proposalAverageScore,
+  instrumentName,
+  instrumentAvailabilityTime,
+  fapTimeAllocation,
+  proposalTitle,
+  proposalId,
+  techReviewTimeAllocation,
+  technicalReviewComment,
+  propFapRankOrder,
+}: FapDataRowInput): RowObj {
   return {
     proposalPk: proposalPk,
     propShortCode: proposalId?.toString(),
@@ -23,9 +45,9 @@ export function getDataRow(
     instrAvailTime: instrumentAvailabilityTime,
     techReviewTimeAllocation: techReviewTimeAllocation,
     techReviewComment: technicalReviewComment,
-    fapTimeAllocation: fapTimeAllocation ?? null,
-    propReviewAvgScore: proposalAverageScore ?? 0,
-    propFapRankOrder: propFapRankOrder ?? null,
+    fapTimeAllocation: fapTimeAllocation,
+    propReviewAvgScore: proposalAverageScore,
+    propFapRankOrder: propFapRankOrder,
     inAvailZone: null,
   };
 }
