@@ -105,6 +105,21 @@ export class SMTPMailService extends MailService {
     );
   }
 
+  private async resolveEmailTemplate(identifier: string) {
+    const isNumericIdentifier = /^\d+$/.test(identifier);
+
+    if (isNumericIdentifier) {
+      const byId =
+        await this.emailTemplateDataSource.getEmailTemplate(+identifier);
+
+      if (byId) {
+        return byId;
+      }
+    }
+
+    return this.emailTemplateDataSource.getEmailTemplateByName(identifier);
+  }
+
   private async compileEmailTemplate(options: SendMailOptions): Promise<{
     subject: string;
     body: string;
@@ -113,8 +128,8 @@ export class SMTPMailService extends MailService {
       return { subject: '= ``', body: '' };
     }
 
-    const emailTemplate = await this.emailTemplateDataSource.getEmailTemplate(
-      +options.content.template
+    const emailTemplate = await this.resolveEmailTemplate(
+      options.content.template
     );
 
     if (!emailTemplate) {
