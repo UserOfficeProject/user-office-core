@@ -217,18 +217,13 @@ const getDatePickerSections = (selector: string) =>
     .closest('.MuiPickersInputBase-root')
     .find('.MuiPickersSectionList-sectionContent');
 
-const setDatePickerValue = (selector: string, value: string) => {
+const setDatePickerValue = (selector: string, value: string) =>
   getDatePickerSections(selector)
     // NOTE: Points to the first sub-field which is usually the date. Typing
     // digits replaces the focused section and advances to the next one.
     .first()
     .click()
     .type(numbersOnly(value));
-
-  // NOTE: Yield the input rather than the section that was typed into, so a
-  // chained `should('have.value', ...)` reads the value the form submits.
-  return cy.get(selector);
-};
 
 const clearDatePickerValue = (selector: string) =>
   getDatePickerSections(selector).each(($section) => {
