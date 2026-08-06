@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger/lib/logger';
 import { container } from 'tsyringe';
 
 import { getBaseURL } from '../../../config/dls/configureDLSEnvironment';
@@ -130,6 +131,8 @@ export const decorateDLSProposalEmailActionSubstitutionData = async (
     [EmailTemplateId.RESERVED_PROPOSAL]: proposalReservedHandler,
   };
 
+  logger.logInfo('******** Got emailTemplateName ' + emailTemplateName, {});
+
   const handler = handlers[emailTemplateName as EmailTemplateId];
 
   return handler ? handler(recipientWithData) : {};
@@ -141,6 +144,11 @@ async function proposalAcceptedHandler(
   const proposal = recipientWithData.proposals[0];
 
   if (!proposal) {
+    logger.logInfo(
+      '******** Substitution data decorator: No proposal found for recipientWithData',
+      {}
+    );
+
     return {};
   }
 
@@ -165,6 +173,11 @@ async function proposalAcceptedHandler(
   ]);
 
   if (!call) {
+    logger.logInfo(
+      '******** Substitution data decorator: No call found for recipientWithData',
+      {}
+    );
+
     return {};
   }
 
