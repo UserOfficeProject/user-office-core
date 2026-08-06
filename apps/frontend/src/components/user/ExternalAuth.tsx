@@ -30,6 +30,31 @@ export const getCurrentUrlValues = () => {
   };
 };
 
+// Module scope, not a ref: a ref resets on remount and the code gets replayed.
+let authorizationCodeExchange: {
+  code: string;
+  result: Promise<string>;
+} | null = null;
+
+const exchangeAuthorizationCode = (
+  api: ReturnType<ReturnType<typeof useUnauthorizedApi>>,
+  code: string,
+  redirectUri: string,
+  iss: string | null
+): Promise<string> => {
+  if (authorizationCodeExchange?.code === code) {
+    return authorizationCodeExchange.result;
+  }
+
+  const result = api
+    .externalTokenLogin({ externalToken: code, redirectUri, iss })
+    .then(({ externalTokenLogin }) => externalTokenLogin);
+
+  authorizationCodeExchange = { code, result };
+
+  return result;
+};
+
 function ExternalAuth() {
   const [searchParams] = useSearchParams();
   const sessionid = searchParams.get('sessionid');
@@ -123,13 +148,13 @@ function ExternalAuth() {
       const iss = queryParams.get('iss');
       setView(<ContactingAuthorizationServerMessage />);
 
-      unauthorizedApi()
-        .externalTokenLogin({
-          externalToken: authorizationCode,
-          redirectUri: currentUrlWithoutParams,
-          iss: iss,
-        })
-        .then(({ externalTokenLogin }) => {
+      exchangeAuthorizationCode(
+        unauthorizedApi(),
+        authorizationCode,
+        currentUrlWithoutParams,
+        iss
+      )
+        .then((externalTokenLogin) => {
           handleLogin(externalTokenLogin);
           const previousPath = localStorage.getItem('redirectPath');
           clearSession('redirectPath');
