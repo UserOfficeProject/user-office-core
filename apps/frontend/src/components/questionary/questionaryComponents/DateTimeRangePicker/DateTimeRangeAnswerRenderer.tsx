@@ -4,7 +4,7 @@ import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegis
 import { Maybe, Scalars, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-const DateRangeAnswerValueRenderer = ({
+const DateTimeRangeAnswerValueRenderer = ({
   value,
 }: {
   value: Maybe<Scalars['IntStringDateBoolArray']['input']>;
@@ -13,11 +13,11 @@ const DateRangeAnswerValueRenderer = ({
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse,
   });
-  if (value?.dateRanges?.[0]?.from && value?.dateRanges?.[0]?.to) {
+  if (value?.dateTimeRanges?.[0]?.from && value?.dateTimeRanges?.[0]?.to) {
     return (
       <span>
-        {toFormattedDateTime(value.dateRanges[0].from)} :{' '}
-        {toFormattedDateTime(value.dateRanges[0].to)}
+        {toFormattedDateTime(value.dateTimeRanges[0].from)} :{' '}
+        {toFormattedDateTime(value.dateTimeRanges[0].to)}
       </span>
     );
   }
@@ -30,7 +30,7 @@ const DateAnswerRenderer: AnswerRenderer = ({ value }) => {
     return <span>Left blank</span>;
   }
 
-  return <DateRangeAnswerValueRenderer value={value} />;
+  return <DateTimeRangeAnswerValueRenderer value={value} />;
 };
 
 export default DateAnswerRenderer;

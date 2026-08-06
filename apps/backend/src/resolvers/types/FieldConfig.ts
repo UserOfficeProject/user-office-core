@@ -95,7 +95,7 @@ export class DateConfig extends ConfigBase {
 }
 
 @ObjectType()
-export class DateRangeConfig extends ConfigBase {
+export class DateTimeRangeConfig extends ConfigBase {
   @Field(() => String, { nullable: true })
   defaultDate:
     | {
@@ -403,7 +403,7 @@ export const FieldConfigType = createUnionType({
   types: () => [
     BooleanConfig,
     DateConfig,
-    DateRangeConfig,
+    DateTimeRangeConfig,
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,

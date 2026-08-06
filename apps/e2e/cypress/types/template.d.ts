@@ -177,12 +177,12 @@ declare global {
       /**
        * Creates dynamic multiple choice question. You have to be in edit template view to call this method
        *
-       * @returns {typeof createDateRangeQuestion}
+       * @returns {typeof createDateTimeRangeQuestion}
        * @memberof Chainable
        * @example
-       *    cy.createDateRangeQuestion('When should you plant daisies?')
+       *    cy.createDateTimeRangeQuestion('When should you plant daisies?')
        */
-      createDateRangeQuestion: (title: string) => void;
+      createDateTimeRangeQuestion: (title: string) => void;
 
       /**
        * Creates dynamic multiple choice question. You have to be in edit template view to call this method

@@ -10,12 +10,12 @@ import React, { useEffect } from 'react';
 
 import DayTimeRangePicker from 'components/common/FormikUIDayTimeRangePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { DateRangeConfig } from 'generated/sdk';
+import { DateTimeRangeConfig } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 import Hint from '../Hint';
 
-export function QuestionaryComponentDateRangePicker(
+export function QuestionaryComponentDateTimeRangePicker(
   props: BasicComponentProps
 ) {
   const {
@@ -28,7 +28,7 @@ export function QuestionaryComponentDateRangePicker(
     question: { id, question },
   } = answer;
 
-  const { tooltip } = answer.config as DateRangeConfig;
+  const { tooltip } = answer.config as DateTimeRangeConfig;
   const { format: dateTimeFormat, timezone } = useFormattedDateTime();
 
   const isError = !!errors[id];
@@ -37,19 +37,19 @@ export function QuestionaryComponentDateRangePicker(
     startEndDate: { from: string; to: string };
   }>();
 
-  // Writes dateRange to db after the user selects it.
+  // Writes dateTimeRange to db after the user selects it.
   useEffect(() => {
-    onComplete({ dateRanges: [values.startEndDate] });
+    onComplete({ dateTimeRanges: [values.startEndDate] });
   }, [values.startEndDate]);
 
   // Sets the UI from the db on page load.
   useEffect(() => {
-    const dateRange = answer?.value?.dateRanges?.[0];
+    const dateTimeRange = answer?.value?.dateTimeRanges?.[0];
 
-    if (dateRange) {
+    if (dateTimeRange) {
       setFieldValue('startEndDate', {
-        from: DateTime.fromISO(dateRange.from),
-        to: DateTime.fromISO(dateRange.to),
+        from: DateTime.fromISO(dateTimeRange.from),
+        to: DateTime.fromISO(dateTimeRange.to),
       });
     }
   }, []);

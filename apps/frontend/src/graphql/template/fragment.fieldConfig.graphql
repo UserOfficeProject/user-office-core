@@ -16,7 +16,7 @@ fragment fieldConfig on FieldConfig {
     includeTime
   }
 
-  ... on DateRangeConfig {
+  ... on DateTimeRangeConfig {
     small_label
     required
     tooltip

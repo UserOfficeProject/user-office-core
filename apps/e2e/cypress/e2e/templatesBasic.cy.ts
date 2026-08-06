@@ -338,7 +338,7 @@ context('Template Basic tests', () => {
       /* --- */
 
       /* Date range */
-      cy.createDateRangeQuestion('When to plant foxgloves?');
+      cy.createDateTimeRangeQuestion('When to plant foxgloves?');
 
       cy.contains('When to plant foxgloves?')
         .closest('[data-cy=question-container]')
@@ -1645,7 +1645,7 @@ context('Template Basic tests', () => {
   });
 
   describe('Date range picker tests', () => {
-    const createProposalAndOpenDateRangeQuestion = () => {
+    const createProposalAndOpenDateTimeRangeQuestion = () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
@@ -1665,11 +1665,11 @@ context('Template Basic tests', () => {
     });
 
     it.only('Should display date range selector', () => {
-      cy.createDateRangeQuestion(
+      cy.createDateTimeRangeQuestion(
         'What range of years do osprey come to Britain?'
       );
 
-      createProposalAndOpenDateRangeQuestion();
+      createProposalAndOpenDateTimeRangeQuestion();
 
       cy.contains('What range of years do osprey come to Britain?').should(
         'exist'

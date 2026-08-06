@@ -10,7 +10,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionDateForm = (props: QuestionFormProps) => {
+export const QuestionDateTimeForm = (props: QuestionFormProps) => {
   const field = props.question;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);

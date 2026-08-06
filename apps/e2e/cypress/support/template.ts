@@ -477,7 +477,7 @@ function createDynamicMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
-function createDateRangeQuestion(
+function createDateTimeRangeQuestion(
   question: string,
   options?: {
     key?: string;
@@ -835,7 +835,10 @@ Cypress.Commands.add(
   createDynamicMultipleChoiceQuestion
 );
 
-Cypress.Commands.add('createDateRangeQuestion', createDateRangeQuestion);
+Cypress.Commands.add(
+  'createDateTimeRangeQuestion',
+  createDateTimeRangeQuestion
+);
 
 Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);
 
