@@ -55,6 +55,11 @@ export const createFormikConfigObjects = (
         answer,
         state,
       });
+    } else {
+      console.log(
+        'Failed to get yup answer validation schema for: ',
+        answer.question.id
+      );
     }
   });
 

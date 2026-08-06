@@ -28,7 +28,7 @@ export function QuestionaryComponentDateTimeRangePicker(
     question: { id, question },
   } = answer;
 
-  const { tooltip } = answer.config as DateTimeRangeConfig;
+  const { tooltip, required } = answer.config as DateTimeRangeConfig;
   const { format: dateTimeFormat, timezone } = useFormattedDateTime();
 
   const isError = !!errors[id];
@@ -55,7 +55,7 @@ export function QuestionaryComponentDateTimeRangePicker(
   }, []);
 
   return (
-    <FormControl margin="dense" error={isError}>
+    <FormControl margin="dense" error={isError} required={required}>
       <FormLabel
         sx={{
           mb: 1,
