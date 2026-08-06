@@ -405,7 +405,7 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
-              rejectionComment: recipientWithData,
+              rejectionComment: recipientWithData.rejectionComment,
             },
             recipients: [{ address: recipientWithData.email }],
           });

@@ -668,8 +668,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 aria-labelledby="status-select-label"
                 onChange={(e) => {
                   if (e.target.value === StatusCode.UNSUCCESSFUL) {
-                    // Do you want to add a comment
-                    console.log('HEREEEEEEE!!!!!!!!!!');
                     setUnsuccessfullPK(rowData.primaryKey);
                     setUnsuccessfullWorkflowID(rowData.workflowId);
                     setRejectionCommentModalOpen(true);

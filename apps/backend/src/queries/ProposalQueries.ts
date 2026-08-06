@@ -213,7 +213,7 @@ export default class ProposalQueries {
       .getProposalRejectionComment(proposalPk)
       .catch((error) => {
         return rejection(
-          `Could not get proposal scientist comment proposal: '${proposalPk}'`,
+          `Could not get proposal rejection comment proposal: '${proposalPk}'`,
           { agent, args: proposalPk },
           error
         );
