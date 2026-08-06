@@ -2,7 +2,8 @@ name: Sync auto-merge PRs with develop
 
 on:
   schedule:
-    - cron: '0 0-5 * * *'
+    # Off-peak minute: at minute 0 GitHub dropped most of these triggers.
+    - cron: '46 0-6 * * *'
   workflow_dispatch:
 
 jobs:

@@ -58,6 +58,17 @@ export default class DataAccessUsersMutations {
         );
       }
 
+      // Data access users are stored via delete-all + reinsert, so capture the
+      // current members first to work out who is genuinely newly invited.
+      const existingDataAccessUsers =
+        await this.dataSource.findByProposalPk(proposalPk);
+      const existingUserIds = new Set(
+        existingDataAccessUsers.map((user) => user.id)
+      );
+      const newlyAddedUserIds = userIds.filter(
+        (userId) => !existingUserIds.has(userId)
+      );
+
       const result = await this.dataSource.updateDataAccessUsers(
         proposalPk,
         userIds
@@ -69,6 +80,7 @@ export default class DataAccessUsersMutations {
         await eventBus.publish({
           type: Event.DATA_ACCESS_USERS_UPDATED,
           proposalPKey: proposalPk,
+          newlyAddedUserIds: newlyAddedUserIds,
           key: 'proposalPk',
           loggedInUserId: agent ? agent.id : null,
           isRejection: false,

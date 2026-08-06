@@ -108,7 +108,7 @@ export const collectCallFapXLSXData = async (
   return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
-export const CallExtraFapDataColumns = [
+export const DefaultCallExtraFapDataColumns = [
   'Fap Time allocation',
   'Fap Meeting Decision',
   'Fap Meeting Comment for User',

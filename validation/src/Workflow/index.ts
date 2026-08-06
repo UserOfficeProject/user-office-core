@@ -16,6 +16,10 @@ export const deleteWorkflowValidationSchema = Yup.object().shape({
   id: Yup.number().required(),
 });
 
+export const cloneWorkflowValidationSchema = Yup.object().shape({
+  workflowId: Yup.number().required(),
+});
+
 export const addWorkflowStatusValidationSchema = Yup.object().shape({
   workflowId: Yup.number().required(),
   sortOrder: Yup.number().required(),

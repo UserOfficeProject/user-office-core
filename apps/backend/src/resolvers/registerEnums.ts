@@ -9,6 +9,7 @@ import {
 import {
   ExperimentSafetyReviewerDecisionEnum,
   ExperimentStatus,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
 } from '../models/Experiment';
 import { FapReviewVisibility } from '../models/Fap';
@@ -69,6 +70,10 @@ export const registerEnums = () => {
   });
   registerEnumType(ExperimentStatus, {
     name: 'ExperimentStatus',
+  });
+  registerEnumType(ExperimentTableSortField, {
+    name: 'ExperimentTableSortField',
+    description: 'Experiment table columns that support sorting',
   });
   registerEnumType(FeedbackStatus, {
     name: 'FeedbackStatus',

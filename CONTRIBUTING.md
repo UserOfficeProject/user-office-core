@@ -12,6 +12,10 @@ Please consider these guidelines when filing a pull request:
 
 ## Creating releases
 
+To create a release, you must create a pull request from the develop branch into 'master' using the 'Create a merge commit' option. Once this has been approved it will automatically run the pipeline to generate a new release. [example](https://github.com/UserOfficeProject/user-office-core/pull/1621)
+
+After this, create a new pull request merging 'master' into 'develop' using the 'Create a merge commit' option. There should be no files changed, but the commits listed. This is to ensure the branches remain in sync. [example](https://github.com/UserOfficeProject/user-office-core/pull/1623)
+
 UserOfficeProject/user-office-core uses [semantic-release](https://github.com/semantic-release/semantic-release)
 to release new versions automatically.
 

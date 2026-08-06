@@ -2,7 +2,7 @@ query getAllExperiments(
   $filter: ExperimentsFilter
   $first: Int
   $offset: Int
-  $sortField: String
+  $sortField: ExperimentTableSortField
   $sortDirection: PaginationSortDirection
   $searchText: String
 ) {

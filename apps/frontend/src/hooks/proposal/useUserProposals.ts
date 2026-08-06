@@ -63,8 +63,8 @@ export function useUserProposals(role = UserRole.USER) {
             return;
           }
 
-          if (data.me) {
-            setProposals(data.me.proposals);
+          if (data.me?.paginatedProposals) {
+            setProposals(data.me.paginatedProposals.userProposals);
           }
           setLoadingProposals(false);
         });

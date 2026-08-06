@@ -1,6 +1,7 @@
 import {
   addNextStatusEventsValidationSchema,
   addStatusActionsToConnectionValidationSchema,
+  cloneWorkflowValidationSchema,
   createWorkflowValidationSchema,
   deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
@@ -73,6 +74,25 @@ export default class WorkflowMutations {
   ): Promise<Workflow | Rejection> {
     return this.dataSource.deleteWorkflow(args.id).catch((error) => {
       return rejection('Could not delete workflow', { agent, args }, error);
+    });
+  }
+
+  @ValidateArgs(cloneWorkflowValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async cloneWorkflow(
+    agent: UserWithRole | null,
+    {
+      workflowId,
+    }: {
+      workflowId: number;
+    }
+  ) {
+    return this.dataSource.cloneWorkflow(workflowId).catch((error) => {
+      return rejection(
+        'Could not clone workflow',
+        { agent, workflowId },
+        error
+      );
     });
   }
 

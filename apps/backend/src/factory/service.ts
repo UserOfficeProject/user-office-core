@@ -38,6 +38,27 @@ export type XLSXMetaBase = MetaBase & { columns: string[] };
 
 const ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
+async function throwFactoryError(
+  factoryResp: globalThis.Response,
+  downloadType: DownloadType,
+  type: PDFType | XLSXType | ZIPType
+) {
+  const body = await factoryResp.text();
+
+  let parsed: { message?: string } | undefined;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    parsed = undefined;
+  }
+
+  const detail = typeof parsed?.message === 'string' ? parsed.message : body;
+
+  throw new Error(
+    `Factory service failed to generate ${downloadType}/${type}: ${detail}`
+  );
+}
+
 export default async function callFactoryService<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
   type: PDFType | XLSXType | ZIPType,
@@ -90,7 +111,7 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
             );
 
             if (!factoryResp.ok) {
-              throw new Error(await factoryResp.text());
+              await throwFactoryError(factoryResp, downloadType, type);
             }
 
             factoryRespBody = factoryResp.body;
@@ -110,6 +131,7 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
               });
               span.setStatus({ code: 2, message: String(err) });
             }
+            throw err;
           } finally {
             span.end();
           }
@@ -124,7 +146,7 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
       });
 
       if (!factoryResp.ok) {
-        throw new Error(await factoryResp.text());
+        await throwFactoryError(factoryResp, downloadType, type);
       }
 
       factoryRespBody = factoryResp.body;
@@ -141,7 +163,7 @@ export default async function callFactoryService<TData, TMeta extends MetaBase>(
 
     readableStream.on('error', (err) => {
       next({
-        error: err.toString(),
+        error: err,
         message: `Could not download generated ${downloadType}/${type}`,
       });
     });
