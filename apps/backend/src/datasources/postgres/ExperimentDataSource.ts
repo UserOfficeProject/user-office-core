@@ -742,6 +742,7 @@ export default class PostgresExperimentDataSource
       .join('experiments as e', 'v.experiment_pk', 'e.experiment_pk')
       .where('v.visit_id', visitId)
       .first();
+
     return record ? createExperimentObject(record) : null;
   }
 
