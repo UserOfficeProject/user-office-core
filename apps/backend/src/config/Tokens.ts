@@ -51,6 +51,7 @@ export const Tokens = {
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
   FapDataColumns: Symbol('FapDataColumns'),
+  CallExtraFapDataColumns: Symbol('CallExtraFapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
   PopulateCallRow: Symbol('PopulateCallRow'),
