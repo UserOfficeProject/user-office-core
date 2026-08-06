@@ -283,7 +283,10 @@ async function proposalRejectedHandler(
     commentsToUser,
     technicalAssessments,
     nextCallDeadline: getNextCallDeadline(call, calls),
-    call: getFormattedAllocationPeriod(call),
+    call: {
+      ...getFormattedAllocationPeriod(call),
+      referenceNumber: call.shortCode.replace(/^AP\s*/i, ''),
+    },
   };
 }
 
@@ -337,6 +340,9 @@ async function proposalReservedHandler(
     commentsToUser,
     technicalAssessments,
     nextCallDeadline: getNextCallDeadline(call, calls),
-    call: getFormattedAllocationPeriod(call),
+    call: {
+      ...getFormattedAllocationPeriod(call),
+      referenceNumber: call.shortCode.replace(/^AP\s*/i, ''),
+    },
   };
 }
