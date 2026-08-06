@@ -286,7 +286,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         yesterday
-      ).should('have.value', yesterday);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        yesterday
+      );
 
       cy.get('[data-cy=end-call-internal-date] .Mui-error').should('exist');
     });
@@ -421,7 +425,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         callInternalEndDate
-      ).should('have.value', callInternalEndDate);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        callInternalEndDate
+      );
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -599,7 +607,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         callInternalEndDate
-      ).should('have.value', callInternalEndDate);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        callInternalEndDate
+      );
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
