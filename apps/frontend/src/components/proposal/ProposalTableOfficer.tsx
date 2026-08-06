@@ -6,6 +6,7 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
+import ApprovalIcon from '@mui/icons-material/Approval';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -85,6 +86,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import NotifyProposal from './NotifyProposal';
+import { AdministrationFormData } from './ProposalAdmin';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
@@ -667,6 +669,25 @@ const ProposalTableOfficer = ({
     });
   };
 
+  const sendProposalsToFinalDecision = (): void => {
+    getSelectedProposalPks().forEach(async (proposalPk) => {
+      const administrationValues = {
+        proposalPk: proposalPk,
+        commentForUser: null,
+        commentForManagement: null,
+        finalStatus: null,
+        managementTimeAllocations: null,
+        managementDecisionSubmitted: true,
+      };
+      const inputvals: AdministrationFormData = administrationValues;
+      await api({
+        toastSuccessMessage: 'Saved!z',
+      }).administrationProposal(inputvals);
+
+      refreshTableData();
+    });
+  };
+
   const assignProposalsToFaps = async (
     fapInstsruments: FapInstrumentInput[]
   ): Promise<void> => {
@@ -966,6 +987,22 @@ const ProposalTableOfficer = ({
     .map((selectedProposal) => selectedProposal.instruments);
 
   const tableActions: Action<ProposalViewData>[] = [
+    {
+      icon: ApprovalIcon,
+      tooltip: 'Submit Final Decisionzac',
+      onClick: () => {
+        confirm(
+          () => {
+            sendProposalsToFinalDecision();
+          },
+          {
+            title: 'Submit Proposals',
+            description: `This action submit ${selectedProposalsData.length} proposal(s).`,
+          }
+        )();
+      },
+      position: 'toolbarOnSelect',
+    },
     {
       icon: FileCopy,
       tooltip: 'Clone proposals to call',

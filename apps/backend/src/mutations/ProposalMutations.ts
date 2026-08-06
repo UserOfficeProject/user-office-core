@@ -439,6 +439,32 @@ export default class ProposalMutations {
       );
     }
 
+    // Throws an error if the database is missing the finalStatus and null is supplied.
+    // The "Submit Final Decision" button reads these errors to flag to users the count of proposals
+    // that are not ready to have managementDecisionSubmitted set to true. When "Submit Final Decision" is
+    // pressed finalStatus is null.
+    if (
+      finalStatus === null &&
+      (proposal?.finalStatus === null || proposal?.finalStatus === undefined)
+    ) {
+      return rejection(
+        'Cannot edit proposal with no finalStatus existing in database or supplied.',
+        { args, agent }
+      );
+    }
+
+    const existingManagementTimeAllocations =
+      await this.instrumentDataSource.getInstrumentsByProposalPk(primaryKey);
+    if (
+      managementTimeAllocations === null &&
+      !existingManagementTimeAllocations?.[0]
+    ) {
+      return rejection(
+        'Cannot edit proposal with no managementTimeAllocations existing in database or supplied.',
+        { args, agent }
+      );
+    }
+
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
@@ -453,7 +479,8 @@ export default class ProposalMutations {
       );
     }
 
-    if (finalStatus !== undefined) {
+    // Need to check for undefined and null because 0/UNSET is falsy.
+    if (finalStatus !== undefined && finalStatus !== null) {
       proposal.finalStatus = finalStatus;
     }
 
