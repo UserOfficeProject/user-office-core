@@ -27,6 +27,7 @@ import {
   getTranslation,
 } from '@user-office-software/duo-localisation';
 import { TFunction } from 'i18next';
+import { useSnackbar } from 'notistack';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +66,7 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
@@ -668,24 +670,39 @@ const ProposalTableOfficer = ({
       refreshTableData();
     });
   };
-
-  const sendProposalsToFinalDecision = (): void => {
-    getSelectedProposalPks().forEach(async (proposalPk) => {
-      const administrationValues = {
-        proposalPk: proposalPk,
-        commentForUser: null,
-        commentForManagement: null,
-        finalStatus: null,
-        managementTimeAllocations: null,
-        managementDecisionSubmitted: true,
-      };
-      const inputvals: AdministrationFormData = administrationValues;
-      await api({
-        toastSuccessMessage: 'Saved!z',
-      }).administrationProposal(inputvals);
-
-      refreshTableData();
-    });
+  let successCount = 0;
+  let failCount = 0;
+  const { enqueueSnackbar } = useSnackbar();
+  const suppressednackbarAPI = useDataApi(true);
+  const sendProposalsToFinalDecision = async (): Promise<void> => {
+    await Promise.all(
+      getSelectedProposalPks().map(async (proposalPk) => {
+        const administrationValues = {
+          proposalPk: proposalPk,
+          commentForUser: null,
+          commentForManagement: null,
+          finalStatus: null,
+          managementTimeAllocations: null,
+          managementDecisionSubmitted: true,
+        };
+        const inputvals: AdministrationFormData = administrationValues;
+        try {
+          await suppressednackbarAPI().administrationProposal(inputvals);
+          successCount += 1;
+        } catch {
+          failCount += 1;
+        }
+      })
+    );
+    refreshTableData();
+    enqueueSnackbar(
+      `${successCount} management decisions were submitted and ${failCount} failed.`,
+      {
+        variant: 'info',
+        className: 'snackbar-success',
+        autoHideDuration: 5000,
+      }
+    );
   };
 
   const assignProposalsToFaps = async (
@@ -989,7 +1006,7 @@ const ProposalTableOfficer = ({
   const tableActions: Action<ProposalViewData>[] = [
     {
       icon: ApprovalIcon,
-      tooltip: 'Submit Final Decisionzac',
+      tooltip: 'Submit Final Decision',
       onClick: () => {
         confirm(
           () => {

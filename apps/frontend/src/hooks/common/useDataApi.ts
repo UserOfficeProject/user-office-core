@@ -43,14 +43,17 @@ const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
   userMessage: string,
   error: ClientError | string,
+  suppressedSnackbar: boolean,
   writeToServerLog = true,
   token?: string
 ) => {
-  enqueueSnackbar(userMessage, {
-    variant: 'error',
-    preventDuplicate: true,
-    className: 'snackbar-error',
-  });
+  if (!suppressedSnackbar) {
+    enqueueSnackbar(userMessage, {
+      variant: 'error',
+      preventDuplicate: true,
+      className: 'snackbar-error',
+    });
+  }
 
   console.error({ userMessage, error });
 
@@ -86,6 +89,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'No response received from server',
             error,
+            false,
             false
           );
         } else if (
@@ -96,10 +100,16 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Connection problem!',
             error,
+            false,
             false
           );
         } else {
-          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Something went wrong!',
+            error,
+            false
+          );
         }
 
         throw error;
@@ -118,6 +128,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private onSessionExpired: () => void,
     private handleUserActive: () => void,
     private isIdle: boolean,
+    private suppressSnackbar: boolean,
     private isIdleContextEnabled?: boolean,
     private tokenRenewed?: (newToken: string) => void,
     private externalAuthLoginUrl?: string
@@ -127,6 +138,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
     this.externalToken = this.getExternalToken(token);
+    this.suppressSnackbar = suppressSnackbar;
   }
 
   async request<T = unknown, V extends Variables = Variables>(
@@ -151,6 +163,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           this.enqueueSnackbar,
           'Server rejected user credentials',
           JSON.stringify(error),
+          this.suppressSnackbar,
           true,
           this.token
         );
@@ -170,6 +183,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'No response received from server',
             error,
+            this.suppressSnackbar,
             false,
             this.token
           );
@@ -181,6 +195,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Connection problem!',
             error,
+            this.suppressSnackbar,
             false,
             this.token
           );
@@ -193,6 +208,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Your session has expired, you will need to log in again through the external homepage',
             error,
+            this.suppressSnackbar,
             false,
             this.token
           );
@@ -202,6 +218,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             'Your session has expired, you will need to log in again.',
             error,
+            this.suppressSnackbar,
             false,
             this.token
           );
@@ -213,6 +230,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
             this.enqueueSnackbar,
             graphQLError?.message || 'Something went wrong!',
             error,
+            this.suppressSnackbar,
             true,
             this.token
           );
@@ -233,7 +251,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   }
 }
 
-export function useDataApi() {
+export function useDataApi(surpressSnackbar?: boolean) {
   const settingsContext = useContext(SettingsContext);
   const featureContext = useContext(FeatureContext);
   const externalAuthLoginUrl = settingsContext.settingsMap.get(
@@ -261,6 +279,7 @@ export function useDataApi() {
               },
               handleUserActive,
               isIdle,
+              surpressSnackbar ? true : false,
               isIdleContextEnabled ? isIdleContextEnabled : undefined,
               handleNewToken,
               externalAuthLoginUrl ? externalAuthLoginUrl : undefined
@@ -272,6 +291,7 @@ export function useDataApi() {
       enqueueSnackbar,
       handleUserActive,
       isIdle,
+      surpressSnackbar,
       isIdleContextEnabled,
       handleNewToken,
       externalAuthLoginUrl,
