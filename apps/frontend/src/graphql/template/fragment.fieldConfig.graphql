@@ -21,7 +21,6 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     readPermissions
-    includeTime
   }
   ... on EmbellishmentConfig {
     html

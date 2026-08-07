@@ -22,7 +22,6 @@ export const dateTimeRangeDefinition: Question<DataType.DATE_TIME_RANGE_PICKER> 
       config.required = false;
       config.tooltip = '';
       config.readPermissions = [];
-      config.includeTime = false;
 
       return config;
     },
