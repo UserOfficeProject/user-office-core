@@ -9,9 +9,10 @@ const DateTimeRangeAnswerValueRenderer = ({
 }: {
   value: Maybe<Scalars['IntStringDateBoolArray']['input']>;
 }) => {
-  const settingsFormatToUse = SettingsId.DATE_FORMAT;
+  const settingsFormatToUse = SettingsId.DATE_TIME_FORMAT;
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse,
+    shouldUseTimeZone: false,
   });
   if (value?.dateTimeRanges?.[0]?.from && value?.dateTimeRanges?.[0]?.to) {
     return (
