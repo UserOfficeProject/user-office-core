@@ -1,5 +1,4 @@
 import TodayIcon from '@mui/icons-material/Today';
-import { dateTimeRangeQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -25,7 +24,7 @@ export const dateTimeRangeDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
     answerRenderer: DateTimeRangeAnswerRenderer,
   },
-  createYupValidationSchema: dateTimeRangeQuestionValidationSchema,
+  createYupValidationSchema: null,
   getYupInitialValue: ({ answer }) => answer.value,
   searchCriteriaComponent: DateSearchCriteriaInput,
 };
