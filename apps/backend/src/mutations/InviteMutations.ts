@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
@@ -455,6 +456,23 @@ export default class InviteMutations {
         );
       // already a data access user
       if (isDataAccessUser) {
+        continue;
+      }
+
+      // A user cannot be simultaneously a data access user and a member of the
+      // proposal, as enforced in DataAccessUsersMutations.updateDataAccessUsers.
+      // Skip the claim rather than reject, so the rest of the invite is still
+      // accepted and the user is not left unable to redeem their code.
+      const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+        claimerUserId,
+        claim.proposalPk
+      );
+      if (isMemberOfProposal) {
+        logger.logWarn(
+          'Skipped data access claim because the user is a member of the proposal',
+          { claimerUserId, proposalPk: claim.proposalPk, inviteId }
+        );
+
         continue;
       }
 

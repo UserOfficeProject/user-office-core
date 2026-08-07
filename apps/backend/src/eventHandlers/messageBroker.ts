@@ -9,6 +9,7 @@ import { AllocationTimeUnitConverter } from '../config/base/allocationTimeUnitCo
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../datasources/DataAccessClaimDataSource';
 import {
   DataAccessUsersDataSource,
   UserWithInstitution,
@@ -311,6 +312,11 @@ export async function createPostToRabbitMQHandler() {
       Tokens.CoProposerClaimDataSource
     );
 
+  const dataAccessClaimDataSource =
+    container.resolve<DataAccessClaimDataSource>(
+      Tokens.DataAccessClaimDataSource
+    );
+
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -367,6 +373,29 @@ export async function createPostToRabbitMQHandler() {
           const proposal = await proposalDataSource.get(claim.proposalPk);
           if (!proposal) {
             return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
+        break;
+      }
+      case Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED: {
+        const { invite } = event;
+
+        const claims = await dataAccessClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            continue;
           }
 
           const jsonMessage = await getProposalMessageData(proposal);

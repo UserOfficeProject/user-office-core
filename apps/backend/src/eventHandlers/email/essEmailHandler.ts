@@ -289,17 +289,23 @@ export async function essEmailHandler(event: ApplicationEvent) {
           continue;
         }
 
-        await sendInviteEmail(
-          invite,
-          inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
-        ).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
-            description: 'Visit registration invite sent',
+        try {
+          await sendInviteEmail(
             invite,
-          });
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
+          );
+        } catch {
+          // sendInviteEmail has already logged; skip the invite rather than
+          // abandoning the ones still to be sent.
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+          description: 'Visit registration invite sent',
+          invite,
         });
       }
       break;
@@ -334,17 +340,21 @@ export async function essEmailHandler(event: ApplicationEvent) {
           continue;
         }
 
-        await sendInviteEmail(
-          invite,
-          inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
-          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
-        ).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+        try {
+          await sendInviteEmail(
             invite,
-          });
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+            { proposalTitle: proposal.title, proposalId: proposal.proposalId }
+          );
+        } catch {
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+          invite,
         });
       }
       break;
@@ -379,20 +389,79 @@ export async function essEmailHandler(event: ApplicationEvent) {
           continue;
         }
 
-        await sendInviteEmail(
-          invite,
-          inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER,
-          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
-        ).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+        try {
+          await sendInviteEmail(
             invite,
-          });
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER,
+            { proposalTitle: proposal.title, proposalId: proposal.proposalId }
+          );
+        } catch {
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+          invite,
         });
       }
       break;
+    }
+
+    case Event.DATA_ACCESS_USERS_UPDATED: {
+      // Only newly added users are notified; a pure removal or no-op update
+      // carries an empty list and sends nothing.
+      if (event.newlyAddedUserIds.length === 0) {
+        return;
+      }
+
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
+
+      const invitedUsers = await userDataSource.getBasicUsersInfo(
+        event.newlyAddedUserIds
+      );
+
+      for (const user of invitedUsers) {
+        mailService
+          .sendMail({
+            content: {
+              template: EmailTemplateId.DATA_ACCESS_USER_ADDED,
+            },
+            substitution_data: {
+              preferredname: user.preferredname,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              proposalTitle: proposal.title,
+              proposalId: proposal.proposalId,
+            },
+            recipients: [{ address: user.email }],
+          })
+          .then((res) => {
+            logger.logInfo('Email sent on data access user added', {
+              result: res,
+              userId: user.id,
+              proposalPKey: event.proposalPKey,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email on data access user added', {
+              error: err,
+              userId: user.id,
+              event,
+            });
+          });
+      }
+
+      return;
     }
 
     case Event.FAP_REVIEWER_NOTIFIED: {
@@ -578,5 +647,8 @@ async function sendInviteEmail(
     })
     .catch((err: string) => {
       logger.logException('Failed email transmission', err);
+
+      // Rethrown so callers do not chain an "invite sent" event onto a failure.
+      throw err;
     });
 }

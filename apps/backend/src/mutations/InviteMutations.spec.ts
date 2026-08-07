@@ -9,6 +9,7 @@ import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { DataAccessClaimDataSourceMock } from '../datasources/mockups/DataAccessClaimDataSource';
+import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import {
@@ -28,6 +29,10 @@ const inviteMutations = container.resolve(InviteMutations);
 const visitDataSource = container.resolve<VisitDataSource>(
   Tokens.VisitDataSource
 );
+const dataAccessUsersDataSource =
+  container.resolve<MockDataAccessUsersDataSource>(
+    Tokens.DataAccessUsersDataSource
+  );
 
 describe('Test Invite Mutations', () => {
   beforeEach(() => {
@@ -43,6 +48,7 @@ describe('Test Invite Mutations', () => {
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
     container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
+    dataAccessUsersDataSource.updateDataAccessUsers(1, []);
   });
 
   afterEach(() => {
@@ -420,12 +426,34 @@ describe('Test Invite Mutations', () => {
   });
 
   test('A user can accept valid data access invite without code', async () => {
+    const claimer = {
+      ...dummyUserNotOnProposalWithRole,
+      email: 'test_dau@example.com',
+    };
+
     const invite = await inviteMutations.acceptDataAccessInvite(
-      { ...dummyUserWithRole, email: 'test_dau@example.com' },
+      claimer,
       'shortCode'
     );
 
     expect(invite).toBeInstanceOf(Invite);
+    await expect(
+      dataAccessUsersDataSource.isDataAccessUserOfProposal(claimer.id, 1)
+    ).resolves.toBe(true);
+  });
+
+  test('A member of the proposal is not granted data access on accept', async () => {
+    const claimer = { ...dummyUserWithRole, email: 'test_dau@example.com' };
+
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      claimer,
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Invite);
+    await expect(
+      dataAccessUsersDataSource.isDataAccessUserOfProposal(claimer.id, 1)
+    ).resolves.toBe(false);
   });
 
   test('A user can not accept data access invite without code if email does not match', async () => {
