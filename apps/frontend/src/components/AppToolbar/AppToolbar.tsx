@@ -11,7 +11,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 import {
-  DRAWER_WIDTH,
+  drawerWidth,
   useIsPortrait,
   useIsTabletOrMobile,
 } from 'hooks/common/useResponsive';
@@ -58,8 +58,10 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
           duration: theme.transitions.duration.leavingScreen,
         }),
         ...(open && {
-          marginLeft: isTabletOrMobile ? 0 : DRAWER_WIDTH,
-          width: isTabletOrMobile ? '100%' : `calc(100% - ${DRAWER_WIDTH}px)`,
+          marginLeft: isTabletOrMobile ? 0 : drawerWidth(theme),
+          width: isTabletOrMobile
+            ? '100%'
+            : `calc(100% - ${drawerWidth(theme)})`,
           transition: isTabletOrMobile
             ? 'none'
             : theme.transitions.create(['width', 'margin'], {
