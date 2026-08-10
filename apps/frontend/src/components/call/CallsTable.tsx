@@ -31,6 +31,7 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
+import { useDownloadXLSXFinalDecision } from 'hooks/finalDecision/useDownloadXLSXFinalDecision';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -104,6 +105,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
   });
 
   const exportFapData = useDownloadXLSXCallFap();
+  const exportFinalDecisionData = useDownloadXLSXFinalDecision();
   const search = searchParam.get('search');
   const [isCallReorderMode, setIsCallReorderMode] = useState(false);
   let callStatus = searchParam.get('callStatus');
@@ -507,6 +509,13 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
               icon: GridOnIcon,
               tooltip: `Export ${t('Fap')} Data`,
               onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
+              position: 'row',
+            }),
+            (rowData) => ({
+              icon: GridOnIcon,
+              tooltip: `Export Final Decision Data`,
+              onClick: (): void =>
+                exportFinalDecisionData(rowData.id, rowData.shortCode),
               position: 'row',
             }),
           ]}

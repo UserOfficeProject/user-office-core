@@ -119,6 +119,7 @@ export enum PREPARE_DOWNLOAD_TYPE {
   XLSX_FAP,
   XLSX_CALL_FAP,
   XLSX_PROPOSAL_TECHNIQUE,
+  XLSX_FINAL_DECISION,
 }
 
 export type DownloadOptions = {
@@ -183,6 +184,8 @@ function generateLink(
       return '/download/zip/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.ZIP_EXPERIMENT_SAFETY:
       return '/download/zip/experiment-safety/' + ids;
+    case PREPARE_DOWNLOAD_TYPE.XLSX_FINAL_DECISION:
+      return '/download/xlsx/final-decision/' + ids;
     default:
       throw new Error('Unknown type:' + type);
   }
