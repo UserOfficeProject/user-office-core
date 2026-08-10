@@ -327,6 +327,17 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
+        const jsonMessage = JSON.stringify(event.proposals);
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
