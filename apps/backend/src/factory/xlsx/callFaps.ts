@@ -6,6 +6,7 @@ import baseContext from '../../buildContext';
 import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { stripHtml } from '../../utils/stringStripHtml';
@@ -106,6 +107,112 @@ export const collectCallFapXLSXData = async (
   );
 
   return { data: baseData, filename: filename.replace(/\s+/g, '_') };
+};
+
+const collectFinalDecisionData = async (
+  fapId: number,
+  callId: number,
+  user: UserWithRole,
+  instrumentName: string
+) => {
+  const finalDecisionColumns = [
+    'Proposal Reference Number',
+    'Principal Investigator',
+    'Instrument Name',
+    'Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
+    'FAP allocated time', // Awarded Time, time recommendation from FAP process
+    'FAP Meeting Decision', // Decision (FAP Meeting Decision) recommendation from FAP process
+    'FAP comment to user', // Comment to user (FAP Comment to user)
+    'Internal comments', // Internal comments
+    'Technical Review comments', // Technical assessment Comment to management
+    'FAP comments', // FAP meeting Comment to management
+  ];
+
+  const baseData = await fapDataSource.getFapReviewData(callId, fapId);
+  const returnData = baseData.map((fapreview) => {
+    return [
+      'zac1',
+      'zac2',
+      instrumentName,
+      'zac2',
+      'zac1',
+      'zac2',
+      'zac1',
+      'zac2',
+      'zac1',
+      'zac2',
+      'zac1',
+      'zac12',
+      'zac13',
+    ];
+  });
+  const principalInvestigator = '';
+
+  //console.log(returnData);
+
+  return returnData;
+
+  return {
+    'Proposal Reference Number': 'hi',
+    'Proposal Title': 'hi',
+    'Principal Investigator': 'hi',
+    Instruments: 'hi',
+    'Reason for multiple instruments': 'hi',
+    'Instrument available time': 'hi',
+    'FAP allocated time': 'hi',
+    'FAP Meeting Decision': 'hi', // Decision (FAP Meeting Decision) recommendation from FAP process
+    'FAP comment to user': 'hi', // Comment to user (FAP Comment to user)
+    'Internal comments': 'hi',
+    'Technical Review comments': 'hi', // Technical assessment Comment to management
+    'FAP comments': 'hi', // FAP meeting Comment to management
+  };
+};
+
+export const collectFinalDecisionXLSXData = async (
+  callId: number,
+  user: UserWithRole
+) => {
+  const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const instruments = await instrumentDataSource.getInstrumentsByCallId(
+    [callId],
+    true
+  );
+  const call = await baseContext.queries.call.get(user, callId);
+  const filename = `${call?.shortCode}_FAP_Results.xlsx`;
+
+  const baseData2 = await Promise.all(
+    instruments.map(async (instrument) => {
+      const newRows = [] as string[][];
+      for (const fap of faps) {
+        //const rowOfInstrument = await collectFinalDecisionData(3, callId, user, instrument.name);
+        newRows.push([
+          'zac1',
+          'zac2',
+          'instrumentName',
+          'zac2',
+          'zac1',
+          'zac2',
+          'zac1',
+          'zac2',
+          'zac1',
+          'zac2',
+          'zac1',
+          'zac12',
+          'zac13',
+        ]);
+      }
+
+      return {
+        sheetName: instrument.name,
+        rows: newRows,
+      };
+    })
+  );
+
+  return { data: baseData2, filename: filename.replace(/\s+/g, '_') };
 };
 
 export const DefaultCallExtraFapDataColumns = [

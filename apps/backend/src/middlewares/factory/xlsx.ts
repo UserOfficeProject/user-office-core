@@ -12,6 +12,7 @@ import { getCurrentTimestamp } from '../../factory/util';
 import {
   DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
+  collectFinalDecisionXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
 import {
@@ -253,20 +254,34 @@ router.get(`/${XLSXType.FINAL_DECISION}/:call_id`, async (req, res, next) => {
       throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
     }
 
-    const { data, filename } = await collectCallFapXLSXData(
+    const { data, filename } = await collectFinalDecisionXLSXData(
       callId,
       userWithRole
     );
 
+    const finalDecisionColumns = [
+      'Proposal Reference Number',
+      'Principal Investigator',
+      'Instrument Name',
+      'Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
+      'FAP allocated time', // Awarded Time, time recommendation from FAP process
+      'FAP Meeting Decision', // Decision (FAP Meeting Decision) recommendation from FAP process
+      'FAP comment to user', // Comment to user (FAP Comment to user)
+      'Internal comments', // Internal comments
+      'Technical Review comments', // Technical assessment Comment to management
+      'FAP comments', // FAP meeting Comment to management
+    ];
+
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: fapDataColumns.concat(callExtraFapDataColumns),
+      columns: finalDecisionColumns,
     };
 
     const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.XLSX,
+      //XLSXType.FINAL_DECISION,
       XLSXType.CALL_FAP,
       { data, meta, userRole },
       req,
