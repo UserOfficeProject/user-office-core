@@ -16,9 +16,9 @@ import { UserContext } from 'context/UserContextProvider';
 import { PageName, SettingsId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import {
-  DRAWER_WIDTH,
-  TOOLBAR_HEIGHT_SM,
-  TOOLBAR_HEIGHT_XS,
+  drawerRailWidth,
+  drawerWidth,
+  toolbarHeight,
   useIsTabletOrMobile,
 } from 'hooks/common/useResponsive';
 
@@ -65,29 +65,53 @@ const PageLayout = ({
   const { currentRole } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
+  const toolbar = toolbarHeight(theme);
   const drawer = {
-    width: DRAWER_WIDTH,
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    '.MuiDrawer-paper': {
-      width: 'inherit',
-    },
   };
-  const drawerOpen = () => ({
-    width: DRAWER_WIDTH,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  });
-  const drawerClose = () => ({
-    transition: theme.transitions.create('width', {
+  const menuLabel = {
+    transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+  };
+  const paper = {
+    overflowX: 'hidden',
+    boxSizing: 'border-box',
+    '.MuiListItemText-root': menuLabel,
+  };
+  const openWidth = {
+    width: drawerWidth(theme),
+  };
+  const closedWidth = {
+    width: drawerRailWidth(theme),
+  };
+  const widthTransition = (duration: number) =>
+    theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration,
+    });
+  const drawerOpen = () => ({
+    ...openWidth,
+    transition: widthTransition(theme.transitions.duration.enteringScreen),
+    '.MuiDrawer-paper': {
+      ...paper,
+      ...openWidth,
+      transition: widthTransition(theme.transitions.duration.enteringScreen),
+    },
+  });
+  const drawerClose = () => ({
+    ...closedWidth,
+    transition: widthTransition(theme.transitions.duration.leavingScreen),
+    '.MuiDrawer-paper': {
+      ...paper,
+      ...closedWidth,
+      transition: widthTransition(theme.transitions.duration.leavingScreen),
+      '.MuiListItemText-root': {
+        ...menuLabel,
+        opacity: 0,
+      },
     },
   });
 
@@ -182,13 +206,10 @@ const PageLayout = ({
           component="main"
           sx={{
             flexGrow: 1,
-            marginTop: {
-              xs: `${TOOLBAR_HEIGHT_XS}px`,
-              sm: `${TOOLBAR_HEIGHT_SM}px`,
-            },
+            marginTop: toolbar,
             height: {
-              xs: `calc(100vh - ${TOOLBAR_HEIGHT_XS}px)`,
-              sm: `calc(100vh - ${TOOLBAR_HEIGHT_SM}px)`,
+              xs: `calc(100vh - ${toolbar.xs})`,
+              sm: `calc(100vh - ${toolbar.sm})`,
             },
             minWidth: 0,
           }}
