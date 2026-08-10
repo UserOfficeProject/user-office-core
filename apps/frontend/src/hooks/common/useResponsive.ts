@@ -1,13 +1,20 @@
-import { Breakpoint } from '@mui/material/styles';
+import { Breakpoint, Theme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 export const DRAWER_OVERLAY_BREAKPOINT: Breakpoint = 'lg';
 export const COMPACT_UI_BREAKPOINT: Breakpoint = 'sm';
 
-export const TOOLBAR_HEIGHT_XS = 56;
-export const TOOLBAR_HEIGHT_SM = 64;
+export const toolbarHeight = (theme: Theme) => ({
+  xs: theme.spacing(7),
+  sm: theme.spacing(8),
+});
 
-export const DRAWER_WIDTH = 250;
+export const drawerWidth = (theme: Theme) => theme.spacing(31.25);
+
+export const drawerRailWidth = (theme: Theme) => ({
+  xs: theme.spacing(6),
+  sm: theme.spacing(8),
+});
 
 export function useIsBelow(breakpoint: Breakpoint): boolean {
   return useMediaQuery((theme) => theme.breakpoints.down(breakpoint));
