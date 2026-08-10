@@ -127,15 +127,14 @@ const collectFinalDecisionData = async (
     'Technical Review comments', // Technical assessment Comment to management
     'FAP comments', // FAP meeting Comment to management
   ];
-
   const baseData = await fapDataSource.getFapReviewData(callId, fapId);
   const returnData = baseData.map((fapreview) => {
     return [
-      'zac1',
-      'zac2',
+      fapreview.proposal_id.toString(),
+      'aaron',
       instrumentName,
-      'zac2',
-      'zac1',
+      fapreview.availability_time.toString(),
+      fapreview.time_allocation.toString(),
       'zac2',
       'zac1',
       'zac2',
@@ -148,24 +147,7 @@ const collectFinalDecisionData = async (
   });
   const principalInvestigator = '';
 
-  //console.log(returnData);
-
   return returnData;
-
-  return {
-    'Proposal Reference Number': 'hi',
-    'Proposal Title': 'hi',
-    'Principal Investigator': 'hi',
-    Instruments: 'hi',
-    'Reason for multiple instruments': 'hi',
-    'Instrument available time': 'hi',
-    'FAP allocated time': 'hi',
-    'FAP Meeting Decision': 'hi', // Decision (FAP Meeting Decision) recommendation from FAP process
-    'FAP comment to user': 'hi', // Comment to user (FAP Comment to user)
-    'Internal comments': 'hi',
-    'Technical Review comments': 'hi', // Technical assessment Comment to management
-    'FAP comments': 'hi', // FAP meeting Comment to management
-  };
 };
 
 export const collectFinalDecisionXLSXData = async (
@@ -187,22 +169,15 @@ export const collectFinalDecisionXLSXData = async (
     instruments.map(async (instrument) => {
       const newRows = [] as string[][];
       for (const fap of faps) {
-        //const rowOfInstrument = await collectFinalDecisionData(3, callId, user, instrument.name);
-        newRows.push([
-          'zac1',
-          'zac2',
-          'instrumentName',
-          'zac2',
-          'zac1',
-          'zac2',
-          'zac1',
-          'zac2',
-          'zac1',
-          'zac2',
-          'zac1',
-          'zac12',
-          'zac13',
-        ]);
+        const rowOfInstrument = await collectFinalDecisionData(
+          fap.id,
+          callId,
+          user,
+          instrument.name
+        );
+        for (const row of rowOfInstrument) {
+          newRows.push(row);
+        }
       }
 
       return {
