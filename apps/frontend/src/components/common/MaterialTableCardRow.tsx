@@ -1,4 +1,4 @@
-import { Column, MTableBodyRow } from '@material-table/core';
+import { Column } from '@material-table/core';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -97,11 +97,3 @@ export default function MaterialTableCardRow<RowData extends object>({
     </TableRow>
   );
 }
-
-const CARD_ROW = { Row: MaterialTableCardRow };
-const DEFAULT_ROW = { Row: MTableBodyRow };
-
-// material-table ignores a falsy `components`, so it never reverts to the
-// default Row. Both states must be named, and the references must be stable.
-export const rowComponents = (asCards: boolean) =>
-  asCards ? CARD_ROW : DEFAULT_ROW;
