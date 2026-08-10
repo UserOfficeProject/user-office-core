@@ -1,6 +1,8 @@
-import MaterialTable, { MaterialTableProps } from '@material-table/core';
+import { MaterialTableProps } from '@material-table/core';
 import React, { useMemo } from 'react';
 
+import ResponsiveMaterialTable from 'components/common/ResponsiveMaterialTable';
+import { useCardRows } from 'hooks/common/useResponsive';
 import { denseTableColumns } from 'utils/helperFunctions';
 
 /**NOTE:
@@ -10,12 +12,16 @@ import { denseTableColumns } from 'utils/helperFunctions';
 function DenseMaterialTable<RowData extends object>(
   props: MaterialTableProps<RowData>
 ) {
-  // NOTE: Using useMemo() with an empty dependencies array will calculate the value only once, on mount.
+  const asCards = useCardRows();
+  // Deliberately not keyed on props.columns.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const columns = useMemo(() => denseTableColumns(props.columns), []);
+  const columns = useMemo(
+    () => (asCards ? props.columns : denseTableColumns(props.columns)),
+    [asCards]
+  );
 
   return (
-    <MaterialTable
+    <ResponsiveMaterialTable
       {...props}
       options={{ ...props.options, pageSize: props.options?.pageSize || 10 }}
       columns={columns}
