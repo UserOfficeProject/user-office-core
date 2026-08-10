@@ -1,12 +1,11 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { rowComponents } from 'components/common/MaterialTableCardRow';
+import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useIsMobile } from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -48,7 +47,6 @@ export default function UserUpcomingExperimentsTable({
     userExperiments,
     setUserUpcomingExperiments,
   } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
-  const isMobile = useIsMobile();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -104,14 +102,12 @@ export default function UserUpcomingExperimentsTable({
         isLoading={experimentsLoading}
         columns={columns(t)}
         data={userExperimentsWithFormattedDates}
-        components={rowComponents(isMobile)}
         options={{
           search: false,
           padding: 'dense',
           emptyRowsWhenPaging: false,
           paging: false,
           actionsColumnIndex: -1,
-          header: !isMobile,
         }}
       />
       <Dialog
