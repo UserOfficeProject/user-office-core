@@ -364,6 +364,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       {
         id: 'declareShipment',
         helperText: 'Needed before samples arrive',
+        // TODO: placeholder copy. This action sets no stateReason, so the locked
+        // row has nothing to show. Confirm the real precondition with the user
+        // office and set it here and on the desktop tooltip together.
         reason: 'Opens once the proposal is accepted',
       }
     );
@@ -398,6 +401,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
           navigate(`/CreateFeedback/${event.experimentPk}`);
         }
       },
+      // TODO: placeholder reason, same as declareShipment above.
       { id: 'giveFeedback', reason: 'Available after the experiment' }
     );
   };
