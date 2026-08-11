@@ -26,8 +26,10 @@ const STATUS_ICON: Record<
   locked: { icon: <LockIcon />, color: 'action.disabled' },
 };
 
+// Only `locked` is inert, matching the desktop action buttons — a completed step
+// can still be reopened to redo it.
 const TaskRow = ({ task, onClick }: CardTaskItem) => {
-  const actionable = task.status === 'todo' && !!onClick;
+  const actionable = task.status !== 'locked' && !!onClick;
   const { icon, color } = STATUS_ICON[task.status];
 
   return (
@@ -66,8 +68,7 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
           variant="body2"
           sx={{
             fontWeight: task.status === 'todo' ? 500 : 400,
-            color: task.status === 'todo' ? 'text.primary' : 'text.disabled',
-            textDecoration: task.status === 'done' ? 'line-through' : undefined,
+            color: task.status === 'locked' ? 'text.disabled' : 'text.primary',
           }}
         >
           {task.label}
