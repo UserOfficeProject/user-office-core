@@ -1013,7 +1013,7 @@ const ProposalTableOfficer = ({
             sendProposalsToManagementDecision();
           },
           {
-            title: 'Submit Proposals',
+            title: 'Submit Management Decisions',
             description: `This action will submit the management decision for ${selectedProposalsData.length} proposal(s).`,
           }
         )();
