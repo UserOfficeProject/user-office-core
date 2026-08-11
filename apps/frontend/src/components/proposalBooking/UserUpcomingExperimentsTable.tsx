@@ -1,7 +1,7 @@
 import { Column } from '@material-table/core';
 import { Box, Chip, Dialog, DialogContent, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
-import React, { useState, ReactNode, useContext } from 'react';
+import React, { useEffect, useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CardTaskItem } from 'components/common/cards/CardTaskList';
@@ -45,10 +45,13 @@ const columns: (
 
 type UserUpcomingExperimentsTableProps = {
   hideIfEmpty?: boolean;
+  /** Reports the outstanding task count so the section nav can badge it. */
+  onTasksDueChange?: (count: number) => void;
 };
 
 export default function UserUpcomingExperimentsTable({
   hideIfEmpty = true,
+  onTasksDueChange,
 }: UserUpcomingExperimentsTableProps) {
   const {
     loading: experimentsLoading,
@@ -115,6 +118,18 @@ export default function UserUpcomingExperimentsTable({
       ];
     });
 
+  const tasksDue = userExperiments.reduce(
+    (total, experiment) =>
+      total +
+      taskItemsFor(experiment).filter((item) => item.task.status === 'todo')
+        .length,
+    0
+  );
+
+  useEffect(() => {
+    onTasksDueChange?.(tasksDue);
+  }, [tasksDue, onTasksDueChange]);
+
   // if there are no upcoming experiments, the dashboard hides the table
   // altogether; the standalone page keeps it and shows its empty state
   if (hideIfEmpty && userExperiments.length === 0) {
@@ -127,14 +142,6 @@ export default function UserUpcomingExperimentsTable({
       startsAtFormatted: toFormattedDateTime(experiment.startsAt),
       endsAtFormatted: toFormattedDateTime(experiment.endsAt),
     })
-  );
-
-  const tasksDue = userExperiments.reduce(
-    (total, experiment) =>
-      total +
-      taskItemsFor(experiment).filter((item) => item.task.status === 'todo')
-        .length,
-    0
   );
 
   return (
