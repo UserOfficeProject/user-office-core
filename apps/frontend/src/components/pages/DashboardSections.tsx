@@ -1,4 +1,3 @@
-import Badge from '@mui/material/Badge';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Box from '@mui/material/Box';
@@ -12,9 +11,10 @@ export type DashboardSection = {
   id: string;
   label?: string;
   icon?: React.ReactNode;
-  badgeCount?: number;
   render: (options: { canHideWhenEmpty: boolean }) => React.ReactNode;
 };
+
+const NAV_HEIGHT = 60;
 
 export const Panel = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper
@@ -44,20 +44,25 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
 
   return (
     <>
-      {sections.map((section) => (
-        <Box
-          key={section.id}
-          hidden={section.id !== current}
-          sx={{ display: section.id === current ? 'block' : 'none' }}
-        >
-          <Panel>{section.render({ canHideWhenEmpty: false })}</Panel>
-        </Box>
-      ))}
+      {/* Clears the fixed nav so the last card is never behind it. */}
+      <Box sx={{ paddingBottom: `${NAV_HEIGHT}px` }}>
+        {sections.map((section) => (
+          <Box
+            key={section.id}
+            hidden={section.id !== current}
+            sx={{ display: section.id === current ? 'block' : 'none' }}
+          >
+            <Panel>{section.render({ canHideWhenEmpty: false })}</Panel>
+          </Box>
+        ))}
+      </Box>
       <MuiPaper
         elevation={3}
         sx={{
-          position: 'sticky',
+          position: 'fixed',
           bottom: 0,
+          left: 0,
+          right: 0,
           zIndex: (theme) => theme.zIndex.appBar,
         }}
       >
@@ -65,7 +70,7 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
           value={current}
           onChange={(_event, section) => setCurrent(section)}
           showLabels
-          sx={{ height: 60 }}
+          sx={{ height: NAV_HEIGHT }}
           data-cy="dashboard-section-nav"
         >
           {sections.map((section) => (
@@ -73,15 +78,7 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
               key={section.id}
               label={section.label ?? section.id}
               value={section.id}
-              icon={
-                section.badgeCount ? (
-                  <Badge color="warning" badgeContent={section.badgeCount}>
-                    {section.icon}
-                  </Badge>
-                ) : (
-                  section.icon
-                )
-              }
+              icon={section.icon}
               data-cy={`dashboard-section-${section.id}`}
             />
           ))}
