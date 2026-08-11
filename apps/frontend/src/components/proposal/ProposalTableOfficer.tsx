@@ -674,7 +674,7 @@ const ProposalTableOfficer = ({
   let failCount = 0;
   const { enqueueSnackbar } = useSnackbar();
   const suppressednackbarAPI = useDataApi(true);
-  const sendProposalsToFinalDecision = async (): Promise<void> => {
+  const sendProposalsToManagementDecision = async (): Promise<void> => {
     await Promise.all(
       getSelectedProposalPks().map(async (proposalPk) => {
         const administrationValues = {
@@ -696,10 +696,10 @@ const ProposalTableOfficer = ({
     );
     refreshTableData();
     enqueueSnackbar(
-      `${successCount} management decisions were submitted and ${failCount} failed.`,
+      `${successCount} management decision(s) were submitted and ${failCount} failed.`,
       {
         variant: 'info',
-        className: 'snackbar-success',
+        className: 'snackbar-info',
         autoHideDuration: 5000,
       }
     );
@@ -1006,15 +1006,15 @@ const ProposalTableOfficer = ({
   const tableActions: Action<ProposalViewData>[] = [
     {
       icon: ApprovalIcon,
-      tooltip: 'Submit Final Decision',
+      tooltip: 'Submit Management Decision',
       onClick: () => {
         confirm(
           () => {
-            sendProposalsToFinalDecision();
+            sendProposalsToManagementDecision();
           },
           {
             title: 'Submit Proposals',
-            description: `This action submit ${selectedProposalsData.length} proposal(s).`,
+            description: `This action will submit the management decision for ${selectedProposalsData.length} proposal(s).`,
           }
         )();
       },

@@ -251,7 +251,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   }
 }
 
-export function useDataApi(surpressSnackbar?: boolean) {
+export function useDataApi(suppressSnackbar?: boolean) {
   const settingsContext = useContext(SettingsContext);
   const featureContext = useContext(FeatureContext);
   const externalAuthLoginUrl = settingsContext.settingsMap.get(
@@ -279,7 +279,7 @@ export function useDataApi(surpressSnackbar?: boolean) {
               },
               handleUserActive,
               isIdle,
-              surpressSnackbar ? true : false,
+              suppressSnackbar ? true : false,
               isIdleContextEnabled ? isIdleContextEnabled : undefined,
               handleNewToken,
               externalAuthLoginUrl ? externalAuthLoginUrl : undefined
@@ -291,7 +291,7 @@ export function useDataApi(surpressSnackbar?: boolean) {
       enqueueSnackbar,
       handleUserActive,
       isIdle,
-      surpressSnackbar,
+      suppressSnackbar,
       isIdleContextEnabled,
       handleNewToken,
       externalAuthLoginUrl,

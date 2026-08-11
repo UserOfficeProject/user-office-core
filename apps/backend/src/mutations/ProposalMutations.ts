@@ -441,7 +441,7 @@ export default class ProposalMutations {
 
     // To match the UI we want to reject any attempts to submit a management decision without setting the finalStatus or existingManagementTimeAllocations.
     // Note that both options do start as null in the database when a proposal is first submitted. finalStatus can become 'UNSET' in the database.
-    // This rejection is used in the 'Submit final decision' button to inform users which ones have failed.
+    // This rejection is used in the 'Submit management decision' button to inform users which ones have failed.
     if (managementDecisionSubmitted === true) {
       if (
         finalStatus === null &&
