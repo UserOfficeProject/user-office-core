@@ -13,7 +13,7 @@ import { useCardRows } from 'hooks/common/useResponsive';
 const CARD_ROW = { Row: MaterialTableCardRow };
 const DEFAULT_ROW = { Row: MTableBodyRow };
 
-type ResponsiveMaterialTableProps<RowData extends object> =
+export type ResponsiveMaterialTableProps<RowData extends object> =
   MaterialTableProps<RowData> & {
     /** Replaces the generic card body on the mobile card path. */
     cardRow?: (data: RowData) => React.ReactNode;
