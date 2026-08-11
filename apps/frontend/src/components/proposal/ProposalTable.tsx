@@ -6,19 +6,22 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
+import ProposalCard from 'components/common/cards/ProposalCard';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useCardRows } from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -105,6 +108,8 @@ const ProposalTable = ({
     number | undefined
   >();
 
+  const asCards = useCardRows();
+
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
@@ -151,6 +156,99 @@ const ProposalTable = ({
 
     return readonly;
   };
+  // Behaviour shared by the desktop row icons and the mobile card, so the two
+  // presentations cannot drift apart.
+  const isReadOnly = (rowData: PartialProposalsDataType) =>
+    isCallEnded(
+      rowData.call?.startCall,
+      isInternalUser ? rowData.call?.endCallInternal : rowData.call?.endCall
+    ) || getProposalReadonlyStatus(rowData);
+
+  const isProposer = (rowData: PartialProposalsDataType) =>
+    rowData.proposerId === userContext.user.id;
+
+  const canViewDataAccessUsers = (rowData: PartialProposalsDataType) =>
+    isDataAccessUsersEnabled !== false &&
+    isProposer(rowData) &&
+    rowData.publicStatus === ProposalPublicStatus.ACCEPTED;
+
+  const canDeleteProposal = (rowData: PartialProposalsDataType) =>
+    isProposer(rowData) && !rowData.submitted;
+
+  const openProposal = (rowData: PartialProposalsDataType) =>
+    setEditProposalPk(rowData.primaryKey);
+
+  const cloneProposal = (rowData: PartialProposalsDataType) => {
+    api()
+      .getProposalToClone({ primaryKey: rowData.primaryKey })
+      .then((result) => {
+        setProposalToClone(result.proposal);
+        setOpenCallSelection(true);
+      });
+  };
+
+  const downloadProposal = (rowData: PartialProposalsDataType) =>
+    downloadPDFProposal([rowData.primaryKey], rowData.title);
+
+  const openDataAccessUsers = (rowData: PartialProposalsDataType) => {
+    setSelectedProposalPk(rowData.primaryKey);
+    setIsDataAccessUsersModalOpen(true);
+  };
+
+  const deleteProposal = (rowData: PartialProposalsDataType) =>
+    confirm(
+      async () => {
+        const { deleteProposal } = await api().deleteProposal({
+          proposalPk: rowData.primaryKey,
+        });
+        if (deleteProposal) {
+          refreshTableData();
+        }
+      },
+      {
+        title: 'Are you sure?',
+        description: `Are you sure you want to delete proposal '${rowData.title}'`,
+      }
+    )();
+
+  const sheetItemsFor = (
+    rowData: PartialProposalsDataType
+  ): CardActionSheetItem[] => [
+    {
+      key: 'clone',
+      label: 'Clone proposal',
+      icon: <FileCopy />,
+      onClick: () => cloneProposal(rowData),
+    },
+    {
+      key: 'download',
+      label: 'Download PDF',
+      icon: <GetAppIcon />,
+      onClick: () => downloadProposal(rowData),
+    },
+    ...(canViewDataAccessUsers(rowData)
+      ? [
+          {
+            key: 'data-access',
+            label: 'Data access users',
+            icon: <PeopleIcon />,
+            onClick: () => openDataAccessUsers(rowData),
+          },
+        ]
+      : []),
+    ...(canDeleteProposal(rowData)
+      ? [
+          {
+            key: 'delete',
+            label: 'Delete proposal',
+            icon: <DeleteIcon />,
+            onClick: () => deleteProposal(rowData),
+            destructive: true,
+          },
+        ]
+      : []),
+  ];
+
   const cloneProposalsToCall = async (call: Call) => {
     setProposalToClone(null);
 
@@ -193,6 +291,17 @@ const ProposalTable = ({
         onClose={() => setIsDataAccessUsersModalOpen(false)}
         proposalPk={selectedProposalPk}
       />
+      {asCards && (
+        <Box sx={{ padding: 1, paddingBottom: 1.5 }}>
+          <Typography
+            variant="subtitle1"
+            component="h2"
+            sx={{ fontWeight: 500 }}
+          >
+            {title}
+          </Typography>
+        </Box>
+      )}
       <MaterialTable
         tableRef={tableRef}
         icons={tableIcons}
@@ -217,120 +326,100 @@ const ProposalTable = ({
         options={{
           search: search,
           debounceInterval: 400,
+          toolbar: !asCards,
         }}
         actions={[
           (rowData) => {
-            const callHasEnded = isCallEnded(
-              rowData.call?.startCall,
-              isInternalUser
-                ? rowData.call?.endCallInternal
-                : rowData.call?.endCall
-            );
-            const readOnly = callHasEnded || getProposalReadonlyStatus(rowData);
+            const readOnly = isReadOnly(rowData);
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
               tooltip: readOnly ? 'View proposal' : 'Edit proposal',
-              onClick: (event, rowData) =>
-                setEditProposalPk(
-                  (rowData as PartialProposalsDataType).primaryKey
-                ),
+              onClick: (_event, rowData) =>
+                openProposal(rowData as PartialProposalsDataType),
             };
           },
           {
             icon: () => <FileCopy />,
             tooltip: 'Clone proposal',
-            onClick: (_event, rowData) => {
-              api()
-                .getProposalToClone({
-                  primaryKey: (rowData as PartialProposalsDataType).primaryKey,
-                })
-                .then((result) => {
-                  setProposalToClone(result.proposal);
-                  setOpenCallSelection(true);
-                });
-            },
+            onClick: (_event, rowData) =>
+              cloneProposal(rowData as PartialProposalsDataType),
           },
-          (rowData) => {
-            const isPI = rowData.proposerId === userContext.user.id;
-
-            return {
-              icon: () => <PeopleIcon />,
-              tooltip: 'View data access users',
-              hidden:
-                isDataAccessUsersEnabled === false ||
-                isPI === false ||
-                rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
-              onClick: (_event, rowData) => {
-                setSelectedProposalPk(
-                  (rowData as PartialProposalsDataType).primaryKey
-                );
-                setIsDataAccessUsersModalOpen(true);
-              },
-            };
-          },
+          (rowData) => ({
+            icon: () => <PeopleIcon />,
+            tooltip: 'View data access users',
+            hidden: !canViewDataAccessUsers(rowData),
+            onClick: (_event, rowData) =>
+              openDataAccessUsers(rowData as PartialProposalsDataType),
+          }),
           {
             icon: () => <GetAppIcon />,
             tooltip: 'Download proposal',
-            onClick: (event, rowData) =>
-              downloadPDFProposal(
-                [(rowData as PartialProposalsDataType).primaryKey],
-                (rowData as PartialProposalsDataType).title
-              ),
+            onClick: (_event, rowData) =>
+              downloadProposal(rowData as PartialProposalsDataType),
           },
-          (rowData) => {
-            const isPI = rowData.proposerId === userContext.user.id;
-            const isSubmitted = rowData.submitted;
-            const canDelete = isPI && !isSubmitted;
-
-            return {
-              icon: () => <DeleteIcon />,
-              tooltip: isSubmitted
-                ? 'Only draft proposals can be deleted'
-                : !isPI
-                  ? 'Only PI can delete proposal'
-                  : 'Delete proposal',
-              hidden: !canDelete,
-              onClick: (_event, rowData) =>
-                confirm(
-                  async () => {
-                    const { deleteProposal } = await api().deleteProposal({
-                      proposalPk: (rowData as PartialProposalsDataType)
-                        .primaryKey,
-                    });
-                    if (deleteProposal) {
-                      refreshTableData();
-                    }
-                  },
-                  {
-                    title: 'Are you sure?',
-                    description: `Are you sure you want to delete proposal '${
-                      (rowData as PartialProposalsDataType).title
-                    }'`,
-                  }
-                )(),
-            };
-          },
+          (rowData) => ({
+            icon: () => <DeleteIcon />,
+            tooltip: rowData.submitted
+              ? 'Only draft proposals can be deleted'
+              : !isProposer(rowData)
+                ? 'Only PI can delete proposal'
+                : 'Delete proposal',
+            hidden: !canDeleteProposal(rowData),
+            onClick: (_event, rowData) =>
+              deleteProposal(rowData as PartialProposalsDataType),
+          }),
         ]}
+        cardRow={(proposal) => (
+          <ProposalCard
+            proposal={proposal}
+            readOnly={isReadOnly(proposal)}
+            onOpen={() => openProposal(proposal)}
+            sheetItems={sheetItemsFor(proposal)}
+          />
+        )}
       />
-      {isEmailInviteEnabled && (
-        <ActionButtonContainer>
+      {isEmailInviteEnabled &&
+        (asCards ? (
           <ButtonWithDialog
             label="Join proposal"
             data-cy="join-proposal-btn"
             startIcon={<AddIcon />}
             title="Join proposal"
+            variant="outlined"
+            fullWidth
+            sx={{ minHeight: 44, marginTop: 2 }}
           >
             <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
           </ButtonWithDialog>
-        </ActionButtonContainer>
-      )}
-      {showReferenceText(data) && (
-        <span>
-          <br />* Pre-submission reference. Reference will change upon
-          submission.
-        </span>
-      )}
+        ) : (
+          <ActionButtonContainer>
+            <ButtonWithDialog
+              label="Join proposal"
+              data-cy="join-proposal-btn"
+              startIcon={<AddIcon />}
+              title="Join proposal"
+            >
+              <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
+            </ButtonWithDialog>
+          </ActionButtonContainer>
+        ))}
+      {showReferenceText(data) &&
+        (asCards ? (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            component="p"
+            sx={{ paddingX: 1, paddingTop: 1.5 }}
+          >
+            * Pre-submission reference. Reference will change upon submission.
+          </Typography>
+        ) : (
+          <span>
+            <br />* Pre-submission reference. Reference will change upon
+            submission.
+          </span>
+        ))}
     </div>
   );
 };
