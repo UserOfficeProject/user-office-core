@@ -4,6 +4,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 export const DRAWER_OVERLAY_BREAKPOINT: Breakpoint = 'lg';
 export const COMPACT_UI_BREAKPOINT: Breakpoint = 'md';
 
+/** For `sx` keys, where a media query is cheaper than re-rendering on a hook. */
+export const belowCompactUi = (theme: Theme) =>
+  theme.breakpoints.down(COMPACT_UI_BREAKPOINT);
+
 export const toolbarHeight = (theme: Theme) => ({
   xs: theme.spacing(7),
   sm: theme.spacing(8),
