@@ -293,11 +293,7 @@ const ProposalTable = ({
       />
       {asCards && (
         <Box sx={{ padding: 1, paddingBottom: 1.5 }}>
-          <Typography
-            variant="subtitle1"
-            component="h2"
-            sx={{ fontWeight: 500 }}
-          >
+          <Typography variant="h5" component="h2">
             {title}
           </Typography>
         </Box>
