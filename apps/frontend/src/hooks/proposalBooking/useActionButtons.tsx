@@ -5,6 +5,11 @@ import GroupIcon from '@mui/icons-material/Group';
 import React, { ReactNode, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  CardTask,
+  CardTaskId,
+  CardTaskStatus,
+} from 'components/common/cards/CardTask';
 import BoxIcon from 'components/common/icons/BoxIcon';
 import EsiIcon from 'components/common/icons/EsiIcon';
 import ActionButton, {
@@ -16,11 +21,91 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
   ProposalEndStatus,
+  SettingsId,
   UserJwt,
   VisitRegistrationStatus,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
+/** An action carrying the checklist metadata the mobile experiment card needs. */
+export type ExperimentAction = Action<UserExperiment> & { task?: CardTask };
+
+const TASK_STATUS: Record<ActionButtonState, CardTaskStatus | null> = {
+  completed: 'done',
+  active: 'todo',
+  neutral: 'todo',
+  pending: 'waiting',
+  inactive: 'locked',
+  cancelled: 'locked',
+  invisible: null,
+};
+
+const TASK_COPY: Record<
+  CardTaskId,
+  { todo: string; done: string; idle: string }
+> = {
+  formTeam: {
+    todo: 'Register your team',
+    done: 'Team registered',
+    idle: 'Register team',
+  },
+  finishEsi: {
+    todo: 'Finish safety input',
+    done: 'Safety input complete',
+    idle: 'Safety input',
+  },
+  registerVisit: {
+    todo: 'Register your visit',
+    done: 'Visit registered',
+    idle: 'Register visit',
+  },
+  declareShipment: {
+    todo: 'Declare your shipment',
+    done: 'Shipment declared',
+    idle: 'Declare shipment',
+  },
+  giveFeedback: {
+    todo: 'Give feedback',
+    done: 'Feedback given',
+    idle: 'Give feedback',
+  },
+};
+
+type TaskInput = {
+  id: CardTaskId;
+  /** Shown under a `todo` label. */
+  helperText?: string;
+  /** Shown under a `waiting` or `locked` label. */
+  reason?: string | null;
+};
+
+const createTask = (
+  state: ActionButtonState,
+  { id, helperText, reason }: TaskInput
+): CardTask | undefined => {
+  const status = TASK_STATUS[state];
+
+  if (!status) {
+    return undefined;
+  }
+
+  if (status === 'done') {
+    return { id, status, label: TASK_COPY[id].done };
+  }
+
+  if (status === 'todo') {
+    return { id, status, label: TASK_COPY[id].todo, helperText };
+  }
+
+  return {
+    id,
+    status,
+    label: TASK_COPY[id].idle,
+    helperText: reason ?? undefined,
+  };
+};
 
 const getParticipationRole = (
   user: UserJwt,
@@ -54,14 +139,16 @@ const createActionButton = (
   tooltip: string,
   icon: React.ReactNode,
   state: ActionButtonState,
-  onClick: () => void | undefined
-): Action<UserExperiment> => ({
+  onClick: () => void | undefined,
+  task: TaskInput
+): ExperimentAction => ({
   tooltip,
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
   onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
+  task: createTask(state, task),
 });
 
 interface UseActionButtonsArgs {
@@ -73,6 +160,10 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+    shouldUseTimeZone: true,
+  });
   const { openModal, closeModal, eventUpdated } = args;
 
   const formTeamAction = (event: UserExperiment) => {
@@ -112,6 +203,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             }}
           />
         );
+      },
+      {
+        id: 'formTeam',
+        helperText: 'Needed before the visit',
+        reason: stateReason,
       }
     );
   };
@@ -165,6 +261,13 @@ export function useActionButtons(args: UseActionButtonsArgs) {
               }
             });
         }
+      },
+      {
+        id: 'finishEsi',
+        helperText: event.startsAt
+          ? `Needed before ${toFormattedDateTime(event.startsAt)}`
+          : undefined,
+        reason: stateReason,
       }
     );
   };
@@ -249,7 +352,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             onClose={closeModal}
           />
         );
-      }
+      },
+      { id: 'registerVisit', reason: stateReason }
     );
   };
 
@@ -271,6 +375,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState,
       () => {
         navigate(`/Experiments/${event.experimentPk}/Shipments`);
+      },
+      {
+        id: 'declareShipment',
+        helperText: 'Needed before samples arrive',
+        reason: 'Opens once the proposal is accepted',
       }
     );
   };
@@ -303,7 +412,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         } else {
           navigate(`/CreateFeedback/${event.experimentPk}`);
         }
-      }
+      },
+      { id: 'giveFeedback', reason: 'Available after the experiment' }
     );
   };
 

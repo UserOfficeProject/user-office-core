@@ -1,16 +1,22 @@
 import { Column } from '@material-table/core';
-import { Dialog, DialogContent } from '@mui/material';
+import { Box, Chip, Dialog, DialogContent, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { CardTaskItem } from 'components/common/cards/CardTaskList';
+import ExperimentCard from 'components/common/cards/ExperimentCard';
 import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCardRows } from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
 } from 'hooks/experiment/useUserExperiments';
-import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
+import {
+  ExperimentAction,
+  useActionButtons,
+} from 'hooks/proposalBooking/useActionButtons';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
@@ -51,6 +57,7 @@ export default function UserUpcomingExperimentsTable({
     shouldUseTimeZone: true,
   });
   const { t } = useTranslation();
+  const asCards = useCardRows();
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -75,6 +82,31 @@ export default function UserUpcomingExperimentsTable({
     },
   });
 
+  const actions = [
+    formTeamAction,
+    finishEsi,
+    registerVisitAction,
+    declareShipmentAction,
+    giveFeedback,
+  ];
+
+  const taskItemsFor = (experiment: UserExperiment): CardTaskItem[] =>
+    actions.flatMap((buildAction) => {
+      const action: ExperimentAction = buildAction(experiment);
+
+      if (action.hidden || !action.task) {
+        return [];
+      }
+
+      return [
+        {
+          task: action.task,
+          onClick: (event: React.MouseEvent<HTMLElement>) =>
+            action.onClick?.(event, experiment),
+        },
+      ];
+    });
+
   if (hideIfEmpty && userExperiments.length === 0) {
     return null;
   }
@@ -87,27 +119,64 @@ export default function UserUpcomingExperimentsTable({
     })
   );
 
+  const tasksDue = userExperiments.reduce(
+    (total, experiment) =>
+      total +
+      taskItemsFor(experiment).filter((item) => item.task.status === 'todo')
+        .length,
+    0
+  );
+
   return (
     <div data-cy="upcoming-experiments">
+      {asCards && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 1,
+            padding: 1,
+            paddingBottom: 1.5,
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            component="h2"
+            sx={{ fontWeight: 500 }}
+          >
+            Upcoming experiments
+          </Typography>
+          {tasksDue > 0 && (
+            <Chip
+              size="small"
+              color="warning"
+              variant="outlined"
+              label={`${tasksDue} task${tasksDue === 1 ? '' : 's'} due`}
+              data-cy="experiment-tasks-due"
+            />
+          )}
+        </Box>
+      )}
       <MaterialTable
-        actions={[
-          formTeamAction,
-          finishEsi,
-          registerVisitAction,
-          declareShipmentAction,
-          giveFeedback,
-        ]}
+        actions={actions}
         icons={tableIcons}
         title="Upcoming experiments"
         isLoading={experimentsLoading}
         columns={columns(t)}
         data={userExperimentsWithFormattedDates}
+        cardRow={(experiment) => (
+          <ExperimentCard
+            experiment={experiment}
+            tasks={taskItemsFor(experiment)}
+          />
+        )}
         options={{
           search: false,
           padding: 'dense',
           emptyRowsWhenPaging: false,
           paging: false,
           actionsColumnIndex: -1,
+          toolbar: !asCards,
         }}
       />
       <Dialog
