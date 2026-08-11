@@ -97,18 +97,16 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
               />
             </Link>
           )}
-          {(!isTabletOrMobile || !isPortraitMode) && (
-            <Typography
-              component="h1"
-              variant="h6"
-              noWrap
-              sx={{
-                color: 'inherit',
-              }}
-            >
-              {location.pathname === '/' ? 'Dashboard' : header}
-            </Typography>
-          )}
+          <Typography
+            component="h1"
+            variant="h6"
+            noWrap
+            sx={{
+              color: 'inherit',
+            }}
+          >
+            {location.pathname === '/' ? 'Dashboard' : header}
+          </Typography>
         </Box>
         <AccountActionButton />
       </Toolbar>

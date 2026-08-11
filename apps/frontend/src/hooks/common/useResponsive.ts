@@ -2,7 +2,7 @@ import { Breakpoint, Theme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 export const DRAWER_OVERLAY_BREAKPOINT: Breakpoint = 'lg';
-export const COMPACT_UI_BREAKPOINT: Breakpoint = 'sm';
+export const COMPACT_UI_BREAKPOINT: Breakpoint = 'md';
 
 export const toolbarHeight = (theme: Theme) => ({
   xs: theme.spacing(7),
