@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
+import { useCardRowRenderer } from 'components/common/cards/CardRowContext';
+
 type MaterialTableCardRowProps<RowData extends object> = {
   data: RowData;
   columns: Column<RowData>[];
@@ -45,6 +47,20 @@ export default function MaterialTableCardRow<RowData extends object>({
   const visibleColumns = columns.filter((columnDef) => !columnDef.hidden);
   const [primaryColumn, ...detailColumns] = visibleColumns;
   const Actions = components.Actions;
+  const cardRow = useCardRowRenderer();
+
+  if (cardRow) {
+    return (
+      <TableRow>
+        <TableCell
+          colSpan={visibleColumns.length + 1}
+          sx={{ padding: 1, borderBottom: 'none' }}
+        >
+          {cardRow(data as never)}
+        </TableCell>
+      </TableRow>
+    );
+  }
 
   return (
     <TableRow>
