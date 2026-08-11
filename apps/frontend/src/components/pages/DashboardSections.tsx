@@ -1,3 +1,4 @@
+import Badge from '@mui/material/Badge';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Box from '@mui/material/Box';
@@ -11,6 +12,7 @@ export type DashboardSection = {
   id: string;
   label?: string;
   icon?: React.ReactNode;
+  badgeCount?: number;
   render: (options: { canHideWhenEmpty: boolean }) => React.ReactNode;
 };
 
@@ -63,6 +65,7 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
           value={current}
           onChange={(_event, section) => setCurrent(section)}
           showLabels
+          sx={{ height: 60 }}
           data-cy="dashboard-section-nav"
         >
           {sections.map((section) => (
@@ -70,7 +73,15 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
               key={section.id}
               label={section.label ?? section.id}
               value={section.id}
-              icon={section.icon}
+              icon={
+                section.badgeCount ? (
+                  <Badge color="warning" badgeContent={section.badgeCount}>
+                    {section.icon}
+                  </Badge>
+                ) : (
+                  section.icon
+                )
+              }
               data-cy={`dashboard-section-${section.id}`}
             />
           ))}
@@ -80,13 +91,29 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
   );
 };
 
-const DashboardSections = ({ sections }: { sections: DashboardSection[] }) => {
+type DashboardSectionsProps = {
+  sections: DashboardSection[];
+  /**
+   * Supplementary content. A trailing tab when tabbed, a leading panel when
+   * stacked. Kept out of `sections` so it cannot decide whether tabs appear.
+   */
+  infoSection?: DashboardSection | null;
+};
+
+const DashboardSections = ({
+  sections,
+  infoSection,
+}: DashboardSectionsProps) => {
   const isMobile = useIsMobile();
 
   return isMobile && sections.length > 1 ? (
-    <TabbedSections sections={sections} />
+    <TabbedSections
+      sections={infoSection ? [...sections, infoSection] : sections}
+    />
   ) : (
-    <StackedSections sections={sections} />
+    <StackedSections
+      sections={infoSection ? [infoSection, ...sections] : sections}
+    />
   );
 };
 

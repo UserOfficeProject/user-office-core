@@ -10,6 +10,7 @@ import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import parse from 'html-react-parser';
 import React, { Suspense, useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -19,6 +20,7 @@ import {
   drawerRailWidth,
   drawerWidth,
   toolbarHeight,
+  useIsMobile,
   useIsTabletOrMobile,
 } from 'hooks/common/useResponsive';
 
@@ -56,6 +58,8 @@ const PageLayout = ({
 }) => {
   const theme = useTheme();
   const isTabletOrMobile = useIsTabletOrMobile();
+  const isMobile = useIsMobile();
+  const location = useLocation();
   const [open, setOpen] = React.useState(
     localStorage.drawerOpen
       ? localStorage.drawerOpen === '1'
@@ -135,10 +139,16 @@ const PageLayout = ({
     }
   }, [isTabletOrMobile]);
 
+  // TODO: these sit directly above the dashboard's sticky section nav on a phone
+  // and are easy to hit by accident, so they are suppressed there for now. Where
+  // they should live on mobile is still open.
+  const showFooterLinks = !(isMobile && location.pathname === '/');
   const displayPrivacyPageLink =
+    showFooterLinks &&
     settingsMap.get(SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK)
       ?.settingsValue === 'true';
   const displayFAQLink =
+    showFooterLinks &&
     settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
   const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
 
