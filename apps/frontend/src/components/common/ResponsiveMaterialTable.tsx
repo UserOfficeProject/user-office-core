@@ -4,6 +4,7 @@ import MaterialTable, {
 } from '@material-table/core';
 import React from 'react';
 
+import { CardRowProvider } from 'components/common/cards/CardRowContext';
 import MaterialTableCardRow from 'components/common/MaterialTableCardRow';
 import { useCardRows } from 'hooks/common/useResponsive';
 
@@ -12,17 +13,26 @@ import { useCardRows } from 'hooks/common/useResponsive';
 const CARD_ROW = { Row: MaterialTableCardRow };
 const DEFAULT_ROW = { Row: MTableBodyRow };
 
-function ResponsiveMaterialTable<RowData extends object>(
-  props: MaterialTableProps<RowData>
-) {
+type ResponsiveMaterialTableProps<RowData extends object> =
+  MaterialTableProps<RowData> & {
+    /** Replaces the generic card body on the mobile card path. */
+    cardRow?: (data: RowData) => React.ReactNode;
+  };
+
+function ResponsiveMaterialTable<RowData extends object>({
+  cardRow,
+  ...props
+}: ResponsiveMaterialTableProps<RowData>) {
   const asCards = useCardRows();
 
   return (
-    <MaterialTable
-      {...props}
-      components={asCards ? CARD_ROW : DEFAULT_ROW}
-      options={{ header: !asCards, ...props.options }}
-    />
+    <CardRowProvider value={asCards ? cardRow ?? null : null}>
+      <MaterialTable
+        {...props}
+        components={asCards ? CARD_ROW : DEFAULT_ROW}
+        options={{ header: !asCards, ...props.options }}
+      />
+    </CardRowProvider>
   );
 }
 
