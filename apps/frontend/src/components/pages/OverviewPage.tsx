@@ -1,7 +1,7 @@
 import EventIcon from '@mui/icons-material/Event';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import parse from 'html-react-parser';
-import React, { useContext } from 'react';
+import InfoIcon from '@mui/icons-material/Info';
+import React, { useContext, useState } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
@@ -14,14 +14,18 @@ import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
-import DashboardSections, {
-  DashboardSection,
-  Panel,
-} from './DashboardSections';
+import DashboardInfoSection from './DashboardInfoSection';
+import DashboardSections, { DashboardSection } from './DashboardSections';
+
+type SectionOptions = {
+  isSchedulerEnabled: boolean;
+  tasksDue: number;
+  onTasksDueChange: (count: number) => void;
+};
 
 const getSections = (
   userRole: UserRole,
-  isSchedulerEnabled: boolean
+  { isSchedulerEnabled, tasksDue, onTasksDueChange }: SectionOptions
 ): DashboardSection[] => {
   switch (userRole) {
     case UserRole.USER: {
@@ -29,8 +33,12 @@ const getSections = (
         id: 'experiments',
         label: 'Experiments',
         icon: <EventIcon />,
+        badgeCount: tasksDue,
         render: ({ canHideWhenEmpty }) => (
-          <UserUpcomingExperimentsTable hideIfEmpty={canHideWhenEmpty} />
+          <UserUpcomingExperimentsTable
+            hideIfEmpty={canHideWhenEmpty}
+            onTasksDueChange={onTasksDueChange}
+          />
         ),
       };
       const proposals: DashboardSection = {
@@ -90,25 +98,39 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   );
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
+  const [tasksDue, setTasksDue] = useState(0);
 
   const showPageContent =
     props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
     props.userRole !== UserRole.PROPOSAL_READER &&
     Object.values(UserRole).includes(props.userRole);
 
+  // Kept mounted while loading so the desktop panel still shows its placeholder;
+  // the section drops out entirely if the instance has no homepage content.
+  const infoSection: DashboardSection | null =
+    showPageContent && (loadingContent || !!pageContent)
+      ? {
+          id: 'info',
+          label: 'Call info',
+          icon: <InfoIcon />,
+          render: () =>
+            loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              <DashboardInfoSection pageContent={pageContent} />
+            ),
+        }
+      : null;
+
   return (
     <StyledContainer maxWidth={false}>
-      {showPageContent && (
-        <Panel>
-          {loadingContent ? (
-            <div>Loading...</div>
-          ) : (
-            parse(pageContent as string)
-          )}
-        </Panel>
-      )}
       <DashboardSections
-        sections={getSections(props.userRole, !!isSchedulerEnabled)}
+        sections={getSections(props.userRole, {
+          isSchedulerEnabled: !!isSchedulerEnabled,
+          tasksDue,
+          onTasksDueChange: setTasksDue,
+        })}
+        infoSection={infoSection}
       />
     </StyledContainer>
   );
