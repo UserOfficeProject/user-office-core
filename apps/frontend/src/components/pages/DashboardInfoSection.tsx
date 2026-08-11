@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import parse from 'html-react-parser';
 import React from 'react';
 
-import { COMPACT_UI_BREAKPOINT } from 'hooks/common/useResponsive';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 
 // The content is admin-authored HTML, so it is restyled from the outside rather
 // than rewritten. Scoped to the compact breakpoint because above it this is still
@@ -16,7 +16,7 @@ export default function DashboardInfoSection({
     <Box
       data-cy="dashboard-info-content"
       sx={(theme) => ({
-        [theme.breakpoints.down(COMPACT_UI_BREAKPOINT)]: {
+        [belowCompactUi(theme)]: {
           '& h1, & h2': {
             ...theme.typography.h6,
             marginTop: 0,
