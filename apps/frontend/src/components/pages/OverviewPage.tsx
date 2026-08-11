@@ -1,7 +1,7 @@
 import EventIcon from '@mui/icons-material/Event';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import InfoIcon from '@mui/icons-material/Info';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableOfficer from 'components/proposal/ProposalTableOfficer';
@@ -17,15 +17,9 @@ import { StyledContainer } from 'styles/StyledComponents';
 import DashboardInfoSection from './DashboardInfoSection';
 import DashboardSections, { DashboardSection } from './DashboardSections';
 
-type SectionOptions = {
-  isSchedulerEnabled: boolean;
-  tasksDue: number;
-  onTasksDueChange: (count: number) => void;
-};
-
 const getSections = (
   userRole: UserRole,
-  { isSchedulerEnabled, tasksDue, onTasksDueChange }: SectionOptions
+  isSchedulerEnabled: boolean
 ): DashboardSection[] => {
   switch (userRole) {
     case UserRole.USER: {
@@ -33,12 +27,8 @@ const getSections = (
         id: 'experiments',
         label: 'Experiments',
         icon: <EventIcon />,
-        badgeCount: tasksDue,
         render: ({ canHideWhenEmpty }) => (
-          <UserUpcomingExperimentsTable
-            hideIfEmpty={canHideWhenEmpty}
-            onTasksDueChange={onTasksDueChange}
-          />
+          <UserUpcomingExperimentsTable hideIfEmpty={canHideWhenEmpty} />
         ),
       };
       const proposals: DashboardSection = {
@@ -98,7 +88,6 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   );
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
-  const [tasksDue, setTasksDue] = useState(0);
 
   const showPageContent =
     props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
@@ -125,11 +114,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   return (
     <StyledContainer maxWidth={false}>
       <DashboardSections
-        sections={getSections(props.userRole, {
-          isSchedulerEnabled: !!isSchedulerEnabled,
-          tasksDue,
-          onTasksDueChange: setTasksDue,
-        })}
+        sections={getSections(props.userRole, !!isSchedulerEnabled)}
         infoSection={infoSection}
       />
     </StyledContainer>
