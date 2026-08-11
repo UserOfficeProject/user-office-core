@@ -441,14 +441,14 @@ export default class ProposalMutations {
 
     // To match the UI we want to reject any attempts to submit a management decision without setting the finalStatus or existingManagementTimeAllocations.
     // Note that both options do start as null in the database when a proposal is first submitted. finalStatus can become 'UNSET' in the database.
-    // This rejection is used in the 'Submit management decision' button to inform users which ones have failed.
+    // This rejection is used in the 'Submit Management Decision' button to inform users which ones have failed.
     if (managementDecisionSubmitted === true) {
       if (
         finalStatus === null &&
         (proposal?.finalStatus === null || proposal?.finalStatus === undefined)
       ) {
         return rejection(
-          'Cannot edit proposal with no finalStatus existing in database or supplied.',
+          'Cannot submit management decision on proposal with no finalStatus existing in database or supplied.',
           { args, agent }
         );
       }
@@ -460,7 +460,7 @@ export default class ProposalMutations {
         !existingManagementTimeAllocations?.[0]
       ) {
         return rejection(
-          'Cannot edit proposal with no managementTimeAllocations existing in database or supplied.',
+          'Cannot submit management decision on proposal with no managementTimeAllocations existing in database or supplied.',
           { args, agent }
         );
       }
