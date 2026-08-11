@@ -51,7 +51,7 @@ export default function ExperimentCard({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 1,
-            marginBottom: 0.75,
+            marginBottom: 1.5,
           }}
         >
           <Typography
@@ -79,13 +79,12 @@ export default function ExperimentCard({
           </Typography>
         </Box>
         <Typography
-          variant="subtitle1"
+          variant="h6"
           component="h3"
           sx={{
-            fontWeight: 500,
             lineHeight: 1.35,
             textWrap: 'pretty',
-            marginBottom: 0.75,
+            marginBottom: 1.5,
           }}
         >
           {experiment.proposal.title}
