@@ -1,4 +1,6 @@
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EditIcon from '@mui/icons-material/Edit';
+import HistoryIcon from '@mui/icons-material/History';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
@@ -12,6 +14,7 @@ import { ProposalPublicStatus } from 'generated/sdk';
 import { timeAgo } from 'utils/Time';
 
 import CardActionSheet, { CardActionSheetItem } from './CardActionSheet';
+import CardDetailLine from './CardDetailLine';
 import StatusChip from './StatusChip';
 
 // Structural rather than ProposalTableUser's PartialProposalsDataType, which
@@ -23,6 +26,9 @@ type ProposalCardData = {
   created: string | null;
   call?: { shortCode: string } | null;
 };
+
+/** Spacing units, so both footer controls clear the 44px minimum hit target. */
+const TOUCH_TARGET = 5.5;
 
 type ProposalCardProps = {
   proposal: ProposalCardData;
@@ -41,13 +47,48 @@ export default function ProposalCard({
 
   return (
     <Card variant="outlined" data-cy="proposal-card">
-      <Box sx={{ padding: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 1.5,
+          paddingX: 2,
+          paddingY: 2.5,
+        }}
+      >
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{ lineHeight: 1.35, textWrap: 'pretty' }}
+          >
+            {proposal.title}
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+            <CardDetailLine icon={<CalendarTodayIcon />}>
+              {proposal.call?.shortCode ?? '-'}
+            </CardDetailLine>
+            <CardDetailLine icon={<HistoryIcon />}>
+              Created {timeAgo(proposal.created)}
+            </CardDetailLine>
+          </Box>
+        </Box>
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            marginBottom: 1,
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 0.5,
+            flexShrink: 0,
           }}
         >
           <StatusChip status={proposal.publicStatus} />
@@ -55,28 +96,12 @@ export default function ProposalCard({
             {proposal.proposalId}
           </Typography>
         </Box>
-        <Typography
-          variant="subtitle1"
-          component="h3"
-          sx={{
-            fontWeight: 500,
-            lineHeight: 1.35,
-            textWrap: 'pretty',
-            marginBottom: 1,
-          }}
-        >
-          {proposal.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {proposal.call?.shortCode ?? '-'} &middot; created{' '}
-          {timeAgo(proposal.created)}
-        </Typography>
       </Box>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1,
+          gap: 2,
           padding: 2,
           paddingTop: 1.5,
           borderTop: 1,
@@ -85,10 +110,11 @@ export default function ProposalCard({
       >
         <Button
           fullWidth
-          variant={readOnly ? 'outlined' : 'contained'}
+          color="secondary"
+          variant="outlined"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={{ minHeight: 44 }}
+          sx={(theme) => ({ minHeight: theme.spacing(TOUCH_TARGET) })}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}
@@ -97,7 +123,14 @@ export default function ProposalCard({
           <IconButton
             aria-label={`More actions for ${proposal.title}`}
             onClick={() => setSheetOpen(true)}
-            sx={{ width: 44, height: 44, border: 1, borderColor: 'divider' }}
+            sx={(theme) => ({
+              width: theme.spacing(TOUCH_TARGET),
+              height: theme.spacing(TOUCH_TARGET),
+              flexShrink: 0,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+            })}
             data-cy="proposal-card-menu"
           >
             <MoreHorizIcon />
