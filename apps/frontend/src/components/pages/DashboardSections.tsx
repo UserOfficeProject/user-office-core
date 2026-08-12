@@ -2,7 +2,7 @@ import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Box from '@mui/material/Box';
 import MuiPaper from '@mui/material/Paper';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useIsMobile } from 'hooks/common/useResponsive';
 import { StyledPaper } from 'styles/StyledComponents';
@@ -15,6 +15,8 @@ export type DashboardSection = {
 };
 
 const NAV_HEIGHT = 60;
+
+const SECTION_STORAGE_KEY = 'dashboardSection';
 
 export const Panel = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper
@@ -39,9 +41,15 @@ const StackedSections = ({ sections }: { sections: DashboardSection[] }) => (
   </>
 );
 
-const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
-  const [current, setCurrent] = useState(sections[0].id);
-
+const TabbedSections = ({
+  sections,
+  current,
+  onChange,
+}: {
+  sections: DashboardSection[];
+  current: string;
+  onChange: (id: string) => void;
+}) => {
   return (
     <>
       {/* Clears the fixed nav so the last card is never behind it. */}
@@ -68,7 +76,7 @@ const TabbedSections = ({ sections }: { sections: DashboardSection[] }) => {
       >
         <BottomNavigation
           value={current}
-          onChange={(_event, section) => setCurrent(section)}
+          onChange={(_event, section) => onChange(section)}
           showLabels
           sx={{ height: NAV_HEIGHT }}
           data-cy="dashboard-section-nav"
@@ -102,10 +110,37 @@ const DashboardSections = ({
   infoSection,
 }: DashboardSectionsProps) => {
   const isMobile = useIsMobile();
+  // Held here rather than in TabbedSections, which is unmounted whenever the
+  // layout crosses the breakpoint. Persisted so a reload keeps the section too.
+  const [storedSection, setStoredSection] = useState(
+    () => localStorage.getItem(SECTION_STORAGE_KEY) ?? ''
+  );
+
+  const tabbedSections = infoSection ? [...sections, infoSection] : sections;
+  // The stored id can name a section this role or feature set no longer has.
+  const current = tabbedSections.some(({ id }) => id === storedSection)
+    ? storedSection
+    : tabbedSections[0]?.id ?? '';
+
+  // Drop a stored id that no longer names a section, so it cannot come back if
+  // that section reappears later.
+  useEffect(() => {
+    if (storedSection && storedSection !== current) {
+      localStorage.removeItem(SECTION_STORAGE_KEY);
+      setStoredSection('');
+    }
+  }, [storedSection, current]);
+
+  const selectSection = (id: string) => {
+    localStorage.setItem(SECTION_STORAGE_KEY, id);
+    setStoredSection(id);
+  };
 
   return isMobile && sections.length > 1 ? (
     <TabbedSections
-      sections={infoSection ? [...sections, infoSection] : sections}
+      sections={tabbedSections}
+      current={current}
+      onChange={selectSection}
     />
   ) : (
     <StackedSections
