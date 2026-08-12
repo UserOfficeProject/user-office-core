@@ -90,7 +90,7 @@ const RoleManagement: React.FC = () => {
   const deleteRole = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Call deleted successfully',
+        toastSuccessMessage: 'Role deleted successfully',
       }).deleteRole({
         id: id as number,
       });
