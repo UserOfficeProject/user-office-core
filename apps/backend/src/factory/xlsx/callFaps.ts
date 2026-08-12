@@ -140,29 +140,30 @@ const collectFinalDecisionData = async (
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+  let instrumentAvailableTime = baseData[0]?.availability_time ?? 0;
 
   const returnData = await Promise.all(
     baseData.map(async (fapreview) => {
       const proposalInfo = await proposalDataSource.get(fapreview.proposal_pk);
-      if (proposalInfo) {
-        const principalInvestigatorInfo = await userDataSource.getBasicUserInfo(
-          fapreview.proposer_id
-        );
-        const fapMeetingDecision =
-          await fapDataSource.getProposalsFapMeetingDecisions([
-            fapreview.proposal_pk,
-          ]);
+      const principalInvestigatorInfo = await userDataSource.getBasicUserInfo(
+        fapreview.proposer_id
+      );
+      const fapMeetingDecision =
+        await fapDataSource.getProposalsFapMeetingDecisions([
+          fapreview.proposal_pk,
+        ]);
 
-        const instrumentAllocatedTime = fapreview.fap_time_allocation
-          ? fapreview.fap_time_allocation
-          : fapreview.time_allocation;
+      const instrumentAllocatedTime = fapreview.fap_time_allocation
+        ? fapreview.fap_time_allocation
+        : fapreview.time_allocation;
 
-        return [
+      return {
+        grade: fapreview.average_grade ?? 0,
+        instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
+        xlsxrowdata: [
           fapreview.proposal_id.toString() ?? '<missing>', //Proposal Reference Number
           `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`, //Principal Investigator Name
-          fapreview.availability_time
-            ? fapreview.availability_time.toString()
-            : '<missing>', //Instrument available time (running total)
+          '<missing>', //Instrument available time (running total)
           instrumentAllocatedTime
             ? instrumentAllocatedTime.toString()
             : '<missing>', //FAP allocated time
@@ -173,12 +174,22 @@ const collectFinalDecisionData = async (
           fapMeetingDecision?.[0]?.commentForManagement ?? '<missing>', //FAP comments
           proposalInfo?.commentForManagement ?? '<missing>', //Internal comments
           fapreview.comment ?? '<missing>', //Technical Review comments
-        ];
-      }
+        ],
+      };
     })
   );
 
-  return returnData;
+  const orderedDataByGrade = returnData.sort((data) => data.grade);
+  const finalData = [] as string[][];
+  for (const proposaldataobject of orderedDataByGrade) {
+    const xlsxRowData = proposaldataobject.xlsxrowdata;
+    instrumentAvailableTime =
+      instrumentAvailableTime - proposaldataobject.instrumentAllocatedTime;
+    xlsxRowData[2] = instrumentAvailableTime.toString();
+    finalData.push(xlsxRowData);
+  }
+
+  return finalData;
 };
 
 export const collectFinalDecisionXLSXData = async (
