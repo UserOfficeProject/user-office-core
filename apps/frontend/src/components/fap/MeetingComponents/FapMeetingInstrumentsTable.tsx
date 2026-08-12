@@ -334,7 +334,7 @@ const FapMeetingInstrumentsTable = ({
         actions={[
           ...accessDependentActions,
           {
-            icon: GridOnIcon,
+            icon: () => <GridOnIcon />,
             tooltip: 'Export in Excel',
             disabled: !selectedCall || loadingInstruments,
             onClick: (): void => {

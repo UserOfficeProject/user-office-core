@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
-import { TransitionProps } from '@mui/material/transitions/transition';
+import { TransitionProps } from '@mui/material/transitions';
 import React from 'react';
 
 const Transition = React.forwardRef(function Transition(
@@ -41,7 +41,9 @@ const ExperimentReviewModal = ({
         open={modalOpen}
         fullScreen
         onClose={handleClose}
-        TransitionComponent={Transition}
+        slots={{
+          transition: Transition,
+        }}
       >
         <AppBar sx={{ position: 'relative' }}>
           <Toolbar>

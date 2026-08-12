@@ -1,4 +1,4 @@
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -86,7 +86,9 @@ export const QuestionTemplateRelationDateForm = (
               Label={{
                 label: 'Include time',
               }}
-              inputProps={{ 'data-cy': 'includeTime' }}
+              slotProps={{
+                input: { 'data-cy': 'includeTime' },
+              }}
             />
             <Field
               name="config.tooltip"

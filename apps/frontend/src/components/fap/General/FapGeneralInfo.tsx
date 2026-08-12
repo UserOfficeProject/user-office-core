@@ -76,7 +76,12 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
             {`${fap.code} ${t('Facility access panel')}`}
           </Typography>
           <Grid container spacing={3}>
-            <Grid item sm={6} xs={12}>
+            <Grid
+              size={{
+                sm: 6,
+                xs: 12,
+              }}
+            >
               <Field
                 name="code"
                 id="code"
@@ -127,7 +132,6 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 id="customGradeGuide"
                 name="customGradeGuide"
                 component={CheckboxWithLabel}
-                inputProps={{ 'aria-label': 'primary checkbox' }}
                 type="checkbox"
                 checked={values.customGradeGuide}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,9 +143,17 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }}
                 data-cy="custom-grade-guide"
                 disabled={!hasAccessRights || isExecutingCall}
+                slotProps={{
+                  input: { 'aria-label': 'primary checkbox' },
+                }}
               />
             </Grid>
-            <Grid item sm={6} xs={12}>
+            <Grid
+              size={{
+                sm: 6,
+                xs: 12,
+              }}
+            >
               <Field
                 id="description"
                 name="description"
@@ -163,7 +175,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
-              <Grid item>
+              <Grid>
                 <Field
                   id="reviewVisibility"
                   name="reviewVisibility"

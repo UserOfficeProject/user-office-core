@@ -154,7 +154,7 @@ export const FormikUICustomTable = ({
         options={{ search: false, paging: false }}
         actions={[
           (rowData) => ({
-            icon: ArrowUpwardIcon,
+            icon: () => <ArrowUpwardIcon />,
             disabled: getElementIndex(state, rowData) === 0,
             tooltip: 'Up',
             onClick: (event, rowData): void =>
@@ -167,7 +167,7 @@ export const FormikUICustomTable = ({
               ),
           }),
           (rowData) => ({
-            icon: ArrowDownwardIcon,
+            icon: () => <ArrowDownwardIcon />,
             disabled: getElementIndex(state, rowData) === state.length - 1,
             tooltip: 'Down',
             onClick: (event, rowData): void =>

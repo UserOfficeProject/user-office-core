@@ -114,8 +114,19 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
         {({ isSubmitting, values }) => (
           <Form>
             <PromptIfDirty />
-            <Grid container spacing={2} alignItems="center">
-              <Grid item sm={6} xs={12}>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                alignItems: 'center',
+              }}
+            >
+              <Grid
+                size={{
+                  sm: 6,
+                  xs: 12,
+                }}
+              >
                 <Field
                   name="finalStatus"
                   options={statusOptions}
@@ -128,7 +139,12 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
-              <Grid item sm={6} xs={12}>
+              <Grid
+                size={{
+                  sm: 6,
+                  xs: 12,
+                }}
+              >
                 <FieldArray
                   name="managementTimeAllocations"
                   render={(arrayHelpers) =>
@@ -149,25 +165,27 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                             });
                           }
                         }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              {instrument?.name}:
-                            </InputAdornment>
-                          ),
-                          inputProps: { min: 0, max: 1e5 },
-                        }}
                         fullWidth
                         autoComplete="off"
                         data-cy={`managementTimeAllocation-${instrument?.id}`}
                         disabled={!isUserOfficer || isSubmitting}
                         required
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                {instrument?.name}:
+                              </InputAdornment>
+                            ),
+                            inputProps: { min: 0, max: 1e5 },
+                          },
+                        }}
                       />
                     ))
                   }
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormikUIPredefinedMessagesTextField
                   name="commentForUser"
                   label="Comment for user"
@@ -182,7 +200,7 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   message-key={PredefinedMessageKey.USER}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormikUIPredefinedMessagesTextField
                   name="commentForManagement"
                   label="Comment for management"
@@ -197,7 +215,7 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   message-key={PredefinedMessageKey.MANAGER}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <StyledButtonContainer>
                   <Field
                     id="managementDecisionSubmitted"

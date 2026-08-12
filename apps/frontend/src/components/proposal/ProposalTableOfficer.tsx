@@ -290,10 +290,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
       <MTableToolbar {...props} />
       {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
         <Box
-          textAlign="center"
-          padding={1}
-          bgcolor={(theme) => theme.palette.background.default}
           data-cy="select-all-proposals"
+          sx={{
+            textAlign: 'center',
+            padding: 1,
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
         >
           {selectAllAction.iconProps?.hidden ? (
             <>
@@ -612,7 +614,12 @@ const ProposalTableOfficer = ({
       confirm(action, {
         title: 'Are you sure? Multiple proposals selected!',
         description: (
-          <Box display="flex" alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Warning color="warning" sx={{ marginRight: 1 }} />
             <span>
               <b>{selectedCount}</b> proposals are selected. This action will
@@ -967,7 +974,7 @@ const ProposalTableOfficer = ({
 
   const tableActions: Action<ProposalViewData>[] = [
     {
-      icon: FileCopy,
+      icon: () => <FileCopy />,
       tooltip: 'Clone proposals to call',
       onClick: () =>
         runWithMultiSelectConfirm(() => {
@@ -1031,13 +1038,13 @@ const ProposalTableOfficer = ({
     },
     {
       tooltip: shouldShowSelectAllAction,
-      icon: DoneAllIcon,
+      icon: () => (
+        <DoneAllIcon
+          sx={{ display: allPrefetchedProposalsSelected ? 'none' : undefined }}
+          className={allProposalSelectionLoading ? 'loading' : ''}
+        />
+      ),
       hidden: false,
-      iconProps: {
-        hidden: allPrefetchedProposalsSelected,
-        defaultValue: totalCount,
-        className: allProposalSelectionLoading ? 'loading' : '',
-      },
       onClick: async () => {
         setAllProposalSelectionLoading(true);
         if (allPrefetchedProposalsSelected) {

@@ -1,4 +1,4 @@
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -43,7 +43,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         label="Visit start"
         format={format}
         component={DatePicker}
-        inputProps={{ placeholder: format }}
         variant="inline"
         disableToolbar
         autoOk={true}
@@ -52,9 +51,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         textField={{
           fullWidth: true,
           required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
+          slotProps: { inputLabel: { shrink: true } },
         }}
         onChange={(startsAt: DateTime) => {
           dispatch({
@@ -70,7 +67,6 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         label="Visit end"
         format={format}
         component={DatePicker}
-        inputProps={{ placeholder: format }}
         variant="inline"
         disableToolbar
         autoOk={true}
@@ -79,9 +75,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         textField={{
           fullWidth: true,
           required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
+          slotProps: { inputLabel: { shrink: true } },
         }}
         onChange={(endsAt: DateTime) => {
           dispatch({

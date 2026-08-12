@@ -1235,9 +1235,6 @@ context('Template Delete, Archive, Unarchive', () => {
     const existingProposalId = initialDBData.proposal.id;
     const existingExperimentPk =
       initialDBData.experiments.upcoming.experimentPk;
-    const startQuestion = 'Visit start';
-    const endQuestion = 'Visit end';
-
     const cyTagRegisterVisit = 'register-visit-icon';
     const startDate = DateTime.fromJSDate(new Date()).toFormat(
       initialDBData.getFormats().dateFormat
@@ -1291,8 +1288,8 @@ context('Template Delete, Archive, Unarchive', () => {
         .first()
         .click();
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.setDatePickerValue('input[name="visit_basis.startsAt"]', startDate);
+      cy.setDatePickerValue('input[name="visit_basis.endsAt"]', endDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 

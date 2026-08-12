@@ -207,14 +207,28 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}_ifr`).first().focus().click(); // Also focus the iframe to trigger any onChange events
 };
 
-const setDatePickerValue = (selector: string, value: string) =>
+// NOTE: Since @mui/x-date-pickers v8 the accessible field DOM structure is the
+// only option. The input matched by the selector is aria-hidden and only carries
+// the value for form submission, so it cannot be typed into. The editable surface
+// is the list of contenteditable section spans sitting on top of it.
+const getDatePickerSections = (selector: string) =>
   cy
     .get(selector)
-    // NOTE: Clears the value from the datepicker
-    .type('{selectall}{backspace}')
-    // NOTE: Points to the first sub-field which is usually the date.
-    .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+    .closest('.MuiPickersInputBase-root')
+    .find('.MuiPickersSectionList-sectionContent');
+
+const setDatePickerValue = (selector: string, value: string) =>
+  getDatePickerSections(selector)
+    // NOTE: Points to the first sub-field which is usually the date. Typing
+    // digits replaces the focused section and advances to the next one.
+    .first()
+    .click()
     .type(numbersOnly(value));
+
+const clearDatePickerValue = (selector: string) =>
+  getDatePickerSections(selector).each(($section) => {
+    cy.wrap($section).click().type('{backspace}');
+  });
 
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
@@ -309,6 +323,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
 Cypress.Commands.add('setDatePickerValue', setDatePickerValue);
+Cypress.Commands.add('clearDatePickerValue', clearDatePickerValue);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
 Cypress.Commands.add('createApiAccessToken', createApiAccessToken);

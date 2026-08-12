@@ -238,7 +238,7 @@ const ProposalTable = ({
             };
           },
           {
-            icon: FileCopy,
+            icon: () => <FileCopy />,
             tooltip: 'Clone proposal',
             onClick: (_event, rowData) => {
               api()
@@ -255,7 +255,7 @@ const ProposalTable = ({
             const isPI = rowData.proposerId === userContext.user.id;
 
             return {
-              icon: PeopleIcon,
+              icon: () => <PeopleIcon />,
               tooltip: 'View data access users',
               hidden:
                 isDataAccessUsersEnabled === false ||
@@ -270,7 +270,7 @@ const ProposalTable = ({
             };
           },
           {
-            icon: GetAppIcon,
+            icon: () => <GetAppIcon />,
             tooltip: 'Download proposal',
             onClick: (event, rowData) =>
               downloadPDFProposal(
@@ -284,7 +284,7 @@ const ProposalTable = ({
             const canDelete = isPI && !isSubmitted;
 
             return {
-              icon: DeleteIcon,
+              icon: () => <DeleteIcon />,
               tooltip: isSubmitted
                 ? 'Only draft proposals can be deleted'
                 : !isPI

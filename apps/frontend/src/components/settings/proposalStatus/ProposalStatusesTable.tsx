@@ -1,4 +1,4 @@
-import Delete from '@mui/icons-material/DeleteOutline';
+import Delete from '@mui/icons-material/DeleteOutlined';
 import { Typography } from '@mui/material';
 import React from 'react';
 
@@ -85,7 +85,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
         actions={[
           (rowActionData) => {
             return {
-              icon: Delete,
+              icon: () => <Delete />,
               tooltip: 'Delete',
               onClick: (event, rowData) =>
                 confirm(

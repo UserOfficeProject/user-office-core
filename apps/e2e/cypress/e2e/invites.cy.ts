@@ -249,7 +249,7 @@ context('Invites tests', () => {
         cy.get('#code').type(response.setCoProposerInvites[0].code ?? '');
         cy.get('[data-cy="invitation-submit"]').click();
         cy.get('[data-testid="VisibilityIcon"]').first().click();
-        cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+        cy.get('#horizontal-tab-1').click();
         cy.get('[data-cy=questionary-details-view]').should(
           'contain.text',
           initialDBData.users.user3.lastName
@@ -509,7 +509,7 @@ context('Invites tests', () => {
       );
       cy.get(`[data-testid=accept-invite-btn-1]`).click();
       // Success snackbar and dialog closes
-      cy.get('.SnackbarItem-variantSuccess').should('exist');
+      cy.get('.notistack-MuiContent-success').should('exist');
       // Proposal should now be in the table after accepting
       cy.get('[data-cy="proposal-table"]').should(
         'contain.text',

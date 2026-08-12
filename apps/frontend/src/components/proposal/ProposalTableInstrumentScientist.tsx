@@ -204,10 +204,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
       <MTableToolbar {...props} />
       {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
         <Box
-          textAlign="center"
-          padding={1}
-          bgcolor={(theme) => theme.palette.background.default}
           data-cy="select-all-proposals"
+          sx={{
+            textAlign: 'center',
+            padding: 1,
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
         >
           {selectAllAction.iconProps?.hidden ? (
             <>
@@ -956,7 +958,12 @@ const ProposalTableInstrumentScientist = ({
       )}
       {isInstrumentScientist && (
         <Grid container spacing={2}>
-          <Grid item sm={2} xs={12}>
+          <Grid
+            size={{
+              sm: 2,
+              xs: 12,
+            }}
+          >
             <ReviewerFilterComponent
               reviewer={reviewer ?? ReviewerFilter.ALL}
               onChange={(reviewer) =>
@@ -964,7 +971,12 @@ const ProposalTableInstrumentScientist = ({
               }
             />
           </Grid>
-          <Grid item sm={10} xs={12}>
+          <Grid
+            size={{
+              sm: 10,
+              xs: 12,
+            }}
+          >
             <ProposalFilterBar
               calls={{ data: calls, isLoading: loadingCalls }}
               instruments={{ data: instruments, isLoading: loadingInstruments }}

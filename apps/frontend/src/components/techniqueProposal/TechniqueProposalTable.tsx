@@ -1045,13 +1045,17 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               },
               {
                 tooltip: 'Select all proposals',
-                icon: DoneAllIcon,
+                icon: () => (
+                  <DoneAllIcon
+                    sx={{
+                      display: allPrefetchedProposalsSelected
+                        ? 'none'
+                        : undefined,
+                    }}
+                    className={allProposalSelectionLoading ? 'loading' : ''}
+                  />
+                ),
                 hidden: false,
-                iconProps: {
-                  hidden: allPrefetchedProposalsSelected,
-                  defaultValue: totalCount,
-                  className: allProposalSelectionLoading ? 'loading' : '',
-                },
                 onClick: async () => {
                   setAllProposalSelectionLoading(true);
                   if (allPrefetchedProposalsSelected) {
