@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import MuiPaper from '@mui/material/Paper';
 import React, { useEffect, useState } from 'react';
 
-import { useIsMobile } from 'hooks/common/useResponsive';
+import { bottomNavHeight, useIsMobile } from 'hooks/common/useResponsive';
 import { StyledPaper } from 'styles/StyledComponents';
 
 export type DashboardSection = {
@@ -13,8 +13,6 @@ export type DashboardSection = {
   icon?: React.ReactNode;
   render: (options: { canHideWhenEmpty: boolean }) => React.ReactNode;
 };
-
-const NAV_HEIGHT = 60;
 
 const SECTION_STORAGE_KEY = 'dashboardSection';
 
@@ -53,7 +51,7 @@ const TabbedSections = ({
   return (
     <>
       {/* Clears the fixed nav so the last card is never behind it. */}
-      <Box sx={{ paddingBottom: `${NAV_HEIGHT}px` }}>
+      <Box sx={(theme) => ({ paddingBottom: bottomNavHeight(theme) })}>
         {sections.map((section) => (
           <Box
             key={section.id}
@@ -78,7 +76,6 @@ const TabbedSections = ({
           value={current}
           onChange={(_event, section) => onChange(section)}
           showLabels
-          sx={{ height: NAV_HEIGHT }}
           data-cy="dashboard-section-nav"
         >
           {sections.map((section) => (
