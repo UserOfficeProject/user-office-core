@@ -9,6 +9,25 @@ import React, { useCallback, useContext, useEffect } from 'react';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 
+// A grey that behaves like the rest of the palette, so components can ask for it
+// through their `color` prop instead of overriding text and border by hand. It is
+// fixed rather than instance-configurable: the PALETTE_* settings cover only the
+// six semantic colours.
+declare module '@mui/material/styles' {
+  interface Palette {
+    neutral: Palette['primary'];
+  }
+  interface PaletteOptions {
+    neutral?: PaletteOptions['primary'];
+  }
+}
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    neutral: true;
+  }
+}
+
 const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
@@ -56,6 +75,10 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         settingsMap.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
         defaultTheme.palette.info.main,
     },
+    neutral: defaultTheme.palette.augmentColor({
+      color: { main: defaultTheme.palette.grey[600] },
+      name: 'neutral',
+    }),
     // NOTE: This was previous default background on the body. Now it is white and that's why we are overwriting it.
     // (https://v4.mui.com/customization/default-theme/#explore vs https://mui.com/customization/default-theme/#explore)
     background: {
