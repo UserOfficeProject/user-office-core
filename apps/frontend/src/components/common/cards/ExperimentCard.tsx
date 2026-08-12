@@ -1,4 +1,5 @@
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import PersonIcon from '@mui/icons-material/Person';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -7,13 +8,14 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import { experimentPhase } from 'utils/experimentPhase';
 import { getFullUserName } from 'utils/user';
 
-import CardDetailLine from './CardDetailLine';
+import CardDetailLine, { CardDetailList } from './CardDetailLine';
 import CardTaskList, { CardTaskItem } from './CardTaskList';
 
 type ExperimentCardProps = {
@@ -28,6 +30,7 @@ export default function ExperimentCard({
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+  const { t } = useTranslation();
   const { phase, label } = experimentPhase(
     experiment.startsAt,
     experiment.endsAt
@@ -89,22 +92,26 @@ export default function ExperimentCard({
         >
           {experiment.proposal.title}
         </Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-          <CardDetailLine icon={<CalendarMonthIcon />}>
+        <CardDetailList>
+          <CardDetailLine icon={<CalendarMonthIcon />} label="Dates">
             {toFormattedDateTime(experiment.startsAt)} &rarr;{' '}
             {toFormattedDateTime(experiment.endsAt)}
           </CardDetailLine>
-          <CardDetailLine icon={<ScienceIcon />}>
-            {experiment.instrument?.name
-              ? `${experiment.instrument.name} · proposal ${experiment.proposal.proposalId}`
-              : `Proposal ${experiment.proposal.proposalId}`}
+          <CardDetailLine
+            icon={<ScienceIcon />}
+            label={t('instrument') as string}
+          >
+            {experiment.instrument?.name ?? 'Not assigned'}
           </CardDetailLine>
-          <CardDetailLine icon={<PersonIcon />}>
+          <CardDetailLine icon={<FolderOpenIcon />} label="Proposal">
+            {experiment.proposal.proposalId}
+          </CardDetailLine>
+          <CardDetailLine icon={<PersonIcon />} label="Local contact">
             {experiment.localContact
-              ? `${getFullUserName(experiment.localContact)}, local contact`
-              : 'No local contact assigned'}
+              ? getFullUserName(experiment.localContact)
+              : 'Not assigned'}
           </CardDetailLine>
-        </Box>
+        </CardDetailList>
       </Box>
       <CardTaskList items={tasks} />
     </Card>
