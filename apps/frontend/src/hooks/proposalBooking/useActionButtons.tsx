@@ -21,11 +21,9 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
   ProposalEndStatus,
-  SettingsId,
   UserJwt,
   VisitRegistrationStatus,
 } from 'generated/sdk';
-import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -42,48 +40,12 @@ const TASK_STATUS: Record<ActionButtonState, CardTaskStatus | null> = {
   invisible: null,
 };
 
-const TASK_COPY: Record<
-  CardTaskId,
-  { todo: string; done: string; idle: string }
-> = {
-  formTeam: {
-    todo: 'Register your team',
-    done: 'Team registered',
-    idle: 'Register team',
-  },
-  finishEsi: {
-    todo: 'Finish safety input',
-    done: 'Safety input complete',
-    idle: 'Safety input',
-  },
-  registerVisit: {
-    todo: 'Register your visit',
-    done: 'Visit registered',
-    idle: 'Register visit',
-  },
-  declareShipment: {
-    todo: 'Declare your shipment',
-    done: 'Shipment declared',
-    idle: 'Declare shipment',
-  },
-  giveFeedback: {
-    todo: 'Give feedback',
-    done: 'Feedback given',
-    idle: 'Give feedback',
-  },
-};
-
-type TaskInput = {
-  id: CardTaskId;
-  /** Shown under a `todo` label. */
-  helperText?: string;
-  /** Shown under a `waiting` or `locked` label. */
-  reason?: string | null;
-};
-
 const createTask = (
+  id: CardTaskId,
   state: ActionButtonState,
-  { id, helperText, reason }: TaskInput
+  label: string,
+  stateReason: string | null,
+  badgedIcon: React.ReactNode
 ): CardTask | undefined => {
   const status = TASK_STATUS[state];
 
@@ -91,19 +53,12 @@ const createTask = (
     return undefined;
   }
 
-  if (status === 'done') {
-    return { id, status, label: TASK_COPY[id].done };
-  }
-
-  if (status === 'todo') {
-    return { id, status, label: TASK_COPY[id].todo, helperText };
-  }
-
   return {
     id,
     status,
-    label: TASK_COPY[id].idle,
-    helperText: reason ?? undefined,
+    label,
+    helperText: stateReason ?? undefined,
+    icon: badgedIcon,
   };
 };
 
@@ -136,20 +91,25 @@ const isTeamlead = (user: UserJwt, event: UserExperiment) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
-  tooltip: string,
+  taskId: CardTaskId,
+  label: string,
   icon: React.ReactNode,
   state: ActionButtonState,
-  onClick: () => void | undefined,
-  task: TaskInput
-): ExperimentAction => ({
-  tooltip,
-  icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
-  hidden: state === 'invisible',
-  onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
-    ? onClick
-    : () => {},
-  task: createTask(state, task),
-});
+  stateReason: string | null,
+  onClick: () => void | undefined
+): ExperimentAction => {
+  const badgedIcon = <ActionButton variant={state}>{icon}</ActionButton>;
+
+  return {
+    tooltip: stateReason ? `${label} (${stateReason})` : label,
+    icon: () => badgedIcon,
+    hidden: state === 'invisible',
+    onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
+      ? onClick
+      : () => {},
+    task: createTask(taskId, state, label, stateReason, badgedIcon),
+  };
+};
 
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
@@ -160,10 +120,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const { toFormattedDateTime } = useFormattedDateTime({
-    settingsFormatToUse: SettingsId.DATE_FORMAT,
-    shouldUseTimeZone: true,
-  });
   const { openModal, closeModal, eventUpdated } = args;
 
   const formTeamAction = (event: UserExperiment) => {
@@ -190,9 +146,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define who is coming ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'formTeam',
+      'Define who is coming',
       <GroupIcon data-cy="define-visit-icon" />,
       buttonState,
+      stateReason,
       () => {
         openModal(
           <CreateUpdateVisit
@@ -203,11 +161,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             }}
           />
         );
-      },
-      {
-        id: 'formTeam',
-        helperText: 'Needed before the visit',
-        reason: stateReason,
       }
     );
   };
@@ -240,9 +193,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Finish experiment safety form ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'finishEsi',
+      'Finish experiment safety form',
       <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
+      stateReason,
       () => {
         if (event.experimentSafety) {
           // If experiment safety already exists, navigate directly
@@ -261,13 +216,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
               }
             });
         }
-      },
-      {
-        id: 'finishEsi',
-        helperText: event.startsAt
-          ? `Needed before ${toFormattedDateTime(event.startsAt)}`
-          : undefined,
-        reason: stateReason,
       }
     );
   };
@@ -312,9 +260,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define your visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'registerVisit',
+      'Define your visit',
       <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
+      stateReason,
       () => {
         openModal(
           <CreateUpdateCancelVisitRegistration
@@ -352,13 +302,13 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             onClose={closeModal}
           />
         );
-      },
-      { id: 'registerVisit', reason: stateReason }
+      }
     );
   };
 
   const declareShipmentAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (
       event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
@@ -367,28 +317,27 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'neutral';
     } else {
       buttonState = 'inactive';
+      // TODO: wording invented to give the locked state a reason, which this
+      // action never had. Confirm the real precondition with the user office.
+      stateReason =
+        'This action is disabled because proposal is not accepted or missing management decision';
     }
 
     return createActionButton(
+      'declareShipment',
       'Declare shipment(s)',
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
+      stateReason,
       () => {
         navigate(`/Experiments/${event.experimentPk}/Shipments`);
-      },
-      {
-        id: 'declareShipment',
-        helperText: 'Needed before samples arrive',
-        // TODO: placeholder copy. This action sets no stateReason, so the locked
-        // row has nothing to show. Confirm the real precondition with the user
-        // office and set it here and on the desktop tooltip together.
-        reason: 'Opens once the proposal is accepted',
       }
     );
   };
 
   const giveFeedback = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (isTeamlead(user, event)) {
       if (event.status === 'COMPLETED') {
@@ -400,24 +349,27 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         }
       } else {
         buttonState = 'inactive';
+        // TODO: wording invented, same as declareShipment above.
+        stateReason =
+          'This action is disabled because the experiment is not completed';
       }
     } else {
       buttonState = 'invisible';
     }
 
     return createActionButton(
+      'giveFeedback',
       'Provide feedback',
       <FeedbackIcon data-cy="provide-feedback-icon" />,
       buttonState,
+      stateReason,
       () => {
         if (event?.feedback) {
           navigate(`/UpdateFeedback/${event.feedback.id}`);
         } else {
           navigate(`/CreateFeedback/${event.experimentPk}`);
         }
-      },
-      // TODO: placeholder reason, same as declareShipment above.
-      { id: 'giveFeedback', reason: 'Available after the experiment' }
+      }
     );
   };
 

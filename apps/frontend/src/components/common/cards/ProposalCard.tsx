@@ -14,7 +14,7 @@ import { ProposalPublicStatus } from 'generated/sdk';
 import { timeAgo } from 'utils/Time';
 
 import CardActionSheet, { CardActionSheetItem } from './CardActionSheet';
-import CardDetailLine from './CardDetailLine';
+import CardDetailLine, { CardDetailList } from './CardDetailLine';
 import StatusChip from './StatusChip';
 
 // Structural rather than ProposalTableUser's PartialProposalsDataType, which
@@ -46,7 +46,7 @@ export default function ProposalCard({
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <Card variant="outlined" data-cy="proposal-card">
+    <Card elevation={2} data-cy="proposal-card">
       <Box
         sx={{
           display: 'flex',
@@ -73,14 +73,14 @@ export default function ProposalCard({
           >
             {proposal.title}
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-            <CardDetailLine icon={<CalendarTodayIcon />}>
+          <CardDetailList>
+            <CardDetailLine icon={<CalendarTodayIcon />} label="Call">
               {proposal.call?.shortCode ?? '-'}
             </CardDetailLine>
-            <CardDetailLine icon={<HistoryIcon />}>
-              Created {timeAgo(proposal.created)}
+            <CardDetailLine icon={<HistoryIcon />} label="Created">
+              {timeAgo(proposal.created)}
             </CardDetailLine>
-          </Box>
+          </CardDetailList>
         </Box>
         <Box
           sx={{
