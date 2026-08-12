@@ -87,7 +87,7 @@ const ProposalTableUser = () => {
         onAccept={() => setRefreshTableKey((prev) => prev + 1)}
       />
       <ProposalTable
-        title="My proposals"
+        title="Proposals"
         search={false}
         searchQuery={sendUserProposalRequest}
         key={refreshTableKey}
