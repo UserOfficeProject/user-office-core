@@ -33,7 +33,7 @@ const getSections = (
       };
       const proposals: DashboardSection = {
         id: 'proposals',
-        label: 'My proposals',
+        label: 'Proposals',
         icon: <FolderOpenIcon />,
         render: () => <ProposalTableUser />,
       };
