@@ -28,6 +28,12 @@ declare module '@mui/material/Chip' {
   }
 }
 
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    quiet: true;
+  }
+}
+
 const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
@@ -93,6 +99,22 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         defaultProps: {
           variant: 'contained',
         },
+        variants: [
+          // An outlined button that carries no palette colour, for sitting
+          // beside a plain IconButton without outshouting it.
+          {
+            props: { variant: 'quiet' },
+            style: {
+              color: defaultTheme.palette.action.active,
+              border: '1px solid',
+              borderColor: defaultTheme.palette.divider,
+              '&:hover': {
+                borderColor: defaultTheme.palette.divider,
+                backgroundColor: defaultTheme.palette.action.hover,
+              },
+            },
+          },
+        ],
       },
       MuiSelect: {
         defaultProps: {
