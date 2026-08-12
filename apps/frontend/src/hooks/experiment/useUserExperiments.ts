@@ -52,7 +52,7 @@ export function useUserExperiments({
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, notDraft, onlyUpcoming, instrumentId]);
 
   return { userExperiments, setUserUpcomingExperiments, loading };
 }

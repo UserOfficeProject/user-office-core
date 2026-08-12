@@ -98,9 +98,11 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     return submissionDisabled;
   });
 
+  const callId = technicalReview.proposal?.callId;
+
   useEffect(() => {
     async function initializeSubmissionMessage() {
-      if (!technicalReview.proposal?.callId || submitDisabled) {
+      if (!callId || submitDisabled) {
         setLoadingSubmitMessage(false);
 
         return;
@@ -112,7 +114,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
       setLoadingSubmitMessage(false);
     }
     initializeSubmissionMessage();
-  }, [api, submitDisabled]);
+  }, [callId, submitDisabled]);
 
   if (loadingSubmitMessage) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
