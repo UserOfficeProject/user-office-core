@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { belowCompactUi } from 'hooks/common/useResponsive';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { useProposalInvites } from 'hooks/invite/useProposalInvites';
 
 const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
@@ -88,7 +88,10 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           disabled={loading}
           sx={(theme) => ({
             marginLeft: 2,
-            [belowCompactUi(theme)]: { marginLeft: 0, minHeight: 44 },
+            [belowCompactUi(theme)]: {
+              marginLeft: 0,
+              minHeight: minTouchTarget(theme),
+            },
           })}
         >
           {loading ? 'Loading...' : 'View Invitations'}

@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
 import { ProposalPublicStatus } from 'generated/sdk';
+import { minTouchTarget } from 'hooks/common/useResponsive';
 import { timeAgo } from 'utils/Time';
 
 import CardActionSheet, { CardActionSheetItem } from './CardActionSheet';
@@ -26,9 +27,6 @@ type ProposalCardData = {
   created: string | null;
   call?: { shortCode: string } | null;
 };
-
-/** Spacing units, so both footer controls clear the 44px minimum hit target. */
-const TOUCH_TARGET = 5.5;
 
 type ProposalCardProps = {
   proposal: ProposalCardData;
@@ -114,7 +112,7 @@ export default function ProposalCard({
           variant="outlined"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={(theme) => ({ minHeight: theme.spacing(TOUCH_TARGET) })}
+          sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}
@@ -124,8 +122,8 @@ export default function ProposalCard({
             aria-label={`More actions for ${proposal.title}`}
             onClick={() => setSheetOpen(true)}
             sx={(theme) => ({
-              width: theme.spacing(TOUCH_TARGET),
-              height: theme.spacing(TOUCH_TARGET),
+              width: minTouchTarget(theme),
+              height: minTouchTarget(theme),
               flexShrink: 0,
               border: 1,
               borderColor: 'divider',

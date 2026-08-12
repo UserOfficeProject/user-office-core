@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import parse from 'html-react-parser';
 import React from 'react';
 
-import { belowCompactUi } from 'hooks/common/useResponsive';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 
 // The content is admin-authored HTML, so it is restyled from the outside rather
 // than rewritten. Scoped to the compact breakpoint because above it this is still
@@ -28,7 +28,10 @@ export default function DashboardInfoSection({
             color: theme.palette.text.secondary,
           },
           '& ul': { paddingLeft: theme.spacing(2.75) },
-          '& a': { minHeight: 44, display: 'inline-block' },
+          '& a': {
+            minHeight: minTouchTarget(theme),
+            display: 'inline-block',
+          },
         },
       })}
     >
