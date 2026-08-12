@@ -1,9 +1,11 @@
 import { Column } from '@material-table/core';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Box, Dialog, DialogContent, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import CardEmptyState from 'components/common/cards/CardEmptyState';
 import { CardTaskItem } from 'components/common/cards/CardTaskList';
 import ExperimentCard from 'components/common/cards/ExperimentCard';
 import MaterialTable from 'components/common/ResponsiveMaterialTable';
@@ -146,28 +148,36 @@ export default function UserUpcomingExperimentsTable({
           </Typography>
         </Box>
       )}
-      <MaterialTable
-        actions={actions}
-        icons={tableIcons}
-        title="Upcoming experiments"
-        isLoading={experimentsLoading}
-        columns={columns(t)}
-        data={userExperimentsWithFormattedDates}
-        cardRow={(experiment) => (
-          <ExperimentCard
-            experiment={experiment}
-            tasks={taskItemsFor(experiment)}
-          />
-        )}
-        options={{
-          search: false,
-          padding: 'dense',
-          emptyRowsWhenPaging: false,
-          paging: false,
-          actionsColumnIndex: -1,
-          toolbar: !asCards,
-        }}
-      />
+      {asCards && !experimentsLoading && userExperiments.length === 0 ? (
+        <CardEmptyState
+          icon={<EventBusyIcon />}
+          title="No upcoming experiments"
+          description="Once a proposal of yours is accepted and scheduled, the experiment and everything it needs from you will show up here."
+        />
+      ) : (
+        <MaterialTable
+          actions={actions}
+          icons={tableIcons}
+          title="Upcoming experiments"
+          isLoading={experimentsLoading}
+          columns={columns(t)}
+          data={userExperimentsWithFormattedDates}
+          cardRow={(experiment) => (
+            <ExperimentCard
+              experiment={experiment}
+              tasks={taskItemsFor(experiment)}
+            />
+          )}
+          options={{
+            search: false,
+            padding: 'dense',
+            emptyRowsWhenPaging: false,
+            paging: false,
+            actionsColumnIndex: -1,
+            toolbar: !asCards,
+          }}
+        />
+      )}
       <Dialog
         open={modalContents !== null}
         onClose={() => setModalContents(null)}

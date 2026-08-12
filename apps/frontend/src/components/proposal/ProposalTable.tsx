@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import FileCopy from '@mui/icons-material/FileCopy';
+import FolderOffIcon from '@mui/icons-material/FolderOff';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
@@ -17,6 +18,7 @@ import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
+import CardEmptyState from 'components/common/cards/CardEmptyState';
 import ProposalCard from 'components/common/cards/ProposalCard';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -101,6 +103,7 @@ const ProposalTable = ({
   const [partialProposalsData, setPartialProposalsData] = useState<
     PartialProposalsDataType[] | undefined
   >([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [openCallSelection, setOpenCallSelection] = useState(false);
   const [proposalToClone, setProposalToClone] = useState<Pick<
     ProposalData,
@@ -274,6 +277,7 @@ const ProposalTable = ({
     }
   };
   const data = partialProposalsData as PartialProposalsDataType[];
+  const showEmptyState = asCards && isLoaded && data.length === 0;
 
   return (
     <div data-cy="proposal-table">
@@ -302,6 +306,16 @@ const ProposalTable = ({
           </Typography>
         </Box>
       )}
+      {/* A sibling, not localization.body.emptyDataSourceMessage: material-table
+          deep-merges localization and deepmerge stack-overflows on React
+          elements under React 19. Same workaround as TemplatesTable. */}
+      {showEmptyState && (
+        <CardEmptyState
+          icon={<FolderOffIcon />}
+          title="No proposals yet"
+          description="Proposals you write, and any you are invited to join, will appear here."
+        />
+      )}
       <MaterialTable
         tableRef={tableRef}
         icons={tableIcons}
@@ -311,7 +325,9 @@ const ProposalTable = ({
             {title}
           </Typography>
         }
-        columns={columns}
+        columns={columns}// Kept mounted rather than swapped out: tableRef drives refreshTableData
+        // after a proposal is joined by code, which is reachable from empty.
+        style={showEmptyState ? { display: 'none' } : undefined}
         data={(query) => {
           // On inital load all columns are sent to the backend including ones not ordered. This filters
           // out all columns except defaultOrderByCollection
@@ -325,6 +341,7 @@ const ProposalTable = ({
             filteredOrderByCollection
           ).then((result) => {
             setPartialProposalsData(result.data ?? []);
+            setIsLoaded(true);
 
             return {
               data: result.data ?? [],
