@@ -4,6 +4,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import ScienceIcon from '@mui/icons-material/Science';
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
@@ -97,8 +98,14 @@ export default function ExperimentCard({
             icon={<CalendarMonthIcon fontSize="small" color="action" />}
             label="Dates"
           >
-            {toFormattedDateTime(experiment.startsAt)} &rarr;{' '}
-            {toFormattedDateTime(experiment.endsAt)}
+            {/* Each date is one unbreakable run, so the only place the value can
+                wrap is after the arrow. */}
+            <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
+              {toFormattedDateTime(experiment.startsAt)} &rarr;
+            </Box>{' '}
+            <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
+              {toFormattedDateTime(experiment.endsAt)}
+            </Box>
           </CardDetailLine>
           <CardDetailLine
             icon={<ScienceIcon fontSize="small" color="action" />}
