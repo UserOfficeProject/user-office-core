@@ -21,6 +21,7 @@ import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import {
   Experiment,
+  ExperimentTableSortField,
   PaginationSortDirection,
   SettingsId,
   UserRole,
@@ -41,6 +42,14 @@ import { ExperimentsFilter } from './ExperimentsPage';
 type ExperimentsTableProps = {
   experimentsFilter: ExperimentsFilter;
   setExperimentsFilter?: (filter: ExperimentsFilter) => void;
+};
+
+// Maps a material-table column `field` to the GraphQL sort enum.
+const COLUMN_FIELD_TO_SORT_FIELD: Record<string, ExperimentTableSortField> = {
+  experimentId: ExperimentTableSortField.EXPERIMENTID,
+  'proposal.proposalId': ExperimentTableSortField.PROPOSALID,
+  startsAt: ExperimentTableSortField.STARTSAT,
+  endsAt: ExperimentTableSortField.ENDSAT,
 };
 
 const RowActionButtons = (rowData: Experiment) => {
@@ -160,7 +169,9 @@ export default function ExperimentsTable({
               ...(experimentStartDate ? { experimentStartDate } : {}),
               ...(experimentEndDate ? { experimentEndDate } : {}),
             },
-            sortField: orderBy?.orderByField,
+            sortField: orderBy
+              ? COLUMN_FIELD_TO_SORT_FIELD[orderBy.orderByField]
+              : undefined,
             sortDirection:
               orderBy?.orderDirection == PaginationSortDirection.ASC
                 ? PaginationSortDirection.ASC
@@ -252,10 +263,12 @@ export default function ExperimentsTable({
     {
       title: 'Instrument',
       field: 'instrument.name',
+      sorting: false,
     },
     {
       title: 'Experiment Safety Status',
       field: 'experimentSafety.status.name',
+      sorting: false,
       render: (rowData: Experiment) =>
         rowData.experimentSafety?.status?.name ?? 'ESF Not Started',
     },
