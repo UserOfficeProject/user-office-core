@@ -13,7 +13,6 @@ import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
 import CardEmptyState from 'components/common/cards/CardEmptyState';
 import ProposalCard from 'components/common/cards/ProposalCard';
@@ -23,7 +22,7 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { useCardRows } from 'hooks/common/useResponsive';
+import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -295,13 +294,36 @@ const ProposalTable = ({
         onClose={() => setIsDataAccessUsersModalOpen(false)}
         proposalPk={selectedProposalPk}
       />
-      {asCards && (
-        <Box sx={{ padding: 1, paddingBottom: 1.5 }}>
-          <Typography variant="h5" component="h2">
-            {title}
-          </Typography>
-        </Box>
-      )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          // Matches the inset of the rows below: MUI TableCell pads 16px, and
+          // MaterialTableCardRow's cell pads 8px on the card path.
+          paddingX: 1,
+          paddingBottom: 2,
+        }}
+      >
+        <Typography variant="h5" component="h2" sx={{ fontWeight: 500 }}>
+          {title}
+        </Typography>
+        {isEmailInviteEnabled && (
+          <ButtonWithDialog
+            label="Join proposal"
+            data-cy="join-proposal-btn"
+            startIcon={<AddIcon />}
+            title="Join proposal"
+            sx={(theme) => ({
+              minHeight: minTouchTarget(theme),
+              flexShrink: 0,
+            })}
+          >
+            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
+          </ButtonWithDialog>
+        )}
+      </Box>
       {/* A sibling, not localization.body.emptyDataSourceMessage: material-table
           deep-merges localization and deepmerge stack-overflows on React
           elements under React 19. Same workaround as TemplatesTable. */}
@@ -316,11 +338,6 @@ const ProposalTable = ({
         tableRef={tableRef}
         icons={tableIcons}
         localization={tableLocalization}
-        title={
-          <Typography variant="h6" component="h2">
-            {title}
-          </Typography>
-        }
         columns={columns}
         // Kept mounted rather than swapped out: tableRef drives refreshTableData
         // after a proposal is joined by code, which is reachable from empty.
@@ -340,7 +357,7 @@ const ProposalTable = ({
         options={{
           search: search,
           debounceInterval: 400,
-          toolbar: !asCards,
+          toolbar: false,
         }}
         actions={[
           (rowData) => {
@@ -393,31 +410,6 @@ const ProposalTable = ({
           />
         )}
       />
-      {isEmailInviteEnabled &&
-        (asCards ? (
-          <ButtonWithDialog
-            label="Join proposal"
-            data-cy="join-proposal-btn"
-            startIcon={<AddIcon />}
-            title="Join proposal"
-            variant="outlined"
-            fullWidth
-            sx={{ minHeight: 44, marginTop: 2 }}
-          >
-            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
-          </ButtonWithDialog>
-        ) : (
-          <ActionButtonContainer>
-            <ButtonWithDialog
-              label="Join proposal"
-              data-cy="join-proposal-btn"
-              startIcon={<AddIcon />}
-              title="Join proposal"
-            >
-              <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
-            </ButtonWithDialog>
-          </ActionButtonContainer>
-        ))}
       {showReferenceText(data) &&
         (asCards ? (
           <Typography
