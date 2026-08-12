@@ -8,11 +8,11 @@ const STATUS: Record<
   { label: string; color: ChipProps['color'] }
 > = {
   [ProposalPublicStatus.DRAFT]: { label: 'Draft', color: 'warning' },
-  [ProposalPublicStatus.SUBMITTED]: { label: 'Submitted', color: 'default' },
+  [ProposalPublicStatus.SUBMITTED]: { label: 'Submitted', color: 'neutral' },
   [ProposalPublicStatus.ACCEPTED]: { label: 'Accepted', color: 'success' },
   [ProposalPublicStatus.REJECTED]: { label: 'Rejected', color: 'error' },
   [ProposalPublicStatus.RESERVED]: { label: 'Reserved', color: 'info' },
-  [ProposalPublicStatus.UNKNOWN]: { label: 'Unknown', color: 'default' },
+  [ProposalPublicStatus.UNKNOWN]: { label: 'Unknown', color: 'neutral' },
 };
 
 export default function StatusChip({
@@ -25,11 +25,15 @@ export default function StatusChip({
 
   return (
     <Chip
-      size="small"
       variant="outlined"
       color={color}
       label={label}
       data-cy={`proposal-status-${status}`}
+      sx={(theme) => ({
+        fontSize: theme.typography.pxToRem(14),
+        fontWeight: 550,
+        borderWidth: 1,
+      })}
     />
   );
 }
