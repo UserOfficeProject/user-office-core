@@ -1,7 +1,8 @@
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EditIcon from '@mui/icons-material/Edit';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import HistoryIcon from '@mui/icons-material/History';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import TagIcon from '@mui/icons-material/Tag';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -44,7 +45,7 @@ export default function ProposalCard({
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <Card elevation={2} data-cy="proposal-card">
+    <Card variant="outlined" data-cy="proposal-card" sx={{ borderRadius: 2 }}>
       <Box
         sx={{
           display: 'flex',
@@ -65,14 +66,17 @@ export default function ProposalCard({
           }}
         >
           <Typography
-            variant="h6"
+            variant="h5"
             component="h3"
             sx={{ lineHeight: 1.35, textWrap: 'pretty' }}
           >
             {proposal.title}
           </Typography>
           <CardDetailList>
-            <CardDetailLine icon={<CalendarTodayIcon />} label="Call">
+            <CardDetailLine icon={<TagIcon />} label="Proposal ID">
+              {proposal.proposalId}
+            </CardDetailLine>
+            <CardDetailLine icon={<FolderOpenIcon />} label="Call">
               {proposal.call?.shortCode ?? '-'}
             </CardDetailLine>
             <CardDetailLine icon={<HistoryIcon />} label="Created">
@@ -80,19 +84,8 @@ export default function ProposalCard({
             </CardDetailLine>
           </CardDetailList>
         </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: 0.5,
-            flexShrink: 0,
-          }}
-        >
+        <Box sx={{ flexShrink: 0 }}>
           <StatusChip status={proposal.publicStatus} />
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {proposal.proposalId}
-          </Typography>
         </Box>
       </Box>
       <Box
@@ -100,19 +93,25 @@ export default function ProposalCard({
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          padding: 2,
-          paddingTop: 1.5,
-          borderTop: 1,
-          borderColor: 'divider',
+          paddingX: 2,
+          paddingBottom: 2.5,
         }}
       >
         <Button
           fullWidth
-          color="secondary"
           variant="outlined"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
+          sx={(theme) => ({
+            minHeight: minTouchTarget(theme),
+            color: 'action.active',
+            borderColor: 'divider',
+            borderRadius: 1,
+            '&:hover': {
+              borderColor: 'divider',
+              backgroundColor: 'action.hover',
+            },
+          })}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}

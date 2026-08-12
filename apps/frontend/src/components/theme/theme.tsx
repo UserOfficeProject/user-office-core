@@ -9,6 +9,25 @@ import React, { useCallback, useContext, useEffect } from 'react';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 
+// A grey that behaves like the rest of the palette, so components can ask for it
+// through their `color` prop instead of overriding text and border by hand. It is
+// fixed rather than instance-configurable: the PALETTE_* settings cover only the
+// six semantic colours.
+declare module '@mui/material/styles' {
+  interface Palette {
+    neutral: Palette['primary'];
+  }
+  interface PaletteOptions {
+    neutral?: PaletteOptions['primary'];
+  }
+}
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    neutral: true;
+  }
+}
+
 const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
