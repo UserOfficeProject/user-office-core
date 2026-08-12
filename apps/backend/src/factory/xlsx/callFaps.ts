@@ -121,26 +121,23 @@ const collectManagementDecisionData = async (
     fapId,
     instrumentId,
   });
-
   const managementDecisionData = await Promise.all(
     fapReviews.map(async (fapreview) => {
       return await generateManagementDecisionData(agent, fapreview);
     })
   );
 
-  let instrumentAvailableTime = fapReviews[0]?.availability_time ?? 0;
-  const orderedDataByGrade = managementDecisionData.sort((data) => data.grade);
-  const finalData = [] as string[][];
-  for (const proposaldataobject of orderedDataByGrade) {
-    // Adds the running total of remaining instrument time.
-    const xlsxRowData = proposaldataobject.xlsxrowdata;
-    instrumentAvailableTime =
-      instrumentAvailableTime - proposaldataobject.instrumentAllocatedTime;
-    xlsxRowData[2] = instrumentAvailableTime.toString();
-    finalData.push(xlsxRowData);
-  }
+  const instrumentAvailableTime = fapReviews[0]?.availability_time ?? 0;
+  addDecreasingInstrumentAvailTime(
+    managementDecisionData,
+    instrumentAvailableTime
+  );
 
-  return finalData;
+  const rowsOfManagmentDecisions = managementDecisionData.map(
+    (data) => data.xlsxrowdata
+  );
+
+  return rowsOfManagmentDecisions;
 };
 
 async function generateManagementDecisionData(
@@ -175,7 +172,7 @@ async function generateManagementDecisionData(
     xlsxrowdata: [
       fapreview.proposal_id.toString() ?? '<missing>',
       `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
-      '<missing>', // Running total of remaining instrument time. (filled in later below)
+      '<missing>', // Running total of remaining instrument time. (filled in later)
       instrumentAllocatedTime
         ? instrumentAllocatedTime.toString()
         : '<missing>',
@@ -186,6 +183,26 @@ async function generateManagementDecisionData(
       fapreview.comment ?? '<missing>',
     ],
   };
+}
+
+function addDecreasingInstrumentAvailTime(
+  managementDecisionData: {
+    grade: number;
+    instrumentAllocatedTime: number;
+    xlsxrowdata: string[];
+  }[],
+  instrumentAvailableTime: number
+) {
+  //Sort by grade so the rows are in order, and the allocated time decreases from first to last.
+  managementDecisionData.sort((data) => data.grade);
+  let remainingInstrumentTime = instrumentAvailableTime;
+  for (let i = 0; i < managementDecisionData.length; i++) {
+    remainingInstrumentTime =
+      remainingInstrumentTime -
+      managementDecisionData[i].instrumentAllocatedTime;
+    const timeToShowToUser = Math.max(remainingInstrumentTime, 0).toString();
+    managementDecisionData[i].xlsxrowdata[2] = timeToShowToUser;
+  }
 }
 
 export const collectFinalDecisionXLSXData = async (
