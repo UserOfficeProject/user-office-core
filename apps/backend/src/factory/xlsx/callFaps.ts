@@ -7,7 +7,7 @@ import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
-import { Instrument } from '../../models/Instrument';
+import { FapReviewsRecord } from '../../datasources/postgres/records';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { stripHtml } from '../../utils/stringStripHtml';
@@ -121,53 +121,15 @@ const collectManagementDecisionData = async (
     fapId,
     instrumentId,
   });
-  let instrumentAvailableTime = fapReviews[0]?.availability_time ?? 0;
 
-  const returnData = await Promise.all(
+  const managementDecisionData = await Promise.all(
     fapReviews.map(async (fapreview) => {
-      const proposalInfo = await baseContext.queries.proposal.get(
-        agent,
-        fapreview.proposal_pk
-      );
-      const principalInvestigatorInfo = await baseContext.queries.user.get(
-        agent,
-        fapreview.proposer_id
-      );
-      const fapMeetingData =
-        await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
-          proposalPk: fapreview.proposal_pk,
-        });
-
-      const instrumentAllocatedTime = fapreview.fap_time_allocation
-        ? fapreview.fap_time_allocation
-        : fapreview.time_allocation;
-
-      const fapMeetingRecommendation =
-        fapMeetingData[0] && fapMeetingData[0].recommendation
-          ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
-          : ProposalEndStatusStringValue[0];
-
-      return {
-        grade: fapreview.average_grade ?? 0,
-        instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
-        xlsxrowdata: [
-          fapreview.proposal_id.toString() ?? '<missing>',
-          `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
-          '<missing>', // Running total of remaining instrument time. (filled in later below)
-          instrumentAllocatedTime
-            ? instrumentAllocatedTime.toString()
-            : '<missing>',
-          fapMeetingRecommendation,
-          fapMeetingData?.[0]?.commentForUser ?? '<missing>',
-          fapMeetingData?.[0]?.commentForManagement ?? '<missing>',
-          proposalInfo?.commentForManagement ?? '<missing>',
-          fapreview.comment ?? '<missing>',
-        ],
-      };
+      return await generateManagementDecisionData(agent, fapreview);
     })
   );
 
-  const orderedDataByGrade = returnData.sort((data) => data.grade);
+  let instrumentAvailableTime = fapReviews[0]?.availability_time ?? 0;
+  const orderedDataByGrade = managementDecisionData.sort((data) => data.grade);
   const finalData = [] as string[][];
   for (const proposaldataobject of orderedDataByGrade) {
     // Adds the running total of remaining instrument time.
@@ -180,6 +142,51 @@ const collectManagementDecisionData = async (
 
   return finalData;
 };
+
+async function generateManagementDecisionData(
+  agent: UserWithRole,
+  fapreview: FapReviewsRecord
+) {
+  const proposalInfo = await baseContext.queries.proposal.get(
+    agent,
+    fapreview.proposal_pk
+  );
+  const principalInvestigatorInfo = await baseContext.queries.user.get(
+    agent,
+    fapreview.proposer_id
+  );
+  const fapMeetingData =
+    await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
+      proposalPk: fapreview.proposal_pk,
+    });
+
+  const instrumentAllocatedTime = fapreview.fap_time_allocation
+    ? fapreview.fap_time_allocation
+    : fapreview.time_allocation;
+
+  const fapMeetingRecommendation =
+    fapMeetingData[0] && fapMeetingData[0].recommendation
+      ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
+      : ProposalEndStatusStringValue[0];
+
+  return {
+    grade: fapreview.average_grade ?? 0,
+    instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
+    xlsxrowdata: [
+      fapreview.proposal_id.toString() ?? '<missing>',
+      `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
+      '<missing>', // Running total of remaining instrument time. (filled in later below)
+      instrumentAllocatedTime
+        ? instrumentAllocatedTime.toString()
+        : '<missing>',
+      fapMeetingRecommendation,
+      fapMeetingData?.[0]?.commentForUser ?? '<missing>',
+      fapMeetingData?.[0]?.commentForManagement ?? '<missing>',
+      proposalInfo?.commentForManagement ?? '<missing>',
+      fapreview.comment ?? '<missing>',
+    ],
+  };
+}
 
 export const collectFinalDecisionXLSXData = async (
   callId: number,
@@ -196,38 +203,42 @@ export const collectFinalDecisionXLSXData = async (
   const filename = `${call?.shortCode}_management_decision.xlsx`;
   const xlsxData = await Promise.all(
     instruments.map(async (instrument) => {
-      return generateXLSXPageDataForInstrument(agent, callId, instrument);
+      return {
+        sheetName: instrument.name,
+        rows: await generateFinalDecisionRowsByInstrument(
+          agent,
+          callId,
+          instrument.id
+        ),
+      };
     })
   );
 
   return { data: xlsxData, filename: filename.replace(/\s+/g, '_') };
 };
 
-async function generateXLSXPageDataForInstrument(
+async function generateFinalDecisionRowsByInstrument(
   agent: UserWithRole,
   callId: number,
-  instrument: Instrument
+  instrumentId: number
 ) {
   const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
-  const xlsxPageData = [] as string[][];
+  const rowsOfManagmentDecisions = [] as string[][];
   for (const fap of faps) {
     const fapReviewsRows = await collectManagementDecisionData(
       fap.id,
       callId,
       agent,
-      instrument.id
+      instrumentId
     );
     for (const row of fapReviewsRows) {
       if (row) {
-        xlsxPageData.push(row);
+        rowsOfManagmentDecisions.push(row);
       }
     }
   }
 
-  return {
-    sheetName: instrument.name,
-    rows: xlsxPageData,
-  };
+  return rowsOfManagmentDecisions;
 }
 
 export const DefaultCallExtraFapDataColumns = [
