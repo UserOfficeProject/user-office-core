@@ -11,6 +11,9 @@ export const belowCompactUi = (theme: Theme) =>
 /** WCAG 2.5.5 minimum hit target, on the theme spacing scale rather than in px. */
 export const minTouchTarget = (theme: Theme) => theme.spacing(5.5);
 
+/** MUI's own BottomNavigation height, for clearing the fixed dashboard nav. */
+export const bottomNavHeight = (theme: Theme) => theme.spacing(7);
+
 export const toolbarHeight = (theme: Theme) => ({
   xs: theme.spacing(7),
   sm: theme.spacing(8),
