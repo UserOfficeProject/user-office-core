@@ -1,36 +1,21 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import LockIcon from '@mui/icons-material/Lock';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import ScheduleIcon from '@mui/icons-material/Schedule';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-import { CardTask, CardTaskStatus } from './CardTask';
+import { CardTask } from './CardTask';
 
 export type CardTaskItem = {
   task: CardTask;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
-const STATUS_ICON: Record<
-  CardTaskStatus,
-  { icon: React.ReactNode; color: string }
-> = {
-  done: { icon: <CheckCircleIcon />, color: 'primary.main' },
-  todo: { icon: <RadioButtonUncheckedIcon />, color: 'warning.dark' },
-  waiting: { icon: <ScheduleIcon />, color: 'warning.main' },
-  locked: { icon: <LockIcon />, color: 'action.disabled' },
-};
-
 // Only `locked` is inert, matching the desktop action buttons — a completed step
 // can still be reopened to redo it.
 const TaskRow = ({ task, onClick }: CardTaskItem) => {
   const actionable = task.status !== 'locked' && !!onClick;
-  const { icon, color } = STATUS_ICON[task.status];
 
   return (
     <ListItemButton
@@ -38,7 +23,7 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
       disableRipple={!actionable}
       onClick={actionable ? onClick : undefined}
       aria-label={
-        task.helperText ? `${task.label} — ${task.helperText}` : task.label
+        task.helperText ? `${task.label} (${task.helperText})` : task.label
       }
       data-cy={`experiment-task-${task.id}`}
       sx={{
@@ -47,6 +32,7 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
         paddingX: 2,
         paddingY: 0.75,
         cursor: actionable ? 'pointer' : 'default',
+        opacity: task.status === 'locked' ? 0.6 : 1,
         '&:hover': actionable ? undefined : { backgroundColor: 'transparent' },
         '&:not(:last-of-type)': {
           borderBottom: 1,
@@ -59,9 +45,13 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
     >
       <Box
         aria-hidden
-        sx={{ display: 'flex', color, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          '& .MuiSvgIcon-root': { fontSize: 20 },
+        }}
       >
-        {icon}
+        {task.icon}
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
