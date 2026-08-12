@@ -38,7 +38,7 @@ export function experimentPhase(
   }
 
   if (now >= start) {
-    return { phase: 'running', label: 'Running now' };
+    return { phase: 'running', label: 'Active' };
   }
 
   return {
