@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
@@ -16,28 +16,17 @@ export default function CardEmptyState({
   action,
 }: CardEmptyStateProps) {
   return (
-    <Box
+    <Stack
       data-cy="card-empty-state"
+      spacing={1}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
-        gap: 1,
         paddingX: 3,
         paddingY: 5,
       }}
     >
-      <Box
-        aria-hidden
-        sx={{
-          display: 'flex',
-          color: 'text.disabled',
-          '& .MuiSvgIcon-root': { fontSize: 40 },
-        }}
-      >
-        {icon}
-      </Box>
+      {icon}
       <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
         {title}
       </Typography>
@@ -46,7 +35,7 @@ export default function CardEmptyState({
           {description}
         </Typography>
       )}
-      {action && <Box sx={{ marginTop: 1 }}>{action}</Box>}
-    </Box>
+      {action}
+    </Stack>
   );
 }
