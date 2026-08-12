@@ -4,8 +4,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import ScienceIcon from '@mui/icons-material/Science';
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,13 +48,13 @@ export default function ExperimentCard({
         overflow: 'hidden',
       }}
     >
-      <Box sx={{ padding: 2, paddingBottom: 1.5 }}>
-        <Box
+      <CardContent>
+        <Stack
+          direction="row"
+          spacing={1}
           sx={{
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 1,
             marginBottom: 1.5,
           }}
         >
@@ -67,20 +68,19 @@ export default function ExperimentCard({
               letterSpacing: '0.3px',
               textTransform: 'uppercase',
               color: isRunning ? 'primary.main' : 'text.secondary',
-              '& .MuiSvgIcon-root': { fontSize: 16 },
             }}
           >
             {isRunning ? (
-              <RadioButtonCheckedIcon aria-hidden />
+              <RadioButtonCheckedIcon fontSize="small" />
             ) : (
-              <ScheduleIcon aria-hidden />
+              <ScheduleIcon fontSize="small" />
             )}
             {label}
           </Typography>
           <Typography variant="caption" color="text.secondary" noWrap>
             {experiment.experimentId}
           </Typography>
-        </Box>
+        </Stack>
         <Typography
           variant="h6"
           component="h3"
@@ -93,26 +93,35 @@ export default function ExperimentCard({
           {experiment.proposal.title}
         </Typography>
         <CardDetailList>
-          <CardDetailLine icon={<CalendarMonthIcon />} label="Dates">
+          <CardDetailLine
+            icon={<CalendarMonthIcon fontSize="small" color="action" />}
+            label="Dates"
+          >
             {toFormattedDateTime(experiment.startsAt)} &rarr;{' '}
             {toFormattedDateTime(experiment.endsAt)}
           </CardDetailLine>
           <CardDetailLine
-            icon={<ScienceIcon />}
+            icon={<ScienceIcon fontSize="small" color="action" />}
             label={t('instrument') as string}
           >
             {experiment.instrument?.name ?? 'Not assigned'}
           </CardDetailLine>
-          <CardDetailLine icon={<FolderOpenIcon />} label="Proposal">
+          <CardDetailLine
+            icon={<FolderOpenIcon fontSize="small" color="action" />}
+            label="Proposal"
+          >
             {experiment.proposal.proposalId}
           </CardDetailLine>
-          <CardDetailLine icon={<PersonIcon />} label="Local contact">
+          <CardDetailLine
+            icon={<PersonIcon fontSize="small" color="action" />}
+            label="Local contact"
+          >
             {experiment.localContact
               ? getFullUserName(experiment.localContact)
               : 'Not assigned'}
           </CardDetailLine>
         </CardDetailList>
-      </Box>
+      </CardContent>
       <CardTaskList items={tasks} />
     </Card>
   );

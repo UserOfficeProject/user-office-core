@@ -141,7 +141,7 @@ export default function UserUpcomingExperimentsTable({
       )}
       {asCards && !experimentsLoading && userExperiments.length === 0 ? (
         <CardEmptyState
-          icon={<EventBusyIcon />}
+          icon={<EventBusyIcon fontSize="large" color="disabled" />}
           title="No upcoming experiments"
           description="Once a proposal of yours is accepted and scheduled, the experiment and everything it needs from you will show up here."
           action={

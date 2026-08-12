@@ -3,7 +3,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import { Typography } from '@mui/material';
 import { t } from 'i18next';
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -49,9 +49,7 @@ const columns: Column<ProposalViewData>[] = [
 const PREFETCH_SIZE = 200;
 
 const ProposalTableReader = () => {
-  const [editProposalPk, setEditProposalPk] = useState<number | undefined>(
-    undefined
-  );
+  const navigate = useNavigate();
 
   const [queryParameters] = useState({
     query: {
@@ -66,11 +64,6 @@ const ProposalTableReader = () => {
     {},
     queryParameters.query
   );
-
-  // Redirect to edit when set
-  if (editProposalPk) {
-    return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
-  }
 
   const title = 'Proposals';
   const isLoading = loading;
@@ -98,7 +91,9 @@ const ProposalTableReader = () => {
             icon: () => <Visibility />,
             tooltip: 'View proposal',
             onClick: () =>
-              setEditProposalPk((rowData as ProposalViewData).primaryKey),
+              navigate(
+                `/ProposalEdit/${(rowData as ProposalViewData).primaryKey}`
+              ),
           }),
         ]}
       />
