@@ -7,6 +7,7 @@ import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { Instrument } from '../../models/Instrument';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { stripHtml } from '../../utils/stringStripHtml';
@@ -109,31 +110,31 @@ export const collectCallFapXLSXData = async (
   return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
-const collectFinalDecisionData = async (
+const collectManagementDecisionData = async (
   fapId: number,
   callId: number,
-  user: UserWithRole,
+  agent: UserWithRole,
   instrumentId: number
 ) => {
-  const baseData = await fapDataSource.getFapReviewData(
+  const fapReviews = await baseContext.queries.fap.getFapReviewData(agent, {
     callId,
     fapId,
-    instrumentId
-  );
-  let instrumentAvailableTime = baseData[0]?.availability_time ?? 0;
+    instrumentId,
+  });
+  let instrumentAvailableTime = fapReviews[0]?.availability_time ?? 0;
 
   const returnData = await Promise.all(
-    baseData.map(async (fapreview) => {
+    fapReviews.map(async (fapreview) => {
       const proposalInfo = await baseContext.queries.proposal.get(
-        user,
+        agent,
         fapreview.proposal_pk
       );
       const principalInvestigatorInfo = await baseContext.queries.user.get(
-        user,
+        agent,
         fapreview.proposer_id
       );
       const fapMeetingData =
-        await baseContext.queries.fap.getProposalFapMeetingDecisions(user, {
+        await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
           proposalPk: fapreview.proposal_pk,
         });
 
@@ -144,7 +145,7 @@ const collectFinalDecisionData = async (
       const fapMeetingRecommendation =
         fapMeetingData[0] && fapMeetingData[0].recommendation
           ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
-          : '<missing>';
+          : ProposalEndStatusStringValue[0];
 
       return {
         grade: fapreview.average_grade ?? 0,
@@ -169,6 +170,7 @@ const collectFinalDecisionData = async (
   const orderedDataByGrade = returnData.sort((data) => data.grade);
   const finalData = [] as string[][];
   for (const proposaldataobject of orderedDataByGrade) {
+    // Adds the running total of remaining instrument time.
     const xlsxRowData = proposaldataobject.xlsxrowdata;
     instrumentAvailableTime =
       instrumentAvailableTime - proposaldataobject.instrumentAllocatedTime;
@@ -181,9 +183,8 @@ const collectFinalDecisionData = async (
 
 export const collectFinalDecisionXLSXData = async (
   callId: number,
-  user: UserWithRole
+  agent: UserWithRole
 ) => {
-  const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -191,35 +192,43 @@ export const collectFinalDecisionXLSXData = async (
     [callId],
     true
   );
-  const call = await baseContext.queries.call.get(user, callId);
-  const filename = `${call?.shortCode}_FAP_Results.xlsx`;
-
-  const baseData2 = await Promise.all(
+  const call = await baseContext.queries.call.get(agent, callId);
+  const filename = `${call?.shortCode}_management_decision.xlsx`;
+  const xlsxData = await Promise.all(
     instruments.map(async (instrument) => {
-      const newRows = [] as string[][];
-      for (const fap of faps) {
-        const rowOfInstrument = await collectFinalDecisionData(
-          fap.id,
-          callId,
-          user,
-          instrument.id
-        );
-        for (const row of rowOfInstrument) {
-          if (row) {
-            newRows.push(row);
-          }
-        }
-      }
-
-      return {
-        sheetName: instrument.name,
-        rows: newRows,
-      };
+      return generateXLSXPageDataForInstrument(agent, callId, instrument);
     })
   );
 
-  return { data: baseData2, filename: filename.replace(/\s+/g, '_') };
+  return { data: xlsxData, filename: filename.replace(/\s+/g, '_') };
 };
+
+async function generateXLSXPageDataForInstrument(
+  agent: UserWithRole,
+  callId: number,
+  instrument: Instrument
+) {
+  const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
+  const xlsxPageData = [] as string[][];
+  for (const fap of faps) {
+    const fapReviewsRows = await collectManagementDecisionData(
+      fap.id,
+      callId,
+      agent,
+      instrument.id
+    );
+    for (const row of fapReviewsRows) {
+      if (row) {
+        xlsxPageData.push(row);
+      }
+    }
+  }
+
+  return {
+    sheetName: instrument.name,
+    rows: xlsxPageData,
+  };
+}
 
 export const DefaultCallExtraFapDataColumns = [
   'Fap Time allocation',
