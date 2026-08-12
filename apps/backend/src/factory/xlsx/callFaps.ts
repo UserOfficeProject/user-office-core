@@ -7,8 +7,6 @@ import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
-import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { UserDataSource } from '../../datasources/UserDataSource';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { stripHtml } from '../../utils/stringStripHtml';
@@ -117,63 +115,52 @@ const collectFinalDecisionData = async (
   user: UserWithRole,
   instrumentId: number
 ) => {
-  const finalDecisionColumns = [
-    'Proposal Reference Number',
-    'Principal Investigator',
-    'Instrument Name',
-    'Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
-    'FAP allocated time', // Awarded Time, time recommendation from FAP process
-    'FAP Meeting Decision', // Decision (FAP Meeting Decision) recommendation from FAP process
-    'FAP comment to user', // Comment to user (FAP Comment to user)
-    'Internal comments', // Internal comments
-    'Technical Review comments', // Technical assessment Comment to management
-    'FAP comments', // FAP meeting Comment to management
-  ];
   const baseData = await fapDataSource.getFapReviewData(
     callId,
     fapId,
     instrumentId
   );
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-  const userDataSource = container.resolve<UserDataSource>(
-    Tokens.UserDataSource
-  );
   let instrumentAvailableTime = baseData[0]?.availability_time ?? 0;
 
   const returnData = await Promise.all(
     baseData.map(async (fapreview) => {
-      const proposalInfo = await proposalDataSource.get(fapreview.proposal_pk);
-      const principalInvestigatorInfo = await userDataSource.getBasicUserInfo(
+      const proposalInfo = await baseContext.queries.proposal.get(
+        user,
+        fapreview.proposal_pk
+      );
+      const principalInvestigatorInfo = await baseContext.queries.user.get(
+        user,
         fapreview.proposer_id
       );
-      const fapMeetingDecision =
-        await fapDataSource.getProposalsFapMeetingDecisions([
-          fapreview.proposal_pk,
-        ]);
+      const fapMeetingData =
+        await baseContext.queries.fap.getProposalFapMeetingDecisions(user, {
+          proposalPk: fapreview.proposal_pk,
+        });
 
       const instrumentAllocatedTime = fapreview.fap_time_allocation
         ? fapreview.fap_time_allocation
         : fapreview.time_allocation;
 
+      const fapMeetingRecommendation =
+        fapMeetingData[0] && fapMeetingData[0].recommendation
+          ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
+          : '<missing>';
+
       return {
         grade: fapreview.average_grade ?? 0,
         instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
         xlsxrowdata: [
-          fapreview.proposal_id.toString() ?? '<missing>', //Proposal Reference Number
-          `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`, //Principal Investigator Name
-          '<missing>', //Instrument available time (running total)
+          fapreview.proposal_id.toString() ?? '<missing>',
+          `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
+          '<missing>', // Running total of remaining instrument time. (filled in later below)
           instrumentAllocatedTime
             ? instrumentAllocatedTime.toString()
-            : '<missing>', //FAP allocated time
-          fapMeetingDecision[0] && fapMeetingDecision[0].recommendation
-            ? ProposalEndStatusStringValue[fapMeetingDecision[0].recommendation]
-            : '<missing>', //FAP Meeting Decision
-          fapMeetingDecision?.[0]?.commentForUser ?? '<missing>', //FAP comment to user
-          fapMeetingDecision?.[0]?.commentForManagement ?? '<missing>', //FAP comments
-          proposalInfo?.commentForManagement ?? '<missing>', //Internal comments
-          fapreview.comment ?? '<missing>', //Technical Review comments
+            : '<missing>',
+          fapMeetingRecommendation,
+          fapMeetingData?.[0]?.commentForUser ?? '<missing>',
+          fapMeetingData?.[0]?.commentForManagement ?? '<missing>',
+          proposalInfo?.commentForManagement ?? '<missing>',
+          fapreview.comment ?? '<missing>',
         ],
       };
     })
