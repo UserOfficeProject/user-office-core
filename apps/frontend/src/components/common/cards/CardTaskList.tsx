@@ -1,9 +1,11 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import Typography from '@mui/material/Typography';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import React from 'react';
+
+import { minTouchTarget } from 'hooks/common/useResponsive';
 
 import { CardTask } from './CardTask';
 
@@ -20,61 +22,31 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
   return (
     <ListItemButton
       component="div"
-      disableRipple={!actionable}
-      onClick={actionable ? onClick : undefined}
-      aria-label={
-        task.helperText ? `${task.label} (${task.helperText})` : task.label
-      }
+      disabled={!actionable}
+      onClick={onClick}
       data-cy={`experiment-task-${task.id}`}
-      sx={{
-        minHeight: task.helperText ? 52 : 48,
+      sx={(theme) => ({
+        minHeight: minTouchTarget(theme),
         gap: 1.5,
-        paddingX: 2,
-        paddingY: 0.75,
-        cursor: actionable ? 'pointer' : 'default',
-        opacity: task.status === 'locked' ? 0.6 : 1,
-        '&:hover': actionable ? undefined : { backgroundColor: 'transparent' },
         '&:not(:last-of-type)': {
           borderBottom: 1,
           borderColor: 'divider',
         },
-      }}
-      {...(actionable
-        ? { role: 'button', tabIndex: 0 }
-        : { 'aria-disabled': true })}
+      })}
     >
-      <Box
-        aria-hidden
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          '& .MuiSvgIcon-root': { fontSize: 20 },
+      <ListItemIcon sx={{ minWidth: 0 }}>{task.icon}</ListItemIcon>
+      <ListItemText
+        primary={task.label}
+        secondary={task.helperText}
+        slotProps={{
+          primary: {
+            variant: 'body2',
+            sx: { fontWeight: task.status === 'todo' ? 500 : 400 },
+          },
+          secondary: { variant: 'caption' },
         }}
-      >
-        {task.icon}
-      </Box>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: task.status === 'todo' ? 500 : 400,
-            color: task.status === 'locked' ? 'text.disabled' : 'text.primary',
-          }}
-        >
-          {task.label}
-        </Typography>
-        {task.helperText && (
-          <Typography variant="caption" color="text.secondary" component="div">
-            {task.helperText}
-          </Typography>
-        )}
-      </Box>
-      {actionable && (
-        <ChevronRightIcon
-          aria-hidden
-          sx={{ fontSize: 22, color: 'action.active', opacity: 0.5 }}
-        />
-      )}
+      />
+      {actionable && <ChevronRightIcon fontSize="small" color="action" />}
     </ListItemButton>
   );
 };
@@ -87,7 +59,11 @@ export default function CardTaskList({ items }: { items: CardTaskItem[] }) {
   return (
     <List
       disablePadding
-      sx={{ borderTop: 1, borderColor: 'divider', backgroundColor: 'grey.50' }}
+      sx={{
+        borderTop: 1,
+        borderColor: 'divider',
+        backgroundColor: 'action.hover',
+      }}
     >
       {items.map((item) => (
         <TaskRow key={item.task.id} {...item} />
