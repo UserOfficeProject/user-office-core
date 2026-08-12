@@ -92,18 +92,10 @@ export default function ProposalCard({
       >
         <Button
           fullWidth
-          variant="outlined"
+          variant="quiet"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={(theme) => ({
-            minHeight: minTouchTarget(theme),
-            color: 'action.active',
-            borderColor: 'divider',
-            '&:hover': {
-              borderColor: 'divider',
-              backgroundColor: 'action.hover',
-            },
-          })}
+          sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}
