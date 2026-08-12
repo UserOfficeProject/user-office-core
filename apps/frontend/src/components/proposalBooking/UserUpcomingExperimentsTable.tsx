@@ -1,16 +1,17 @@
 import { Column } from '@material-table/core';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import { Box, Dialog, DialogContent, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, Link, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link as RouterLink } from 'react-router-dom';
 
 import CardEmptyState from 'components/common/cards/CardEmptyState';
 import { CardTaskItem } from 'components/common/cards/CardTaskList';
 import ExperimentCard from 'components/common/cards/ExperimentCard';
 import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useCardRows } from 'hooks/common/useResponsive';
+import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -143,6 +144,20 @@ export default function UserUpcomingExperimentsTable({
           icon={<EventBusyIcon />}
           title="No upcoming experiments"
           description="Once a proposal of yours is accepted and scheduled, the experiment and everything it needs from you will show up here."
+          action={
+            <Link
+              component={RouterLink}
+              to="/ProposalSelectType"
+              data-cy="empty-new-proposal-link"
+              sx={(theme) => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: minTouchTarget(theme),
+              })}
+            >
+              New proposal
+            </Link>
+          }
         />
       ) : (
         <MaterialTable

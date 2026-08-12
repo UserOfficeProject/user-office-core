@@ -7,11 +7,11 @@ import FolderOffIcon from '@mui/icons-material/FolderOff';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link as RouterLink, Navigate } from 'react-router-dom';
 
 import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
 import CardEmptyState from 'components/common/cards/CardEmptyState';
@@ -331,7 +331,21 @@ const ProposalTable = ({
         <CardEmptyState
           icon={<FolderOffIcon />}
           title="No proposals yet"
-          description="Proposals you write, and any you are invited to join, will appear here."
+          description="Create one below or join one using the invite code."
+          action={
+            <Link
+              component={RouterLink}
+              to="/ProposalSelectType"
+              data-cy="empty-new-proposal-link"
+              sx={(theme) => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: minTouchTarget(theme),
+              })}
+            >
+              New proposal
+            </Link>
+          }
         />
       )}
       <MaterialTable
