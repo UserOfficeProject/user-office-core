@@ -7,6 +7,8 @@ import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { UserDataSource } from '../../datasources/UserDataSource';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { stripHtml } from '../../utils/stringStripHtml';
@@ -113,7 +115,7 @@ const collectFinalDecisionData = async (
   fapId: number,
   callId: number,
   user: UserWithRole,
-  instrumentName: string
+  instrumentId: number
 ) => {
   const finalDecisionColumns = [
     'Proposal Reference Number',
@@ -127,25 +129,54 @@ const collectFinalDecisionData = async (
     'Technical Review comments', // Technical assessment Comment to management
     'FAP comments', // FAP meeting Comment to management
   ];
-  const baseData = await fapDataSource.getFapReviewData(callId, fapId);
-  const returnData = baseData.map((fapreview) => {
-    return [
-      fapreview.proposal_id.toString(),
-      'aaron',
-      instrumentName,
-      fapreview.availability_time.toString(),
-      fapreview.time_allocation.toString(),
-      'zac2',
-      'zac1',
-      'zac2',
-      'zac1',
-      'zac2',
-      'zac1',
-      'zac12',
-      'zac13',
-    ];
-  });
-  const principalInvestigator = '';
+  const baseData = await fapDataSource.getFapReviewData(
+    callId,
+    fapId,
+    instrumentId
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
+  const returnData = await Promise.all(
+    baseData.map(async (fapreview) => {
+      const proposalInfo = await proposalDataSource.get(fapreview.proposal_pk);
+      if (proposalInfo) {
+        const principalInvestigatorInfo = await userDataSource.getBasicUserInfo(
+          fapreview.proposer_id
+        );
+        const fapMeetingDecision =
+          await fapDataSource.getProposalsFapMeetingDecisions([
+            fapreview.proposal_pk,
+          ]);
+
+        const instrumentAllocatedTime = fapreview.fap_time_allocation
+          ? fapreview.fap_time_allocation
+          : fapreview.time_allocation;
+
+        return [
+          fapreview.proposal_id.toString() ?? '<missing>', //Proposal Reference Number
+          `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`, //Principal Investigator Name
+          fapreview.availability_time
+            ? fapreview.availability_time.toString()
+            : '<missing>', //Instrument available time (running total)
+          instrumentAllocatedTime
+            ? instrumentAllocatedTime.toString()
+            : '<missing>', //FAP allocated time
+          fapMeetingDecision[0] && fapMeetingDecision[0].recommendation
+            ? ProposalEndStatusStringValue[fapMeetingDecision[0].recommendation]
+            : '<missing>', //FAP Meeting Decision
+          fapMeetingDecision?.[0]?.commentForUser ?? '<missing>', //FAP comment to user
+          fapMeetingDecision?.[0]?.commentForManagement ?? '<missing>', //FAP comments
+          proposalInfo?.commentForManagement ?? '<missing>', //Internal comments
+          fapreview.comment ?? '<missing>', //Technical Review comments
+        ];
+      }
+    })
+  );
 
   return returnData;
 };
@@ -173,10 +204,12 @@ export const collectFinalDecisionXLSXData = async (
           fap.id,
           callId,
           user,
-          instrument.name
+          instrument.id
         );
         for (const row of rowOfInstrument) {
-          newRows.push(row);
+          if (row) {
+            newRows.push(row);
+          }
         }
       }
 

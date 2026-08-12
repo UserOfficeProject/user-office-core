@@ -260,16 +260,15 @@ router.get(`/${XLSXType.FINAL_DECISION}/:call_id`, async (req, res, next) => {
     );
 
     const finalDecisionColumns = [
-      'Proposal Reference Number',
-      'Principal Investigator',
-      'Instrument Name',
-      'Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
+      'Proposal ID', //
+      'Principal Investigator', //Stored as proposer_id in proposals table
+      'Remaining Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
       'FAP allocated time', // Awarded Time, time recommendation from FAP process
       'FAP Meeting Decision', // Decision (FAP Meeting Decision) recommendation from FAP process
       'FAP comment to user', // Comment to user (FAP Comment to user)
-      'Internal comments', // Internal comments
-      'Technical Review comments', // Technical assessment Comment to management
-      'FAP comments', // FAP meeting Comment to management
+      'FAP meeting Comment to management', //FAP comments to manaegment Comment for management
+      'Comment for manegment (admin page)', // Internal comments
+      'Technical Review comments', // techincal reveiew public comments
     ];
 
     const meta: XLSXMetaBase = {
