@@ -8,6 +8,9 @@ export const COMPACT_UI_BREAKPOINT: Breakpoint = 'md';
 export const belowCompactUi = (theme: Theme) =>
   theme.breakpoints.down(COMPACT_UI_BREAKPOINT);
 
+/** WCAG 2.5.5 minimum hit target, on the theme spacing scale rather than in px. */
+export const minTouchTarget = (theme: Theme) => theme.spacing(5.5);
+
 export const toolbarHeight = (theme: Theme) => ({
   xs: theme.spacing(7),
   sm: theme.spacing(8),
