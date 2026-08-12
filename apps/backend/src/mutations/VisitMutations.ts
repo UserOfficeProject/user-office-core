@@ -21,7 +21,7 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
+import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutation';
 import { CancelVisitRegistrationInput } from '../resolvers/mutations/CancelVisitRegistrationMutation';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
 import { RequestVisitRegistrationChangesInput } from '../resolvers/mutations/RequestVisitRegistrationChangesMutation';
