@@ -6,12 +6,14 @@ type CardEmptyStateProps = {
   icon: React.ReactNode;
   title: string;
   description?: string;
+  action?: React.ReactNode;
 };
 
 export default function CardEmptyState({
   icon,
   title,
   description,
+  action,
 }: CardEmptyStateProps) {
   return (
     <Box
@@ -44,6 +46,7 @@ export default function CardEmptyState({
           {description}
         </Typography>
       )}
+      {action && <Box sx={{ marginTop: 1 }}>{action}</Box>}
     </Box>
   );
 }
