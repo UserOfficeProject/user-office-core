@@ -11,7 +11,7 @@ import { Box, Link, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
-import { Link as RouterLink, Navigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
 import CardEmptyState from 'components/common/cards/CardEmptyState';
@@ -94,6 +94,7 @@ const ProposalTable = ({
   const tableRef =
     React.useRef<MaterialTableCore<PartialProposalsDataType>>(undefined);
   const { api } = useDataApiWithFeedback();
+  const navigate = useNavigate();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
     PartialProposalsDataType[] | undefined
@@ -124,11 +125,7 @@ const ProposalTable = ({
     FeatureId.DATA_ACCESS_USERS
   )?.isEnabled;
 
-  const [editProposalPk, setEditProposalPk] = useState(0);
   const { isInternalUser } = useContext(UserContext);
-  if (editProposalPk) {
-    return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
-  }
 
   const showReferenceText = (
     proposalData: PartialProposalsDataType[]
@@ -177,8 +174,11 @@ const ProposalTable = ({
   const canDeleteProposal = (rowData: PartialProposalsDataType) =>
     isProposer(rowData) && !rowData.submitted;
 
+  // Navigated from the handler rather than by rendering <Navigate/> from state:
+  // Navigate redirects inside an effect, which StrictMode runs twice, leaving two
+  // history entries so the first press of Back appears to do nothing.
   const openProposal = (rowData: PartialProposalsDataType) =>
-    setEditProposalPk(rowData.primaryKey);
+    navigate(`/ProposalEdit/${rowData.primaryKey}`);
 
   const cloneProposal = (rowData: PartialProposalsDataType) => {
     api()
@@ -329,7 +329,7 @@ const ProposalTable = ({
           elements under React 19. Same workaround as TemplatesTable. */}
       {showEmptyState && (
         <CardEmptyState
-          icon={<FolderOffIcon />}
+          icon={<FolderOffIcon fontSize="large" color="disabled" />}
           title="No proposals yet"
           description="Create one below or join one using the invite code."
           action={

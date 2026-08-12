@@ -4,10 +4,12 @@ import HistoryIcon from '@mui/icons-material/History';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TagIcon from '@mui/icons-material/Tag';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
@@ -46,56 +48,47 @@ export default function ProposalCard({
 
   return (
     <Card variant="outlined" data-cy="proposal-card" sx={{ borderRadius: 2 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 1.5,
-          paddingX: 2,
-          paddingY: 2.5,
-        }}
-      >
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1.5,
-          }}
+      <CardContent>
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }}
         >
-          <Typography
-            variant="h5"
-            component="h3"
-            sx={{ lineHeight: 1.35, textWrap: 'pretty' }}
-          >
-            {proposal.title}
-          </Typography>
-          <CardDetailList>
-            <CardDetailLine icon={<TagIcon />} label="Proposal ID">
-              {proposal.proposalId}
-            </CardDetailLine>
-            <CardDetailLine icon={<FolderOpenIcon />} label="Call">
-              {proposal.call?.shortCode ?? '-'}
-            </CardDetailLine>
-            <CardDetailLine icon={<HistoryIcon />} label="Created">
-              {timeAgo(proposal.created)}
-            </CardDetailLine>
-          </CardDetailList>
-        </Box>
-        <Box sx={{ flexShrink: 0 }}>
+          <Stack spacing={1.5} sx={{ flex: 1, minWidth: 0 }}>
+            <Typography
+              variant="h5"
+              component="h3"
+              sx={{ lineHeight: 1.35, textWrap: 'pretty' }}
+            >
+              {proposal.title}
+            </Typography>
+            <CardDetailList>
+              <CardDetailLine
+                icon={<TagIcon fontSize="small" color="action" />}
+                label="Proposal ID"
+              >
+                {proposal.proposalId}
+              </CardDetailLine>
+              <CardDetailLine
+                icon={<FolderOpenIcon fontSize="small" color="action" />}
+                label="Call"
+              >
+                {proposal.call?.shortCode ?? '-'}
+              </CardDetailLine>
+              <CardDetailLine
+                icon={<HistoryIcon fontSize="small" color="action" />}
+                label="Created"
+              >
+                {timeAgo(proposal.created)}
+              </CardDetailLine>
+            </CardDetailList>
+          </Stack>
           <StatusChip status={proposal.publicStatus} />
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          paddingX: 2,
-          paddingBottom: 2.5,
-        }}
+        </Stack>
+      </CardContent>
+      <CardActions
+        disableSpacing
+        sx={{ gap: 2, paddingX: 2, paddingBottom: 2 }}
       >
         <Button
           fullWidth
@@ -106,7 +99,6 @@ export default function ProposalCard({
             minHeight: minTouchTarget(theme),
             color: 'action.active',
             borderColor: 'divider',
-            borderRadius: 1,
             '&:hover': {
               borderColor: 'divider',
               backgroundColor: 'action.hover',
@@ -133,7 +125,7 @@ export default function ProposalCard({
             <MoreHorizIcon />
           </IconButton>
         )}
-      </Box>
+      </CardActions>
       <CardActionSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}

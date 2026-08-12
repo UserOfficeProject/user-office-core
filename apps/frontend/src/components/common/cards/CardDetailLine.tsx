@@ -27,6 +27,7 @@ export function CardDetailList({ children }: { children: React.ReactNode }) {
 }
 
 type CardDetailLineProps = {
+  /** Give it `fontSize="small"`; it is rendered as passed. */
   icon: React.ReactNode;
   label: string;
   children: React.ReactNode;
@@ -40,17 +41,7 @@ export default function CardDetailLine({
 }: CardDetailLineProps) {
   return (
     <>
-      <Box
-        aria-hidden
-        sx={{
-          display: 'flex',
-          color: 'action.active',
-          opacity: 0.45,
-          '& .MuiSvgIcon-root': { fontSize: 18 },
-        }}
-      >
-        {icon}
-      </Box>
+      {icon}
       <Typography
         variant="body1"
         color="text.secondary"
