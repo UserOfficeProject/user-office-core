@@ -540,11 +540,13 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
           search: false,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           selectionProps: (rowData: UserWithReview) => ({
-            inputProps: {
-              'aria-label': `${rowData.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.title}-select`,
+              },
             },
           }),
         }}

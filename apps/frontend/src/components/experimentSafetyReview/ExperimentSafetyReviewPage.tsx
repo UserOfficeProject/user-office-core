@@ -280,7 +280,7 @@ function ExperimentSafetyReviewPage() {
             options={{
               selection: true,
               headerSelectionProps: {
-                inputProps: { 'aria-label': 'Select All Rows' },
+                slotProps: { input: { 'aria-label': 'Select All Rows' } },
               },
             }}
             actions={[
