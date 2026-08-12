@@ -6,10 +6,7 @@ interface LoadingOverlayProps {
   children: React.ReactNode;
 }
 
-const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
-  isLoading,
-  children,
-}) => {
+const LoadingOverlay = ({ isLoading, children }: LoadingOverlayProps) => {
   const getContainerStyle = (): React.CSSProperties => {
     return isLoading
       ? {

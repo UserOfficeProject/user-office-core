@@ -6,7 +6,6 @@ import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -110,11 +109,6 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
       </Toolbar>
     </AppBar>
   );
-};
-
-AppToolbar.propTypes = {
-  open: PropTypes.bool.isRequired,
-  handleDrawerOpen: PropTypes.func.isRequired,
 };
 
 export default AppToolbar;

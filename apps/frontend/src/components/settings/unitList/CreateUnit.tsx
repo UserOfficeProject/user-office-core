@@ -1,6 +1,5 @@
 import Button from '@mui/material/Button';
 import { Field, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -135,11 +134,6 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
       )}
     </Formik>
   );
-};
-
-CreateUnit.propTypes = {
-  unit: PropTypes.any,
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUnit;

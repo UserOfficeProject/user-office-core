@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { Reducer, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ConnectionLineType } from 'reactflow';
 
@@ -301,7 +301,7 @@ const WorkflowEditorModel = (
     });
   }
 
-  const [state, dispatch] = useReducerWithMiddleWares<Reducer<Workflow, Event>>(
+  const [state, dispatch] = useReducerWithMiddleWares<Workflow, Event>(
     reducer,
     blankInitTemplate,
     middlewares || []

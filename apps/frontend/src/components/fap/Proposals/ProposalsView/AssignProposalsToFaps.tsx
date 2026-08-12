@@ -86,7 +86,7 @@ const AssignProposalsToFaps = ({
           close();
         }}
       >
-        {({ isSubmitting, values }): JSX.Element => (
+        {({ isSubmitting, values }) => (
           <Form>
             <Typography variant="h6" component="h1">
               {`Assign proposal/s to ${t('FAP')}`}

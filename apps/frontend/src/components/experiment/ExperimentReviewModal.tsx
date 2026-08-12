@@ -11,21 +11,20 @@ import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import React from 'react';
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = ({
+  ref,
+  ...props
+}: TransitionProps & {
+  children: React.ReactElement;
+  ref?: React.Ref<unknown>;
+}) => <Slide direction="up" ref={ref} {...props} />;
 
 type ExperimentReviewModalProps = {
   modalOpen: boolean;
   handleClose: () => void;
   title: string;
   reviewItemId?: number | null;
-  children: React.ReactElement;
+  children: React.ReactElement<{ isInsideModal?: boolean }>;
 };
 
 //TODO: This is a copy of the ProposalReviewModal. We should refactor this to use a common modal component.
