@@ -12,7 +12,7 @@ import { QuestionTemplateRelationDateForm } from './QuestionTemplateRelationDate
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const dateTimeRangeDefinition: QuestionaryComponentDefinition = {
-  dataType: DataType.DATE_TIME_RANGE_PICKER,
+  dataType: DataType.DATE_TIME_RANGE,
   name: 'Date Time Range',
   questionaryComponent: QuestionaryComponentDateTimeRangePicker,
   questionForm: () => QuestionDateTimeForm,

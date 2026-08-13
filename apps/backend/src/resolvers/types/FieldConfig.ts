@@ -100,12 +100,9 @@ export class DateTimeRangeConfig extends ConfigBase {
   defaultDate:
     | {
         from: Date | undefined;
-        to?: Date | undefined;
+        to: Date | undefined;
       }[]
     | null;
-
-  @Field(() => Boolean)
-  includeTime: boolean;
 }
 
 @ObjectType()

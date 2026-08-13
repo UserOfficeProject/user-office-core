@@ -1,6 +1,5 @@
 export * from './boolean';
 export * from './date';
-export * from './dateTimeRange';
 export * from './fileUpload';
 export * from './interval';
 export * from './multipleChoice';

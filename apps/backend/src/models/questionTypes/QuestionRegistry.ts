@@ -110,7 +110,7 @@ export type QuestionDataTypeConfigMapping<T extends DataType> =
                                                   ? InstrumentPickerConfig
                                                   : T extends DataType.TECHNIQUE_PICKER
                                                     ? TechniquePickerConfig
-                                                    : T extends DataType.DATE_TIME_RANGE_PICKER
+                                                    : T extends DataType.DATE_TIME_RANGE
                                                       ? DateTimeRangeConfig
                                                       : never;
 export interface Question<T extends DataType> {
