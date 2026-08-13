@@ -20,7 +20,7 @@ export enum XLSXType {
   FAP = 'fap',
   CALL_FAP = 'call_fap',
   TECHNIQUE = 'technique',
-  MANAGEMENT_DECISION = 'management-decision',
+  MANAGEMENT_DECISION = 'management_decision',
 }
 
 export enum PDFType {
