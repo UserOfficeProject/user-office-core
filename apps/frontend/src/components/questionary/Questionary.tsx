@@ -7,12 +7,12 @@ import Typography from '@mui/material/Typography';
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import MobileAppBar from 'components/common/mobile/MobileAppBar';
 import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { toolbarHeight, useIsMobile } from 'hooks/common/useResponsive';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import WizardAppBar from './mobile/WizardAppBar';
 import {
   WizardHeaderProvider,
   useWizardHeader,
@@ -152,7 +152,7 @@ function Questionary({
 
     return (
       <Box sx={{ width: '100%' }}>
-        <WizardAppBar
+        <MobileAppBar
           title={title}
           subtitle={variant === 'dialog' ? undefined : appBarSubtitle}
           variant={variant}
