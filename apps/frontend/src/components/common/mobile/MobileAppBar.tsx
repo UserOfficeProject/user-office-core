@@ -34,6 +34,7 @@ export default function MobileAppBar({
   return (
     <AppBar
       position="sticky"
+      color="inherit"
       elevation={0}
       data-cy="mobile-app-bar"
       sx={{
@@ -77,6 +78,7 @@ export default function MobileAppBar({
               fontWeight: 500,
               fontSize: isDialog ? 16 : 15,
               lineHeight: isDialog ? 1.3 : 1.25,
+              color: 'text.primary',
             }}
           >
             {title}
