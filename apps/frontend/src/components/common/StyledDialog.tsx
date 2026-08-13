@@ -13,6 +13,9 @@
  *   placed inside MUI's Dialog can also be used inside StyledDialog.
  * - Additional props (`DialogProps`) are passed down to the underlying MUI Dialog component.
  *
+ * `fullScreen` defaults to true below the compact breakpoint. Pass `fullScreen={false}`
+ * for short prompts, which read as broken when blown up to the whole viewport.
+ *
  * Usage:
  * ```
  * <StyledDialog
@@ -33,6 +36,8 @@ import Dialog, { DialogProps } from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 
+import { useIsMobile } from 'hooks/common/useResponsive';
+
 const DialogHeader = styled('div')({
   display: 'flex',
   width: '100%',
@@ -49,9 +54,10 @@ type StyledDialogProps = {
 
 function StyledDialog(props: StyledDialogProps) {
   const { extra, error, title, onClose } = props;
+  const isMobile = useIsMobile();
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} fullScreen={props.fullScreen ?? isMobile}>
       <DialogHeader>
         <DialogTitle
           id="customized-dialog-title"
