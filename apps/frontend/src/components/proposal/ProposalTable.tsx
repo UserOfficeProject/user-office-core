@@ -237,16 +237,6 @@ const ProposalTable = ({
       icon: <GetAppIcon />,
       onClick: () => downloadProposal(rowData),
     },
-    ...(canViewDataAccessUsers(rowData)
-      ? [
-          {
-            key: 'data-access',
-            label: 'Data access users',
-            icon: <PeopleIcon />,
-            onClick: () => openDataAccessUsers(rowData),
-          },
-        ]
-      : []),
     ...(canDeleteProposal(rowData)
       ? [
           {
@@ -452,6 +442,11 @@ const ProposalTable = ({
             proposal={proposal}
             readOnly={isReadOnly(proposal)}
             onOpen={() => openProposal(proposal)}
+            onOpenDataAccess={
+              canViewDataAccessUsers(proposal)
+                ? () => openDataAccessUsers(proposal)
+                : undefined
+            }
             sheetItems={sheetItemsFor(proposal)}
           />
         )}
