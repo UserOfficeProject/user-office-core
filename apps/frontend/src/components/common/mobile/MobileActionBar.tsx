@@ -102,7 +102,8 @@ export default function MobileActionBar({
         display: 'flex',
         alignItems: 'center',
         gap: 1,
-        paddingY: 1.25,
+        paddingTop: 1.25,
+        paddingBottom: 2,
         backgroundColor: 'background.paper',
         borderTop: 1,
         borderColor: 'divider',
@@ -137,7 +138,9 @@ export default function MobileActionBar({
             disabled={primary.disabled}
             loading={isLoading}
             startIcon={primary.icon === 'send' ? <SendIcon /> : undefined}
-            endIcon={primary.icon === 'send' ? undefined : <ArrowForwardIcon />}
+            endIcon={
+              primary.icon === 'forward' ? <ArrowForwardIcon /> : undefined
+            }
             data-cy="mobile-action-primary"
             sx={(theme) => ({
               flex: 1,

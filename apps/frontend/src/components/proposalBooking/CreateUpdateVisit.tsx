@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
@@ -6,9 +6,12 @@ import * as Yup from 'yup';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import MobileActionBar from 'components/common/mobile/MobileActionBar';
+import MobileAppBar from 'components/common/mobile/MobileAppBar';
 import UserManagementTable from 'components/common/UserManagementTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -19,6 +22,7 @@ interface CreateUpdateVisitProps {
 }
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();
+  const isMobile = useIsMobile();
   const [visitInvites, setVisitInvites] = useState<Invite[]>(
     event.visit?.registrationInvites || []
   );
@@ -86,56 +90,106 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
         }
       }}
     >
-      {({ values, isSubmitting, setFieldValue }) => (
-        <Form>
-          <Typography variant="h6">
-            {visit ? 'Update the visit' : 'Create new visit'}
-          </Typography>
-          <UserManagementTable
-            title="Visitors"
-            addModalTitle="Add Visitors"
-            setInvites={setVisitInvites}
-            invites={visitInvites}
-            setUsers={(team: BasicUserDetails[]) => {
-              setFieldValue('team', team);
-            }}
-            users={values.team || []}
-            allowInviteByEmail={allowInviteByEmail}
-          />
-          <ErrorMessage name="team" />
+      {({ values, isSubmitting, setFieldValue, submitForm }) => {
+        const heading = visit ? 'Update the visit' : 'Create new visit';
+        const fields = (
+          <>
+            <UserManagementTable
+              title="Visitors"
+              addModalTitle="Add Visitors"
+              setInvites={setVisitInvites}
+              invites={visitInvites}
+              setUsers={(team: BasicUserDetails[]) => {
+                setFieldValue('team', team);
+              }}
+              users={values.team || []}
+              allowInviteByEmail={allowInviteByEmail}
+            />
+            <ErrorMessage name="team" />
 
-          <FormikUIAutocomplete
-            items={values.team.map((user) => ({
-              text: getFullUserName(user),
-              value: user.id,
-            }))}
-            label="Team lead"
-            name="teamLeadUserId"
-            InputProps={{
-              'data-cy': 'team-lead-user-dropdown',
-              margin: 'dense',
-            }}
-          />
-          <ErrorMessage name="teamLeadUserId" />
+            <FormikUIAutocomplete
+              items={values.team.map((user) => ({
+                text: getFullUserName(user),
+                value: user.id,
+              }))}
+              label="Team lead"
+              name="teamLeadUserId"
+              InputProps={{
+                'data-cy': 'team-lead-user-dropdown',
+                margin: 'dense',
+              }}
+            />
+            <ErrorMessage name="teamLeadUserId" />
+          </>
+        );
 
-          <ActionButtonContainer>
-            <Button
-              disabled={isSubmitting}
-              variant="text"
-              onClick={() => close(event)}
-            >
-              Close
-            </Button>
-            <Button
-              disabled={isSubmitting}
-              type="submit"
-              data-cy="create-update-visit-button"
-            >
-              {visit ? 'Update' : 'Create'}
-            </Button>
-          </ActionButtonContainer>
-        </Form>
-      )}
+        return (
+          <Form
+            style={
+              isMobile
+                ? {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '100%',
+                  }
+                : undefined
+            }
+          >
+            {isMobile ? (
+              <MobileAppBar
+                title={heading}
+                variant="dialog"
+                onBack={() => close(event)}
+              />
+            ) : (
+              <Typography variant="h6">{heading}</Typography>
+            )}
+            {isMobile ? (
+              <Box
+                sx={{
+                  paddingX: 2,
+                  paddingY: 2,
+                  flex: 1,
+                  backgroundColor: 'background.default',
+                }}
+              >
+                {fields}
+              </Box>
+            ) : (
+              fields
+            )}
+            {isMobile ? (
+              <Box sx={{ paddingX: 2 }}>
+                <MobileActionBar
+                  primary={{
+                    label: visit ? 'Update' : 'Create',
+                    onClick: submitForm,
+                    disabled: isSubmitting,
+                  }}
+                  isLoading={isSubmitting}
+                />
+              </Box>
+            ) : (
+              <ActionButtonContainer>
+                <Button
+                  disabled={isSubmitting}
+                  variant="text"
+                  onClick={() => close(event)}
+                >
+                  Close
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  data-cy="create-update-visit-button"
+                >
+                  {visit ? 'Update' : 'Create'}
+                </Button>
+              </ActionButtonContainer>
+            )}
+          </Form>
+        );
+      }}
     </Formik>
   );
 }

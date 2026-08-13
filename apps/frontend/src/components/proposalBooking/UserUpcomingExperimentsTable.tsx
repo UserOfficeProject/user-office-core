@@ -195,7 +195,9 @@ export default function UserUpcomingExperimentsTable({
         fullWidth
         fullScreen={isMobile}
       >
-        <DialogContent>{modalContents}</DialogContent>
+        <DialogContent sx={isMobile ? { padding: 0 } : undefined}>
+          {modalContents}
+        </DialogContent>
       </Dialog>
     </div>
   );

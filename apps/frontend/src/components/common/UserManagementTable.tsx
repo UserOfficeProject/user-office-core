@@ -144,7 +144,6 @@ const UserManagementTable = ({
             <CardEmptyState
               icon={<GroupOffIcon fontSize="large" color="disabled" />}
               title="Nobody added yet"
-              description={addButtonTooltip}
             />
           }
         >
