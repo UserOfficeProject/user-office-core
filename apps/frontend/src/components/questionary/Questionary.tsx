@@ -33,10 +33,6 @@ interface QuestionaryProps {
   info?: React.ReactNode;
   previewMode?: boolean;
   confirm: WithConfirmType;
-  /** `dialog` swaps the app bar's back arrow for a close button. */
-  variant?: 'page' | 'dialog';
-  subtitle?: string;
-  onClose?: () => void;
 }
 
 function Questionary({
@@ -44,9 +40,6 @@ function Questionary({
   info,
   previewMode = false,
   confirm,
-  variant = 'page',
-  subtitle,
-  onClose,
 }: QuestionaryProps) {
   const isMobile = useIsMobile();
 
@@ -146,19 +139,14 @@ function Questionary({
       })
     );
 
-    const appBarSubtitle = [subtitle, state.isDirty ? 'unsaved changes' : null]
-      .filter(Boolean)
-      .join(' · ');
+    const appBarSubtitle = state.isDirty ? 'unsaved changes' : undefined;
 
     return (
       <Box sx={{ width: '100%' }}>
         <MobileAppBar
           title={title}
-          subtitle={variant === 'dialog' ? undefined : appBarSubtitle}
-          variant={variant}
-          onBack={
-            variant === 'dialog' ? onClose ?? (() => {}) : () => navigate(-1)
-          }
+          subtitle={appBarSubtitle}
+          onBack={() => navigate(-1)}
           sheetItems={header?.menuItems ?? []}
         />
         <LinearProgress
@@ -175,7 +163,7 @@ function Questionary({
             title={stepsMetadata[state.stepIndex].title}
             navigatorOpen={navigatorOpen}
             onOpenNavigator={() => setNavigatorOpen((open) => !open)}
-            stickyTop={variant === 'dialog' ? 0 : toolbarHeight(theme)}
+            stickyTop={toolbarHeight(theme)}
           />
         )}
         <Box sx={{ paddingX: 2, paddingY: 2.5 }}>{getStepContent()}</Box>
