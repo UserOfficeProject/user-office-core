@@ -1,6 +1,5 @@
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
@@ -24,7 +23,6 @@ type MobileActionBarProps = {
   back?: MobileAction;
   save?: MobileAction;
   primary?: MobilePrimaryAction;
-  readOnly?: boolean;
   isLoading?: boolean;
 };
 
@@ -35,23 +33,13 @@ type QuietActionProps = {
   action: MobileAction;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
-  grow?: boolean;
   dataCy: string;
 };
 
-function QuietAction({
-  action,
-  startIcon,
-  endIcon,
-  grow = false,
-  dataCy,
-}: QuietActionProps) {
+function QuietAction({ action, startIcon, endIcon, dataCy }: QuietActionProps) {
   return (
     <Tooltip title={action.label}>
-      <Box
-        component="span"
-        sx={grow ? { flex: 1, minWidth: 0 } : { flexShrink: 0 }}
-      >
+      <Box component="span" sx={{ flexShrink: 0 }}>
         <Button
           variant="quiet"
           onClick={action.onClick}
@@ -60,7 +48,6 @@ function QuietAction({
           endIcon={endIcon}
           aria-label={action.label}
           data-cy={dataCy}
-          fullWidth={grow}
           sx={(theme) => ({
             minHeight: minTouchTarget(theme),
             minWidth: minTouchTarget(theme),
@@ -90,7 +77,6 @@ export default function MobileActionBar({
   back,
   save,
   primary,
-  readOnly = false,
   isLoading = false,
 }: MobileActionBarProps) {
   return (
@@ -113,50 +99,41 @@ export default function MobileActionBar({
         <QuietAction
           action={back}
           startIcon={<ChevronLeftIcon />}
-          grow={readOnly}
-          dataCy="wizard-action-back"
+          dataCy="mobile-action-back"
         />
       )}
-      {!readOnly && save && (
+      {save && (
         <QuietAction
           action={save}
           startIcon={<SaveOutlinedIcon />}
-          dataCy="wizard-action-save"
+          dataCy="mobile-action-save"
         />
       )}
-      {primary &&
-        (readOnly ? (
-          <QuietAction
-            action={primary}
-            endIcon={<ChevronRightIcon />}
-            grow
-            dataCy="wizard-action-primary"
-          />
-        ) : (
-          <Button
-            onClick={primary.onClick}
-            disabled={primary.disabled}
-            loading={isLoading}
-            startIcon={primary.icon === 'send' ? <SendIcon /> : undefined}
-            endIcon={
-              primary.icon === 'forward' ? <ArrowForwardIcon /> : undefined
-            }
-            data-cy="mobile-action-primary"
-            sx={(theme) => ({
-              flex: 1,
-              minWidth: 0,
-              minHeight: minTouchTarget(theme),
-              borderRadius: 1,
-              fontWeight: 500,
-              fontSize: 15,
-              lineHeight: 1,
-              letterSpacing: '.03em',
-              boxShadow: '0 1px 3px rgba(0,0,0,.24)',
-            })}
-          >
-            {primary.label}
-          </Button>
-        ))}
+      {primary && (
+        <Button
+          onClick={primary.onClick}
+          disabled={primary.disabled}
+          loading={isLoading}
+          startIcon={primary.icon === 'send' ? <SendIcon /> : undefined}
+          endIcon={
+            primary.icon === 'forward' ? <ArrowForwardIcon /> : undefined
+          }
+          data-cy="mobile-action-primary"
+          sx={(theme) => ({
+            flex: 1,
+            minWidth: 0,
+            minHeight: minTouchTarget(theme),
+            borderRadius: 1,
+            fontWeight: 500,
+            fontSize: 15,
+            lineHeight: 1,
+            letterSpacing: '.03em',
+            boxShadow: '0 1px 3px rgba(0,0,0,.24)',
+          })}
+        >
+          {primary.label}
+        </Button>
+      )}
     </Box>
   );
 }
