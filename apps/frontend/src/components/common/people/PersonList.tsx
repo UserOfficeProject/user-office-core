@@ -18,7 +18,6 @@ type PersonListProps = {
   addButtonLabel?: string;
   onAdd?: () => void;
   disabled?: boolean;
-  dataCy?: string;
 };
 
 export default function PersonList({
@@ -29,10 +28,9 @@ export default function PersonList({
   addButtonLabel = 'Add',
   onAdd,
   disabled,
-  dataCy,
 }: PersonListProps) {
   return (
-    <Box data-cy={dataCy}>
+    <Box>
       <Stack
         direction="row"
         spacing={1}
@@ -51,7 +49,6 @@ export default function PersonList({
             startIcon={<AddIcon />}
             onClick={onAdd}
             disabled={disabled}
-            data-cy={dataCy && `${dataCy}-add`}
             sx={(theme) => ({
               flexShrink: 0,
               minHeight: minTouchTarget(theme),
