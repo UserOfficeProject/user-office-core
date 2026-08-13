@@ -36,6 +36,7 @@ import Dialog, { DialogProps } from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 
+import MobileAppBar from 'components/common/mobile/MobileAppBar';
 import { useIsMobile } from 'hooks/common/useResponsive';
 
 const DialogHeader = styled('div')({
@@ -55,37 +56,53 @@ type StyledDialogProps = {
 function StyledDialog(props: StyledDialogProps) {
   const { extra, error, title, onClose } = props;
   const isMobile = useIsMobile();
+  const asFullScreen = props.fullScreen ?? isMobile;
 
   return (
-    <Dialog {...props} fullScreen={props.fullScreen ?? isMobile}>
-      <DialogHeader>
-        <DialogTitle
-          id="customized-dialog-title"
-          sx={(theme) => ({
-            flex: 1,
-            color: error
-              ? theme.palette.error.main
-              : theme.palette.primary.main,
-          })}
-        >
-          {title}
-          {props.tooltip && props.tooltip}
-        </DialogTitle>
-        {extra}
-
-        {onClose && (
-          <IconButton
-            data-cy="close-modal-btn"
-            aria-label="close"
-            onClick={(e) => onClose?.(e, 'escapeKeyDown')}
-            sx={{
-              color: (theme) => theme.palette.grey[500],
-            }}
+    <Dialog {...props} fullScreen={asFullScreen}>
+      {asFullScreen ? (
+        <MobileAppBar
+          title={title ?? ''}
+          variant="dialog"
+          error={error}
+          onBack={() => onClose?.({}, 'escapeKeyDown')}
+          extra={
+            <>
+              {props.tooltip}
+              {extra}
+            </>
+          }
+        />
+      ) : (
+        <DialogHeader>
+          <DialogTitle
+            id="customized-dialog-title"
+            sx={(theme) => ({
+              flex: 1,
+              color: error
+                ? theme.palette.error.main
+                : theme.palette.primary.main,
+            })}
           >
-            <CloseIcon />
-          </IconButton>
-        )}
-      </DialogHeader>
+            {title}
+            {props.tooltip && props.tooltip}
+          </DialogTitle>
+          {extra}
+
+          {onClose && (
+            <IconButton
+              data-cy="close-modal-btn"
+              aria-label="close"
+              onClick={(e) => onClose?.(e, 'escapeKeyDown')}
+              sx={{
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogHeader>
+      )}
       {props.children}
     </Dialog>
   );
