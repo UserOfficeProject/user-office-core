@@ -1,6 +1,8 @@
 import MaterialTable from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
+import GroupOffIcon from '@mui/icons-material/GroupOff';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import SendIcon from '@mui/icons-material/Send';
 import { Chip, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -11,8 +13,16 @@ import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import CardActionSheet, {
+  CardActionSheetItem,
+} from 'components/common/cards/CardActionSheet';
+import CardEmptyState from 'components/common/cards/CardEmptyState';
+import PersonList from 'components/common/people/PersonList';
+import PersonListRow from 'components/common/people/PersonListRow';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
+import { useIsMobile } from 'hooks/common/useResponsive';
+import { getFullUserName } from 'utils/user';
 
 import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
@@ -53,6 +63,8 @@ const UserManagementTable = ({
   excludeUserIds = [],
   allowInviteByEmail = false,
 }: UserManagementTableProps) => {
+  const isMobile = useIsMobile();
+  const [sheetFor, setSheetFor] = useState<BasicUserDetails | null>(null);
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
 
@@ -92,6 +104,85 @@ const UserManagementTable = ({
       allowInviteByEmail={allowInviteByEmail}
     />
   );
+
+  if (isMobile) {
+    const sheetItems: CardActionSheetItem[] = sheetFor
+      ? [
+          ...(onUserAction
+            ? [
+                {
+                  key: 'setPi',
+                  label: 'Assign as PI',
+                  icon: <PersonAddIcon />,
+                  onClick: () => {
+                    removeUser(sheetFor);
+                    onUserAction('setPrincipalInvestigator', sheetFor);
+                  },
+                },
+              ]
+            : []),
+          {
+            key: 'remove',
+            label: 'Remove',
+            icon: <PersonRemoveIcon />,
+            destructive: true,
+            onClick: () => removeUser(sheetFor),
+          },
+        ]
+      : [];
+
+    return (
+      <Box sx={sx} data-cy="user-management-list">
+        {modalOpen && InviteComponent}
+        <PersonList
+          title={title}
+          count={users.length + invites.length}
+          onAdd={openModal}
+          addButtonLabel={addButtonLabel}
+          disabled={disabled}
+          emptyState={
+            <CardEmptyState
+              icon={<GroupOffIcon fontSize="large" color="disabled" />}
+              title="Nobody added yet"
+              description={addButtonTooltip}
+            />
+          }
+        >
+          {users.map((user) => (
+            <PersonListRow
+              key={user.id}
+              primary={getFullUserName(user)}
+              secondary={user.institution}
+              onOpenActions={() => setSheetFor(user)}
+              dataCy={`person-row-${user.id}`}
+            />
+          ))}
+          {invites.map((invite) => (
+            <PersonListRow
+              key={invite.email}
+              primary={invite.email}
+              chips={
+                <Chip
+                  size="small"
+                  color="secondary"
+                  label={invite.isEmailSent ? 'Invited' : 'Not sent yet'}
+                />
+              }
+              onOpenActions={() => handleDeleteInvite(invite)}
+              actionsLabel={`Remove invitation for ${invite.email}`}
+              dataCy={`invite-row-${invite.email}`}
+            />
+          ))}
+        </PersonList>
+        <CardActionSheet
+          open={sheetFor !== null}
+          onClose={() => setSheetFor(null)}
+          title={sheetFor ? getFullUserName(sheetFor) : ''}
+          items={sheetItems}
+        />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={sx}>
