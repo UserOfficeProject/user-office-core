@@ -2,6 +2,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import HistoryIcon from '@mui/icons-material/History';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import PeopleIcon from '@mui/icons-material/People';
 import TagIcon from '@mui/icons-material/Tag';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Button from '@mui/material/Button';
@@ -35,6 +36,7 @@ type ProposalCardProps = {
   proposal: ProposalCardData;
   readOnly: boolean;
   onOpen: () => void;
+  onOpenDataAccess?: () => void;
   sheetItems: CardActionSheetItem[];
 };
 
@@ -42,6 +44,7 @@ export default function ProposalCard({
   proposal,
   readOnly,
   onOpen,
+  onOpenDataAccess,
   sheetItems,
 }: ProposalCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -100,6 +103,23 @@ export default function ProposalCard({
         >
           {readOnly ? 'View' : 'Continue'}
         </Button>
+        {onOpenDataAccess && (
+          <IconButton
+            aria-label={`Data access users for ${proposal.title}`}
+            onClick={onOpenDataAccess}
+            sx={(theme) => ({
+              width: minTouchTarget(theme),
+              height: minTouchTarget(theme),
+              flexShrink: 0,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+            })}
+            data-cy="proposal-card-data-access"
+          >
+            <PeopleIcon />
+          </IconButton>
+        )}
         {sheetItems.length > 0 && (
           <IconButton
             aria-label={`More actions for ${proposal.title}`}
