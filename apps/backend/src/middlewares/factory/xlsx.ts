@@ -238,62 +238,59 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
   }
 });
 
-router.get(
-  `/${XLSXType.MANAGEMENT_DECISION}/:call_id`,
-  async (req, res, next) => {
-    try {
-      if (!req.user) {
-        throw new Error('Not authorized');
-      }
-
-      const userWithRole = {
-        ...res.locals.agent,
-      };
-
-      const callId = parseInt(req.params.call_id);
-
-      if (isNaN(+callId)) {
-        throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
-      }
-
-      const { data, filename } = await collectManagementDecisionXLSXData(
-        callId,
-        userWithRole
-      );
-
-      const managementDecisionColumns = [
-        'Proposal ID',
-        'Principal Investigator',
-        'Remaining Instrument Available Time', // Running total of remaining available instrument time
-        'Time allocation',
-        'FAP Recommendation',
-        'FAP Comment to User',
-        'FAP Comment to Management',
-        'Admin Comment for Management',
-        'Technical Review Comments',
-      ];
-
-      const meta: XLSXMetaBase = {
-        singleFilename: filename,
-        collectionFilename: filename,
-        columns: managementDecisionColumns,
-      };
-
-      const userRole = req.user.currentRole;
-      callFactoryService(
-        DownloadType.XLSX,
-        //XLSXType.MANAGEMENT_DECISION,
-        XLSXType.CALL_FAP,
-        { data, meta, userRole },
-        req,
-        res,
-        next
-      );
-    } catch (e) {
-      next(e);
+router.get('/management-decision/:call_id', async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
     }
+
+    const userWithRole = {
+      ...res.locals.agent,
+    };
+
+    const callId = parseInt(req.params.call_id);
+
+    if (isNaN(+callId)) {
+      throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
+    }
+
+    const { data, filename } = await collectManagementDecisionXLSXData(
+      callId,
+      userWithRole
+    );
+
+    const managementDecisionColumns = [
+      'Proposal ID',
+      'Principal Investigator',
+      'Remaining Instrument Available Time', // Running total of remaining available instrument time
+      'Time allocation',
+      'FAP Recommendation',
+      'FAP Comment to User',
+      'FAP Comment to Management',
+      'Admin Comment for Management',
+      'Technical Review Comments',
+    ];
+
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: managementDecisionColumns,
+    };
+
+    const userRole = req.user.currentRole;
+    callFactoryService(
+      DownloadType.XLSX,
+      //XLSXType.MANAGEMENT_DECISION,
+      XLSXType.CALL_FAP,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
   }
-);
+});
 
 export default function xlsxDownload() {
   return router;
