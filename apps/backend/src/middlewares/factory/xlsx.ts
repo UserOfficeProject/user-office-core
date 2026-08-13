@@ -12,9 +12,9 @@ import { getCurrentTimestamp } from '../../factory/util';
 import {
   DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
-  collectFinalDecisionXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
+import { collectManagementDecisionXLSXData } from '../../factory/xlsx/managementDecision';
 import {
   collectProposalXLSXData,
   collectTechniqueProposalXLSXData,
@@ -129,7 +129,7 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
   }
 });
 
-router.get(`/${'call_fap'}/:call_id`, async (req, res, next) => {
+router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
@@ -254,7 +254,7 @@ router.get(`/${XLSXType.FINAL_DECISION}/:call_id`, async (req, res, next) => {
       throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
     }
 
-    const { data, filename } = await collectFinalDecisionXLSXData(
+    const { data, filename } = await collectManagementDecisionXLSXData(
       callId,
       userWithRole
     );
