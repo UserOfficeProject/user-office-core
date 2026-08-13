@@ -10,20 +10,20 @@ import React from 'react';
 
 import { minTouchTarget } from 'hooks/common/useResponsive';
 
-type WizardAction = {
+type MobileAction = {
   label: string;
   onClick: () => void;
   disabled?: boolean;
 };
 
-type WizardPrimaryAction = WizardAction & {
+type MobilePrimaryAction = MobileAction & {
   icon?: 'forward' | 'send';
 };
 
-type WizardActionBarProps = {
-  back?: WizardAction;
-  save?: WizardAction;
-  primary?: WizardPrimaryAction;
+type MobileActionBarProps = {
+  back?: MobileAction;
+  save?: MobileAction;
+  primary?: MobilePrimaryAction;
   readOnly?: boolean;
   isLoading?: boolean;
 };
@@ -32,7 +32,7 @@ type WizardActionBarProps = {
 const COLLAPSING_LABEL = { display: { xs: 'none', sm: 'inline' } };
 
 type QuietActionProps = {
-  action: WizardAction;
+  action: MobileAction;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
   grow?: boolean;
@@ -86,16 +86,16 @@ function QuietAction({
   );
 }
 
-export default function WizardActionBar({
+export default function MobileActionBar({
   back,
   save,
   primary,
   readOnly = false,
   isLoading = false,
-}: WizardActionBarProps) {
+}: MobileActionBarProps) {
   return (
     <Box
-      data-cy="wizard-action-bar"
+      data-cy="mobile-action-bar"
       sx={{
         position: 'sticky',
         bottom: 0,
@@ -138,7 +138,7 @@ export default function WizardActionBar({
             loading={isLoading}
             startIcon={primary.icon === 'send' ? <SendIcon /> : undefined}
             endIcon={primary.icon === 'send' ? undefined : <ArrowForwardIcon />}
-            data-cy="wizard-action-primary"
+            data-cy="mobile-action-primary"
             sx={(theme) => ({
               flex: 1,
               minWidth: 0,
