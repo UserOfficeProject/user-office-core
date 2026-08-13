@@ -262,15 +262,15 @@ router.get(
       );
 
       const managementDecisionColumns = [
-        'Proposal ID', //
-        'Principal Investigator', //Stored as proposer_id in proposals table
-        'Remaining Instrument available time', // Instrument available time, running total field of the instrument available time minus previous proposal allocations
-        'FAP allocated time', // Awarded Time, time recommendation from FAP process
-        'FAP Meeting Decision', // Decision (FAP Meeting Decision) recommendation from FAP process
-        'FAP comment to user', // Comment to user (FAP Comment to user)
-        'FAP meeting Comment to management', //FAP comments to manaegment Comment for management
-        'Comment for manegment (admin page)', // Internal comments
-        'Technical Review comments', // techincal reveiew public comments
+        'Proposal ID',
+        'Principal Investigator',
+        'Remaining Instrument Available Time', // Running total of remaining available instrument time
+        'Time allocation',
+        'FAP Recommendation',
+        'FAP Comment to User',
+        'FAP Comment to Management',
+        'Admin Comment for Management',
+        'Technical Review Comments',
       ];
 
       const meta: XLSXMetaBase = {

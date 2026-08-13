@@ -6,7 +6,7 @@ import {
 } from 'context/DownloadContextProvider';
 export function useDownloadXLSXManagementDecision() {
   const { prepareDownload } = useContext(DownloadContext);
-  const downloadFinalDescisionXSLX = useCallback(
+  const downloadManagementDescisionXSLX = useCallback(
     (callId: number, name: string) => {
       prepareDownload(
         PREPARE_DOWNLOAD_TYPE.XLSX_MANAGEMENT_DECISION,
@@ -17,5 +17,5 @@ export function useDownloadXLSXManagementDecision() {
     [prepareDownload]
   );
 
-  return downloadFinalDescisionXSLX;
+  return downloadManagementDescisionXSLX;
 }

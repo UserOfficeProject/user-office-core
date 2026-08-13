@@ -1,6 +1,7 @@
 import { DropResult } from '@hello-pangea/dnd';
 import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
+import Grid4x4Icon from '@mui/icons-material/Grid4x4';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
 import { Paper } from '@mui/material';
@@ -512,8 +513,8 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
               position: 'row',
             }),
             (rowData) => ({
-              icon: GridOnIcon,
-              tooltip: `Export Final Decision Data`,
+              icon: Grid4x4Icon,
+              tooltip: `Export Management Decision Data`,
               onClick: (): void =>
                 exportManagementDecisionData(rowData.id, rowData.shortCode),
               position: 'row',
