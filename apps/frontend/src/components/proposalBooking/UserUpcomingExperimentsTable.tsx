@@ -11,7 +11,11 @@ import { CardTaskItem } from 'components/common/cards/CardTaskList';
 import ExperimentCard from 'components/common/cards/ExperimentCard';
 import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
+import {
+  minTouchTarget,
+  useCardRows,
+  useIsMobile,
+} from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -61,6 +65,7 @@ export default function UserUpcomingExperimentsTable({
   });
   const { t } = useTranslation();
   const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -188,6 +193,7 @@ export default function UserUpcomingExperimentsTable({
         onClose={() => setModalContents(null)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogContent>{modalContents}</DialogContent>
       </Dialog>
