@@ -10,7 +10,11 @@ import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
+import {
+  belowCompactUi,
+  minTouchTarget,
+  useIsMobile,
+} from 'hooks/common/useResponsive';
 import { useProposalInvites } from 'hooks/invite/useProposalInvites';
 
 const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
@@ -22,6 +26,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
     acceptCoProposerInvite,
   } = useProposalInvites();
   const { enqueueSnackbar } = useSnackbar();
+  const isMobile = useIsMobile();
 
   if (proposalInvites.length === 0) {
     return null;
@@ -103,6 +108,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
         onClose={() => setIsDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogTitle>
           <Typography variant="h6">Proposal Invitations</Typography>
