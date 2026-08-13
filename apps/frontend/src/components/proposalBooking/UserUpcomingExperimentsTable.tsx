@@ -13,7 +13,11 @@ import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
+import {
+  minTouchTarget,
+  useCardRows,
+  useIsMobile,
+} from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -63,6 +67,7 @@ export default function UserUpcomingExperimentsTable({
   });
   const { t } = useTranslation();
   const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -198,6 +203,7 @@ export default function UserUpcomingExperimentsTable({
         onClose={() => setModalContents(null)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogContent>{modalContents}</DialogContent>
       </Dialog>

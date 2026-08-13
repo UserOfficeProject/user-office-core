@@ -25,7 +25,11 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
+import {
+  minTouchTarget,
+  useCardRows,
+  useIsMobile,
+} from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -116,6 +120,7 @@ const ProposalTable = ({
   >();
 
   const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -285,6 +290,7 @@ const ProposalTable = ({
         aria-describedby="simple-modal-description"
         open={openCallSelection}
         onClose={(): void => setOpenCallSelection(false)}
+        fullScreen={isMobile}
       >
         <DialogContent>
           <CallSelectModalOnProposalsClone
