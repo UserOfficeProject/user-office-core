@@ -19,6 +19,9 @@ type MobileAppBarProps = {
   onBack: () => void;
   sheetItems?: CardActionSheetItem[];
   variant?: 'page' | 'dialog';
+  /** Trailing content, for dialogs that put their own control in the header. */
+  extra?: React.ReactNode;
+  error?: boolean;
 };
 
 export default function MobileAppBar({
@@ -27,6 +30,8 @@ export default function MobileAppBar({
   onBack,
   sheetItems = [],
   variant = 'page',
+  extra,
+  error,
 }: MobileAppBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const isDialog = variant === 'dialog';
@@ -78,7 +83,7 @@ export default function MobileAppBar({
               fontWeight: 500,
               fontSize: isDialog ? 16 : 15,
               lineHeight: isDialog ? 1.3 : 1.25,
-              color: 'text.primary',
+              color: error ? 'error.main' : 'text.primary',
             }}
           >
             {title}
@@ -97,6 +102,7 @@ export default function MobileAppBar({
             </Typography>
           )}
         </Box>
+        {extra}
         {sheetItems.length > 0 && (
           <IconButton
             aria-label="More actions"
