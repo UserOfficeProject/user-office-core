@@ -2,10 +2,10 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Stack } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 
+import MobileActionBar from 'components/common/mobile/MobileActionBar';
 import UOLoader from 'components/common/UOLoader';
 import { useIsMobile } from 'hooks/common/useResponsive';
 
-import WizardActionBar from './mobile/WizardActionBar';
 import { useWizardHeader } from './mobile/WizardHeaderContext';
 
 export type WizardAction = {
@@ -75,7 +75,7 @@ const NavigationFragment = (props: {
     const { back, save, primary } = props.actions;
 
     return (
-      <WizardActionBar
+      <MobileActionBar
         back={back}
         save={save}
         primary={primary}
