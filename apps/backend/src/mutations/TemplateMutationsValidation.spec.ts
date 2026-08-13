@@ -1,8 +1,8 @@
 import * as Yup from 'yup';
 
-import database from './database';
-import { validateConfigBeforeWrite } from './TemplateDataSource';
-import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { validateConfigBeforeWrite } from './TemplateMutations';
+import database from '../datasources/postgres/database';
+import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 
 jest.mock('../database');
 jest.mock('../QuestionRegistry');

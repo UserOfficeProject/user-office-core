@@ -1,6 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import * as Yup from 'yup';
 
 import {
   ComparisonStatus,
@@ -60,7 +59,6 @@ import {
   TopicRecord,
 } from './records';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
-import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 
 const EXPORT_VERSION = '1.2.0';
 const MIN_SUPPORTED_VERSION = '1.2.0';
@@ -684,8 +682,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       dependenciesOperator,
     } = args;
 
-    await validateConfigBeforeWrite(config, questionId);
-
     await database('templates_has_questions')
       .update({
         config: config,
@@ -1286,48 +1282,4 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     return newTemplate;
   }
-}
-
-export async function validateConfigBeforeWrite(
-  newConfig: any,
-  questionId: string
-) {
-  let newConfigObject;
-  try {
-    newConfigObject = JSON.parse(newConfig);
-  } catch {
-    throw new GraphQLError('Invalid JSON for config.');
-  }
-
-  const questionType = await database('questions')
-    .select('data_type')
-    .where('question_id', questionId)
-    .first();
-
-  const questionDef = getQuestionDefinition(questionType.data_type as DataType);
-
-  const configBaseYupSchema = Yup.object({
-    small_label: Yup.string(),
-    required: Yup.boolean().required(),
-    tooltip: Yup.string(),
-    readPermissions: Yup.array().of(Yup.string().required()).required(),
-  });
-
-  try {
-    //When all configs have their own schemas written this will no longer be optional.
-    if (questionDef.customYupSchema) {
-      const combinedYupSchema = configBaseYupSchema
-        .concat(questionDef.customYupSchema)
-        .noUnknown(true, 'Unknown field');
-      await combinedYupSchema.validate(newConfigObject);
-    }
-  } catch (error) {
-    throw new GraphQLError('Config schema not valid');
-  }
-
-  if (questionDef.validateConfig) {
-    questionDef.validateConfig(newConfigObject);
-  }
-
-  return;
 }
