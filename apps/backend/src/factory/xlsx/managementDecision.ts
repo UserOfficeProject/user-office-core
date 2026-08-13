@@ -1,13 +1,20 @@
 import { container } from 'tsyringe';
 
-import { ProposalEndStatusStringValue } from './callFaps';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { FapReviewsRecord } from '../../datasources/postgres/records';
+import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 
-const collectManagementDecisionData = async (
+const ProposalEndStatusStringValue = {
+  [ProposalEndStatus.UNSET]: 'Unset',
+  [ProposalEndStatus.ACCEPTED]: 'Accepted',
+  [ProposalEndStatus.RESERVED]: 'Reserved',
+  [ProposalEndStatus.REJECTED]: 'Rejected',
+};
+
+export const collectManagementDecisionData = async (
   fapId: number,
   callId: number,
   agent: UserWithRole,
@@ -37,7 +44,7 @@ const collectManagementDecisionData = async (
   return rowsOfManagmentDecisions;
 };
 
-async function generateManagementDecisionData(
+export async function generateManagementDecisionData(
   agent: UserWithRole,
   fapreview: FapReviewsRecord
 ) {
@@ -82,7 +89,7 @@ async function generateManagementDecisionData(
   };
 }
 
-function addDecreasingInstrumentAvailTime(
+export function addDecreasingInstrumentAvailTime(
   managementDecisionData: {
     grade: number;
     instrumentAllocatedTime: number;
@@ -91,7 +98,7 @@ function addDecreasingInstrumentAvailTime(
   instrumentAvailableTime: number
 ) {
   //Sort by grade so the rows are in order, and the allocated time decreases from first to last.
-  managementDecisionData.sort((data) => data.grade);
+  managementDecisionData.sort((a, b) => a.grade - b.grade);
   let remainingInstrumentTime = instrumentAvailableTime;
   for (let i = 0; i < managementDecisionData.length; i++) {
     remainingInstrumentTime =
