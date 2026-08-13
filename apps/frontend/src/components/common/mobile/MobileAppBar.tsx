@@ -13,7 +13,7 @@ import CardActionSheet, {
 } from 'components/common/cards/CardActionSheet';
 import { minTouchTarget } from 'hooks/common/useResponsive';
 
-type WizardAppBarProps = {
+type MobileAppBarProps = {
   title: string;
   subtitle?: string;
   onBack: () => void;
@@ -21,13 +21,13 @@ type WizardAppBarProps = {
   variant?: 'page' | 'dialog';
 };
 
-export default function WizardAppBar({
+export default function MobileAppBar({
   title,
   subtitle,
   onBack,
   sheetItems = [],
   variant = 'page',
-}: WizardAppBarProps) {
+}: MobileAppBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const isDialog = variant === 'dialog';
 
@@ -35,7 +35,7 @@ export default function WizardAppBar({
     <AppBar
       position="sticky"
       elevation={0}
-      data-cy="wizard-app-bar"
+      data-cy="mobile-app-bar"
       sx={{
         backgroundColor: 'background.paper',
         color: 'text.primary',
@@ -55,7 +55,7 @@ export default function WizardAppBar({
         <IconButton
           aria-label={isDialog ? 'Close' : 'Back'}
           onClick={onBack}
-          data-cy="wizard-app-bar-back"
+          data-cy="mobile-app-bar-back"
           sx={(theme) => ({
             width: minTouchTarget(theme),
             height: minTouchTarget(theme),
@@ -99,7 +99,7 @@ export default function WizardAppBar({
           <IconButton
             aria-label="More actions"
             onClick={() => setSheetOpen(true)}
-            data-cy="wizard-app-bar-menu"
+            data-cy="mobile-app-bar-menu"
             sx={(theme) => ({
               width: minTouchTarget(theme),
               height: minTouchTarget(theme),
