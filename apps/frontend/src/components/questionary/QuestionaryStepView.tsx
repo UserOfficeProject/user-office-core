@@ -10,6 +10,7 @@ import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { useFapData } from 'hooks/fap/useFapData';
 import {
   usePostSubmitActions,
@@ -26,6 +27,7 @@ import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmis
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import { useWizardHeader } from './mobile/WizardHeaderContext';
 import NavigationFragment from './NavigationFragment';
 import {
   createQuestionaryComponent,
@@ -67,6 +69,19 @@ export const createFormikConfigObjects = (
   };
 };
 
+function ErrorCountPublisher({ count }: { count: number }) {
+  const header = useWizardHeader();
+  const setErrorCount = header?.setErrorCount;
+
+  useEffect(() => {
+    setErrorCount?.(count);
+
+    return () => setErrorCount?.(0);
+  }, [setErrorCount, count]);
+
+  return null;
+}
+
 function QuestionaryStepView(props: {
   topicId: number;
   readonly: boolean;
@@ -76,6 +91,7 @@ function QuestionaryStepView(props: {
 }) {
   const { topicId, confirm } = props;
 
+  const isMobile = useIsMobile();
   const preSubmitActions = usePreSubmitActions();
   const postSubmitActions = usePostSubmitActions();
   const { api } = useDataApiWithFeedback();
@@ -320,6 +336,13 @@ function QuestionaryStepView(props: {
       {(formikProps) => {
         const { submitForm, setFieldValue, isSubmitting } = formikProps;
 
+        const errorCount =
+          formikProps.submitCount > 0
+            ? activeFields.filter(
+                (field) => !!formikProps.errors[field.question.id]
+              ).length
+            : 0;
+
         const saveHandler = async () => {
           /*
            * The title and abstract are non-nullable and should always be validated - even when
@@ -332,6 +355,31 @@ function QuestionaryStepView(props: {
           performSave(true);
         };
 
+        const back = {
+          label: 'Back',
+          onClick: backHandler,
+          disabled: state.stepIndex === 0,
+        };
+        const reset = {
+          label: 'Reset',
+          onClick: resetHandler,
+          disabled: !state.isDirty,
+        };
+        const save = questionaryStep.isCompleted
+          ? undefined
+          : {
+              label: 'Save',
+              onClick: saveHandler,
+              disabled: !state.isDirty || isSaving,
+              isBusy: isSaving,
+            };
+        const primary = {
+          label: 'Save and continue',
+          onClick: submitForm,
+          isBusy: isSubmitting,
+          icon: 'forward' as const,
+        };
+
         return (
           <form
             style={{
@@ -339,6 +387,7 @@ function QuestionaryStepView(props: {
             }}
           >
             <PromptIfDirty isDirty={state.isDirty} />
+            {isMobile && <ErrorCountPublisher count={errorCount} />}
             {activeFields.map((field) => {
               return (
                 <Box
@@ -365,6 +414,7 @@ function QuestionaryStepView(props: {
             <NavigationFragment
               disabled={props.readonly}
               isLoading={isSubmitting}
+              actions={{ back, reset, save, primary }}
             >
               {state.stepIndex == 0 && fapId != 0 && (
                 <ButtonWithDialog
@@ -376,31 +426,28 @@ function QuestionaryStepView(props: {
                   {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
                 </ButtonWithDialog>
               )}
-              <NavigButton
-                onClick={backHandler}
-                disabled={state.stepIndex === 0}
-              >
-                Back
+              <NavigButton onClick={back.onClick} disabled={back.disabled}>
+                {back.label}
               </NavigButton>
-              <NavigButton onClick={resetHandler} disabled={!state.isDirty}>
-                Reset
+              <NavigButton onClick={reset.onClick} disabled={reset.disabled}>
+                {reset.label}
               </NavigButton>
-              {!questionaryStep.isCompleted && (
+              {save && (
                 <NavigButton
-                  onClick={saveHandler}
-                  disabled={!state.isDirty || isSaving}
-                  isBusy={isSaving}
+                  onClick={save.onClick}
+                  disabled={save.disabled}
+                  isBusy={save.isBusy}
                   data-cy="save-button"
                 >
-                  Save
+                  {save.label}
                 </NavigButton>
               )}
               <NavigButton
-                onClick={submitForm}
-                isBusy={isSubmitting}
+                onClick={primary.onClick}
+                isBusy={primary.isBusy}
                 data-cy="save-and-continue-button"
               >
-                Save and continue
+                {primary.label}
               </NavigButton>
             </NavigationFragment>
             <ErrorFocus />
