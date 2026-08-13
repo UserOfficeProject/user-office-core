@@ -4,12 +4,12 @@ import {
   DownloadContext,
   PREPARE_DOWNLOAD_TYPE,
 } from 'context/DownloadContextProvider';
-export function useDownloadXLSXFinalDecision() {
+export function useDownloadXLSXManagementDecision() {
   const { prepareDownload } = useContext(DownloadContext);
   const downloadFinalDescisionXSLX = useCallback(
     (callId: number, name: string) => {
       prepareDownload(
-        PREPARE_DOWNLOAD_TYPE.XLSX_FINAL_DECISION,
+        PREPARE_DOWNLOAD_TYPE.XLSX_MANAGEMENT_DECISION,
         [callId],
         name
       );

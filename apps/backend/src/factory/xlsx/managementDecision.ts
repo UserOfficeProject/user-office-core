@@ -119,7 +119,7 @@ export const collectManagementDecisionXLSXData = async (
     instruments.map(async (instrument) => {
       return {
         sheetName: instrument.name,
-        rows: await generateFinalDecisionRowsByInstrument(
+        rows: await generateManagementDecisionRowsByInstrument(
           agent,
           callId,
           instrument.id
@@ -131,7 +131,7 @@ export const collectManagementDecisionXLSXData = async (
   return { data: xlsxData, filename: filename.replace(/\s+/g, '_') };
 };
 
-async function generateFinalDecisionRowsByInstrument(
+async function generateManagementDecisionRowsByInstrument(
   agent: UserWithRole,
   callId: number,
   instrumentId: number
