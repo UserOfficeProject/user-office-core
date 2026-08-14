@@ -65,6 +65,37 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
     return '';
   };
 
+  const primary = {
+    label: getSubmitButtonLabel(),
+    onClick: () =>
+      confirm(
+        async () => {
+          const { submitVisitRegistration } =
+            await api().submitVisitRegistration({
+              visitId: state.registration.visitId,
+              userId: state.registration.userId,
+            });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: submitVisitRegistration,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+            itemWithQuestionary: submitVisitRegistration,
+          });
+        },
+        {
+          title: 'Confirmation',
+          description:
+            'I am aware that no further edits can be done after visit submission.',
+        }
+      )(),
+    disabled: ![
+      VisitRegistrationStatus.DRAFTED,
+      VisitRegistrationStatus.CHANGE_REQUESTED,
+    ].includes(registration.status),
+  };
+
   return (
     <div>
       <QuestionaryDetails
@@ -72,41 +103,13 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
         additionalDetails={additionalDetails}
         title="Visit information"
       />
-      <NavigationFragment isLoading={isExecutingCall}>
+      <NavigationFragment isLoading={isExecutingCall} actions={{ primary }}>
         <NavigButton
-          onClick={() =>
-            confirm(
-              async () => {
-                const { submitVisitRegistration } =
-                  await api().submitVisitRegistration({
-                    visitId: state.registration.visitId,
-                    userId: state.registration.userId,
-                  });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: submitVisitRegistration,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: submitVisitRegistration,
-                });
-              },
-              {
-                title: 'Confirmation',
-                description:
-                  'I am aware that no further edits can be done after visit submission.',
-              }
-            )()
-          }
-          disabled={
-            ![
-              VisitRegistrationStatus.DRAFTED,
-              VisitRegistrationStatus.CHANGE_REQUESTED,
-            ].includes(registration.status)
-          }
+          onClick={primary.onClick}
+          disabled={primary.disabled}
           data-cy="submit-visit-registration-button"
         >
-          {getSubmitButtonLabel()}
+          {primary.label}
         </NavigButton>
       </NavigationFragment>
     </div>

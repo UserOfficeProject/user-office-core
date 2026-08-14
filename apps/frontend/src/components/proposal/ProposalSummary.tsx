@@ -137,65 +137,82 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
+  const back = {
+    label: 'Back',
+    onClick: () => dispatch({ type: 'BACK_CLICKED' }),
+    disabled: state.stepIndex === 0,
+    isBusy: isSubmitting,
+  };
+  const save = {
+    label: 'Download PDF',
+    onClick: () => downloadPDFProposal([proposal.primaryKey], proposal.title),
+    disabled: !allStepsComplete || isSubmitting,
+  };
+  const primary = {
+    label: proposal.submitted ? '✔ Submitted' : 'Submit',
+    onClick: () => {
+      confirm(
+        async () => {
+          setIsSubmitting(true);
+          try {
+            const { submitProposal } = await api({
+              toastSuccessMessage: proposalSubmissionSuccessMessage,
+            }).submitProposal({
+              proposalPk: state.proposal.primaryKey,
+            });
+
+            const { proposal } = await api().getProposal({
+              primaryKey: submitProposal.primaryKey,
+            }); // refetching proposal after event handling is done in backend
+
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary: proposal!,
+            });
+          } finally {
+            setSubmitDisabled(true);
+            setIsSubmitting(false);
+          }
+        },
+        {
+          title: 'Please confirm',
+          description: submitButtonMessage,
+        }
+      )();
+    },
+    disabled: submitDisabled,
+    isBusy: isSubmitting,
+  };
+
   return (
     <>
       <ProposalQuestionaryReview data={proposal} />
       <NavigationFragment
         disabled={proposal.status?.id === ''}
         isLoading={isSubmitting}
+        actions={{ back, save, primary }}
       >
         <NavigButton
-          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-          disabled={state.stepIndex === 0}
-          isBusy={isSubmitting}
+          onClick={back.onClick}
+          disabled={back.disabled}
+          isBusy={back.isBusy}
         >
-          Back
+          {back.label}
         </NavigButton>
         <NavigButton
-          onClick={() => {
-            confirm(
-              async () => {
-                setIsSubmitting(true);
-                try {
-                  const { submitProposal } = await api({
-                    toastSuccessMessage: proposalSubmissionSuccessMessage,
-                  }).submitProposal({
-                    proposalPk: state.proposal.primaryKey,
-                  });
-
-                  const { proposal } = await api().getProposal({
-                    primaryKey: submitProposal.primaryKey,
-                  }); // refetching proposal after event handling is done in backend
-
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: proposal!,
-                  });
-                } finally {
-                  setSubmitDisabled(true);
-                  setIsSubmitting(false);
-                }
-              },
-              {
-                title: 'Please confirm',
-                description: submitButtonMessage,
-              }
-            )();
-          }}
-          disabled={submitDisabled}
-          isBusy={isSubmitting}
+          onClick={primary.onClick}
+          disabled={primary.disabled}
+          isBusy={primary.isBusy}
           data-cy="button-submit-proposal"
         >
-          {proposal.submitted ? '✔ Submitted' : 'Submit'}
+          {primary.label}
         </NavigButton>
         <Button
-          onClick={() =>
-            downloadPDFProposal([proposal.primaryKey], proposal.title)
-          }
-          disabled={!allStepsComplete || isSubmitting}
+          onClick={save.onClick}
+          disabled={save.disabled}
           color="secondary"
         >
-          Download PDF
+          {save.label}
         </Button>
       </NavigationFragment>
     </>
