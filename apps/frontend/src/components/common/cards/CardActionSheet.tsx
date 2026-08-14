@@ -37,6 +37,9 @@ export default function CardActionSheet({
       open={open}
       onClose={onClose}
       transitionDuration={reduceMotion ? 0 : undefined}
+      // A Drawer sits below Dialog by default, so a sheet opened from inside a
+      // full-screen dialog would render behind it.
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
       slotProps={{
         paper: {
           elevation: 8,
