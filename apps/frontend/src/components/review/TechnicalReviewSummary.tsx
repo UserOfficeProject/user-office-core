@@ -129,6 +129,81 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
       !(isUserOfficer || fapSecOrChairCanEdit)) ||
     isInternalReviewer;
 
+  const back = {
+    label: 'Back',
+    onClick: () => dispatch({ type: 'BACK_CLICKED' }),
+    disabled: state.stepIndex === 0,
+    isBusy: isSubmitting,
+  };
+  const submit = !(isUserOfficer || fapSecOrChairCanEdit)
+    ? {
+        label: technicalReview.submitted ? '✔ Submitted' : 'Submit',
+        onClick: () => {
+          confirm(
+            async () => {
+              setIsSubmitting(true);
+              try {
+                const submittedTechnicalReview = {
+                  proposalPk: state.technicalReview.proposalPk,
+                  timeAllocation: +(state.technicalReview.timeAllocation || 0),
+                  comment: state.technicalReview.comment,
+                  publicComment: state.technicalReview.publicComment,
+                  status: state.technicalReview.status,
+                  submitted: true,
+                  reviewerId: user.id,
+                  files: state.technicalReview.files,
+                  instrumentId: state.technicalReview.instrumentId,
+                  questionaryId: state.technicalReview.questionaryId,
+                };
+
+                const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
+                  [submittedTechnicalReview];
+
+                await api({
+                  toastSuccessMessage:
+                    'Your review has been submitted successfully.',
+                }).submitTechnicalReviews({
+                  technicalReviews: submittedTechnicalReviewsInput,
+                });
+
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: submittedTechnicalReview,
+                });
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: submittedTechnicalReview,
+                });
+                dispatch({
+                  type: 'CLEAN_DIRTY_STATE',
+                });
+              } finally {
+                setSubmitDisabled(true);
+                setIsSubmitting(false);
+              }
+            },
+            {
+              title: 'Please confirm',
+              description: submitButtonMessage,
+            }
+          )();
+        },
+        disabled:
+          isSubmitting ||
+          technicalReview.submitted ||
+          isInternalReviewer ||
+          submitDisabled,
+        isBusy: isSubmitting,
+      }
+    : undefined;
+
+  // The submitted checkbox and the save button have no slot in the mobile bar,
+  // so the roles that see them keep the desktop row.
+  const actions =
+    submit && !(isUserOfficer || isFapChairOrSec)
+      ? { back, primary: submit }
+      : undefined;
+
   return (
     <>
       <Formik
@@ -138,7 +213,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
       >
         <Form>
           <TechnicalReviewQuestionaryReview data={technicalReview} />
-          <NavigationFragment isLoading={isSubmitting}>
+          <NavigationFragment isLoading={isSubmitting} actions={actions}>
             {(isUserOfficer || isFapChairOrSec) && (
               <Field
                 id="submitted"
@@ -162,11 +237,11 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
             )}
             <NavigButton
               data-cy="back-button"
-              onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-              disabled={state.stepIndex === 0}
-              isBusy={isSubmitting}
+              onClick={back.onClick}
+              disabled={back.disabled}
+              isBusy={back.isBusy}
             >
-              Back
+              {back.label}
             </NavigButton>
             {isUserOfficer && (
               <NavigButton
@@ -213,70 +288,14 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 Save
               </NavigButton>
             )}
-            {!(isUserOfficer || fapSecOrChairCanEdit) && (
+            {submit && (
               <NavigButton
-                onClick={() => {
-                  confirm(
-                    async () => {
-                      setIsSubmitting(true);
-                      try {
-                        const submittedTechnicalReview = {
-                          proposalPk: state.technicalReview.proposalPk,
-                          timeAllocation: +(
-                            state.technicalReview.timeAllocation || 0
-                          ),
-                          comment: state.technicalReview.comment,
-                          publicComment: state.technicalReview.publicComment,
-                          status: state.technicalReview.status,
-                          submitted: true,
-                          reviewerId: user.id,
-                          files: state.technicalReview.files,
-                          instrumentId: state.technicalReview.instrumentId,
-                          questionaryId: state.technicalReview.questionaryId,
-                        };
-
-                        const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
-                          [submittedTechnicalReview];
-
-                        await api({
-                          toastSuccessMessage:
-                            'Your review has been submitted successfully.',
-                        }).submitTechnicalReviews({
-                          technicalReviews: submittedTechnicalReviewsInput,
-                        });
-
-                        dispatch({
-                          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                          itemWithQuestionary: submittedTechnicalReview,
-                        });
-                        dispatch({
-                          type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                          itemWithQuestionary: submittedTechnicalReview,
-                        });
-                        dispatch({
-                          type: 'CLEAN_DIRTY_STATE',
-                        });
-                      } finally {
-                        setSubmitDisabled(true);
-                        setIsSubmitting(false);
-                      }
-                    },
-                    {
-                      title: 'Please confirm',
-                      description: submitButtonMessage,
-                    }
-                  )();
-                }}
-                disabled={
-                  isSubmitting ||
-                  technicalReview.submitted ||
-                  isInternalReviewer ||
-                  submitDisabled
-                }
-                isBusy={isSubmitting}
+                onClick={submit.onClick}
+                disabled={submit.disabled}
+                isBusy={submit.isBusy}
                 data-cy="button-submit-technical-review"
               >
-                {technicalReview.submitted ? '✔ Submitted' : 'Submit'}
+                {submit.label}
               </NavigButton>
             )}
           </NavigationFragment>
