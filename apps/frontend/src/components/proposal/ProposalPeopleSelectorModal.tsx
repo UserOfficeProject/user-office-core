@@ -2,11 +2,16 @@ import { Info } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Autocomplete,
+  createFilterOptions,
+  Box,
   Button,
+  Chip,
   CircularProgress,
   DialogContent,
   IconButton,
+  List,
   ListItemButton,
+  ListItemText,
   TextField,
   Tooltip,
 } from '@mui/material';
@@ -18,12 +23,14 @@ import React, {
   useState,
 } from 'react';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { minTouchTarget, useIsMobile } from 'hooks/common/useResponsive';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
-import { getFullUserNameWithInstitution } from 'utils/user';
+import { getFullUserName, getFullUserNameWithInstitution } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 import NoOptionsText from './NoOptionsText';
@@ -62,6 +69,8 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
 
 const MIN_SEARCH_LENGTH = 3;
 
+const filterByLabel = createFilterOptions<BasicUserDetails>();
+
 function ProposalPeopleSelectorModal({
   modalOpen,
   title,
@@ -75,6 +84,7 @@ function ProposalPeopleSelectorModal({
   multiple = true,
 }: ProposalPeopleSelectorModalProps & WithConfirmProps) {
   const api = useDataApi();
+  const isMobile = useIsMobile();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<BasicUserDetails[]>([]);
@@ -288,6 +298,40 @@ function ProposalPeopleSelectorModal({
 
   const isLoading = loading || isPendingSearch.current;
 
+  const noOptions = (
+    <NoOptionsText
+      query={query}
+      onAddEmail={(email) =>
+        allowInviteByEmail ? addValidEmailToSelection(email) : undefined
+      }
+      exactEmailMatch={exactEmailMatch}
+      onAddUser={(user) => {
+        multiple ? addToSelectedItems(user) : setSelectedItems([user]);
+      }}
+      excludeEmails={
+        excludeEmails?.concat(categorizeSelectedItems(selectedItems).invites) ||
+        []
+      }
+      isEmailSearchOnly={isEmailSearchOnly}
+      allowInviteByEmail={allowInviteByEmail}
+    />
+  );
+
+  const submitDisabled =
+    !selectedItems.length || isSameParticipants(selectedItems, preset || []);
+
+  // Mirrors what Autocomplete does to `options` on the desktop branch:
+  // `filterSelectedOptions`, then its default label-substring filter.
+  const visibleOptions = filterByLabel(
+    options.filter(
+      (option) =>
+        !selectedItems.some(
+          (item) => getOptionKey(item) === getOptionKey(option)
+        )
+    ),
+    { inputValue: query, getOptionLabel }
+  );
+
   return (
     <StyledDialog
       open={modalOpen}
@@ -314,119 +358,175 @@ function ProposalPeopleSelectorModal({
       }
       data-cy="participant-selector"
     >
-      <DialogContent
-        dividers
-        sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}
-      >
-        <Autocomplete
-          multiple={multiple}
-          fullWidth
-          options={options}
-          loading={isLoading}
-          getOptionLabel={getOptionLabel}
-          value={
-            multiple
-              ? selectedItems
-              : selectedItems.length
-                ? selectedItems[0]
-                : undefined
-          }
-          onChange={(_, newValue) =>
-            setSelectedItems(
-              newValue
-                ? multiple
-                  ? (newValue as UserOrEmail[])
-                  : [newValue as UserOrEmail]
-                : []
-            )
-          }
-          filterSelectedOptions
-          onInputChange={(_, newValue) => setQuery(newValue.trim())}
-          onKeyDown={handleKeyDown}
-          data-cy="invite-user-autocomplete"
-          renderInput={(params) => (
+      {isMobile ? (
+        <DialogContent
+          dividers
+          sx={{ padding: 0, display: 'flex', flexDirection: 'column' }}
+        >
+          <Box sx={{ paddingX: 2, paddingTop: 1 }}>
             <TextField
-              {...params}
+              fullWidth
+              variant="standard"
               label={labelText}
-              variant="outlined"
-              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                if (event.key === 'Backspace') {
-                  event.stopPropagation();
-                }
-              }}
+              value={query}
+              onChange={(event) => setQuery(event.target.value.trim())}
+              onKeyDown={handleKeyDown}
+              data-cy="invite-user-search"
               slotProps={{
-                ...params.slotProps,
-
                 input: {
-                  ...params.slotProps.input,
-                  endAdornment: (
-                    <>
-                      {isLoading && (
-                        <CircularProgress color="inherit" size={20} />
-                      )}
-                      {params.slotProps.input.endAdornment}
-                    </>
-                  ),
+                  endAdornment: isLoading ? (
+                    <CircularProgress color="inherit" size={20} />
+                  ) : undefined,
                 },
               }}
             />
+          </Box>
+          {selectedItems.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1,
+                paddingX: 2,
+                paddingTop: 2,
+              }}
+              data-cy="picker-selected"
+            >
+              {selectedItems.map((item) => (
+                <Chip
+                  key={getOptionKey(item)}
+                  label={getOptionLabel(item)}
+                  onDelete={() =>
+                    setSelectedItems((prev) =>
+                      prev.filter((i) => getOptionKey(i) !== getOptionKey(item))
+                    )
+                  }
+                />
+              ))}
+            </Box>
           )}
-          renderOption={(props, option) => {
-            // Must not be a MenuItem. Material UI v9 makes MenuItem throw
-            // ("MenuListContext is missing") when rendered outside a Menu or
-            // MenuList, and Autocomplete renders its listbox as a plain <ul>.
-            // `props` already carries the correct role, id and event handlers.
-            return (
-              <ListItemButton
-                {...props}
-                component="li"
-                key={getOptionKey(option)}
-              >
-                {getOptionLabel(option)}
-              </ListItemButton>
-            );
-          }}
-          noOptionsText={
-            !isLoading ? (
-              <NoOptionsText
-                query={query}
-                onAddEmail={(email) =>
-                  allowInviteByEmail
-                    ? addValidEmailToSelection(email)
-                    : undefined
-                }
-                exactEmailMatch={exactEmailMatch}
-                onAddUser={(user) => {
-                  multiple
-                    ? addToSelectedItems(user)
-                    : setSelectedItems([user]);
-                }}
-                excludeEmails={
-                  excludeEmails?.concat(
-                    categorizeSelectedItems(selectedItems).invites
-                  ) || []
-                }
-                isEmailSearchOnly={isEmailSearchOnly}
-                allowInviteByEmail={allowInviteByEmail}
-              />
-            ) : null
-          }
-        />
-
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          sx={{ margin: '16px 0 8px 0' }}
-          startIcon={<AddIcon />}
-          disabled={
-            !selectedItems.length ||
-            isSameParticipants(selectedItems, preset || [])
-          }
-          data-cy="invite-user-submit-button"
+          <Box sx={{ flex: 1, paddingTop: 1 }}>
+            {visibleOptions.length > 0 ? (
+              <List disablePadding data-cy="picker-results">
+                {visibleOptions.map((option) => (
+                  <ListItemButton
+                    key={option.id}
+                    divider
+                    onClick={() => addToSelectedItems(option)}
+                    sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
+                  >
+                    <ListItemText
+                      primary={getFullUserName(option)}
+                      secondary={option.institution}
+                      slotProps={{ secondary: { noWrap: true } }}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            ) : (
+              !isLoading && <Box sx={{ paddingX: 2 }}>{noOptions}</Box>
+            )}
+          </Box>
+          <ActionButtonContainer sx={{ paddingX: 2, paddingBottom: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              startIcon={<AddIcon />}
+              disabled={submitDisabled}
+              data-cy="invite-user-submit-button"
+            >
+              {multiple ? 'Add' : 'Select'}
+            </Button>
+          </ActionButtonContainer>
+        </DialogContent>
+      ) : (
+        <DialogContent
+          dividers
+          sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}
         >
-          {multiple ? 'Add' : 'Select'}
-        </Button>
-      </DialogContent>
+          <Autocomplete
+            multiple={multiple}
+            fullWidth
+            options={options}
+            loading={isLoading}
+            getOptionLabel={getOptionLabel}
+            value={
+              multiple
+                ? selectedItems
+                : selectedItems.length
+                  ? selectedItems[0]
+                  : undefined
+            }
+            onChange={(_, newValue) =>
+              setSelectedItems(
+                newValue
+                  ? multiple
+                    ? (newValue as UserOrEmail[])
+                    : [newValue as UserOrEmail]
+                  : []
+              )
+            }
+            filterSelectedOptions
+            onInputChange={(_, newValue) => setQuery(newValue.trim())}
+            onKeyDown={handleKeyDown}
+            data-cy="invite-user-autocomplete"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={labelText}
+                variant="outlined"
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (event.key === 'Backspace') {
+                    event.stopPropagation();
+                  }
+                }}
+                slotProps={{
+                  ...params.slotProps,
+
+                  input: {
+                    ...params.slotProps.input,
+                    endAdornment: (
+                      <>
+                        {isLoading && (
+                          <CircularProgress color="inherit" size={20} />
+                        )}
+                        {params.slotProps.input.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+            renderOption={(props, option) => {
+              // Must not be a MenuItem. Material UI v9 makes MenuItem throw
+              // ("MenuListContext is missing") when rendered outside a Menu or
+              // MenuList, and Autocomplete renders its listbox as a plain <ul>.
+              // `props` already carries the correct role, id and event handlers.
+              return (
+                <ListItemButton
+                  {...props}
+                  component="li"
+                  key={getOptionKey(option)}
+                >
+                  {getOptionLabel(option)}
+                </ListItemButton>
+              );
+            }}
+            noOptionsText={!isLoading ? noOptions : null}
+          />
+
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ margin: '16px 0 8px 0' }}
+            startIcon={<AddIcon />}
+            disabled={submitDisabled}
+            data-cy="invite-user-submit-button"
+          >
+            {multiple ? 'Add' : 'Select'}
+          </Button>
+        </DialogContent>
+      )}
     </StyledDialog>
   );
 }

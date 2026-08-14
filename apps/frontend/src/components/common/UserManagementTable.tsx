@@ -64,7 +64,10 @@ const UserManagementTable = ({
   allowInviteByEmail = false,
 }: UserManagementTableProps) => {
   const isMobile = useIsMobile();
-  const [sheetFor, setSheetFor] = useState<BasicUserDetails | null>(null);
+  const [sheet, setSheet] = useState<{
+    title: string;
+    items: CardActionSheetItem[];
+  } | null>(null);
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
 
@@ -90,6 +93,44 @@ const UserManagementTable = ({
     setInvites?.(invites.filter((i) => i.email !== invite.email));
   };
 
+  const inviteChips = invites.length > 0 && (
+    <Box
+      sx={{
+        display: 'flex',
+        marginTop: 1,
+        gap: 1,
+        alignItems: 'flex-start',
+      }}
+      data-cy="invites-chips"
+    >
+      <Typography
+        sx={{
+          fontSize: '12px',
+          color: 'grey',
+          paddingRight: '10px',
+          display: 'inline-block',
+          whiteSpace: 'nowrap',
+          mt: '4px',
+        }}
+      >
+        Invited:
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
+        {invites.map((invite) => (
+          <Chip
+            sx={{ gap: '2px', padding: '6px' }}
+            color="secondary"
+            icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
+            size="small"
+            label={invite.email}
+            key={invite.email}
+            onDelete={() => handleDeleteInvite(invite)}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
+
   const InviteComponent = (
     <ProposalPeopleSelectorModal
       modalOpen={modalOpen}
@@ -106,37 +147,38 @@ const UserManagementTable = ({
   );
 
   if (isMobile) {
-    const sheetItems: CardActionSheetItem[] = sheetFor
-      ? [
-          ...(onUserAction
-            ? [
-                {
-                  key: 'setPi',
-                  label: 'Assign as PI',
-                  icon: <PersonAddIcon />,
-                  onClick: () => {
-                    removeUser(sheetFor);
-                    onUserAction('setPrincipalInvestigator', sheetFor);
-                  },
+    const userSheet = (user: BasicUserDetails) => ({
+      title: getFullUserName(user),
+      items: [
+        ...(onUserAction
+          ? [
+              {
+                key: 'setPi',
+                label: 'Assign as PI',
+                icon: <PersonAddIcon />,
+                onClick: () => {
+                  removeUser(user);
+                  onUserAction('setPrincipalInvestigator', user);
                 },
-              ]
-            : []),
-          {
-            key: 'remove',
-            label: 'Remove',
-            icon: <PersonRemoveIcon />,
-            destructive: true,
-            onClick: () => removeUser(sheetFor),
-          },
-        ]
-      : [];
+              },
+            ]
+          : []),
+        {
+          key: 'remove',
+          label: 'Remove',
+          icon: <PersonRemoveIcon />,
+          destructive: true,
+          onClick: () => removeUser(user),
+        },
+      ],
+    });
 
     return (
       <Box sx={sx} data-cy="user-management-list">
         {modalOpen && InviteComponent}
         <PersonList
           title={title}
-          count={users.length + invites.length}
+          count={users.length}
           onAdd={openModal}
           addButtonLabel={addButtonLabel}
           disabled={disabled}
@@ -152,32 +194,17 @@ const UserManagementTable = ({
               key={user.id}
               primary={getFullUserName(user)}
               secondary={user.institution}
-              onOpenActions={() => setSheetFor(user)}
+              onOpenActions={() => setSheet(userSheet(user))}
               dataCy={`person-row-${user.id}`}
             />
           ))}
-          {invites.map((invite) => (
-            <PersonListRow
-              key={invite.email}
-              primary={invite.email}
-              chips={
-                <Chip
-                  size="small"
-                  color="secondary"
-                  label={invite.isEmailSent ? 'Invited' : 'Not sent yet'}
-                />
-              }
-              onOpenActions={() => handleDeleteInvite(invite)}
-              actionsLabel={`Remove invitation for ${invite.email}`}
-              dataCy={`invite-row-${invite.email}`}
-            />
-          ))}
         </PersonList>
+        {inviteChips}
         <CardActionSheet
-          open={sheetFor !== null}
-          onClose={() => setSheetFor(null)}
-          title={sheetFor ? getFullUserName(sheetFor) : ''}
-          items={sheetItems}
+          open={sheet !== null}
+          onClose={() => setSheet(null)}
+          title={sheet?.title ?? ''}
+          items={sheet?.items ?? []}
         />
       </Box>
     );
@@ -246,43 +273,7 @@ const UserManagementTable = ({
             }}
           />
 
-          {invites.length > 0 && (
-            <Box
-              sx={{
-                display: 'flex',
-                marginTop: 1,
-                gap: 1,
-                alignItems: 'flex-start',
-              }}
-              data-cy="invites-chips"
-            >
-              <Typography
-                sx={{
-                  fontSize: '12px',
-                  color: 'grey',
-                  paddingRight: '10px',
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap',
-                  mt: '4px',
-                }}
-              >
-                Invited:
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
-                {invites.map((invite) => (
-                  <Chip
-                    sx={{ gap: '2px', padding: '6px' }}
-                    color="secondary"
-                    icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
-                    size="small"
-                    label={invite.email}
-                    key={invite.email}
-                    onDelete={() => handleDeleteInvite(invite)}
-                  />
-                ))}
-              </Box>
-            </Box>
-          )}
+          {inviteChips}
           <ActionButtonContainer
             sx={(theme) => ({
               marginTop: theme.spacing(1),
