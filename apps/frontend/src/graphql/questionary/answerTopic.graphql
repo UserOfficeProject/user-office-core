@@ -3,12 +3,14 @@ mutation answerTopic(
   $topicId: Int!
   $answers: [AnswerInput!]!
   $isPartialSave: Boolean
+  $editStartTime: DateTime
 ) {
   answerTopic(
     questionaryId: $questionaryId
     topicId: $topicId
     answers: $answers
     isPartialSave: $isPartialSave
+    editStartTime: $editStartTime
   ) {
     ...answerMinimal
   }

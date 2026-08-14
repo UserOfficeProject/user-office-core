@@ -41,7 +41,11 @@ import {
 } from './records';
 
 type QuestionaryAnswerRecord<T extends DataType> = QuestionRecord &
-  QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+  QuestionTemplateRelRecord & {
+    value: any;
+    answer_id: number;
+    last_edited: Date;
+  } & {
     config: QuestionDataTypeConfigMapping<T>;
     dependency_natural_key: string;
   };
@@ -180,6 +184,7 @@ export default class PostgresQuestionaryDataSource
       return database('answers')
         .update({
           answer: answer,
+          last_edited: new Date(),
         })
         .where({
           questionary_id,
@@ -195,6 +200,7 @@ export default class PostgresQuestionaryDataSource
           questionary_id,
           question_id,
           answer,
+          last_edited: new Date(),
         })
         .returning('*')
         .then((answer: AnswerRecord[]) => {
@@ -386,7 +392,7 @@ export default class PostgresQuestionaryDataSource
     const answerRecords: QuestionaryAnswerRecord<DataType>[] = (
       await database.raw(`
         SELECT 
-          templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
+          templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, answers.last_edited, questions.natural_key as dependency_natural_key
         FROM 
           templates_has_questions
         LEFT JOIN
@@ -431,7 +437,12 @@ export default class PostgresQuestionaryDataSource
             ? getDefaultAnswerValue(questionTemplateRelation)
             : record.value.value;
 
-        return new Answer(record.answer_id, questionTemplateRelation, value);
+        return new Answer(
+          record.answer_id,
+          questionTemplateRelation,
+          value,
+          record.last_edited
+        );
       })
     );
 

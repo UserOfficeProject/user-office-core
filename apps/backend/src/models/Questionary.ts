@@ -6,7 +6,8 @@ export class AnswerBasic {
     public questionaryId: number,
     public questionId: string,
     public answer: any,
-    public createdAt: Date
+    public createdAt: Date,
+    public lastEdited: Date
   ) {}
 }
 
@@ -14,7 +15,8 @@ export class Answer extends QuestionTemplateRelation {
   constructor(
     public answerId: number,
     questionTemplateRelation: QuestionTemplateRelation,
-    public value?: any
+    public value?: any,
+    public lastEdited?: Date
   ) {
     super(
       questionTemplateRelation.question,

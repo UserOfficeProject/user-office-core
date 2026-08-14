@@ -541,5 +541,63 @@ context('Template tests', () => {
         .find('[data-cy="image-figure"] input')
         .should('have.value', 'Fig_test');
     });
+
+    it.only('If 2 users edit a proposal then the second user should be prompted to merge their answers', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal.title,
+            abstract: proposal.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
+        cy.login('user1');
+        cy.visit(`/ProposalEdit/${createdProposal.primaryKey}`);
+        cy.get('[data-cy="save-and-continue-button"]').click();
+        cy.finishedLoading();
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000); // need to wait as this is dependent on the page being fully loaded
+
+        cy.answerTopic({
+          questionaryId: createdProposal.questionaryId,
+          topicId: initialDBData.template.topic.id,
+          answers: [
+            {
+              questionId: initialDBData.questions.boolean.id,
+              value: '{"value":true}',
+            },
+            {
+              questionId: initialDBData.questions.numberInput.id,
+              value:
+                '{"value":{"value":2,"unit":{"id":"meter","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"},"siValue":2}}',
+            },
+          ],
+        });
+        // need to make sure the previous api call has finished
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
+
+        cy.get('[data-cy="save-and-continue-button"]').click();
+        cy.contains(
+          'Can not answer topic because the answers have been edited by another user'
+        );
+
+        cy.get('[data-cy="merge-modal"]').contains(
+          'Number question from seeds'
+        );
+
+        cy.get('[data-cy="merge-modal"]').contains(
+          'Boolean question from seeds'
+        );
+
+        cy.get('[data-cy="merge-update"]').click();
+
+        cy.get('[data-cy="save-and-continue-button"]').click();
+
+        cy.get('[data-cy="button-submit-proposal"]').should('exist');
+      });
+    });
   });
 });

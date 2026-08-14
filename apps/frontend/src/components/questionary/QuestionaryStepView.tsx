@@ -32,6 +32,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from './QuestionaryContext';
+import QuestionaryMergeView from './QuestionaryMergeView';
 
 export const createFormikConfigObjects = (
   answers: Answer[],
@@ -64,6 +65,18 @@ export const createFormikConfigObjects = (
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractCurrentAnswersFromError = (error: any): Answer[] => {
+  try {
+    const editedAnswers = JSON.parse(error.response.body).errors[0].extensions
+      .context.conflictingAnswers;
+
+    return editedAnswers;
+  } catch {
+    return [];
+  }
+};
+
 function QuestionaryStepView(props: {
   topicId: number;
   readonly: boolean;
@@ -71,6 +84,9 @@ function QuestionaryStepView(props: {
   confirm: WithConfirmType;
   showValidationErrorsOnMount?: boolean;
 }) {
+  const [editStartTime, setEditStartTime] = useState(new Date());
+  const [oldAnswers, setOldAnswers] = useState<Answer[]>([]);
+
   const { topicId, confirm } = props;
 
   const preSubmitActions = usePreSubmitActions();
@@ -212,6 +228,7 @@ function QuestionaryStepView(props: {
         answers: prepareAnswers(activeFields),
         topicId: topicId,
         isPartialSave: isPartialSave,
+        editStartTime: editStartTime,
       });
 
       dispatch({
@@ -221,8 +238,16 @@ function QuestionaryStepView(props: {
         isPartialSave: isPartialSave,
       });
 
+      setEditStartTime(new Date());
+
       setLastSavedFormValues(initialValues);
-    } catch {
+    } catch (error) {
+      const editedAnswers = extractCurrentAnswersFromError(error);
+
+      if (editedAnswers.length > 0) {
+        setOldAnswers(editedAnswers);
+      }
+
       return false;
     } finally {
       setIsSaving(false);
@@ -290,115 +315,139 @@ function QuestionaryStepView(props: {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
+  const mergeAnswers = (accepted: Answer[]) => {
+    accepted.forEach((answer) => {
+      dispatch({
+        type: 'FIELD_CHANGED',
+        id: answer.question.id,
+        newValue: answer.value,
+      });
+    });
+
+    setOldAnswers([]);
+    setEditStartTime(new Date());
+  };
+
   return (
-    <Formik
-      initialValues={initialValues}
-      initialTouched={
-        props.showValidationErrorsOnMount ? initialTouched : undefined
-      }
-      validationSchema={Yup.object().shape(validationSchema)}
-      validateOnMount={props.showValidationErrorsOnMount ?? false}
-      onSubmit={async () => {
-        const isSaveSuccess = await performSave(false);
+    <>
+      {oldAnswers.length > 0 && (
+        <QuestionaryMergeView
+          open={!!oldAnswers.length}
+          newAnswers={activeFields}
+          oldAnswers={oldAnswers}
+          mergeAnswers={mergeAnswers}
+        />
+      )}
 
-        if (isSaveSuccess) {
-          dispatch({ type: 'GO_STEP_FORWARD' });
-          props.onStepComplete?.(topicId);
+      <Formik
+        initialValues={initialValues}
+        initialTouched={
+          props.showValidationErrorsOnMount ? initialTouched : undefined
         }
-      }}
-      enableReinitialize={true}
-    >
-      {(formikProps) => {
-        const { submitForm, setFieldValue, isSubmitting } = formikProps;
+        validationSchema={Yup.object().shape(validationSchema)}
+        validateOnMount={props.showValidationErrorsOnMount ?? false}
+        onSubmit={async () => {
+          const isSaveSuccess = await performSave(false);
 
-        const saveHandler = async () => {
-          /*
-           * The title and abstract are non-nullable and should always be validated - even when
-           * using the save button to do a partial save that doesn't validate other questions.
-           */
-          if (!validateProposalBasisFields(formikProps)) {
-            return;
+          if (isSaveSuccess) {
+            dispatch({ type: 'GO_STEP_FORWARD' });
+            props.onStepComplete?.(topicId);
           }
+        }}
+        enableReinitialize={true}
+      >
+        {(formikProps) => {
+          const { submitForm, setFieldValue, isSubmitting } = formikProps;
 
-          performSave(true);
-        };
+          const saveHandler = async () => {
+            /*
+             * The title and abstract are non-nullable and should always be validated - even when
+             * using the save button to do a partial save that doesn't validate other questions.
+             */
+            if (!validateProposalBasisFields(formikProps)) {
+              return;
+            }
 
-        return (
-          <form
-            style={{
-              ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
-            }}
-          >
-            <PromptIfDirty isDirty={state.isDirty} />
-            {activeFields.map((field) => {
-              return (
-                <Box
-                  sx={(theme) => ({ margin: theme.spacing(2, 0, 0, 0) })}
-                  key={field.question.id}
-                >
-                  {createQuestionaryComponent({
-                    answer: field,
-                    formikProps,
-                    onComplete: (newValue: Answer['value']) => {
-                      if (field.value !== newValue) {
-                        dispatch({
-                          type: 'FIELD_CHANGED',
-                          id: field.question.id,
-                          newValue: newValue,
-                        });
-                        setFieldValue(field.question.id, newValue, true);
-                      }
-                    },
-                  })}
-                </Box>
-              );
-            })}
-            <NavigationFragment
-              disabled={props.readonly}
-              isLoading={isSubmitting}
+            performSave(true);
+          };
+
+          return (
+            <form
+              style={{
+                ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
+              }}
             >
-              {state.stepIndex == 0 && fapId != 0 && (
-                <ButtonWithDialog
-                  label="Grading guide"
-                  disabled={isSubmitting}
-                  data-cy="grade-guide"
-                  title="Grading Guide"
-                >
-                  {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
-                </ButtonWithDialog>
-              )}
-              <NavigButton
-                onClick={backHandler}
-                disabled={state.stepIndex === 0}
+              <PromptIfDirty isDirty={state.isDirty} />
+              {activeFields.map((field) => {
+                return (
+                  <Box
+                    sx={(theme) => ({ margin: theme.spacing(2, 0, 0, 0) })}
+                    key={field.question.id}
+                  >
+                    {createQuestionaryComponent({
+                      answer: field,
+                      formikProps,
+                      onComplete: (newValue: Answer['value']) => {
+                        if (field.value !== newValue) {
+                          dispatch({
+                            type: 'FIELD_CHANGED',
+                            id: field.question.id,
+                            newValue: newValue,
+                          });
+                          setFieldValue(field.question.id, newValue, true);
+                        }
+                      },
+                    })}
+                  </Box>
+                );
+              })}
+              <NavigationFragment
+                disabled={props.readonly}
+                isLoading={isSubmitting}
               >
-                Back
-              </NavigButton>
-              <NavigButton onClick={resetHandler} disabled={!state.isDirty}>
-                Reset
-              </NavigButton>
-              {!questionaryStep.isCompleted && (
+                {state.stepIndex == 0 && fapId != 0 && (
+                  <ButtonWithDialog
+                    label="Grading guide"
+                    disabled={isSubmitting}
+                    data-cy="grade-guide"
+                    title="Grading Guide"
+                  >
+                    {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
+                  </ButtonWithDialog>
+                )}
                 <NavigButton
-                  onClick={saveHandler}
-                  disabled={!state.isDirty || isSaving}
-                  isBusy={isSaving}
-                  data-cy="save-button"
+                  onClick={backHandler}
+                  disabled={state.stepIndex === 0}
                 >
-                  Save
+                  Back
                 </NavigButton>
-              )}
-              <NavigButton
-                onClick={submitForm}
-                isBusy={isSubmitting}
-                data-cy="save-and-continue-button"
-              >
-                Save and continue
-              </NavigButton>
-            </NavigationFragment>
-            <ErrorFocus />
-          </form>
-        );
-      }}
-    </Formik>
+                <NavigButton onClick={resetHandler} disabled={!state.isDirty}>
+                  Reset
+                </NavigButton>
+                {!questionaryStep.isCompleted && (
+                  <NavigButton
+                    onClick={saveHandler}
+                    disabled={!state.isDirty || isSaving}
+                    isBusy={isSaving}
+                    data-cy="save-button"
+                  >
+                    Save
+                  </NavigButton>
+                )}
+                <NavigButton
+                  onClick={submitForm}
+                  isBusy={isSubmitting}
+                  data-cy="save-and-continue-button"
+                >
+                  Save and continue
+                </NavigButton>
+              </NavigationFragment>
+              <ErrorFocus />
+            </form>
+          );
+        }}
+      </Formik>
+    </>
   );
 }
 

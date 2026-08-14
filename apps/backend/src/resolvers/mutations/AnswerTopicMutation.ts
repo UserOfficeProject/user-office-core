@@ -34,6 +34,9 @@ export class AnswerTopicArgs {
 
   @Field(() => Boolean, { nullable: true })
   public isPartialSave?: boolean;
+
+  @Field({ nullable: true })
+  public editStartTime?: Date;
 }
 
 @Resolver()

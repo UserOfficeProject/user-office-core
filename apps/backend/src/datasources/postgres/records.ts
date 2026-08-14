@@ -186,6 +186,7 @@ export interface AnswerRecord {
   readonly question_id: string;
   readonly answer: string;
   readonly created_at: Date;
+  readonly last_edited: Date;
 }
 
 export interface Dependency {
@@ -1093,7 +1094,8 @@ export const createAnswerBasic = (answer: AnswerRecord) => {
     answer.questionary_id,
     answer.question_id,
     answer.answer,
-    answer.created_at
+    answer.created_at,
+    answer.last_edited
   );
 };
 
