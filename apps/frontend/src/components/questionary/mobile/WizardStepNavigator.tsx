@@ -39,6 +39,9 @@ export default function WizardStepNavigator({
       onClose={onClose}
       transitionDuration={reduceMotion ? 0 : undefined}
       data-cy="wizard-step-navigator"
+      // A Drawer sits below Dialog by default, and the wizard is rendered
+      // inside one for sample declarations and generic templates.
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
       slotProps={{
         paper: {
           elevation: 8,
