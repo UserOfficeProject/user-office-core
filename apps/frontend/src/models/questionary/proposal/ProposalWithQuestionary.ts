@@ -26,6 +26,7 @@ export type ProposalWithQuestionary = Pick<
   call?: Maybe<
     Pick<
       Call,
+      | 'allocationTimeUnit'
       | 'isActive'
       | 'isActiveInternal'
       | 'referenceNumberFormat'
