@@ -542,7 +542,7 @@ context('Template tests', () => {
         .should('have.value', 'Fig_test');
     });
 
-    it.only('If 2 users edit a proposal then the second user should be prompted to merge their answers', () => {
+    it('If 2 users edit a proposal then the second user should be prompted to merge their answers', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
