@@ -68,6 +68,42 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
 
   const isSubmitted = state.shipment.status === ShipmentStatus.SUBMITTED;
 
+  const primary = {
+    label: isSubmitted ? '✔ Submitted' : 'Submit',
+    onClick: () =>
+      confirm(
+        async () => {
+          const { submitShipment } = await api().submitShipment({
+            shipmentId: state.shipment.id,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: submitShipment,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+            itemWithQuestionary: submitShipment,
+          });
+        },
+        {
+          title: 'Confirmation',
+          description:
+            'I am aware that no further edits can be done after shipment submission.',
+        }
+      )(),
+    disabled: isSubmitted || isExecutingCall,
+  };
+  const save = isSubmitted
+    ? {
+        label: 'Download shipment label',
+        onClick: () =>
+          downloadShipmentLabel(
+            [state.shipment.id],
+            `${state.shipment.title}.pdf`
+          ),
+      }
+    : undefined;
+
   return (
     <>
       <QuestionaryDetails
@@ -75,47 +111,21 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
         additionalDetails={additionalDetails}
         title="Shipment information"
       />
-      <NavigationFragment isLoading={isExecutingCall}>
-        <NavigButton
-          onClick={() =>
-            confirm(
-              async () => {
-                const { submitShipment } = await api().submitShipment({
-                  shipmentId: state.shipment.id,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: submitShipment,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: submitShipment,
-                });
-              },
-              {
-                title: 'Confirmation',
-                description:
-                  'I am aware that no further edits can be done after shipment submission.',
-              }
-            )()
-          }
-          disabled={isSubmitted || isExecutingCall}
-        >
-          {isSubmitted ? '✔ Submitted' : 'Submit'}
+      <NavigationFragment
+        isLoading={isExecutingCall}
+        actions={{ save, primary }}
+      >
+        <NavigButton onClick={primary.onClick} disabled={primary.disabled}>
+          {primary.label}
         </NavigButton>
-        {state.shipment.status === ShipmentStatus.SUBMITTED && (
+        {save && (
           <NavigButton
-            onClick={() =>
-              downloadShipmentLabel(
-                [state.shipment.id],
-                `${state.shipment.title}.pdf`
-              )
-            }
+            onClick={save.onClick}
             startIcon={<GetAppIcon />}
             color="secondary"
             data-cy="download-shipment-label"
           >
-            Download shipment label
+            {save.label}
           </NavigButton>
         )}
       </NavigationFragment>

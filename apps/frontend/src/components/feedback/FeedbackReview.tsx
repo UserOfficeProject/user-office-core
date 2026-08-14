@@ -36,6 +36,33 @@ function FeedbackReview({ confirm }: FeedbackReviewProps) {
     { label: 'Status', value: isSubmitted ? 'Submitted' : 'Draft' },
   ];
 
+  const primary = {
+    label: isSubmitted ? '✔ Submitted' : 'Submit',
+    onClick: () =>
+      confirm(
+        async () => {
+          const { updateFeedback } = await api().updateFeedback({
+            feedbackId: state.feedback.id,
+            status: FeedbackStatus.SUBMITTED,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: updateFeedback,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+            itemWithQuestionary: updateFeedback,
+          });
+        },
+        {
+          title: 'Confirmation',
+          description:
+            'I am aware that no further edits can be done after feedback submission.',
+        }
+      )(),
+    disabled: isSubmitted,
+  };
+
   return (
     <>
       <QuestionaryDetails
@@ -43,35 +70,13 @@ function FeedbackReview({ confirm }: FeedbackReviewProps) {
         additionalDetails={additionalDetails}
         title="Feedback information"
       />
-      <NavigationFragment isLoading={isExecutingCall}>
+      <NavigationFragment isLoading={isExecutingCall} actions={{ primary }}>
         <NavigButton
-          onClick={() =>
-            confirm(
-              async () => {
-                const { updateFeedback } = await api().updateFeedback({
-                  feedbackId: state.feedback.id,
-                  status: FeedbackStatus.SUBMITTED,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: updateFeedback,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: updateFeedback,
-                });
-              },
-              {
-                title: 'Confirmation',
-                description:
-                  'I am aware that no further edits can be done after feedback submission.',
-              }
-            )()
-          }
-          disabled={isSubmitted}
+          onClick={primary.onClick}
+          disabled={primary.disabled}
           data-cy="submit-feedback-button"
         >
-          {isSubmitted ? '✔ Submitted' : 'Submit'}
+          {primary.label}
         </NavigButton>
       </NavigationFragment>
     </>
