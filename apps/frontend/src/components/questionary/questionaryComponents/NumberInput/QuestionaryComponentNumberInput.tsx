@@ -129,7 +129,10 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             </>
           </FormLabel>
         </Grid>
-        <Grid sx={(theme) => ({ paddingRight: theme.spacing(1) })} size={2}>
+        <Grid
+          sx={(theme) => ({ paddingRight: theme.spacing(1) })}
+          size={{ xs: 4, md: 2 }}
+        >
           <TextField
             id={`${id}-value`}
             onChange={(event) => {
@@ -165,12 +168,12 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid size={10}>{getUnits()}</Grid>
+        <Grid size={{ xs: 8, md: 10 }}>{getUnits()}</Grid>
 
-        <Grid size={2}>
+        <Grid size={{ xs: 4, md: 2 }}>
           {isError && <FormHelperText>{fieldError.value}</FormHelperText>}
         </Grid>
-        <Grid size={10}>
+        <Grid size={{ xs: 8, md: 10 }}>
           {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>

@@ -26,6 +26,7 @@ import React, { ChangeEvent, useState } from 'react';
 
 import { Maybe } from 'generated/sdk';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
@@ -71,7 +72,7 @@ export function FileEntry(props: {
         alignItems: 'center',
       }}
     >
-      <Grid sx={{ maxWidth: '50px' }} size={1}>
+      <Grid sx={{ maxWidth: '50px' }} size={{ xs: 2, md: 1 }}>
         <ListItemAvatar>
           <Avatar
             sx={{
@@ -83,7 +84,7 @@ export function FileEntry(props: {
           </Avatar>
         </ListItemAvatar>
       </Grid>
-      <Grid size={6}>
+      <Grid size={{ xs: 10, md: 6 }}>
         <Box
           sx={{
             display: 'flex',
@@ -154,7 +155,7 @@ export function FileEntry(props: {
           </Box>
         </Box>
       </Grid>
-      <Grid size={5}>
+      <Grid size={{ xs: 12, md: 5 }}>
         <Grid container spacing={1}>
           {props.metaData.mimeType.startsWith('image') && (
             <Grid size={6}>
@@ -164,6 +165,7 @@ export function FileEntry(props: {
                 defaultValue={props.figure || ''}
                 sx={{
                   marginLeft: theme.spacing(2),
+                  [belowCompactUi(theme)]: { marginLeft: 0 },
                 }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
@@ -201,6 +203,7 @@ export function FileEntry(props: {
                 defaultValue={props.caption || ''}
                 sx={{
                   marginLeft: theme.spacing(2),
+                  [belowCompactUi(theme)]: { marginLeft: 0 },
                 }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
