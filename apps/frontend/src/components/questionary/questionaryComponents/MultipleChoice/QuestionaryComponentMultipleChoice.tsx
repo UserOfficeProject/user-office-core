@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 import { toArray } from 'utils/helperFunctions';
 
 export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
@@ -107,7 +108,10 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
             name={id}
             value={stateValue[0] || ''}
             onChange={handleOnChange}
-            sx={{ flexDirection: config.options.length < 3 ? 'row' : 'column' }}
+            sx={(theme) => ({
+              flexDirection: config.options.length < 3 ? 'row' : 'column',
+              [belowCompactUi(theme)]: { flexDirection: 'column' },
+            })}
           >
             {config.options.map((option) => {
               return (
