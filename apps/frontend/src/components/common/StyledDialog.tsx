@@ -31,7 +31,8 @@
  */
 
 import CloseIcon from '@mui/icons-material/Close';
-import { DialogTitle, IconButton } from '@mui/material';
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import { Box, DialogTitle, IconButton, Typography } from '@mui/material';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import React from 'react';
@@ -46,11 +47,27 @@ const DialogHeader = styled('div')({
   alignContent: 'center',
 });
 
+/**
+ * Marks a dialog opened from inside another one. On a phone the child is
+ * inset so the parent's app bar stays visible above it, and a strip names
+ * what it is adding to, so closing it cannot read as closing the parent.
+ */
+export type DialogNesting = {
+  /** The collection being added to, e.g. `Samples`. */
+  collection: string;
+  /** What stays open behind, e.g. `proposal`. */
+  parent: string;
+};
+
+/** Parent app bar (56px) plus the peek that shows it is still there. */
+const NESTED_TOP_OFFSET = 84;
+
 type StyledDialogProps = {
   title?: string;
   error?: boolean;
   extra?: React.ReactNode;
   tooltip?: React.ReactNode;
+  nesting?: DialogNesting;
 } & DialogProps;
 
 /**
@@ -60,12 +77,31 @@ type StyledDialogProps = {
 export const DialogAppBarContext = React.createContext(false);
 
 function StyledDialog(props: StyledDialogProps) {
-  const { extra, error, title, onClose } = props;
+  const { extra, error, title, onClose, nesting, ...dialogProps } = props;
   const isMobile = useIsMobile();
   const asFullScreen = props.fullScreen ?? isMobile;
+  const asSheet = asFullScreen && !!nesting;
 
   return (
-    <Dialog {...props} fullScreen={asFullScreen}>
+    <Dialog
+      {...dialogProps}
+      fullScreen={asFullScreen}
+      slotProps={
+        asSheet
+          ? {
+              backdrop: { sx: { backgroundColor: 'rgba(0,0,0,.45)' } },
+              paper: {
+                sx: {
+                  marginTop: `${NESTED_TOP_OFFSET}px`,
+                  height: `calc(100% - ${NESTED_TOP_OFFSET}px)`,
+                  borderRadius: '16px 16px 0 0',
+                  boxShadow: '0 -6px 20px rgba(0,0,0,.3)',
+                },
+              },
+            }
+          : props.slotProps
+      }
+    >
       {asFullScreen ? (
         <MobileAppBar
           title={title ?? ''}
@@ -108,6 +144,29 @@ function StyledDialog(props: StyledDialogProps) {
             </IconButton>
           )}
         </DialogHeader>
+      )}
+      {asSheet && nesting && (
+        <Box
+          data-cy="dialog-nesting-strip"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            padding: '10px 16px',
+            backgroundColor: 'rgba(0,0,0,.05)',
+          }}
+        >
+          <SubdirectoryArrowRightIcon
+            sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }}
+          />
+          <Typography sx={{ fontSize: 12, lineHeight: 1.4 }}>
+            Adding to{' '}
+            <Box component="span" sx={{ fontWeight: 500 }}>
+              {nesting.collection}
+            </Box>
+            {` · ${nesting.parent} stays open`}
+          </Typography>
+        </Box>
       )}
       <DialogAppBarContext.Provider value={asFullScreen}>
         {props.children}
