@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { Answer, InstrumentPickerConfig } from 'generated/sdk';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 
 /* InstrumentIdAndTime is used to save the 
 instrument id and requested time in database*/
@@ -177,7 +178,7 @@ export function QuestionaryComponentInstrumentPicker(
     return (
       requestTimeForInstrument && (
         <Stack
-          direction="row"
+          direction={{ xs: 'column', md: 'row' }}
           spacing={3}
           sx={{
             marginTop: 3,
@@ -291,9 +292,10 @@ export function QuestionaryComponentInstrumentPicker(
             name={id}
             value={answer.value?.instrumentId ?? null}
             onChange={handleOnChange}
-            sx={{
+            sx={(theme) => ({
               flexDirection: config.instruments.length < 3 ? 'row' : 'column',
-            }}
+              [belowCompactUi(theme)]: { flexDirection: 'column' },
+            })}
             data-cy="radio-ul"
           >
             {config.instruments.map((instrument) => {
