@@ -16,6 +16,7 @@ export interface WorkflowDataSource {
   updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow>;
   updateWorkflowTimestamp(workflowId: number): Promise<void>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
+  cloneWorkflow(workflowId: number): Promise<Workflow>;
 
   createWorkflowConnection(
     newWorkflowConnectionInput: CreateWorkflowConnectionInput

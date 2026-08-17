@@ -1,0 +1,5 @@
+mutation cloneWorkflow($workflowId: Int!) {
+  cloneWorkflow(workflowId: $workflowId) {
+    ...workflow
+  }
+}

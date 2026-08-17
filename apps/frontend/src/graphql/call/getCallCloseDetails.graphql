@@ -6,5 +6,6 @@ query getCallCloseDetails($callId: Int!) {
     endCallInternal
     startCall
     endCall
+    allocationTimeUnit
   }
 }
