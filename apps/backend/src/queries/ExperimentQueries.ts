@@ -4,6 +4,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { Authorized } from '../decorators';
+import { ExperimentTableSortField } from '../models/Experiment';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ExperimentSampleArgs } from '../resolvers/queries/ExperimentSampleQuery';
@@ -97,7 +98,7 @@ export default class ExperimentQueries {
     filter: ExperimentsFilter = {},
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ) {

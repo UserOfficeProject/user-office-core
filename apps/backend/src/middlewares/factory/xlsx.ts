@@ -11,7 +11,7 @@ import callFactoryService, {
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
-  CallExtraFapDataColumns,
+  DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
@@ -22,6 +22,11 @@ import {
 } from '../../factory/xlsx/proposal';
 
 const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
+const callExtraFapDataColumns = container.isRegistered(
+  Tokens.CallExtraFapDataColumns
+)
+  ? container.resolve<string[]>(Tokens.CallExtraFapDataColumns)
+  : DefaultCallExtraFapDataColumns;
 
 const router = express.Router();
 
@@ -148,7 +153,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: fapDataColumns.concat(CallExtraFapDataColumns),
+      columns: fapDataColumns.concat(callExtraFapDataColumns),
     };
 
     const userRole = req.user.currentRole;

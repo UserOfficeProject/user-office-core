@@ -101,7 +101,7 @@ export default class FapQueries {
       if (agent?.currentRole?.shortCode === Roles.FAP_REVIEWER) {
         const usersProposals = (
           await this.proposalDataSource.getUserProposals(agent.id)
-        ).map((p) => p.primaryKey);
+        ).userProposals.map((p) => p.primaryKey);
 
         return fapProposals.filter(
           (fp) => !usersProposals.includes(fp.proposalPk)

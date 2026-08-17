@@ -6,9 +6,9 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
-import { DateTime } from 'luxon';
 
 import { newCall, proposalWorkflow } from './templateContext';
+import { selectDateRange } from '../support/dayRangePicker';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
@@ -1235,16 +1235,9 @@ context('Template Delete, Archive, Unarchive', () => {
     const existingProposalId = initialDBData.proposal.id;
     const existingExperimentPk =
       initialDBData.experiments.upcoming.experimentPk;
-    const startQuestion = 'Visit start';
-    const endQuestion = 'Visit end';
+    const visitBasisDateRange = 'visit_basis.dateRange';
 
     const cyTagRegisterVisit = 'register-visit-icon';
-    const startDate = DateTime.fromJSDate(new Date()).toFormat(
-      initialDBData.getFormats().dateFormat
-    );
-    const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-      initialDBData.getFormats().dateFormat
-    );
     const createVisit = () => {
       cy.updateProposal({
         proposalPk: existingProposalId,
@@ -1291,8 +1284,7 @@ context('Template Delete, Archive, Unarchive', () => {
         .first()
         .click();
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      selectDateRange(visitBasisDateRange);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
