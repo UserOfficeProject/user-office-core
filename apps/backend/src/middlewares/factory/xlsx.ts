@@ -263,11 +263,10 @@ router.get('/management-decision/:call_id', async (req, res, next) => {
       'Proposal ID',
       'Principal Investigator',
       'Remaining Instrument Available Time', // Running total of remaining available instrument time
-      'Time allocation',
+      'Time Allocation',
       'FAP Recommendation',
       'FAP Comment to User',
       'FAP Comment to Management',
-      'Admin Comment for Management',
       'Technical Review Comments',
     ];
 

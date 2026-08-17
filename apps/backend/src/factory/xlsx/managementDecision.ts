@@ -48,10 +48,6 @@ export async function generateManagementDecisionData(
   agent: UserWithRole,
   fapreview: FapReviewsRecord
 ) {
-  const proposalInfo = await baseContext.queries.proposal.get(
-    agent,
-    fapreview.proposal_pk
-  );
   const principalInvestigatorInfo = await baseContext.queries.user.get(
     agent,
     fapreview.proposer_id
@@ -83,7 +79,6 @@ export async function generateManagementDecisionData(
       fapMeetingRecommendation,
       fapMeetingData?.[0]?.commentForUser ?? '<missing>',
       fapMeetingData?.[0]?.commentForManagement ?? '<missing>',
-      proposalInfo?.commentForManagement ?? '<missing>',
       fapreview.comment ?? '<missing>',
     ],
   };
