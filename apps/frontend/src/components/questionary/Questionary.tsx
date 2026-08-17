@@ -130,19 +130,16 @@ function Questionary({
     const stepCount = stepsMetadata.length;
     const errorCount = header?.errorCount ?? 0;
 
-    // Inside a full-screen dialog the header sits outside the scrolling box,
-    // so the sticky offsets start at zero rather than below our own app bar.
-    const progressStickyTop = hasDialogAppBar ? 0 : toolbarHeight(theme);
-
-    // The step bar sticks below the progress bar, so its offset clears both.
+    // A full-screen dialog's header sits outside the scrolling box, so these
+    // offsets start at zero rather than below our own app bar.
+    const toolbar = toolbarHeight(theme);
+    const progressStickyTop = hasDialogAppBar ? 0 : toolbar;
     const stepBarStickyTop = hasDialogAppBar
       ? PROGRESS_HEIGHT
-      : Object.fromEntries(
-          Object.entries(toolbarHeight(theme)).map(([breakpoint, height]) => [
-            breakpoint,
-            `calc(${height} + ${PROGRESS_HEIGHT}px)`,
-          ])
-        );
+      : {
+          xs: `calc(${toolbar.xs} + ${PROGRESS_HEIGHT}px)`,
+          sm: `calc(${toolbar.sm} + ${PROGRESS_HEIGHT}px)`,
+        };
 
     const navigatorSteps: WizardNavigatorStep[] = stepsMetadata.map(
       (metadata, index) => ({
