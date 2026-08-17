@@ -11,10 +11,21 @@ import { minTouchTarget } from 'hooks/common/useResponsive';
 
 import { TableRowData } from '../QuestionaryDetails';
 
+const ROW_SX = {
+  minWidth: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2px',
+} as const;
+
+const LABEL_SX = { fontSize: 13, lineHeight: 1.4, color: 'text.secondary' };
+
+// `anywhere` so a value that is one unbroken token cannot widen the card.
+const VALUE_SX = { fontSize: 14, lineHeight: 1.4, overflowWrap: 'anywhere' };
+
 type ReviewAnswerCardProps = {
   title: string;
   rows: TableRowData[];
-  /** Omitted where the step cannot be edited, which also loosens the rows. */
   onEdit?: () => void;
 };
 
@@ -108,38 +119,15 @@ export default function ReviewAnswerCard({
             padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
-            // A two-column grid sizes its label column to the longest label,
-            // and questionary labels are whole questions, so the value column
-            // collapsed to a few characters wide. Stack them instead.
-            gap: onEdit ? '10px' : '14px',
+            gap: '12px',
           }}
         >
           {rows.map((row, index) => (
-            <Box
-              key={index}
-              sx={{
-                minWidth: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '2px',
-              }}
-            >
-              <Typography
-                component="div"
-                sx={{ fontSize: 13, lineHeight: 1.4, color: 'text.secondary' }}
-              >
+            <Box key={index} sx={ROW_SX}>
+              <Typography component="div" sx={LABEL_SX}>
                 {row.label}
               </Typography>
-              <Typography
-                component="div"
-                sx={{
-                  fontSize: 14,
-                  lineHeight: 1.4,
-                  // An answer can be one unbroken token, such as a sample name,
-                  // which would otherwise push the card sideways.
-                  overflowWrap: 'anywhere',
-                }}
-              >
+              <Typography component="div" sx={VALUE_SX}>
                 {row.value}
               </Typography>
             </Box>

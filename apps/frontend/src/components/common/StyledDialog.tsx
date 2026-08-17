@@ -47,15 +47,8 @@ const DialogHeader = styled('div')({
   alignContent: 'center',
 });
 
-/**
- * Marks a dialog opened from inside another one. On a phone the child is
- * inset so the parent's app bar stays visible above it, and a strip names
- * what it is adding to, so closing it cannot read as closing the parent.
- */
 export type DialogNesting = {
-  /** The collection being added to, e.g. `Samples`. */
   collection: string;
-  /** What stays open behind, e.g. `proposal`. */
   parent: string;
 };
 
@@ -77,18 +70,20 @@ type StyledDialogProps = {
 export const DialogAppBarContext = React.createContext(false);
 
 function StyledDialog(props: StyledDialogProps) {
-  const { extra, error, title, onClose, nesting, ...dialogProps } = props;
+  const { extra, error, title, tooltip, nesting, slotProps, ...dialogProps } =
+    props;
   const isMobile = useIsMobile();
   const asFullScreen = props.fullScreen ?? isMobile;
-  const asSheet = asFullScreen && !!nesting;
+  const sheet = asFullScreen ? nesting : undefined;
 
   return (
     <Dialog
       {...dialogProps}
       fullScreen={asFullScreen}
       slotProps={
-        asSheet
+        sheet
           ? {
+              ...slotProps,
               backdrop: { sx: { backgroundColor: 'rgba(0,0,0,.45)' } },
               paper: {
                 sx: {
@@ -99,7 +94,7 @@ function StyledDialog(props: StyledDialogProps) {
                 },
               },
             }
-          : props.slotProps
+          : slotProps
       }
     >
       {asFullScreen ? (
@@ -107,10 +102,10 @@ function StyledDialog(props: StyledDialogProps) {
           title={title ?? ''}
           variant="dialog"
           error={error}
-          onBack={() => onClose?.({}, 'escapeKeyDown')}
+          onBack={() => props.onClose?.({}, 'escapeKeyDown')}
           extra={
             <>
-              {props.tooltip}
+              {tooltip}
               {extra}
             </>
           }
@@ -127,15 +122,15 @@ function StyledDialog(props: StyledDialogProps) {
             })}
           >
             {title}
-            {props.tooltip && props.tooltip}
+            {tooltip}
           </DialogTitle>
           {extra}
 
-          {onClose && (
+          {props.onClose && (
             <IconButton
               data-cy="close-modal-btn"
               aria-label="close"
-              onClick={(e) => onClose?.(e, 'escapeKeyDown')}
+              onClick={(e) => props.onClose?.(e, 'escapeKeyDown')}
               sx={{
                 color: (theme) => theme.palette.grey[500],
               }}
@@ -145,7 +140,7 @@ function StyledDialog(props: StyledDialogProps) {
           )}
         </DialogHeader>
       )}
-      {asSheet && nesting && (
+      {sheet && (
         <Box
           data-cy="dialog-nesting-strip"
           sx={{
@@ -162,9 +157,9 @@ function StyledDialog(props: StyledDialogProps) {
           <Typography sx={{ fontSize: 12, lineHeight: 1.4 }}>
             Adding to{' '}
             <Box component="span" sx={{ fontWeight: 500 }}>
-              {nesting.collection}
+              {sheet.collection}
             </Box>
-            {` · ${nesting.parent} stays open`}
+            {` · ${sheet.parent} stays open`}
           </Typography>
         </Box>
       )}

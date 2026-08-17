@@ -102,23 +102,21 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
       rows.unshift(...additionalDetails);
     }
 
-    if (isMobile) {
-      // Resolve by topic rather than by index: the review step is appended and
-      // some flows use their own factory, so the two lists need not line up.
-      const wizardIndex =
-        state?.wizardSteps.findIndex(
-          (wizardStep) => wizardStep.payload?.topicId === step.topic.id
-        ) ?? -1;
-      const editable =
-        wizardIndex >= 0 &&
-        state !== null &&
-        !state.wizardSteps[wizardIndex].getMetadata(
-          state,
-          state.wizardSteps[wizardIndex].payload
-        ).isReadonly;
+    // Resolve by topic, not by the index of this map: the review step is
+    // appended, so the two lists need not line up.
+    const wizardIndex =
+      state?.wizardSteps.findIndex(
+        (wizardStep) => wizardStep.payload?.topicId === step.topic.id
+      ) ?? -1;
+    const wizardStep =
+      state && wizardIndex >= 0 && state.wizardSteps[wizardIndex];
+    const editable =
+      wizardStep &&
+      !wizardStep.getMetadata(state, wizardStep.payload).isReadonly;
 
-      return (
-        <div data-cy="questionary-details-view" key={step.topic.id}>
+    return (
+      <div data-cy="questionary-details-view" key={step.topic.id}>
+        {isMobile ? (
           <ReviewAnswerCard
             title={step.topic.title}
             rows={rows}
@@ -132,15 +130,12 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
                 : undefined
             }
           />
-        </div>
-      );
-    }
-
-    const stepContent = <AnswersTable rows={rows} />;
-
-    return (
-      <div data-cy="questionary-details-view" key={step.topic.id}>
-        <StepView title={step.topic.title} content={stepContent} />
+        ) : (
+          <StepView
+            title={step.topic.title}
+            content={<AnswersTable rows={rows} />}
+          />
+        )}
       </div>
     );
   });
