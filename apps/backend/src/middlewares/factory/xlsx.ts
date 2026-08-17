@@ -261,6 +261,8 @@ router.get('/management-decision/:call_id', async (req, res, next) => {
 
     const managementDecisionColumns = [
       'Proposal ID',
+      'Proposal PK',
+      'Instrument ID',
       'Principal Investigator',
       'Remaining Instrument Available Time', // Running total of remaining available instrument time
       'Time Allocation',

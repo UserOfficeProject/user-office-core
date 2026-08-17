@@ -72,6 +72,8 @@ export async function generateManagementDecisionData(
     instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
     xlsxrowdata: [
       fapreview.proposal_id.toString() ?? '<missing>',
+      fapreview.proposal_pk.toString() ?? '<missing>',
+      fapreview.instrument_id.toString() ?? '<missing>',
       `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
       '<missing>', // Running total of remaining instrument time. (filled in later)
       instrumentAllocatedTime
@@ -105,7 +107,7 @@ export function addDecreasingInstrumentAvailTime(
       remainingInstrumentTime -
       managementDecisionData[i].instrumentAllocatedTime;
     const timeToShowToUser = Math.max(remainingInstrumentTime, 0).toString();
-    managementDecisionData[i].xlsxrowdata[2] = timeToShowToUser;
+    managementDecisionData[i].xlsxrowdata[4] = timeToShowToUser;
   }
 }
 
