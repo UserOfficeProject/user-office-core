@@ -53,6 +53,12 @@ type StyledDialogProps = {
   tooltip?: React.ReactNode;
 } & DialogProps;
 
+/**
+ * True when this dialog already renders a mobile app bar, so nested content
+ * that would render one of its own can leave it out.
+ */
+export const DialogAppBarContext = React.createContext(false);
+
 function StyledDialog(props: StyledDialogProps) {
   const { extra, error, title, onClose } = props;
   const isMobile = useIsMobile();
@@ -103,7 +109,9 @@ function StyledDialog(props: StyledDialogProps) {
           )}
         </DialogHeader>
       )}
-      {props.children}
+      <DialogAppBarContext.Provider value={asFullScreen}>
+        {props.children}
+      </DialogAppBarContext.Provider>
     </Dialog>
   );
 }
