@@ -1,23 +1,21 @@
-import CloseIcon from '@mui/icons-material/Close';
 import {
   Typography,
   Alert,
   Stack,
-  Dialog,
   DialogContent,
   Divider,
   Paper,
-  DialogTitle,
-  IconButton,
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
 import {
   QuestionnairesList,
   QuestionnairesListRow,
 } from 'components/questionary/questionaryComponents/QuestionnairesList';
 import { ShipmentFragment, ShipmentStatus } from 'generated/sdk';
+import { useIsTabletOrMobile } from 'hooks/common/useResponsive';
 import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useShipments } from 'hooks/shipment/useShipments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -44,6 +42,8 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+
+  const isMobile = useIsTabletOrMobile();
 
   const { shipments, setShipments } = useShipments({
     experimentPk: experimentPk,
@@ -128,7 +128,7 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
       <Typography variant="h6" component="h2" sx={{ marginBottom: 3 }}>
         Declare Shipments
       </Typography>
-      <Stack spacing={4} direction="row">
+      <Stack spacing={4} direction={isMobile ? 'column' : 'row'}>
         <Stack
           sx={{
             flex: 1,
@@ -150,7 +150,7 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
             </Alert>
           )}
         </Stack>
-        <Divider orientation="vertical" flexItem />
+        <Divider orientation={isMobile ? 'horizontal' : 'vertical'} flexItem />
         <Stack
           sx={{
             flex: 1,
@@ -171,9 +171,10 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
           </Paper>
         </Stack>
       </Stack>
-      <Dialog
-        aria-labelledby="shipment-declaration"
-        aria-describedby="shipment-declaration-description"
+      <StyledDialog
+        title={
+          selectedShipment ? 'Update Shipment' : 'Add Shipment Declaration'
+        }
         open={isModalOpen}
         onClose={(event, reason) => {
           if (reason === 'backdropClick') {
@@ -184,21 +185,6 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ m: 0, p: 2 }}>
-          {selectedShipment ? 'Update Shipment' : 'Add Shipment Declaration'}
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
         <DialogContent dividers>
           <CreateUpdateShipment
             onShipmentSubmitted={handleSubmitted}
@@ -208,7 +194,7 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
             shipment={selectedShipment}
           />
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
     </>
   );
 }
