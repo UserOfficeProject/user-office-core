@@ -137,7 +137,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={3}
+          size={{ xs: 6, md: 3 }}
         >
           <TextField
             label="Min"
@@ -171,7 +171,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={3}
+          size={{ xs: 6, md: 3 }}
         >
           <TextField
             label="Max"
@@ -214,18 +214,18 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={6}
+          size={{ xs: 12, md: 6 }}
         >
           {getUnits()}
         </Grid>
 
-        <Grid size={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           {isError && <FormHelperText>{fieldError.min}</FormHelperText>}
         </Grid>
-        <Grid size={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           {isError && <FormHelperText>{fieldError.max}</FormHelperText>}
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>
