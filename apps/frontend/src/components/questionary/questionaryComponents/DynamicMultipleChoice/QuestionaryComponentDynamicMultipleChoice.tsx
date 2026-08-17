@@ -15,6 +15,7 @@ import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import { DynamicMultipleChoiceConfig } from 'generated/sdk';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
 import { toArray } from 'utils/helperFunctions';
 
@@ -137,9 +138,10 @@ export function QuestionaryComponentDynamicMultipleChoice(
             name={id}
             value={stateValue[0] || ''}
             onChange={handleOnChange}
-            sx={{
+            sx={(theme) => ({
               flexDirection: options.length < 3 ? 'row' : 'column',
-            }}
+              [belowCompactUi(theme)]: { flexDirection: 'column' },
+            })}
           >
             {options.map((option) => {
               return (
