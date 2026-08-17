@@ -216,7 +216,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const currentRoleTags = roles.find((r) => currentRoleId === r.id)!.tags;
   const currentRoleFirstTagName = currentRoleTags?.length
-    ? currentRoleTags[0].name
+    ? `${currentRoleTags[0].name}.`
     : '';
 
   const lastProcessedCallId = useRef<number | null>(null);
@@ -699,7 +699,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const techniquesColumns = () => [
     {
-      title: i18n.t(`${currentRoleFirstTagName}.Technique`),
+      title: i18n.t(`${currentRoleFirstTagName}Technique`),
       field: 'technique.name',
       sorting: false,
       render: (rowData: ProposalViewData) =>
