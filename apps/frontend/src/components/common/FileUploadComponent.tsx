@@ -26,7 +26,6 @@ import React, { ChangeEvent, useState } from 'react';
 
 import { Maybe } from 'generated/sdk';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
-import { belowCompactUi } from 'hooks/common/useResponsive';
 import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
@@ -163,10 +162,7 @@ export function FileEntry(props: {
                 label="Figure"
                 data-cy="image-figure"
                 defaultValue={props.figure || ''}
-                sx={{
-                  marginLeft: theme.spacing(2),
-                  [belowCompactUi(theme)]: { marginLeft: 0 },
-                }}
+                sx={{ marginLeft: { xs: 0, md: theme.spacing(2) } }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
@@ -201,10 +197,7 @@ export function FileEntry(props: {
                 label="Image caption"
                 data-cy="image-caption"
                 defaultValue={props.caption || ''}
-                sx={{
-                  marginLeft: theme.spacing(2),
-                  [belowCompactUi(theme)]: { marginLeft: 0 },
-                }}
+                sx={{ marginLeft: { xs: 0, md: theme.spacing(2) } }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
