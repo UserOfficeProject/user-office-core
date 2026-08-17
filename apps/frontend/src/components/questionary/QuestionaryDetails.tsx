@@ -1,15 +1,18 @@
 import Box from '@mui/material/Box';
 import { TableProps } from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Answer, DataType, Questionary } from 'generated/sdk';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { areDependenciesSatisfied } from 'models/questionary/QuestionaryFunctions';
 
 import { AnswersTable } from './AnswersTable';
+import ReviewAnswerCard from './mobile/ReviewAnswerCard';
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
+import { QuestionaryContext } from './QuestionaryContext';
 import { StepView } from './StepView';
 
 export interface TableRowData {
@@ -33,6 +36,9 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
     additionalDetails,
     title,
   } = props;
+
+  const isMobile = useIsMobile();
+  const { state, dispatch } = useContext(QuestionaryContext);
 
   const { questionary, loadingQuestionary } = useQuestionary(
     questionaryId,
@@ -94,6 +100,40 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
 
     if (index === 0 && additionalDetails !== undefined) {
       rows.unshift(...additionalDetails);
+    }
+
+    if (isMobile) {
+      // Resolve by topic rather than by index: the review step is appended and
+      // some flows use their own factory, so the two lists need not line up.
+      const wizardIndex =
+        state?.wizardSteps.findIndex(
+          (wizardStep) => wizardStep.payload?.topicId === step.topic.id
+        ) ?? -1;
+      const editable =
+        wizardIndex >= 0 &&
+        state !== null &&
+        !state.wizardSteps[wizardIndex].getMetadata(
+          state,
+          state.wizardSteps[wizardIndex].payload
+        ).isReadonly;
+
+      return (
+        <div data-cy="questionary-details-view" key={step.topic.id}>
+          <ReviewAnswerCard
+            title={step.topic.title}
+            rows={rows}
+            onEdit={
+              editable
+                ? () =>
+                    dispatch({
+                      type: 'GO_TO_STEP_CLICKED',
+                      stepIndex: wizardIndex,
+                    })
+                : undefined
+            }
+          />
+        </div>
+      );
     }
 
     const stepContent = <AnswersTable rows={rows} />;
