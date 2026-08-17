@@ -12,6 +12,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { CallsFilter, PaginationSortDirection } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
@@ -71,8 +72,17 @@ const ProposalChooseCall = () => {
                 onClick={() => handleSelect(call.id, call.templateId)}
                 divider={true}
                 component="li"
+                sx={(theme) => ({
+                  [belowCompactUi(theme)]: {
+                    // Keep the text clear of the absolutely positioned chevron.
+                    paddingRight: `calc(${minTouchTarget(theme)} + ${theme.spacing(2)})`,
+                  },
+                })}
               >
                 <ListItemText
+                  sx={(theme) => ({
+                    [belowCompactUi(theme)]: { overflowWrap: 'anywhere' },
+                  })}
                   primary={header}
                   secondary={
                     <>
@@ -115,7 +125,18 @@ const ProposalChooseCall = () => {
                   <IconButton
                     edge="end"
                     aria-label={'Select ' + call.shortCode}
-                    onClick={() => handleSelect(call.id, call.templateId)}
+                    onClick={(event) => {
+                      // Without this the click also reaches the row, which
+                      // navigates a second time and doubles the history entry.
+                      event.stopPropagation();
+                      handleSelect(call.id, call.templateId);
+                    }}
+                    sx={(theme) => ({
+                      [belowCompactUi(theme)]: {
+                        width: minTouchTarget(theme),
+                        height: minTouchTarget(theme),
+                      },
+                    })}
                   >
                     <NavigateNext />
                   </IconButton>
