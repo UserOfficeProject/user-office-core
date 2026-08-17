@@ -4,6 +4,8 @@ import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
+import { ExperimentSafetyWorkflowStatusCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 
@@ -14,7 +16,8 @@ export class ExperimentSafetyAuthorization {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ExperimentDataSource)
-    private experimentDataSource: ExperimentDataSource
+    private experimentDataSource: ExperimentDataSource,
+    @inject(Tokens.StatusDataSource) private statusDataSource: StatusDataSource
   ) {}
 
   private async resolveExperimentSafety(
@@ -98,6 +101,11 @@ export class ExperimentSafetyAuthorization {
     if (!experimentSafety) {
       return false;
     }
+    const experimentSafetyStatus =
+      await this.statusDataSource.getStatusByWorkflowStatusId(
+        experimentSafety.workflowStatusId
+      );
+
     const experiment = await this.experimentDataSource.getExperiment(
       experimentSafety.experimentPk
     );
@@ -106,6 +114,8 @@ export class ExperimentSafetyAuthorization {
     }
     if (
       experimentSafety.esiQuestionarySubmittedAt !== null &&
+      experimentSafetyStatus?.id !==
+        ExperimentSafetyWorkflowStatusCodes.AWAITING_ESF &&
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;

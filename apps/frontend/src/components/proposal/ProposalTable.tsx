@@ -1,4 +1,4 @@
-import { Column } from '@material-table/core';
+import MaterialTableCore, { Column } from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -10,7 +10,7 @@ import { Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -44,9 +44,10 @@ type ProposalTableProps = {
   /** Basic user details array to be shown in the modal. */
   search: boolean;
   /** Function for getting data. */
-  searchQuery: () => Promise<UserProposalDataType>;
-  /** Loading data indicator */
-  isLoading: boolean;
+  searchQuery: (
+    page: number,
+    pageSize: number
+  ) => Promise<UserProposalDataType>;
   confirm: WithConfirmType;
 };
 
@@ -83,11 +84,11 @@ const ProposalTable = ({
   title,
   search,
   searchQuery,
-  isLoading,
   confirm,
 }: ProposalTableProps) => {
   const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
+  const tableRef = React.useRef<MaterialTableCore<PartialProposalsDataType>>();
   const { api } = useDataApiWithFeedback();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
@@ -104,6 +105,10 @@ const ProposalTable = ({
     number | undefined
   >();
 
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
+
   const isEmailInviteEnabled = featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
@@ -111,25 +116,6 @@ const ProposalTable = ({
   const isDataAccessUsersEnabled = featureContext.featuresMap.get(
     FeatureId.DATA_ACCESS_USERS
   )?.isEnabled;
-
-  // TODO: This api call here should be replaced with a hook for getting user proposals.
-  useEffect(() => {
-    let unmounted = false;
-
-    searchQuery().then((data) => {
-      if (unmounted) {
-        return;
-      }
-
-      if (data) {
-        setPartialProposalsData(data.data);
-      }
-    });
-
-    return () => {
-      unmounted = true;
-    };
-  }, [searchQuery]);
 
   const [editProposalPk, setEditProposalPk] = useState(0);
   const { isInternalUser } = useContext(UserContext);
@@ -181,23 +167,8 @@ const ProposalTable = ({
 
     const [resultProposal] = cloneProposals;
 
-    if (partialProposalsData && resultProposal) {
-      const newClonedProposal = {
-        primaryKey: resultProposal.primaryKey,
-        title: resultProposal.title,
-        status: resultProposal.status,
-        publicStatus: resultProposal.publicStatus,
-        submitted: resultProposal.submitted,
-        proposalId: resultProposal.proposalId,
-        created: resultProposal.created,
-        notified: resultProposal.notified,
-        proposerId: resultProposal.proposer?.id,
-        call: resultProposal.call,
-      };
-
-      const newProposalsData = [newClonedProposal, ...partialProposalsData];
-
-      setPartialProposalsData(newProposalsData);
+    if (resultProposal) {
+      refreshTableData();
     }
   };
   const data = partialProposalsData as PartialProposalsDataType[];
@@ -223,6 +194,7 @@ const ProposalTable = ({
         proposalPk={selectedProposalPk}
       />
       <MaterialTable
+        tableRef={tableRef}
         icons={tableIcons}
         localization={tableLocalization}
         title={
@@ -231,8 +203,17 @@ const ProposalTable = ({
           </Typography>
         }
         columns={columns}
-        data={data}
-        isLoading={isLoading}
+        data={(query) =>
+          searchQuery(query.page, query.pageSize).then((result) => {
+            setPartialProposalsData(result.data ?? []);
+
+            return {
+              data: result.data ?? [],
+              page: result.page,
+              totalCount: result.totalCount ?? 0,
+            };
+          })
+        }
         options={{
           search: search,
           debounceInterval: 400,
@@ -318,12 +299,7 @@ const ProposalTable = ({
                         .primaryKey,
                     });
                     if (deleteProposal) {
-                      setPartialProposalsData(
-                        partialProposalsData?.filter(
-                          (item) =>
-                            item.primaryKey !== deleteProposal?.primaryKey
-                        )
-                      );
+                      refreshTableData();
                     }
                   },
                   {
@@ -345,15 +321,7 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <AcceptInviteWithCode
-              onAccepted={() => {
-                searchQuery().then((data) => {
-                  if (data) {
-                    setPartialProposalsData(data.data);
-                  }
-                });
-              }}
-            />
+            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
           </ButtonWithDialog>
         </ActionButtonContainer>
       )}
@@ -371,7 +339,6 @@ ProposalTable.propTypes = {
   title: PropTypes.string.isRequired,
   search: PropTypes.bool.isRequired,
   searchQuery: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
 };
 
 export default withConfirm(ProposalTable);

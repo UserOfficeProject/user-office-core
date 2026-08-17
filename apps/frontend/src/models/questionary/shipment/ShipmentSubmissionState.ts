@@ -8,8 +8,11 @@ import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 export class ShipmentSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
 
-  constructor(public shipment: ShipmentWithQuestionary) {
-    super(TemplateGroupId.SHIPMENT, shipment);
+  constructor(
+    public shipment: ShipmentWithQuestionary,
+    public previewMode: boolean | undefined
+  ) {
+    super(TemplateGroupId.SHIPMENT, shipment, previewMode);
     this.stepIndex = this.getInitialStepIndex();
   }
 

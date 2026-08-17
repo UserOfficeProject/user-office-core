@@ -300,7 +300,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getUserProposals(id: number) {
-    return allProposals.filter((proposal) => proposal.proposerId === id);
+    const userProposals = allProposals.filter(
+      (proposal) => proposal.proposerId === id
+    );
+
+    return { userProposals, totalCount: userProposals.length };
   }
 
   async getProposalsByPks(proposalPks: number[]): Promise<Proposal[]> {
@@ -334,15 +338,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     workflowStatusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    const proposals = allProposals.map((p) => {
-      return {
-        ...p,
-        workflowStatusId,
-        statusId: dummyWorkflowStatuses.find(
-          (ws) => ws.workflowStatusId === workflowStatusId
-        )?.statusId as string,
-      };
-    });
+    const proposals = allProposals
+      .filter((proposal) => proposalPks.includes(proposal.primaryKey))
+      .map((p) => {
+        return {
+          ...p,
+          workflowStatusId,
+          statusId: dummyWorkflowStatuses.find(
+            (ws) => ws.workflowStatusId === workflowStatusId
+          )?.statusId as string,
+        };
+      });
 
     return { proposals: proposals };
   }

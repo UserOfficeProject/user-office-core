@@ -915,11 +915,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async getUserProposals(
     id: number,
-    filter?: UserProposalsFilter
-  ): Promise<Proposal[]> {
+    filter?: UserProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
     return (
       database
-        .select('p.*')
+        .select('p.*', database.raw('count(*) OVER() AS full_count'))
         .from('proposals as p')
         .where('p.proposer_id', id) // Principal investigator
         .orWhereIn('p.proposal_pk', function () {
@@ -963,9 +965,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           }
         })
         .groupBy('p.proposal_pk')
-        .then((proposals: ProposalRecord[]) =>
-          proposals.map((proposal) => createProposalObject(proposal))
-        )
+        .modify((qb) => {
+          if (first) qb.limit(first);
+          if (offset) qb.offset(offset);
+        })
+        .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
+          userProposals: proposals.map((proposal) =>
+            createProposalObject(proposal)
+          ),
+          totalCount: proposals[0]?.full_count ?? 0,
+        }))
     );
   }
 
@@ -1419,7 +1428,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getInvitedProposal(inviteId: number): Promise<InvitedProposal | null> {
-    const proposals: InvitedProposalRecord[] | undefined = await database
+    return await database
       .select(
         'proposals.proposal_id',
         'proposer.firstname as proposer_name',
@@ -1433,8 +1442,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .join('users as proposer', {
         'proposals.proposer_id': 'proposer.user_id',
       })
-      .where('invite_id', inviteId);
-
-    return proposals ? createInvitedProposalObject(proposals[0]) : null;
+      .where('invite_id', inviteId)
+      .first()
+      .then((proposal: InvitedProposalRecord | undefined) =>
+        proposal ? createInvitedProposalObject(proposal) : null
+      );
   }
 }
