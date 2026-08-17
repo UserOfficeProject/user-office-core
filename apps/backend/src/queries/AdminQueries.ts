@@ -12,7 +12,7 @@ import { getContextKeys } from '../utils/helperFunctions';
 
 type GetPageTextArgs = {
   pageId: number;
-  tagId?: number;
+  roleId?: number;
 };
 
 @injectable()
@@ -21,8 +21,8 @@ export default class AdminQueries {
     @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
   ) {}
 
-  async getPageText({ pageId, tagId }: GetPageTextArgs): Promise<string | null> {
-    return await this.dataSource.get(pageId, tagId);
+  async getPageText({ pageId, roleId }: GetPageTextArgs): Promise<string | null> {
+    return await this.dataSource.get(pageId, roleId);
   }
 
   async getCountries() {

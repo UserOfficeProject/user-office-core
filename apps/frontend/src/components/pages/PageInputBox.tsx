@@ -7,16 +7,16 @@ import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { TagFilter } from './PageEditor';
+import { RoleFilter } from './PageEditor';
 import { useSearchParams } from 'react-router-dom';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
-  tagFilter: TagFilter
+  roleFilter: RoleFilter;
 }) {
 
-  const [loading, pageContent] = useGetPageContent(props.pageName, props.tagFilter.tagId);
+  const [loading, pageContent] = useGetPageContent(props.pageName, props.roleFilter.roleId);
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
@@ -58,7 +58,7 @@ export default function PageInputBox(props: {
             api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
               pageId: props.pageName,
               text: content,
-              tagId: props.tagFilter.tagId !== 0 ? props.tagFilter.tagId : undefined,
+              roleId: props.roleFilter.roleId !== 0 ? props.roleFilter.roleId : undefined,
             })
           }
           }

@@ -138,16 +138,16 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return createInstitutionObject(institutionRecord);
   }
 
-  async get(pageId: number, tagId?: number): Promise<string | null> {
+  async get(pageId: number, roleId?: number): Promise<string | null> {
     return database
       .select('content')
       .from('pagetext')
       .where('page_id', pageId)
       .modify((query) => {
-        if (tagId == null) {
-          query.whereNull('tag_id');
+        if (roleId == null) {
+          query.whereNull('role_id');
         } else {
-          query.where('tag_id', tagId);
+          query.where('role_id', roleId);
         }
       })
       .first()
@@ -181,15 +181,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     );
   }
 
-  async setPageText(pageId: number, content: string, tagId?: number): Promise<Page> {
+  async setPageText(pageId: number, content: string, roleId?: number): Promise<Page> {
     const pageTextId = await database.select('pagetext_id')
       .from('pagetext')
       .where('page_id', pageId)
       .modify((query) => {
-        if (tagId == null) {
-          query.whereNull('tag_id');
+        if (roleId == null) {
+          query.whereNull('role_id');
         } else {
-          query.where('tag_id', tagId);
+          query.where('role_id', roleId);
         }
       })
       .first();
@@ -198,11 +198,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         pagetext_id: pageTextId.pagetext_id,
         page_id: pageId,
         content: content,
-        tag_id: tagId == null ? null : tagId
+        role_id: roleId == null ? null : roleId
       } : {
         page_id: pageId,
         content: content,
-        tag_id: tagId == null ? null : tagId
+        role_id: roleId == null ? null : roleId
       }
 
     const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
@@ -211,10 +211,10 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .merge()
       .returning('*');
 
-    const tagIdErrorMsg = tagId != null ? ` and tag id:${tagId}` : '';
+    const roleIdErrorMsg = roleId != null ? ` and role id:${roleId}` : '';
 
     if (!pagetextRecord) {
-      throw new GraphQLError(`Could not update page with page id:${pageId}${tagIdErrorMsg}`);
+      throw new GraphQLError(`Could not update page with page id:${pageId}${roleIdErrorMsg}`);
     }
 
     return createPageObject(pagetextRecord);

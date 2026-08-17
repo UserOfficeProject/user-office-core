@@ -7,11 +7,11 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import PageInputBox from './PageInputBox';
-import TagFilter from './TagFilter';
+import RoleFilter from './RoleFilter';
 import { useSearchParams } from 'react-router-dom';
 
-export type TagFilter = {
-    tagId: number | undefined
+export type RoleFilter = {
+    roleId: number | undefined
   }
 
 export default function PageEditor() {
@@ -19,10 +19,10 @@ export default function PageEditor() {
     UserRole.USER_OFFICER,
   ]);
   const [searchParams] = useSearchParams();
-  const tagId = searchParams.get('tag');
+  const roleId = searchParams.get('role');
 
-  const [tagIdFilter, setTagIdFilter] = React.useState<TagFilter>({
-    tagId: tagId ? +tagId : undefined,
+  const [roleIdFilter, setroleIdFilter] = React.useState<RoleFilter>({
+    roleId: roleId ? +roleId : undefined,
   })
 
   return (
@@ -46,56 +46,56 @@ export default function PageEditor() {
           <PageInputBox
             pageName={PageName.HOMEPAGE}
             heading={'Set user homepage'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.REVIEWPAGE}
             heading={'Set reviewer homepage'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.HELPPAGE}
             heading={'Set help page'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.PRIVACYPAGE}
             heading={'Set privacy agreement'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.COOKIEPAGE}
             heading={'Set cookie policy'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.FOOTERCONTENT}
             heading={'Set footer content'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.LOGINHELPPAGE}
             heading={'Set login help page'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           <PageInputBox
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
-            tagFilter={tagIdFilter}
+            roleFilter={roleIdFilter}
           />
           {isTechniqueProposalsEnabled && (
             <PageInputBox
               pageName={PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE}
               heading={`Set ${t('technique proposals')} management page notice`}
-              tagFilter={tagIdFilter}
+              roleFilter={roleIdFilter}
             />
           )}
         </SimpleTabs>
-        <TagFilter
+        <roleFilter
             onChange={
-              (tagId) => {
-            setTagIdFilter({
-              tagId: tagId,
+              (roleId) => {
+            setRoleIdFilter({
+              roleId: roleId,
             });
           }}/>
       </StyledPaper>
