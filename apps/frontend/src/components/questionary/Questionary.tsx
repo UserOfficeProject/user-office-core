@@ -8,6 +8,7 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import MobileAppBar from 'components/common/mobile/MobileAppBar';
+import { DialogAppBarContext } from 'components/common/StyledDialog';
 import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { toolbarHeight, useIsMobile } from 'hooks/common/useResponsive';
@@ -28,6 +29,8 @@ import {
 import { getQuestionaryDefinition } from './QuestionaryRegistry';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
 
+const PROGRESS_HEIGHT = 3;
+
 interface QuestionaryProps {
   title: string;
   info?: React.ReactNode;
@@ -45,6 +48,7 @@ function Questionary({
 
   const theme = useTheme();
   const navigate = useNavigate();
+  const hasDialogAppBar = useContext(DialogAppBarContext);
   const header = useWizardHeader();
   const { state, dispatch } = useContext(QuestionaryContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -126,6 +130,20 @@ function Questionary({
     const stepCount = stepsMetadata.length;
     const errorCount = header?.errorCount ?? 0;
 
+    // Inside a full-screen dialog the header sits outside the scrolling box,
+    // so the sticky offsets start at zero rather than below our own app bar.
+    const progressStickyTop = hasDialogAppBar ? 0 : toolbarHeight(theme);
+
+    // The step bar sticks below the progress bar, so its offset clears both.
+    const stepBarStickyTop = hasDialogAppBar
+      ? PROGRESS_HEIGHT
+      : Object.fromEntries(
+          Object.entries(toolbarHeight(theme)).map(([breakpoint, height]) => [
+            breakpoint,
+            `calc(${height} + ${PROGRESS_HEIGHT}px)`,
+          ])
+        );
+
     const navigatorSteps: WizardNavigatorStep[] = stepsMetadata.map(
       (metadata, index) => ({
         title: metadata.title,
@@ -143,17 +161,24 @@ function Questionary({
 
     return (
       <Box sx={{ width: '100%' }}>
-        <MobileAppBar
-          title={title}
-          subtitle={appBarSubtitle}
-          onBack={() => navigate(-1)}
-          sheetItems={header?.menuItems ?? []}
-        />
+        {!hasDialogAppBar && (
+          <MobileAppBar
+            title={title}
+            subtitle={appBarSubtitle}
+            onBack={() => navigate(-1)}
+            sheetItems={header?.menuItems ?? []}
+          />
+        )}
         <LinearProgress
           variant="determinate"
           value={((state.stepIndex + 1) / stepCount) * 100}
           color={errorCount > 0 ? 'error' : 'primary'}
-          sx={{ height: 3 }}
+          sx={{
+            height: PROGRESS_HEIGHT,
+            position: 'sticky',
+            top: progressStickyTop,
+            zIndex: theme.zIndex.appBar - 1,
+          }}
           data-cy="questionary-progress"
         />
         {stepCount > 1 && (
@@ -163,7 +188,7 @@ function Questionary({
             title={stepsMetadata[state.stepIndex].title}
             navigatorOpen={navigatorOpen}
             onOpenNavigator={() => setNavigatorOpen((open) => !open)}
-            stickyTop={toolbarHeight(theme)}
+            stickyTop={stepBarStickyTop}
           />
         )}
         <Box sx={{ paddingX: 2, paddingY: 2.5 }}>{getStepContent()}</Box>
