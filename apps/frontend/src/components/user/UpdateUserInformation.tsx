@@ -1,13 +1,13 @@
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
 import React, { useState, useContext } from 'react';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
@@ -16,6 +16,7 @@ import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { UpdateUserMutationVariables } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { useCountries } from 'hooks/user/useCountries';
 import { useUserData } from 'hooks/user/useUserData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -102,7 +103,7 @@ export default function UpdateUserInformation(
       {({ isSubmitting, values }) => (
         <Form>
           <Grid container spacing={3}>
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <LocalizationProvider dateAdapter={DateAdapter}>
                 <Field
                   name="userTitle"
@@ -139,7 +140,7 @@ export default function UpdateUserInformation(
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Field
                 name="oidcSub"
                 label="OIDC Subject"
@@ -181,27 +182,31 @@ export default function UpdateUserInformation(
               />
             </Grid>
           </Grid>
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{
-              justifyContent: 'flex-end',
-              marginTop: 2,
-            }}
-          >
+          <ActionButtonContainer>
             {props.id !== user.id && (
               <ImpersonateButton
                 userId={props.id}
                 startIcon={<SwitchAccountOutlinedIcon />}
                 data-cy="impersonate-user-button"
+                sx={(theme) => ({
+                  [belowCompactUi(theme)]: {
+                    minHeight: minTouchTarget(theme),
+                  },
+                })}
               >
                 Connect as this user...
               </ImpersonateButton>
             )}
-            <Button disabled={isSubmitting} type="submit">
+            <Button
+              disabled={isSubmitting}
+              type="submit"
+              sx={(theme) => ({
+                [belowCompactUi(theme)]: { minHeight: minTouchTarget(theme) },
+              })}
+            >
               Update Profile
             </Button>
-          </Stack>
+          </ActionButtonContainer>
         </Form>
       )}
     </Formik>
