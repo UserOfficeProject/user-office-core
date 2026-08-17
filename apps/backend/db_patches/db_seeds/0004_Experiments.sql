@@ -7,6 +7,14 @@ DECLARE
   instrument_id_1_var int;
   instrument_id_2_var int;
   experiment_workflow_id_var int;
+  awaiting_esf_workflow_status_id_var int;
+  esf_is_review_workflow_status_id_var int;
+  esf_esr_review_workflow_status_id_var int;
+  esf_approved_workflow_status_id_var int;
+  esf_rejected_workflow_status_id_var int;
+  workflow_status_connection_id_var int;
+  email_action_id_var int;
+  rabbitmq_action_id_var int;
   BEGIN
     -- Get instrument ids
     SELECT instrument_id INTO instrument_id_1_var FROM instruments WHERE name='Instrument 1' limit 1;
@@ -18,8 +26,277 @@ DECLARE
 
     UPDATE call SET experiment_workflow_id = experiment_workflow_id_var;
 
-    INSERT INTO workflow_has_statuses(workflow_id, status_id)
-    VALUES (experiment_workflow_id_var, (SELECT status_id FROM statuses WHERE status_id='AWAITING_ESF'));
+    SELECT workflow_status_action_id
+    INTO email_action_id_var
+    FROM workflow_status_actions
+    WHERE type = 'EMAIL'
+    LIMIT 1;
+
+    SELECT workflow_status_action_id
+    INTO rabbitmq_action_id_var
+    FROM workflow_status_actions
+    WHERE type = 'RABBITMQ'
+    LIMIT 1;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id, pos_x, pos_y)
+    VALUES (experiment_workflow_id_var, 'AWAITING_ESF', -191, -117)
+    RETURNING workflow_status_id INTO awaiting_esf_workflow_status_id_var;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id, pos_x, pos_y)
+    VALUES (experiment_workflow_id_var, 'ESF_IS_REVIEW', -190, 5)
+    RETURNING workflow_status_id INTO esf_is_review_workflow_status_id_var;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id, pos_x, pos_y)
+    VALUES (experiment_workflow_id_var, 'ESF_ESR_REVIEW', -189, 189)
+    RETURNING workflow_status_id INTO esf_esr_review_workflow_status_id_var;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id, pos_x, pos_y)
+    VALUES (experiment_workflow_id_var, 'ESF_APPROVED', 303, 135)
+    RETURNING workflow_status_id INTO esf_approved_workflow_status_id_var;
+
+    INSERT INTO workflow_has_statuses(workflow_id, status_id, pos_x, pos_y)
+    VALUES (experiment_workflow_id_var, 'ESF_REJECTED', -187, 361)
+    RETURNING workflow_status_id INTO esf_rejected_workflow_status_id_var;
+
+    INSERT INTO workflow_status_connections(
+      workflow_id,
+      prev_workflow_status_id,
+      next_workflow_status_id,
+      source_handle,
+      target_handle
+    )
+    VALUES (
+      experiment_workflow_id_var,
+      awaiting_esf_workflow_status_id_var,
+      esf_is_review_workflow_status_id_var,
+      'bottom-source',
+      'top-target'
+    )
+    RETURNING workflow_status_connection_id INTO workflow_status_connection_id_var;
+
+    INSERT INTO workflow_status_connection_has_events(
+      workflow_status_connection_id,
+      status_changing_event
+    )
+    VALUES (workflow_status_connection_id_var, 'EXPERIMENT_ESF_SUBMITTED');
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      email_action_id_var,
+      experiment_workflow_id_var,
+      '{"recipientsWithEmailTemplate":[{"recipient":{"name":"INSTRUMENT_SCIENTISTS","description":"Instrument scientists including the manager on the instrument related to the proposal"},"emailTemplate":{"id":"instrument-scientist-esf-review","name":"Instrument Scientist ESF Review"}}]}'
+    );
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      rabbitmq_action_id_var,
+      experiment_workflow_id_var,
+      '{"exchanges":["user_office_backend.fanout"]}'
+    );
+
+    INSERT INTO workflow_status_connections(
+      workflow_id,
+      prev_workflow_status_id,
+      next_workflow_status_id,
+      source_handle,
+      target_handle
+    )
+    VALUES (
+      experiment_workflow_id_var,
+      esf_is_review_workflow_status_id_var,
+      esf_approved_workflow_status_id_var,
+      'right-source',
+      'top-target'
+    )
+    RETURNING workflow_status_connection_id INTO workflow_status_connection_id_var;
+
+    INSERT INTO workflow_status_connection_has_events(
+      workflow_status_connection_id,
+      status_changing_event
+    )
+    VALUES (workflow_status_connection_id_var, 'EXPERIMENT_ESF_APPROVED_BY_IS');
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      email_action_id_var,
+      experiment_workflow_id_var,
+      '{"recipientsWithEmailTemplate":[{"recipient":{"name":"PI","description":"Principal investigator on the proposal"},"emailTemplate":{"id":"esf-approved","name":"ESF Approved"}}]}'
+    );
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      rabbitmq_action_id_var,
+      experiment_workflow_id_var,
+      '{"exchanges":["user_office_backend.fanout"]}'
+    );
+
+    INSERT INTO workflow_status_connections(
+      workflow_id,
+      prev_workflow_status_id,
+      next_workflow_status_id,
+      source_handle,
+      target_handle
+    )
+    VALUES (
+      experiment_workflow_id_var,
+      esf_esr_review_workflow_status_id_var,
+      esf_rejected_workflow_status_id_var,
+      'bottom-source',
+      'top-target'
+    )
+    RETURNING workflow_status_connection_id INTO workflow_status_connection_id_var;
+
+    INSERT INTO workflow_status_connection_has_events(
+      workflow_status_connection_id,
+      status_changing_event
+    )
+    VALUES (workflow_status_connection_id_var, 'EXPERIMENT_ESF_REJECTED_BY_ESR');
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      email_action_id_var,
+      experiment_workflow_id_var,
+      '{"recipientsWithEmailTemplate":[{"recipient":{"name":"PI","description":"Principal investigator on the proposal"},"emailTemplate":{"id":"esf-rejected","name":"ESF Rejected"}}]}'
+    );
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      rabbitmq_action_id_var,
+      experiment_workflow_id_var,
+      '{"exchanges":["user_office_backend.fanout"]}'
+    );
+
+    INSERT INTO workflow_status_connections(
+      workflow_id,
+      prev_workflow_status_id,
+      next_workflow_status_id,
+      source_handle,
+      target_handle
+    )
+    VALUES (
+      experiment_workflow_id_var,
+      esf_is_review_workflow_status_id_var,
+      esf_esr_review_workflow_status_id_var,
+      'bottom-source',
+      'top-target'
+    )
+    RETURNING workflow_status_connection_id INTO workflow_status_connection_id_var;
+
+    INSERT INTO workflow_status_connection_has_events(
+      workflow_status_connection_id,
+      status_changing_event
+    )
+    VALUES (workflow_status_connection_id_var, 'EXPERIMENT_ESF_REJECTED_BY_IS');
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      email_action_id_var,
+      experiment_workflow_id_var,
+      '{"recipientsWithEmailTemplate":[{"recipient":{"name":"EXPERIMENT_SAFETY_REVIEWERS","description":"The Experiment Safety email address"},"emailTemplate":{"id":"esr-esf-review","name":"ESR ESF Review"}}]}'
+    );
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      rabbitmq_action_id_var,
+      experiment_workflow_id_var,
+      '{"exchanges":["user_office_backend.fanout"]}'
+    );
+
+    INSERT INTO workflow_status_connections(
+      workflow_id,
+      prev_workflow_status_id,
+      next_workflow_status_id,
+      source_handle,
+      target_handle
+    )
+    VALUES (
+      experiment_workflow_id_var,
+      esf_esr_review_workflow_status_id_var,
+      esf_is_review_workflow_status_id_var,
+      'right-source',
+      'right-target'
+    )
+    RETURNING workflow_status_connection_id INTO workflow_status_connection_id_var;
+
+    INSERT INTO workflow_status_connection_has_events(
+      workflow_status_connection_id,
+      status_changing_event
+    )
+    VALUES (workflow_status_connection_id_var, 'EXPERIMENT_ESF_APPROVED_BY_ESR');
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      email_action_id_var,
+      experiment_workflow_id_var,
+      '{"recipientsWithEmailTemplate":[{"recipient":{"name":"INSTRUMENT_SCIENTISTS","description":"Instrument scientists including the manager on the instrument related to the proposal"},"combineEmails":null,"emailTemplate":{"id":"instrument-scientist-esf-review","name":"Instrument Scientist ESF Review"},"otherRecipientEmails":null}]}'
+    );
+
+    INSERT INTO workflow_status_connection_has_actions(
+      workflow_status_connection_id,
+      workflow_status_action_id,
+      workflow_id,
+      config
+    )
+    VALUES (
+      workflow_status_connection_id_var,
+      rabbitmq_action_id_var,
+      experiment_workflow_id_var,
+      '{"exchanges":["user_office_backend.fanout"]}'
+    );
 
     INSERT INTO experiments(
       experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
@@ -47,6 +324,10 @@ DECLARE
       INTO exp_safety_review_template_id_var
       from templates
       where group_id = 'EXPERIMENT_SAFETY_REVIEW_TEMPLATE' limit 1;
+
+    INSERT INTO active_templates(group_id, template_id)
+    VALUES ('EXPERIMENT_SAFETY_REVIEW_TEMPLATE', exp_safety_review_template_id_var)
+    ON CONFLICT (group_id) DO NOTHING;
     
     select topics.topic_id 
       INTO exp_safety_review_template_topic_id_var

@@ -1,15 +1,15 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
+import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
 import { Tokens } from './Tokens';
+import { mapClass, mapValue } from './utils';
 import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { DLSUserAuthorization } from '../auth/DLSUserAuthorization';
-import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
-import { configureDLSEnvironment } from './dls/configureDLSEnvironment';
-import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -55,12 +55,15 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import {
-  callFapPopulateRow,
-  getDataRow,
-  populateRow,
-} from '../factory/xlsx/FapDataRow';
+  DLSCallExtraFapDataColumns,
+  DLSFapDataColumns,
+} from '../factory/xlsx/dls/DLSFapDataColumns';
+import {
+  callFapDLSPopulateRow,
+  getDLSDataRow,
+  populateDLSRow,
+} from '../factory/xlsx/dls/DLSFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
@@ -127,10 +130,11 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 
-mapValue(Tokens.FapDataColumns, FapDataColumns);
-mapValue(Tokens.FapDataRow, getDataRow);
-mapValue(Tokens.PopulateRow, populateRow);
-mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
+mapValue(Tokens.FapDataColumns, DLSFapDataColumns);
+mapValue(Tokens.CallExtraFapDataColumns, DLSCallExtraFapDataColumns);
+mapValue(Tokens.FapDataRow, getDLSDataRow);
+mapValue(Tokens.PopulateRow, populateDLSRow);
+mapValue(Tokens.PopulateCallRow, callFapDLSPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, DLSEmailHandler);
 mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);

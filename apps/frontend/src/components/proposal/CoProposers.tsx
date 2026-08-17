@@ -41,6 +41,7 @@ const CoProposers = ({
         {...props}
         title="Co-Proposers"
         addButtonTooltip="Add a co-proposer"
+        addModalTitle="Add co-proposers"
         onUserAction={handleUserAction}
         excludeUserIds={proposer ? [proposer.id] : []}
         // QuickFix for material table changing immutable state

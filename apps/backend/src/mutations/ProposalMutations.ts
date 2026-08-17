@@ -12,8 +12,12 @@ import {
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import FapMutations from './FapMutations';
+import InstrumentMutations from './InstrumentMutations';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -25,10 +29,14 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import {
+  proposalStatusActionEngine,
+  ProposalWithWorkflowStatusConnectionId,
+} from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
-import { rejection, Rejection } from '../models/Rejection';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
@@ -40,13 +48,7 @@ import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
-import { CallDataSource } from './../datasources/CallDataSource';
-import { CloneUtils } from './../utils/CloneUtils';
-import FapMutations from './FapMutations';
-import InstrumentMutations from './InstrumentMutations';
+import { CloneUtils } from '../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
@@ -166,8 +168,13 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const { proposalPk, title, abstract, users, proposerId, created } = args;
 
-    proposal.title = title;
-    proposal.abstract = abstract;
+    if (title !== undefined) {
+      proposal.title = title;
+    }
+
+    if (abstract !== undefined) {
+      proposal.abstract = abstract;
+    }
 
     if (created !== undefined) {
       proposal.created = created;
@@ -432,6 +439,33 @@ export default class ProposalMutations {
       );
     }
 
+    // To match the UI we want to reject any attempts to submit a management decision without setting the finalStatus or existingManagementTimeAllocations.
+    // Note that both options do start as null in the database when a proposal is first submitted. finalStatus can become 'UNSET' in the database.
+    // This rejection is used in the 'Submit Management Decision' button to inform users which ones have failed.
+    if (managementDecisionSubmitted === true) {
+      if (
+        finalStatus === null &&
+        (proposal?.finalStatus === null || proposal?.finalStatus === undefined)
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no finalStatus existing in database or supplied.',
+          { args, agent }
+        );
+      }
+
+      const existingManagementTimeAllocations =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(primaryKey);
+      if (
+        managementTimeAllocations === null &&
+        !existingManagementTimeAllocations?.[0]
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no managementTimeAllocations existing in database or supplied.',
+          { args, agent }
+        );
+      }
+    }
+
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
@@ -446,7 +480,8 @@ export default class ProposalMutations {
       );
     }
 
-    if (finalStatus !== undefined) {
+    // Need to check for undefined and null because 0/UNSET is falsy.
+    if (finalStatus !== undefined && finalStatus !== null) {
       proposal.finalStatus = finalStatus;
     }
 
@@ -541,7 +576,11 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
-    const { workflowStatusId: statusId, proposalPks } = args;
+    const {
+      workflowStatusId: statusId,
+      proposalPks,
+      statusActionsWorkflowConnectionId,
+    } = args;
 
     const result = await this.proposalDataSource.changeProposalsWorkflowStatus(
       statusId,
@@ -549,47 +588,55 @@ export default class ProposalMutations {
     );
 
     if (result.proposals.length === proposalPks.length) {
-      const fullProposals = await Promise.all(
-        proposalPks.map(async (proposalPk) => {
-          const fullProposal = result.proposals.find(
-            (updatedProposal) => updatedProposal.primaryKey === proposalPk
-          );
-
-          if (!fullProposal) {
-            return null;
-          }
-
-          const proposalWorkflow =
-            await this.callDataSource.getProposalWorkflowByCall(
-              fullProposal.callId
+      // Only run status actions if a specific workflow connection was provided
+      if (statusActionsWorkflowConnectionId) {
+        const fullProposals = await Promise.all(
+          proposalPks.map(async (proposalPk) => {
+            const fullProposal = result.proposals.find(
+              (updatedProposal) => updatedProposal.primaryKey === proposalPk
             );
 
-          if (!proposalWorkflow) {
-            return rejection(
-              `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
-              {
-                agent,
-                args,
-              }
-            );
-          }
+            if (!fullProposal) {
+              return null;
+            }
 
-          return {
-            ...fullProposal,
-          };
-        })
-      );
+            const proposalWorkflow =
+              await this.callDataSource.getProposalWorkflowByCall(
+                fullProposal.callId
+              );
 
-      const statusEngineReadyProposals = fullProposals.filter(
-        (item): item is WorkflowEngineProposalType => !!item
-      );
+            if (!proposalWorkflow) {
+              return rejection(
+                `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
+                {
+                  agent,
+                  args,
+                }
+              );
+            }
 
-      // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      proposalStatusActionEngine(statusEngineReadyProposals);
+            return {
+              proposal: fullProposal,
+              workflowStatusConnectionId: statusActionsWorkflowConnectionId,
+            };
+          })
+        );
+
+        const statusEngineReadyProposals = fullProposals.filter(
+          (item): item is ProposalWithWorkflowStatusConnectionId =>
+            item !== null && !isRejection(item)
+        );
+
+        // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
+        proposalStatusActionEngine(statusEngineReadyProposals);
+      }
     } else {
-      rejection('Could not change statuses to all of the selected proposals', {
-        result,
-      });
+      return rejection(
+        'Could not change statuses to all of the selected proposals',
+        {
+          result,
+        }
+      );
     }
 
     return result || rejection('Can not change proposal status', { result });

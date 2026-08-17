@@ -1,3 +1,10 @@
+import {
+  isExperimentESFApprovedByESR,
+  isExperimentESFApprovedByIS,
+  isExperimentESFRejectedByESR,
+  isExperimentESFRejectedByIS,
+  isExperimentESFSubmitted,
+} from '../workflowEngine/guards';
 import { isCallEndedGuard } from '../workflowEngine/guards/isCallEndedGuard';
 import { isCallEndedInternalGuard } from '../workflowEngine/guards/isCallEndedInternalGuard';
 import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapReviewEndedGuard';
@@ -87,6 +94,7 @@ export enum Event {
   PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
+  EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED = 'EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED',
   TOPIC_ANSWERED = 'TOPIC_ANSWERED',
   PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
   PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
@@ -133,6 +141,7 @@ export enum Event {
   EMAIL_TEMPLATE_UPDATED = 'EMAIL_TEMPLATE_UPDATED',
   EMAIL_TEMPLATE_DELETED = 'EMAIL_TEMPLATE_DELETED',
   VISIT_CREATED = 'VISIT_CREATED',
+  EXPERIMENT_UPDATED = 'EXPERIMENT_UPDATED',
 }
 
 interface EventMetadata {
@@ -446,6 +455,13 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     },
   ],
   [
+    Event.EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED,
+    {
+      label:
+        'Event occurs when the experiment safety status action is being executed in the status engine',
+    },
+  ],
+  [
     Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
     {
       label: 'Event occurs when co-proposer invites are updated for a proposal',
@@ -630,23 +646,38 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   ],
   [
     Event.EXPERIMENT_ESF_SUBMITTED,
-    { label: 'Event occurs when experiment ESF is submitted' },
+    {
+      label: 'Event occurs when experiment ESF is submitted',
+      guard: isExperimentESFSubmitted,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_IS,
-    { label: 'Event occurs when experiment ESF is approved by IS' },
+    {
+      label: 'Event occurs when experiment ESF is approved by IS',
+      guard: isExperimentESFApprovedByIS,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_IS,
-    { label: 'Event occurs when experiment ESF is rejected by IS' },
+    {
+      label: 'Event occurs when experiment ESF is rejected by IS',
+      guard: isExperimentESFRejectedByIS,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_APPROVED_BY_ESR,
-    { label: 'Event occurs when experiment ESF is approved by ESR' },
+    {
+      label: 'Event occurs when experiment ESF is approved by ESR',
+      guard: isExperimentESFApprovedByESR,
+    },
   ],
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
-    { label: 'Event occurs when experiment ESF is rejected by ESR' },
+    {
+      label: 'Event occurs when experiment ESF is rejected by ESR',
+      guard: isExperimentESFRejectedByESR,
+    },
   ],
   [
     Event.DATA_ACCESS_USERS_UPDATED,
@@ -701,5 +732,9 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.EMAIL_TEMPLATE_DELETED,
     { label: 'Event occurs when email template is deleted' },
+  ],
+  [
+    Event.EXPERIMENT_UPDATED,
+    { label: 'Event occurs when experiment is updated' },
   ],
 ]);

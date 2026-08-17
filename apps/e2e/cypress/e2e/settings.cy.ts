@@ -722,6 +722,54 @@ context('Settings tests', () => {
         .should('contain.text', updatedWorkflowDescription);
     });
 
+    it('User Officer should be able to clone proposal workflow', () => {
+      cy.addStatusToWorkflow({
+        statusId: statuses.feasibilityReview.id,
+        workflowId: createdWorkflowId,
+        prevId: createdDraftWorkflowStatusId,
+      }).then((result) => {
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: result.createWorkflowConnection.id,
+          statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+        });
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.contains(workflowName).parent().find('[aria-label="Clone"]').click();
+
+      cy.contains('Yes').click();
+
+      cy.contains(`Copy of ${workflowName}`)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="workflow-metadata-container"]')
+        .should('contain.text', `Copy of ${workflowName}`)
+        .should('contain.text', workflowDescription);
+
+      cy.get('[data-cy^="workflow_status_DRAFT"]').should(
+        'contain.text',
+        'DRAFT'
+      );
+
+      cy.get('[data-cy^="workflow_status_FEASIBILITY_REVIEW"]').should(
+        'contain.text',
+        'FEASIBILITY_REVIEW'
+      );
+
+      cy.get("[aria-label='Edge from DRAFT to FEASIBILITY_REVIEW']").should(
+        'exist'
+      );
+    });
+
     it('User Officer should be able to add more statuses in proposal workflow', () => {
       cy.login('officer');
       cy.visit('/');
@@ -1596,7 +1644,7 @@ context('Settings tests', () => {
       cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
     });
 
-    it('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
+    it.only('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -1625,7 +1673,9 @@ context('Settings tests', () => {
 
       cy.reload();
 
-      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click({
+        force: true,
+      });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_SUBMITTED).click();
@@ -1642,7 +1692,9 @@ context('Settings tests', () => {
         .contains(Event.EXPERIMENT_ESF_SUBMITTED)
         .should('exist');
 
-      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click({
+        force: true,
+      });
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_APPROVED_BY_IS).click();

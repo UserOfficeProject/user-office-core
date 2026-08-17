@@ -323,6 +323,7 @@ context('Template Basic tests', () => {
         {
           url: dynamicMultipleChoiceQuestion.url,
           isMultipleSelect: true,
+          useBaseDomain: false,
         }
       );
 
@@ -1547,6 +1548,7 @@ context('Template Basic tests', () => {
           jsonPath: '$.[*].item',
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
 
@@ -1567,6 +1569,7 @@ context('Template Basic tests', () => {
           jsonPath: dynamicMultipleChoiceQuestion.jsonPath,
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
       createProposalAndClickDropdownBehavior();
@@ -1589,6 +1592,7 @@ context('Template Basic tests', () => {
           url: dynamicMultipleChoiceQuestion.url,
           isMultipleSelect: true,
           firstTopic: true,
+          useBaseDomain: false,
         }
       );
       createProposalAndClickDropdownBehavior();
@@ -1614,6 +1618,7 @@ context('Template Basic tests', () => {
           isMultipleSelect: true,
           firstTopic: true,
           headers: { Authorization: 'Bearer 1234', 'Content-Type': 'text/' },
+          useBaseDomain: false,
         }
       );
 
@@ -2129,6 +2134,103 @@ context('Template Basic tests', () => {
       cy.notification({ variant: 'success', text: 'updated successfully' });
       cy.contains(emailTemplateName2);
       cy.contains(emailTemplateDescription2);
+    });
+
+    it('User officer edits the Pug body → preview renders variables as their names', () => {
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'emailTemplatePreview') {
+          req.alias = 'emailTemplatePreview';
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .type('p Proposal: #{proposalTitle}', {
+          parseSpecialCharSequences: false,
+        })
+        .should('contain.text', 'proposalTitle');
+
+      cy.contains('Preview').click();
+      cy.wait('@emailTemplatePreview');
+
+      cy.get('[data-cy="email-template-preview-frame"]')
+        .its('0.contentDocument.body')
+        .should('contain.text', 'Proposal: proposalTitle');
+
+      cy.get('[data-cy="email-template-preview-subject"]').should('exist');
+    });
+
+    it('User officer writes invalid Pug → inline preview error and no error notification', () => {
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'emailTemplatePreview') {
+          req.alias = 'emailTemplatePreview';
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .type('p #{', { parseSpecialCharSequences: false });
+
+      cy.contains('Preview').click();
+      cy.wait('@emailTemplatePreview');
+
+      cy.get('[data-cy="email-template-preview-error"]').should('be.visible');
+
+      cy.get('.snackbar-error #notistack-snackbar').should('not.exist');
+    });
+
+    it('Non-officer requests an email template preview → query resolves to null', () => {
+      cy.login('user1').then((result) => {
+        const token = result.externalTokenLogin;
+
+        cy.request({
+          method: 'POST',
+          url: '/graphql',
+          headers: { authorization: `Bearer ${token}` },
+          body: {
+            operationName: 'emailTemplatePreview',
+            query: `query emailTemplatePreview($emailTemplatePreviewInput: EmailTemplatePreviewInput!) {
+              emailTemplatePreview(emailTemplatePreviewInput: $emailTemplatePreviewInput) {
+                subject
+                body
+              }
+            }`,
+            variables: {
+              emailTemplatePreviewInput: {
+                useTemplateFile: false,
+                subject: 'subject',
+                body: 'p hello',
+                variables: [],
+              },
+            },
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.data.emailTemplatePreview).to.be.null;
+        });
+      });
     });
 
     it('User officer can delete email template', () => {

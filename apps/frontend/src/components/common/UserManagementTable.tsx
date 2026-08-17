@@ -27,6 +27,8 @@ export type UserManagementTableProps = {
   title: string;
   addButtonLabel?: string;
   addButtonTooltip?: string;
+  /** Header shown at the top of the invite/selector modal */
+  addModalTitle?: string;
   /** Disable the add button */
   disabled?: boolean;
   /** Custom actions to be passed to PeopleTable */
@@ -45,6 +47,7 @@ const UserManagementTable = ({
   title,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
+  addModalTitle,
   disabled = false,
   onUserAction,
   excludeUserIds = [],
@@ -78,7 +81,7 @@ const UserManagementTable = ({
   const InviteComponent = (
     <ProposalPeopleSelectorModal
       modalOpen={modalOpen}
-      title="Add co-proposers"
+      title={addModalTitle}
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
@@ -157,10 +160,9 @@ const UserManagementTable = ({
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
                 marginTop: 1,
                 gap: 1,
-                alignItems: 'center',
+                alignItems: 'flex-start',
               }}
               data-cy="invites-chips"
             >
@@ -170,21 +172,25 @@ const UserManagementTable = ({
                   color: 'grey',
                   paddingRight: '10px',
                   display: 'inline-block',
+                  whiteSpace: 'nowrap',
+                  mt: '4px',
                 }}
               >
                 Invited:
               </Typography>
-              {invites.map((invite) => (
-                <Chip
-                  sx={{ gap: '2px', padding: '6px' }}
-                  color="secondary"
-                  icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
-                  size="small"
-                  label={invite.email}
-                  key={invite.email}
-                  onDelete={() => handleDeleteInvite(invite)}
-                />
-              ))}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
+                {invites.map((invite) => (
+                  <Chip
+                    sx={{ gap: '2px', padding: '6px' }}
+                    color="secondary"
+                    icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
+                    size="small"
+                    label={invite.email}
+                    key={invite.email}
+                    onDelete={() => handleDeleteInvite(invite)}
+                  />
+                ))}
+              </Box>
             </Box>
           )}
           <ActionButtonContainer

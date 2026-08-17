@@ -18,6 +18,14 @@ export class ChangeProposalsStatusInput {
 
   @Field(() => [Int])
   public proposalPks: number[];
+
+  /**
+   * The workflow connection whose status actions (emails, RabbitMQ messages,
+   * PDF generation) should run after the status change. Omit to change the
+   * proposal status WITHOUT running any status actions.
+   */
+  @Field(() => Int, { nullable: true })
+  public statusActionsWorkflowConnectionId?: number;
 }
 
 @Resolver()

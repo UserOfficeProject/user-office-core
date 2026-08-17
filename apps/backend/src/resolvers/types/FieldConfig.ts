@@ -157,6 +157,9 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
   jsonPath: string;
 
   @Field(() => Boolean)
+  useBaseDomain: boolean;
+
+  @Field(() => Boolean)
   isMultipleSelect: boolean;
 
   @Field(() => Boolean)
