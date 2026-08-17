@@ -213,6 +213,7 @@ function QuestionaryComponentSampleDeclaration(
                 maxWidth="md"
                 fullWidth
                 title="Sample Declaration"
+                nesting={{ collection: 'Samples', parent: 'proposal' }}
               >
                 <DialogContent dividers>
                   {selectedSample ? (
