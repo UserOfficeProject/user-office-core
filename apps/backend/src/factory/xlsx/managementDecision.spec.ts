@@ -178,7 +178,6 @@ describe('generateManagementDecisionData tests', () => {
       'Accepted',
       'Comment for user',
       'Comment for management',
-      'proposal management comment',
       'FAP review comment',
     ]);
   });
@@ -214,7 +213,6 @@ describe('collectManagementDecisionData test', () => {
         'Accepted',
         'Comment for user',
         'Comment for management',
-        'proposal management comment',
         'FAP review comment',
       ],
     ]);
@@ -249,7 +247,6 @@ describe('collectManagementDecisionData test', () => {
         'Accepted',
         'Comment for user',
         'Comment for management',
-        'proposal management comment',
         'FAP review comment',
       ],
       [
@@ -260,7 +257,6 @@ describe('collectManagementDecisionData test', () => {
         'Accepted',
         'Comment for user',
         'Comment for management',
-        'proposal management comment',
         'FAP review comment',
       ],
     ]);

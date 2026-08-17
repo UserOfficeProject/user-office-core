@@ -6,6 +6,7 @@ import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { FapReviewsRecord } from '../../datasources/postgres/records';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 const ProposalEndStatusStringValue = {
   [ProposalEndStatus.UNSET]: 'Unset',
@@ -77,9 +78,13 @@ export async function generateManagementDecisionData(
         ? instrumentAllocatedTime.toString()
         : '<missing>',
       fapMeetingRecommendation,
-      fapMeetingData?.[0]?.commentForUser ?? '<missing>',
-      fapMeetingData?.[0]?.commentForManagement ?? '<missing>',
-      fapreview.comment ?? '<missing>',
+      fapMeetingData?.[0]?.commentForUser
+        ? stripHtml(fapMeetingData[0].commentForUser)
+        : '<missing>',
+      fapMeetingData?.[0]?.commentForManagement
+        ? stripHtml(fapMeetingData[0].commentForManagement)
+        : '<missing>',
+      fapreview.comment ? stripHtml(fapreview.comment) : '<missing>',
     ],
   };
 }
