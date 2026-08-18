@@ -1,6 +1,6 @@
 import { Column } from '@material-table/core';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
+import { Box, Button, DialogContent, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import CardEmptyState from 'components/common/cards/CardEmptyState';
 import { CardTaskItem } from 'components/common/cards/CardTaskList';
 import ExperimentCard from 'components/common/cards/ExperimentCard';
 import MaterialTable from 'components/common/ResponsiveMaterialTable';
+import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -195,17 +196,16 @@ export default function UserUpcomingExperimentsTable({
           }}
         />
       )}
-      <Dialog
+      <StyledDialog
         open={modalContents !== null}
         onClose={() => setModalContents(null)}
         maxWidth="md"
         fullWidth
-        fullScreen={isMobile}
       >
         <DialogContent sx={isMobile ? { padding: 0 } : undefined}>
           {modalContents}
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
     </div>
   );
 }

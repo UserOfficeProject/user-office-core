@@ -8,6 +8,7 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import MobileActionBar from 'components/common/mobile/MobileActionBar';
 import MobileAppBar from 'components/common/mobile/MobileAppBar';
+import { DialogAppBarContext } from 'components/common/StyledDialog';
 import UserManagementTable from 'components/common/UserManagementTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -49,6 +50,7 @@ function CreateUpdateVisit({
   };
 
   const featureContext = useContext(FeatureContext);
+  const hasDialogAppBar = useContext(DialogAppBarContext);
   const allowInviteByEmail = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
@@ -174,13 +176,13 @@ function CreateUpdateVisit({
                 : undefined
             }
           >
-            {isMobile ? (
+            {isMobile && !hasDialogAppBar ? (
               <MobileAppBar
                 title={heading}
                 variant="dialog"
                 onBack={() => close(event)}
               />
-            ) : (
+            ) : isMobile ? null : (
               <Typography variant="h6">{heading}</Typography>
             )}
             {isMobile ? (
