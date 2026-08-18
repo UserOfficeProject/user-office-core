@@ -1,9 +1,9 @@
 mutation administrationProposal(
   $proposalPk: Int!
-  $finalStatus: ProposalEndStatus!
+  $finalStatus: ProposalEndStatus
   $commentForUser: String
   $commentForManagement: String
-  $managementTimeAllocations: [ManagementTimeAllocationsInput!]!
+  $managementTimeAllocations: [ManagementTimeAllocationsInput!]
   $managementDecisionSubmitted: Boolean
 ) {
   administrationProposal(
