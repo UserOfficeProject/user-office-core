@@ -6,7 +6,6 @@ import MaterialTable, {
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
 import {
-  Dialog,
   DialogContent,
   IconButton,
   Link,
@@ -19,6 +18,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import RoleBasedLink from 'components/common/RoleBasedLink';
+import StyledDialog from 'components/common/StyledDialog';
 import {
   Experiment,
   ExperimentTableSortField,
@@ -372,9 +372,7 @@ export default function ExperimentsTable({
 
   return (
     <div data-cy="experiments-table">
-      <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+      <StyledDialog
         open={openChangeExperimentSafetyStatus}
         maxWidth="lg"
         onClose={(): void => setOpenChangeExperimentSafetyStatus(false)}
@@ -387,7 +385,7 @@ export default function ExperimentsTable({
             selectedExperiments={selectedExperimentsData}
           />
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
 
       <MaterialTable
         tableRef={tableRef}
