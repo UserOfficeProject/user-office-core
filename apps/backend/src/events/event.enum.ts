@@ -144,6 +144,7 @@ export enum Event {
   EMAIL_TEMPLATE_UPDATED = 'EMAIL_TEMPLATE_UPDATED',
   EMAIL_TEMPLATE_DELETED = 'EMAIL_TEMPLATE_DELETED',
   VISIT_CREATED = 'VISIT_CREATED',
+  EXPERIMENT_UPDATED = 'EXPERIMENT_UPDATED',
 }
 
 interface EventMetadata {
@@ -752,5 +753,9 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
   [
     Event.EMAIL_TEMPLATE_DELETED,
     { label: 'Event occurs when email template is deleted' },
+  ],
+  [
+    Event.EXPERIMENT_UPDATED,
+    { label: 'Event occurs when experiment is updated' },
   ],
 ]);
