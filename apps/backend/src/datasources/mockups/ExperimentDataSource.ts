@@ -117,6 +117,13 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   constructor() {
     this.init();
   }
+  async getExperimentByVisitId(visitId: number): Promise<Experiment | null> {
+    const experiment = this.experiments.find(
+      (exp) => exp.scheduledEventId === visitId
+    );
+
+    return experiment || null;
+  }
 
   async getExperiments(
     filter?: ExperimentsFilter,
