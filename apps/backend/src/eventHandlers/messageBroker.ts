@@ -31,7 +31,10 @@ import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
-import { VisitRegistrationStatus } from '../models/VisitRegistration';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
 import { WorkflowEngine } from '../workflowEngine';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 
@@ -295,6 +298,29 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
   return JSON.stringify(messageData);
 };
 
+export const getVisitMessageData = async (
+  visitRegistration: VisitRegistration
+) => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  const proposal = await proposalDataSource.getProposalByVisitId(
+    visitRegistration.visitId
+  );
+  const proposalPayload = await getProposalMessageData(proposal);
+
+  const visitJsonMessage = JSON.stringify({
+    id: visitRegistration.id,
+    startAt: visitRegistration.startsAt,
+    endAt: visitRegistration.endsAt,
+    visitorId: visitRegistration.userId.toString(),
+    proposal: JSON.parse(proposalPayload),
+  });
+
+  return visitJsonMessage;
+};
+
 export async function createPostToRabbitMQHandler() {
   const rabbitMQ = await getRabbitMQMessageBroker();
 
@@ -495,7 +521,6 @@ export async function createPostToRabbitMQHandler() {
           break;
         }
 
-        const jsonMessage = await getExperimentMessageData(experiment);
         let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
         if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
@@ -503,17 +528,21 @@ export async function createPostToRabbitMQHandler() {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
         }
 
+        const visitJsonMessage = await getVisitMessageData(visitRegistration);
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           rabbitMQVisitEventType,
-          jsonMessage
+          visitJsonMessage
         );
 
+        const experimentJsonMessage =
+          await getExperimentMessageData(experiment);
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           Event.EXPERIMENT_UPDATED,
-          jsonMessage
+          experimentJsonMessage
         );
+
         break;
       }
       case Event.DATA_ACCESS_USERS_UPDATED: {
