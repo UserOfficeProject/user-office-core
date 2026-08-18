@@ -7,6 +7,7 @@ import {
   ExperimentHasSample,
   ExperimentSafety,
   ExperimentSafetyReviewerDecisionEnum,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
@@ -83,8 +84,23 @@ function generateExperimentId(
   return `${proposalNumber}-${sequence ?? 0}`;
 }
 
-const fieldMap: { [key: string]: string } = {
-  experimentId: 'experiment_id',
+type SortableExperimentTableColumnName =
+  | 'experiment_id'
+  | 'proposal_id'
+  | 'starts_at'
+  | 'ends_at';
+
+// Maps a sortable column from the API to its database column.
+// Instrument and experiment safety status are intentionally omitted
+// (not sortable at the DB layer; create a view later if needed).
+const fieldMap: Record<
+  ExperimentTableSortField,
+  SortableExperimentTableColumnName
+> = {
+  [ExperimentTableSortField.experimentId]: 'experiment_id',
+  [ExperimentTableSortField.proposalId]: 'proposal_id',
+  [ExperimentTableSortField.startsAt]: 'starts_at',
+  [ExperimentTableSortField.endsAt]: 'ends_at',
 };
 
 @injectable()
@@ -570,7 +586,7 @@ export default class PostgresExperimentDataSource
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
@@ -689,8 +705,8 @@ export default class PostgresExperimentDataSource
           if (!fieldMap.hasOwnProperty(sortField)) {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
-          sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          const databaseSortField = fieldMap[sortField];
+          query.orderBy(databaseSortField, sortDirection);
         }
 
         if (first) {
@@ -717,6 +733,17 @@ export default class PostgresExperimentDataSource
       .then((rows: ExperimentRecord[]) =>
         rows.map((row) => createExperimentObject(row))
       );
+  }
+
+  async getExperimentByVisitId(visitId: number): Promise<Experiment | null> {
+    const record = await database
+      .select('e.*')
+      .from('visits as v')
+      .join('experiments as e', 'v.experiment_pk', 'e.experiment_pk')
+      .where('v.visit_id', visitId)
+      .first();
+
+    return record ? createExperimentObject(record) : null;
   }
 
   async getExperimentSafetyEvents(

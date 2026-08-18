@@ -439,6 +439,33 @@ export default class ProposalMutations {
       );
     }
 
+    // To match the UI we want to reject any attempts to submit a management decision without setting the finalStatus or existingManagementTimeAllocations.
+    // Note that both options do start as null in the database when a proposal is first submitted. finalStatus can become 'UNSET' in the database.
+    // This rejection is used in the 'Submit Management Decision' button to inform users which ones have failed.
+    if (managementDecisionSubmitted === true) {
+      if (
+        finalStatus === null &&
+        (proposal?.finalStatus === null || proposal?.finalStatus === undefined)
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no finalStatus existing in database or supplied.',
+          { args, agent }
+        );
+      }
+
+      const existingManagementTimeAllocations =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(primaryKey);
+      if (
+        managementTimeAllocations === null &&
+        !existingManagementTimeAllocations?.[0]
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no managementTimeAllocations existing in database or supplied.',
+          { args, agent }
+        );
+      }
+    }
+
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
@@ -453,7 +480,8 @@ export default class ProposalMutations {
       );
     }
 
-    if (finalStatus !== undefined) {
+    // Need to check for undefined and null because 0/UNSET is falsy.
+    if (finalStatus !== undefined && finalStatus !== null) {
       proposal.finalStatus = finalStatus;
     }
 

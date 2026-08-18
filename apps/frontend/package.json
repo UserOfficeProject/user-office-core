@@ -10,6 +10,8 @@
   "private": true,
   "dependencies": {
     "@codemirror/lang-html": "^6.4.5",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/legacy-modes": "^6.5.3",
     "@graphql-codegen/cli": "^6.2.1",
     "@graphql-codegen/typescript": "^5.0.9",
     "@graphql-codegen/typescript-graphql-request": "^7.0.0",
