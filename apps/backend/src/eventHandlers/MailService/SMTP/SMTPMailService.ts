@@ -139,9 +139,7 @@ export class SMTPMailService extends MailService {
     }
 
     const tokenRequest = {
-      scopes: [
-        process.env.EMAIL_SCOPE || 'https://outlook.office365.com/.default',
-      ],
+      scopes: [process.env.EMAIL_SCOPE || ''],
     };
 
     const msalConfig = {
@@ -219,11 +217,17 @@ export class SMTPMailService extends MailService {
   }
 
   private async createTransport() {
-    if (process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD) {
-      return this.createBasicAuthTransport();
+    if (
+      process.env.EMAIL_TENANT_ID &&
+      process.env.EMAIL_CLIENT_ID &&
+      process.env.EMAIL_CLIENT_SECRET &&
+      process.env.EMAIL_SCOPE &&
+      process.env.EMAIL_AUTHORITY
+    ) {
+      return this.createOauth2Transport();
     }
 
-    return this.createOauth2Transport();
+    return this.createBasicAuthTransport();
   }
 
   async sendMail(options: SendMailOptions) {
