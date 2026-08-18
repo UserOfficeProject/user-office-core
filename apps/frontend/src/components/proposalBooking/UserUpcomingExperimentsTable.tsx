@@ -1,6 +1,6 @@
 import { Column } from '@material-table/core';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import { Box, Dialog, DialogContent, Link, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -160,18 +160,15 @@ export default function UserUpcomingExperimentsTable({
           title="No upcoming experiments"
           description="Once a proposal of yours is accepted and scheduled, the experiment and everything it needs from you will show up here."
           action={
-            <Link
+            <Button
+              variant="outlined"
               component={RouterLink}
               to="/ProposalSelectType"
               data-cy="empty-new-proposal-link"
-              sx={(theme) => ({
-                display: 'inline-flex',
-                alignItems: 'center',
-                minHeight: minTouchTarget(theme),
-              })}
+              sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
             >
               New proposal
-            </Link>
+            </Button>
           }
         />
       ) : (
