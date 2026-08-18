@@ -96,6 +96,7 @@ export interface ExperimentDataSource {
     experiments: Experiment[];
   }>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
+  getExperimentByVisitId(visitId: number): Promise<Experiment | null>;
   getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null>;
