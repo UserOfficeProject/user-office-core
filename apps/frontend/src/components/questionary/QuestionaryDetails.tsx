@@ -115,11 +115,23 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
       !wizardStep.getMetadata(state, wizardStep.payload).isReadonly;
 
     return (
-      <div data-cy="questionary-details-view" key={step.topic.id}>
+      <div
+        data-cy="questionary-details-view"
+        key={step.topic.id}
+        style={
+          isMobile && index > 0
+            ? {
+                borderTop: '1px solid rgba(0,0,0,.09)',
+                paddingTop: '18px',
+              }
+            : undefined
+        }
+      >
         {isMobile ? (
           <ReviewAnswerCard
             title={step.topic.title}
             rows={rows}
+            storageKey={`questionary-${questionaryId}-topic-${step.topic.id}`}
             onEdit={
               editable
                 ? () =>
@@ -145,7 +157,20 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         {title}
       </Typography>
-      {steps}
+      {isMobile ? (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '18px',
+            paddingTop: '14px',
+          }}
+        >
+          {steps}
+        </Box>
+      ) : (
+        steps
+      )}
     </>
   );
 }
