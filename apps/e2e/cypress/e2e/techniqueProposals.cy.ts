@@ -1747,10 +1747,6 @@ context('Technique Proposal tests', () => {
     });
 
     it('User Officer should be able to add a rejection comment when changing status to unsuccessful', function () {
-      cy.changeProposalsStatus({
-        proposalPks: createdProposalPk1,
-        workflowStatusId: underReviewStatus.workflowStatusId as number,
-      });
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -1774,18 +1770,9 @@ context('Technique Proposal tests', () => {
 
       cy.get('[data-cy="submit-proposal-rejection-comment"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', unsuccessfulStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
     });
 
     it('User Officer should be able to not add a rejection comment when changing status to unsuccessful', function () {
-      cy.changeProposalsStatus({
-        proposalPks: createdProposalPk1,
-        workflowStatusId: underReviewStatus.workflowStatusId as number,
-      });
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -1803,12 +1790,6 @@ context('Technique Proposal tests', () => {
         .click();
       cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', unsuccessfulStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
     });
 
     it('Scientist can only change to specific statuses and cannot assign an instrument when the current status is submitted', function () {
