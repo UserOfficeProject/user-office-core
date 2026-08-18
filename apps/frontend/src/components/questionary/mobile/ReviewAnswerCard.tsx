@@ -1,4 +1,3 @@
-import EditIcon from '@mui/icons-material/Edit';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
@@ -7,57 +6,88 @@ import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
-import { minTouchTarget } from 'hooks/common/useResponsive';
-
 import { TableRowData } from '../QuestionaryDetails';
-
-const ROW_SX = {
-  minWidth: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2px',
-} as const;
 
 const LABEL_SX = { fontSize: 13, lineHeight: 1.4, color: 'text.secondary' };
 
-// `anywhere` so a value that is one unbroken token cannot widen the card.
-const VALUE_SX = { fontSize: 14, lineHeight: 1.4, overflowWrap: 'anywhere' };
+const VALUE_SX = {
+  fontWeight: 500,
+  fontSize: 15,
+  lineHeight: 1.4,
+  overflowWrap: 'anywhere',
+};
+
+const EMPTY_SX = { fontSize: 15, lineHeight: 1.4, color: 'text.disabled' };
+
+/**
+ * A rendered element counts as answered even when it looks empty, because we
+ * cannot see inside it. Renderers signal "no answer" by returning null.
+ */
+const isEmpty = (value: React.ReactNode) =>
+  React.isValidElement(value)
+    ? false
+    : value === null || value === undefined || value === '';
+
+const readCollapsed = (key: string | undefined) => {
+  if (!key) {
+    return false;
+  }
+
+  try {
+    return sessionStorage.getItem(key) === 'collapsed';
+  } catch {
+    return false;
+  }
+};
 
 type ReviewAnswerCardProps = {
   title: string;
   rows: TableRowData[];
   onEdit?: () => void;
+  /** Enables remembering the collapsed state for the session. */
+  storageKey?: string;
 };
 
 export default function ReviewAnswerCard({
   title,
   rows,
   onEdit,
+  storageKey,
 }: ReviewAnswerCardProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(() => !readCollapsed(storageKey));
+
+  const toggle = () => {
+    const next = !expanded;
+    setExpanded(next);
+
+    if (storageKey) {
+      try {
+        sessionStorage.setItem(storageKey, next ? 'expanded' : 'collapsed');
+      } catch {
+        // A blocked or full store only costs us the memory of the toggle.
+      }
+    }
+  };
 
   return (
     <Box
       data-cy="review-answer-card"
       sx={{
-        border: 1,
-        borderColor: 'divider',
-        borderRadius: 4,
-        backgroundColor: 'background.paper',
-        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: onEdit ? '13px' : '16px',
       }}
     >
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1,
-          padding: '8px 8px 8px 16px',
-          ...(expanded && { borderBottom: 1, borderColor: 'divider' }),
+          gap: '10px',
+          ...(onEdit && { minHeight: 44 }),
         }}
       >
         <ButtonBase
-          onClick={() => setExpanded((open) => !open)}
+          onClick={toggle}
           aria-expanded={expanded}
           data-cy="review-answer-card-toggle"
           sx={{
@@ -65,13 +95,14 @@ export default function ReviewAnswerCard({
             minWidth: 0,
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: '10px',
             textAlign: 'left',
           }}
         >
           <Typography
             sx={{
               flex: 1,
+              minWidth: 0,
               fontWeight: 500,
               fontSize: 14,
               lineHeight: 1.35,
@@ -81,7 +112,7 @@ export default function ReviewAnswerCard({
           </Typography>
           {!expanded && (
             <Typography
-              sx={{ fontSize: 13, lineHeight: 1.35, color: 'text.secondary' }}
+              sx={{ fontSize: 13, lineHeight: 1, color: 'rgba(0,0,0,.45)' }}
             >
               {rows.length === 1 ? '1 answer' : `${rows.length} answers`}
             </Typography>
@@ -92,48 +123,60 @@ export default function ReviewAnswerCard({
             <ExpandMoreIcon sx={{ fontSize: 20, color: 'action.active' }} />
           )}
         </ButtonBase>
-        {expanded && onEdit && (
+        {onEdit && (
           <Button
-            variant="quiet"
+            variant="text"
+            color="primary"
             onClick={onEdit}
-            startIcon={<EditIcon sx={{ fontSize: 18 }} />}
             data-cy="review-answer-card-edit"
-            sx={(theme) => ({
+            sx={{
               flexShrink: 0,
-              minHeight: minTouchTarget(theme),
-              paddingX: 1.5,
-              borderRadius: 1,
+              position: 'relative',
+              height: 30,
+              minWidth: 0,
+              paddingX: 1,
+              marginRight: -1,
               fontWeight: 500,
               fontSize: 13,
               lineHeight: 1,
-              letterSpacing: '.02em',
-            })}
+              letterSpacing: '.03em',
+              // Deliberately 30px tall, so the 44px target is hit area only.
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: '-7px -8px',
+              },
+            }}
           >
             Edit
           </Button>
         )}
       </Box>
-      {expanded && (
-        <Box
-          sx={{
-            padding: '14px 16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-        >
-          {rows.map((row, index) => (
-            <Box key={index} sx={ROW_SX}>
-              <Typography component="div" sx={LABEL_SX}>
-                {row.label}
+      {expanded &&
+        rows.map((row, index) => (
+          <Box
+            key={index}
+            sx={{
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '3px',
+            }}
+          >
+            <Typography component="div" sx={LABEL_SX}>
+              {row.label}
+            </Typography>
+            {isEmpty(row.value) ? (
+              <Typography component="div" sx={EMPTY_SX}>
+                —
               </Typography>
+            ) : (
               <Typography component="div" sx={VALUE_SX}>
                 {row.value}
               </Typography>
-            </Box>
-          ))}
-        </Box>
-      )}
+            )}
+          </Box>
+        ))}
     </Box>
   );
 }
