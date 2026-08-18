@@ -242,7 +242,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
 
 export const getProposalsMessageData = async (proposals: Proposal[]) => {
   const proposalsMessageData = await Promise.all(
-    proposals.map(getProposalMessageData)
+    proposals.map(buildProposalMessageData)
   );
 
   return JSON.stringify(proposalsMessageData);
