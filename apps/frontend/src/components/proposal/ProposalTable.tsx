@@ -8,7 +8,6 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
 import { Box, Link, Typography } from '@mui/material';
-import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -18,15 +17,12 @@ import CardEmptyState from 'components/common/cards/CardEmptyState';
 import ProposalCard from 'components/common/cards/ProposalCard';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import {
-  minTouchTarget,
-  useCardRows,
-  useIsMobile,
-} from 'hooks/common/useResponsive';
+import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -116,7 +112,6 @@ const ProposalTable = ({
   >();
 
   const asCards = useCardRows();
-  const isMobile = useIsMobile();
 
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -271,12 +266,10 @@ const ProposalTable = ({
 
   return (
     <div data-cy="proposal-table">
-      <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+      <StyledDialog
+        title="Clone proposal"
         open={openCallSelection}
         onClose={(): void => setOpenCallSelection(false)}
-        fullScreen={isMobile}
       >
         <DialogContent>
           <CallSelectModalOnProposalsClone
@@ -284,7 +277,7 @@ const ProposalTable = ({
             close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
       <DataAccessUsersModal
         open={isDataAccessUsersModalOpen}
         onClose={() => setIsDataAccessUsersModalOpen(false)}
