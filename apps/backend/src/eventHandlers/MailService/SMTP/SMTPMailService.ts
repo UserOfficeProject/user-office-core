@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -7,13 +7,17 @@ import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 import SMTPPool from 'nodemailer/lib/smtp-pool';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import pug from 'pug';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
 import { EmailTemplateDataSource } from '../../../datasources/EmailTemplateDataSource';
 import { SettingsId } from '../../../models/Settings';
+import {
+  EmailTemplateSource,
+  readEmailTemplateSourceFromFiles,
+  renderEmailTemplate,
+} from '../../../utils/emailTemplateRenderer';
 import { isProduction } from '../../../utils/helperFunctions';
 import SendMailOptions, { MailService, SendMailResults } from '../MailService';
 
@@ -98,13 +102,6 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  private getEmailTemplatePath(type: string, template: string): string {
-    return path.join(
-      process.env.EMAIL_TEMPLATE_PATH || '',
-      `${template}.${type}`
-    );
-  }
-
   private async resolveEmailTemplate(identifier: string) {
     const isNumericIdentifier = /^\d+$/.test(identifier);
 
@@ -140,18 +137,11 @@ export class SMTPMailService extends MailService {
       return null;
     }
 
-    let templateBody = '';
-    let templateSubject = '';
+    let source: EmailTemplateSource;
 
     if (emailTemplate.useTemplateFile) {
-      const templateBodyPath =
-        this.getEmailTemplatePath('html', emailTemplate.name) + '.pug';
-      const templateSubjectPath =
-        this.getEmailTemplatePath('subject', emailTemplate.name) + '.pug';
-
       try {
-        templateBody = readFileSync(templateBodyPath, 'utf-8');
-        templateSubject = readFileSync(templateSubjectPath, 'utf-8');
+        source = readEmailTemplateSourceFromFiles(emailTemplate.name);
       } catch (error) {
         logger.logError('Email template file not found', {
           error: error,
@@ -160,30 +150,26 @@ export class SMTPMailService extends MailService {
         return null;
       }
     } else {
-      templateBody = emailTemplate.body || '';
-      templateSubject = emailTemplate.subject || '';
+      source = {
+        body: emailTemplate.body || '',
+        subject: emailTemplate.subject || '',
+      };
     }
 
-    try {
-      let compiledSubject = '';
-      let compiledBody = '';
-      compiledSubject = pug.render(
-        templateSubject,
-        options.substitution_data || {}
-      );
-      compiledBody = pug.render(templateBody, options.substitution_data || {});
+    const result = renderEmailTemplate(
+      source,
+      (options.substitution_data as Record<string, unknown>) || {}
+    );
 
-      return {
-        subject: compiledSubject,
-        body: compiledBody,
-      };
-    } catch (error) {
+    if ('error' in result) {
       logger.logError('Error compiling email template', {
-        error: error,
+        error: result.error,
       });
 
       return null;
     }
+
+    return result;
   }
 
   private getSmtpAuthOptions() {
