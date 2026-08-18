@@ -153,7 +153,6 @@ export class SMTPMailService extends MailService {
     };
 
     const cca = new ConfidentialClientApplication(msalConfig);
-
     this.authToken = await cca.acquireTokenByClientCredential(tokenRequest);
 
     if (!this.authToken || !this.authToken.accessToken) {
@@ -190,17 +189,33 @@ export class SMTPMailService extends MailService {
   private async createOauth2Transport() {
     const accessToken = await this.getAccessToken();
 
-    return createTransport({
-      host: process.env.EMAIL_AUTH_HOST,
-      port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
-      secure: false,
-      requireTLS: true,
-      auth: {
-        type: 'OAuth2',
-        user: process.env.EMAIL_SENDER,
-        accessToken: accessToken,
-      },
-    });
+    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
+      return createTransport({
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
+        pool: true,
+        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        secure: false,
+        requireTLS: true,
+        auth: {
+          type: 'OAuth2',
+          user: process.env.EMAIL_SENDER,
+          accessToken: accessToken,
+        },
+      });
+    } else {
+      return createTransport({
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
+        secure: false,
+        requireTLS: true,
+        auth: {
+          type: 'OAuth2',
+          user: process.env.EMAIL_SENDER,
+          accessToken: accessToken,
+        },
+      });
+    }
   }
 
   private async createTransport() {
@@ -232,6 +247,14 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
+    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+      logger.logInfo('Skipping email sending', {
+        template: options.content.template,
+      });
+
+      return { results: sendMailResults };
+    }
+
     const template = await this.compileEmailTemplate(options);
 
     if (!template) {
@@ -243,14 +266,6 @@ export class SMTPMailService extends MailService {
     }
 
     const transport = await this.createTransport();
-
-    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
-      logger.logInfo('Skipping email sending', {
-        template: options.content.template,
-      });
-
-      return { results: sendMailResults };
-    }
 
     this.emailTemplate = new EmailTemplates({
       message: {
