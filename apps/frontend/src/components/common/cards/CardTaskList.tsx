@@ -27,6 +27,8 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
       data-cy={`experiment-task-${task.id}`}
       sx={(theme) => ({
         minHeight: minTouchTarget(theme),
+        paddingX: 1.5,
+        paddingY: 0.5,
         gap: 1.5,
         '&:not(:last-of-type)': {
           borderBottom: 1,
@@ -34,7 +36,11 @@ const TaskRow = ({ task, onClick }: CardTaskItem) => {
         },
       })}
     >
-      <ListItemIcon sx={{ minWidth: 0 }}>{task.icon}</ListItemIcon>
+      <ListItemIcon
+        sx={{ minWidth: 0, '& .MuiSvgIcon-root': { fontSize: 18 } }}
+      >
+        {task.icon}
+      </ListItemIcon>
       <ListItemText
         primary={task.label}
         secondary={task.helperText}

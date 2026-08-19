@@ -2,54 +2,25 @@ import { DateTime } from 'luxon';
 
 import { DateConfig, Scalars } from 'generated/sdk';
 
-function paddZero(num: number): string {
-  if (num < 10) {
-    // Adding leading zero to minutes
-    return `0${num}`;
-  }
-
-  return num.toString();
-}
-
 function getFormattedDate(
   date: Date,
   prefomattedDate?: string,
   hideYear = false
 ): string {
-  const MONTH_NAMES = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const day = date.getDate();
-  const month = MONTH_NAMES[date.getMonth()];
-  const year = date.getFullYear();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  const dateTime = DateTime.fromJSDate(date);
+  const time = dateTime.toFormat('HH:mm');
 
   if (prefomattedDate) {
     // Today at 10:20
     // Yesterday at 10:20
-    return `${prefomattedDate} at ${paddZero(hours)}:${paddZero(minutes)}`;
+    return `${prefomattedDate} at ${time}`;
   }
 
-  if (hideYear) {
-    // 10. January at 10:20
-    return `${day}. ${month} at ${paddZero(hours)}:${paddZero(minutes)}`;
-  }
-
-  // 10. January 2017. at 10:20
-  return `${day}. ${month} ${year}. at ${paddZero(hours)}:${paddZero(minutes)}`;
+  // 10 Jan, 10:20
+  // 10 Jan 2017, 10:20
+  // The month name is abbreviated by the locale rather than by a table here,
+  // so it stays right in every language the app is served in.
+  return `${dateTime.toFormat(hideYear ? 'd LLL' : 'd LLL yyyy')}, ${time}`;
 }
 
 // --- Main function
@@ -83,10 +54,10 @@ export function timeAgo(
   } else if (isYesterday) {
     return getFormattedDate(date, 'Yesterday'); // Yesterday at 10:20
   } else if (isThisYear) {
-    return getFormattedDate(date, undefined, true); // 10. January at 10:20
+    return getFormattedDate(date, undefined, true); // 10 Jan, 10:20
   }
 
-  return getFormattedDate(date); // 10. January 2017. at 10:20
+  return getFormattedDate(date); // 10 Jan 2017, 10:20
 }
 
 export function timeRemaining(toDate: Date): string {
