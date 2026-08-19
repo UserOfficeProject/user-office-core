@@ -8,6 +8,7 @@ import React, { useCallback, useContext, useEffect } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
+import { belowCompactUi } from 'hooks/common/useResponsive';
 
 // A grey that behaves like the rest of the palette, so components can ask for it
 // through their `color` prop instead of overriding text and border by hand. It is
@@ -31,6 +32,29 @@ declare module '@mui/material/Chip' {
 declare module '@mui/material/Button' {
   interface ButtonPropsVariantOverrides {
     quiet: true;
+  }
+}
+
+// The type scale the mobile cards and the questionary review are built from.
+// Kept here rather than as constants beside each card, so the two stay in step.
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    cardTitle: React.CSSProperties;
+    cardLabel: React.CSSProperties;
+    cardValue: React.CSSProperties;
+  }
+  interface TypographyVariantsOptions {
+    cardTitle?: React.CSSProperties;
+    cardLabel?: React.CSSProperties;
+    cardValue?: React.CSSProperties;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    cardTitle: true;
+    cardLabel: true;
+    cardValue: true;
   }
 }
 
@@ -94,7 +118,58 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
 
   const baseTheme = createTheme({
     palette: palette,
+    typography: {
+      cardTitle: {
+        fontSize: 16,
+        fontWeight: 550,
+        lineHeight: 1.4,
+        textWrap: 'pretty',
+      },
+      cardLabel: {
+        fontSize: 13,
+        lineHeight: 1.4,
+        color: defaultTheme.palette.text.secondary,
+      },
+      cardValue: {
+        fontSize: 15,
+        fontWeight: 500,
+        lineHeight: 1.4,
+        overflowWrap: 'anywhere',
+      },
+    },
     components: {
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            [belowCompactUi(defaultTheme)]: {
+              padding: defaultTheme.spacing(1.5),
+              '&:last-child': {
+                paddingBottom: defaultTheme.spacing(1.5),
+              },
+            },
+          },
+        },
+      },
+      MuiCardActions: {
+        styleOverrides: {
+          root: {
+            [belowCompactUi(defaultTheme)]: {
+              padding: defaultTheme.spacing(1.5),
+              paddingTop: 0,
+            },
+          },
+        },
+      },
+      MuiCssBaseline: {
+        styleOverrides: {
+          [belowCompactUi(defaultTheme)]: {
+            'html, body': { scrollbarWidth: 'none' },
+            'html::-webkit-scrollbar, body::-webkit-scrollbar': {
+              display: 'none',
+            },
+          },
+        },
+      },
       MuiTextField: {
         defaultProps: {
           variant: 'standard',

@@ -22,7 +22,11 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { minTouchTarget, useCardRows } from 'hooks/common/useResponsive';
+import {
+  belowCompactUi,
+  minTouchTarget,
+  useCardRows,
+} from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -290,12 +294,19 @@ const ProposalTable = ({
           justifyContent: 'space-between',
           gap: 2,
           // Matches the inset of the rows below: MUI TableCell pads 16px, and
-          // MaterialTableCardRow's cell pads 8px on the card path.
-          paddingX: 1,
-          paddingBottom: 2,
+          // MaterialTableCardRow's cell pads none on the card path.
+          paddingX: asCards ? 0 : 1,
+          paddingBottom: asCards ? 1 : 2,
         }}
       >
-        <Typography variant="h5" component="h2" sx={{ fontWeight: 500 }}>
+        <Typography
+          variant="h5"
+          component="h2"
+          sx={(theme) => ({
+            fontWeight: 500,
+            [belowCompactUi(theme)]: { fontSize: 18 },
+          })}
+        >
           {title}
         </Typography>
         {isEmailInviteEnabled && (
