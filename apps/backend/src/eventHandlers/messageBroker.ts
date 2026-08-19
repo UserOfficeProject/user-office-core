@@ -124,7 +124,7 @@ export function createListenToQueueHandler() {
   );
 }
 
-export const getProposalMessageData = async (proposal: Proposal) => {
+const buildProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -234,7 +234,21 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     );
   }
 
+  return messageData;
+};
+
+export const getProposalMessageData = async (proposal: Proposal) => {
+  const messageData = await buildProposalMessageData(proposal);
+
   return JSON.stringify(messageData);
+};
+
+export const getProposalsMessageData = async (proposals: Proposal[]) => {
+  const proposalsMessageData = await Promise.all(
+    proposals.map(buildProposalMessageData)
+  );
+
+  return JSON.stringify(proposalsMessageData);
 };
 
 export const getExperimentMessageData = async (experiment: Experiment) => {
@@ -353,6 +367,19 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
+        const jsonMessage = await getProposalsMessageData(
+          event.proposals.proposals
+        );
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
