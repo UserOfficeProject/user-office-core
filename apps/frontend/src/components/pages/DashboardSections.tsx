@@ -4,7 +4,11 @@ import Box from '@mui/material/Box';
 import MuiPaper from '@mui/material/Paper';
 import React, { useEffect, useState } from 'react';
 
-import { bottomNavHeight, useIsMobile } from 'hooks/common/useResponsive';
+import {
+  belowCompactUi,
+  bottomNavHeight,
+  useIsMobile,
+} from 'hooks/common/useResponsive';
 import { StyledPaper } from 'styles/StyledComponents';
 
 export type DashboardSection = {
@@ -19,11 +23,18 @@ const SECTION_STORAGE_KEY = 'dashboardSection';
 export const Panel = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper
     margin={[0, 0, 2, 0]}
-    sx={{
+    sx={(theme) => ({
       '&:empty': {
         display: 'none',
       },
-    }}
+      // The cards inside carry their own outline, so a panel around them reads
+      // as a box in a box and costs two more gutters.
+      [belowCompactUi(theme)]: {
+        padding: theme.spacing(1),
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+      },
+    })}
   >
     {children}
   </StyledPaper>

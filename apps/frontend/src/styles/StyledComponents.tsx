@@ -4,6 +4,8 @@ import Paper, { PaperProps } from '@mui/material/Paper';
 import { Theme, styled } from '@mui/material/styles';
 import { BoxProps } from '@mui/system';
 
+import { belowCompactUi } from 'hooks/common/useResponsive';
+
 const getValueFromArrayProperty = (
   prop: [number, number?, number?, number?],
   theme: Theme
@@ -60,6 +62,9 @@ export const StyledContainer = styled(Container, {
 
   return {
     padding: paddingValue || theme.spacing(2, 2),
+    [belowCompactUi(theme)]: {
+      padding: paddingValue || theme.spacing(1.5, 1),
+    },
   };
 });
 

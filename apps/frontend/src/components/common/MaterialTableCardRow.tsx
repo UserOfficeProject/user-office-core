@@ -54,7 +54,7 @@ export default function MaterialTableCardRow<RowData extends object>({
       <TableRow>
         <TableCell
           colSpan={visibleColumns.length + 1}
-          sx={{ padding: 1, borderBottom: 'none' }}
+          sx={{ paddingX: 0, paddingY: 0.75, borderBottom: 'none' }}
         >
           {cardRow(data as never)}
         </TableCell>
@@ -66,7 +66,7 @@ export default function MaterialTableCardRow<RowData extends object>({
     <TableRow>
       <TableCell
         colSpan={visibleColumns.length + 1}
-        sx={{ padding: 1, borderBottom: 'none' }}
+        sx={{ paddingX: 0, paddingY: 0.75, borderBottom: 'none' }}
       >
         <Card variant="outlined">
           <CardContent sx={{ paddingBottom: 0 }}>
