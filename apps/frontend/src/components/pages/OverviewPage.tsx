@@ -100,7 +100,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     showPageContent && (loadingContent || !!pageContent)
       ? {
           id: 'info',
-          label: 'Call info',
+          label: 'Info',
           icon: <InfoIcon />,
           render: () =>
             loadingContent ? (
