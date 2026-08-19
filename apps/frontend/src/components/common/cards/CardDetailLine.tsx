@@ -2,18 +2,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-const LABEL_SX = { fontSize: 13, lineHeight: 1.4, color: 'text.secondary' };
-
-const VALUE_SX = {
-  fontWeight: 500,
-  fontSize: 15,
-  lineHeight: 1.4,
-  overflowWrap: 'anywhere',
-};
-
 export function CardDetailList({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {children}
     </Box>
   );
@@ -23,6 +14,11 @@ type CardDetailLineProps = {
   /** Give it `fontSize="small"`; it is rendered as passed. */
   icon: React.ReactNode;
   label: string;
+  /**
+   * Puts the value under the label rather than opposite it, for a value that
+   * needs the full width to stay on one line.
+   */
+  stacked?: boolean;
   children: React.ReactNode;
 };
 
@@ -30,36 +26,33 @@ type CardDetailLineProps = {
 export default function CardDetailLine({
   icon,
   label,
+  stacked = false,
   children,
 }: CardDetailLineProps) {
   return (
-    <Box
-      sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, minWidth: 0 }}
-    >
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+      <Box sx={{ display: 'flex', flexShrink: 0 }}>{icon}</Box>
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          flexShrink: 0,
-          // One label line (13px x 1.4), so the icon centres on the label
-          // rather than on the whole pair.
-          height: '18px',
-        }}
-      >
-        {icon}
-      </Box>
-      <Box
-        sx={{
+          flex: 1,
           minWidth: 0,
           display: 'flex',
-          flexDirection: 'column',
-          gap: '3px',
+          ...(stacked
+            ? { flexDirection: 'column' }
+            : { alignItems: 'center', gap: 1 }),
         }}
       >
-        <Typography component="div" sx={LABEL_SX}>
+        <Typography variant="cardLabel" component="div" sx={{ flexShrink: 0 }}>
           {label}
         </Typography>
-        <Typography component="div" sx={VALUE_SX}>
+        <Typography
+          variant="cardValue"
+          component="div"
+          sx={{
+            minWidth: 0,
+            ...(stacked ? {} : { marginLeft: 'auto', textAlign: 'right' }),
+          }}
+        >
           {children}
         </Typography>
       </Box>
