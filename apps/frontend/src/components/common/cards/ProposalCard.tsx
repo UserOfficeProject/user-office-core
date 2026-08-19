@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
 import { ProposalPublicStatus } from 'generated/sdk';
-import { minTouchTarget } from 'hooks/common/useResponsive';
+import { compactTouchTarget } from 'hooks/common/useResponsive';
 import { timeAgo } from 'utils/Time';
 
 import CardActionSheet, { CardActionSheetItem } from './CardActionSheet';
@@ -52,53 +52,50 @@ export default function ProposalCard({
   return (
     <Card variant="outlined" data-cy="proposal-card" sx={{ borderRadius: 2 }}>
       <CardContent>
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }}
-        >
-          <Stack spacing={1.5} sx={{ flex: 1, minWidth: 0 }}>
+        <Stack spacing={1.25}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }}
+          >
             <Typography
-              variant="h5"
+              variant="cardTitle"
               component="h3"
-              sx={{ lineHeight: 1.35, textWrap: 'pretty' }}
+              sx={{ flex: 1, minWidth: 0 }}
             >
               {proposal.title}
             </Typography>
-            <CardDetailList>
-              <CardDetailLine
-                icon={<TagIcon fontSize="small" color="action" />}
-                label="Proposal ID"
-              >
-                {proposal.proposalId}
-              </CardDetailLine>
-              <CardDetailLine
-                icon={<FolderOpenIcon fontSize="small" color="action" />}
-                label="Call"
-              >
-                {proposal.call?.shortCode ?? '-'}
-              </CardDetailLine>
-              <CardDetailLine
-                icon={<HistoryIcon fontSize="small" color="action" />}
-                label="Created"
-              >
-                {timeAgo(proposal.created)}
-              </CardDetailLine>
-            </CardDetailList>
+            <StatusChip status={proposal.publicStatus} />
           </Stack>
-          <StatusChip status={proposal.publicStatus} />
+          <CardDetailList>
+            <CardDetailLine
+              icon={<TagIcon fontSize="small" color="action" />}
+              label="Proposal ID"
+            >
+              {proposal.proposalId}
+            </CardDetailLine>
+            <CardDetailLine
+              icon={<FolderOpenIcon fontSize="small" color="action" />}
+              label="Call"
+            >
+              {proposal.call?.shortCode ?? '-'}
+            </CardDetailLine>
+            <CardDetailLine
+              icon={<HistoryIcon fontSize="small" color="action" />}
+              label="Created"
+            >
+              {timeAgo(proposal.created)}
+            </CardDetailLine>
+          </CardDetailList>
         </Stack>
       </CardContent>
-      <CardActions
-        disableSpacing
-        sx={{ gap: 2, paddingX: 2, paddingBottom: 2 }}
-      >
+      <CardActions disableSpacing sx={{ gap: 1.5 }}>
         <Button
           fullWidth
           variant="quiet"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={(theme) => ({ minHeight: minTouchTarget(theme) })}
+          sx={(theme) => compactTouchTarget(theme, 4.5)}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}
@@ -108,8 +105,8 @@ export default function ProposalCard({
             aria-label={`Data access users for ${proposal.title}`}
             onClick={onOpenDataAccess}
             sx={(theme) => ({
-              width: minTouchTarget(theme),
-              height: minTouchTarget(theme),
+              ...compactTouchTarget(theme, 4.5),
+              width: theme.spacing(4.5),
               flexShrink: 0,
               border: 1,
               borderColor: 'divider',
@@ -125,8 +122,8 @@ export default function ProposalCard({
             aria-label={`More actions for ${proposal.title}`}
             onClick={() => setSheetOpen(true)}
             sx={(theme) => ({
-              width: minTouchTarget(theme),
-              height: minTouchTarget(theme),
+              ...compactTouchTarget(theme, 4.5),
+              width: theme.spacing(4.5),
               flexShrink: 0,
               border: 1,
               borderColor: 'divider',

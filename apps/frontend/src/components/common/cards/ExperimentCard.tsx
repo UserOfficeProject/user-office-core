@@ -56,7 +56,7 @@ export default function ExperimentCard({
           sx={{
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 1.5,
+            marginBottom: 1,
           }}
         >
           <Typography
@@ -83,13 +83,9 @@ export default function ExperimentCard({
           </Typography>
         </Stack>
         <Typography
-          variant="h6"
+          variant="cardTitle"
           component="h3"
-          sx={{
-            lineHeight: 1.35,
-            textWrap: 'pretty',
-            marginBottom: 1.5,
-          }}
+          sx={{ marginBottom: 1.25 }}
         >
           {experiment.proposal.title}
         </Typography>
@@ -97,9 +93,10 @@ export default function ExperimentCard({
           <CardDetailLine
             icon={<CalendarMonthIcon fontSize="small" color="action" />}
             label="Dates"
+            stacked
           >
-            {/* Each date is one unbreakable run, so the only place the value can
-                wrap is after the arrow. */}
+            {/* Stacked above, so the pair has the full width and the arrow
+                keeps both dates on one line. */}
             <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
               {toFormattedDateTime(experiment.startsAt)} &rarr;
             </Box>{' '}
