@@ -89,13 +89,20 @@ export default function ProposalCard({
           </CardDetailList>
         </Stack>
       </CardContent>
-      <CardActions disableSpacing sx={{ gap: 1.5 }}>
+      <CardActions disableSpacing sx={{ gap: 1 }}>
         <Button
           fullWidth
+          size="small"
           variant="quiet"
           startIcon={readOnly ? <VisibilityIcon /> : <EditIcon />}
           onClick={onOpen}
-          sx={(theme) => compactTouchTarget(theme, 4.5)}
+          sx={(theme) => ({
+            ...compactTouchTarget(theme, 3.5),
+            fontSize: theme.typography.pxToRem(13),
+            paddingY: 0,
+            paddingX: 1,
+            '& .MuiButton-startIcon': { marginRight: theme.spacing(0.5) },
+          })}
           data-cy="proposal-card-open"
         >
           {readOnly ? 'View' : 'Continue'}
@@ -104,9 +111,10 @@ export default function ProposalCard({
           <IconButton
             aria-label={`Data access users for ${proposal.title}`}
             onClick={onOpenDataAccess}
+            size="small"
             sx={(theme) => ({
-              ...compactTouchTarget(theme, 4.5),
-              width: theme.spacing(4.5),
+              ...compactTouchTarget(theme, 3.5),
+              width: theme.spacing(3.5),
               flexShrink: 0,
               border: 1,
               borderColor: 'divider',
@@ -114,16 +122,17 @@ export default function ProposalCard({
             })}
             data-cy="proposal-card-data-access"
           >
-            <PeopleIcon />
+            <PeopleIcon fontSize="small" />
           </IconButton>
         )}
         {sheetItems.length > 0 && (
           <IconButton
             aria-label={`More actions for ${proposal.title}`}
             onClick={() => setSheetOpen(true)}
+            size="small"
             sx={(theme) => ({
-              ...compactTouchTarget(theme, 4.5),
-              width: theme.spacing(4.5),
+              ...compactTouchTarget(theme, 3.5),
+              width: theme.spacing(3.5),
               flexShrink: 0,
               border: 1,
               borderColor: 'divider',
@@ -131,7 +140,7 @@ export default function ProposalCard({
             })}
             data-cy="proposal-card-menu"
           >
-            <MoreHorizIcon />
+            <MoreHorizIcon fontSize="small" />
           </IconButton>
         )}
       </CardActions>
