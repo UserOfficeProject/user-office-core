@@ -9,23 +9,22 @@ import {
 } from '../datasources/mockups/StatusActionsLogsDataSource';
 import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { Rejection } from '../models/Rejection';
 
 const statusActionsLogsMutations = container.resolve(
   StatusActionsLogsMutations
 );
 
 describe('Test Status Actions Logs Mutations', () => {
-  test('A logged in user officer should be able to replay status actions logs', () => {
+  test('A logged in user officer should be able to a replay status actions log', async () => {
     return expect(
-      statusActionsLogsMutations.replayStatusActionsLog(
+      statusActionsLogsMutations.replayStatusActionsLogs(
         dummyUserOfficerWithRole,
-        dummyStatusActionsLog.statusActionsLogId
+        [dummyStatusActionsLog.statusActionsLogId]
       )
     ).resolves.toBeTruthy();
   });
 
-  test('Replaying a status actions log whose connection/action no longer exists should be rejected, not throw', async () => {
+  test('Replaying a status actions log whose connection/action no longer exists should report failure', async () => {
     const statusActionsDataSource = container.resolve<StatusActionsDataSource>(
       Tokens.StatusActionsDataSource
     );
@@ -33,12 +32,19 @@ describe('Test Status Actions Logs Mutations', () => {
       .spyOn(statusActionsDataSource, 'getConnectionStatusAction')
       .mockResolvedValueOnce(null);
 
-    const result = await statusActionsLogsMutations.replayStatusActionsLog(
+    const result = await statusActionsLogsMutations.replayStatusActionsLogs(
       dummyUserOfficerWithRole,
-      dummyStatusActionsLog.statusActionsLogId
+      [dummyStatusActionsLog.statusActionsLogId]
     );
 
-    expect(result).toBeInstanceOf(Rejection);
+    expect(result.totalRequested).toBe(1);
+    expect(result.successful).toHaveLength(0);
+    expect(result.failed).toEqual([
+      {
+        logId: dummyStatusActionsLog.statusActionsLogId,
+        error: expect.any(String),
+      },
+    ]);
 
     getConnectionStatusActionSpy.mockRestore();
   });
@@ -103,5 +109,37 @@ describe('Test Status Actions Logs Mutations', () => {
       successful: [],
       failed: [],
     });
+  });
+
+  test('Should not allow replaying duplicate status actions log IDs', async () => {
+    const replaySingleSpy = jest.spyOn(
+      statusActionsLogsMutations as unknown as Record<
+        string,
+        (...args: unknown[]) => unknown
+      >,
+      'replayStatusActionsLog'
+    );
+
+    const result = await statusActionsLogsMutations.replayStatusActionsLogs(
+      dummyUserOfficerWithRole,
+      [
+        dummyStatusActionsLog.statusActionsLogId,
+        dummyStatusActionsLog.statusActionsLogId,
+        dummyStatusActionsLogReplay.statusActionsLogId,
+        dummyStatusActionsLogReplay.statusActionsLogId,
+      ]
+    );
+
+    expect(result.totalRequested).toBe(2);
+    expect(result.successful.sort()).toEqual(
+      [
+        dummyStatusActionsLog.statusActionsLogId,
+        dummyStatusActionsLogReplay.statusActionsLogId,
+      ].sort()
+    );
+    expect(result.failed).toHaveLength(0);
+    expect(replaySingleSpy).toHaveBeenCalledTimes(2);
+
+    replaySingleSpy.mockRestore();
   });
 });
