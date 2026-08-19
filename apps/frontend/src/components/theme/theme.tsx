@@ -127,13 +127,13 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
       },
       cardLabel: {
         fontSize: 13,
-        lineHeight: 1.4,
+        lineHeight: 1.3,
         color: defaultTheme.palette.text.secondary,
       },
       cardValue: {
         fontSize: 15,
         fontWeight: 500,
-        lineHeight: 1.4,
+        lineHeight: 1.3,
         overflowWrap: 'anywhere',
       },
     },
@@ -189,6 +189,7 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
               color: defaultTheme.palette.action.active,
               border: '1px solid',
               borderColor: defaultTheme.palette.divider,
+              textTransform: 'none',
               '&:hover': {
                 borderColor: defaultTheme.palette.divider,
                 backgroundColor: defaultTheme.palette.action.hover,
