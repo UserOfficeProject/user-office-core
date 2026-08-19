@@ -286,9 +286,9 @@ const StatusActionsLogsTable = ({
           toastSuccessMessage: 'Status action replay successfully sent.',
         })
           .replayStatusActionsLogs({
-            statusActionsLogIds: selectedStatusActionsLogIds.map(
-              (logId) => +logId
-            ),
+            statusActionsLogIds: Array.from(
+              new Set(selectedStatusActionsLogIds)
+            ).map((logId) => +logId),
           })
           .then(() => {
             setSearchParams((searchParams) => {
@@ -470,7 +470,7 @@ const StatusActionsLogsTable = ({
             });
           }}
           onChangeColumnHidden={(columnChange) => {
-            const proposalColumns = columns.map(
+            const statusActionLogColumns = columns.map(
               (statusActionLogsColumn: Column<StatusActionsLog>) => ({
                 hidden:
                   statusActionLogsColumn.title === columnChange.title
@@ -480,7 +480,7 @@ const StatusActionsLogsTable = ({
               })
             );
 
-            setLocalStorageValue(proposalColumns);
+            setLocalStorageValue(statusActionLogColumns);
           }}
           onPageChange={(page, pageSize) => {
             setSearchParams((searchParams) => {
