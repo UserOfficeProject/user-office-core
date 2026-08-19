@@ -2,25 +2,18 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-/**
- * Grid owner for CardDetailLine. The lines emit bare cells rather than rows, so
- * the key column sizes itself to the longest label and every row stays aligned.
- */
+const LABEL_SX = { fontSize: 13, lineHeight: 1.4, color: 'text.secondary' };
+
+const VALUE_SX = {
+  fontWeight: 500,
+  fontSize: 15,
+  lineHeight: 1.4,
+  overflowWrap: 'anywhere',
+};
+
 export function CardDetailList({ children }: { children: React.ReactNode }) {
   return (
-    <Box
-      sx={(theme) => ({
-        display: 'grid',
-        // A floor under the label column, so a card whose labels are all short
-        // still lines its values up where a longer-labelled card puts them.
-        gridTemplateColumns: `auto minmax(${theme.spacing(11)}, auto) 1fr`,
-        alignItems: 'center',
-        // Icon to label only. The label to value gap is padding on the label, so
-        // widening one does not widen the other.
-        columnGap: 1,
-        rowGap: 1,
-      })}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       {children}
     </Box>
   );
@@ -40,18 +33,36 @@ export default function CardDetailLine({
   children,
 }: CardDetailLineProps) {
   return (
-    <>
-      {icon}
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ paddingRight: 2 }}
+    <Box
+      sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, minWidth: 0 }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          flexShrink: 0,
+          // One label line (13px x 1.4), so the icon centres on the label
+          // rather than on the whole pair.
+          height: '18px',
+        }}
       >
-        {label}
-      </Typography>
-      <Typography variant="body1" sx={{ minWidth: 0 }}>
-        {children}
-      </Typography>
-    </>
+        {icon}
+      </Box>
+      <Box
+        sx={{
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '3px',
+        }}
+      >
+        <Typography component="div" sx={LABEL_SX}>
+          {label}
+        </Typography>
+        <Typography component="div" sx={VALUE_SX}>
+          {children}
+        </Typography>
+      </Box>
+    </Box>
   );
 }
