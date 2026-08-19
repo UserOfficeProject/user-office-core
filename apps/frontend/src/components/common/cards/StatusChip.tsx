@@ -34,9 +34,11 @@ export default function StatusChip({
       // and every status would lose both its border and its colour. This
       // component is itself the one place the status chip is defined.
       sx={(theme) => ({
-        fontSize: theme.typography.pxToRem(14),
+        height: 'auto',
+        fontSize: theme.typography.pxToRem(12),
         fontWeight: 550,
         borderWidth: 1,
+        '& .MuiChip-label': { padding: theme.spacing(0.5, 1.125) },
       })}
     />
   );
