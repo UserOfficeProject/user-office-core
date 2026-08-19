@@ -340,7 +340,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalPk: number,
     instrumentId: number
   ): Promise<number> {
-    const result = await database.raw(`
+    const result = await database.raw(
+      `
       SELECT sum(timeRequestedOne) AS total_time_requested FROM (
         --First query is for handling multiInstrument picker when answers.answer.value is an array.
         SELECT 
@@ -365,7 +366,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         INNER JOIN answers a ON a.questionary_id = p.questionary_id 
         WHERE jsonb_typeof(a.answer -> 'value') = 'object' 
       ) AS combinedResults
-      WHERE instrumentId = '${instrumentId}' AND proposalpk = ${proposalPk};`);
+      WHERE instrumentId = '?' AND proposalpk = ?;`,
+      [instrumentId, proposalPk]
+    );
 
     return result?.rows?.[0]?.total_time_requested
       ? Number(result?.rows?.[0]?.total_time_requested)
