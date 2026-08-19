@@ -136,11 +136,10 @@ export default function UserUpcomingExperimentsTable({
             display: 'flex',
             alignItems: 'baseline',
             gap: 1,
-            padding: 1,
-            paddingBottom: 1.5,
+            paddingBottom: 1,
           }}
         >
-          <Typography variant="h5" component="h2" sx={{ fontWeight: 500 }}>
+          <Typography component="h2" sx={{ fontSize: 18, fontWeight: 500 }}>
             Upcoming Experiments
           </Typography>
         </Box>
