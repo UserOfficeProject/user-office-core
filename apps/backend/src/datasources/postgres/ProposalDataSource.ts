@@ -341,24 +341,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     instrumentId: number
   ): Promise<number> {
     //Non-nullable, time is either requested for the instrument or it is zero.
-    const result = await database('proposals as p')
-      .sum({
-        total_time_requested: database.raw(
-          "(a.answer->'value'->>'timeRequested')::numeric"
-        ),
-      })
-      .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
-      .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
-      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
-      .where('p.proposal_pk', proposalPk)
-      .where('q.data_type', 'INSTRUMENT_PICKER')
-      .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
-        instrumentId.toString(),
-      ])
-      .first();
+    const result = await database.raw(
+      `select sum(timeRequestedOne) as total_time_requested from (
+	select (instrumenrequest->>'timeRequested')::numeric as timeRequestedOne, p.proposal_pk as proposalPk, x.instrumenrequest->> 'instrumentId' as inslist from proposals p
+	inner join answers a on a.questionary_id  = p.questionary_id 
+	cross join lateral (
+	select  jsonb_array_elements(a.answer -> 'value') as instrumenrequest) x
+	where jsonb_typeof(a.answer->'value') = 'array'
+	union ALL
+	select (a.answer->'value'->>'timeRequested')::numeric as timeRequestedOne,  p.proposal_pk as proposalPk, a.answer->'value'->>'instrumentId' as inslist  from proposals p
+	inner join answers a on a.questionary_id  = p.questionary_id where jsonb_typeof(a.answer -> 'value') = 'object' 
+) as combinedResults
+where inslist = '${instrumentId}' and proposalpk =${proposalPk};`
+    );
 
-    return result?.total_time_requested
-      ? Number(result.total_time_requested)
+    return result?.rows?.[0]?.total_time_requested
+      ? Number(result?.rows?.[0]?.total_time_requested)
       : 0;
   }
 
