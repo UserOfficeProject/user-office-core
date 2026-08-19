@@ -341,31 +341,31 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     instrumentId: number
   ): Promise<number> {
     const result = await database.raw(`
-      select sum(timeRequestedOne) as total_time_requested from (
+      SELECT sum(timeRequestedOne) AS total_time_requested FROM (
         --First query is for handling multiInstrument picker when answers.answer.value is an array.
-        select 
-          (instrumentrequest->>'timeRequested')::numeric as timeRequestedOne,
-          p.proposal_pk as proposalPk,
-          x.instrumentrequest->> 'instrumentId' as instrumentId
-        from proposals p
-	      inner join answers a on a.questionary_id = p.questionary_id 
-	      cross join lateral (
-	        select 
-            jsonb_array_elements(a.answer -> 'value') as instrumentrequest) x
-	        where jsonb_typeof(a.answer->'value') = 'array'
+        SELECT 
+          (instrumentrequest->>'timeRequested')::numeric AS timeRequestedOne,
+          p.proposal_pk AS proposalPk,
+          x.instrumentrequest->> 'instrumentId' AS instrumentId
+        FROM proposals p
+	      INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+	      CROSS JOIN LATERAL (
+	        SELECT 
+            jsonb_array_elements(a.answer -> 'value') AS instrumentrequest) x
+	        WHERE jsonb_typeof(a.answer->'value') = 'array'
 
-	      union ALL
+	      UNION ALL
 	
         --Second query is for handling single instrument picker when answers.answer.value is an object.
-        select 
-          (a.answer->'value'->>'timeRequested')::numeric as timeRequestedOne,
-          p.proposal_pk as proposalPk, 
-          a.answer->'value'->>'instrumentId' as instrumentId 
-        from proposals p
-        inner join answers a on a.questionary_id = p.questionary_id 
-        where jsonb_typeof(a.answer -> 'value') = 'object' 
-      ) as combinedResults
-      where instrumentId = '${instrumentId}' and proposalpk =${proposalPk};`);
+        SELECT 
+          (a.answer->'value'->>'timeRequested')::numeric AS timeRequestedOne,
+          p.proposal_pk AS proposalPk, 
+          a.answer->'value'->>'instrumentId' AS instrumentId 
+        FROM proposals p
+        INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+        WHERE jsonb_typeof(a.answer -> 'value') = 'object' 
+      ) AS combinedResults
+      WHERE instrumentId = '${instrumentId}' AND proposalpk = ${proposalPk};`);
 
     return result?.rows?.[0]?.total_time_requested
       ? Number(result?.rows?.[0]?.total_time_requested)
