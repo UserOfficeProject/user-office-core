@@ -11,6 +11,26 @@ export const belowCompactUi = (theme: Theme) =>
 /** WCAG 2.5.5 minimum hit target, on the theme spacing scale rather than in px. */
 export const minTouchTarget = (theme: Theme) => theme.spacing(5.5);
 
+/**
+ * A control that renders shorter than `minTouchTarget` but still meets it, by
+ * growing its pointer area with a pseudo-element. `height` is on the spacing
+ * scale, like the rest of this module.
+ */
+export const compactTouchTarget = (theme: Theme, height: number) => {
+  const size = theme.spacing(height);
+
+  return {
+    position: 'relative' as const,
+    height: size,
+    minHeight: size,
+    '&::after': {
+      content: '""',
+      position: 'absolute' as const,
+      inset: `calc((${size} - ${minTouchTarget(theme)}) / 2)`,
+    },
+  };
+};
+
 /** MUI's own BottomNavigation height, for clearing the fixed dashboard nav. */
 export const bottomNavHeight = (theme: Theme) => theme.spacing(7);
 

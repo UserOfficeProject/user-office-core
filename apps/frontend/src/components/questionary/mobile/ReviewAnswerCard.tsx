@@ -8,16 +8,8 @@ import React, { useState } from 'react';
 
 import { TableRowData } from '../QuestionaryDetails';
 
-const LABEL_SX = { fontSize: 13, lineHeight: 1.4, color: 'text.secondary' };
-
-const VALUE_SX = {
-  fontWeight: 500,
-  fontSize: 15,
-  lineHeight: 1.4,
-  overflowWrap: 'anywhere',
-};
-
-const EMPTY_SX = { fontSize: 15, lineHeight: 1.4, color: 'text.disabled' };
+// The em dash stands in for an answer, so it is deliberately lighter than one.
+const EMPTY_SX = { fontWeight: 400, color: 'text.disabled' };
 
 /**
  * A rendered element counts as answered even when it looks empty, because we
@@ -163,15 +155,15 @@ export default function ReviewAnswerCard({
               gap: '3px',
             }}
           >
-            <Typography component="div" sx={LABEL_SX}>
+            <Typography variant="cardLabel" component="div">
               {row.label}
             </Typography>
             {isEmpty(row.value) ? (
-              <Typography component="div" sx={EMPTY_SX}>
+              <Typography variant="cardValue" component="div" sx={EMPTY_SX}>
                 —
               </Typography>
             ) : (
-              <Typography component="div" sx={VALUE_SX}>
+              <Typography variant="cardValue" component="div">
                 {row.value}
               </Typography>
             )}
