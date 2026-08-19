@@ -376,7 +376,6 @@ const sendMail = async (
   const emailEventHandler = container.resolve<
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.EmailEventHandler);
-
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -405,6 +404,10 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
+              call: recipientWithData.call,
+              faps: recipientWithData.faps,
+              fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
+              technicalReviews: recipientWithData.technicalReviews,
             },
             recipients: [{ address: recipientWithData.email }],
           });

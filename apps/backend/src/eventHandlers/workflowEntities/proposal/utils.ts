@@ -10,14 +10,19 @@ import { GenericTemplateDataSource } from '../../../datasources/GenericTemplateD
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
 import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
+import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
+import { Call } from '../../../models/Call';
+import { FapProposal } from '../../../models/Fap';
+import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
 import { InstrumentWithManagementTime } from '../../../models/Instrument';
 import { Proposal } from '../../../models/Proposal';
 import { Answer } from '../../../models/Questionary';
+import { TechnicalReview } from '../../../models/TechnicalReview';
 import { Technique } from '../../../models/Technique';
 import { DataType } from '../../../models/Template';
 import { BasicUserDetails, User } from '../../../models/User';
@@ -75,6 +80,10 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
+  call?: Call | null;
+  faps?: FapProposal[];
+  fapMeetingDecisions?: FapMeetingDecision[];
+  technicalReviews?: TechnicalReview[] | null;
 };
 
 async function stepAnswers(
@@ -158,6 +167,16 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
     Tokens.TemplateDataSource
   );
 
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+
+  const reviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
+  );
+
   await Promise.all(
     recipientUsers.map(async (recipient) => {
       const foundIndex = emailReadyUsersWithProposals.findIndex(
@@ -176,17 +195,21 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           ? await usersDataSource.getProposalUsers(proposal.primaryKey)
           : null;
 
-        const callDataSource = container.resolve<CallDataSource>(
-          Tokens.CallDataSource
-        );
+        const [call, faps, fapMeetingDecisions, technicalReviews, questionary] =
+          await Promise.all([
+            callDataSource.getCall(proposal.callId),
+            fapDataSource.getFapsByProposalPks([proposal.primaryKey]),
+            fapDataSource.getProposalsFapMeetingDecisions([
+              proposal.primaryKey,
+            ]),
+            reviewDataSource.getTechnicalReviews(proposal.primaryKey),
+            questionaryDataSource.getQuestionary(proposal.questionaryId),
+          ]);
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
         let proposalTemplateName: string | undefined = '';
 
-        const questionary = await questionaryDataSource.getQuestionary(
-          proposal.questionaryId
-        );
         const templateId = questionary ? questionary?.templateId : -1;
         if (templateId == -1) {
           logger.logError('Could not fetch proposal templateId for email', {
@@ -250,6 +273,10 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
+          call,
+          faps,
+          fapMeetingDecisions,
+          technicalReviews,
         });
       }
     })
