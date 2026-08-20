@@ -4,8 +4,8 @@ import { validateConfigBeforeWrite } from './TemplateMutations';
 import database from '../datasources/postgres/database';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 
-jest.mock('../database');
-jest.mock('../QuestionRegistry');
+jest.mock('../datasources/postgres/database');
+jest.mock('../models/questionTypes/QuestionRegistry');
 
 describe('validateConfigBeforeWrite', () => {
   it('should validate a valid config without throwing', async () => {
