@@ -28,6 +28,12 @@ const FLATTEN_CONTAINER = {
   },
 };
 
+const CARD_PAGING = {
+  pageSize: 20,
+  pageSizeOptions: [20],
+  showFirstLastPageButtons: false,
+};
+
 export type ResponsiveMaterialTableProps<RowData extends object> =
   MaterialTableProps<RowData> & {
     /** Replaces the generic card body on the mobile card path. */
@@ -44,7 +50,11 @@ function ResponsiveMaterialTable<RowData extends object>({
     <MaterialTable
       {...props}
       components={asCards ? CARD_ROW : DEFAULT_ROW}
-      options={{ header: !asCards, ...props.options }}
+      options={{
+        header: !asCards,
+        ...(asCards ? CARD_PAGING : {}),
+        ...props.options,
+      }}
     />
   );
 
