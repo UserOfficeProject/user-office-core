@@ -366,7 +366,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         INNER JOIN answers a ON a.questionary_id = p.questionary_id 
         WHERE jsonb_typeof(a.answer -> 'value') = 'object' 
       ) AS combinedResults
-      WHERE instrumentId = '?' AND proposalpk = ?;`,
+      WHERE instrumentId = ? AND proposalpk = ?;`,
       [instrumentId, proposalPk]
     );
 
