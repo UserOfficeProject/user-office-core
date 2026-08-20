@@ -1,20 +1,15 @@
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import {
-  belowCompactUi,
-  minTouchTarget,
-  useIsMobile,
-} from 'hooks/common/useResponsive';
+import StyledDialog from 'components/common/StyledDialog';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { useProposalInvites } from 'hooks/invite/useProposalInvites';
 
 const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
@@ -28,7 +23,6 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
     acceptDataAccessInvite,
   } = useProposalInvites();
   const { enqueueSnackbar } = useSnackbar();
-  const isMobile = useIsMobile();
 
   if (proposalInvites.length === 0 && dataAccessInvites.length === 0) {
     return null;
@@ -124,17 +118,14 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           {loading ? 'Loading...' : 'View Invitations'}
         </Button>
       </Box>
-      <Dialog
+      <StyledDialog
         data-testid="proposal-invite-dialog"
+        title="Proposal Invitations"
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         maxWidth="md"
         fullWidth
-        fullScreen={isMobile}
       >
-        <DialogTitle>
-          <Typography variant="h6">Proposal Invitations</Typography>
-        </DialogTitle>
         <DialogContent>
           {proposalInvites.length === 0 && dataAccessInvites.length === 0 ? (
             <Typography variant="body1" color="textSecondary">
@@ -262,7 +253,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
     </>
   );
 };
