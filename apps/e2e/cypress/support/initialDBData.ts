@@ -209,6 +209,12 @@ export default {
     questionaryId: 2,
     shortCode: '999999',
   },
+  // NOTE: The second proposal from db_seeds/0001_ProposalForScheduling.sql.
+  proposal2: {
+    id: 2,
+    title: 'Test proposal 2',
+    shortCode: '222222',
+  },
   technicalReview: {
     questionaryId: 3,
   },
@@ -428,21 +434,40 @@ export default {
   experiments: {
     upcoming: {
       experimentPk: 996,
+      experimentId: '000001',
+      proposalPk: 1,
       startsAt: '07-01-2030 10:00',
       endsAt: '07-01-2030 11:00',
     },
     upcomingDraft: {
+      experimentPk: 998,
+      experimentId: '000003',
+      proposalPk: 1,
       startsAt: '07-01-2030 12:00',
       endsAt: '07-01-2030 13:00',
     },
     ended: {
+      experimentPk: 997,
+      experimentId: '000002',
+      proposalPk: 2,
       startsAt: '07-01-2020 10:00',
       endsAt: '07-01-2020 11:00',
     },
     completed: {
+      experimentPk: 999,
+      experimentId: '000004',
+      proposalPk: 1,
       startsAt: '07-02-2030 12:00',
       endsAt: '07-02-2030 13:00',
     },
+  },
+  // NOTE: The pending co-proposer invites from db_seeds/0007_CoProposersInvite.sql,
+  // in the order they are inserted, which is the order the invite ids follow.
+  coProposerInvites: {
+    user3OnProposal1: { id: 1, code: 'DAVE001', proposalPk: 1 },
+    user2OnProposal1: { id: 2, code: 'BEN001', proposalPk: 1 },
+    user3OnProposal2: { id: 3, code: 'DAVE002', proposalPk: 2 },
+    user2OnProposal2: { id: 4, code: 'BEN002', proposalPk: 2 },
   },
   features: {
     instrumentManagement: {
