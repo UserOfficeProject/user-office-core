@@ -345,7 +345,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       SELECT sum(timeRequestedOne) AS total_time_requested FROM (
         --First query is for handling multiInstrument picker when answers.answer.value is an array.
         SELECT 
-          (instrumentrequest->>'timeRequested')::numeric AS timeRequestedOne,
+          COALESCE((instrumentrequest->>'timeRequested')::numeric, 0) AS timeRequestedOne,
           p.proposal_pk AS proposalPk,
           x.instrumentrequest->> 'instrumentId' AS instrumentId
         FROM proposals p
@@ -359,7 +359,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 	
         --Second query is for handling single instrument picker when answers.answer.value is an object.
         SELECT 
-          (a.answer->'value'->>'timeRequested')::numeric AS timeRequestedOne,
+          COALESCE((a.answer->'value'->>'timeRequested')::numeric, 0) AS timeRequestedOne,
           p.proposal_pk AS proposalPk, 
           a.answer->'value'->>'instrumentId' AS instrumentId 
         FROM proposals p
