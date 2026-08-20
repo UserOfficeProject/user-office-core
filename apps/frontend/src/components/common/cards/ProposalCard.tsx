@@ -60,7 +60,7 @@ export default function ProposalCard({
           >
             <Typography
               variant="cardTitle"
-              component="h3"
+              component="h4"
               sx={{ flex: 1, minWidth: 0 }}
             >
               {proposal.title}
