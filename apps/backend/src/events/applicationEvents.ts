@@ -194,6 +194,11 @@ interface ProposalStatusActionExecutedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ExperimentSafetyStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED;
+  experimentSafety: ExperimentSafety;
+}
+
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
   proposals: Proposals;
@@ -415,6 +420,9 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
 interface UserDataAccessUpdatedEvent extends GeneralEvent {
   type: Event.DATA_ACCESS_USERS_UPDATED;
   proposalPKey: number;
+  // Users newly added as data access users in this update (empty on removals
+  // or no-op updates). Used to notify only the freshly invited users by email.
+  newlyAddedUserIds: number[];
 }
 
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
@@ -455,7 +463,7 @@ interface ExperimentSafetyStatusChangedByWorkflowEvent extends GeneralEvent {
 }
 interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER;
-  experimentsafety: ExperimentSafety;
+  array: ExperimentSafety[];
 }
 
 interface ExperimentESFSubmittedEvent extends GeneralEvent {
@@ -541,6 +549,7 @@ export type ApplicationEvent =
   | InstrumentDeletedEvent
   | FapReviewerNotified
   | ProposalStatusActionExecutedEvent
+  | ExperimentSafetyStatusActionExecutedEvent
   | TechniqueCreatedEvent
   | TechniqueUpdatedEvent
   | TechniqueDeletedEvent

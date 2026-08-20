@@ -350,6 +350,61 @@ export async function essEmailHandler(event: ApplicationEvent) {
       break;
     }
 
+    case Event.DATA_ACCESS_USERS_UPDATED: {
+      // Only newly added users are notified; a pure removal or no-op update
+      // carries an empty list and sends nothing.
+      if (event.newlyAddedUserIds.length === 0) {
+        return;
+      }
+
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
+
+      const invitedUsers = await userDataSource.getBasicUsersInfo(
+        event.newlyAddedUserIds
+      );
+
+      for (const user of invitedUsers) {
+        mailService
+          .sendMail({
+            content: {
+              template: EmailTemplateId.DATA_ACCESS_USER_ADDED,
+            },
+            substitution_data: {
+              preferredname: user.preferredname,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              proposalTitle: proposal.title,
+              proposalId: proposal.proposalId,
+            },
+            recipients: [{ address: user.email }],
+          })
+          .then((res) => {
+            logger.logInfo('Email sent on data access user added', {
+              result: res,
+              userId: user.id,
+              proposalPKey: event.proposalPKey,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email on data access user added', {
+              error: err,
+              userId: user.id,
+              event,
+            });
+          });
+      }
+
+      return;
+    }
+
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
       const fapReviewer = await userDataSource.getUser(userID);

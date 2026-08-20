@@ -40,48 +40,46 @@ export type UserProposalDataType = {
 
 const ProposalTableUser = () => {
   const api = useDataApi();
-  const [loading, setLoading] = useState<boolean>(false);
   const [refreshTableKey, setRefreshTableKey] = useState(0);
-  const sendUserProposalRequest = useCallback(async () => {
-    setLoading(true);
+  const sendUserProposalRequest = useCallback(
+    async (page: number, pageSize: number) => {
+      return api()
+        .getUserProposals({ first: pageSize, offset: page * pageSize })
+        .then((data) => {
+          return {
+            page,
+            totalCount: data?.me?.paginatedProposals?.totalCount,
+            data: data?.me?.paginatedProposals?.userProposals
+              .sort((a, b) => {
+                return (
+                  new Date(b.created).getTime() - new Date(a.created).getTime()
+                );
+              })
+              .map((proposal) => {
+                const hasReferenceNumberFormat =
+                  !!proposal.call?.referenceNumberFormat;
 
-    return api()
-      .getUserProposals()
-      .then((data) => {
-        setLoading(false);
-
-        return {
-          page: 0,
-          totalCount: data?.me?.proposals.length,
-          data: data?.me?.proposals
-            .sort((a, b) => {
-              return (
-                new Date(b.created).getTime() - new Date(a.created).getTime()
-              );
-            })
-            .map((proposal) => {
-              const hasReferenceNumberFormat =
-                !!proposal.call?.referenceNumberFormat;
-
-              return {
-                primaryKey: proposal.primaryKey,
-                title: proposal.title,
-                status: proposal.status,
-                publicStatus: proposal.publicStatus,
-                submitted: proposal.submitted,
-                proposalId:
-                  !proposal.submitted && hasReferenceNumberFormat
-                    ? `* ${proposal.proposalId}`
-                    : proposal.proposalId,
-                created: proposal.created,
-                notified: proposal.notified,
-                proposerId: proposal.proposer?.id,
-                call: proposal.call,
-              };
-            }),
-        };
-      });
-  }, [api]);
+                return {
+                  primaryKey: proposal.primaryKey,
+                  title: proposal.title,
+                  status: proposal.status,
+                  publicStatus: proposal.publicStatus,
+                  submitted: proposal.submitted,
+                  proposalId:
+                    !proposal.submitted && hasReferenceNumberFormat
+                      ? `* ${proposal.proposalId}`
+                      : proposal.proposalId,
+                  created: proposal.created,
+                  notified: proposal.notified,
+                  proposerId: proposal.proposer?.id,
+                  call: proposal.call,
+                };
+              }),
+          };
+        });
+    },
+    [api]
+  );
 
   return (
     <>
@@ -92,7 +90,6 @@ const ProposalTableUser = () => {
         title="My proposals"
         search={false}
         searchQuery={sendUserProposalRequest}
-        isLoading={loading}
         key={refreshTableKey}
       />
     </>

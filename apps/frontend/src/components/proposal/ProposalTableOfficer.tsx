@@ -6,6 +6,7 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
+import ApprovalIcon from '@mui/icons-material/Approval';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -26,10 +27,11 @@ import {
   getTranslation,
 } from '@user-office-software/duo-localisation';
 import { TFunction } from 'i18next';
+import { useSnackbar } from 'notistack';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
@@ -37,6 +39,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import RoleBasedLink from 'components/common/RoleBasedLink';
 import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
@@ -63,11 +66,13 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
+import { fromArrayToCommaSeparatedLinks } from 'utils/fromArrayToCommaSeparatedLinks';
 import {
   addColumns,
   fromArrayToCommaSeparated,
@@ -83,6 +88,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import NotifyProposal from './NotifyProposal';
+import { AdministrationFormData } from './ProposalAdmin';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
@@ -130,9 +136,17 @@ let columns: Column<ProposalViewData>[] = [
     sorting: false,
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname
-        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
-        : '',
+      proposalView.principalInvestigator?.lastname ? (
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/People/${proposalView.principalInvestigator.id}`,
+          }}
+        >
+          {`${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`}
+        </RoleBasedLink>
+      ) : (
+        ''
+      ),
   },
   {
     title: 'PI Email',
@@ -157,6 +171,19 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Call',
     field: 'callShortCode',
+    // No per-call route exists, so officers link to the Calls list page.
+    render: (rowData) =>
+      rowData.callShortCode ? (
+        <RoleBasedLink
+          roleRoutes={{
+            [UserRole.USER_OFFICER]: `/Calls?search=${encodeURIComponent(rowData.callShortCode)}`,
+          }}
+        >
+          {rowData.callShortCode}
+        </RoleBasedLink>
+      ) : (
+        ''
+      ),
   },
 ];
 
@@ -200,10 +227,19 @@ const instrumentManagementColumns = (
   {
     title: t('instrument'),
     field: 'instruments.name',
+    // No per-instrument route exists, so officers link to the Instruments list page.
+
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(
-        rowData.instruments?.map((instrument) => instrument.name)
+      fromArrayToCommaSeparatedLinks(
+        rowData.instruments?.map((instrument) => ({
+          key: instrument.id,
+          label: instrument.name,
+          roleRoutes: {
+            [UserRole.USER_OFFICER]: `/Instruments?search=${instrument.name}`,
+          },
+        }))
       ),
+
     customFilterAndSearch: () => true,
   },
 ];
@@ -223,7 +259,13 @@ const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
     title: t('FAP'),
     field: 'faps.code',
     render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
+      fromArrayToCommaSeparatedLinks(
+        rowData.faps?.map((fap) => ({
+          key: fap.id,
+          label: fap.code,
+          roleRoutes: { [UserRole.USER_OFFICER]: `/FapPage/${fap.id}` },
+        }))
+      ),
   },
 ];
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
@@ -429,6 +471,7 @@ const ProposalTableOfficer = ({
   const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
   const isReadOnly = useCheckAccess([UserRole.PROPOSAL_READER]);
 
@@ -626,6 +669,40 @@ const ProposalTableOfficer = ({
 
       refreshTableData();
     });
+  };
+  let successCount = 0;
+  let failCount = 0;
+  const { enqueueSnackbar } = useSnackbar();
+  const suppressednackbarAPI = useDataApi(true);
+  const sendProposalsToManagementDecision = async (): Promise<void> => {
+    await Promise.all(
+      getSelectedProposalPks().map(async (proposalPk) => {
+        const administrationValues = {
+          proposalPk: proposalPk,
+          commentForUser: null,
+          commentForManagement: null,
+          finalStatus: null,
+          managementTimeAllocations: null,
+          managementDecisionSubmitted: true,
+        };
+        const inputvals: AdministrationFormData = administrationValues;
+        try {
+          await suppressednackbarAPI().administrationProposal(inputvals);
+          successCount += 1;
+        } catch {
+          failCount += 1;
+        }
+      })
+    );
+    refreshTableData();
+    enqueueSnackbar(
+      `${successCount} management decision(s) were submitted and ${failCount} failed.`,
+      {
+        variant: 'info',
+        className: 'snackbar-info',
+        autoHideDuration: 5000,
+      }
+    );
   };
 
   const assignProposalsToFaps = async (
@@ -928,6 +1005,22 @@ const ProposalTableOfficer = ({
 
   const tableActions: Action<ProposalViewData>[] = [
     {
+      icon: ApprovalIcon,
+      tooltip: 'Submit Management Decision',
+      onClick: () => {
+        confirm(
+          () => {
+            sendProposalsToManagementDecision();
+          },
+          {
+            title: 'Submit Management Decision',
+            description: `This action will submit the management decision for ${selectedProposalsData.length} proposal(s).`,
+          }
+        )();
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
       icon: FileCopy,
       tooltip: 'Clone proposals to call',
       onClick: () =>
@@ -1219,11 +1312,21 @@ const ProposalTableOfficer = ({
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={() => {
+          const from = searchParams.get('from');
+
           if (searchParams.get('proposalId')) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
+          }
+
+          if (from) {
+            // Return to the page that opened the modal (e.g. Experiments),
+            // restoring its filters, instead of staying on /Proposals.
+            navigate(decodeURIComponent(from), { replace: true });
+
+            return;
           }
 
           setSearchParams((searchParams) => {
