@@ -1,20 +1,15 @@
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import {
-  belowCompactUi,
-  minTouchTarget,
-  useIsMobile,
-} from 'hooks/common/useResponsive';
+import StyledDialog from 'components/common/StyledDialog';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { useProposalInvites } from 'hooks/invite/useProposalInvites';
 
 const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
@@ -26,7 +21,6 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
     acceptCoProposerInvite,
   } = useProposalInvites();
   const { enqueueSnackbar } = useSnackbar();
-  const isMobile = useIsMobile();
 
   if (proposalInvites.length === 0) {
     return null;
@@ -102,33 +96,28 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           {loading ? 'Loading...' : 'View Invitations'}
         </Button>
       </Box>
-      <Dialog
+      <StyledDialog
         data-testid="proposal-invite-dialog"
+        title="Proposal Invitations"
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         maxWidth="md"
         fullWidth
-        fullScreen={isMobile}
       >
-        <DialogTitle>
-          <Typography variant="h6">Proposal Invitations</Typography>
-        </DialogTitle>
         <DialogContent>
           {proposalInvites.length === 0 ? (
             <Typography variant="body1" color="textSecondary">
               No pending invitations found.
             </Typography>
           ) : (
-            proposalInvites.map((invite) => (
-              <>
-                {invite.proposal && (
+            proposalInvites.map(
+              (invite) =>
+                invite.proposal && (
                   <Box
                     key={invite.id}
-                    sx={{
-                      backgroundColor: (theme) =>
-                        alpha(theme.palette.info.main, 0.12),
-                      border: (theme) =>
-                        `1px solid ${alpha(theme.palette.info.main, 0.5)}`,
+                    sx={(theme) => ({
+                      backgroundColor: alpha(theme.palette.info.main, 0.12),
+                      border: `1px solid ${alpha(theme.palette.info.main, 0.5)}`,
                       color: 'info.main',
                       borderRadius: 1,
                       padding: 2,
@@ -136,8 +125,16 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      gap: theme.spacing(2),
                       width: '100%',
-                    }}
+                      // The same squeeze the notification above has: a
+                      // space-between row leaves the title a few words wide.
+                      [belowCompactUi(theme)]: {
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        gap: theme.spacing(1.25),
+                      },
+                    })}
                   >
                     <div>
                       <Typography
@@ -156,7 +153,19 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                         {new Date(invite.createdAt).toLocaleDateString()}
                       </Typography>
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <Box
+                      sx={(theme) => ({
+                        display: 'flex',
+                        gap: 1,
+                        flexShrink: 0,
+                        [belowCompactUi(theme)]: {
+                          '& .MuiButton-root': {
+                            flex: 1,
+                            minHeight: minTouchTarget(theme),
+                          },
+                        },
+                      })}
+                    >
                       <Button
                         data-testid={`accept-invite-btn-${invite.id}`}
                         color="primary"
@@ -169,11 +178,10 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
                           ? 'Processing...'
                           : 'Accept'}
                       </Button>
-                    </div>
+                    </Box>
                   </Box>
-                )}
-              </>
-            ))
+                )
+            )
           )}
         </DialogContent>
         <DialogActions>
@@ -181,7 +189,7 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
     </>
   );
 };
