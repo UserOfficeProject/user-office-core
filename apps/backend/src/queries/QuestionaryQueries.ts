@@ -108,7 +108,6 @@ export default class QuestionaryQueries {
     return this.dataSource.getCount(templateId);
   }
 
-  @Authorized()
   async isCompleted(agent: UserWithRole | null, questionaryId: number) {
     const hasRights =
       this.userAuth.isApiToken(agent) ||
