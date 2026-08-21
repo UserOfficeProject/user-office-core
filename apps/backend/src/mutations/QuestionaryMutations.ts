@@ -201,9 +201,37 @@ export default class QuestionaryMutations {
       await this.dataSource.getQuestionarySteps(questionaryId)
     ).find((step) => step.topic.id === topicId)?.fields;
 
-    const missingAnswers = currentAnswers?.filter(
-      (oldAnswer) =>
-        !answers.some((answer) => answer.questionId === oldAnswer.question.id)
+    const hasQuestionReadPermission = (questionField: {
+      config: { readPermissions: string[] };
+    }) =>
+      this.userAuth.isApiToken(agent) ||
+      questionField.config.readPermissions.length === 0 ||
+      questionField.config.readPermissions.includes(
+        agent?.currentRole?.shortCode ?? ''
+      );
+
+    const unauthorizedSubmittedAnswer = answers.find((submittedAnswer) => {
+      const currentAnswer = currentAnswers?.find(
+        (answer) => answer.question.id === submittedAnswer.questionId
+      );
+
+      return currentAnswer != null && !hasQuestionReadPermission(currentAnswer);
+    });
+
+    if (unauthorizedSubmittedAnswer) {
+      return rejection(
+        'Can not answer topic because of insufficient question permissions',
+        { agent, answer: unauthorizedSubmittedAnswer }
+      );
+    }
+
+    const missingReadableAnswers = currentAnswers?.filter(
+      (currentAnswer) =>
+        hasQuestionReadPermission(currentAnswer) &&
+        !answers.some(
+          (submittedAnswer) =>
+            submittedAnswer.questionId === currentAnswer.question.id
+        )
     );
 
     const answersToUpdate = answers.filter((answer) => {
@@ -221,7 +249,7 @@ export default class QuestionaryMutations {
       answers,
       answersToUpdate
         .map((a) => a.questionId)
-        .concat(missingAnswers?.map((a) => a.question.id) || []),
+        .concat(missingReadableAnswers?.map((a) => a.question.id) || []),
       agent
     );
 
@@ -240,6 +268,13 @@ export default class QuestionaryMutations {
               questionId: answer.questionId,
               templateId: questionary.templateId,
             }
+          );
+        }
+
+        if (!hasQuestionReadPermission(questionTemplateRelation)) {
+          return rejection(
+            'Can not answer topic because of insufficient question permissions',
+            { agent, answer }
           );
         }
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
