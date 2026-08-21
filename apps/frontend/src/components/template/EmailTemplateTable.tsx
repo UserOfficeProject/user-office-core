@@ -87,6 +87,7 @@ const EmailTemplatesTable = () => {
           debounceInterval: 400,
         }}
         createModal={createModal}
+        createModalSize="lg"
         persistUrlQueryParams={true}
       ></SuperMaterialTable>
     </div>

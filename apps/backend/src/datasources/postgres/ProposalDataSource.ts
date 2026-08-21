@@ -340,25 +340,38 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalPk: number,
     instrumentId: number
   ): Promise<number> {
-    //Non-nullable, time is either requested for the instrument or it is zero.
-    const result = await database('proposals as p')
-      .sum({
-        total_time_requested: database.raw(
-          "(a.answer->'value'->>'timeRequested')::numeric"
-        ),
-      })
-      .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
-      .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
-      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
-      .where('p.proposal_pk', proposalPk)
-      .where('q.data_type', 'INSTRUMENT_PICKER')
-      .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
-        instrumentId.toString(),
-      ])
-      .first();
+    const result = await database.raw(
+      `
+      SELECT sum(timeRequestedOne) AS total_time_requested FROM (
+        --First query is for handling multiInstrument picker when answers.answer.value is an array.
+        SELECT 
+          COALESCE((instrumentrequest->>'timeRequested')::numeric, 0) AS timeRequestedOne,
+          p.proposal_pk AS proposalPk,
+          x.instrumentrequest->> 'instrumentId' AS instrumentId
+        FROM proposals p
+	      INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+	      CROSS JOIN LATERAL (
+	        SELECT 
+            jsonb_array_elements(a.answer -> 'value') AS instrumentrequest) x
+	        WHERE jsonb_typeof(a.answer->'value') = 'array'
 
-    return result?.total_time_requested
-      ? Number(result.total_time_requested)
+	      UNION ALL
+	
+        --Second query is for handling single instrument picker when answers.answer.value is an object.
+        SELECT 
+          COALESCE((a.answer->'value'->>'timeRequested')::numeric, 0) AS timeRequestedOne,
+          p.proposal_pk AS proposalPk, 
+          a.answer->'value'->>'instrumentId' AS instrumentId 
+        FROM proposals p
+        INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+        WHERE jsonb_typeof(a.answer -> 'value') = 'object' 
+      ) AS combinedResults
+      WHERE instrumentId = ? AND proposalpk = ?;`,
+      [instrumentId, proposalPk]
+    );
+
+    return result?.rows?.[0]?.total_time_requested
+      ? Number(result?.rows?.[0]?.total_time_requested)
       : 0;
   }
 
@@ -915,11 +928,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async getUserProposals(
     id: number,
-    filter?: UserProposalsFilter
-  ): Promise<Proposal[]> {
+    filter?: UserProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
     return (
       database
-        .select('p.*')
+        .select('p.*', database.raw('count(*) OVER() AS full_count'))
         .from('proposals as p')
         .where('p.proposer_id', id) // Principal investigator
         .orWhereIn('p.proposal_pk', function () {
@@ -963,9 +978,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           }
         })
         .groupBy('p.proposal_pk')
-        .then((proposals: ProposalRecord[]) =>
-          proposals.map((proposal) => createProposalObject(proposal))
-        )
+        .modify((qb) => {
+          if (first) qb.limit(first);
+          if (offset) qb.offset(offset);
+        })
+        .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
+          userProposals: proposals.map((proposal) =>
+            createProposalObject(proposal)
+          ),
+          totalCount: proposals[0]?.full_count ?? 0,
+        }))
     );
   }
 

@@ -121,7 +121,7 @@ export function createListenToQueueHandler() {
   );
 }
 
-export const getProposalMessageData = async (proposal: Proposal) => {
+const buildProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -231,7 +231,21 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     );
   }
 
+  return messageData;
+};
+
+export const getProposalMessageData = async (proposal: Proposal) => {
+  const messageData = await buildProposalMessageData(proposal);
+
   return JSON.stringify(messageData);
+};
+
+export const getProposalsMessageData = async (proposals: Proposal[]) => {
+  const proposalsMessageData = await Promise.all(
+    proposals.map(buildProposalMessageData)
+  );
+
+  return JSON.stringify(proposalsMessageData);
 };
 
 export const getExperimentMessageData = async (experiment: Experiment) => {
@@ -327,6 +341,19 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
+        const jsonMessage = await getProposalsMessageData(
+          event.proposals.proposals
+        );
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
@@ -488,18 +515,14 @@ export async function createPostToRabbitMQHandler() {
           break;
         }
 
-        const proposal = await proposalDataSource.getProposalByVisitId(
+        const experiment = await experimentDataSource.getExperimentByVisitId(
           visitRegistration.visitId
         );
-        const proposalPayload = await getProposalMessageData(proposal);
-        const user = await userDataSource.getUser(visitRegistration.userId);
-        const jsonMessage = JSON.stringify({
-          id: visitRegistration.id,
-          startAt: visitRegistration.startsAt,
-          endAt: visitRegistration.endsAt,
-          visitorId: user!.oidcSub,
-          proposal: JSON.parse(proposalPayload),
-        });
+        if (!experiment) {
+          break;
+        }
+
+        const jsonMessage = await getExperimentMessageData(experiment);
         let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
         if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
@@ -515,8 +538,8 @@ export async function createPostToRabbitMQHandler() {
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
-          Event.PROPOSAL_UPDATED,
-          proposalPayload
+          Event.EXPERIMENT_UPDATED,
+          jsonMessage
         );
         break;
       }
@@ -708,7 +731,7 @@ export async function createListenToRabbitMQHandler() {
           const jsonMessage = await getExperimentMessageData(experiment);
           await rabbitMQ.sendMessageToExchange(
             EXCHANGE_NAME,
-            'EXPERIMENT_UPDATED',
+            Event.EXPERIMENT_UPDATED,
             jsonMessage
           );
         } catch (error) {
