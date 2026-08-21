@@ -1057,6 +1057,11 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
                 open={isRejectionCommentModalOpen}
+                onClose={() => {
+                  setRejectionCommentModalOpen(false);
+                  setUnsuccessfullPK(-1);
+                  setUnsuccessfullWorkflowID(-1);
+                }}
                 maxWidth="md"
                 fullWidth
                 title="Add Proposal Rejection Comment"

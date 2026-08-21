@@ -1171,14 +1171,14 @@ export default class ProposalMutations {
     }
 
     if (techniqueIds) {
-      this.techniqueDataSource.assignProposalToTechniques(
+      await this.techniqueDataSource.assignProposalToTechniques(
         submittedProposal.primaryKey,
         techniqueIds
       );
     }
 
     if (instrumentId) {
-      this.instrumentDataSource.assignProposalToInstrument(
+      await this.instrumentDataSource.assignProposalToInstrument(
         submittedProposal.primaryKey,
         instrumentId
       );

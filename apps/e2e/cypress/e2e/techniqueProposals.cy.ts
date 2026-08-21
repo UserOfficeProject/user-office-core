@@ -1687,10 +1687,7 @@ context('Technique Proposal tests', () => {
         workflowStatusId: underReviewStatus.workflowStatusId as number,
       });
       cy.login(scientist1);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Technique Proposals').click();
+      cy.visit('/TechniqueProposals');
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1698,9 +1695,7 @@ context('Technique Proposal tests', () => {
         .find('[data-cy="status-dropdown"]')
         .click();
 
-      cy.get('[role="listbox"]')
-        .should('contain', unsuccessfulStatus.name)
-        .click();
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
 
       cy.setTinyMceContent(
         `${createdProposalPk1}-rejection-comment`,
@@ -1723,9 +1718,7 @@ context('Technique Proposal tests', () => {
       });
       cy.login(scientist1);
       cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Technique Proposals').click();
+      cy.visit('/TechniqueProposals');
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1733,9 +1726,7 @@ context('Technique Proposal tests', () => {
         .find('[data-cy="status-dropdown"]')
         .click();
 
-      cy.get('[role="listbox"]')
-        .should('contain', unsuccessfulStatus.name)
-        .click();
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
       cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -1748,36 +1739,26 @@ context('Technique Proposal tests', () => {
 
     it('User Officer should be able to add a rejection comment when changing status to unsuccessful', function () {
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/TechniqueProposals');
       cy.finishedLoading();
-
-      cy.contains('Technique Proposals').click();
-      cy.finishedLoading();
-
       cy.contains(proposal1.title)
         .parent()
         .find('[data-cy="status-dropdown"]')
         .click();
 
-      cy.get('[role="listbox"]')
-        .should('contain', unsuccessfulStatus.name)
-        .click();
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
 
       cy.setTinyMceContent(
         `${createdProposalPk1}-rejection-comment`,
         faker.lorem.words(10)
       );
-
       cy.get('[data-cy="submit-proposal-rejection-comment"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
     });
 
     it('User Officer should be able to not add a rejection comment when changing status to unsuccessful', function () {
       cy.login('officer');
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Technique Proposals').click();
+      cy.visit('/TechniqueProposals');
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1785,9 +1766,7 @@ context('Technique Proposal tests', () => {
         .find('[data-cy="status-dropdown"]')
         .click();
 
-      cy.get('[role="listbox"]')
-        .should('contain', unsuccessfulStatus.name)
-        .click();
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
       cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
     });
