@@ -462,9 +462,9 @@ const StatusActionsLogsTable = ({
               );
 
               searchParams.delete('selection');
-              [...otherPagesSelection, ...currentPageSelection].forEach(
-                (logId) => searchParams.append('selection', logId)
-              );
+              Array.from(
+                new Set([...otherPagesSelection, ...currentPageSelection])
+              ).forEach((logId) => searchParams.append('selection', logId));
 
               return searchParams;
             });
