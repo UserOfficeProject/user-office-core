@@ -180,11 +180,11 @@ const createTopicWithQuestionsAndRelations = (
         const createdQuestion = questionResult.createQuestion;
         if (createdQuestion) {
           textId = createdQuestion.id;
-
+          const config = `{"max":"${textQuestion.maxChars}","multiline":true,"required":true,"readPermissions":[]}`;
           cy.updateQuestion({
             id: createdQuestion.id,
             question: textQuestion.title,
-            config: `{"max":"${textQuestion.maxChars}","multiline":true,"required":true,"readPermissions":[]}`,
+            config,
           });
 
           if (shouldAddQuestionsToTemplate) {
@@ -206,6 +206,7 @@ const createTopicWithQuestionsAndRelations = (
                 },
                 dependencyId: boolId,
               },
+              config,
             });
           }
         }
