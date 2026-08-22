@@ -2,6 +2,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
+import * as Yup from 'yup';
 
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
@@ -125,4 +126,26 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         }
       );
     },
+    validateConfig: (config) => {
+      if (config?.variant === 'radio' && config?.isMultipleSelect) {
+        throw new GraphQLError(
+          'Radio instrument pickers cannot have isMultipleSelect as true.'
+        );
+      }
+
+      return;
+    },
+    customYupSchema: Yup.object({
+      variant: Yup.string().required(),
+      instruments: Yup.array()
+        .of(
+          Yup.object({
+            id: Yup.number().required(),
+            name: Yup.string().required(),
+          })
+        )
+        .required(),
+      isMultipleSelect: Yup.boolean().required(),
+      requestTime: Yup.boolean().required(),
+    }),
   };
