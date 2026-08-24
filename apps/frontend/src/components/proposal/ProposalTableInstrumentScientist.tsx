@@ -207,10 +207,11 @@ const ToolbarWithSelectAllPrefetched = (props: {
         <Box
           data-cy="select-all-proposals"
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             padding: 1,
-            bgcolor: (theme) => theme.palette.background.default
-          }}>
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
+        >
           {selectAllAction.iconProps?.hidden ? (
             <>
               All proposals are selected.
@@ -954,8 +955,9 @@ const ProposalTableInstrumentScientist = ({
           <Grid
             size={{
               sm: 2,
-              xs: 12
-            }}>
+              xs: 12,
+            }}
+          >
             <ReviewerFilterComponent
               reviewer={reviewer ?? ReviewerFilter.ALL}
               onChange={(reviewer) =>
@@ -966,8 +968,9 @@ const ProposalTableInstrumentScientist = ({
           <Grid
             size={{
               sm: 10,
-              xs: 12
-            }}>
+              xs: 12,
+            }}
+          >
             <ProposalFilterBar
               calls={{ data: calls, isLoading: loadingCalls }}
               instruments={{ data: instruments, isLoading: loadingInstruments }}

@@ -15,8 +15,9 @@ const UserListItem = ({ user }: UserListItemProps) => {
       secondary={`${user?.institution || ''} , ${user?.country || ''}`}
       slotProps={{
         primary: { variant: 'body2' },
-        secondary: { variant: 'caption' }
-      }} />
+        secondary: { variant: 'caption' },
+      }}
+    />
   );
 };
 

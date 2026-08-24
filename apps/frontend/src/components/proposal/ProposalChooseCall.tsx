@@ -108,7 +108,7 @@ const ProposalChooseCall = () => {
                     </>
                   }
                   slotProps={{
-                    secondary: { component: 'div' }
+                    secondary: { component: 'div' },
                   }}
                 />
                 <ListItemSecondaryAction>
