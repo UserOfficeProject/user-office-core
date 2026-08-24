@@ -488,7 +488,7 @@ function createDateTimeRangeQuestion(
     firstTopic: options?.firstTopic ?? true,
   });
 
-  cy.contains('Add Date Range').click();
+  cy.contains('Add Date Time Range').click();
 
   if (options?.key) {
     cy.get('[data-cy=natural_key]').clear().type(options.key);
