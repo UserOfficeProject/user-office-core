@@ -107,8 +107,9 @@ const SetStatusChangingEventsOnConnection = ({
                       <Grid
                         key={index}
                         size={{
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -133,7 +134,7 @@ const SetStatusChangingEventsOnConnection = ({
                               slotProps={{
                                 input: {
                                   'aria-label': 'primary checkbox',
-                                }
+                                },
                               }}
                             />
                           }
@@ -160,12 +161,15 @@ const SetStatusChangingEventsOnConnection = ({
             container
             spacing={1}
             sx={{
-              justifyContent: "flex-end",
-              paddingTop: 1
-            }}>
-            <Grid sx={{
-              marginTop: 1
-            }}>
+              justifyContent: 'flex-end',
+              paddingTop: 1,
+            }}
+          >
+            <Grid
+              sx={{
+                marginTop: 1,
+              }}
+            >
               <ErrorMessage name="selectedStatusChangingEvents" />
             </Grid>
             <Grid>

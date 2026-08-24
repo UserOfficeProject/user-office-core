@@ -29,8 +29,9 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <Paper
             elevation={0}
             sx={(theme) => ({
@@ -50,8 +51,9 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <Paper
             elevation={0}
             sx={(theme) => ({

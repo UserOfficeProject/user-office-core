@@ -59,8 +59,9 @@ const FapReviewersAndAssignments = ({
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallFilter
             calls={calls}
             isLoading={loadingCalls}
@@ -71,8 +72,9 @@ const FapReviewersAndAssignments = ({
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <InstrumentFilter
             instruments={instruments}
             isLoading={loadingInstruments}

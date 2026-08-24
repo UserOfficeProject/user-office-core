@@ -141,8 +141,9 @@ const FapsTable = () => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <FapStatusFilter
             fapStatus={fapStatus || FapStatus.ACTIVE}
             onChange={handleStatusFilterChange}

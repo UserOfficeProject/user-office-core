@@ -114,9 +114,12 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container sx={{
-        alignItems: "flex-end"
-      }}>
+      <Grid
+        container
+        sx={{
+          alignItems: 'flex-end',
+        }}
+      >
         <Grid size={12}>
           <FormLabel>
             <>
@@ -134,7 +137,8 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={3}>
+          size={3}
+        >
           <TextField
             label="Min"
             id={`${id}-Min`}
@@ -167,7 +171,8 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={3}>
+          size={3}
+        >
           <TextField
             label="Max"
             id={`${id}-Max`}
@@ -209,7 +214,8 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           sx={{
             paddingRight: theme.spacing(1),
           }}
-          size={6}>
+          size={6}
+        >
           {getUnits()}
         </Grid>
 
