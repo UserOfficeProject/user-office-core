@@ -16,6 +16,7 @@ import {
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -30,6 +31,7 @@ import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
+import { TemplateGroupId } from '../models/Template';
 import { Visit } from '../models/Visit';
 import {
   VisitRegistration,
@@ -87,6 +89,11 @@ type ExperimentMessageData = {
   proposal?: ProposalMessageData;
   samples?: Pick<Sample, 'id' | 'title'>[];
   instrument?: { id: number; name: string; shortCode: string };
+};
+
+type VisitRegistrationAnswerMessageData = {
+  questionNaturalKey: string;
+  value: unknown;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -318,11 +325,42 @@ export const getVisitMessageData = async (
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+  const templateDataSource = container.resolve<TemplateDataSource>(
+    Tokens.TemplateDataSource
+  );
 
   const proposal = await proposalDataSource.getProposalByVisitId(
     visitRegistration.visitId
   );
   const proposalPayload = await getProposalMessageData(proposal);
+
+  const registrationAnswers: VisitRegistrationAnswerMessageData[] = [];
+  if (visitRegistration.registrationQuestionaryId !== null) {
+    const questionary = await questionaryDataSource.getQuestionary(
+      visitRegistration.registrationQuestionaryId
+    );
+    const template = questionary
+      ? await templateDataSource.getTemplate(questionary.templateId)
+      : null;
+
+    if (template?.groupId === TemplateGroupId.VISIT_REGISTRATION) {
+      const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+        visitRegistration.registrationQuestionaryId
+      );
+
+      registrationAnswers.push(
+        ...questionarySteps.flatMap((step) =>
+          step.fields.map((field) => ({
+            questionNaturalKey: field.question.naturalKey,
+            value: field.value,
+          }))
+        )
+      );
+    }
+  }
 
   const visitJsonMessage = JSON.stringify({
     id: visitRegistration.id,
@@ -330,6 +368,7 @@ export const getVisitMessageData = async (
     endAt: visitRegistration.endsAt,
     visitorId: visitRegistration.userId.toString(),
     proposal: JSON.parse(proposalPayload),
+    registrationAnswers,
   });
 
   return visitJsonMessage;
