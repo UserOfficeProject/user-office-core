@@ -76,7 +76,7 @@ const FormikUIPredefinedMessagesTextField = ({
                 </IconButton>
               </Tooltip>
             ),
-          }
+          },
         }}
       />
     </>

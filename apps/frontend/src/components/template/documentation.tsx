@@ -104,16 +104,20 @@ export default function PDFTemplateDocumentation() {
                     variant="h6"
                     noWrap
                     sx={{
-                      color: "inherit"
+                      color: 'inherit',
                     }}
                   >
                     Object: {key}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography gutterBottom variant="body1" sx={{
-                    color: "inherit"
-                  }}>
+                  <Typography
+                    gutterBottom
+                    variant="body1"
+                    sx={{
+                      color: 'inherit',
+                    }}
+                  >
                     <div key={key}>
                       {Object.keys(documentation[key]).map((subKey) => (
                         <div key={subKey}>

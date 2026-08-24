@@ -41,9 +41,11 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
 
   if (loadingQuestionary) {
     return (
-      <Box sx={{
-        textAlign: "center"
-      }}>
+      <Box
+        sx={{
+          textAlign: 'center',
+        }}
+      >
         <UOLoader />
       </Box>
     );

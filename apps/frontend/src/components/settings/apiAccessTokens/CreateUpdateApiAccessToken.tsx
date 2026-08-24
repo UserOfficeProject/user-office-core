@@ -183,8 +183,9 @@ const CreateUpdateApiAccessToken = ({
                       }}
                       size={{
                         md: 6,
-                        xs: 12
-                      }}>
+                        xs: 12,
+                      }}
+                    >
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -207,7 +208,7 @@ const CreateUpdateApiAccessToken = ({
                             slotProps={{
                               input: {
                                 'aria-label': 'primary checkbox',
-                              }
+                              },
                             }}
                           />
                         }
@@ -365,9 +366,13 @@ const CreateUpdateApiAccessToken = ({
           />
           <Grid
             container
-            sx={[{
-              justifyContent: "flex-end"
-            }, (theme) => ({ margin: theme.spacing(2, 0, 2) })]}>
+            sx={[
+              {
+                justifyContent: 'flex-end',
+              },
+              (theme) => ({ margin: theme.spacing(2, 0, 2) }),
+            ]}
+          >
             <Grid>
               <ErrorMessage name="accessPermissions" />
 

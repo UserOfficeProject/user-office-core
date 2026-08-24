@@ -355,7 +355,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
       setUserData(
         (usersData) =>
-          (({
+          ({
             ...usersData,
 
             reviews: usersData?.reviews.map((review) => {
@@ -374,8 +374,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
                   ...review,
                 };
               }
-            })
-          }) as UserWithReviewsQuery['me'])
+            }),
+          }) as UserWithReviewsQuery['me']
       );
     }
   };
@@ -438,8 +438,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
           <Grid
             size={{
               sm: 3,
-              xs: 12
-            }}>
+              xs: 12,
+            }}
+          >
             <ReviewerFilterComponent
               reviewer={reviewer}
               onChange={handleReviewerFilterChange}
@@ -449,8 +450,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <ReviewStatusFilter
             reviewStatus={reviewStatus}
             onChange={handleStatusFilterChange}
@@ -459,8 +461,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallFilter
             shouldShowAll
             calls={calls}
@@ -475,8 +478,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <InstrumentFilter
             shouldShowAll
             instruments={instruments}

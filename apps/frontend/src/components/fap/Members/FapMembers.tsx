@@ -310,7 +310,7 @@ const FapMembers = ({
                             </Tooltip>
                           </>
                         ),
-                      }
+                      },
                     }}
                   />
                 </TableCell>
@@ -361,21 +361,27 @@ const FapMembers = ({
       <Typography variant="h6" component="h2" gutterBottom>
         {`${fapData.code} - ${t('Fap')} Members`}
       </Typography>
-      <Grid container spacing={3} sx={{
-        alignItems: "center"
-      }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          alignItems: 'center',
+        }}
+      >
         <Grid
           size={{
             sm: 6,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           {fapChairSecTable(fapData.fapChairs, true)}
         </Grid>
         <Grid
           size={{
             sm: 6,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           {fapChairSecTable(fapData.fapSecretaries, false)}
         </Grid>
       </Grid>
@@ -383,11 +389,12 @@ const FapMembers = ({
         <Stack
           direction="row"
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
+            display: 'flex',
+            justifyContent: 'space-between',
             marginTop: '10px',
-            marginBottom: '10px'
-          }}>
+            marginBottom: '10px',
+          }}
+        >
           <Button
             onClick={() => setFapChairModalOpen(true)}
             aria-label={`Add New ${t('Fap')} Chair Button`}

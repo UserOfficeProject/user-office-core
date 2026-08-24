@@ -208,7 +208,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             open={open}
             onClose={() => setAnchorEl(null)}
             slots={{
-              transition: Fade
+              transition: Fade,
             }}
           >
             {getQuestionaryComponentDefinitions()
@@ -262,7 +262,8 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             }}
             style={getListStyle(snapshot.isDraggingOver)}
             data-cy="question-list"
-            size={12}>
+            size={12}
+          >
             {getItems()}
             {provided.placeholder}
           </Grid>

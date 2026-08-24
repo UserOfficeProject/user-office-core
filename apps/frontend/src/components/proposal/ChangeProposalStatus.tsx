@@ -223,8 +223,9 @@ const ChangeProposalStatus = ({
                 <Grid
                   size={{
                     xs: 12,
-                    md: 8
-                  }}>
+                    md: 8,
+                  }}
+                >
                   <div style={{ height: '500px' }}>
                     <WorkflowView
                       workflowId={selectedProposalsWorkflowIds[0]}
@@ -252,8 +253,9 @@ const ChangeProposalStatus = ({
                 <Grid
                   size={{
                     xs: 12,
-                    md: 4
-                  }}>
+                    md: 4,
+                  }}
+                >
                   <Grid container spacing={3}>
                     <Grid size={12}>
                       <FormikUIAutocomplete

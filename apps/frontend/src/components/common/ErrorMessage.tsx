@@ -13,11 +13,15 @@ function ErrorMessage(props: Pick<ErrorMessageProps, 'name'> & BoxProps) {
   return (
     <Box
       {...boxProps}
-      sx={[{
-        color: "error.main",
-        fontSize: "small",
-        mt: 0.5
-      }, ...(Array.isArray(boxProps.sx) ? boxProps.sx : [boxProps.sx])]}>
+      sx={[
+        {
+          color: 'error.main',
+          fontSize: 'small',
+          mt: 0.5,
+        },
+        ...(Array.isArray(boxProps.sx) ? boxProps.sx : [boxProps.sx]),
+      ]}
+    >
       <FormikErrorMessage name={name} component="span" />
     </Box>
   );

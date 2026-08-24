@@ -90,7 +90,7 @@ export const DownloadMonitorDialog = ({
                       primary: {
                         noWrap: true,
                         variant: 'caption',
-                      }
+                      },
                     }}
                   />
                   {cancel && (

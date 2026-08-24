@@ -68,8 +68,9 @@ export default function PrincipalInvestigator(
               readOnly: true,
             },
 
-            inputLabel: { shrink: true }
-          }} />
+            inputLabel: { shrink: true },
+          }}
+        />
 
         <Tooltip title="Edit Principal Investigator">
           <span>
