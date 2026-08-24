@@ -215,12 +215,12 @@ export default class QuestionaryMutations {
         (answer) => answer.question.id === submittedAnswer.questionId
       );
 
-      return currentAnswer != null && !hasQuestionReadPermission(currentAnswer);
+      return currentAnswer == null || !hasQuestionReadPermission(currentAnswer);
     });
 
     if (unauthorizedSubmittedAnswer) {
       return rejection(
-        'Can not answer topic because of insufficient question permissions',
+        'Can not answer topic because the question is not part of the topic or permissions are insufficient',
         { agent, answer: unauthorizedSubmittedAnswer }
       );
     }
