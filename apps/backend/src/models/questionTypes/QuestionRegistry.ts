@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
+import * as Yup from 'yup';
 
 import { AnswerInput } from '../../resolvers/mutations/AnswerTopicMutation';
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
@@ -127,6 +128,15 @@ export interface Question<T extends DataType> {
     value: any
   ) => Promise<boolean>;
 
+  /**
+   * Performs validation on the config submitted before persisting data into the database
+   */
+  readonly validateConfig?: (config: any) => void;
+
+  /**
+   * Defines the Yup schema used to validate the config before writing to database
+   */
+  readonly customYupSchema?: Yup.ObjectSchema<any>;
   /**
    * Question can contain configuration, e.g. isRequired, maxValue, etc,
    * This function returns configuration for newly created questions
