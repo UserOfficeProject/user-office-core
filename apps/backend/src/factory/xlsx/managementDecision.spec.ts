@@ -131,7 +131,7 @@ describe('addDecreasingInstrumentAvailTime test', () => {
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 100);
-    expect(managementDecisionData[0].xlsxrowdata[2]).toEqual('99');
+    expect(managementDecisionData[0].xlsxrowdata[5]).toEqual('99');
   });
 
   test('Ensure allocated time is limited to zero and added to xlsxrowdata', () => {
@@ -149,7 +149,7 @@ describe('addDecreasingInstrumentAvailTime test', () => {
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 100);
-    expect(managementDecisionData[0].xlsxrowdata[2]).toEqual('0');
+    expect(managementDecisionData[0].xlsxrowdata[5]).toEqual('0');
   });
 });
 
@@ -172,6 +172,9 @@ describe('generateManagementDecisionData tests', () => {
     expect(result.instrumentAllocatedTime).toEqual(10);
     expect(result.xlsxrowdata).toEqual([
       '456',
+      '123',
+      '3',
+      'Instrument A',
       'Zachary Hankin',
       '<missing>',
       '10',
@@ -207,6 +210,9 @@ describe('collectManagementDecisionData test', () => {
     expect(result).toEqual([
       [
         '456',
+        '123',
+        '3',
+        'Instrument A',
         'Zachary Hankin',
         '90', //100 - 10
         '10',
@@ -241,6 +247,9 @@ describe('collectManagementDecisionData test', () => {
     expect(result).toEqual([
       [
         '456',
+        '123',
+        '3',
+        'Instrument A',
         'Zachary Hankin',
         '90', //100 - 10
         '10',
@@ -251,6 +260,9 @@ describe('collectManagementDecisionData test', () => {
       ],
       [
         '456',
+        '123',
+        '3',
+        'Instrument A',
         'Zachary Hankin',
         '80', //100 - 10 - 10
         '10',
