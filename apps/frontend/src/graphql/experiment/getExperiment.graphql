@@ -19,7 +19,6 @@ query getExperiment($experimentPk: Int!) {
           ...basicUserDetails
         }
       }
-      teamLeadUserId
       teamLead {
         ...basicUserDetails
       }
