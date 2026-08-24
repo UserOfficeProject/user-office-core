@@ -117,8 +117,10 @@ export default function DayRangePicker({
           value={displayValue}
           error={!!error}
           helperText={error ?? helperText}
-          InputLabelProps={{ shrink: true }}
-          InputProps={{ readOnly: true }}
+          slotProps={{
+            inputLabel: { shrink: true },
+            input: { readOnly: true },
+          }}
         />
       </Box>
       <IconButton
