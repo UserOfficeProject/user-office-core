@@ -203,7 +203,7 @@ const ChangeExperimentSafetyStatusForm = ({
           return (
             <Form>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Typography
                     variant="h6"
                     component="h1"
@@ -216,7 +216,7 @@ const ChangeExperimentSafetyStatusForm = ({
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <div style={{ height: '500px' }}>
                     <WorkflowView
                       workflowId={workflowId}
@@ -241,9 +241,9 @@ const ChangeExperimentSafetyStatusForm = ({
                   </div>
                 </Grid>
 
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <FormikUIAutocomplete
                         name="selectedWorkflowStatusId"
                         label="Select experiment status"
@@ -265,7 +265,7 @@ const ChangeExperimentSafetyStatusForm = ({
 
                     {values.selectedWorkflowStatusId &&
                       connectionsWithActions.length > 0 && (
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -349,7 +349,7 @@ const ChangeExperimentSafetyStatusForm = ({
                         </Grid>
                       )}
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       {!values.selectedWorkflowStatusId && (
                         <Alert
                           severity="warning"
