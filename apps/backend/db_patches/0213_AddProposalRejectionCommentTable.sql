@@ -5,7 +5,7 @@ BEGIN
 		BEGIN
 			CREATE TABLE IF NOT EXISTS proposal_rejection_comments (
 				comment_id SERIAL,
-				proposal_pk INT REFERENCES proposals(proposal_pk) ON DELETE CASCADE UNIQUE,
+				proposal_pk INT REFERENCES proposals(proposal_pk),
 				comment TEXT NOT NULL,
 				updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 				PRIMARY KEY (comment_id)
