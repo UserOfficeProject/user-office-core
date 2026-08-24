@@ -112,8 +112,9 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
             <Grid
               size={{
                 sm: 6,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <Field
                 name={statusFieldId}
                 value={localStatus}
@@ -138,8 +139,9 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
             <Grid
               size={{
                 sm: 6,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <Field
                 name={timeAllocationFieldId}
                 value={localTimeAllocation}

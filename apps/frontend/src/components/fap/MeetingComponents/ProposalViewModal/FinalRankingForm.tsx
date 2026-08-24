@@ -154,8 +154,9 @@ const FinalRankingForm = ({
                 <Grid
                   size={{
                     sm: 6,
-                    xs: 12
-                  }}>
+                    xs: 12,
+                  }}
+                >
                   <InputLabel htmlFor="commentForUser" shrink margin="dense">
                     Comment for user
                   </InputLabel>
@@ -217,8 +218,9 @@ const FinalRankingForm = ({
                 <Grid
                   size={{
                     sm: 6,
-                    xs: 12
-                  }}>
+                    xs: 12,
+                  }}
+                >
                   <InputLabel
                     htmlFor="commentForManagement"
                     shrink
@@ -263,12 +265,16 @@ const FinalRankingForm = ({
                       <>
                         {isSubmitting && (
                           <Box
-                            sx={[{
-                              display: "flex",
-                              alignItems: "center"
-                            }, (theme) => ({
-                              margin: theme.spacing(0, 0, 0, 1),
-                            })]}>
+                            sx={[
+                              {
+                                display: 'flex',
+                                alignItems: 'center',
+                              },
+                              (theme) => ({
+                                margin: theme.spacing(0, 0, 0, 1),
+                              }),
+                            ]}
+                          >
                             <UOLoader buttonSized />
                           </Box>
                         )}

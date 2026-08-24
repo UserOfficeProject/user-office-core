@@ -51,7 +51,7 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
             slotProps={{
               input: {
                 'aria-label': 'primary checkbox',
-              }
+              },
             }}
           />
         }

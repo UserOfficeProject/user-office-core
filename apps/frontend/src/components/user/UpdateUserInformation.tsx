@@ -185,9 +185,10 @@ export default function UpdateUserInformation(
             direction="row"
             spacing={2}
             sx={{
-              justifyContent: "flex-end",
-              marginTop: 2
-            }}>
+              justifyContent: 'flex-end',
+              marginTop: 2,
+            }}
+          >
             {props.id !== user.id && (
               <ImpersonateButton
                 userId={props.id}

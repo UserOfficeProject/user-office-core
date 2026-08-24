@@ -79,8 +79,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
             <Grid
               size={{
                 sm: 6,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <Field
                 name="code"
                 id="code"
@@ -150,8 +151,9 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
             <Grid
               size={{
                 sm: 6,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <Field
                 id="description"
                 name="description"

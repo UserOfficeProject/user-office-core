@@ -36,8 +36,9 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
             <Grid
               size={{
                 sm: 3,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <DatePicker
                 format={inputDateFormat}
                 label="From date"
@@ -85,8 +86,9 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
             <Grid
               size={{
                 sm: 3,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <DatePicker
                 format={inputDateFormat}
                 label="To date"

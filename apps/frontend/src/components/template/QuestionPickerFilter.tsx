@@ -68,7 +68,7 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
           slotProps={{
             inputLabel: {
               shrink: true,
-            }
+            },
           }}
         />
       </FormControl>

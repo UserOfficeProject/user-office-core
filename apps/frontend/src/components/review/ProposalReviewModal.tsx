@@ -70,7 +70,7 @@ const ProposalReviewModal = ({
         fullScreen
         onClose={(): Promise<void> => handleClose()}
         slots={{
-          transition: Transition
+          transition: Transition,
         }}
       >
         <AppBar sx={{ position: 'relative' }}>

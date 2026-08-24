@@ -73,8 +73,9 @@ function DateFilter(props: DateFilterProps) {
         <Grid
           size={{
             sm: 4,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <DatePicker
             format={inputDateFormat}
             label="From"
@@ -111,8 +112,9 @@ function DateFilter(props: DateFilterProps) {
         <Grid
           size={{
             sm: 4,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <DatePicker
             format={inputDateFormat}
             label="To"
@@ -158,8 +160,9 @@ function DateFilter(props: DateFilterProps) {
           sx={{ display: 'flex', justifyContent: 'center' }}
           size={{
             sm: 4,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <PresetDateSelector
             value={presetValue}
             setValue={(val) => {

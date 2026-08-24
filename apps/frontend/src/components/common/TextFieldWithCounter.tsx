@@ -49,7 +49,7 @@ const TextFieldWithCounter = (
                 {counter}
               </InputAdornment>
             ),
-          }
+          },
         }}
       />
     </div>

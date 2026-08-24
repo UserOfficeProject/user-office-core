@@ -56,9 +56,10 @@ const ProposalAttachmentDownload = ({
         container
         spacing={1}
         sx={{
-          justifyContent: "center",
-          alignItems: "flex-start"
-        }}>
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+      >
         <Grid size={12}>
           <Autocomplete
             id="attachment-question-select"
