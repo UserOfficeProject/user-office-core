@@ -183,7 +183,7 @@ const ExperimentSafetyNotification = ({
         {icon}
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
-        <Typography variant="subtitle1" fontWeight="bold">
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
           {title}
         </Typography>
         <Typography variant="body2" color="textSecondary">
@@ -198,7 +198,7 @@ const ExperimentSafetyNotification = ({
         )}
         {comments.length > 0 && (
           <Box sx={{ marginTop: 1 }}>
-            <Typography variant="subtitle2" fontWeight="bold">
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
               Feedback:
             </Typography>
             {comments.map((comment, index) => (
