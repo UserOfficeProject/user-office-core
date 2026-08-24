@@ -116,14 +116,19 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
         {({ isSubmitting, values }) => (
           <Form>
             <PromptIfDirty />
-            <Grid container spacing={2} sx={{
-              alignItems: "center"
-            }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                alignItems: 'center',
+              }}
+            >
               <Grid
                 size={{
                   sm: 6,
-                  xs: 12
-                }}>
+                  xs: 12,
+                }}
+              >
                 <Field
                   name="finalStatus"
                   options={statusOptions}
@@ -139,8 +144,9 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
               <Grid
                 size={{
                   sm: 6,
-                  xs: 12
-                }}>
+                  xs: 12,
+                }}
+              >
                 <FieldArray
                   name="managementTimeAllocations"
                   render={(arrayHelpers) =>

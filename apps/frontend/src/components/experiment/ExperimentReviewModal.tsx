@@ -41,7 +41,7 @@ const ExperimentReviewModal = ({
         fullScreen
         onClose={handleClose}
         slots={{
-          transition: Transition
+          transition: Transition,
         }}
       >
         <AppBar sx={{ position: 'relative' }}>

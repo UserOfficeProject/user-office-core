@@ -403,8 +403,9 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallStatusFilter
             show={isArchivedTab && !isCallReorderMode}
             callStatus={callStatus ?? CallStatus.ALL}

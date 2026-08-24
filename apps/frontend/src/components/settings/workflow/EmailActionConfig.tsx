@@ -204,13 +204,19 @@ const EmailActionConfig = ({
               getRecipientIndexByName(recipient.name);
 
             return (
-              <Grid key={index} container columnSpacing={2} sx={{
-                paddingX: 1
-              }}>
+              <Grid
+                key={index}
+                container
+                columnSpacing={2}
+                sx={{
+                  paddingX: 1,
+                }}
+              >
                 <Grid
                   size={{
-                    sm: 5
-                  }}>
+                    sm: 5,
+                  }}
+                >
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -236,7 +242,7 @@ const EmailActionConfig = ({
                         slotProps={{
                           input: {
                             'aria-label': 'primary checkbox',
-                          }
+                          },
                         }}
                       />
                     }
@@ -256,8 +262,9 @@ const EmailActionConfig = ({
                   size={{
                     sm: getEmailTemplateColumnWidth(
                       foundRecipientWithEmailTemplateIndex
-                    )
-                  }}>
+                    ),
+                  }}
+                >
                   {foundRecipientWithEmailTemplateIndex !== -1 && (
                     <>
                       <Autocomplete
@@ -348,8 +355,9 @@ const EmailActionConfig = ({
                   ].recipient.name !== EmailStatusActionRecipients.OTHER && (
                     <Grid
                       size={{
-                        sm: 3
-                      }}>
+                        sm: 3,
+                      }}
+                    >
                       <FormControlLabel
                         control={
                           <Checkbox

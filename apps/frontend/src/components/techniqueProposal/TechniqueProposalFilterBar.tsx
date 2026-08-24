@@ -38,8 +38,9 @@ const TechniqueProposalFilterBar = ({
       <Grid
         size={{
           sm: 3,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <CallFilter
           callId={filter.callId as number}
           calls={calls?.data}
@@ -56,8 +57,9 @@ const TechniqueProposalFilterBar = ({
       <Grid
         size={{
           sm: 3,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <TechniqueFilter
           techniqueId={filter.techniqueFilter?.techniqueId}
           showMultiTechniqueProposals={
@@ -77,8 +79,9 @@ const TechniqueProposalFilterBar = ({
       <Grid
         size={{
           sm: 3,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <InstrumentFilter
           instrumentIds={getInstrumentFilterIds(filter.instrumentFilter)}
           showMultiInstrumentProposals={
@@ -98,8 +101,9 @@ const TechniqueProposalFilterBar = ({
       <Grid
         size={{
           sm: 3,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <ProposalStatusFilter
           statusId={filter.proposalStatusId ?? undefined}
           statuses={proposalStatuses?.data}
@@ -117,8 +121,9 @@ const TechniqueProposalFilterBar = ({
       <Grid
         size={{
           sm: 5,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <Grid size={12}>
           <DateFilter
             from={filter.dateFilter?.from}

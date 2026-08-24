@@ -84,9 +84,10 @@ export function QuestionnairesList({
       )}
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center"
-        }}>
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
         {`${data.length} item(s)`}
         <StyledButtonContainer
           sx={{
