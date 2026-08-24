@@ -78,8 +78,9 @@ function ExperimentFilterBar({
       <Grid
         size={{
           sm: 4,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <CallFilter
           callId={filter.callId as number}
           calls={calls?.data}
@@ -96,8 +97,9 @@ function ExperimentFilterBar({
       <Grid
         size={{
           sm: 4,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <InstrumentFilter
           instrumentIds={
             filter.instrumentId ? [filter.instrumentId] : undefined
@@ -118,8 +120,9 @@ function ExperimentFilterBar({
       <Grid
         size={{
           sm: 4,
-          xs: 12
-        }}>
+          xs: 12,
+        }}
+      >
         <ExperimentSafetyStatusFilter
           statusId={filter.experimentSafetyStatusId as number}
           statuses={experimentStatuses?.data}

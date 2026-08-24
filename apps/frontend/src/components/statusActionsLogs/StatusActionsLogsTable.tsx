@@ -339,8 +339,9 @@ const StatusActionsLogsTable = ({
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <CallFilter
             callId={call ? +call : null}
             calls={calls}
@@ -354,8 +355,9 @@ const StatusActionsLogsTable = ({
         <Grid
           size={{
             sm: 3,
-            xs: 12
-          }}>
+            xs: 12,
+          }}
+        >
           <StatusActionsStatusFilter
             statusActionsLogStatus={
               statusActionsLogStatus

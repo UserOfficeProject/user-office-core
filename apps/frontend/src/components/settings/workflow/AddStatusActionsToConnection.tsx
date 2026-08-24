@@ -250,7 +250,7 @@ const AddStatusActionsToConnection = ({
                                 slotProps={{
                                   input: {
                                     'aria-label': 'primary checkbox',
-                                  }
+                                  },
                                 }}
                               />
                             }
@@ -287,12 +287,15 @@ const AddStatusActionsToConnection = ({
             container
             spacing={1}
             sx={{
-              justifyContent: "flex-end",
-              paddingTop: 1
-            }}>
-            <Grid sx={{
-              marginTop: 1
-            }}>
+              justifyContent: 'flex-end',
+              paddingTop: 1,
+            }}
+          >
+            <Grid
+              sx={{
+                marginTop: 1,
+              }}
+            >
               <ErrorMessage name="selectedStatusActions" />
               <ErrorMessage name="emailStatusActionConfig.recipientsWithEmailTemplate" />
             </Grid>

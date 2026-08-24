@@ -110,9 +110,12 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
       margin="dense"
       fullWidth
     >
-      <Grid container sx={{
-        alignItems: "flex-end"
-      }}>
+      <Grid
+        container
+        sx={{
+          alignItems: 'flex-end',
+        }}
+      >
         <Grid size={12}>
           <FormLabel>
             <>
@@ -162,9 +165,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid size={10}>
-          {getUnits()}
-        </Grid>
+        <Grid size={10}>{getUnits()}</Grid>
 
         <Grid size={2}>
           {isError && <FormHelperText>{fieldError.value}</FormHelperText>}

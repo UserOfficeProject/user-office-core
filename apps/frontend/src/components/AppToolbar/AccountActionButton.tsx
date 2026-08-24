@@ -176,8 +176,9 @@ const AccountActionButton = () => {
             <Box
               sx={{
                 paddingRight: 1,
-                paddingTop: 1
-              }}>
+                paddingTop: 1,
+              }}
+            >
               <ManageAccounts />
             </Box>
             Manage account
@@ -193,8 +194,9 @@ const AccountActionButton = () => {
               <Box
                 sx={{
                   paddingRight: 1,
-                  paddingTop: 1
-                }}>
+                  paddingTop: 1,
+                }}
+              >
                 <SupervisedUserCircleIcon />
               </Box>
               <Box
@@ -247,8 +249,9 @@ const AccountActionButton = () => {
               <Box
                 sx={{
                   paddingRight: 1,
-                  paddingTop: 1
-                }}>
+                  paddingTop: 1,
+                }}
+              >
                 <HomeOutlinedIcon />
               </Box>
               Facilities Homepage
@@ -262,8 +265,9 @@ const AccountActionButton = () => {
             <Box
               sx={{
                 paddingRight: 1,
-                paddingTop: 1
-              }}>
+                paddingTop: 1,
+              }}
+            >
               {isLoggingOut ? <UOLoader size={24} /> : <ExitToApp />}
             </Box>
             Logout

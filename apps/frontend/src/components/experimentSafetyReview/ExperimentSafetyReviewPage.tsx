@@ -259,8 +259,9 @@ function ExperimentSafetyReviewPage() {
             <Grid
               size={{
                 sm: 3,
-                xs: 12
-              }}>
+                xs: 12,
+              }}
+            >
               <CallFilter
                 callId={selectedCallId}
                 calls={calls}
