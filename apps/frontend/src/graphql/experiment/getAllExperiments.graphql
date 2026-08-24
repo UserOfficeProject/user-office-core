@@ -39,6 +39,7 @@ query getAllExperiments(
             ...basicUserDetails
           }
         }
+        teamLeadUserId
         teamLead {
           ...basicUserDetails
         }

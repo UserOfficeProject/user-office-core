@@ -214,6 +214,18 @@ context('visits tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
+
+    it('PI should see the visit', () => {
+      cy.login(PI);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'invisible');
+    });
   });
 
   describe('Visits basic tests', () => {

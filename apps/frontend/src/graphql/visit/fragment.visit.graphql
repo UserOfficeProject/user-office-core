@@ -2,4 +2,5 @@ fragment visit on Visit {
   id
   proposalPk
   creatorId
+  teamLeadUserId
 }
