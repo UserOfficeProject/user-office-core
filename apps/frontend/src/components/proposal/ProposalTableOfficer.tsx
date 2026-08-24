@@ -296,10 +296,11 @@ const ToolbarWithSelectAllPrefetched = (props: {
         <Box
           data-cy="select-all-proposals"
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             padding: 1,
-            bgcolor: (theme) => theme.palette.background.default
-          }}>
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
+        >
           {selectAllAction.iconProps?.hidden ? (
             <>
               All proposals are selected.
@@ -617,9 +618,10 @@ const ProposalTableOfficer = ({
         description: (
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center"
-            }}>
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Warning color="warning" sx={{ marginRight: 1 }} />
             <span>
               <b>{selectedCount}</b> proposals are selected. This action will

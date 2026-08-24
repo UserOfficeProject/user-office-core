@@ -36,9 +36,13 @@ const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
       <Typography variant="h6" component="h2" gutterBottom>
         Available Statuses
       </Typography>
-      <Typography variant="body2" color="textSecondary" sx={{
-        marginBottom: "16px"
-      }}>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{
+          marginBottom: '16px',
+        }}
+      >
         Drag a status into the diagram to add it to the workflow.
       </Typography>
       <TextField
@@ -76,8 +80,9 @@ const StatusPicker = ({ statuses, onDragStart }: StatusPickerProps) => {
               secondary={status.description}
               slotProps={{
                 primary: { variant: 'subtitle2' },
-                secondary: { variant: 'caption' }
-              }} />
+                secondary: { variant: 'caption' },
+              }}
+            />
           </ListItemButton>
         ))}
         {filteredStatuses.length === 0 && searchTerm && (
