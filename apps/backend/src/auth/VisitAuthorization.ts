@@ -68,8 +68,8 @@ export class VisitAuthorization {
      */
     return (
       visit.creatorId === agent.id ||
-      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk) ||
-      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
+      (await this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk)) ||
+      (await this.visitDataSource.isVisitorOfVisit(agent.id, visit.id))
     );
   }
 
