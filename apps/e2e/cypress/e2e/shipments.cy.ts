@@ -79,9 +79,9 @@ context('Shipments tests', () => {
     const name = faker.person.firstName();
     const email = faker.internet.email();
     const phone = faker.phone.number();
-    const street = faker.address.streetAddress();
-    const zip = faker.address.zipCode();
-    const city = faker.address.city();
+    const street = faker.location.streetAddress();
+    const zip = faker.location.zipCode();
+    const city = faker.location.city();
 
     cy.login('officer');
     cy.visit('/');
