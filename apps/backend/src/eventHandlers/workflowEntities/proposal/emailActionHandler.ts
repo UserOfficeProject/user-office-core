@@ -408,7 +408,6 @@ const sendMail = async (
               commentsToUser: recipientWithData.commentsToUser,
               technicalAssessments: recipientWithData.technicalAssessments,
               call: recipientWithData.call,
-              requestedFacilities: recipientWithData.requestedFacilities,
             },
             recipients: [{ address: recipientWithData.email }],
           });

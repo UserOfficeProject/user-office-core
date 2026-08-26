@@ -10,14 +10,21 @@ import { GenericTemplateDataSource } from '../../../datasources/GenericTemplateD
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
 import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
+import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
-import { InstrumentWithManagementTime } from '../../../models/Instrument';
+import { FapProposal } from '../../../models/Fap';
+import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
+import {
+  Instrument,
+  InstrumentWithManagementTime,
+} from '../../../models/Instrument';
 import { Proposal } from '../../../models/Proposal';
 import { Answer } from '../../../models/Questionary';
+import { TechnicalReview } from '../../../models/TechnicalReview';
 import { Technique } from '../../../models/Technique';
 import { DataType } from '../../../models/Template';
 import { BasicUserDetails, User } from '../../../models/User';
@@ -26,6 +33,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../../../resolvers/types/StatusActionConfig';
+import { stripHtml } from '../../../utils/stringStripHtml';
 
 interface GroupedObjectType {
   [key: string]: ProposalWithWorkflowStatusConnectionId[];
@@ -75,7 +83,60 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
+  awardedShifts?: unknown[];
+  commentsToUser?: string;
+  technicalAssessments?: unknown[];
+  call?: unknown;
 };
+
+const getAwardedShifts = (
+  fapProposals: FapProposal[],
+  technicalReviews: TechnicalReview[] | null,
+  instruments: Instrument[],
+  instrumentIds: number[]
+) =>
+  instrumentIds.flatMap((instrumentId) => {
+    const numberOfShifts =
+      fapProposals.find((fap) => fap.instrumentId === instrumentId)
+        ?.fapTimeAllocation ??
+      technicalReviews?.find((review) => review.instrumentId === instrumentId)
+        ?.timeAllocation;
+    const instrument = instruments.find(({ id }) => id === instrumentId);
+
+    return typeof numberOfShifts === 'number' && instrument
+      ? [{ numberOfShifts, instrument: instrument.name }]
+      : [];
+  });
+
+const getCommentsToUser = (fapMeetingDecisions: FapMeetingDecision[]) =>
+  stripHtml(
+    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
+      ?.commentForUser ?? ''
+  );
+
+const getTechnicalAssessments = (
+  technicalReviews: TechnicalReview[] | null,
+  instruments: Instrument[]
+) =>
+  (technicalReviews ?? []).flatMap((technicalReview) => {
+    const instrument = instruments.find(
+      ({ id }) => id === technicalReview.instrumentId
+    );
+    if (!instrument) {
+      return [];
+    }
+
+    return [
+      {
+        instrument: {
+          name: instrument.name,
+          description: instrument.description,
+        },
+        feasibility: technicalReview.status,
+        assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
+      },
+    ];
+  });
 
 async function stepAnswers(
   fields: Answer[],
@@ -153,9 +214,58 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const questionaryDataSource: QuestionaryDataSource = container.resolve(
     Tokens.QuestionaryDataSource
   );
+  const instrumentDataSource: InstrumentDataSource = container.resolve(
+    Tokens.InstrumentDataSource
+  );
 
   const templateDataSource: TemplateDataSource = container.resolve(
     Tokens.TemplateDataSource
+  );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+  const reviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
+  );
+
+  const [
+    call,
+    requestedInstruments,
+    fapProposals,
+    fapMeetingDecisions,
+    technicalReviews,
+  ] = await Promise.all([
+    callDataSource.getCall(proposal.callId),
+    instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey),
+    fapDataSource.getFapsByProposalPks([proposal.primaryKey]),
+    fapDataSource.getProposalsFapMeetingDecisions([proposal.primaryKey]),
+    reviewDataSource.getTechnicalReviews(proposal.primaryKey),
+  ]);
+
+  const instrumentIds = Array.from(
+    new Set([
+      ...fapProposals
+        .map(({ instrumentId }) => instrumentId)
+        .filter(
+          (instrumentId): instrumentId is number => instrumentId !== null
+        ),
+      ...(technicalReviews ?? []).map(({ instrumentId }) => instrumentId),
+    ])
+  );
+  const instruments = instrumentIds.length
+    ? await instrumentDataSource.getInstrumentsByIds(instrumentIds)
+    : requestedInstruments;
+  const awardedShifts = getAwardedShifts(
+    fapProposals,
+    technicalReviews,
+    instruments,
+    instrumentIds
+  );
+  const commentsToUser = getCommentsToUser(fapMeetingDecisions);
+  const technicalAssessments = getTechnicalAssessments(
+    technicalReviews,
+    instruments
   );
 
   await Promise.all(
@@ -175,10 +285,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         const coProposers = proposal
           ? await usersDataSource.getProposalUsers(proposal.primaryKey)
           : null;
-
-        const callDataSource = container.resolve<CallDataSource>(
-          Tokens.CallDataSource
-        );
 
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
@@ -252,6 +358,10 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
+          awardedShifts,
+          commentsToUser,
+          technicalAssessments,
+          call,
         });
       }
     })
