@@ -15,23 +15,17 @@ import {
 } from './utils';
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
-import { CallDataSource } from '../../../datasources/CallDataSource';
-import { FapDataSource } from '../../../datasources/FapDataSource';
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
-import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
-import { Instrument } from '../../../models/Instrument';
 import { Proposal } from '../../../models/Proposal';
 import { SettingsId } from '../../../models/Settings';
 import { ConnectionHasStatusAction } from '../../../models/StatusAction';
-import { TechnicalReview } from '../../../models/TechnicalReview';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../../../resolvers/types/StatusActionConfig';
-import { stripHtml } from '../../../utils/stringStripHtml';
 import { MailService } from '../../MailService/MailService';
 
 export const emailActionHandler = async (
@@ -391,13 +385,6 @@ const sendMail = async (
   }
 
   try {
-    const additionalEmailSubstitutionData =
-      recipientsWithData.length > 1
-        ? await getAndFormatAdditionalEmailSubstitutionData(
-            recipientsWithData[0]
-          )
-        : {};
-
     const mailServiceResponse = await Promise.all(
       recipientsWithData.map(async (recipientWithData) => {
         try {
@@ -417,7 +404,11 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
-              ...additionalEmailSubstitutionData,
+              awardedShifts: recipientWithData.awardedShifts,
+              commentsToUser: recipientWithData.commentsToUser,
+              technicalAssessments: recipientWithData.technicalAssessments,
+              call: recipientWithData.call,
+              requestedFacilities: recipientWithData.requestedFacilities,
             },
             recipients: [{ address: recipientWithData.email }],
           });
@@ -474,99 +465,3 @@ const sendMail = async (
     await statusActionLogger(false, failMessage);
   }
 };
-
-async function getAndFormatAdditionalEmailSubstitutionData(
-  recipientWithData: EmailReadyType
-): Promise<Record<string, unknown>> {
-  const proposal = recipientWithData.proposals[0];
-  if (!proposal) {
-    return {};
-  }
-
-  const callDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
-  );
-
-  const [
-    call,
-    requestedInstruments,
-    fapProposals,
-    fapMeetingDecisions,
-    technicalReviews,
-  ] = await Promise.all([
-    callDataSource.getCall(proposal.callId),
-    instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey),
-    fapDataSource.getFapsByProposalPks([proposal.primaryKey]),
-    fapDataSource.getProposalsFapMeetingDecisions([proposal.primaryKey]),
-    reviewDataSource.getTechnicalReviews(proposal.primaryKey),
-  ]);
-
-  const instrumentIds = Array.from(
-    new Set([
-      ...fapProposals
-        .map(({ instrumentId }) => instrumentId)
-        .filter(
-          (instrumentId): instrumentId is number => instrumentId !== null
-        ),
-      ...(technicalReviews ?? []).map(({ instrumentId }) => instrumentId),
-    ])
-  );
-  const instruments = instrumentIds.length
-    ? await instrumentDataSource.getInstrumentsByIds(instrumentIds)
-    : requestedInstruments;
-
-  const technicalAssessments = (technicalReviews ?? []).flatMap(
-    (technicalReview: TechnicalReview) => {
-      const instrument = instruments.find(
-        ({ id }) => id === technicalReview.instrumentId
-      );
-      if (!instrument) {
-        return [];
-      }
-
-      return [
-        {
-          facility: {
-            name: instrument.name,
-            description: instrument.description,
-          },
-          feasibility: technicalReview.status,
-          assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
-        },
-      ];
-    }
-  );
-
-  const awardedShifts = instrumentIds.flatMap((instrumentId) => {
-    const numberOfShifts =
-      fapProposals.find((fap) => fap.instrumentId === instrumentId)
-        ?.fapTimeAllocation ??
-      technicalReviews?.find((review) => review.instrumentId === instrumentId)
-        ?.timeAllocation;
-    const instrument = instruments.find(({ id }) => id === instrumentId);
-
-    return typeof numberOfShifts === 'number' && instrument
-      ? [{ numberOfShifts, facility: instrument.name }]
-      : [];
-  });
-
-  return {
-    awardedShifts,
-    commentsToUser: stripHtml(
-      fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
-        ?.commentForUser ?? ''
-    ),
-    technicalAssessments,
-    call,
-    requestedFacilities: requestedInstruments.map(
-      ({ name, description }: Instrument) => ({ name, description })
-    ),
-  };
-}
