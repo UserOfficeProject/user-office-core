@@ -147,20 +147,15 @@ async function generateManagementDecisionRowsByInstrument(
   instrumentId: number
 ) {
   const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
-  const rowsOfManagmentDecisions = [] as string[][];
-  for (const fap of faps) {
-    const fapReviewsRows = await collectManagementDecisionData(
-      fap.id,
-      callId,
-      agent,
-      instrumentId
-    );
-    for (const row of fapReviewsRows) {
-      if (row) {
-        rowsOfManagmentDecisions.push(row);
-      }
-    }
-  }
+  const rowsOfManagementDecisions = (
+    await Promise.all(
+      faps.map((fap) =>
+        collectManagementDecisionData(fap.id, callId, agent, instrumentId)
+      )
+    )
+  )
+    .flat()
+    .filter((row) => row !== undefined && row !== null);
 
-  return rowsOfManagmentDecisions;
+  return rowsOfManagementDecisions;
 }
