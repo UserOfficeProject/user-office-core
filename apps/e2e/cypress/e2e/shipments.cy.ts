@@ -76,7 +76,7 @@ context('Shipments tests', () => {
 
     const temp = 'Ambient';
     const description = faker.lorem.words(2);
-    const name = faker.name.firstName();
+    const name = faker.person.firstName();
     const email = faker.internet.email();
     const phone = faker.phone.number();
     const street = faker.address.streetAddress();

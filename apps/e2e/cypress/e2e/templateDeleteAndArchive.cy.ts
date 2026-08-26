@@ -850,7 +850,7 @@ context('Template Delete, Archive, Unarchive', () => {
 
       const temp = 'Ambient';
       const description = faker.lorem.words(2);
-      const name = faker.name.firstName();
+      const name = faker.person.firstName();
       const email = faker.internet.email();
       const phone = faker.phone.number();
       const street = faker.address.streetAddress();
@@ -1242,7 +1242,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.updateProposal({
         proposalPk: existingProposalId,
         title: initialDBData.proposal.title,
-        abstract: faker.random.words(3),
+        abstract: faker.lorem.words(3),
         proposerId: PI.id,
         users: [coProposer.id],
       });
