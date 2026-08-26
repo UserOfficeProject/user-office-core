@@ -282,8 +282,7 @@ router.get('/management-decision/:call_id', async (req, res, next) => {
     const userRole = req.user.currentRole;
     callFactoryService(
       DownloadType.XLSX,
-      //XLSXType.MANAGEMENT_DECISION,
-      XLSXType.CALL_FAP,
+      XLSXType.MANAGEMENT_DECISION,
       { data, meta, userRole },
       req,
       res,
