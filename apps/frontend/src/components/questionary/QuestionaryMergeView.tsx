@@ -33,10 +33,20 @@ const QuestionaryMergeView: React.FC<QuestionaryMergeViewProps> = ({
   const allAnswers = oldAnswers.map((oldA) => {
     const current = newAnswers.find((a) => a.question.id === oldA.question.id);
 
+    // Need to set the ID of the current answer to one updated in the database so the backend can
+    // recognise it when rendering.
+    const currentAnswerForDisplay = current
+      ? {
+          ...current,
+          answerId: oldA.answerId,
+        }
+      : null;
+
     return {
       questionId: oldA.question.id,
       oldAnswer: oldA,
       currentAnswer: current ?? null,
+      currentAnswerForDisplay,
     };
   });
 
@@ -133,8 +143,10 @@ const QuestionaryMergeView: React.FC<QuestionaryMergeViewProps> = ({
                           Your current Answer
                         </Typography>
                         <Typography variant="body1">
-                          {question.currentAnswer?.value
-                            ? renderers.answerRenderer(question.currentAnswer)
+                          {question.currentAnswerForDisplay?.value
+                            ? renderers.answerRenderer(
+                                question.currentAnswerForDisplay
+                              )
                             : 'No answer'}
                         </Typography>
                         <FormControlLabel
