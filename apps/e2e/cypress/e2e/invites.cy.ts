@@ -509,7 +509,7 @@ context('Invites tests', () => {
       );
       cy.get(`[data-testid=accept-invite-btn-1]`).click();
       // Success snackbar and dialog closes
-      cy.get('.SnackbarItem-variantSuccess').should('exist');
+      cy.get('.notistack-MuiContent-success').should('exist');
       // Proposal should now be in the table after accepting
       cy.get('[data-cy="proposal-table"]').should(
         'contain.text',
