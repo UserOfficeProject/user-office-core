@@ -1,4 +1,5 @@
 import { Answer } from './Questionary';
+import { DataType } from './Template';
 
 export enum EvaluatorOperator {
   eq = 'eq',
@@ -10,8 +11,28 @@ export enum DependenciesLogicOperator {
   OR = 'OR',
 }
 
+const equalityForInstrumentPicker = (
+  answer: Answer,
+  params: Record<string, unknown>
+): boolean => {
+  if (Array.isArray(answer.value)) {
+    const ids = answer.value.map(
+      (v: { instrumentId: string }) => v?.instrumentId
+    );
+
+    return ids.includes(new String(params).valueOf());
+  } else {
+    const v: { instrumentId: string } | undefined = answer.value;
+
+    return v?.instrumentId === new String(params).valueOf();
+  }
+};
+
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(answer: Answer, params: Record<string, unknown>): boolean {
+    if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+      return equalityForInstrumentPicker(answer, params);
+    }
     if (Array.isArray(answer.value)) {
       return answer.value.some((v: unknown) => v === params);
     } else {
@@ -24,6 +45,10 @@ export class EqualityValidator implements FieldConditionEvaluator {
 
 export class InequalityValidator implements FieldConditionEvaluator {
   isSatisfied(answer: Answer, params: Record<string, unknown>): boolean {
+    if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+      return !equalityForInstrumentPicker(answer, params);
+    }
+
     return answer.value !== params;
   }
 }
