@@ -3,6 +3,7 @@ import {
   ExperimentSafety,
   ExperimentHasSample,
   ExperimentStatus,
+  ExperimentTableSortField,
   InstrumentScientistDecisionEnum,
   ExperimentSafetyReviewerDecisionEnum,
 } from '../../models/Experiment';
@@ -116,12 +117,19 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   constructor() {
     this.init();
   }
+  async getExperimentByVisitId(visitId: number): Promise<Experiment | null> {
+    const experiment = this.experiments.find(
+      (exp) => exp.scheduledEventId === visitId
+    );
+
+    return experiment || null;
+  }
 
   async getExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
-    sortField?: string,
+    sortField?: ExperimentTableSortField,
     sortDirection?: PaginationSortDirection,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
