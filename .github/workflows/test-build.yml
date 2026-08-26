@@ -524,7 +524,9 @@ jobs:
           EAM_AUTH_CLIENT_SECRET: dummyClientSecret
           EAM_OAUTH_SCOPE: uos.api.read
           EAM_OAUTH_AUDIENCE: https://ios.esss.lu.se/
-          EAM_AUTH_ORGANIZATION: dummyOrg
+          EAM_ORGANIZATION_CODE: XXX
+          EAM_ORGANIZATION_NAME: YYYYY
+          EAM_LOCATION_CODE: ZZZZ
           EAM_EQUIPMENT_PART_CODE: 12413
           AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
           AUTH_CLIENT_ID: useroffice

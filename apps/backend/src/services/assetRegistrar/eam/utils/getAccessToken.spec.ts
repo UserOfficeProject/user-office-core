@@ -21,8 +21,14 @@ jest.mock('./getEnvOrThrow', () => ({
 }));
 
 describe('getAccessToken', () => {
+  const originalFetch = global.fetch;
+
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    global.fetch = originalFetch;
   });
 
   it('requests a token with client_credentials grant and Basic auth', async () => {

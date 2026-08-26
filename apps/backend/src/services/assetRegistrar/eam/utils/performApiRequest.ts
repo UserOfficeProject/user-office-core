@@ -7,9 +7,9 @@ export async function performApiRequest(uri: string, requestData: object) {
   let response: Response;
   let data: any;
 
-  try {
-    const accessToken = await getAccessToken();
+  const accessToken = await getAccessToken();
 
+  try {
     response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(requestData),
