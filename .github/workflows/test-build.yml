@@ -329,28 +329,38 @@ jobs:
       fail-fast: false
       matrix:
         pattern:
+          - id: calls
+            files: cypress/e2e/calls.cy.ts
+          - id: experimentSafetyReview
+            files: cypress/e2e/experimentSafetyReview.cy.ts
           - id: ae
-            files: cypress/e2e/[a-e]*.ts
+            files: cypress/e2e/[a-e]!(alls|xperimentSafetyReview)*.cy.ts
           - id: fh
-            files: cypress/e2e/[f-h]*.ts
+            files: cypress/e2e/[f-h]*.cy.ts
+          - id: instruments
+            files: cypress/e2e/instruments.cy.ts
           - id: io
-            files: cypress/e2e/[i-o]*.ts
+            files: cypress/e2e/[i-o]!(nstruments)*.cy.ts
           - id: p-am
-            files: cypress/e2e/p[a-m]*.ts
+            files: cypress/e2e/p[a-m]*.cy.ts
           - id: p-nz
-            files: cypress/e2e/p[n-z]!(oposals)*.ts
+            files: cypress/e2e/p[n-z]!(oposals)*.cy.ts
           - id: proposals
-            files: cypress/e2e/proposals*.ts
-          - id: rs
-            files: cypress/e2e/[r-s]*.ts
+            files: cypress/e2e/proposals*.cy.ts
+          - id: qs
+            files: cypress/e2e/[q-s]*.cy.ts
+          - id: techniqueProposals
+            files: cypress/e2e/techniqueProposals.cy.ts
+          - id: templateDeleteAndArchive
+            files: cypress/e2e/templateDeleteAndArchive.cy.ts
+          - id: templatesBasic
+            files: cypress/e2e/templatesBasic.cy.ts
           - id: t
-            files: cypress/e2e/t!(emplatesBasic).ts
-          - id: templateDelete
-            files: cypress/e2e/templatesBasic*.ts
+            files: cypress/e2e/t!(echniqueProposals|emplateDeleteAndArchive|emplatesBasic).cy.ts
           - id: uz
-            files: cypress/e2e/[u-z]*.ts
+            files: cypress/e2e/[u-z]*.cy.ts
           - id: AZ
-            files: cypress/e2e/[A-Z]*.ts
+            files: cypress/e2e/[A-Z]*.cy.ts
 
     steps:
       - uses: actions/checkout@v6
@@ -424,29 +434,11 @@ jobs:
           path: apps/frontend/build
           key: frontend-build-${{ github.sha }}-${{ github.run_id }}
 
-      # TODO: See how to proceed with e2e caching because there is some error:
-      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
-      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v5
-      #   with:
-      #     path: apps/e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
-
       - name: Install e2e dependencies
         env:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
-
-      - name: Download required repositories
-        run: |
-          cd "$GITHUB_WORKSPACE/.."
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
@@ -541,6 +533,15 @@ jobs:
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           npm run e2e:after:start -- --dns-result-order=ipv4first
+
+      - name: Factory logs
+        if: failure()
+        run: |
+          cd apps/backend
+          echo "===== factory logs (stfc) ====="
+          docker compose -f docker-compose-stfc.e2e.yml logs --no-color factory || true
+          echo "===== factory logs ====="
+          docker compose -f docker-compose.e2e.yml logs --no-color factory || true
 
       - name: Upload cypres screenshots
         if: failure()

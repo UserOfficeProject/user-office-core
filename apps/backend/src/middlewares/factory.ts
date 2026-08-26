@@ -83,17 +83,26 @@ factoryDownloadRouter.use(
     next: NextFunction
   ) => {
     let message: string;
+    let underlyingError: Error | undefined;
 
     if (err instanceof Error) {
       message = err.message;
+      underlyingError = err;
     } else if (typeof err === 'string') {
       message = err;
+    } else if (err.error instanceof Error) {
+      message = err.error.message;
+      underlyingError = err.error;
     } else {
       message = err.message;
     }
 
-    err instanceof Error
-      ? logger.logException(err.message, err, getLogContextFromRequest(req))
+    underlyingError
+      ? logger.logException(
+          message,
+          underlyingError,
+          getLogContextFromRequest(req)
+        )
       : logger.logError(defaultErrorMessage, {
           err,
           ...getLogContextFromRequest(req),
