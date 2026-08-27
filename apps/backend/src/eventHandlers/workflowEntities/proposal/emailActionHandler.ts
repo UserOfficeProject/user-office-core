@@ -59,7 +59,7 @@ export const emailActionHandler = async (
         ${statusActionRecipients}`
       );
     }
-    emailStatusActionRecipient(
+    await emailStatusActionRecipient(
       recipientWithTemplate,
       statusAction,
       proposals,
