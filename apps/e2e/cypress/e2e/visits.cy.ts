@@ -40,7 +40,7 @@ context('visits tests', () => {
     cy.updateProposal({
       proposalPk: existingProposalId,
       title: initialDBData.proposal.title,
-      abstract: faker.random.words(3),
+      abstract: faker.lorem.words(3),
       proposerId: PI.id,
       users: [coProposer.id],
     });
