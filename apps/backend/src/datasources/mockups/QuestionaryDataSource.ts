@@ -26,6 +26,7 @@ import {
   EmbellishmentConfig,
   FieldConfigType,
   FileUploadConfig,
+  InstrumentPickerConfig,
   SelectionFromOptionsConfig,
   TextInputConfig,
 } from '../../resolvers/types/FieldConfig';
@@ -365,6 +366,52 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
             ],
           }),
           ['A', 'B']
+        ),
+
+        // Instrument picker questions
+        new Answer(
+          12,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'instrument_picker',
+              naturalKey: 'instrument_picker',
+              dataType: DataType.INSTRUMENT_PICKER,
+              config: createConfig<InstrumentPickerConfig>(
+                DataType.INSTRUMENT_PICKER,
+                {
+                  instruments: [{ id: 49, name: 'INST1' }],
+                  isMultipleSelect: false,
+                  requestTime: false,
+                  variant: 'dropdown',
+                }
+              ),
+            }),
+          }),
+          { instrumentId: '49', timeRequested: '0' }
+        ),
+
+        new Answer(
+          13,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              id: 'instrument_picker_depender',
+              naturalKey: 'instrument_picker_depender',
+              dataType: DataType.TEXT_INPUT,
+              config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
+                multiline: false,
+                required: true,
+              }),
+            }),
+            dependencies: [
+              new FieldDependency(
+                'instrument_picker_depender',
+                'instrument_picker',
+                'instrument_picker',
+                new FieldCondition(EvaluatorOperator.eq, 49)
+              ),
+            ],
+          }),
+          'INST1-only answer'
         ),
       ]
     ),
