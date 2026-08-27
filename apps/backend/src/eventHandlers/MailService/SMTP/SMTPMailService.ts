@@ -217,13 +217,7 @@ export class SMTPMailService extends MailService {
   }
 
   private async createTransport() {
-    if (
-      process.env.EMAIL_TENANT_ID &&
-      process.env.EMAIL_CLIENT_ID &&
-      process.env.EMAIL_CLIENT_SECRET &&
-      process.env.EMAIL_SCOPE &&
-      process.env.EMAIL_AUTHORITY
-    ) {
+    if (process.env.EMAIL_USE_SMTP_OAUTH_2 === 'true') {
       return this.createOauth2Transport();
     }
 
