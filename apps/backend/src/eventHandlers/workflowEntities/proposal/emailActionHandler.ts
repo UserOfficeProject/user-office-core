@@ -406,7 +406,7 @@ const sendMail = async (
               hazards: recipientWithData.hazards,
               awardedTime: recipientWithData.awardedTime,
               fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
-              technicalAssessments: recipientWithData.technicalAssessments,
+              technicalReviews: recipientWithData.technicalReviews,
               call: recipientWithData.call,
             },
             recipients: [{ address: recipientWithData.email }],

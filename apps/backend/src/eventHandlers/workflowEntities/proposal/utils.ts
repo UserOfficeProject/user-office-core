@@ -16,6 +16,7 @@ import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
+import { Call } from '../../../models/Call';
 import { FapProposal } from '../../../models/Fap';
 import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
 import {
@@ -33,11 +34,15 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../../../resolvers/types/StatusActionConfig';
-import { stripHtml } from '../../../utils/stringStripHtml';
 
 interface GroupedObjectType {
   [key: string]: ProposalWithWorkflowStatusConnectionId[];
 }
+
+type AwardedTime = {
+  awardedTime: number;
+  instrument: string;
+};
 
 export const groupProposalsByProperties = (
   proposals: ProposalWithWorkflowStatusConnectionId[],
@@ -83,10 +88,10 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
-  awardedTime?: unknown[];
-  fapMeetingDecisions?: FapMeetingDecision[];
-  technicalAssessments?: unknown[];
-  call?: unknown;
+  awardedTime?: AwardedTime[] | null;
+  fapMeetingDecisions?: FapMeetingDecision[] | null;
+  technicalReviews?: TechnicalReview[] | null;
+  call?: Call | null;
 };
 
 const getAwardedTime = (
@@ -94,7 +99,7 @@ const getAwardedTime = (
   technicalReviews: TechnicalReview[] | null,
   instruments: Instrument[],
   instrumentIds: number[]
-) =>
+): AwardedTime[] =>
   instrumentIds.flatMap((instrumentId) => {
     const awardedTime =
       fapProposals.find((fap) => fap.instrumentId === instrumentId)
@@ -106,30 +111,6 @@ const getAwardedTime = (
     return typeof awardedTime === 'number' && instrument
       ? [{ awardedTime, instrument: instrument.name }]
       : [];
-  });
-
-const getTechnicalAssessments = (
-  technicalReviews: TechnicalReview[] | null,
-  instruments: Instrument[]
-) =>
-  (technicalReviews ?? []).flatMap((technicalReview) => {
-    const instrument = instruments.find(
-      ({ id }) => id === technicalReview.instrumentId
-    );
-    if (!instrument) {
-      return [];
-    }
-
-    return [
-      {
-        instrument: {
-          name: instrument.name,
-          description: instrument.description,
-        },
-        feasibility: technicalReview.status,
-        assessorsComment: stripHtml(technicalReview.publicComment ?? ''),
-      },
-    ];
   });
 
 async function stepAnswers(
@@ -256,10 +237,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
     instruments,
     instrumentIds
   );
-  const technicalAssessments = getTechnicalAssessments(
-    technicalReviews,
-    instruments
-  );
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -353,7 +330,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           hazards: hazardAnswers,
           awardedTime: awardedTime,
           fapMeetingDecisions,
-          technicalAssessments,
+          technicalReviews,
           call,
         });
       }
