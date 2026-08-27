@@ -266,7 +266,7 @@ context('Template Basic tests', () => {
 
       cy.contains(multipleChoiceQuestion.answers[0])
         .parent()
-        .find('[aria-label=Up]')
+        .find('[aria-label="Up"] button, button[aria-label="Up"]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[0])
@@ -281,7 +281,7 @@ context('Template Basic tests', () => {
 
       cy.contains(multipleChoiceQuestion.answers[2])
         .parent()
-        .find('[aria-label=Down]')
+        .find('[aria-label="Down"] button, button[aria-label="Down"]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[2])
