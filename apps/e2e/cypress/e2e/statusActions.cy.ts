@@ -1323,38 +1323,28 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to access the proposal from the link in status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+      cy.login('officer');
+      cy.visit('/');
 
-            cy.login('officer');
-            cy.visit('/');
+      cy.finishedLoading();
 
-            cy.finishedLoading();
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-            cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+      cy.contains(proposal2Id).click();
 
-            cy.contains(proposal.proposalId).click();
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
 
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
+      cy.visit('/');
 
-            cy.visit('/');
+      cy.navigateToStatusActionLogsSubmenu('Email');
 
-            cy.navigateToStatusActionLogsSubmenu('Email');
+      cy.contains(proposal2Id).click();
 
-            cy.contains(proposal.proposalId).click();
-
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
-          });
-        }
-      });
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
     });
   });
 });
