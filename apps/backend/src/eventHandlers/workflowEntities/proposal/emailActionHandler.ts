@@ -15,7 +15,6 @@ import {
 } from './utils';
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
-import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Proposal } from '../../../models/Proposal';
@@ -225,10 +224,6 @@ export const emailStatusActionRecipient = async (
         Tokens.AdminDataSource
       );
 
-      const instrumentDataSource = container.resolve<InstrumentDataSource>(
-        Tokens.InstrumentDataSource
-      );
-
       const userOfficeEmail = (
         await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
       )?.settingsValue;
@@ -263,9 +258,6 @@ export const emailStatusActionRecipient = async (
           email: userOfficeEmail,
           proposals: [proposal],
           template: recipientWithTemplate.emailTemplate.id,
-          instruments: await instrumentDataSource.getInstrumentsByProposalPk(
-            proposal.primaryKey
-          ),
           pi:
             (await usersDataSource.getBasicUserInfo(proposal.proposerId)) ||
             null,
@@ -404,7 +396,6 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
-              awardedTime: recipientWithData.awardedTime,
               fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
               technicalReviews: recipientWithData.technicalReviews,
               call: recipientWithData.call,

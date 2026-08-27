@@ -17,12 +17,8 @@ import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
 import { Call } from '../../../models/Call';
-import { FapProposal } from '../../../models/Fap';
 import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
-import {
-  Instrument,
-  InstrumentWithManagementTime,
-} from '../../../models/Instrument';
+import { InstrumentWithManagementTime } from '../../../models/Instrument';
 import { Proposal } from '../../../models/Proposal';
 import { Answer } from '../../../models/Questionary';
 import { TechnicalReview } from '../../../models/TechnicalReview';
@@ -38,11 +34,6 @@ import {
 interface GroupedObjectType {
   [key: string]: ProposalWithWorkflowStatusConnectionId[];
 }
-
-type AwardedTime = {
-  awardedTime: number;
-  instrument: string;
-};
 
 export const groupProposalsByProperties = (
   proposals: ProposalWithWorkflowStatusConnectionId[],
@@ -88,30 +79,10 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
-  awardedTime?: AwardedTime[] | null;
   fapMeetingDecisions?: FapMeetingDecision[] | null;
   technicalReviews?: TechnicalReview[] | null;
   call?: Call | null;
 };
-
-const getAwardedTime = (
-  fapProposals: FapProposal[],
-  technicalReviews: TechnicalReview[] | null,
-  instruments: Instrument[],
-  instrumentIds: number[]
-): AwardedTime[] =>
-  instrumentIds.flatMap((instrumentId) => {
-    const awardedTime =
-      fapProposals.find((fap) => fap.instrumentId === instrumentId)
-        ?.fapTimeAllocation ??
-      technicalReviews?.find((review) => review.instrumentId === instrumentId)
-        ?.timeAllocation;
-    const instrument = instruments.find(({ id }) => id === instrumentId);
-
-    return typeof awardedTime === 'number' && instrument
-      ? [{ awardedTime, instrument: instrument.name }]
-      : [];
-  });
 
 async function stepAnswers(
   fields: Answer[],
@@ -204,39 +175,13 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
     Tokens.ReviewDataSource
   );
 
-  const [
-    call,
-    requestedInstruments,
-    fapProposals,
-    fapMeetingDecisions,
-    technicalReviews,
-  ] = await Promise.all([
-    callDataSource.getCall(proposal.callId),
-    instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey),
-    fapDataSource.getFapsByProposalPks([proposal.primaryKey]),
-    fapDataSource.getProposalsFapMeetingDecisions([proposal.primaryKey]),
-    reviewDataSource.getTechnicalReviews(proposal.primaryKey),
-  ]);
-
-  const instrumentIds = Array.from(
-    new Set([
-      ...fapProposals
-        .map(({ instrumentId }) => instrumentId)
-        .filter(
-          (instrumentId): instrumentId is number => instrumentId !== null
-        ),
-      ...(technicalReviews ?? []).map(({ instrumentId }) => instrumentId),
-    ])
-  );
-  const instruments = instrumentIds.length
-    ? await instrumentDataSource.getInstrumentsByIds(instrumentIds)
-    : requestedInstruments;
-  const awardedTime = getAwardedTime(
-    fapProposals,
-    technicalReviews,
-    instruments,
-    instrumentIds
-  );
+  const [call, instruments, fapMeetingDecisions, technicalReviews] =
+    await Promise.all([
+      callDataSource.getCall(proposal.callId),
+      instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey),
+      fapDataSource.getProposalsFapMeetingDecisions([proposal.primaryKey]),
+      reviewDataSource.getTechnicalReviews(proposal.primaryKey),
+    ]);
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -322,13 +267,13 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           firstName: recipient.firstname,
           lastName: recipient.lastname,
           preferredName: recipient.preferredname,
-          pi: pi,
-          coProposers: coProposers,
+          instruments,
+          pi,
+          coProposers,
           techniques: techniques,
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
-          awardedTime: awardedTime,
           fapMeetingDecisions,
           technicalReviews,
           call,
