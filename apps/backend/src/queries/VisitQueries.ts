@@ -122,14 +122,10 @@ export default class VisitQueries {
       await this.experimentDataSource.getExperiment(experimentPk);
 
     if (experiment) {
-      const isPi = await this.visitAuth.hasCreateRights(
+      createable = await this.visitAuth.hasCreateRights(
         agent,
         experiment!.proposalPk
       );
-
-      if (isPi) {
-        createable = true;
-      }
     }
 
     if (visit) {

@@ -17,8 +17,8 @@ import {
 } from './records';
 
 class PostgresVisitDataSource implements VisitDataSource {
-  getVisits(filter?: VisitsFilter): Promise<Visit[]> {
-    return database('visits')
+  async getVisits(filter?: VisitsFilter): Promise<Visit[]> {
+    const visits: VisitRecord[] = await database('visits')
       .select('*')
       .modify((query) => {
         if (filter?.creatorId) {
@@ -30,118 +30,117 @@ class PostgresVisitDataSource implements VisitDataSource {
         if (filter?.experimentPk) {
           query.where('experiment_pk', filter.experimentPk);
         }
-      })
-      .then((visits: VisitRecord[]) =>
-        visits.map((visit) => createVisitObject(visit))
-      );
+      });
+
+    return visits.map((visit) => createVisitObject(visit));
   }
 
-  getVisit(visitId: number): Promise<Visit | null> {
-    return database('visits')
+  async getVisit(visitId: number): Promise<Visit | null> {
+    const visit = await database('visits')
       .select('*')
       .where({ visit_id: visitId })
-      .first()
-      .then((visit) => (visit ? createVisitObject(visit) : null));
+      .first();
+
+    return visit ? createVisitObject(visit) : null;
   }
 
-  getRegistration(
+  async getRegistration(
     userId: number,
     visitId: number
   ): Promise<VisitRegistration | null> {
-    return database('visits_has_users')
+    const registration = await database('visits_has_users')
       .where({ visit_id: visitId })
       .andWhere({ user_id: userId })
-      .first()
-      .then((registration) =>
-        registration ? createVisitRegistrationObject(registration) : null
-      );
+      .first();
+
+    return registration ? createVisitRegistrationObject(registration) : null;
   }
 
-  getRegistrations(
+  async getRegistrations(
     filter: GetRegistrationsFilter
   ): Promise<VisitRegistration[]> {
-    return database('visits_has_users')
-      .modify((query) => {
-        if (filter.questionaryIds) {
-          query.whereIn('registration_questionary_id', filter.questionaryIds);
-        }
-        if (filter.visitId) {
-          query.where({ visit_id: filter.visitId });
-        }
-        query.orderBy('user_id');
-      })
-      .then((registrations: VisitRegistrationRecord[]) =>
-        registrations.map((registration) =>
-          createVisitRegistrationObject(registration)
-        )
-      );
+    const registrations: VisitRegistrationRecord[] = await database(
+      'visits_has_users'
+    ).modify((query) => {
+      if (filter.questionaryIds) {
+        query.whereIn('registration_questionary_id', filter.questionaryIds);
+      }
+      if (filter.visitId) {
+        query.where({ visit_id: filter.visitId });
+      }
+      query.orderBy('user_id');
+    });
+
+    return registrations.map((registration) =>
+      createVisitRegistrationObject(registration)
+    );
   }
 
-  getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
-    return database('visits')
+  async getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
+    const visit = await database('visits')
       .select('*')
       .where({ experiment_pk: experimentPk })
-      .first()
-      .then((visit) => (visit ? createVisitObject(visit) : null));
+      .first();
+
+    return visit ? createVisitObject(visit) : null;
   }
 
-  createVisit(
+  async createVisit(
     { experimentPk, teamLeadUserId }: CreateVisitArgs,
     creatorId: number,
     proposalPk: number
   ): Promise<Visit> {
-    return database('visits')
+    const visit = await database('visits')
       .insert({
         proposal_pk: proposalPk,
         creator_id: creatorId,
         experiment_pk: experimentPk,
         team_lead_user_id: teamLeadUserId,
       })
-      .returning('*')
-      .then((visit) => createVisitObject(visit[0]));
+      .returning('*');
+
+    return createVisitObject(visit[0]);
   }
 
-  updateVisit(args: UpdateVisitArgs): Promise<Visit> {
-    return database
-      .transaction(async (trx) => {
-        if (args.team) {
-          await database('visits_has_users')
-            .delete()
-            .where({ visit_id: args.visitId })
-            .whereNotIn('user_id', args.team)
-            .transacting(trx);
+  async updateVisit(args: UpdateVisitArgs): Promise<Visit> {
+    await database.transaction(async (trx) => {
+      if (args.team) {
+        await database('visits_has_users')
+          .delete()
+          .where({ visit_id: args.visitId })
+          .whereNotIn('user_id', args.team)
+          .transacting(trx);
 
-          await database('visits_has_users')
-            .insert(
-              args.team.map((userId) => ({
-                visit_id: args.visitId,
-                user_id: userId,
-              }))
-            )
-            .onConflict(['user_id', 'visit_id'])
-            .ignore()
-            .transacting(trx);
-        }
-        if (args.teamLeadUserId) {
-          await database('visits')
-            .update({
-              team_lead_user_id: args.teamLeadUserId,
-            })
-            .where({ visit_id: args.visitId })
-            .transacting(trx);
-        }
-      })
-      .then(async () => {
-        const updatedVisit = await this.getVisit(args.visitId);
-        if (!updatedVisit) {
-          throw new GraphQLError('Updated visit not found');
-        }
+        await database('visits_has_users')
+          .insert(
+            args.team.map((userId) => ({
+              visit_id: args.visitId,
+              user_id: userId,
+            }))
+          )
+          .onConflict(['user_id', 'visit_id'])
+          .ignore()
+          .transacting(trx);
+      }
+      if (args.teamLeadUserId) {
+        await database('visits')
+          .update({
+            team_lead_user_id: args.teamLeadUserId,
+          })
+          .where({ visit_id: args.visitId })
+          .transacting(trx);
+      }
+    });
 
-        return updatedVisit;
-      });
+    const updatedVisit = await this.getVisit(args.visitId);
+    if (!updatedVisit) {
+      throw new GraphQLError('Updated visit not found');
+    }
+
+    return updatedVisit;
   }
 
-  updateRegistration({
+  async updateRegistration({
     userId,
     visitId,
     registrationQuestionaryId,
@@ -149,7 +148,7 @@ class PostgresVisitDataSource implements VisitDataSource {
     endsAt,
     status,
   }: UpdateVisitRegistrationArgs): Promise<VisitRegistration> {
-    return database('visits_has_users')
+    const result = await database('visits_has_users')
       .update({
         status: status,
         registration_questionary_id: registrationQuestionaryId,
@@ -158,58 +157,73 @@ class PostgresVisitDataSource implements VisitDataSource {
       })
       .where({ visit_id: visitId })
       .andWhere({ user_id: userId })
-      .returning('*')
-      .then((result) => createVisitRegistrationObject(result[0]));
+      .returning('*');
+
+    return createVisitRegistrationObject(result[0]);
   }
 
-  deleteVisit(visitId: number): Promise<Visit> {
-    return database('visits')
+  async deleteVisit(visitId: number): Promise<Visit> {
+    const result = await database('visits')
       .where({ visit_id: visitId })
       .delete()
-      .returning('*')
-      .then((result) => {
-        if (result.length !== 1) {
-          throw new GraphQLError('Visit not found');
-        }
+      .returning('*');
 
-        return createVisitObject(result[0]);
-      });
+    if (result.length !== 1) {
+      throw new GraphQLError('Visit not found');
+    }
+
+    return createVisitObject(result[0]);
   }
 
-  isVisitorOfProposal(visitorId: number, proposalPk: number): Promise<boolean> {
-    return database
+  async isVisitorOfProposal(
+    visitorId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const visitIdsOnProposal = database
+      .select('visit_id')
+      .from('visits')
+      .where('proposal_pk', proposalPk);
+
+    const results = await database
       .select('*')
       .from('visits_has_users')
-      .whereIn('visit_id', function () {
-        this.select('visit_id').from('visits').where('proposal_pk', proposalPk);
-      })
-      .andWhere('visits_has_users.user_id', visitorId)
-      .then((results) => results.length > 0);
+      .whereIn('visit_id', visitIdsOnProposal)
+      .andWhere('visits_has_users.user_id', visitorId);
+
+    return results.length > 0;
   }
 
-  isVisitorOfVisit(visitorId: number, visitId: number): Promise<boolean> {
-    return database
+  async isVisitorOfVisit(visitorId: number, visitId: number): Promise<boolean> {
+    const results = await database
       .select('*')
       .from('visits_has_users')
       .where('visits_has_users.visit_id', visitId)
-      .andWhere('visits_has_users.user_id', visitorId)
-      .then((results) => results.length > 0);
+      .andWhere('visits_has_users.user_id', visitorId);
+
+    return results.length > 0;
   }
 
   // current user -> get related visits -> get related users for each of those visits
-  async getRelatedUsersOnVisits(id: number): Promise<number[]> {
-    // Visits the user is related to: as creator, team lead, visitor,
-    // or as a member (PI or co-proposer) of the visit's proposal
+  async getRelatedUsersOnVisits(userId: number): Promise<number[]> {
+    const proposalPksWhereUserIsPi = database
+      .select('proposal_pk')
+      .from('proposals')
+      .where('proposer_id', userId);
+
+    // Visits the user is related to: as creator, team lead or visitor, or as
+    // the principal investigator of the visit's proposal.
+    // Co-proposers are deliberately excluded -- they get no rights on a visit
+    // (see VisitAuthorization) -- and the PI clause is what lets a PI resolve a
+    // team lead or visitor who is not a member of their proposal, which
+    // ProposalDataSource.getRelatedUsersOnProposals does not cover.
     const relatedVisitIds = database
       .select('v.visit_id')
       .from('visits as v')
       .leftJoin('visits_has_users as vhu', 'vhu.visit_id', 'v.visit_id')
-      .where('v.creator_id', id)
-      .orWhere('v.team_lead_user_id', id)
-      .orWhere('vhu.user_id', id)
-      .orWhereIn('v.proposal_pk', function () {
-        this.select('proposal_pk').from('proposals').where('proposer_id', id);
-      });
+      .where('v.creator_id', userId)
+      .orWhere('v.team_lead_user_id', userId)
+      .orWhere('vhu.user_id', userId)
+      .orWhereIn('v.proposal_pk', proposalPksWhereUserIsPi);
 
     // Everyone participating in those visits: creators, team leads and visitors
     const relatedUsers: { user_id: number }[] = await database

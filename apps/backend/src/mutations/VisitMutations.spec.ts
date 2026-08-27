@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import VisitMutations from './VisitMutations';
 import { Tokens } from '../config/Tokens';
 import {
+  dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -25,9 +26,9 @@ beforeEach(() => {
   visitDataSource.init();
 });
 
-test('User can create visit for his proposal', async () => {
+test('The principal investigator can create a visit for his proposal', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, {
+    mutations.createVisit(dummyPrincipalInvestigatorWithRole, {
       experimentPk: 2,
       teamLeadUserId: 1,
       team: [1],
@@ -35,35 +36,58 @@ test('User can create visit for his proposal', async () => {
   ).resolves.toBeInstanceOf(Visit);
 });
 
+// Creating a visit is a principal investigator right (VisitAuthorization.hasCreateRights);
+// read rights on the proposal are deliberately not enough.
+test('A co-proposer can not create a visit for the proposal', async () => {
+  const result = await mutations.createVisit(dummyUserWithRole, {
+    experimentPk: 2,
+    teamLeadUserId: dummyUserWithRole.id,
+    team: [dummyUserWithRole.id],
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect((result as Rejection).reason).toEqual(
+    'Can not create visit for a proposal you are not the principal investigator of'
+  );
+});
+
 test('User can not create visit for proposal that is not accepted', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, {
+    mutations.createVisit(dummyPrincipalInvestigatorWithRole, {
       experimentPk: 1,
-      teamLeadUserId: dummyUserWithRole.id,
-      team: [dummyUserWithRole.id],
+      teamLeadUserId: dummyPrincipalInvestigatorWithRole.id,
+      team: [dummyPrincipalInvestigatorWithRole.id],
     })
   ).resolves.toBeInstanceOf(Rejection);
 });
 
+// experimentPk 2 sits on an accepted proposal, so this fails on the create
+// rights check rather than on the proposal status check before it.
 test('User can not create visit for someone elses proposal', async () => {
-  await expect(
-    mutations.createVisit(dummyUserWithRole, {
-      experimentPk: 3,
-      teamLeadUserId: dummyUserWithRole.id,
-      team: [dummyUserWithRole.id],
-    })
-  ).resolves.toBeInstanceOf(Rejection);
+  const result = await mutations.createVisit(dummyUserNotOnProposalWithRole, {
+    experimentPk: 2,
+    teamLeadUserId: dummyUserNotOnProposalWithRole.id,
+    team: [dummyUserNotOnProposalWithRole.id],
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect((result as Rejection).reason).toEqual(
+    'Can not create visit for a proposal you are not the principal investigator of'
+  );
 });
 
 // Enforces the invariant relied on by VisitAuthorization.hasReadRights: a team
 // lead is always a visitor (part of the team). If this rejection is ever
 // removed, the team-lead read path silently breaks.
 test('User can not create visit when the team lead is not part of the team', async () => {
-  const result = await mutations.createVisit(dummyUserWithRole, {
-    experimentPk: 2,
-    teamLeadUserId: 1,
-    team: [dummyUserWithRole.id], // team lead (1) is not in the team
-  });
+  const result = await mutations.createVisit(
+    dummyPrincipalInvestigatorWithRole,
+    {
+      experimentPk: 2,
+      teamLeadUserId: 2,
+      team: [dummyPrincipalInvestigatorWithRole.id], // team lead (2) is not in the team
+    }
+  );
 
   expect(result).toBeInstanceOf(Rejection);
   expect((result as Rejection).reason).toEqual(
@@ -77,16 +101,19 @@ test('User can not delete visit for someone elses proposal', async () => {
   expect(result).toBeInstanceOf(Rejection);
   expect(result).toHaveProperty(
     'message',
-    'Can not update visit because of insufficient permissions'
+    'Can not delete visit because of insufficient permissions'
   );
 });
 
 test('User can update visit', async () => {
-  const visit = (await mutations.createVisit(dummyUserWithRole, {
-    experimentPk: 2,
-    teamLeadUserId: dummyUserWithRole.id,
-    team: [dummyUserWithRole.id],
-  })) as Visit;
+  const visit = (await mutations.createVisit(
+    dummyPrincipalInvestigatorWithRole,
+    {
+      experimentPk: 2,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    }
+  )) as Visit;
 
   const updated = (await mutations.updateVisit(dummyUserWithRole, {
     visitId: visit.id,
@@ -101,11 +128,14 @@ test('User can update visit', async () => {
 // part of the team, otherwise it is silently dropped from the visitor list and
 // loses read access (VisitAuthorization.hasReadRights).
 test('User can not update visit to a team lead who is not in the given team', async () => {
-  const visit = (await mutations.createVisit(dummyUserWithRole, {
-    experimentPk: 2,
-    teamLeadUserId: dummyUserWithRole.id,
-    team: [dummyUserWithRole.id],
-  })) as Visit;
+  const visit = (await mutations.createVisit(
+    dummyPrincipalInvestigatorWithRole,
+    {
+      experimentPk: 2,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    }
+  )) as Visit;
 
   const result = await mutations.updateVisit(dummyUserWithRole, {
     visitId: visit.id,
@@ -120,11 +150,14 @@ test('User can not update visit to a team lead who is not in the given team', as
 });
 
 test('User can not change only the team lead to someone not on the existing team', async () => {
-  const visit = (await mutations.createVisit(dummyUserWithRole, {
-    experimentPk: 2,
-    teamLeadUserId: dummyUserWithRole.id,
-    team: [dummyUserWithRole.id],
-  })) as Visit;
+  const visit = (await mutations.createVisit(
+    dummyPrincipalInvestigatorWithRole,
+    {
+      experimentPk: 2,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    }
+  )) as Visit;
 
   // No team passed: the new team lead is checked against the current team.
   const result = await mutations.updateVisit(dummyUserWithRole, {
@@ -139,11 +172,14 @@ test('User can not change only the team lead to someone not on the existing team
 });
 
 test('User can not himself approve visit registration', async () => {
-  const visit = (await mutations.createVisit(dummyUserWithRole, {
-    experimentPk: 2,
-    teamLeadUserId: dummyUserWithRole.id,
-    team: [dummyUserWithRole.id],
-  })) as Visit;
+  const visit = (await mutations.createVisit(
+    dummyPrincipalInvestigatorWithRole,
+    {
+      experimentPk: 2,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    }
+  )) as Visit;
 
   await expect(
     mutations.approveVisitRegistration(dummyUserWithRole, {

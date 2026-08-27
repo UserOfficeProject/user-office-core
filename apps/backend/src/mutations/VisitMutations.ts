@@ -28,7 +28,6 @@ import { RequestVisitRegistrationChangesInput } from '../resolvers/mutations/Req
 import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { UserAuthorization } from './../auth/UserAuthorization';
 @injectable()
 export default class VisitMutations {
@@ -46,9 +45,7 @@ export default class VisitMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ExperimentDataSource)
     private experimentDataSource: ExperimentDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
-    @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -110,12 +107,12 @@ export default class VisitMutations {
       );
     }
 
-    const hasReadRights =
+    const hasCreateRights =
       this.userAuth.isApiToken(agent) ||
-      (await this.proposalAuth.hasReadRights(agent, proposal));
-    if (hasReadRights === false) {
+      (await this.visitAuth.hasCreateRights(agent, proposal));
+    if (hasCreateRights === false) {
       return rejection(
-        'Can not create visit for proposal that does not belong to you',
+        'Can not create visit for a proposal you are not the principal investigator of',
         { args, agent }
       );
     }
@@ -218,13 +215,14 @@ export default class VisitMutations {
       (await this.visitAuth.hasWriteRights(agent, visitId));
     if (!hasRights) {
       return rejection(
-        'Can not update visit because of insufficient permissions',
+        'Can not delete visit because of insufficient permissions',
         { user: agent, visitId }
       );
     }
 
     return this.dataSource.deleteVisit(visitId);
   }
+
   @Authorized()
   async createVisitRegistration(
     agent: UserWithRole | null,

@@ -36,7 +36,6 @@ export class VisitAuthorization {
     return visit;
   }
 
-  // NOTE: Keep constraints in sync with VisitDataSource.ts
   async hasReadRights(
     agent: UserWithRole | null,
     visitOrVisitId: Visit | number
@@ -71,7 +70,6 @@ export class VisitAuthorization {
     return visit.creatorId === agent.id || isPI || isVisitVisitor;
   }
 
-  // NOTE: Keep constraints in sync with VisitDataSource.ts
   async hasWriteRights(
     agent: UserWithRole | null,
     visitOrVisitId: number | Visit
@@ -110,7 +108,35 @@ export class VisitAuthorization {
     return true;
   }
 
-  // NOTE: Keep constraints in sync with VisitDataSource.ts
+  async hasDeleteRights(
+    agent: UserWithRole | null,
+    visitOrVisitId: number | Visit
+  ): Promise<boolean> {
+    // Deleting a visit is a PI right, same as creating one. Only someone who
+    // can created visits may delete it, i.e, the current PI.
+    //
+    // Also allow User Officers delete a visit.
+    //
+    // The team lead has write rights, but not delete rights.
+
+    if (!agent) {
+      return false;
+    }
+
+    // User officer has access
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const visit = await this.resolveVisit(visitOrVisitId);
+
+    if (!visit) {
+      return false;
+    }
+
+    return this.hasCreateRights(agent, visit.proposalPk);
+  }
+
   async hasCreateRights(
     agent: UserWithRole | null,
     proposalOrProposalPk: Proposal | number
