@@ -1,4 +1,3 @@
-import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
@@ -18,7 +17,6 @@ import {
 import { useFapsData } from 'hooks/fap/useFapsData';
 
 const CallReviewAndNotification = () => {
-  const theme = useTheme();
   const { t } = useTranslation();
   const { currentRole } = useContext(UserContext);
   const { faps: allActiveFaps, loadingFaps } = useFapsData({
@@ -55,7 +53,6 @@ const CallReviewAndNotification = () => {
             'data-cy': 'start-review',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -71,7 +68,6 @@ const CallReviewAndNotification = () => {
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -85,7 +81,6 @@ const CallReviewAndNotification = () => {
           textField={{
             fullWidth: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
           name="endFapReview"
@@ -99,7 +94,6 @@ const CallReviewAndNotification = () => {
           textField={{
             fullWidth: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
       </LocalizationProvider>
       <FormikUIAutocomplete
