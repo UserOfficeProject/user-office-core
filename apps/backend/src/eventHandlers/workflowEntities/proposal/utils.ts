@@ -84,7 +84,7 @@ export type EmailReadyType = {
   samples?: Answer[];
   hazards?: Answer[];
   awardedTime?: unknown[];
-  commentsToUser?: string;
+  fapMeetingDecisions?: FapMeetingDecision[];
   technicalAssessments?: unknown[];
   call?: unknown;
 };
@@ -107,12 +107,6 @@ const getAwardedTime = (
       ? [{ awardedTime, instrument: instrument.name }]
       : [];
   });
-
-const getCommentsToUser = (fapMeetingDecisions: FapMeetingDecision[]) =>
-  stripHtml(
-    fapMeetingDecisions.find(({ commentForUser }) => commentForUser)
-      ?.commentForUser ?? ''
-  );
 
 const getTechnicalAssessments = (
   technicalReviews: TechnicalReview[] | null,
@@ -262,7 +256,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
     instruments,
     instrumentIds
   );
-  const commentsToUser = getCommentsToUser(fapMeetingDecisions);
   const technicalAssessments = getTechnicalAssessments(
     technicalReviews,
     instruments
@@ -359,7 +352,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           samples: sampleAnswers,
           hazards: hazardAnswers,
           awardedTime: awardedTime,
-          commentsToUser,
+          fapMeetingDecisions,
           technicalAssessments,
           call,
         });

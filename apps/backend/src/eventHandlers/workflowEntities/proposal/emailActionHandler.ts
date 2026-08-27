@@ -405,7 +405,7 @@ const sendMail = async (
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
               awardedTime: recipientWithData.awardedTime,
-              commentsToUser: recipientWithData.commentsToUser,
+              fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
               technicalAssessments: recipientWithData.technicalAssessments,
               call: recipientWithData.call,
             },
