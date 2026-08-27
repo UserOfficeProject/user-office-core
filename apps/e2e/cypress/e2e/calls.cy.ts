@@ -738,9 +738,9 @@ context('Calls tests', () => {
       cy.get('[data-cy="availability-time"]').contains(
         'Availability time must be a positive number'
       );
-      cy.contains(instrumentAssignedToCall.shortCode)
-        .parent()
-        .find('button[aria-label="Save"]')
+      cy.get('[data-cy="availability-time"]')
+        .closest('tr')
+        .find('[aria-label="Save"] button, button[aria-label="Save"]')
         .should('be.disabled');
 
       cy.get('[data-cy="availability-time"] input')
@@ -750,9 +750,9 @@ context('Calls tests', () => {
       cy.get('[data-cy="availability-time"]').contains(
         `Availability time can not be grater than ${MAX_32_BIT_INTEGER - 1}`
       );
-      cy.contains(instrumentAssignedToCall.shortCode)
-        .parent()
-        .find('button[aria-label="Save"]')
+      cy.get('[data-cy="availability-time"]')
+        .closest('tr')
+        .find('[aria-label="Save"] button, button[aria-label="Save"]')
         .should('be.disabled');
     });
 
