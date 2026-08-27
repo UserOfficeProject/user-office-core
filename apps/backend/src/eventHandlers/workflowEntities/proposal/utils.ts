@@ -83,28 +83,28 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
-  awardedShifts?: unknown[];
+  awardedTime?: unknown[];
   commentsToUser?: string;
   technicalAssessments?: unknown[];
   call?: unknown;
 };
 
-const getAwardedShifts = (
+const getAwardedTime = (
   fapProposals: FapProposal[],
   technicalReviews: TechnicalReview[] | null,
   instruments: Instrument[],
   instrumentIds: number[]
 ) =>
   instrumentIds.flatMap((instrumentId) => {
-    const numberOfShifts =
+    const awardedTime =
       fapProposals.find((fap) => fap.instrumentId === instrumentId)
         ?.fapTimeAllocation ??
       technicalReviews?.find((review) => review.instrumentId === instrumentId)
         ?.timeAllocation;
     const instrument = instruments.find(({ id }) => id === instrumentId);
 
-    return typeof numberOfShifts === 'number' && instrument
-      ? [{ numberOfShifts, instrument: instrument.name }]
+    return typeof awardedTime === 'number' && instrument
+      ? [{ awardedTime, instrument: instrument.name }]
       : [];
   });
 
@@ -256,7 +256,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const instruments = instrumentIds.length
     ? await instrumentDataSource.getInstrumentsByIds(instrumentIds)
     : requestedInstruments;
-  const awardedShifts = getAwardedShifts(
+  const awardedTime = getAwardedTime(
     fapProposals,
     technicalReviews,
     instruments,
@@ -358,7 +358,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
-          awardedShifts,
+          awardedTime: awardedTime,
           commentsToUser,
           technicalAssessments,
           call,

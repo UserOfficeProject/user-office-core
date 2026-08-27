@@ -404,7 +404,7 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
-              awardedShifts: recipientWithData.awardedShifts,
+              awardedTime: recipientWithData.awardedTime,
               commentsToUser: recipientWithData.commentsToUser,
               technicalAssessments: recipientWithData.technicalAssessments,
               call: recipientWithData.call,
