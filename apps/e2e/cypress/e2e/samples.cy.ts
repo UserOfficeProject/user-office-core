@@ -20,8 +20,8 @@ context('Samples tests', () => {
   const sampleTitle = faker.lorem.words(2);
   const sampleQuestionaryQuestion = faker.lorem.words(2);
   const proposalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.PROPOSAL,
   };
 
