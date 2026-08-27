@@ -5,8 +5,8 @@ import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('User administration tests', () => {
-  const newFirstName = faker.name.firstName();
-  const newLastName = faker.name.lastName();
+  const newFirstName = faker.person.firstName();
+  const newLastName = faker.person.lastName();
   const newPrefferedName = faker.hacker.noun();
   const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
