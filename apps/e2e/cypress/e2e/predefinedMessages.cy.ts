@@ -8,8 +8,8 @@ context('Predefined messages tests', () => {
     cy.getAndStoreFeaturesEnabled();
   });
 
-  const messageTitle = faker.random.words();
-  const message = faker.random.words();
+  const messageTitle = faker.lorem.words();
+  const message = faker.lorem.words();
 
   it('User officer should be able to save new and use saved predefined message', () => {
     cy.login('officer');
@@ -212,8 +212,8 @@ context('Predefined messages tests', () => {
       .first()
       .should('have.value', '');
 
-    const newMessageTitle = faker.random.words();
-    const newMessage = faker.random.words();
+    const newMessageTitle = faker.lorem.words();
+    const newMessage = faker.lorem.words();
 
     cy.get(
       '[aria-labelledby="predefined-messages-modal"] [data-cy="message-title"] input'

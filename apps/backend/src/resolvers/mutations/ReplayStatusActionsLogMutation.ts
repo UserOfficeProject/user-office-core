@@ -33,17 +33,6 @@ export class ReplayStatusActionsLogsResult {
 
 @Resolver()
 export class ReplayStatusActionsLogMutation {
-  @Mutation(() => Boolean)
-  replayStatusActionsLog(
-    @Arg('statusActionsLogId', () => Int) statusActionsLogId: number,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.statusActionsLogs.replayStatusActionsLog(
-      context.user,
-      statusActionsLogId
-    );
-  }
-
   @Mutation(() => ReplayStatusActionsLogsResult)
   replayStatusActionsLogs(
     @Arg('statusActionsLogIds', () => [Int]) statusActionsLogIds: number[],
