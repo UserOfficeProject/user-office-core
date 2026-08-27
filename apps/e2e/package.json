@@ -49,6 +49,6 @@
     "lint:fix": "tsc --noEmit && eslint --quiet --fix",
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --e2e",
-    "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e"
+    "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e --config numTestsKeptInMemory=0"
   }
 }
