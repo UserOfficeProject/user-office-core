@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import ResponsiveMaterialTable, {
   ResponsiveMaterialTableProps,
@@ -14,12 +14,7 @@ function DenseMaterialTable<RowData extends object>(
   props: ResponsiveMaterialTableProps<RowData>
 ) {
   const asCards = useCardRows();
-  // Deliberately not keyed on props.columns.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const columns = useMemo(
-    () => (asCards ? props.columns : denseTableColumns(props.columns)),
-    [asCards]
-  );
+  const columns = asCards ? props.columns : denseTableColumns(props.columns);
 
   return (
     <ResponsiveMaterialTable
