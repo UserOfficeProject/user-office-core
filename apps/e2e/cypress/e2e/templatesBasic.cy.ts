@@ -540,7 +540,7 @@ context('Template Basic tests', () => {
                       .contains(alternateTitle)
                       .should('not.exist');
 
-                    cy.get('[data-testid="CloseIcon"').click();
+                    cy.get('[data-cy=close-modal-btn]').click();
 
                     // Only the new proposal should count against the new call and appear when the count is clicked
                     cy.get(
@@ -1288,7 +1288,7 @@ context('Template Basic tests', () => {
       cy.visit('/');
 
       cy.visit('/ProposalTemplates');
-      cy.get('[data-testid="EditIcon"]').first().click();
+      cy.get('[aria-label="Edit"]').first().click();
 
       cy.createBooleanQuestion(booleanQuestion);
 
