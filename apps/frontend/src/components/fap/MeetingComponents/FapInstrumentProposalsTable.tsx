@@ -10,7 +10,13 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useContext, DragEvent, useState, useEffect } from 'react';
+import React, {
+  useContext,
+  DragEvent,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -252,29 +258,32 @@ const FapInstrumentProposalsTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fapInstrument.submitted]);
 
-  const sortByRankOrder = (a: FapProposal, b: FapProposal) => {
-    const fapMeetingDecisionA = a.proposal.fapMeetingDecisions?.find(
-      (fmd) => fmd.instrumentId === fapInstrument.id
-    );
-    const fapMeetingDecisionB = b.proposal.fapMeetingDecisions?.find(
-      (fmd) => fmd.instrumentId === fapInstrument.id
-    );
-    if (
-      fapMeetingDecisionA?.rankOrder === fapMeetingDecisionB?.rankOrder ||
-      (!fapMeetingDecisionA?.rankOrder && !fapMeetingDecisionB?.rankOrder)
-    ) {
-      return -1;
-    } else if (!fapMeetingDecisionA?.rankOrder) {
-      return 1;
-    } else if (!fapMeetingDecisionB?.rankOrder) {
-      return -1;
-    } else {
-      return (fapMeetingDecisionA?.rankOrder as number) >
-        (fapMeetingDecisionB?.rankOrder as number)
-        ? 1
-        : -1;
-    }
-  };
+  const sortByRankOrder = useCallback(
+    (a: FapProposal, b: FapProposal) => {
+      const fapMeetingDecisionA = a.proposal.fapMeetingDecisions?.find(
+        (fmd) => fmd.instrumentId === fapInstrument.id
+      );
+      const fapMeetingDecisionB = b.proposal.fapMeetingDecisions?.find(
+        (fmd) => fmd.instrumentId === fapInstrument.id
+      );
+      if (
+        fapMeetingDecisionA?.rankOrder === fapMeetingDecisionB?.rankOrder ||
+        (!fapMeetingDecisionA?.rankOrder && !fapMeetingDecisionB?.rankOrder)
+      ) {
+        return -1;
+      } else if (!fapMeetingDecisionA?.rankOrder) {
+        return 1;
+      } else if (!fapMeetingDecisionB?.rankOrder) {
+        return -1;
+      } else {
+        return (fapMeetingDecisionA?.rankOrder as number) >
+          (fapMeetingDecisionB?.rankOrder as number)
+          ? 1
+          : -1;
+      }
+    },
+    [fapInstrument.id]
+  );
 
   const [sortedProposalsWithAverageScore, setSortedProposalsWithAverageScore] =
     useState<FapProposalWithAverageScoreAndAvailabilityZone[]>([]);
@@ -376,7 +385,13 @@ const FapInstrumentProposalsTable = ({
     if (instrumentProposalsData.length) {
       run();
     }
-  }, [instrumentProposalsData, fapInstrument.availabilityTime]);
+  }, [
+    instrumentProposalsData,
+    fapInstrument.availabilityTime,
+    fapInstrument.id,
+    api,
+    sortByRankOrder,
+  ]);
 
   const ProposalTimeAllocationColumn = (
     rowData: FapProposalWithAverageScoreAndAvailabilityZone
