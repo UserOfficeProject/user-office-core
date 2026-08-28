@@ -223,7 +223,7 @@ const FapProposalsAndAssignmentsTable = ({
   const { t } = useTranslation();
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
     '[data-cy="fap-assignments-table"]',
-    [loadingFapProposals]
+    loadingFapProposals
   );
 
   const translatedColumns = FapProposalColumns.map((column) =>
