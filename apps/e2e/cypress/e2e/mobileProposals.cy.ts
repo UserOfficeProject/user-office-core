@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Mobile proposal tests', () => {
@@ -41,7 +43,13 @@ context('Mobile proposal tests', () => {
     cy.visit('/');
 
     cy.finishedLoading();
-    cy.get('[data-cy="dashboard-section-proposals"]').click();
+
+    // The dashboard only renders a section bar when there is more than one
+    // section, so without the scheduler the proposals content is already on
+    // screen and there is nothing to click. mobileInvites guards the same way.
+    if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      cy.get('[data-cy="dashboard-section-proposals"]').click();
+    }
   };
 
   describe('Proposal cards', () => {
@@ -86,11 +94,14 @@ context('Mobile proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="questionary-progress"]').should('exist');
-      cy.get('[data-cy="mobile-app-bar"]').should(
-        'contain.text',
-        readOnlyProposal.title
-      );
+      // Both seeded proposals have a submitted management decision, so this
+      // one opens on its decision tabs rather than in the questionary wizard.
+      // There is no wizard here, and so no mobile app bar or progress bar; the
+      // proposal is read through the second tab, as invites.cy.ts does.
+      cy.get('#horizontal-tab-1').click();
+
+      cy.get('[data-cy="questionary-details-view"]').should('exist');
+      cy.contains(readOnlyProposal.title);
     });
 
     it('Should offer delete in the action sheet only for a draft proposal', () => {
