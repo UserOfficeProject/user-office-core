@@ -126,11 +126,7 @@ export class SMTPMailService extends MailService {
   }
 
   private isTokenExpired(): boolean {
-    if (!this.authToken?.expiresOn) {
-      throw new Error('Invalid token: Missing expiresOn property');
-    }
-
-    return Date.now() >= this.authToken.expiresOn.getTime();
+    return Date.now() >= this.authToken!.expiresOn!.getTime();
   }
 
   private async getAccessToken(): Promise<string> {
@@ -152,6 +148,10 @@ export class SMTPMailService extends MailService {
 
     const cca = new ConfidentialClientApplication(msalConfig);
     this.authToken = await cca.acquireTokenByClientCredential(tokenRequest);
+
+    if (!this.authToken?.expiresOn) {
+      throw new Error('Invalid token: Missing expiresOn property');
+    }
 
     if (!this.authToken || !this.authToken.accessToken) {
       throw new Error('Failed to get access token');
