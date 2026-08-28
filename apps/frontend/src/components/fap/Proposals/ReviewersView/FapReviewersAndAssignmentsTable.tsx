@@ -129,7 +129,7 @@ const FapReviewersAndAssignmentsTable = ({
 
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
     '[data-cy="fap-reviewers-assignments-table"]',
-    [loadingMembers, loadingFapProposals]
+    loadingMembers || loadingFapProposals
   );
   const downloadFapReviewsXLSX = useDownloadXLSXFapReviews();
 

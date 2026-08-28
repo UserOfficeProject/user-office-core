@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -291,7 +291,13 @@ const ProposalTableInstrumentScientist = ({
   const dataType = searchParams.get('dataType');
   const reviewer = searchParams.get('reviewer');
   const search = searchParams.get('search');
-  const selection = searchParams.getAll('selection');
+  // `searchParams.getAll` returns a new array on every render, so the effect
+  // below keys off the serialised value and reuses one array identity for it.
+  const selectionKey = JSON.stringify(searchParams.getAll('selection'));
+  const selection: string[] = useMemo(
+    () => JSON.parse(selectionKey),
+    [selectionKey]
+  );
   const sortField = searchParams.get('sortField');
   const sortDirection = searchParams.get('sortDirection');
   const reviewModal = searchParams.get('reviewModal');
@@ -402,7 +408,7 @@ const ProposalTableInstrumentScientist = ({
       );
       setSelectedProposals([]);
     }
-  }, [proposalsData, JSON.stringify(selection)]);
+  }, [proposalsData, selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadProposalAttachment = useDownloadProposalAttachment();
