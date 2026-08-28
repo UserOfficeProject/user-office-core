@@ -2028,7 +2028,7 @@
 <span class="w">  </span><span class="p">}</span>
 
 <span class="w">  </span><span class="c1">// otherwise: access is limited to proposals whose call or</span>
-<span class="w">  </span><span class="c1">// instrument is linked to one of the role&#39;s tags</span>
+<span class="w">  </span><span class="c1">// instrument is linked to one of the role's tags</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">userInstruments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">userCalls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
 <span class="w">  </span><span class="nx">hasAccess</span><span class="w"> </span><span class="o">=</span>
@@ -2116,7 +2116,7 @@
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">roleDataSource</span><span class="p">.</span><span class="nx">getTagsByRoleId</span><span class="p">(</span><span class="nx">agent</span><span class="p">.</span><span class="nx">currentRole</span><span class="o">!</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">tagIds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tags</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">tag</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">tag</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
 <span class="w">  </span><span class="nx">indices</span><span class="p">.</span><span class="nx">tags</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">index</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">args</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tagIds</span><span class="p">;</span><span class="w"> </span><span class="c1">// overwrite the marked argument with the role&#39;s tag ids</span>
+<span class="w">    </span><span class="nx">args</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tagIds</span><span class="p">;</span><span class="w"> </span><span class="c1">// overwrite the marked argument with the role's tag ids</span>
 <span class="w">  </span><span class="p">});</span>
 <span class="p">};</span>
 </code></pre></div>

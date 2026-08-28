@@ -2439,10 +2439,10 @@
 <li>Not all proposals show up in the Scheduler. A proposal becomes eligible for scheduling only when it enters a specific status (done via User Office Core). You can define this status using the <strong>UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES</strong> environment variable for the scheduler service (e.g. SCHEDULING)
   Example:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES=&quot;SCHEDULING&quot;
+<div class="highlight"><pre><span></span><code>UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES="SCHEDULING"
 </code></pre></div>
 <p>Hint: Use comma to add more than one status</p>
-<div class="highlight"><pre><span></span><code>UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES=&quot;SCHEDULING, ALLOCATED&quot;
+<div class="highlight"><pre><span></span><code>UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES="SCHEDULING, ALLOCATED"
 </code></pre></div>
 <p>In the example above, proposals in <strong>SCHEDULING</strong> status will appear in the planning sidebar, and administrators can assign time slots (experiments) accordingly. There are two ways to set a proposal to the <strong>SCHEDULING</strong> status:</p>
 <ol>

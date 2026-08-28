@@ -2276,15 +2276,18 @@
 <hr />
 <h2 id="environment-variables">Environment Variables</h2>
 <h3 id="eam-configuration-ess-specific">EAM Configuration (ESS-specific)</h3>
-<p>The EAM (Enterprise Asset Management) section includes variables that configure API access and authentication.</p>
+<p>The EAM (Enterprise Asset Management) section includes variables that configure Camel API access and OAuth2 authentication.</p>
 <ul>
-<li><strong>EAM_API_URL</strong>: Specifies the API URL for EAM services.</li>
-<li><strong>EAM_AUTH_CLIENT_ID</strong>: The client ID for EAM authentication.</li>
-<li><strong>EAM_AUTH_CLIENT_SECRET</strong>: The client secret for EAM authentication.</li>
-<li><strong>EAM_AUTH_HOST</strong>: The authentication host for EAM.</li>
-<li><strong>EAM_AUTH_PASS</strong>: The password for EAM authentication.</li>
-<li><strong>EAM_AUTH_USER</strong>: The username for EAM authentication.</li>
-<li><strong>EAM_PART_CODE</strong>: The part code used in EAM operations.</li>
+<li><strong>EAM_API_URL</strong>: Base URL for the EAM Camel integration endpoints (the <code>/assets</code> and <code>/casemanagement</code> paths are appended).</li>
+<li><strong>EAM_OAUTH_TOKEN_URL</strong>: The OAuth2 token endpoint used to obtain an access token via the client_credentials grant.</li>
+<li><strong>EAM_AUTH_CLIENT_ID</strong>: The client ID used for OAuth2 authentication.</li>
+<li><strong>EAM_AUTH_CLIENT_SECRET</strong>: The client secret used for OAuth2 authentication.</li>
+<li><strong>EAM_OAUTH_SCOPE</strong>: The OAuth2 scope requested when fetching the access token.</li>
+<li><strong>EAM_OAUTH_AUDIENCE</strong>: The OAuth2 audience requested when fetching the access token.</li>
+<li><strong>EAM_ORGANIZATION_CODE</strong>: The organization code used in EAM request payloads.</li>
+<li><strong>EAM_ORGANIZATION_NAME</strong>: The organization name used in EAM request payloads.</li>
+<li><strong>EAM_LOCATION_CODE</strong>: The location code used in EAM request payloads.</li>
+<li><strong>EAM_EQUIPMENT_PART_CODE</strong>: The part code used in EAM operations.</li>
 </ul>
 <h3 id="logging-configuration-graylog">Logging Configuration (Graylog)</h3>
 <p>To enable local logging via Graylog, uncomment and configure the following variables:</p>
