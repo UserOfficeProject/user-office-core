@@ -765,7 +765,7 @@ context('Fap reviews tests', () => {
       //Do second one first as the first chevron tooltip covers the second one
       cy.contains(secondCreatedProposalId)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
@@ -773,12 +773,12 @@ context('Fap reviews tests', () => {
 
       cy.contains(secondCreatedProposalId)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(firstCreatedProposalId)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
@@ -2877,10 +2877,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(fap2.code)
-        .closest('tr')
-        .find('[data-testid="EditIcon"]')
-        .click();
+      cy.contains(fap2.code).closest('tr').find('[aria-label="Edit"]').click();
 
       cy.get('button').contains('Meeting Components').click();
 
@@ -2924,7 +2921,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains(instrument.name)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(instrument.name)
@@ -2934,7 +2931,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains(instrument1.name)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(instrument1.name)
@@ -2988,7 +2985,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains(instrument.name)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(instrument.name)
@@ -2998,16 +2995,13 @@ context('Fap meeting components tests', () => {
 
       cy.visit(`/Faps`);
 
-      cy.contains(fap2.code)
-        .closest('tr')
-        .find('[data-testid="EditIcon"]')
-        .click();
+      cy.contains(fap2.code).closest('tr').find('[aria-label="Edit"]').click();
 
       cy.get('button').contains('Meeting Components').click();
 
       cy.contains(instrument1.name)
         .closest('tr')
-        .find('[data-testid="ChevronRightIcon"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(instrument1.name)
