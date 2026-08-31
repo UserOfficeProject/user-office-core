@@ -28,6 +28,7 @@ export class SMTPMailService extends MailService {
   private emailTemplateDataSource: EmailTemplateDataSource;
   private attachments: any[];
   private authToken: AuthenticationResult | null = null;
+  private transport: nodemailer.Transporter | null = null;
 
   constructor() {
     super();
@@ -129,9 +130,9 @@ export class SMTPMailService extends MailService {
     return Date.now() >= this.authToken!.expiresOn!.getTime();
   }
 
-  private async getAccessToken(): Promise<string> {
+  private async getAccessToken(): Promise<void> {
     if (this.authToken && !this.isTokenExpired()) {
-      return this.authToken.accessToken;
+      return;
     }
 
     const tokenRequest = {
@@ -156,13 +157,15 @@ export class SMTPMailService extends MailService {
     if (!this.authToken || !this.authToken.accessToken) {
       throw new Error('Failed to get access token');
     }
-
-    return this.authToken.accessToken;
   }
 
-  private async createBasicAuthTransport() {
+  private async createBasicAuthTransport(): Promise<void> {
+    if (this.transport) {
+      return;
+    }
+
     if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
-      return nodemailer.createTransport({
+      this.transport = nodemailer.createTransport({
         pool: true,
         maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
         host: process.env.EMAIL_AUTH_HOST,
@@ -173,7 +176,7 @@ export class SMTPMailService extends MailService {
         },
       });
     } else {
-      return nodemailer.createTransport({
+      this.transport = nodemailer.createTransport({
         host: process.env.EMAIL_AUTH_HOST,
         port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
         auth: {
@@ -184,11 +187,19 @@ export class SMTPMailService extends MailService {
     }
   }
 
-  private async createOauth2Transport() {
-    const accessToken = await this.getAccessToken();
+  private async createOauth2Transport(): Promise<void> {
+    if (this.transport && this.authToken && !this.isTokenExpired()) {
+      return;
+    }
+
+    if (this.transport) {
+      this.transport.close();
+    }
+
+    await this.getAccessToken();
 
     if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
-      return createTransport({
+      this.transport = createTransport({
         host: process.env.EMAIL_AUTH_HOST,
         port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
         pool: true,
@@ -198,11 +209,11 @@ export class SMTPMailService extends MailService {
         auth: {
           type: 'OAuth2',
           user: process.env.EMAIL_SENDER,
-          accessToken: accessToken,
+          accessToken: this.authToken?.accessToken,
         },
       });
     } else {
-      return createTransport({
+      this.transport = createTransport({
         host: process.env.EMAIL_AUTH_HOST,
         port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
         secure: false,
@@ -210,18 +221,18 @@ export class SMTPMailService extends MailService {
         auth: {
           type: 'OAuth2',
           user: process.env.EMAIL_SENDER,
-          accessToken: accessToken,
+          accessToken: this.authToken?.accessToken,
         },
       });
     }
   }
 
-  private async createTransport() {
+  private async createTransport(): Promise<void> {
     if (process.env.EMAIL_USE_SMTP_OAUTH_2 === 'true') {
-      return this.createOauth2Transport();
+      await this.createOauth2Transport();
+    } else {
+      await this.createBasicAuthTransport();
     }
-
-    return this.createBasicAuthTransport();
   }
 
   async sendMail(options: SendMailOptions) {
@@ -263,7 +274,15 @@ export class SMTPMailService extends MailService {
       return { results: sendMailResults };
     }
 
-    const transport = await this.createTransport();
+    await this.createTransport();
+
+    if (!this.transport) {
+      logger.logError('Failed to create email transport', {
+        template: options.content.template,
+      });
+
+      return { results: sendMailResults };
+    }
 
     this.emailTemplate = new EmailTemplates({
       message: {
@@ -271,7 +290,7 @@ export class SMTPMailService extends MailService {
         attachments: this.attachments,
       },
       send: true,
-      transport: transport,
+      transport: this.transport,
       juice: true,
       juiceResources: {
         webResources: {
@@ -325,26 +344,22 @@ export class SMTPMailService extends MailService {
       );
     });
 
-    return Promise.allSettled(emailPromises)
-      .then((results) => {
-        results.forEach((result) => {
-          if (result.status === 'rejected') {
-            logger.logError('Unable to send email to user', {
-              error: result.reason,
-            });
-            sendMailResults.total_rejected_recipients++;
-          } else {
-            sendMailResults.total_accepted_recipients++;
-          }
-        });
-
-        return sendMailResults.total_rejected_recipients > 0
-          ? Promise.reject({ results: sendMailResults })
-          : Promise.resolve({ results: sendMailResults });
-      })
-      .finally(() => {
-        transport.close();
+    return Promise.allSettled(emailPromises).then((results) => {
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          logger.logError('Unable to send email to user', {
+            error: result.reason,
+          });
+          sendMailResults.total_rejected_recipients++;
+        } else {
+          sendMailResults.total_accepted_recipients++;
+        }
       });
+
+      return sendMailResults.total_rejected_recipients > 0
+        ? Promise.reject({ results: sendMailResults })
+        : Promise.resolve({ results: sendMailResults });
+    });
   }
 
   async getEmailTemplates() {
