@@ -183,7 +183,13 @@ export function QuestionaryComponentInstrumentPicker(
 
     return (
       requestTimeForInstrument && (
-        <Stack direction="row" spacing={3} marginTop={3}>
+        <Stack
+          direction="row"
+          spacing={3}
+          sx={{
+            marginTop: 3,
+          }}
+        >
           {requestTime.map((value: InstrumentIdNameAndTime) => {
             if (value.instrumentId)
               return (
@@ -194,16 +200,18 @@ export function QuestionaryComponentInstrumentPicker(
                   error={isError}
                   label={`Request Time${requestTimeUnitText}`}
                   type="number"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {value.instrumentName}:
-                      </InputAdornment>
-                    ),
-                  }}
                   data-time-request={value.instrumentId + '-time-request'}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                     handleTimeInput(e.target.value, value.instrumentId);
+                  }}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {value.instrumentName}:
+                        </InputAdornment>
+                      ),
+                    },
                   }}
                 />
               );

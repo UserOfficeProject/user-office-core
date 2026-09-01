@@ -90,46 +90,32 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         <Field
           name={`${id}.title`}
           label="Proposal Title"
-          inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) =>
-              setLocalTitle(event.target.value),
-            onBlur: () => {
-              dispatch({
-                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                itemWithQuestionary: { title: localTitle },
-              });
-            },
-          }}
           required
           fullWidth
           component={TextField}
           data-cy="title"
           margin="dense"
           id="title-input"
-          InputLabelProps={{
-            shrink: true,
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+
+            htmlInput: {
+              onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                setLocalTitle(event.target.value),
+              onBlur: () => {
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: { title: localTitle },
+                });
+              },
+            },
           }}
         />
         <Field
           name={`${id}.abstract`}
           label="Proposal Abstract"
-          inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) => {
-              const value = event.target.value;
-              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
-              const hasInvalid = nonPrintableRegex.test(value);
-              const cleanedValue = value.replace(nonPrintableRegex, ' ');
-              setTextLen(event.target.value.length);
-              setHasInvalidChars(hasInvalid);
-              setLocalAbstract(cleanedValue);
-            },
-            onBlur: () => {
-              dispatch({
-                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                itemWithQuestionary: { abstract: localAbstract },
-              });
-            },
-          }}
           required
           multiline
           maxRows="16"
@@ -139,14 +125,34 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           data-cy="abstract"
           margin="dense"
           id="abstract-input"
-          InputLabelProps={{
-            shrink: true,
-          }}
           helperText={
             hasInvalidChars
               ? 'Non-printable characters have been removed from your input.'
               : 'Only printable ASCII characters are allowed.'
           }
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+
+            htmlInput: {
+              onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                const value = event.target.value;
+                const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+                const hasInvalid = nonPrintableRegex.test(value);
+                const cleanedValue = value.replace(nonPrintableRegex, ' ');
+                setTextLen(event.target.value.length);
+                setHasInvalidChars(hasInvalid);
+                setLocalAbstract(cleanedValue);
+              },
+              onBlur: () => {
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: { abstract: localAbstract },
+                });
+              },
+            },
+          }}
         />
       </Box>
       <InputAdornment

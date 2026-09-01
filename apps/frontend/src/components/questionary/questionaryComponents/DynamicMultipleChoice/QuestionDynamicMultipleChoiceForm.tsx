@@ -181,7 +181,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -190,7 +192,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
 
           <TitledContainer label="Constraints">
@@ -266,7 +270,9 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                   type="text"
                   component={TextField}
                   fullWidth
-                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                  slotProps={{
+                    htmlInput: { 'data-cy': 'dynamic-url' },
+                  }}
                 />
               </div>
               <div style={{ display: 'flex' }}>
@@ -340,123 +346,126 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                 type="text"
                 component={TextField}
                 fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setIsJsonPathFieldDocPopupOpen(true)}
-                      >
-                        <Help />
-                      </IconButton>
-                      <Dialog
-                        open={isJsonPathFieldDocPopupOpen}
-                        onClose={() => setIsJsonPathFieldDocPopupOpen(false)}
-                        aria-labelledby="customized-dialog-title"
-                      >
-                        <DialogContent>
-                          <div>
-                            JsonPath expressions always refer to a JSON
-                            structure in the same way as XPath expression are
-                            used in combination with an XML document. The
-                            &quot;root member object&quot; in JsonPath is always
-                            referred to as $ regardless if it is an object or
-                            array.
-                            <br />
-                            <br />
-                            JsonPath expressions can use the dot–notation
-                            <br />
-                            <Box
-                              component="div"
-                              sx={{
-                                display: 'block',
-                                p: 2,
-                                my: 1,
-                                bgcolor: 'grey.300',
-                                color: 'grey.800',
-                                border: '1px solid',
-                                borderColor: (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'grey.800'
-                                    : 'grey.300',
-                                borderRadius: 2,
-                                fontSize: '0.875rem',
-                              }}
-                            >
-                              <code>$.store.book[0].title</code>
-                            </Box>
-                            or the bracket–notation
-                            <br />
-                            <Box
-                              component="div"
-                              sx={{
-                                display: 'block',
-                                p: 2,
-                                my: 1,
-                                bgcolor: 'grey.300',
-                                color: 'grey.800',
-                                border: '1px solid',
-                                borderColor: (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'grey.800'
-                                    : 'grey.300',
-                                borderRadius: 2,
-                                fontSize: '0.875rem',
-                              }}
-                            >
-                              <code>
-                                $[&apos;store&apos;][&apos;book&apos;][0][&apos;title&apos;]
-                              </code>
-                            </Box>
-                            <h3>Operators</h3>
-                            <TableContainer component={Paper}>
-                              <Table aria-label="customized table">
-                                <TableHead
-                                  sx={{
-                                    background: 'background.default',
-                                  }}
-                                >
-                                  <TableRow>
-                                    <CustomizedTableCell width={'45%'}>
-                                      <strong>Operator</strong>
-                                    </CustomizedTableCell>
-                                    <CustomizedTableCell width={'55%'}>
-                                      <strong>Description</strong>
-                                    </CustomizedTableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {jsonPathFieldsDocRows.map((row) => (
-                                    <CustomizedTableRow key={row.operator}>
-                                      <CustomizedTableCell
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        <code>{row.operator}</code>
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setIsJsonPathFieldDocPopupOpen(true)}
+                        >
+                          <Help />
+                        </IconButton>
+                        <Dialog
+                          open={isJsonPathFieldDocPopupOpen}
+                          onClose={() => setIsJsonPathFieldDocPopupOpen(false)}
+                          aria-labelledby="customized-dialog-title"
+                        >
+                          <DialogContent>
+                            <div>
+                              JsonPath expressions always refer to a JSON
+                              structure in the same way as XPath expression are
+                              used in combination with an XML document. The
+                              &quot;root member object&quot; in JsonPath is
+                              always referred to as $ regardless if it is an
+                              object or array.
+                              <br />
+                              <br />
+                              JsonPath expressions can use the dot–notation
+                              <br />
+                              <Box
+                                component="div"
+                                sx={{
+                                  display: 'block',
+                                  p: 2,
+                                  my: 1,
+                                  bgcolor: 'grey.300',
+                                  color: 'grey.800',
+                                  border: '1px solid',
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'grey.800'
+                                      : 'grey.300',
+                                  borderRadius: 2,
+                                  fontSize: '0.875rem',
+                                }}
+                              >
+                                <code>$.store.book[0].title</code>
+                              </Box>
+                              or the bracket–notation
+                              <br />
+                              <Box
+                                component="div"
+                                sx={{
+                                  display: 'block',
+                                  p: 2,
+                                  my: 1,
+                                  bgcolor: 'grey.300',
+                                  color: 'grey.800',
+                                  border: '1px solid',
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'grey.800'
+                                      : 'grey.300',
+                                  borderRadius: 2,
+                                  fontSize: '0.875rem',
+                                }}
+                              >
+                                <code>
+                                  $[&apos;store&apos;][&apos;book&apos;][0][&apos;title&apos;]
+                                </code>
+                              </Box>
+                              <h3>Operators</h3>
+                              <TableContainer component={Paper}>
+                                <Table aria-label="customized table">
+                                  <TableHead
+                                    sx={{
+                                      background: 'background.default',
+                                    }}
+                                  >
+                                    <TableRow>
+                                      <CustomizedTableCell width={'45%'}>
+                                        <strong>Operator</strong>
                                       </CustomizedTableCell>
-                                      <CustomizedTableCell>
-                                        {row.description}
+                                      <CustomizedTableCell width={'55%'}>
+                                        <strong>Description</strong>
                                       </CustomizedTableCell>
-                                    </CustomizedTableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                          </div>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button
-                            variant="text"
-                            onClick={() =>
-                              setIsJsonPathFieldDocPopupOpen(false)
-                            }
-                          >
-                            CLOSE
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
-                    </InputAdornment>
-                  ),
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {jsonPathFieldsDocRows.map((row) => (
+                                      <CustomizedTableRow key={row.operator}>
+                                        <CustomizedTableCell
+                                          component="th"
+                                          scope="row"
+                                        >
+                                          <code>{row.operator}</code>
+                                        </CustomizedTableCell>
+                                        <CustomizedTableCell>
+                                          {row.description}
+                                        </CustomizedTableCell>
+                                      </CustomizedTableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                            </div>
+                          </DialogContent>
+                          <DialogActions>
+                            <Button
+                              variant="text"
+                              onClick={() =>
+                                setIsJsonPathFieldDocPopupOpen(false)
+                              }
+                            >
+                              CLOSE
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { 'data-cy': 'dynamic-url-jsonPath' },
                 }}
               />
             </FormControl>

@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -204,10 +204,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
       <MTableToolbar {...props} />
       {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
         <Box
-          textAlign="center"
-          padding={1}
-          bgcolor={(theme) => theme.palette.background.default}
           data-cy="select-all-proposals"
+          sx={{
+            textAlign: 'center',
+            padding: 1,
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
         >
           {selectAllAction.iconProps?.hidden ? (
             <>
@@ -289,7 +291,13 @@ const ProposalTableInstrumentScientist = ({
   const dataType = searchParams.get('dataType');
   const reviewer = searchParams.get('reviewer');
   const search = searchParams.get('search');
-  const selection = searchParams.getAll('selection');
+  // `searchParams.getAll` returns a new array on every render, so the effect
+  // below keys off the serialised value and reuses one array identity for it.
+  const selectionKey = JSON.stringify(searchParams.getAll('selection'));
+  const selection: string[] = useMemo(
+    () => JSON.parse(selectionKey),
+    [selectionKey]
+  );
   const sortField = searchParams.get('sortField');
   const sortDirection = searchParams.get('sortDirection');
   const reviewModal = searchParams.get('reviewModal');
@@ -400,7 +408,7 @@ const ProposalTableInstrumentScientist = ({
       );
       setSelectedProposals([]);
     }
-  }, [proposalsData, JSON.stringify(selection)]);
+  }, [proposalsData, selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadProposalAttachment = useDownloadProposalAttachment();
@@ -952,7 +960,12 @@ const ProposalTableInstrumentScientist = ({
       )}
       {isInstrumentScientist && (
         <Grid container spacing={2}>
-          <Grid item sm={2} xs={12}>
+          <Grid
+            size={{
+              sm: 2,
+              xs: 12,
+            }}
+          >
             <ReviewerFilterComponent
               reviewer={reviewer ?? ReviewerFilter.ALL}
               onChange={(reviewer) =>
@@ -960,7 +973,12 @@ const ProposalTableInstrumentScientist = ({
               }
             />
           </Grid>
-          <Grid item sm={10} xs={12}>
+          <Grid
+            size={{
+              sm: 10,
+              xs: 12,
+            }}
+          >
             <ProposalFilterBar
               calls={{ data: calls, isLoading: loadingCalls }}
               instruments={{ data: instruments, isLoading: loadingInstruments }}
@@ -1010,13 +1028,15 @@ const ProposalTableInstrumentScientist = ({
           searchText: search || undefined,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           debounceInterval: 600,
           columnsButton: true,
           selectionProps: (rowData: ProposalViewData) => ({
-            inputProps: {
-              'aria-label': `${rowData.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.title}-select`,
+              },
             },
           }),
           pageSize: 20,

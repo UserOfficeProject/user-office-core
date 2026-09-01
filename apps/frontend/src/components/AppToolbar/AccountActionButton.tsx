@@ -173,7 +173,12 @@ const AccountActionButton = () => {
             disabled={isLoggingOut}
             data-cy="manage-account-button"
           >
-            <Box paddingRight={1} paddingTop={1}>
+            <Box
+              sx={{
+                paddingRight: 1,
+                paddingTop: 1,
+              }}
+            >
               <ManageAccounts />
             </Box>
             Manage account
@@ -186,7 +191,12 @@ const AccountActionButton = () => {
               }}
               data-cy="change-roles-button"
             >
-              <Box paddingRight={1} paddingTop={1}>
+              <Box
+                sx={{
+                  paddingRight: 1,
+                  paddingTop: 1,
+                }}
+              >
                 <SupervisedUserCircleIcon />
               </Box>
               <Box
@@ -236,7 +246,12 @@ const AccountActionButton = () => {
               onClick={handleExternalHomepageClick}
               data-cy="external-homepage-button"
             >
-              <Box paddingRight={1} paddingTop={1}>
+              <Box
+                sx={{
+                  paddingRight: 1,
+                  paddingTop: 1,
+                }}
+              >
                 <HomeOutlinedIcon />
               </Box>
               Facilities Homepage
@@ -247,7 +262,12 @@ const AccountActionButton = () => {
             onClick={handleOnLogout}
             disabled={isLoggingOut}
           >
-            <Box paddingRight={1} paddingTop={1}>
+            <Box
+              sx={{
+                paddingRight: 1,
+                paddingTop: 1,
+              }}
+            >
               {isLoggingOut ? <UOLoader size={24} /> : <ExitToApp />}
             </Box>
             Logout

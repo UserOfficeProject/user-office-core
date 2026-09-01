@@ -102,7 +102,7 @@ export default function UpdateUserInformation(
       {({ isSubmitting, values }) => (
         <Form>
           <Grid container spacing={3}>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
                 <Field
                   name="userTitle"
@@ -139,7 +139,7 @@ export default function UpdateUserInformation(
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Field
                 name="oidcSub"
                 label="OIDC Subject"
@@ -183,9 +183,11 @@ export default function UpdateUserInformation(
           </Grid>
           <Stack
             direction="row"
-            justifyContent="flex-end"
             spacing={2}
-            marginTop={2}
+            sx={{
+              justifyContent: 'flex-end',
+              marginTop: 2,
+            }}
           >
             {props.id !== user.id && (
               <ImpersonateButton

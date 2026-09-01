@@ -181,7 +181,7 @@ context('Proposal tests', () => {
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.get('[data-testid="PeopleIcon"]').click();
+      cy.get('[aria-label="View data access users"]').click();
       cy.get('[data-cy="add-participant-button"]').click();
       cy.get('[data-cy="invite-user-autocomplete"]').type(
         initialDBData.users.user3.email
@@ -197,7 +197,7 @@ context('Proposal tests', () => {
       cy.logout();
       cy.login('user3', initialDBData.roles.user);
       cy.visit('/');
-      cy.get('[data-testid="VisibilityIcon"]').click();
+      cy.get('[aria-label="View proposal"]').click();
       cy.get('[data-cy="questionary-details-view"]').contains(
         createdProposalId
       );
@@ -213,7 +213,7 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-testid="ContentCopyIcon"]').realClick();
+      cy.get('[data-cy="copy-to-clipboard"]').realClick();
 
       cy.window().then((win) => {
         win.navigator.clipboard.readText().then((text) => {

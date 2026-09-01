@@ -75,7 +75,12 @@ function ExperimentFilterBar({
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <CallFilter
           callId={filter.callId as number}
           calls={calls?.data}
@@ -89,7 +94,12 @@ function ExperimentFilterBar({
           }}
         />
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <InstrumentFilter
           instrumentIds={
             filter.instrumentId ? [filter.instrumentId] : undefined
@@ -107,7 +117,12 @@ function ExperimentFilterBar({
           }}
         />
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <ExperimentSafetyStatusFilter
           statusId={filter.experimentSafetyStatusId as number}
           statuses={experimentStatuses?.data}
@@ -122,7 +137,7 @@ function ExperimentFilterBar({
           }}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <DateFilter
           experimentStartDate={experimentStartDate ?? undefined}
           experimentEndDate={experimentEndDate ?? undefined}

@@ -20,11 +20,11 @@
     "@graphql-codegen/typescript-operations": "^5.0.9",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@hello-pangea/dnd": "^18.0.1",
-    "@material-table/core": "6.4.4",
-    "@mui/icons-material": "^5.15.18",
-    "@mui/material": "^5.15.18",
-    "@mui/system": "^5.15.15",
-    "@mui/x-date-pickers": "^7.5.0",
+    "@material-table/core": "^8.0.3",
+    "@mui/icons-material": "^9.2.0",
+    "@mui/material": "^9.2.0",
+    "@mui/system": "^9.2.0",
+    "@mui/x-date-pickers": "^9.10.1",
     "@tinymce/tinymce-react": "^6.3.0",
     "@types/mime": "^2.0.3",
     "@uiw/react-codemirror": "^4.22.1",
@@ -54,10 +54,6 @@
     "reactflow": "^11.11.4",
     "tinymce": "^7.5.1",
     "yup": "^1.7.1"
-  },
-  "overrides": {
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4"
   },
   "proxy": "http://localhost:4000",
   "scripts": {

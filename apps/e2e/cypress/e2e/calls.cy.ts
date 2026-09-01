@@ -214,14 +214,17 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="next-step"]').click();
 
-      cy.get('[name="endReview"]').clear();
+      cy.clearDatePickerValue('[name="endReview"]');
 
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy="submit"]').should('not.exist');
 
+      // NOTE: The accessible picker field cannot hold a malformed date, so an
+      // emptied field reports as required rather than tripping the
+      // TYPE_ERR_INVALID_DATE typeError this used to assert on.
       cy.get('[data-cy="create-modal"]')
-        .contains('Invalid Date Format')
+        .contains('End review date is required')
         .should('exist');
 
       cy.setDatePickerValue(
@@ -283,7 +286,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         yesterday
-      ).should('have.value', yesterday);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        yesterday
+      );
 
       cy.get('[data-cy=end-call-internal-date] .Mui-error').should('exist');
     });
@@ -418,7 +425,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         callInternalEndDate
-      ).should('have.value', callInternalEndDate);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        callInternalEndDate
+      );
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -596,7 +607,11 @@ context('Calls tests', () => {
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
         callInternalEndDate
-      ).should('have.value', callInternalEndDate);
+      );
+      cy.get('[data-cy=end-call-internal-date] input').should(
+        'have.value',
+        callInternalEndDate
+      );
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
@@ -723,9 +738,9 @@ context('Calls tests', () => {
       cy.get('[data-cy="availability-time"]').contains(
         'Availability time must be a positive number'
       );
-      cy.contains(instrumentAssignedToCall.shortCode)
-        .parent()
-        .find('button[aria-label="Save"]')
+      cy.get('[data-cy="availability-time"]')
+        .closest('tr')
+        .find('[aria-label="Save"] button, button[aria-label="Save"]')
         .should('be.disabled');
 
       cy.get('[data-cy="availability-time"] input')
@@ -735,9 +750,9 @@ context('Calls tests', () => {
       cy.get('[data-cy="availability-time"]').contains(
         `Availability time can not be grater than ${MAX_32_BIT_INTEGER - 1}`
       );
-      cy.contains(instrumentAssignedToCall.shortCode)
-        .parent()
-        .find('button[aria-label="Save"]')
+      cy.get('[data-cy="availability-time"]')
+        .closest('tr')
+        .find('[aria-label="Save"] button, button[aria-label="Save"]')
         .should('be.disabled');
     });
 
