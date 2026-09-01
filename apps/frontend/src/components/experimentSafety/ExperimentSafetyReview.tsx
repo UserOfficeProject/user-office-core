@@ -39,42 +39,47 @@ function ExperimentSafetyReview({ confirm }: ExperimentSafetyReviewProps) {
     buttonLabel = '✔ Submitted';
   }
 
+  const primary = {
+    label: buttonLabel,
+    onClick: () =>
+      confirm(
+        async () => {
+          const { submitExperimentSafety } = await api().submitExperimentSafety(
+            {
+              experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+              isSubmitted: true,
+            }
+          );
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: submitExperimentSafety,
+          });
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+            itemWithQuestionary: submitExperimentSafety,
+          });
+        },
+        {
+          title: 'Confirmation',
+          description:
+            'I am aware that no further edits can be done after esi submission.',
+        }
+      )(),
+    disabled: isDisabled,
+  };
+
   return (
     <>
       <ExperimentSafetyDetails
         experimentSafetyPk={state.experimentSafety.experimentSafetyPk}
       />
-      <NavigationFragment isLoading={isExecutingCall}>
+      <NavigationFragment isLoading={isExecutingCall} actions={{ primary }}>
         <NavigButton
-          onClick={() =>
-            confirm(
-              async () => {
-                const { submitExperimentSafety } =
-                  await api().submitExperimentSafety({
-                    experimentSafetyPk:
-                      state.experimentSafety.experimentSafetyPk,
-                    isSubmitted: true,
-                  });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: submitExperimentSafety,
-                });
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: submitExperimentSafety,
-                });
-              },
-              {
-                title: 'Confirmation',
-                description:
-                  'I am aware that no further edits can be done after esi submission.',
-              }
-            )()
-          }
-          disabled={isDisabled}
+          onClick={primary.onClick}
+          disabled={primary.disabled}
           data-cy="submit-proposal-esi-button"
         >
-          {buttonLabel}
+          {primary.label}
         </NavigButton>
       </NavigationFragment>
     </>

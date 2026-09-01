@@ -8,6 +8,55 @@ import React, { useCallback, useContext, useEffect } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
+import { belowCompactUi } from 'hooks/common/useResponsive';
+
+// A grey that behaves like the rest of the palette, so components can ask for it
+// through their `color` prop instead of overriding text and border by hand. It is
+// fixed rather than instance-configurable: the PALETTE_* settings cover only the
+// six semantic colours.
+declare module '@mui/material/styles' {
+  interface Palette {
+    neutral: Palette['primary'];
+  }
+  interface PaletteOptions {
+    neutral?: PaletteOptions['primary'];
+  }
+}
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    neutral: true;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    quiet: true;
+  }
+}
+
+// The type scale the mobile cards and the questionary review are built from.
+// Kept here rather than as constants beside each card, so the two stay in step.
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    cardTitle: React.CSSProperties;
+    cardLabel: React.CSSProperties;
+    cardValue: React.CSSProperties;
+  }
+  interface TypographyVariantsOptions {
+    cardTitle?: React.CSSProperties;
+    cardLabel?: React.CSSProperties;
+    cardValue?: React.CSSProperties;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    cardTitle: true;
+    cardLabel: true;
+    cardValue: true;
+  }
+}
 
 const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
@@ -56,6 +105,10 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         settingsMap.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
         defaultTheme.palette.info.main,
     },
+    neutral: defaultTheme.palette.augmentColor({
+      color: { main: defaultTheme.palette.grey[600] },
+      name: 'neutral',
+    }),
     // NOTE: This was previous default background on the body. Now it is white and that's why we are overwriting it.
     // (https://v4.mui.com/customization/default-theme/#explore vs https://mui.com/customization/default-theme/#explore)
     background: {
@@ -65,7 +118,58 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
 
   const baseTheme = createTheme({
     palette: palette,
+    typography: {
+      cardTitle: {
+        fontSize: 16,
+        fontWeight: 550,
+        lineHeight: 1.4,
+        textWrap: 'pretty',
+      },
+      cardLabel: {
+        fontSize: 13,
+        lineHeight: 1.3,
+        color: defaultTheme.palette.text.secondary,
+      },
+      cardValue: {
+        fontSize: 15,
+        fontWeight: 500,
+        lineHeight: 1.3,
+        overflowWrap: 'anywhere',
+      },
+    },
     components: {
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            [belowCompactUi(defaultTheme)]: {
+              padding: defaultTheme.spacing(1.5),
+              '&:last-child': {
+                paddingBottom: defaultTheme.spacing(1.5),
+              },
+            },
+          },
+        },
+      },
+      MuiCardActions: {
+        styleOverrides: {
+          root: {
+            [belowCompactUi(defaultTheme)]: {
+              padding: defaultTheme.spacing(1.5),
+              paddingTop: 0,
+            },
+          },
+        },
+      },
+      MuiCssBaseline: {
+        styleOverrides: {
+          [belowCompactUi(defaultTheme)]: {
+            'html, body': { scrollbarWidth: 'none' },
+            'html::-webkit-scrollbar, body::-webkit-scrollbar': {
+              display: 'none',
+            },
+          },
+        },
+      },
       MuiTextField: {
         defaultProps: {
           variant: 'standard',
@@ -76,6 +180,23 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         defaultProps: {
           variant: 'contained',
         },
+        variants: [
+          // An outlined button that carries no palette colour, for sitting
+          // beside a plain IconButton without outshouting it.
+          {
+            props: { variant: 'quiet' },
+            style: {
+              color: defaultTheme.palette.action.active,
+              border: '1px solid',
+              borderColor: defaultTheme.palette.divider,
+              textTransform: 'none',
+              '&:hover': {
+                borderColor: defaultTheme.palette.divider,
+                backgroundColor: defaultTheme.palette.action.hover,
+              },
+            },
+          },
+        ],
       },
       MuiSelect: {
         defaultProps: {
