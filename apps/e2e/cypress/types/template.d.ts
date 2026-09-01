@@ -175,7 +175,7 @@ declare global {
       ) => void;
 
       /**
-       * Creates dynamic multiple choice question. You have to be in edit template view to call this method
+       * Creates date time range choice question.
        *
        * @returns {typeof createDateTimeRangeQuestion}
        * @memberof Chainable
