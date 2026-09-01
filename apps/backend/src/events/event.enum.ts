@@ -16,6 +16,7 @@ import { isEveryFapReviewSubmittedForProposalGuard } from '../workflowEngine/gua
 import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapSubmittedReviewRequirementMetForProposalGuard';
 import { isEveryFeasibilityReviewFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewFeasibleForProposalGuard';
 import { isEveryFeasibilityReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewSubmittedForProposalGuard';
+import { isEveryFeasibilityReviewUnFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewUnFeasibleForProposalGuard';
 import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
 import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
 import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
@@ -52,6 +53,7 @@ export enum Event {
   PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED = 'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
   PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED',
   PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE',
+  PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE',
   PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
   PROPOSAL_SAMPLE_SAFE = 'PROPOSAL_SAMPLE_SAFE',
   PROPOSAL_ALL_FAP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_FAP_REVIEWERS_SELECTED',
@@ -223,6 +225,14 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
       label:
         'Event occurs when every feasibility review on a proposal is feasible',
       guard: isEveryFeasibilityReviewFeasibleForProposalGuard,
+    },
+  ],
+  [
+    Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE,
+    {
+      label:
+        'Event occurs when every feasibility review on a proposal is unfeasible',
+      guard: isEveryFeasibilityReviewUnFeasibleForProposalGuard,
     },
   ],
   [
