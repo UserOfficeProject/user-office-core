@@ -14,6 +14,7 @@ import {
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
+import { collectManagementDecisionXLSXData } from '../../factory/xlsx/managementDecision';
 import {
   collectProposalXLSXData,
   collectTechniqueProposalXLSXData,
@@ -227,6 +228,61 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/management-decision/:call_id', async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
+    const userWithRole = {
+      ...res.locals.agent,
+    };
+
+    const callId = parseInt(req.params.call_id);
+
+    if (isNaN(+callId)) {
+      throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
+    }
+
+    const { data, filename } = await collectManagementDecisionXLSXData(
+      callId,
+      userWithRole
+    );
+
+    const managementDecisionColumns = [
+      'Proposal ID',
+      'Proposal PK',
+      'Instrument ID',
+      'Instrument Name',
+      'Principal Investigator',
+      'Remaining Instrument Available Time', // Running total of remaining available instrument time
+      'Time Allocation',
+      'FAP Recommendation',
+      'FAP Comment to User',
+      'FAP Comment to Management',
+      'Technical Review Comments',
+    ];
+
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: managementDecisionColumns,
+    };
+
+    const userRole = req.user.currentRole;
+    callFactoryService(
+      DownloadType.XLSX,
+      XLSXType.MANAGEMENT_DECISION,
       { data, meta, userRole },
       req,
       res,
