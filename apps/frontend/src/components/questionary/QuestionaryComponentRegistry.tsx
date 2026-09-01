@@ -66,8 +66,8 @@ export interface QuestionTemplateRelationFormProps {
   children?: FormChildren<QuestionTemplateRelation>;
 }
 
-export type QuestionRenderer = React.FunctionComponent<Question>;
-export type AnswerRenderer = React.FunctionComponent<Answer>;
+export type QuestionRenderer = (question: Question) => React.ReactNode;
+export type AnswerRenderer = (answer: Answer) => React.ReactNode;
 export interface Renderers {
   readonly questionRenderer: QuestionRenderer;
   readonly answerRenderer: AnswerRenderer;
@@ -106,14 +106,16 @@ export interface QuestionaryComponentDefinition {
   /**
    * A form used in administration panel to define a question (more on this below)
    */
-  readonly questionForm: () => (props: QuestionFormProps) => JSX.Element | null;
+  readonly questionForm: () => (
+    props: QuestionFormProps
+  ) => ReactElement | null;
 
   /**
    * A form used in administration panel to define a question template relation (more on that below)
    */
   readonly questionTemplateRelationForm: () => (
     props: QuestionTemplateRelationFormProps
-  ) => JSX.Element | null;
+  ) => ReactElement | null;
 
   /**
    * Rendering of the question and answer that is displayed in the review,
@@ -149,7 +151,7 @@ export interface QuestionaryComponentDefinition {
   /**
    * The icon for component
    */
-  readonly icon: JSX.Element;
+  readonly icon: React.ReactNode;
 
   /**
    * Component used in search questions page. Contains UI that user officer
@@ -212,14 +214,14 @@ export const getQuestionaryComponentDefinitions = () => registry;
 
 export function createQuestionTemplateRelationForm(
   props: QuestionTemplateRelationFormProps
-): JSX.Element {
+) {
   const dataType = props.questionRel.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 
   return React.createElement(definition.questionTemplateRelationForm(), props);
 }
 
-export function createQuestionForm(props: QuestionFormProps): JSX.Element {
+export function createQuestionForm(props: QuestionFormProps) {
   const dataType = props.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 

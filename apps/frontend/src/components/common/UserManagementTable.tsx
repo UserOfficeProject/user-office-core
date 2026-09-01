@@ -134,7 +134,7 @@ const UserManagementTable = ({
                 ),
                 tooltip: 'Set Principal Investigator',
                 onClick: (
-                  event: React.MouseEvent<JSX.Element>,
+                  event: React.MouseEvent<HTMLElement>,
                   rowData: BasicUserDetails | BasicUserDetails[]
                 ) => {
                   event.preventDefault();

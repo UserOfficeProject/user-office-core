@@ -22,7 +22,7 @@ const defaultOptions = {
 };
 
 function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
-  return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
+  return function WithConfirmComponent(props: Omit<T, 'confirm'>) {
     const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
     const [options, setOptions] = useState<Options>(defaultOptions);
     const {
