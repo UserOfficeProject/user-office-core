@@ -337,6 +337,19 @@ context('Template Basic tests', () => {
       cy.contains('Save').click();
       /* --- */
 
+      /* Date range */
+      cy.createDateTimeRangeQuestion('When to plant foxgloves?');
+
+      cy.contains('When to plant foxgloves?')
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
+      cy.contains('When to plant foxgloves?').click();
+      cy.get('[data-cy=natural-key]').click();
+      cy.contains('Save').click();
+      /* --- */
+
       /* Date */
       cy.createDateQuestion(dateQuestion.title, {
         includeTime: false,
@@ -1628,6 +1641,39 @@ context('Template Basic tests', () => {
       cy.get('[data-cy=api-headers-container]').contains('Content-Type');
       cy.get('[data-cy=api-headers-container]').contains('Bearer 1234');
       cy.get('[data-cy=api-headers-container]').contains('text');
+    });
+  });
+
+  describe('Date range picker tests', () => {
+    const createProposalAndOpenDateTimeRangeQuestion = () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+    };
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
+    });
+
+    it.only('Should display date range selector', () => {
+      cy.createDateTimeRangeQuestion(
+        'What range of years do osprey come to Britain?'
+      );
+
+      createProposalAndOpenDateTimeRangeQuestion();
+
+      cy.contains('What range of years do osprey come to Britain?').should(
+        'exist'
+      );
     });
   });
 
