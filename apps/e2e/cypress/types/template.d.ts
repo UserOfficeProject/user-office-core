@@ -175,6 +175,16 @@ declare global {
       ) => void;
 
       /**
+       * Creates date time range choice question.
+       *
+       * @returns {typeof createDateTimeRangeQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createDateTimeRangeQuestion('When should you plant daisies?')
+       */
+      createDateTimeRangeQuestion: (title: string) => void;
+
+      /**
        * Creates dynamic multiple choice question. You have to be in edit template view to call this method
        *
        * @returns {typeof createDynamicMultipleChoiceQuestion}
