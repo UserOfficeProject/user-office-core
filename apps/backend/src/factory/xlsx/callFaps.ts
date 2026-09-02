@@ -16,7 +16,7 @@ const callFapDataRow = container.resolve<
   typeof callFapPopulateRow | typeof callFapStfcPopulateRow
 >(Tokens.PopulateCallRow);
 
-const ProposalEndStatusStringValue = {
+export const ProposalEndStatusStringValue = {
   [ProposalEndStatus.UNSET]: 'Unset',
   [ProposalEndStatus.ACCEPTED]: 'Accepted',
   [ProposalEndStatus.RESERVED]: 'Reserved',

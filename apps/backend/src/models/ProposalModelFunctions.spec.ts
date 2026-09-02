@@ -166,3 +166,27 @@ it('AND dependency requires all satisfied', async () => {
     false
   );
 });
+
+it('Instrument picker dependencies should be satisfied if the selected instrument matches', async () => {
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
+  const dependee = getFieldById(
+    questionarySteps,
+    'instrument_picker'
+  ) as Answer;
+  const depender = getFieldById(
+    questionarySteps,
+    'instrument_picker_depender'
+  ) as Answer;
+
+  dependee.value = { instrumentId: '49', timeRequested: '0' };
+
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    true
+  );
+
+  dependee.value = { instrumentId: '50', timeRequested: '0' };
+
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    false
+  );
+});
