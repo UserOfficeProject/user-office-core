@@ -30,10 +30,12 @@ import {
   TextInputConfig,
   VisitBasisConfig,
   ExperimentSafetyReviewBasisConfig,
+  DateTimeRangeConfig,
 } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
+import { dateTimeRangeDefinition } from './DateTimeRange';
 import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
 import { experimentSafetyReviewBasisDefinition } from './ExperimentSafetyReviewBasis';
@@ -109,8 +111,9 @@ export type QuestionDataTypeConfigMapping<T extends DataType> =
                                                   ? InstrumentPickerConfig
                                                   : T extends DataType.TECHNIQUE_PICKER
                                                     ? TechniquePickerConfig
-                                                    : never;
-
+                                                    : T extends DataType.DATE_TIME_RANGE
+                                                      ? DateTimeRangeConfig
+                                                      : never;
 export interface Question<T extends DataType> {
   /**
    * The enum value from DataType
@@ -182,6 +185,7 @@ export interface Question<T extends DataType> {
 const registry = [
   booleanDefinition,
   dateDefinition,
+  dateTimeRangeDefinition,
   embellishmentDefinition,
   feedbackBasisDefinition,
   fileUploadDefinition,
