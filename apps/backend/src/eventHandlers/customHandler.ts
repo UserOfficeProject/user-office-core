@@ -147,6 +147,22 @@ export default function createCustomHandler() {
               loggedInUserId: event.loggedInUserId,
             });
           }
+
+          const allTechnicalReviewsUnFeasible =
+            allProposalTechnicalReviews?.every(
+              (technicalReview) =>
+                technicalReview.status === TechnicalReviewStatus.UNFEASIBLE
+            );
+
+          if (allTechnicalReviewsUnFeasible) {
+            eventBus.publish({
+              type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE,
+              proposal: foundProposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
         }
 
         switch (event.technicalreview.status) {
