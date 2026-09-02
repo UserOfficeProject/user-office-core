@@ -1,3 +1,5 @@
+import { Tag } from './Tag';
+
 export enum Roles {
   USER = 'user',
   USER_OFFICER = 'user_officer',
@@ -23,6 +25,7 @@ type RoleBase = {
   title: string;
   description: string;
   isRootRole: boolean;
+  tags?: Tag[];
 };
 
 export type Role =
