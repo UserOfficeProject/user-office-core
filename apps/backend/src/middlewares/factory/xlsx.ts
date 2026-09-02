@@ -1,6 +1,7 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
+import i18next from '../../../i18next';
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
 import callFactoryService, {
@@ -10,10 +11,11 @@ import callFactoryService, {
 } from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
-  CallExtraFapDataColumns,
+  DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
+import { collectManagementDecisionXLSXData } from '../../factory/xlsx/managementDecision';
 import {
   collectProposalXLSXData,
   collectTechniqueProposalXLSXData,
@@ -21,6 +23,11 @@ import {
 } from '../../factory/xlsx/proposal';
 
 const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
+const callExtraFapDataColumns = container.isRegistered(
+  Tokens.CallExtraFapDataColumns
+)
+  ? container.resolve<string[]>(Tokens.CallExtraFapDataColumns)
+  : DefaultCallExtraFapDataColumns;
 
 const router = express.Router();
 
@@ -147,7 +154,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: fapDataColumns.concat(CallExtraFapDataColumns),
+      columns: fapDataColumns.concat(callExtraFapDataColumns),
     };
 
     const userRole = req.user.currentRole;
@@ -165,13 +172,26 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
 });
 
 router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
+  const userAuthorization = container.resolve<UserAuthorization>(
+    Tokens.UserAuthorization
+  );
+
+  const userWithRole = {
+    ...res.locals.agent,
+  };
+
+  const roleTags = await userAuthorization.getCurrentRoleTags(userWithRole);
+  const translationForFirstRoleTag = !roleTags.length
+    ? ''
+    : roleTags[0].name + '.';
+
   const techniqueProposalDataColumns = [
     'Proposal ID',
     'Title',
     'Principal Investigator',
     'PI Email',
     'Date Submitted',
-    'Technique',
+    i18next.t(`${translationForFirstRoleTag}Technique`),
     'Instrument',
     'Status',
   ];
@@ -181,18 +201,10 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
       throw new Error('Not authorized');
     }
 
-    const userWithRole = {
-      ...res.locals.agent,
-    };
-
     const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
       .filter((id: number) => !isNaN(id));
-
-    const userAuthorization = container.resolve<UserAuthorization>(
-      Tokens.UserAuthorization
-    );
 
     if (
       !userAuthorization.isUserOfficer(userWithRole) &&
@@ -222,6 +234,61 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/management-decision/:call_id', async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
+    const userWithRole = {
+      ...res.locals.agent,
+    };
+
+    const callId = parseInt(req.params.call_id);
+
+    if (isNaN(+callId)) {
+      throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
+    }
+
+    const { data, filename } = await collectManagementDecisionXLSXData(
+      callId,
+      userWithRole
+    );
+
+    const managementDecisionColumns = [
+      'Proposal ID',
+      'Proposal PK',
+      'Instrument ID',
+      'Instrument Name',
+      'Principal Investigator',
+      'Remaining Instrument Available Time', // Running total of remaining available instrument time
+      'Time Allocation',
+      'FAP Recommendation',
+      'FAP Comment to User',
+      'FAP Comment to Management',
+      'Technical Review Comments',
+    ];
+
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: managementDecisionColumns,
+    };
+
+    const userRole = req.user.currentRole;
+    callFactoryService(
+      DownloadType.XLSX,
+      XLSXType.MANAGEMENT_DECISION,
       { data, meta, userRole },
       req,
       res,

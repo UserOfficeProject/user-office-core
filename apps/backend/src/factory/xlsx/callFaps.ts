@@ -16,7 +16,7 @@ const callFapDataRow = container.resolve<
   typeof callFapPopulateRow | typeof callFapStfcPopulateRow
 >(Tokens.PopulateCallRow);
 
-const ProposalEndStatusStringValue = {
+export const ProposalEndStatusStringValue = {
   [ProposalEndStatus.UNSET]: 'Unset',
   [ProposalEndStatus.ACCEPTED]: 'Accepted',
   [ProposalEndStatus.RESERVED]: 'Reserved',
@@ -108,7 +108,7 @@ export const collectCallFapXLSXData = async (
   return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
-export const CallExtraFapDataColumns = [
+export const DefaultCallExtraFapDataColumns = [
   'Fap Time allocation',
   'Fap Meeting Decision',
   'Fap Meeting Comment for User',

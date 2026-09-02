@@ -1,7 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
-import { handleWorkflowEngineChange } from './proposalWorkflow';
+import proposalWorkflowEntity from './workflowEntities/proposal';
+import { startWorkflow } from './workflowHandler';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -140,6 +141,22 @@ export default function createCustomHandler() {
           if (allTechnicalReviewsFeasible) {
             eventBus.publish({
               type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE,
+              proposal: foundProposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+
+          const allTechnicalReviewsUnFeasible =
+            allProposalTechnicalReviews?.every(
+              (technicalReview) =>
+                technicalReview.status === TechnicalReviewStatus.UNFEASIBLE
+            );
+
+          if (allTechnicalReviewsUnFeasible) {
+            eventBus.publish({
+              type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE,
               proposal: foundProposal,
               isRejection: false,
               key: 'proposal',
@@ -380,7 +397,7 @@ export default function createCustomHandler() {
             const proposalPks = allProposalsOnCall.proposalViews.map(
               (proposal) => proposal.primaryKey
             );
-            handleWorkflowEngineChange(event, proposalPks);
+            await startWorkflow(event, proposalPks, proposalWorkflowEntity);
           }
         } catch (error) {
           logger.logException(

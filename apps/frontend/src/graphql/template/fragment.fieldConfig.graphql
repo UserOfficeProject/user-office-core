@@ -15,6 +15,13 @@ fragment fieldConfig on FieldConfig {
     defaultDate
     includeTime
   }
+
+  ... on DateTimeRangeConfig {
+    small_label
+    required
+    tooltip
+    readPermissions
+  }
   ... on EmbellishmentConfig {
     html
     plain
@@ -151,6 +158,7 @@ fragment fieldConfig on FieldConfig {
     readPermissions
     url
     jsonPath
+    useBaseDomain
     apiCallRequestHeaders {
       name
       value

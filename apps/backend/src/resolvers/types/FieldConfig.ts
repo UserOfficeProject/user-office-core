@@ -95,6 +95,17 @@ export class DateConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class DateTimeRangeConfig extends ConfigBase {
+  @Field(() => String, { nullable: true })
+  defaultDate:
+    | {
+        from: Date | undefined;
+        to: Date | undefined;
+      }[]
+    | null;
+}
+
+@ObjectType()
 export class EmbellishmentConfig {
   @Field(() => Boolean)
   omitFromPdf: boolean;
@@ -155,6 +166,9 @@ export class DynamicMultipleChoiceConfig extends ConfigBase {
 
   @Field(() => String)
   jsonPath: string;
+
+  @Field(() => Boolean)
+  useBaseDomain: boolean;
 
   @Field(() => Boolean)
   isMultipleSelect: boolean;
@@ -386,6 +400,7 @@ export const FieldConfigType = createUnionType({
   types: () => [
     BooleanConfig,
     DateConfig,
+    DateTimeRangeConfig,
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,

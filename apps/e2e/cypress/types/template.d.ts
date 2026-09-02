@@ -21,6 +21,8 @@ import {
   UpdateQuestionTemplateRelationSettingsMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   SetActiveTemplateMutationVariables,
+  UpdateProposalPdfTemplateMutationVariables,
+  UpdateProposalPdfTemplateMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -173,6 +175,16 @@ declare global {
       ) => void;
 
       /**
+       * Creates date time range choice question.
+       *
+       * @returns {typeof createDateTimeRangeQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createDateTimeRangeQuestion('When should you plant daisies?')
+       */
+      createDateTimeRangeQuestion: (title: string) => void;
+
+      /**
        * Creates dynamic multiple choice question. You have to be in edit template view to call this method
        *
        * @returns {typeof createDynamicMultipleChoiceQuestion}
@@ -185,6 +197,7 @@ declare global {
         options?: {
           url?: string;
           jsonPath?: string;
+          useBaseDomain: boolean;
           isMultipleSelect?: boolean;
           type?: 'radio' | 'dropdown';
           firstTopic?: boolean;
@@ -315,6 +328,7 @@ declare global {
       createTemplate: (
         createTemplateInput: CreateTemplateMutationVariables
       ) => Cypress.Chainable<CreateTemplateMutation>;
+
       /**
        * Clone template
        *
@@ -397,6 +411,18 @@ declare global {
       setActiveTemplate: (
         setActiveTemplateInput: SetActiveTemplateMutationVariables
       ) => Cypress.Chainable<SetActiveTemplateMutation>;
+
+      /**
+       * Updates proposal PDF template
+       *
+       * @returns {typeof updateProposalPdfTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.updateProposalPdfTemplate(updateProposalPdfTemplateInput: UpdateProposalPdfTemplateMutationVariables)
+       */
+      updateProposalPdfTemplate: (
+        updateProposalPdfTemplateInput: UpdateProposalPdfTemplateMutationVariables
+      ) => Cypress.Chainable<UpdateProposalPdfTemplateMutation>;
     }
   }
 }

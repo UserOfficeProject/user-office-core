@@ -2,9 +2,11 @@ import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   DataType,
+  EmailStatusActionRecipients,
   FeatureId,
   ProposalEndStatus,
   SettingsId,
+  StatusActionType,
   TemplateCategoryId,
   TemplateGroupId,
   WorkflowType,
@@ -143,6 +145,7 @@ context('Proposal tests', () => {
           cy.addStatusToWorkflow({
             statusId: initialDBData.proposalStatuses.feasibilityReview.id,
             workflowId: result.createWorkflow.id,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }
@@ -896,6 +899,79 @@ context('Proposal tests', () => {
         );
     });
 
+    it('User officer should be able to opt-in to run status actions when changing status', () => {
+      const statusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.PI,
+              description: '',
+            },
+            emailTemplate: {
+              id: initialDBData.emailTemplates.template1.id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            combineEmails: true,
+          },
+        ],
+      };
+
+      // Add a status with a connection from DRAFT and attach a status action
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
+        posX: 0,
+        posY: 200,
+      }).then((result) => {
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(statusActionConfig),
+            },
+          ],
+          connectionId: result.createWorkflowConnection.id,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains(newProposalTitle).parent().find('[type="checkbox"]').check();
+
+      cy.get('[data-cy="change-proposal-status"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
+
+      // Select the status that has a connection with actions
+      cy.get('@dialog').find('#selectedWorkflowStatusId-input').click();
+      cy.get('[role="listbox"]')
+        .contains(initialDBData.proposalStatuses.feasibilityReview.name)
+        .click();
+
+      // The run status actions checkbox should appear and be unchecked
+      cy.get('[data-cy="run-status-actions-checkbox"] input')
+        .should('exist')
+        .should('not.be.checked');
+
+      // Check it to opt-in to running status actions
+      cy.get('[data-cy="run-status-actions-checkbox"] input').check();
+
+      // Should be able to submit the status change
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'status changed successfully',
+      });
+    });
+
     it('Should be able to delete proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -959,7 +1035,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('label', textQuestion).then(($elem) => {
-        cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
+        cy.get(`#${$elem.attr('for')}`).type(faker.lorem.word());
       });
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.notification({ text: 'Saved', variant: 'success' });
@@ -1421,7 +1497,7 @@ context('Proposal tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
 
       cy.createCall({
         ...newCall,
@@ -1459,7 +1535,7 @@ context('Proposal tests', () => {
         this.skip();
       }
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
       cy.createCall({
         ...newCall,
         shortCode: createdCallTitle,
@@ -1729,10 +1805,20 @@ context('Proposal tests', () => {
     });
 
     it('Multiple instruments should be automatically assigned to the proposal', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: true,
+        requestTime: false,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
 
@@ -1784,10 +1870,20 @@ context('Proposal tests', () => {
       cy.contains('td', instrument2.name).should('exist');
     });
     it('Capture user time request for single instrument', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: false,
+        requestTime: true,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);
@@ -1838,10 +1934,20 @@ context('Proposal tests', () => {
       ).should('exist');
     });
     it('Capture user time request for multiple instruments', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: true,
+        requestTime: true,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":true,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);

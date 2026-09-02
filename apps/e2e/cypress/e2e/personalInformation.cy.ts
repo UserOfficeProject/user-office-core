@@ -10,8 +10,8 @@ context('Personal information tests', () => {
     cy.getAndStoreFeaturesEnabled();
   });
 
-  const newFirstName = faker.name.firstName();
-  const newLastName = faker.name.lastName();
+  const newFirstName = faker.person.firstName();
+  const newLastName = faker.person.lastName();
   const otherOrg = faker.commerce.department();
   const otherInstitution = 'Other';
   const newPreferredName = faker.hacker.noun();

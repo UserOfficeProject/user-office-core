@@ -17,6 +17,7 @@ export class FieldDependency {
 export enum DataType {
   BOOLEAN = 'BOOLEAN',
   DATE = 'DATE',
+  DATE_TIME_RANGE = 'DATE_TIME_RANGE',
   EMBELLISHMENT = 'EMBELLISHMENT',
   FILE_UPLOAD = 'FILE_UPLOAD',
   GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
@@ -80,6 +81,7 @@ export class QuestionTemplateRelation {
     public question: Question,
     public topicId: number,
     public sortOrder: number,
+    public templateId: number,
     public config: typeof FieldConfigType,
     public dependencies: FieldDependency[],
     public dependenciesOperator?: DependenciesLogicOperator

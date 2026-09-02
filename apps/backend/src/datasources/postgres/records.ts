@@ -931,6 +931,7 @@ export const createQuestionTemplateRelationObject = async <T extends DataType>(
     ),
     record.topic_id,
     record.sort_order,
+    record.template_id,
     createConfig<any>(record.data_type as DataType, transformedConfig),
     dependencies,
     record.dependencies_operator

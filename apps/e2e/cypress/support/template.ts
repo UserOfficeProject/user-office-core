@@ -20,6 +20,8 @@ import {
   UpdateQuestionMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateProposalPdfTemplateMutation,
+  UpdateProposalPdfTemplateMutationVariables,
   UpdateTopicMutation,
   UpdateTopicMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -69,6 +71,15 @@ const setActiveTemplate = (
 ) => {
   const api = getE2EApi();
   const request = api.setActiveTemplate(setActiveTemplateInput);
+
+  return cy.wrap(request);
+};
+
+const updateProposalPdfTemplate = (
+  updateProposalPdfTemplateInput: UpdateProposalPdfTemplateMutationVariables
+): Cypress.Chainable<UpdateProposalPdfTemplateMutation> => {
+  const api = getE2EApi();
+  const request = api.updateProposalPdfTemplate(updateProposalPdfTemplateInput);
 
   return cy.wrap(request);
 };
@@ -466,6 +477,36 @@ function createDynamicMultipleChoiceQuestion(
   closeQuestionsMenu();
 }
 
+function createDateTimeRangeQuestion(
+  question: string,
+  options?: {
+    key?: string;
+    firstTopic?: boolean;
+  }
+) {
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic ?? true,
+  });
+
+  cy.contains('Add Date Time Range').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
+
+  cy.get('[data-cy=question]').clear().type(question);
+
+  cy.contains('Save').click({ force: true });
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+}
+
 function createFileUploadQuestion(question: string, fileTypes: string[]) {
   openQuestionsMenu();
 
@@ -794,6 +835,11 @@ Cypress.Commands.add(
   createDynamicMultipleChoiceQuestion
 );
 
+Cypress.Commands.add(
+  'createDateTimeRangeQuestion',
+  createDateTimeRangeQuestion
+);
+
 Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);
 
 Cypress.Commands.add('createNumberInputQuestion', createNumberInputQuestion);
@@ -810,3 +856,5 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('setActiveTemplate', setActiveTemplate);
+
+Cypress.Commands.add('updateProposalPdfTemplate', updateProposalPdfTemplate);

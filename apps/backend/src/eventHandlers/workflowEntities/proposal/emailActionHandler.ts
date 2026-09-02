@@ -12,25 +12,25 @@ import {
   getPIAndFormatOutputForEmailSending,
   getTechniqueScientistsAndFormatOutputForEmailSending,
   statusActionLogger,
-} from './statusActionUtils';
-import { Tokens } from '../config/Tokens';
-import { AdminDataSource } from '../datasources/AdminDataSource';
-import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { UserDataSource } from '../datasources/UserDataSource';
-import { MailService } from '../eventHandlers/MailService/MailService';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { SettingsId } from '../models/Settings';
-import { ConnectionHasStatusAction } from '../models/StatusAction';
+} from './utils';
+import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
+import { UserDataSource } from '../../../datasources/UserDataSource';
+import { ApplicationEvent } from '../../../events/applicationEvents';
+import { Proposal } from '../../../models/Proposal';
+import { SettingsId } from '../../../models/Settings';
+import { ConnectionHasStatusAction } from '../../../models/StatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+} from '../../../resolvers/types/StatusActionConfig';
+import { MailService } from '../../MailService/MailService';
 
 export const emailActionHandler = async (
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   options?: {
     statusActionsLogId?: number;
     loggedInUserId?: number;
@@ -59,7 +59,7 @@ export const emailActionHandler = async (
         ${statusActionRecipients}`
       );
     }
-    emailStatusActionRecipient(
+    await emailStatusActionRecipient(
       recipientWithTemplate,
       statusAction,
       proposals,
@@ -85,7 +85,7 @@ export const emailActionHandler = async (
 export const emailStatusActionRecipient = async (
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineProposalType[],
+  proposals: Proposal[],
   statusActionsLogId?: number | null,
   loggedInUserId?: number | null
 ) => {
@@ -320,65 +320,6 @@ export const emailStatusActionRecipient = async (
       break;
     }
 
-    case EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS: {
-      const adminDataSource = container.resolve<AdminDataSource>(
-        Tokens.AdminDataSource
-      );
-
-      const experimentSafetyEmail = (
-        await adminDataSource.getSetting(
-          SettingsId.EXPERIMENT_SAFETY_REVIEW_EMAIL
-        )
-      )?.settingsValue;
-
-      if (!experimentSafetyEmail) {
-        logger.logError(
-          'Could not send email(s) to the Experiment Safety team as the setting (EXPERIMENT_SAFETY_REVIEW_EMAIL) is not set.',
-          { proposalEmailsSkipped: proposals }
-        );
-
-        break;
-      }
-
-      let experimentSafetyRecipients: EmailReadyType[];
-
-      if (recipientWithTemplate.combineEmails) {
-        experimentSafetyRecipients = [
-          {
-            id: recipientWithTemplate.recipient.name,
-            email: experimentSafetyEmail,
-            proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.id,
-          },
-        ];
-      } else {
-        experimentSafetyRecipients =
-          await getOtherAndFormatOutputForEmailSending(
-            proposals,
-            recipientWithTemplate,
-            experimentSafetyEmail
-          );
-      }
-
-      await sendMail(
-        experimentSafetyRecipients,
-        statusActionLogger({
-          connectionId: statusAction.connectionId,
-          actionId: statusAction.actionId,
-          statusActionsLogId,
-          emailStatusActionRecipient:
-            EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
-          proposalPks,
-        }),
-        successfulMessage,
-        failMessage,
-        emailTemplateId,
-        loggedInUserId
-      );
-
-      break;
-    }
-
     case EmailStatusActionRecipients.OTHER: {
       if (!recipientWithTemplate.otherRecipientEmails?.length) {
         logger.logError(
@@ -435,7 +376,6 @@ const sendMail = async (
   const emailEventHandler = container.resolve<
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.EmailEventHandler);
-
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -464,6 +404,9 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
+              fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
+              technicalReviews: recipientWithData.technicalReviews,
+              call: recipientWithData.call,
             },
             recipients: [{ address: recipientWithData.email }],
           });

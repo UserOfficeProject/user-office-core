@@ -119,6 +119,11 @@ interface ProposalALLFeasibilityReviewFeasibleEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalALLFeasibilityReviewUnFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED;
   review: Review;
@@ -192,6 +197,11 @@ interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
 interface ProposalStatusActionExecutedEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_ACTION_EXECUTED;
   proposal: Proposal;
+}
+
+interface ExperimentSafetyStatusActionExecutedEvent extends GeneralEvent {
+  type: Event.EXPERIMENT_SAFETY_STATUS_ACTION_EXECUTED;
+  experimentSafety: ExperimentSafety;
 }
 
 interface ProposalStatusChangedByUserEvent extends GeneralEvent {
@@ -415,6 +425,9 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
 interface UserDataAccessUpdatedEvent extends GeneralEvent {
   type: Event.DATA_ACCESS_USERS_UPDATED;
   proposalPKey: number;
+  // Users newly added as data access users in this update (empty on removals
+  // or no-op updates). Used to notify only the freshly invited users by email.
+  newlyAddedUserIds: number[];
 }
 
 interface ExperimentSafetyManagementDecisionSubmittedByISEvent
@@ -455,7 +468,7 @@ interface ExperimentSafetyStatusChangedByWorkflowEvent extends GeneralEvent {
 }
 interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   type: Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER;
-  experimentsafety: ExperimentSafety;
+  array: ExperimentSafety[];
 }
 
 interface ExperimentESFSubmittedEvent extends GeneralEvent {
@@ -511,6 +524,7 @@ export type ApplicationEvent =
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewFeasibleEvent
+  | ProposalALLFeasibilityReviewUnFeasibleEvent
   | ProposalFapReviewUpdatedEvent
   | ProposalFapReviewSubmittedEvent
   | ProposalAllFapReviewsSubmittedEvent
@@ -541,6 +555,7 @@ export type ApplicationEvent =
   | InstrumentDeletedEvent
   | FapReviewerNotified
   | ProposalStatusActionExecutedEvent
+  | ExperimentSafetyStatusActionExecutedEvent
   | TechniqueCreatedEvent
   | TechniqueUpdatedEvent
   | TechniqueDeletedEvent

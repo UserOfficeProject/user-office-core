@@ -101,7 +101,7 @@ export default class FapQueries {
       if (agent?.currentRole?.shortCode === Roles.FAP_REVIEWER) {
         const usersProposals = (
           await this.proposalDataSource.getUserProposals(agent.id)
-        ).map((p) => p.primaryKey);
+        ).userProposals.map((p) => p.primaryKey);
 
         return fapProposals.filter(
           (fp) => !usersProposals.includes(fp.proposalPk)
@@ -215,6 +215,30 @@ export default class FapQueries {
       proposalPk,
       fapAccessRestrictions ? agent!.id : null
     );
+  }
+
+  @Authorized()
+  async getFapReviewData(
+    agent: UserWithRole | null,
+    {
+      fapId,
+      callId,
+      instrumentId,
+    }: {
+      fapId: number;
+      callId: number;
+      instrumentId: number;
+    }
+  ) {
+    if (await this.userHasFapAccess(agent, fapId)) {
+      return await this.dataSource.getFapReviewData(
+        callId,
+        fapId,
+        instrumentId
+      );
+    }
+
+    return [];
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])

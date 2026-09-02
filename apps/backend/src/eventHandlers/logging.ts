@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from '@user-office-software/duo-logger';
+import sanitizeHtml from 'sanitize-html';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -35,7 +36,16 @@ export default function createLoggingHandler() {
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
-    const json = JSON.stringify(event);
+    // remove base64 encoded img tags from event to prevent message flood in event_logs table and standard output
+    const json =
+      event.type == Event.TOPIC_ANSWERED
+        ? sanitizeHtml(JSON.stringify(event), {
+            allowedTags: sanitizeHtml.defaults.allowedTags.filter(
+              (tag: string) => tag !== 'img'
+            ),
+          })
+        : JSON.stringify(event);
+
     logger.logInfo('An event was triggered', { json });
 
     // NOTE: If the event is rejection than log that in the database as well. Later we will be able to see all errors that happened.
@@ -194,6 +204,27 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 proposal.primaryKey.toString(),
+                description,
+                event.impersonatingUserId
+              );
+            })
+          );
+          break;
+        case Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER:
+          await Promise.all(
+            event.array.map(async (experimentSafety) => {
+              const experimentStatus =
+                await statusDataSource.getStatusByWorkflowStatusId(
+                  experimentSafety.workflowStatusId
+                );
+
+              const description = `Status changed to: ${experimentStatus?.name}`;
+
+              return eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                experimentSafety.experimentPk.toString(),
                 description,
                 event.impersonatingUserId
               );

@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
-import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   ComparisonStatus,
   ConflictResolutionStrategy,
@@ -59,6 +58,7 @@ import {
   TemplateRecord,
   TopicRecord,
 } from './records';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 
 const EXPORT_VERSION = '1.2.0';
 const MIN_SUPPORTED_VERSION = '1.2.0';

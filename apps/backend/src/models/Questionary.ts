@@ -20,6 +20,7 @@ export class Answer extends QuestionTemplateRelation {
       questionTemplateRelation.question,
       questionTemplateRelation.topicId,
       questionTemplateRelation.sortOrder,
+      questionTemplateRelation.templateId,
       questionTemplateRelation.config,
       questionTemplateRelation.dependencies,
       questionTemplateRelation.dependenciesOperator

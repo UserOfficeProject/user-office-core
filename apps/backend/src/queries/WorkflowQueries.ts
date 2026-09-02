@@ -17,7 +17,7 @@ export default class WorkflowQueries {
     public emailService: MailService
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getWorkflow(
     agent: UserWithRole | null,
     id: number,
