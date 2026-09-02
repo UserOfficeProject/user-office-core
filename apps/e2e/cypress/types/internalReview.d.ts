@@ -13,10 +13,10 @@ declare global {
        * @memberof Chainable
        * @example
        *    cy.createInternalReview({
-       *      title: faker.random.words(2),
-       *      reviewerId: faker.random.alphaNumeric(15),
-       *      comment: faker.random.words(5)
-       *      technicalReviewId: faker.random.alphaNumeric(15),
+       *      title: faker.lorem.words(2),
+       *      reviewerId: faker.string.alphanumeric(15),
+       *      comment: faker.lorem.words(5)
+       *      technicalReviewId: faker.string.alphanumeric(15),
        *    });
        */
       createInternalReview: (
