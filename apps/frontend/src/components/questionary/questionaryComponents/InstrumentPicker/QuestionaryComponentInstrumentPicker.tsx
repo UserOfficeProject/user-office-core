@@ -13,7 +13,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { getIn } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -77,7 +77,7 @@ export function QuestionaryComponentInstrumentPicker(
   const callAllocatedTimeUnit = state?.proposal?.call?.allocationTimeUnit;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
-  const getValueWithInstrumentName = () => {
+  const getValueWithInstrumentName = useCallback(() => {
     const valueWithInstrumentName = Array.isArray(value)
       ? value.map((v: InstrumentIdAndTime) => {
           return {
@@ -97,7 +97,7 @@ export function QuestionaryComponentInstrumentPicker(
         };
 
     return valueWithInstrumentName;
-  };
+  }, [value, config]);
   const [requestTimeForInstrument, setRequestTimeForInstrument] = useState<
     Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
   >(getValueWithInstrumentName());
@@ -109,7 +109,7 @@ export function QuestionaryComponentInstrumentPicker(
     });
 
     setRequestTimeForInstrument(getValueWithInstrumentName());
-  }, [answer, config.instruments.length]);
+  }, [answer, config, getValueWithInstrumentName]);
 
   const label = (
     <>

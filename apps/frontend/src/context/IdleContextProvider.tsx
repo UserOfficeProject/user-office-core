@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jwtDecode } from 'jwt-decode';
-import PropTypes from 'prop-types';
 import React, { useContext, useRef } from 'react';
 
 import IdleTimeoutPrompt from 'components/timeout/TimeOutPrompt';
@@ -33,13 +32,13 @@ export const EmptyIdleContextProvider = (props: {
   const [state] = React.useState(initIdleData);
 
   return (
-    <IdleContext.Provider
+    <IdleContext
       value={{
         ...state,
       }}
     >
       {props.children}
-    </IdleContext.Provider>
+    </IdleContext>
   );
 };
 
@@ -58,7 +57,7 @@ export const IdleContextProvider = (props: { children: React.ReactNode }) => {
     SettingsId.IDLE_TIMEOUT
   )?.settingsValue;
 
-  const idleTimeout = useRef<NodeJS.Timeout>();
+  const idleTimeout = useRef<NodeJS.Timeout>(undefined);
 
   const userIdleTimer = function () {
     if (idleTimeout.current) {
@@ -102,7 +101,7 @@ export const IdleContextProvider = (props: { children: React.ReactNode }) => {
   }
 
   return (
-    <IdleContext.Provider
+    <IdleContext
       value={{
         ...state,
         handleUserActive: userActive,
@@ -110,11 +109,9 @@ export const IdleContextProvider = (props: { children: React.ReactNode }) => {
     >
       {props.children}
       <IdleTimeoutPrompt isIdle={state.isIdle} onConfirm={userActiveButton} />
-    </IdleContext.Provider>
+    </IdleContext>
   );
 };
-
-IdleContextProvider.propTypes = { children: PropTypes.node.isRequired };
 
 export const IdleContextPicker = ({
   children,
@@ -133,5 +130,3 @@ export const IdleContextPicker = ({
     <EmptyIdleContextProvider>{children}</EmptyIdleContextProvider>
   );
 };
-
-IdleContextPicker.propTypes = { children: PropTypes.node.isRequired };

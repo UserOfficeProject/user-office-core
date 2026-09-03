@@ -1,5 +1,5 @@
 import { PaperProps, Typography } from '@mui/material';
-import { default as React, useState } from 'react';
+import React, { useState } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import Questionary from 'components/questionary/Questionary';
@@ -159,7 +159,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
 
   const { submitted, proposalId } = state.proposal;
 
-  let info: JSX.Element | string = (
+  let info: React.ReactNode = (
     <CopyToClipboard
       text={proposalId}
       successMessage={`'${proposalId}' copied to clipboard`}
@@ -183,7 +183,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
   }
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <StyledContainer>
         <StyledPaper elevation={elevation}>
           <Questionary
@@ -193,6 +193,6 @@ export default function ProposalContainer(props: ProposalContainerProps) {
           />
         </StyledPaper>
       </StyledContainer>
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }

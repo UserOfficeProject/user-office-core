@@ -58,7 +58,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   invitationUserRole?: UserRole;
   action?: {
     fn: (data: T | T[]) => void;
-    actionIcon: JSX.Element;
+    actionIcon: React.ReactNode;
     actionText: string;
   };
   isFreeAction?: boolean;
@@ -203,7 +203,7 @@ const PeopleTable = ({
       isFreeAction: isFreeAction,
       tooltip: action.actionText,
       onClick: (
-        event: React.MouseEvent<JSX.Element>,
+        event: React.MouseEvent<HTMLElement>,
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });
