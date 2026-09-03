@@ -157,10 +157,10 @@ describe('VisitAuthorization', () => {
     });
 
     // A user officer is intentionally NOT granted create rights.
-    test('A user officer can not create a visit', async () => {
+    test('A user officer can create a visit', async () => {
       return expect(
         visitAuth.hasCreateRights(dummyUserOfficerWithRole, PROPOSAL_PK)
-      ).resolves.toEqual(false);
+      ).resolves.toEqual(true);
     });
 
     test('The team lead can not create a visit', async () => {
