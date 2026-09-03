@@ -164,25 +164,32 @@ export class SMTPMailService extends MailService {
       return;
     }
 
+    const transportOptions =
+      process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD
+        ? {
+            host: process.env.EMAIL_AUTH_HOST,
+            port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+            user: process.env.EMAIL_AUTH_USERNAME,
+            pass: process.env.EMAIL_AUTH_PASSWORD,
+          }
+        : {
+            host: process.env.EMAIL_AUTH_HOST,
+            port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+            secure: false,
+            tls: {
+              rejectUnauthorized: false,
+            },
+          };
+
     if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
       this.transport = nodemailer.createTransport({
         pool: true,
         maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        auth: {
-          user: process.env.EMAIL_AUTH_USERNAME,
-          pass: process.env.EMAIL_AUTH_PASSWORD,
-        },
+        ...transportOptions,
       });
     } else {
       this.transport = nodemailer.createTransport({
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        auth: {
-          user: process.env.EMAIL_AUTH_USERNAME,
-          pass: process.env.EMAIL_AUTH_PASSWORD,
-        },
+        ...transportOptions,
       });
     }
   }
@@ -200,10 +207,10 @@ export class SMTPMailService extends MailService {
 
     if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
       this.transport = createTransport({
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
         pool: true,
         maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
         secure: false,
         requireTLS: true,
         auth: {
