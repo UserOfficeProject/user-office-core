@@ -56,3 +56,49 @@ export const updateApiAccessTokenValidationSchema = (
             'You must select at least one query or mutation for access'
           ),
   });
+
+export const createOAuthClientValidationSchema = (
+  isBackendValidation: boolean
+) =>
+  Yup.object().shape({
+    clientId: Yup.string()
+      .required('Client id is required')
+      .max(255, 'Client id must be at most 255 characters'),
+    name: Yup.string()
+      .required('Name is required')
+      .max(100, 'Name must be at most 100 characters'),
+    description: Yup.string()
+      .nullable()
+      .max(500, 'Description must be at most 500 characters'),
+    accessPermissions: isBackendValidation
+      ? Yup.string()
+          .required('You must select at least one query or mutation for access')
+          .test('Is valid object', 'Requires valid JSON', checkValidJson)
+      : Yup.array()
+          .of(Yup.string())
+          .required(
+            'You must select at least one query or mutation for access'
+          ),
+  });
+
+export const updateOAuthClientValidationSchema = (
+  isBackendValidation: boolean
+) =>
+  Yup.object().shape({
+    clientId: Yup.string().required('Client id is required'),
+    name: Yup.string()
+      .required('Name is required')
+      .max(100, 'Name must be at most 100 characters'),
+    description: Yup.string()
+      .nullable()
+      .max(500, 'Description must be at most 500 characters'),
+    accessPermissions: isBackendValidation
+      ? Yup.string()
+          .required('You must select at least one query or mutation for access')
+          .test('Is valid object', 'Requires valid JSON', checkValidJson)
+      : Yup.array()
+          .of(Yup.string())
+          .required(
+            'You must select at least one query or mutation for access'
+          ),
+  });
