@@ -141,7 +141,10 @@ export class VisitAuthorization {
     agent: UserWithRole | null,
     proposalOrProposalPk: Proposal | number
   ): Promise<boolean> {
-    // Note: User Officer Does NOT have create access
+    // User officer has access
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
 
     const proposalPk =
       proposalOrProposalPk instanceof Proposal
