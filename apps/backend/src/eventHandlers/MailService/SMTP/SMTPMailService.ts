@@ -169,8 +169,10 @@ export class SMTPMailService extends MailService {
         ? {
             host: process.env.EMAIL_AUTH_HOST,
             port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-            user: process.env.EMAIL_AUTH_USERNAME,
-            pass: process.env.EMAIL_AUTH_PASSWORD,
+            auth: {
+              user: process.env.EMAIL_AUTH_USERNAME,
+              pass: process.env.EMAIL_AUTH_PASSWORD,
+            },
           }
         : {
             host: process.env.EMAIL_AUTH_HOST,
