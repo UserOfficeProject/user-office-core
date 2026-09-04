@@ -105,6 +105,13 @@ test('User can not delete visit for someone elses proposal', async () => {
   );
 });
 
+test('User Officer can delete a visit', async () => {
+  const result = await mutations.deleteVisit(dummyUserOfficerWithRole, 1);
+
+  expect(result).toBeInstanceOf(Visit);
+  expect((result as Visit).id).toEqual(1);
+});
+
 test('User can update visit', async () => {
   const visit = (await mutations.createVisit(
     dummyPrincipalInvestigatorWithRole,
