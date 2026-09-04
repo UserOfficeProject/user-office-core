@@ -6,7 +6,7 @@ import { IntStringDateBoolArray, AnswerType } from '../CustomScalars';
 @ObjectType()
 export class AnswerBasic implements Partial<AnswerBasicOrig> {
   @Field(() => Int, { nullable: true })
-  public answerId: number;
+  public answerId: number | null;
 
   @Field(() => IntStringDateBoolArray)
   public answer: AnswerType;
