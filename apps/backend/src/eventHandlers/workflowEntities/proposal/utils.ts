@@ -11,14 +11,18 @@ import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource'
 import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
 import { ProposalInternalCommentsDataSource } from '../../../datasources/ProposalInternalCommentsDataSource';
 import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
+import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
 import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
 import { UserDataSource } from '../../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../../events/applicationEvents';
 import { Event } from '../../../events/event.enum';
+import { Call } from '../../../models/Call';
+import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
 import { InstrumentWithManagementTime } from '../../../models/Instrument';
 import { Proposal } from '../../../models/Proposal';
 import { Answer } from '../../../models/Questionary';
+import { TechnicalReview } from '../../../models/TechnicalReview';
 import { Technique } from '../../../models/Technique';
 import { DataType } from '../../../models/Template';
 import { BasicUserDetails, User } from '../../../models/User';
@@ -77,6 +81,9 @@ export type EmailReadyType = {
   samples?: Answer[];
   hazards?: Answer[];
   rejectionComment?: string;
+  fapMeetingDecisions?: FapMeetingDecision[] | null;
+  technicalReviews?: TechnicalReview[] | null;
+  call?: Call | null;
 };
 
 async function stepAnswers(
@@ -155,12 +162,30 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const questionaryDataSource: QuestionaryDataSource = container.resolve(
     Tokens.QuestionaryDataSource
   );
+  const instrumentDataSource: InstrumentDataSource = container.resolve(
+    Tokens.InstrumentDataSource
+  );
 
   const templateDataSource: TemplateDataSource = container.resolve(
     Tokens.TemplateDataSource
   );
   const proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource =
     container.resolve(Tokens.ProposalInternalCommentsDataSource);
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+  const reviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
+  );
+
+  const [call, instruments, fapMeetingDecisions, technicalReviews] =
+    await Promise.all([
+      callDataSource.getCall(proposal.callId),
+      instrumentDataSource.getInstrumentsByProposalPk(proposal.primaryKey),
+      fapDataSource.getProposalsFapMeetingDecisions([proposal.primaryKey]),
+      reviewDataSource.getTechnicalReviews(proposal.primaryKey),
+    ]);
 
   await Promise.all(
     recipientUsers.map(async (recipient) => {
@@ -180,9 +205,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           ? await usersDataSource.getProposalUsers(proposal.primaryKey)
           : null;
 
-        const callDataSource = container.resolve<CallDataSource>(
-          Tokens.CallDataSource
-        );
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
@@ -195,6 +217,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           await proposalInternalCommentsDataSource.getProposalRejectionComment(
             proposal.primaryKey
           );
+
         const templateId = questionary ? questionary?.templateId : -1;
         if (templateId == -1) {
           logger.logError('Could not fetch proposal templateId for email', {
@@ -251,13 +274,17 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           firstName: recipient.firstname,
           lastName: recipient.lastname,
           preferredName: recipient.preferredname,
-          pi: pi,
-          coProposers: coProposers,
+          instruments,
+          pi,
+          coProposers,
           techniques: techniques,
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
           rejectionComment: proposalRejectionComment?.comment,
+          fapMeetingDecisions,
+          technicalReviews,
+          call,
         });
       }
     })

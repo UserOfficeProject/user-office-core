@@ -169,7 +169,11 @@ export interface FapDataSource {
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
-  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]>;
+  getFapReviewData(
+    callId: number,
+    fapId: number,
+    instrumentId?: number | null
+  ): Promise<FapReviewsRecord[]>;
   submitFapMeetings(
     callId: number,
     fapId: number,
