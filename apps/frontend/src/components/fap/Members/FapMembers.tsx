@@ -22,10 +22,10 @@ import React, { useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import UOLoader from 'components/common/UOLoader';
-import ProposalPeopleSelectorModal, {
+import PeopleSelectorModal, {
   AddParticipantsData,
-} from 'components/proposal/ProposalPeopleSelectorModal';
+} from 'components/common/PeopleSelectorModal';
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -306,7 +306,7 @@ const FapMembers = ({
 
   return (
     <>
-      <ProposalPeopleSelectorModal
+      <PeopleSelectorModal
         modalOpen={modalOpen === 'reviewer'}
         onClose={closeModal}
         onAddParticipants={addMember}
@@ -315,7 +315,7 @@ const FapMembers = ({
         filterRole={UserRole.FAP_REVIEWER}
         multiple
       />
-      <ProposalPeopleSelectorModal
+      <PeopleSelectorModal
         modalOpen={modalOpen === 'chair'}
         onClose={closeModal}
         onAddParticipants={assignChairOrSecretary(UserRole.FAP_CHAIR)}
@@ -324,7 +324,7 @@ const FapMembers = ({
         filterRole={UserRole.FAP_REVIEWER}
         multiple={false}
       />
-      <ProposalPeopleSelectorModal
+      <PeopleSelectorModal
         modalOpen={modalOpen === 'secretary'}
         onClose={closeModal}
         onAddParticipants={assignChairOrSecretary(UserRole.FAP_SECRETARY)}

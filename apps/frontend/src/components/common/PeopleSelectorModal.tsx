@@ -26,7 +26,7 @@ import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
-import NoOptionsText from './NoOptionsText';
+import NoOptionsText from '../proposal/NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 export type AddParticipantsData = {
@@ -40,7 +40,7 @@ const keyOf = (u: UserOrEmail) =>
 const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean =>
   a.length === b.length && a.every((v, i) => keyOf(v) === keyOf(b[i]));
 
-interface ProposalPeopleSelectorModalProps {
+interface PeopleSelectorModalProps {
   modalOpen: boolean;
   title?: string;
   onClose?: () => void;
@@ -64,7 +64,7 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
 
 const MIN_SEARCH_LENGTH = 3;
 
-function ProposalPeopleSelectorModal({
+function PeopleSelectorModal({
   modalOpen,
   title,
   onClose,
@@ -76,7 +76,7 @@ function ProposalPeopleSelectorModal({
   preset = [],
   multiple = true,
   filterRole,
-}: ProposalPeopleSelectorModalProps & WithConfirmProps) {
+}: PeopleSelectorModalProps & WithConfirmProps) {
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -244,10 +244,16 @@ function ProposalPeopleSelectorModal({
   };
 
   const handleClose = () => {
+    const discardAndClose = () => {
+      setQuery('');
+      setSelectedItems(preset);
+      onClose?.();
+    };
+
     if (isSameParticipants(selectedItems, preset || []) === false) {
       confirm(
         async () => {
-          onClose?.();
+          discardAndClose();
 
           return;
         },
@@ -260,9 +266,7 @@ function ProposalPeopleSelectorModal({
 
       return;
     }
-    setQuery('');
-    setSelectedItems([]);
-    onClose?.();
+    discardAndClose();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -285,7 +289,11 @@ function ProposalPeopleSelectorModal({
         setExactEmailMatch(undefined);
       } else if (options.length === 1) {
         addToSelectedItems(options[0]);
-      } else if (isValidEmail(query) && !isEmailSearchOnly) {
+      } else if (
+        allowInviteByEmail &&
+        isValidEmail(query) &&
+        !isEmailSearchOnly
+      ) {
         addValidEmailToSelection(query);
       }
     }
@@ -430,4 +438,4 @@ function ProposalPeopleSelectorModal({
   );
 }
 
-export default withConfirm(ProposalPeopleSelectorModal);
+export default withConfirm(PeopleSelectorModal);

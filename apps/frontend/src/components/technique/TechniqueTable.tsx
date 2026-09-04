@@ -7,9 +7,11 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import PeopleSelectorModal, {
+  AddParticipantsData,
+} from 'components/common/PeopleSelectorModal';
 import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer } from 'styles/StyledComponents';
@@ -21,7 +23,6 @@ import AssignedScientistsTable from './AssignedScientistsTable';
 import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
 import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
-  BasicUserDetails,
   InstrumentFragment,
   TechniqueFragment,
   UserRole,
@@ -120,9 +121,9 @@ const TechniqueTable = () => {
       }
     }
   };
-  const assignScientistsToTechnique = async (
-    scientists: BasicUserDetails[]
-  ) => {
+  const assignScientistsToTechnique = async ({
+    users: scientists,
+  }: AddParticipantsData) => {
     await api({
       toastSuccessMessage: `Scientist assigned to technique successfully!`,
     }).assignScientistsToTechnique({
@@ -253,21 +254,20 @@ const TechniqueTable = () => {
 
   return (
     <>
-      {isUserOfficer && (
+      {isUserOfficer && !!assigningTechniqueScientistsId && (
         <PeopleSelectorModal
-          show={!!assigningTechniqueScientistsId}
-          close={(): void => {
+          modalOpen
+          onClose={(): void => {
             setSelectedTechnique(null);
             setAssigningTechniqueScientistsId(null);
           }}
-          addParticipants={assignScientistsToTechnique}
-          selectedUsers={selectedTechnique?.scientists.map(
+          onAddParticipants={assignScientistsToTechnique}
+          excludeUserIds={selectedTechnique?.scientists.map(
             (scientist) => scientist.id
           )}
-          selection={true}
-          userRole={UserRole.INSTRUMENT_SCIENTIST}
-          title={t('instrumentSci')}
-          invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+          filterRole={UserRole.INSTRUMENT_SCIENTIST}
+          title={`Assign ${t('instrumentSci')}`}
+          multiple
         />
       )}
       <Dialog

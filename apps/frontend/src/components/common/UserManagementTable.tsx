@@ -14,7 +14,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 
-import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
+import PeopleSelectorModal from './PeopleSelectorModal';
 
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */
@@ -79,7 +79,7 @@ const UserManagementTable = ({
   };
 
   const InviteComponent = (
-    <ProposalPeopleSelectorModal
+    <PeopleSelectorModal
       modalOpen={modalOpen}
       title={addModalTitle}
       onClose={() => setOpen(false)}

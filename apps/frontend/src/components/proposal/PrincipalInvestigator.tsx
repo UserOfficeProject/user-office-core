@@ -14,7 +14,7 @@ import { BasicUserDetails } from 'generated/sdk';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
 import { ProposalContextType } from './ProposalContainer';
-import ProposalPeopleSelectorModal from './ProposalPeopleSelectorModal';
+import PeopleSelectorModal from '../common/PeopleSelectorModal';
 
 interface PrincipalInvestigatorProps {
   setPrincipalInvestigator: (user: BasicUserDetails) => void;
@@ -35,7 +35,7 @@ export default function PrincipalInvestigator(
   return (
     <Box sx={{ margin: '2px' }}>
       {isPickerOpen && (
-        <ProposalPeopleSelectorModal
+        <PeopleSelectorModal
           modalOpen={isPickerOpen}
           title={'Set Principal Investigator'}
           onClose={() => setIsPickerOpen(false)}
