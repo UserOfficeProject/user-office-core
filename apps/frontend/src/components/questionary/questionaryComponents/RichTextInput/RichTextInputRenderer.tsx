@@ -1,4 +1,5 @@
-import { Typography } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { IconButton, Tooltip, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -29,7 +30,13 @@ export const RichTextInputRendererComponent = ({
 
   return (
     <span>
+      <Tooltip title="View full text">
+        <IconButton onClick={handleClickOpen}>
+          <VisibilityIcon />
+        </IconButton>
+      </Tooltip>
       <Typography
+        component="span"
         variant="body1"
         onClick={handleClickOpen}
         data-cy={`${id}_open`}
