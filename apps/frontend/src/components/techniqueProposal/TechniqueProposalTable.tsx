@@ -424,6 +424,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               .map((instrument) => [instrument.id, instrument])
           ).values()
         );
+
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
@@ -460,12 +461,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           instruments = [missingInst, ...instruments];
         }
 
-        if (currentRole === UserRole.USER_OFFICER) {
-          instruments = instruments.filter((i) =>
-            techniqueInstruments.map((ti) => ti.id).includes(i.id)
-          );
-        }
-
         // Always show the current instrument at the top of the dropdown
         instruments.forEach(function (instrument, i) {
           if (fieldValue && instrument.id === fieldValue) {
@@ -473,6 +468,20 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             instruments.unshift(instrument);
           }
         });
+
+        //Filter instruments not available to a User Officer with a derived role whilst preserving the current instruemnt
+        if (currentRole === UserRole.USER_OFFICER) {
+          const currentInst = fieldValue ? [instruments[0]] : [];
+          instruments = Array.from(
+            new Set(
+              currentInst.concat(
+                instruments.filter((i) =>
+                  techniqueInstruments.map((ti) => ti.id).includes(i.id)
+                )
+              )
+            ).values()
+          );
+        }
 
         return shouldBeUneditable ? (
           instruments.find((i) => i.id === fieldValue)?.name
