@@ -265,6 +265,9 @@ ________________________________________________________________________________
 
 
 ??? info "**T**"
+    :material-book-open-variant-outline: **Team lead**
+    > The team lead is the visitor responsible for a visit on site. The team lead must always be one of the visitors on the visit, and is the only visitor who can edit the visit besides the Principal Investigator and the User Officer.
+
     :material-book-open-variant-outline: **Technical review**
     > Technical review is the evaluation of a proposal's technical feasibility, conducted by experts to assess its practicality and resource requirements.
 
@@ -286,6 +289,9 @@ ________________________________________________________________________________
 
 
 ??? info "**V**"
+    :material-book-open-variant-outline: **Visit**
+    > A visit is the record of who is coming to the facility for a scheduled experiment. It holds the team of visitors and the team lead. Only the Principal Investigator of the proposal can create a visit; the Principal Investigator, the team lead and the User Officer can edit it.
+
     :material-book-open-variant-outline: **Visit basis**
     > Visit basis refers to the foundational information and context for a visit, including its purpose and associated proposals.
 
@@ -294,6 +300,9 @@ ________________________________________________________________________________
 
     :material-book-open-variant-outline: **Visit status**
     > Visit status indicates the current state of a visit, such as scheduled, active, or completed.
+
+    :material-book-open-variant-outline: **Visitor**
+    > A visitor is a person named on the team of a visit. Visitors can see the visit and complete their own visit registration, but cannot edit the visit unless they are also the team lead or the Principal Investigator.
 
 ??? info "**W**"
     :material-book-open-variant-outline: **Warnings**

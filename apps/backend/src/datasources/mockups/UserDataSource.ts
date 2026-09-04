@@ -44,6 +44,36 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   ''
 );
 
+const basicUserDetailsFor = (id: number) =>
+  new BasicUserDetails(
+    id,
+    'john',
+    'doe',
+    'john',
+    'org',
+    1,
+    new Date('2019-07-17 08:25:12.23043+00'),
+    'test@email.com',
+    '',
+    '',
+    ''
+  );
+
+// The people taking part in visit 5, see VisitDataSourceMock.
+export const basicDummyVisitor = basicUserDetailsFor(102);
+export const basicDummyVisitTeamLead = basicUserDetailsFor(110);
+export const basicDummySecondVisitor = basicUserDetailsFor(111);
+export const basicDummyThirdVisitor = basicUserDetailsFor(112);
+
+const allBasicUserDetails = [
+  basicDummyUser,
+  basicDummyUserNotOnProposal,
+  basicDummyVisitor,
+  basicDummyVisitTeamLead,
+  basicDummySecondVisitor,
+  basicDummyThirdVisitor,
+];
+
 export const dummyUserOfficer = new User(
   4,
   'Mr.',
@@ -341,6 +371,73 @@ export const dummyVisitorWithRole: UserWithRole = {
   externalTokenValid: true,
 };
 
+/*
+ * The users below are on the visitor list of a visit but are not members of the
+ * underlying proposal, so they isolate the team lead / visitor authorization
+ * paths from proposal membership. See visit 5 in VisitDataSourceMock.
+ */
+export const dummyVisitTeamLeadWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 110,
+  currentRole: {
+    id: 1,
+    title: 'Visit team lead',
+    shortCode: 'user',
+    description: '',
+    config: {},
+    isRootRole: true,
+  },
+  externalTokenValid: true,
+};
+
+export const dummySecondVisitorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 111,
+  currentRole: {
+    id: 1,
+    title: 'Visitor',
+    shortCode: 'user',
+    description: '',
+    config: {},
+    isRootRole: true,
+  },
+  externalTokenValid: true,
+};
+
+export const dummyThirdVisitorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 112,
+  currentRole: {
+    id: 1,
+    title: 'Visitor',
+    shortCode: 'user',
+    description: '',
+    config: {},
+    isRootRole: true,
+  },
+  externalTokenValid: true,
+};
+
+/*
+ * A member of proposal 1 (see proposalMembers in VisitDataSourceMock) who is
+ * deliberately neither a FAP member nor an internal reviewer, so that tests can
+ * show read access being granted by the visit relationship itself rather than
+ * by one of the blanket roles that short circuit listReadableUsers.
+ */
+export const dummyProposalMemberWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 113,
+  currentRole: {
+    id: 1,
+    title: 'User',
+    shortCode: 'user',
+    description: '',
+    config: {},
+    isRootRole: true,
+  },
+  externalTokenValid: true,
+};
+
 export const dummyPlaceHolderUser = new User(
   5,
   'Dr.',
@@ -426,7 +523,7 @@ export class UserDataSourceMock implements UserDataSource {
     return null;
   }
   async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
-    throw new Error('Method not implemented.');
+    return allBasicUserDetails.filter((user) => ids.includes(user.id));
   }
 
   async getBasicUserDetailsByEmail(
