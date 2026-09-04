@@ -25,6 +25,13 @@ import { FapReviewBasisConfig } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 
+// Whole-number grades are always 1 to 10 and do not depend on the config, so
+// the list is built once rather than on every render.
+const WHOLE_NUMBER_GRADES = Array.from({ length: 10 }, (_, i) => ({
+  text: (i + 1).toString(),
+  value: (i + 1).toString(),
+}));
+
 function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const {
     answer: {
@@ -70,6 +77,31 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
 
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
+
+  // A classification, or a whole-number grade, is picked from a list;
+  // anything else is typed into a numeric field.
+  const isGradePickedFromList =
+    gradeType === 'Classification' || config.decimalPoints === 0;
+
+  const gradeLabel =
+    gradeType === 'Classification' ? 'Classification' : 'Grade';
+
+  const handleGradeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { grade: event.target.value },
+    });
+  };
+
+  // Only the list-backed variants have options; the numeric field has none.
+  const gradeOptions = !isGradePickedFromList
+    ? undefined
+    : gradeType === 'Classification'
+      ? config.nonNumericOptions.map((option) => ({
+          text: option,
+          value: option,
+        }))
+      : WHOLE_NUMBER_GRADES;
 
   return (
     <div>
@@ -135,60 +167,50 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             </ToggleButtonGroup>
           )}
 
-          <Box marginTop={1} width={150}>
-            <Field
-              name={gradeFieldId}
-              label={
-                gradeType === 'Classification' ? 'Classification' : 'Grade'
-              }
-              value={localGrade || ''}
-              component={
-                gradeType === 'Classification' || config.decimalPoints === 0
-                  ? Select
-                  : TextField
-              }
-              MenuProps={{ 'data-cy': 'grade-proposal-options' }}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: { grade: event.target.value },
-                });
-              }}
-              formControl={{
-                fullWidth: true,
-                required: true,
-                margin: 'normal',
-              }}
-              inputProps={
-                gradeType === 'Classification' || config.decimalPoints === 0
-                  ? {
-                      id: 'grade-proposal',
-                    }
-                  : {
-                      id: 'grade-proposal',
-                      step: Math.pow(10, -config.decimalPoints).toString(),
-                      inputMode: 'decimal',
-                      type: 'number',
-                      min: '1',
-                      max: '10',
-                    }
-              }
-              data-cy="grade-proposal"
-              labelId="grade-proposal-label"
-              options={
-                gradeType === 'Classification'
-                  ? config.nonNumericOptions.map((option) => ({
-                      text: option,
-                      value: option,
-                    }))
-                  : config.decimalPoints === 0
-                    ? [...Array(10)].map((e, i) => ({
-                        text: (i + 1).toString(),
-                        value: (i + 1).toString(),
-                      }))
-                    : undefined
-              }
-            />
+          <Box
+            sx={{
+              marginTop: 1,
+              width: 150,
+            }}
+          >
+            {isGradePickedFromList ? (
+              <Field
+                name={gradeFieldId}
+                label={gradeLabel}
+                value={localGrade || ''}
+                component={Select}
+                onChange={handleGradeChange}
+                formControl={{
+                  fullWidth: true,
+                  required: true,
+                  margin: 'normal',
+                }}
+                inputProps={{ id: 'grade-proposal' }}
+                MenuProps={{ 'data-cy': 'grade-proposal-options' }}
+                labelId="grade-proposal-label"
+                options={gradeOptions}
+                data-cy="grade-proposal"
+              />
+            ) : (
+              <Field
+                name={gradeFieldId}
+                label={gradeLabel}
+                value={localGrade || ''}
+                component={TextField}
+                onChange={handleGradeChange}
+                slotProps={{
+                  htmlInput: {
+                    id: 'grade-proposal',
+                    step: Math.pow(10, -config.decimalPoints).toString(),
+                    inputMode: 'decimal',
+                    type: 'number',
+                    min: '1',
+                    max: '10',
+                  },
+                }}
+                data-cy="grade-proposal"
+              />
+            )}
           </Box>
         </TitledContainer>
       </Box>

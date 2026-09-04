@@ -349,9 +349,10 @@ function submitESFByUser() {
 
   cy.get('[role="dialog"]').within(() => {
     cy.get('input[name="sample_esi_boolean_question"]').should('exist').check();
-    cy.get('input[name="sample_esi_date_question"]')
-      .should('exist')
-      .type(TEST_CONSTANTS.FORM_VALUES.DATE);
+    cy.setDatePickerValue(
+      'input[name="sample_esi_date_question"]',
+      TEST_CONSTANTS.FORM_VALUES.DATE
+    );
     cy.get('input[name="sample_esi_interval_question.min"]')
       .should('exist')
       .type(TEST_CONSTANTS.FORM_VALUES.INTERVAL_MIN);
@@ -401,9 +402,10 @@ function submitESFByUser() {
 
   // Fill Proposal ESI
   cy.get('input[name="proposal_esi_boolean_question"]').should('exist').check();
-  cy.get('input[name="proposal_esi_date_question"]')
-    .should('exist')
-    .type(TEST_CONSTANTS.FORM_VALUES.DATE);
+  cy.setDatePickerValue(
+    'input[name="proposal_esi_date_question"]',
+    TEST_CONSTANTS.FORM_VALUES.DATE
+  );
   cy.get('input[name="proposal_esi_interval_question.min"]')
     .should('exist')
     .type(TEST_CONSTANTS.FORM_VALUES.INTERVAL_MIN);
@@ -444,9 +446,10 @@ function fillExperimentSafetyReview() {
   cy.get('input[name="experiment_safety_review_boolean_question"]')
     .should('exist')
     .check();
-  cy.get('input[name="experiment_safety_review_date_question"]')
-    .should('exist')
-    .type(TEST_CONSTANTS.FORM_VALUES.DATE);
+  cy.setDatePickerValue(
+    'input[name="experiment_safety_review_date_question"]',
+    TEST_CONSTANTS.FORM_VALUES.DATE
+  );
   cy.get('input[name="experiment_safety_review_interval_question.min"]')
     .should('exist')
     .type(TEST_CONSTANTS.FORM_VALUES.INTERVAL_MIN);

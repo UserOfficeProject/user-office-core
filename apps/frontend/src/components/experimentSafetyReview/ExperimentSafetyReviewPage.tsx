@@ -74,13 +74,16 @@ function ExperimentSafetyReviewDialog(props: {
                 label="Status"
                 select
                 component={TextField}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                InputProps={{ 'data-cy': 'safety-status' }}
                 fullWidth
                 required={true}
                 disabled={isSubmitting}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+
+                  input: { 'data-cy': 'safety-status' },
+                }}
               >
                 <MenuItem
                   key={SampleStatus.PENDING_EVALUATION}
@@ -138,10 +141,12 @@ function ExperimentSafetyReviewDialog(props: {
                 multiline
                 fullWidth
                 disabled={isSubmitting}
-                InputProps={{
-                  minRows: 4,
-                  maxRows: 10,
-                  'data-cy': 'safety-comment',
+                slotProps={{
+                  input: {
+                    minRows: 4,
+                    maxRows: 10,
+                    'data-cy': 'safety-comment',
+                  },
                 }}
               />
 
@@ -251,7 +256,11 @@ function ExperimentSafetyReviewPage() {
       <StyledContainer maxWidth={false}>
         <StyledPaper>
           <Grid container spacing={2}>
-            <Grid item sm={3} xs={12}>
+            <Grid
+              size={{
+                sm: 3,
+                xs: 12
+              }}>
               <CallFilter
                 callId={selectedCallId}
                 calls={calls}

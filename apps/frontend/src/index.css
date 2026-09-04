@@ -169,42 +169,45 @@ h6 {
   background-color: var(--PALETTE_PRIMARY_LIGHT);
 }
 
-.MuiButton-containedPrimary {
+.MuiButton-contained.MuiButton-colorPrimary {
   color: var(--PALETTE_SECONDARY_CONTRAST);
   background-color: var(--PALETTE_SECONDARY_MAIN);
 }
 
-.MuiButton-containedPrimary:hover {
+.MuiButton-contained.MuiButton-colorPrimary:hover {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_SECONDARY_DARK);
 }
 
-.MuiButton-containedSecondary {
+.MuiButton-contained.MuiButton-colorSecondary {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_PRIMARY_MAIN);
 }
 
-.MuiButton-containedSecondary:hover {
+.MuiButton-contained.MuiButton-colorSecondary:hover {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_PRIMARY_LIGHT);
 }
 
-.MuiSnackbar-root [class*='SnackbarItem-variantSuccess'] {
+/* NOTE: notistack v3 renders its own wrapper rather than a MuiSnackbar, and
+   names the content element notistack-MuiContent-<variant>. The two class
+   names are needed to outweigh notistack's own variant colours. */
+.notistack-Snackbar .notistack-MuiContent-success {
   background-color: var(--PALETTE_SUCCESS_MAIN);
   color: var(--PALETTE_PRIMARY_CONTRAST);
 }
 
-.MuiSnackbar-root [class*='SnackbarItem-variantError'] {
+.notistack-Snackbar .notistack-MuiContent-error {
   background-color: var(--PALETTE_ERROR_MAIN);
   color: var(--PALETTE_PRIMARY_CONTRAST);
 }
 
-.MuiSnackbar-root [class*='SnackbarItem-variantWarning'] {
+.notistack-Snackbar .notistack-MuiContent-warning {
   background-color: var(--PALETTE_WARNING_MAIN);
   color: var(--PALETTE_PRIMARY_CONTRAST);
 }
 
-.MuiSnackbar-root [class*='SnackbarItem-variantInformation'] {
+.notistack-Snackbar .notistack-MuiContent-info {
   background-color: var(--PALETTE_INFO_MAIN);
   color: var(--PALETTE_SECONDARY_CONTRAST);
 }

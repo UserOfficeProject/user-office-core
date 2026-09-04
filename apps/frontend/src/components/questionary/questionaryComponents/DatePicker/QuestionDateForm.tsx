@@ -1,4 +1,4 @@
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -88,7 +88,9 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'natural_key' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'natural_key' },
+              }}
             />
             <Field
               name="question"
@@ -97,7 +99,9 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'question' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'question' },
+              }}
             />
             <Field
               name="config.includeTime"
@@ -107,7 +111,9 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               Label={{
                 label: 'Include time',
               }}
-              inputProps={{ 'data-cy': 'includeTime' }}
+              slotProps={{
+                input: { 'data-cy': 'includeTime' },
+              }}
             />
             <Field
               name="config.tooltip"
@@ -116,7 +122,9 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'tooltip' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'tooltip' },
+              }}
             />
 
             <TitledContainer label="Constraints">
@@ -139,7 +147,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   ampm={false}
                   component={component}
                   showToolbar
-                  inputProps={{ placeholder: inputFormat }}
                   maxDate={defaultFieldMaxDate}
                   textField={{
                     fullWidth: true,
@@ -154,7 +161,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   format={inputFormat}
                   ampm={false}
                   component={component}
-                  inputProps={{ placeholder: inputFormat }}
                   minDate={defaultFieldMinDate}
                   textField={{
                     fullWidth: true,
@@ -169,7 +175,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   format={inputFormat}
                   ampm={false}
                   component={component}
-                  inputProps={{ placeholder: inputFormat }}
                   minDate={defaultFieldMinDate}
                   maxDate={defaultFieldMaxDate}
                   textField={{

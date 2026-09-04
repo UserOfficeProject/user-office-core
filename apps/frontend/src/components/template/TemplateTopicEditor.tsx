@@ -126,7 +126,6 @@ export default function QuestionaryEditorTopic(props: {
                 name="title"
                 id="title"
                 type="text"
-                inputProps={{ maxLength: '32' }}
                 component={TextField}
                 sx={{ margin: '3px 8px', flex: 1 }}
                 value={values.title}
@@ -149,6 +148,9 @@ export default function QuestionaryEditorTopic(props: {
                   if (e.key === 'Enter') {
                     e.currentTarget.blur();
                   }
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: '32' },
                 }}
               />
               <IconButton
@@ -255,7 +257,7 @@ export default function QuestionaryEditorTopic(props: {
           style={getItemStyle(provided.draggableProps.style)}
           {...provided.dragHandleProps}
         >
-          <Grid item xs={12}>
+          <Grid size={12}>
             <AppBar
               position="static"
               sx={{
@@ -295,7 +297,9 @@ export default function QuestionaryEditorTopic(props: {
                     keepMounted
                     open={open}
                     onClose={() => setAnchorEl(null)}
-                    TransitionComponent={Fade}
+                    slots={{
+                      transition: Fade
+                    }}
                   >
                     <MenuItem
                       data-cy="add-question-menu-item"
@@ -382,8 +386,6 @@ export default function QuestionaryEditorTopic(props: {
           <Droppable droppableId={data.topic.id.toString()} type="field">
             {(provided, snapshot) => (
               <Grid
-                item
-                xs={12}
                 ref={provided.innerRef}
                 style={getListStyle(snapshot.isDraggingOver)}
                 sx={{
@@ -391,7 +393,7 @@ export default function QuestionaryEditorTopic(props: {
                   height: 'calc(100% - 36px)',
                   padding: '1px',
                 }}
-              >
+                size={12}>
                 {getItems()}
                 {provided.placeholder}
               </Grid>

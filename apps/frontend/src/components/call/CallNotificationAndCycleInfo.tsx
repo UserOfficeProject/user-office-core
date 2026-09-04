@@ -1,4 +1,4 @@
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
@@ -34,7 +34,6 @@ const CallCycleInfo = () => {
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
@@ -51,7 +50,6 @@ const CallCycleInfo = () => {
           minDate={startNotify}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
@@ -66,7 +64,6 @@ const CallCycleInfo = () => {
           format={dateFormat}
           ampm={false}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -84,7 +81,6 @@ const CallCycleInfo = () => {
           ampm={false}
           minDate={startCycle}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -104,7 +100,9 @@ const CallCycleInfo = () => {
         required
         fullWidth
         data-cy="cycle-comment"
-        inputProps={{ maxLength: '100' }}
+        slotProps={{
+          htmlInput: { maxLength: '100' },
+        }}
       />
       <Field
         name="submissionMessage"

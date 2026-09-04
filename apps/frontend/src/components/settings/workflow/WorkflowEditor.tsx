@@ -283,7 +283,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       <StyledPaper>
         <LoadingOverlay isLoading={!dataLoaded}>
           <Grid container style={{ height: '600px' }}>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <WorkflowCanvas
                 nodes={nodes}
                 edges={edges}
@@ -328,7 +328,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 }
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid size={3}>
               <StatusPicker
                 statuses={statuses}
                 onDragStart={(status) => {

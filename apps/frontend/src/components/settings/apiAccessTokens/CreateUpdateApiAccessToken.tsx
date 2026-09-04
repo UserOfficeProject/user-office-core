@@ -169,9 +169,6 @@ const CreateUpdateApiAccessToken = ({
                 <Grid container spacing={1}>
                   {group.items.map((item, index) => (
                     <Grid
-                      item
-                      md={6}
-                      xs={12}
                       key={index}
                       sx={{
                         '& label': {
@@ -184,7 +181,10 @@ const CreateUpdateApiAccessToken = ({
                           },
                         },
                       }}
-                    >
+                      size={{
+                        md: 6,
+                        xs: 12
+                      }}>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -204,8 +204,10 @@ const CreateUpdateApiAccessToken = ({
                                 fieldArrayHelpers.remove(idx);
                               }
                             }}
-                            inputProps={{
-                              'aria-label': 'primary checkbox',
+                            slotProps={{
+                              input: {
+                                'aria-label': 'primary checkbox',
+                              }
                             }}
                           />
                         }
@@ -340,31 +342,33 @@ const CreateUpdateApiAccessToken = ({
               },
             }}
             fullWidth
-            InputProps={{
-              endAdornment: values.accessToken && (
-                <>
-                  <Tooltip title="Copy">
-                    <IconButton
-                      edge="start"
-                      onClick={() =>
-                        navigator.clipboard.writeText(values.accessToken)
-                      }
-                    >
-                      <FileCopyIcon />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              ),
-            }}
             data-cy="accessToken"
             disabled
+            slotProps={{
+              input: {
+                endAdornment: values.accessToken && (
+                  <>
+                    <Tooltip title="Copy">
+                      <IconButton
+                        edge="start"
+                        onClick={() =>
+                          navigator.clipboard.writeText(values.accessToken)
+                        }
+                      >
+                        <FileCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+              },
+            }}
           />
           <Grid
             container
-            justifyContent="flex-end"
-            sx={(theme) => ({ margin: theme.spacing(2, 0, 2) })}
-          >
-            <Grid item>
+            sx={[{
+              justifyContent: "flex-end"
+            }, (theme) => ({ margin: theme.spacing(2, 0, 2) })]}>
+            <Grid>
               <ErrorMessage name="accessPermissions" />
 
               <Button
