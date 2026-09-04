@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { addUserThroughModal } from '../support/peopleSelector';
 import { TestUserId } from '../support/user';
 
 context('Event log tests', () => {
@@ -128,8 +129,7 @@ context('Event log tests', () => {
       cy.get('[aria-label="Edit"]').click();
       cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
       cy.get('[data-cy="add-participant-button"]').click();
-      cy.get('input[type="checkbox"]').eq(0).check();
-      cy.get('[data-cy="assign-selected-users"]').click();
+      addUserThroughModal(initialDBData.users.reviewer.lastName);
       cy.get('.MuiTabs-flexContainer > #horizontal-tab-8').click();
       cy.contains('userId:2 impersonating userId:1');
     });
