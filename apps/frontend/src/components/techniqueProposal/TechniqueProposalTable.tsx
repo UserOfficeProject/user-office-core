@@ -74,7 +74,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     tableRef.current?.onQueryChange({});
   }, []);
   const [searchParams, setSearchParams] = useSearchParams({});
-  const { currentRole } = useContext(UserContext);
+  const { currentRole, roles, currentRoleId } = useContext(UserContext);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   const {
@@ -190,7 +190,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const excludedStatusIds = proposalStatuses
     .filter((status) => !techPropStatusCodes.includes(status.id as StatusCode))
     .map((status) => status.id);
-  console.log({ proposalStatusId });
+
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId,
     instrumentFilter: {
@@ -213,6 +213,11 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
+
+  const currentRoleTags = roles.find((r) => currentRoleId === r.id)!.tags;
+  const currentRoleFirstTagName = currentRoleTags?.length
+    ? `${currentRoleTags[0].name}.`
+    : '';
 
   const lastProcessedCallId = useRef<number | null>(null);
   useEffect(() => {
@@ -694,7 +699,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const techniquesColumns = () => [
     {
-      title: 'Technique',
+      title: i18n.t(`${currentRoleFirstTagName}Technique`),
       field: 'technique.name',
       sorting: false,
       render: (rowData: ProposalViewData) =>

@@ -337,6 +337,19 @@ context('Template Basic tests', () => {
       cy.contains('Save').click();
       /* --- */
 
+      /* Date range */
+      cy.createDateTimeRangeQuestion('When to plant foxgloves?');
+
+      cy.contains('When to plant foxgloves?')
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
+
+      cy.contains('When to plant foxgloves?').click();
+      cy.get('[data-cy=natural-key]').click();
+      cy.contains('Save').click();
+      /* --- */
+
       /* Date */
       cy.createDateQuestion(dateQuestion.title, {
         includeTime: false,
@@ -1631,6 +1644,39 @@ context('Template Basic tests', () => {
     });
   });
 
+  describe('Date range picker tests', () => {
+    const createProposalAndOpenDateTimeRangeQuestion = () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type('title');
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+    };
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
+    });
+
+    it.only('Should display date range selector', () => {
+      cy.createDateTimeRangeQuestion(
+        'What range of years do osprey come to Britain?'
+      );
+
+      createProposalAndOpenDateTimeRangeQuestion();
+
+      cy.contains('What range of years do osprey come to Britain?').should(
+        'exist'
+      );
+    });
+  });
+
   describe('File upload tests', () => {
     beforeEach(() => {
       cy.login('officer');
@@ -2134,6 +2180,103 @@ context('Template Basic tests', () => {
       cy.notification({ variant: 'success', text: 'updated successfully' });
       cy.contains(emailTemplateName2);
       cy.contains(emailTemplateDescription2);
+    });
+
+    it('User officer edits the Pug body → preview renders variables as their names', () => {
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'emailTemplatePreview') {
+          req.alias = 'emailTemplatePreview';
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .type('p Proposal: #{proposalTitle}', {
+          parseSpecialCharSequences: false,
+        })
+        .should('contain.text', 'proposalTitle');
+
+      cy.contains('Preview').click();
+      cy.wait('@emailTemplatePreview');
+
+      cy.get('[data-cy="email-template-preview-frame"]')
+        .its('0.contentDocument.body')
+        .should('contain.text', 'Proposal: proposalTitle');
+
+      cy.get('[data-cy="email-template-preview-subject"]').should('exist');
+    });
+
+    it('User officer writes invalid Pug → inline preview error and no error notification', () => {
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'emailTemplatePreview') {
+          req.alias = 'emailTemplatePreview';
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .type('p #{', { parseSpecialCharSequences: false });
+
+      cy.contains('Preview').click();
+      cy.wait('@emailTemplatePreview');
+
+      cy.get('[data-cy="email-template-preview-error"]').should('be.visible');
+
+      cy.get('.snackbar-error #notistack-snackbar').should('not.exist');
+    });
+
+    it('Non-officer requests an email template preview → query resolves to null', () => {
+      cy.login('user1').then((result) => {
+        const token = result.externalTokenLogin;
+
+        cy.request({
+          method: 'POST',
+          url: '/graphql',
+          headers: { authorization: `Bearer ${token}` },
+          body: {
+            operationName: 'emailTemplatePreview',
+            query: `query emailTemplatePreview($emailTemplatePreviewInput: EmailTemplatePreviewInput!) {
+              emailTemplatePreview(emailTemplatePreviewInput: $emailTemplatePreviewInput) {
+                subject
+                body
+              }
+            }`,
+            variables: {
+              emailTemplatePreviewInput: {
+                useTemplateFile: false,
+                subject: 'subject',
+                body: 'p hello',
+                variables: [],
+              },
+            },
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.data.emailTemplatePreview).to.be.null;
+        });
+      });
     });
 
     it('User officer can delete email template', () => {

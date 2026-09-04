@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
+import * as Yup from 'yup';
 
 import { AnswerInput } from '../../resolvers/mutations/AnswerTopicMutation';
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
@@ -29,10 +30,12 @@ import {
   TextInputConfig,
   VisitBasisConfig,
   ExperimentSafetyReviewBasisConfig,
+  DateTimeRangeConfig,
 } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
+import { dateTimeRangeDefinition } from './DateTimeRange';
 import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
 import { experimentSafetyReviewBasisDefinition } from './ExperimentSafetyReviewBasis';
@@ -108,8 +111,9 @@ export type QuestionDataTypeConfigMapping<T extends DataType> =
                                                   ? InstrumentPickerConfig
                                                   : T extends DataType.TECHNIQUE_PICKER
                                                     ? TechniquePickerConfig
-                                                    : never;
-
+                                                    : T extends DataType.DATE_TIME_RANGE
+                                                      ? DateTimeRangeConfig
+                                                      : never;
 export interface Question<T extends DataType> {
   /**
    * The enum value from DataType
@@ -124,6 +128,15 @@ export interface Question<T extends DataType> {
     value: any
   ) => Promise<boolean>;
 
+  /**
+   * Performs validation on the config submitted before persisting data into the database
+   */
+  readonly validateConfig?: (config: any) => void;
+
+  /**
+   * Defines the Yup schema used to validate the config before writing to database
+   */
+  readonly customYupSchema?: Yup.ObjectSchema<any>;
   /**
    * Question can contain configuration, e.g. isRequired, maxValue, etc,
    * This function returns configuration for newly created questions
@@ -172,6 +185,7 @@ export interface Question<T extends DataType> {
 const registry = [
   booleanDefinition,
   dateDefinition,
+  dateTimeRangeDefinition,
   embellishmentDefinition,
   feedbackBasisDefinition,
   fileUploadDefinition,

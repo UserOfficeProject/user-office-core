@@ -5,8 +5,8 @@ import {
   ProposalEndStatus,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
-import { DateTime } from 'luxon';
 
+import { selectDateRange } from '../support/dayRangePicker';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
@@ -32,7 +32,7 @@ context('visits tests', () => {
     cy.updateProposal({
       proposalPk: existingProposalId,
       title: initialDBData.proposal.title,
-      abstract: faker.random.words(3),
+      abstract: faker.lorem.words(3),
       proposerId: PI.id,
       users: [coProposer.id],
     });
@@ -46,8 +46,7 @@ context('visits tests', () => {
     });
   });
 
-  const startQuestion = 'Visit start';
-  const endQuestion = 'Visit end';
+  const visitBasisDateRange = 'visit_basis.dateRange';
 
   const cyTagDefineVisit = 'define-visit-icon';
   const cyTagRegisterVisit = 'register-visit-icon';
@@ -117,18 +116,7 @@ context('visits tests', () => {
         .first()
         .click();
 
-      const startDateObj = faker.date.future();
-      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
-
-      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      selectDateRange(visitBasisDateRange);
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.get('[data-cy="submit-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -204,21 +192,10 @@ context('visits tests', () => {
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
       cy.get('[data-cy="edit-visit-registration-button"]').click();
 
-      const startDateObj = faker.date.future();
-      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
-
-      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-
       //click the tab New visit
       cy.get('button').contains('New visit').click({ force: true });
 
-      cy.get('input[name="visit_basis.startsAt"]').clear().type(startDate);
-      cy.get('input[name="visit_basis.endsAt"]').clear().type(endDate);
+      selectDateRange(visitBasisDateRange);
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
@@ -364,16 +341,6 @@ context('visits tests', () => {
     });
 
     it('Visitor should be able to register for a visit', () => {
-      const pastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-      const nowDate = DateTime.fromJSDate(new Date()).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-      const futureDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.getFormats().dateFormat
-      );
-
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: visitTemplate.name,
@@ -402,17 +369,11 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Visit start date is required/i).should('exist');
 
-      cy.contains(startQuestion).parent().click().clear().type('101010');
-      cy.get('[data-cy=save-and-continue-button]').click();
-      cy.contains(/Visit start date is required/i).should('exist');
-
-      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(pastDate);
-      cy.get('[data-cy=save-and-continue-button]').click();
-      cy.contains(/end date can't be before start date/i).should('exist');
-
-      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
+      // The malformed-input and end-before-start cases the two date fields used
+      // to cover are unreachable through the range picker: its text field is
+      // readonly, days before today are disabled, and the calendar always
+      // returns the range in order.
+      selectDateRange(visitBasisDateRange);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
