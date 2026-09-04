@@ -40,8 +40,15 @@ export default class InstrumentQueries {
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
+    const agentRoleId = this.userAuth.isApiToken(agent)
+      ? undefined
+      : agent?.currentRole?.id;
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getInstruments();
+      return await this.dataSource.getInstruments(
+        undefined,
+        undefined,
+        agentRoleId
+      );
     } else {
       const instrumentsByCallIds =
         await this.dataSource.getInstrumentsByCallId(callIds);
