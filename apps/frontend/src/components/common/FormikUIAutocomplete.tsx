@@ -129,6 +129,9 @@ const FormikUIAutocomplete = ({
       name={name}
       component={Autocomplete}
       loading={loading}
+      // disable the autocomplete itself, not just the text field it renders,
+      // so the popup, clear button and keyboard interactions are off too
+      disabled={disabled}
       multiple={multiple}
       options={options}
       noOptionsText={noOptionsText}

@@ -22,33 +22,14 @@ import {
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const getParticipationRole = (
-  user: UserJwt,
-  event: UserExperiment
-): 'PI' | 'co-proposer' | 'visitor' | null => {
-  if (event.proposal?.proposer?.id === user.id) {
-    return 'PI';
-  } else if (event.proposal?.users.map((user) => user.id).includes(user.id)) {
-    return 'co-proposer';
-  } else if (
-    event.visit?.registrations
-      .map((registration) => registration.userId)
-      .includes(user.id)
-  ) {
-    return 'visitor';
-  } else {
-    return null;
-  }
-};
-
-const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) => {
-  const role = getParticipationRole(user, event);
-
-  return role === 'PI' || role === 'co-proposer';
-};
+const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) =>
+  event.proposal?.proposer?.id === user.id ||
+  event.proposal?.users.some((coProposer) => coProposer.id === user.id);
 
 const isTeamlead = (user: UserJwt, event: UserExperiment) =>
-  event.visit && event.visit.teamLead.id === user.id;
+  event.visit !== null && event.visit.teamLead.id === user.id;
+
+//---------------------------------------------------------------------
 
 const createActionButton = (
   tooltip: string,
@@ -64,11 +45,14 @@ const createActionButton = (
     : () => {},
 });
 
+//---------------------------------------------------------------------
+
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
   closeModal: () => void;
   eventUpdated: (updatedEvent: UserExperiment) => void;
 }
+
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
@@ -79,7 +63,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
-    if (isPiOrCoProposer(user, event)) {
+    const { readable, createable } = event.visitPerms;
+
+    // the PI can create a visit; PI/visitors can read an existing one.
+    // Co-PIs can do neither, so the button is hidden for them
+    if (createable || readable) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
@@ -170,40 +158,42 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   };
 
   const registerVisitAction = (event: UserExperiment) => {
-    let buttonState: ActionButtonState;
+    let buttonState: ActionButtonState = 'invisible';
     let stateReason: string | null = null;
 
-    if (event.visit !== null) {
-      const registration = event.visit.registrations.find(
-        (registration) => registration.userId === user.id
-      );
-      if (!registration) {
-        buttonState = 'invisible';
-      } else {
-        switch (registration.status) {
-          case VisitRegistrationStatus.DRAFTED:
-            buttonState = 'active';
-            break;
-          case VisitRegistrationStatus.CHANGE_REQUESTED:
-            buttonState = 'active';
-            stateReason = 'Changes are requested for your registration';
-            break;
-          case VisitRegistrationStatus.SUBMITTED:
-            buttonState = 'pending';
-            stateReason = 'The registration is pending approval';
-            break;
-          case VisitRegistrationStatus.APPROVED:
-            buttonState = 'completed';
-            break;
-          case VisitRegistrationStatus.CANCELLED_BY_USER:
-          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            buttonState = 'cancelled';
-            stateReason =
-              'This action is disabled because your registration for visit is cancelled';
-            break;
-        }
+    // the button reflects the user's own registration; anyone without read
+    // rights never sees the visit at all (the backend resolves it to null)
+    const registration = event.visit?.registrations.find(
+      (registration) => registration.userId === user.id
+    );
+
+    if (registration) {
+      switch (registration.status) {
+        case VisitRegistrationStatus.DRAFTED:
+          buttonState = 'active';
+          break;
+        case VisitRegistrationStatus.CHANGE_REQUESTED:
+          buttonState = 'active';
+          stateReason = 'Changes are requested for your registration';
+          break;
+        case VisitRegistrationStatus.SUBMITTED:
+          buttonState = 'pending';
+          stateReason = 'The registration is pending approval';
+          break;
+        case VisitRegistrationStatus.APPROVED:
+          buttonState = 'completed';
+          break;
+        case VisitRegistrationStatus.CANCELLED_BY_USER:
+        case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
+          buttonState = 'cancelled';
+          stateReason =
+            'This action is disabled because your registration for visit is cancelled';
+          break;
+        default:
+          console.log(buttonState);
       }
-    } else {
+    } else if (event.visit === null && event.visitPerms.createable) {
+      // the hint is aimed at the person who can define the visit
       buttonState = 'inactive';
       stateReason = 'This action is disabled because visit is not defined';
     }
