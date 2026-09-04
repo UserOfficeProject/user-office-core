@@ -48,7 +48,7 @@ const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) => {
 };
 
 const isTeamlead = (user: UserJwt, event: UserExperiment) =>
-  event.visit && event.visit.teamLead.id === user.id;
+  event.visit && event.visit.teamLead?.id === user.id;
 
 const createActionButton = (
   tooltip: string,
