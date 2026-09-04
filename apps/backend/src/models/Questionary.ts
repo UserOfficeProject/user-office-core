@@ -2,7 +2,7 @@ import { QuestionTemplateRelation, Topic } from './Template';
 
 export class AnswerBasic {
   constructor(
-    public answerId: number,
+    public answerId: number | null,
     public questionaryId: number,
     public questionId: string,
     public answer: any,
@@ -12,7 +12,7 @@ export class AnswerBasic {
 
 export class Answer extends QuestionTemplateRelation {
   constructor(
-    public answerId: number,
+    public answerId: number | null,
     questionTemplateRelation: QuestionTemplateRelation,
     public value?: any
   ) {
