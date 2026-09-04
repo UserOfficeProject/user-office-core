@@ -16,6 +16,14 @@ context('visits tests', () => {
   const coProposer = initialDBData.users.user2;
   const visitor = initialDBData.users.user3;
   const PI = initialDBData.users.user1;
+  /*
+   * The team lead and these visitors are not members of the proposal, so tests
+   * using them exercise the team lead / visitor rules on their own rather than
+   * passing because the user happens to also be the PI or a co-proposer.
+   */
+  const teamLead = initialDBData.users.visitTeamLead;
+  const teamVisitor = initialDBData.users.visitor1;
+  const extraVisitor = initialDBData.users.visitor2;
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
   const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
@@ -151,6 +159,8 @@ context('visits tests', () => {
 
       cy.finishedLoading();
 
+      cy.testActionButton(cyTagRegisterVisit, 'completed');
+
       cy.get('[data-cy="register-visit-icon"]').closest('button').click();
       cy.get('[data-cy="registration-more-options"]').should('not.exist');
     });
@@ -246,7 +256,10 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
+      // no visit exists yet, so the PI only gets the disabled hint
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because visit is not defined)"]'
+      ).should('exist');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -259,8 +272,46 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('not.exist');
     });
 
-    it('Co-proposer should be able to form team', () => {
+    it('Co-proposer should not see the form team or visit registration actions', () => {
+      // The visit is led by a plain visitor, so the co-proposer is not on it.
+      cy.createVisit({
+        team: [teamLead.id, teamVisitor.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
       cy.login(coProposer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      /*
+       * Only the PI and the visitors may form the team, so a co-proposer sees
+       * neither the form team action nor a visit registration of their own.
+       */
+      cy.testActionButton(cyTagDefineVisit, 'invisible');
+      cy.testActionButton(cyTagRegisterVisit, 'invisible');
+      cy.testActionButton(cyTagDeclareShipment, 'neutral');
+    });
+
+    it('Co-proposer should not see the form team or visit registration actions before a visit is defined', () => {
+      cy.login(coProposer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // only the PI may create the visit, so the co-proposer sees no actions
+      cy.testActionButton(cyTagDefineVisit, 'invisible');
+      cy.testActionButton(cyTagRegisterVisit, 'invisible');
+      cy.testActionButton(cyTagDeclareShipment, 'neutral');
+    });
+
+    it('PI should be able to form team', () => {
+      cy.login(PI);
       cy.visit('/');
 
       cy.finishedLoading();
@@ -269,7 +320,10 @@ context('visits tests', () => {
 
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
+      // no visit exists yet, so the PI only gets the disabled hint
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because visit is not defined)"]'
+      ).should('exist');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
@@ -287,18 +341,12 @@ context('visits tests', () => {
       cy.get('[data-cy=add-participant-button]').click();
       cy.finishedLoading();
 
-      cy.get('[data-cy="invite-user-autocomplete"]').type(
-        initialDBData.users.user2.email
-      );
+      cy.get('[data-cy="invite-user-autocomplete"]').type(teamLead.email);
       cy.get('[role=presentation][data-popper-placement]')
-        .contains(initialDBData.users.user2.lastName)
+        .contains(teamLead.lastName)
         .click();
-      cy.get('[data-cy="invite-user-autocomplete"]').type(
-        initialDBData.users.user3.email
-      );
-      cy.get('[role=presentation]')
-        .contains(initialDBData.users.user3.lastName)
-        .click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(teamVisitor.email);
+      cy.get('[role=presentation]').contains(teamVisitor.lastName).click();
       cy.finishedLoading();
       cy.get('[data-cy="invite-user-submit-button"]')
         .should('be.enabled')
@@ -306,9 +354,7 @@ context('visits tests', () => {
 
       // specify team lead
       cy.get('[data-cy=team-lead-user-dropdown]').click();
-      cy.get('[role="listbox"]')
-        .contains(/Beckley/i)
-        .click();
+      cy.get('[role="listbox"]').contains(teamLead.lastName).click();
 
       cy.get('[data-cy=create-update-visit-button]').click();
 
@@ -318,14 +364,16 @@ context('visits tests', () => {
 
       // test again that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'completed');
-      cy.testActionButton(cyTagRegisterVisit, 'active');
+      // The PI put only the team lead and another visitor on the team, so the
+      // PI has no registration of their own to fill in.
+      cy.testActionButton(cyTagRegisterVisit, 'invisible');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
     it('Visitor should only see permitted actions', () => {
       cy.createVisit({
-        team: [coProposer.id, visitor.id],
-        teamLeadUserId: coProposer.id,
+        team: [teamLead.id, visitor.id],
+        teamLeadUserId: teamLead.id,
         experimentPk: existingExperimentPk,
       });
       cy.login(visitor);
@@ -335,9 +383,41 @@ context('visits tests', () => {
 
       cy.contains(/Upcoming experiments/i).should('exist');
 
-      cy.testActionButton(cyTagDefineVisit, 'invisible');
+      // A visitor may open the team, read only, so the action is visible.
+      cy.testActionButton(cyTagDefineVisit, 'completed');
       cy.testActionButton(cyTagRegisterVisit, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
+    });
+
+    it('Co-proposer who is also a visitor should see the team and their own registration', () => {
+      cy.createVisit({
+        team: [teamLead.id, coProposer.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(coProposer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // being on the team makes the visit readable, but not writeable
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+      // their own registration drives the register action
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      cy.get('[data-cy=add-participant-button]').should('be.disabled');
+      cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
     });
 
     it('Visitor should be able to register for a visit', () => {
@@ -348,8 +428,8 @@ context('visits tests', () => {
       });
 
       cy.createVisit({
-        team: [coProposer.id, visitor.id],
-        teamLeadUserId: coProposer.id,
+        team: [teamLead.id, visitor.id],
+        teamLeadUserId: teamLead.id,
         experimentPk: existingExperimentPk,
       });
 
@@ -358,7 +438,9 @@ context('visits tests', () => {
 
       cy.finishedLoading();
 
-      // test if the actions are available after co-proposer defined the team
+      // The visitor can see the visit they are on ...
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+      // ... and fill in their own visit timings.
       cy.testActionButton(cyTagRegisterVisit, 'active');
 
       cy.get(`[data-cy="${cyTagRegisterVisit}"]`)
@@ -423,6 +505,187 @@ context('visits tests', () => {
       cy.get('body').type('{esc}');
 
       cy.testActionButton(cyTagRegisterVisit, 'invisible');
+    });
+
+    it('Team lead should be able to update the visit', () => {
+      // The team lead is a plain visitor (not the PI or a co-proposer).
+      cy.createVisit({
+        team: [visitor.id],
+        teamLeadUserId: visitor.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(visitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // The team lead can access the define-visit action even though they are
+      // only a visitor.
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      // Add another visitor to the team.
+      cy.get('[data-cy=add-participant-button]').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(coProposer.email);
+      cy.get('[role=presentation][data-popper-placement]')
+        .contains(coProposer.lastName)
+        .click();
+      cy.finishedLoading();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy=create-update-visit-button]').click();
+
+      cy.notification({ text: 'Visit updated', variant: 'success' });
+    });
+
+    it('PI should be able to delete a visitor from the team', () => {
+      cy.createVisit({
+        team: [teamLead.id, teamVisitor.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(PI);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      cy.get('[role="dialog"]').contains(teamVisitor.lastName).should('exist');
+
+      // Delete the visitor and confirm the material table row deletion.
+      cy.get('[role="dialog"]')
+        .contains(teamVisitor.lastName)
+        .parent()
+        .find('[aria-label=Delete]')
+        .click();
+      cy.get('[aria-label="Save"]').click();
+
+      cy.get('[role="dialog"]')
+        .contains(teamVisitor.lastName)
+        .should('not.exist');
+
+      cy.get('[data-cy=create-update-visit-button]').click();
+
+      cy.notification({ text: 'Visit updated', variant: 'success' });
+    });
+
+    it('Team lead should be able to hand the team lead role to another visitor', () => {
+      cy.createVisit({
+        team: [teamLead.id, teamVisitor.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(teamLead);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      // Hand the lead over, then back out of the confirmation.
+      cy.get('[data-cy=team-lead-user-dropdown]').click();
+      cy.get('[role="listbox"]').contains(teamVisitor.lastName).click();
+      cy.get('[data-cy=create-update-visit-button]').click();
+
+      cy.get('[data-cy="confirmation-dialog"]').should('exist');
+      cy.get('[data-cy="confirm-cancel"]').click();
+
+      // Cancelling leaves the form open and the visit untouched.
+      cy.get('[data-cy="confirmation-dialog"]').should('not.exist');
+      cy.contains('Update the visit');
+
+      // Now go through with it.
+      cy.get('[data-cy=create-update-visit-button]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('exist');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({ text: 'Visit updated', variant: 'success' });
+
+      // The previous lead is now an ordinary visitor and can no longer edit.
+      cy.reload();
+      cy.finishedLoading();
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.get('[data-cy=add-participant-button]').should('be.disabled');
+      cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
+    });
+
+    it('Visitor who is not the team lead should see the team read only', () => {
+      cy.createVisit({
+        team: [teamLead.id, teamVisitor.id, extraVisitor.id],
+        teamLeadUserId: teamLead.id,
+        experimentPk: existingExperimentPk,
+      });
+
+      cy.login(extraVisitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(/Upcoming experiments/i).should('exist');
+
+      // The visitor may open the team, but only to read it.
+      cy.testActionButton(cyTagDefineVisit, 'completed');
+
+      cy.get(`[data-cy="${cyTagDefineVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      cy.contains('Update the visit');
+
+      // The whole visitor list is readable.
+      cy.get('[role="dialog"]').contains(teamLead.lastName).should('exist');
+      cy.get('[role="dialog"]').contains(teamVisitor.lastName).should('exist');
+
+      // ... but nothing on it can be changed.
+      cy.get('[data-cy=add-participant-button]').should('be.disabled');
+      cy.get('[data-cy=create-update-visit-button]').should('be.disabled');
+      // the data-cy tag sits on the input wrapper, so check the input itself
+      cy.get('[data-cy=team-lead-user-dropdown] input').should('be.disabled');
+
+      /*
+       * The actions column is dropped entirely rather than being disabled, so
+       * neither the column header nor the delete button is rendered.
+       */
+      cy.get('[role="dialog"]')
+        .find('thead')
+        .contains('Actions')
+        .should('not.exist');
+      cy.get('[role="dialog"]').find('[aria-label=Delete]').should('not.exist');
     });
   });
 });

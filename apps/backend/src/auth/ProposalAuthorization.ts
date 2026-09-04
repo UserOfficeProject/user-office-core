@@ -47,36 +47,52 @@ export class ProposalAuthorization {
   ) {}
 
   private async resolveProposal(
-    proposalOrProposalId: Proposal | number
+    proposalOrProposalPk: Proposal | number
   ): Promise<Proposal | null> {
     let proposal;
 
-    if (typeof proposalOrProposalId === 'number') {
-      proposal = await this.proposalDataSource.get(proposalOrProposalId);
+    if (typeof proposalOrProposalPk === 'number') {
+      proposal = await this.proposalDataSource.get(proposalOrProposalPk);
     } else {
-      proposal = proposalOrProposalId;
+      proposal = proposalOrProposalPk;
     }
 
     return proposal;
+  }
+
+  async isPrincipalInvestigatorOfProposalPk(
+    agentOrUserId: UserJWT | number | null,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (agentOrUserId !== null) {
+      const proposal = await this.resolveProposal(proposalPk);
+
+      if (proposal) {
+        return this.isPrincipalInvestigatorOfProposal(agentOrUserId, proposal);
+      }
+    }
+
+    return false;
   }
 
   isPrincipalInvestigatorOfProposal(
     agentOrUserId: UserJWT | number | null,
     proposal: Proposal | null
   ) {
-    if (agentOrUserId == null || proposal == null) {
-      return false;
-    }
-    let userId: number;
-    if (typeof agentOrUserId === 'number') {
-      userId = agentOrUserId;
-    } else {
-      userId = agentOrUserId.id;
+    if (agentOrUserId !== null && proposal !== null) {
+      let userId: number;
+      if (typeof agentOrUserId === 'number') {
+        userId = agentOrUserId;
+      } else {
+        userId = agentOrUserId.id;
+      }
+
+      if (userId === proposal.proposerId) {
+        return true;
+      }
     }
 
-    if (userId === proposal.proposerId) {
-      return true;
-    }
+    return false;
   }
 
   async isMemberOfProposal(
