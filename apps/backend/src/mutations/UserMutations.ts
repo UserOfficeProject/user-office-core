@@ -23,6 +23,7 @@ import {
   UpdateUserRolesArgs,
   UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
+import { UpdateUsersRolesArgs } from '../resolvers/mutations/UpdateUsersRolesMutation';
 import { UpsertUserByOidcSubArgs } from '../resolvers/mutations/UpsertUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
@@ -140,6 +141,54 @@ export default class UserMutations {
           err
         );
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_ROLE_UPDATED)
+  async addRolesToUsers(
+    agent: UserWithRole | null,
+    args: UpdateUsersRolesArgs
+  ): Promise<boolean | Rejection> {
+    const users = await Promise.all(
+      args.userIds.map((id) => this.dataSource.getUser(id))
+    );
+
+    if (users.some((u) => !u)) {
+      return rejection(
+        'Can not update role because one or more users do not exist',
+        {
+          args,
+          agent,
+          code: ApolloServerErrorCodeExtended.NOT_FOUND,
+        }
+      );
+    }
+
+    return this.dataSource.addUsersRoles(args.userIds, args.roles);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_ROLE_UPDATED)
+  async removeRolesFromUsers(
+    agent: UserWithRole | null,
+    args: UpdateUsersRolesArgs
+  ): Promise<boolean | Rejection> {
+    const users = await Promise.all(
+      args.userIds.map((id) => this.dataSource.getUser(id))
+    );
+
+    if (users.some((u) => !u)) {
+      return rejection(
+        'Can not update role because one or more users do not exist',
+        {
+          args,
+          agent,
+          code: ApolloServerErrorCodeExtended.NOT_FOUND,
+        }
+      );
+    }
+
+    return this.dataSource.removeUsersRoles(args.userIds, args.roles);
   }
 
   @ValidateArgs(getTokenForUserValidationSchema)
