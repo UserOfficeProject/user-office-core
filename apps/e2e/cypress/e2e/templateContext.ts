@@ -120,7 +120,7 @@ const currentDayStart = DateTime.now().startOf('day');
 const esiTemplateName = faker.lorem.words(2);
 
 const newCall = {
-  shortCode: faker.random.alphaNumeric(15),
+  shortCode: faker.string.alphanumeric(15),
   startCall: DateTime.fromJSDate(faker.date.past()),
   endCall: DateTime.fromJSDate(faker.date.future()),
   startReview: currentDayStart,
@@ -143,8 +143,8 @@ const newCall = {
 };
 
 const proposalWorkflow = {
-  name: faker.random.words(2),
-  description: faker.random.words(5),
+  name: faker.lorem.words(2),
+  description: faker.lorem.words(5),
   entityType: WorkflowType.PROPOSAL,
 };
 
@@ -180,11 +180,11 @@ const createTopicWithQuestionsAndRelations = (
         const createdQuestion = questionResult.createQuestion;
         if (createdQuestion) {
           textId = createdQuestion.id;
-
+          const config = `{"max":"${textQuestion.maxChars}","multiline":true,"required":true,"readPermissions":[]}`;
           cy.updateQuestion({
             id: createdQuestion.id,
             question: textQuestion.title,
-            config: `{"max":"${textQuestion.maxChars}","multiline":true,"required":true,"readPermissions":[]}`,
+            config,
           });
 
           if (shouldAddQuestionsToTemplate) {
@@ -206,6 +206,7 @@ const createTopicWithQuestionsAndRelations = (
                 },
                 dependencyId: boolId,
               },
+              config,
             });
           }
         }
