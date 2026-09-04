@@ -35,8 +35,10 @@ type AnswerMinimal = {
   answerId: number | null;
 };
 
+export const BASIS_ANSWER_TIMESTAMP = -1;
+
 export type Event =
-  | { type: 'FIELD_CHANGED'; id: string; newValue: any }
+  | { type: 'FIELD_CHANGED'; id: string; newValue: any; time?: Date }
   | { type: 'BACK_CLICKED'; confirm?: WithConfirmType }
   | { type: 'RESET_CLICKED'; confirm?: WithConfirmType }
   | {
@@ -104,7 +106,9 @@ export type Event =
           questionary: Pick<Questionary, 'isCompleted'>;
         })[]
       >;
-    };
+    }
+  | { type: 'BASIS_CONFLICTING_EDITED'; editedAnswers: any }
+  | { type: 'BASIS_CONFLICTING_EDITED_CLEARED' };
 
 export interface WizardStepMetadata {
   title: string;
@@ -131,6 +135,16 @@ const clamStepIndex = (stepIndex: number, stepCount: number) => {
   return clamp(stepIndex, minStepIndex, maxStepIndex);
 };
 
+const setStartEditTimesFromQuestionary = (questionary: Questionary) => {
+  const map = new Map<number, Date>();
+  questionary.steps.map((step) => map.set(step.topic.id, new Date()));
+
+  //Since basis is saved outside of any topic mutations, we need to set the start edit time for basis as well
+  map.set(BASIS_ANSWER_TIMESTAMP, new Date());
+
+  return map;
+};
+
 export abstract class QuestionarySubmissionState {
   constructor(
     public templateGroupId: TemplateGroupId,
@@ -146,7 +160,11 @@ export abstract class QuestionarySubmissionState {
     public stepIndex: number = 0,
     public isDirty: boolean = false,
     public deletedTemplates: number[] = [],
-    public createdTemplates: number[] = []
+    public createdTemplates: number[] = [],
+    public topicLastFetched = setStartEditTimesFromQuestionary(
+      initItem.questionary
+    ),
+    public basisConflictingEdited: any | null = null
   ) {
     this.initItem = deepClone(initItem); // save initial data to restore it if reset is clicked
   }
@@ -220,6 +238,8 @@ export function QuestionarySubmissionModel<
             action.id
           ) as Answer;
           field.value = action.newValue;
+          action.time &&
+            draftState.topicLastFetched.set(field.topicId, action.time);
           draftState.isDirty = true;
           break;
         case 'CLEAN_DIRTY_STATE':
@@ -289,6 +309,15 @@ export function QuestionarySubmissionModel<
             !action.isPartialSave;
           draftState.isDirty = false;
 
+          draftState.topicLastFetched.set(action.topicId, new Date());
+
+          break;
+        case 'BASIS_CONFLICTING_EDITED':
+          draftState.basisConflictingEdited = action.editedAnswers;
+          break;
+        case 'BASIS_CONFLICTING_EDITED_CLEARED':
+          draftState.basisConflictingEdited = null;
+          draftState.topicLastFetched.set(BASIS_ANSWER_TIMESTAMP, new Date());
           break;
       }
 

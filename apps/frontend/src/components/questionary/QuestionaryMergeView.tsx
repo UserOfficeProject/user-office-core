@@ -15,6 +15,7 @@ import React from 'react';
 
 import { Answer } from 'generated/sdk';
 
+import defaultRenderer from './DefaultQuestionRenderer';
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 
 export type QuestionaryMergeViewProps = {
@@ -82,12 +83,12 @@ const QuestionaryMergeView: React.FC<QuestionaryMergeViewProps> = ({
         <DialogContent dividers>
           <Grid container spacing={2}>
             {allAnswers.map((question) => {
-              const renderers = getQuestionaryComponentDefinition(
+              let renderers = getQuestionaryComponentDefinition(
                 question.oldAnswer.question.dataType
               ).renderers;
 
               if (!renderers) {
-                return;
+                renderers = defaultRenderer;
               }
 
               return (
@@ -102,7 +103,7 @@ const QuestionaryMergeView: React.FC<QuestionaryMergeViewProps> = ({
                       mt={1}
                       gap={2}
                     >
-                      <Box sx={{ width: '50%' }}>
+                      <Box sx={{ width: '50%', wordWrap: 'break-word' }}>
                         <Typography variant="body2" color="textSecondary">
                           Currently saved Answer
                         </Typography>
@@ -128,7 +129,7 @@ const QuestionaryMergeView: React.FC<QuestionaryMergeViewProps> = ({
                           label="Keep"
                         />
                       </Box>
-                      <Box sx={{ width: '50%' }}>
+                      <Box sx={{ width: '50%', wordWrap: 'break-word' }}>
                         <Typography variant="body2" color="textSecondary">
                           Your current Answer
                         </Typography>

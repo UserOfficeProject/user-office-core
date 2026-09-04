@@ -84,9 +84,7 @@ function QuestionaryStepView(props: {
   confirm: WithConfirmType;
   showValidationErrorsOnMount?: boolean;
 }) {
-  const [editStartTime, setEditStartTime] = useState(new Date());
   const [oldAnswers, setOldAnswers] = useState<Answer[]>([]);
-
   const { topicId, confirm } = props;
 
   const preSubmitActions = usePreSubmitActions();
@@ -202,7 +200,12 @@ function QuestionaryStepView(props: {
         (
           await Promise.all(
             preSubmitActions(activeFields).map(
-              async (f) => await f({ state, dispatch, api: api() })
+              async (f) =>
+                await f({
+                  state,
+                  dispatch,
+                  api: api(),
+                })
             )
           )
         ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
@@ -228,7 +231,7 @@ function QuestionaryStepView(props: {
         answers: prepareAnswers(activeFields),
         topicId: topicId,
         isPartialSave: isPartialSave,
-        editStartTime: editStartTime,
+        editStartTime: state.topicLastFetched.get(topicId),
       });
 
       dispatch({
@@ -237,8 +240,6 @@ function QuestionaryStepView(props: {
         topicId: topicId,
         isPartialSave: isPartialSave,
       });
-
-      setEditStartTime(new Date());
 
       setLastSavedFormValues(initialValues);
     } catch (error) {
@@ -321,11 +322,11 @@ function QuestionaryStepView(props: {
         type: 'FIELD_CHANGED',
         id: answer.question.id,
         newValue: answer.value,
+        time: new Date(),
       });
     });
 
     setOldAnswers([]);
-    setEditStartTime(new Date());
   };
 
   return (

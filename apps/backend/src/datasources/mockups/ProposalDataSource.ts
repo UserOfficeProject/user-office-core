@@ -57,7 +57,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.managementDecisionSubmitted || false,
     values?.submittedDate || new Date(),
     values?.experimentSequence || 0,
-    values?.fileId || null
+    values?.fileId || null,
+    values?.lastEdited || new Date()
   );
 };
 

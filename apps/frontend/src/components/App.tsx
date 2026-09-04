@@ -1,6 +1,7 @@
 import Close from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
+import { enableMapSet } from 'immer';
 import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -22,6 +23,7 @@ function Root() {
   const onClickDismiss = (key: string | number | undefined) => () => {
     notistackRef.current?.closeSnackbar(key);
   };
+  enableMapSet();
 
   return (
     <Suspense

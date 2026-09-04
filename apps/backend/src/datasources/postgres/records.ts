@@ -120,6 +120,7 @@ export interface ProposalRecord {
   readonly submitted_date: Date;
   readonly experiment_sequence: number;
   readonly file_id: string;
+  readonly last_edited: Date;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -790,7 +791,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.management_decision_submitted,
     proposal.submitted_date,
     proposal.experiment_sequence,
-    proposal.file_id
+    proposal.file_id,
+    proposal.last_edited
   );
 };
 

@@ -159,6 +159,18 @@ export default class ProposalMutations {
       });
     }
 
+    if (args.editStartTime && args.editStartTime < proposal.lastEdited) {
+      if (
+        proposal.abstract !== args.abstract ||
+        proposal.title !== args.title
+      ) {
+        return rejection(
+          'Another use has updated this proposal since you started editing it',
+          { current: proposal, args }
+        );
+      }
+    }
+
     return await this.updateProposal(agent, { proposal, args });
   }
 
@@ -916,6 +928,7 @@ export default class ProposalMutations {
         submittedDate: null,
         experimentSequence: null,
         fileId: null,
+        lastEdited: new Date(),
       });
 
       const sourceProposalInstrumentId =

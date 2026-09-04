@@ -30,6 +30,9 @@ export class UpdateProposalArgs {
 
   @Field(() => Date, { nullable: true })
   public created?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public editStartTime?: Date;
 }
 
 @Resolver()
