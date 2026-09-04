@@ -107,6 +107,9 @@ export class ProposalViewTechnicalReview {
 export class ProposalScientistComment extends ProposalInternalComment {}
 
 @ObjectType()
+export class ProposalRejectionComment extends ProposalInternalComment {}
+
+@ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
   public primaryKey: number;
