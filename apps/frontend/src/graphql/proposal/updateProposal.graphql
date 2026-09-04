@@ -4,6 +4,7 @@ mutation updateProposal(
   $abstract: String!
   $users: [Int!]
   $proposerId: Int
+  $editStartTime: DateTime
 ) {
   updateProposal(
     proposalPk: $proposalPk
@@ -11,6 +12,7 @@ mutation updateProposal(
     abstract: $abstract
     users: $users
     proposerId: $proposerId
+    editStartTime: $editStartTime
   ) {
     primaryKey
     title

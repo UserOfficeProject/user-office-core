@@ -6,6 +6,11 @@ import { Questionary, TemplateGroupId } from 'generated/sdk';
 import { ProposalWithQuestionary } from './ProposalWithQuestionary';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
+export type ProposalBasisConflictingEdited = {
+  abstract: string;
+  title: string;
+};
+
 export class ProposalSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
   constructor(

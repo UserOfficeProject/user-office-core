@@ -120,6 +120,7 @@ export interface ProposalRecord {
   readonly submitted_date: Date;
   readonly experiment_sequence: number;
   readonly file_id: string;
+  readonly last_edited: Date;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -186,6 +187,7 @@ export interface AnswerRecord {
   readonly question_id: string;
   readonly answer: string;
   readonly created_at: Date;
+  readonly last_edited: Date;
 }
 
 export interface Dependency {
@@ -789,7 +791,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.management_decision_submitted,
     proposal.submitted_date,
     proposal.experiment_sequence,
-    proposal.file_id
+    proposal.file_id,
+    proposal.last_edited
   );
 };
 
@@ -1093,7 +1096,8 @@ export const createAnswerBasic = (answer: AnswerRecord) => {
     answer.questionary_id,
     answer.question_id,
     answer.answer,
-    answer.created_at
+    answer.created_at,
+    answer.last_edited
   );
 };
 

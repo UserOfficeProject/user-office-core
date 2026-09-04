@@ -15,9 +15,14 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import QuestionaryMergeView from 'components/questionary/QuestionaryMergeView';
+import { Answer, BasicUserDetails, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
+import {
+  ProposalBasisConflictingEdited,
+  ProposalSubmissionState,
+} from 'models/questionary/proposal/ProposalSubmissionState';
+import { BASIS_ANSWER_TIMESTAMP } from 'models/questionary/QuestionarySubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
@@ -84,8 +89,70 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   };
   const counter = `Characters: ${textLen}/1500`;
 
+  const hasConflictingEdited = (state as ProposalSubmissionState)
+    .basisConflictingEdited as ProposalBasisConflictingEdited | null;
+
   return (
     <div>
+      {hasConflictingEdited && (
+        <QuestionaryMergeView
+          open={!!hasConflictingEdited}
+          newAnswers={[
+            {
+              ...props.answer,
+              value: localTitle as string,
+              question: {
+                ...props.answer.question,
+                id: 'title',
+                question: 'Proposal Title',
+              },
+            },
+            {
+              ...props.answer,
+              value: localAbstract as string,
+              question: {
+                ...props.answer.question,
+                id: 'abstract',
+                question: 'Proposal Abstract',
+              },
+            },
+          ]}
+          oldAnswers={[
+            {
+              ...props.answer,
+              value: hasConflictingEdited.title,
+              question: {
+                ...props.answer.question,
+                id: 'title',
+                question: 'Proposal Title',
+              },
+            },
+            {
+              ...props.answer,
+              value: hasConflictingEdited.abstract,
+              question: {
+                ...props.answer.question,
+                id: 'abstract',
+                question: 'Proposal Abstract',
+              },
+            },
+          ]}
+          mergeAnswers={(answers: Answer[]) => {
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary: {
+                title: answers[0].value as string,
+                abstract: answers[1].value as string,
+              },
+            });
+            setLocalTitle(answers[0].value as string);
+            setLocalAbstract(answers[1].value as string);
+            dispatch({
+              type: 'BASIS_CONFLICTING_EDITED_CLEARED',
+            });
+          }}
+        />
+      )}
       <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
@@ -181,13 +248,33 @@ const proposalBasisPreSubmit =
     let returnValue = state.questionary.questionaryId;
 
     if (primaryKey > 0) {
-      const result = await api.updateProposal({
-        proposalPk: primaryKey,
-        title: title,
-        abstract: abstract,
-        users: users.map((user) => user.id),
-        proposerId: proposer?.id,
-      });
+      let result;
+      try {
+        result = await api.updateProposal({
+          proposalPk: primaryKey,
+          title: title,
+          abstract: abstract,
+          users: users.map((user) => user.id),
+          proposerId: proposer?.id,
+          editStartTime: state.topicLastFetched.get(BASIS_ANSWER_TIMESTAMP),
+        });
+      } catch (error: unknown) {
+        try {
+          const editedAnswers = JSON.parse(
+            (error as { response: { body: string } }).response.body
+          ).errors[0].extensions.context.current;
+          dispatch({
+            type: 'BASIS_CONFLICTING_EDITED',
+            editedAnswers: {
+              title: editedAnswers.title,
+              abstract: editedAnswers.abstract,
+            },
+          });
+        } catch {
+          throw error;
+        }
+        throw error;
+      }
 
       let invites;
       if (isInvitesEnabled) {

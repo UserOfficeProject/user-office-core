@@ -214,6 +214,36 @@ export default class QuestionaryMutations {
       return !_.isEqual(oldAnswer?.value, JSON.parse(answer.value).value);
     });
 
+    if (args.editStartTime !== undefined) {
+      const oldEditedAnswers = currentAnswers?.filter((oldAnswer) => {
+        const newAnswer = answers.find(
+          (answer) => answer.questionId === oldAnswer.question.id
+        );
+
+        if (!newAnswer) {
+          return false;
+        }
+
+        return (
+          oldAnswer.lastEdited &&
+          (args.editStartTime as Date) < oldAnswer.lastEdited &&
+          !_.isEqual(oldAnswer?.value, JSON.parse(newAnswer.value).value)
+        );
+      });
+
+      if (oldEditedAnswers && oldEditedAnswers.length > 0) {
+        return rejection(
+          'Can not answer topic because the answers have been edited by another user',
+          {
+            questionaryId,
+            topicId,
+            answers,
+            conflictingAnswers: oldEditedAnswers,
+          }
+        );
+      }
+    }
+
     await this.cleanUpAnswers(
       template.templateId,
       questionaryId,

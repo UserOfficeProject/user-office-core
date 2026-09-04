@@ -456,7 +456,14 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
-    return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
+    return new AnswerBasic(
+      answer_id,
+      1,
+      'questionId',
+      '',
+      new Date(),
+      new Date()
+    );
   }
 
   async getBlankQuestionarySteps(
@@ -510,6 +517,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
       questionaryId,
       updatedAnswer.question.id,
       updatedAnswer.value,
+      new Date(),
       new Date()
     );
   }
