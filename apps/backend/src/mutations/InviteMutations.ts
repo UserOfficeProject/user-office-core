@@ -1,12 +1,16 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../datasources/DataAccessClaimDataSource';
+import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import database from '../datasources/postgres/database';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -24,6 +28,7 @@ import { Role, Roles } from '../models/Role';
 import { SettingsId } from '../models/Settings';
 import { UserRole, UserWithRole } from '../models/User';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
+import { SetDataAccessInvitesInput } from '../resolvers/mutations/SetDataAccessInvitesMutation';
 
 @injectable()
 export default class InviteMutations {
@@ -38,12 +43,18 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.DataAccessClaimDataSource)
+    private dataAccessClaimDataSource: DataAccessClaimDataSource,
+    @inject(Tokens.DataAccessUsersDataSource)
+    private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.VisitRegistrationClaimDataSource)
     private visitRegistrationClaimDataSource: VisitRegistrationClaimDataSource,
     @inject(Tokens.VisitDataSource)
     private visitDataSource: VisitDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.DataAccessUsersAuthorization)
+    private dataAccessUsersAuth: DataAccessUsersAuthorization,
     @inject(Tokens.VisitAuthorization)
     private visitAuthorization: VisitAuthorization,
     @inject(Tokens.AdminDataSource)
@@ -74,6 +85,7 @@ export default class InviteMutations {
 
     await this.processAcceptedRoleClaims(agent.id, invite);
     await this.processAcceptedCoProposerClaims(agent.id, invite);
+    await this.processAcceptedDataAccessClaims(agent.id, invite);
     await this.processAcceptedVisitRegistrationClaims(agent.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
@@ -118,17 +130,37 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
-  private async getCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    const existingClaims =
-      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
+  @Authorized([Roles.USER])
+  async acceptDataAccessInvite(agent: UserWithRole | null, proposalId: string) {
+    if (!agent) {
+      return rejection('User not found', { proposalId });
+    }
 
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
+    const proposal = await this.proposalDataSource.getProposalById(proposalId);
+    if (!proposal) {
+      return rejection('Proposal not found', { proposalId });
+    }
 
-    return existingInvites;
+    const [invite] = await this.inviteDataSource.getDataAccessInvites({
+      proposalPk: proposal.primaryKey,
+      email: agent.email,
+      isClaimed: false,
+      isExpired: false,
+    });
+    if (!invite) {
+      return rejection('Invite not found', { proposalId });
+    }
+
+    await this.processAcceptedRoleClaims(agent.id, invite);
+    await this.processAcceptedDataAccessClaims(agent.id, invite);
+
+    const updatedInvite = await this.inviteDataSource.update({
+      id: invite.id,
+      claimedAt: new Date(),
+      claimedByUserId: agent.id,
+    });
+
+    return updatedInvite;
   }
 
   @Authorized()
@@ -147,7 +179,8 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites = await this.getCoProposerInvites(proposalPk);
+    const existingInvites =
+      await this.inviteDataSource.findPendingCoProposerInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
@@ -190,6 +223,78 @@ export default class InviteMutations {
     if (invites.length > 0) {
       await this.eventBus.publish({
         type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+        array: invites,
+        key: 'array',
+        loggedInUserId: agent?.id,
+        inputArgs: JSON.stringify(args),
+        impersonatingUserId: agent ? agent.impersonatingUserId : null,
+        proposalPKey: proposalPk,
+      } as ApplicationEvent);
+    }
+
+    return invites;
+  }
+
+  @Authorized()
+  public async setDataAccessInvites(
+    agent: UserWithRole | null,
+    args: SetDataAccessInvitesInput
+  ): Promise<Invite[] | Rejection> {
+    const { proposalPk, emails } = args;
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.dataAccessUsersAuth.hasWriteRights(agent, proposalPk));
+
+    if (!hasWriteRights) {
+      return rejection(
+        'User is not authorized to create data access invites for this proposal'
+      );
+    }
+
+    const existingInvites =
+      await this.inviteDataSource.findPendingDataAccessInvites(proposalPk);
+    const existingEmails = existingInvites.map((invite) => invite.email);
+
+    const deletedEmails = existingEmails.filter(
+      (email) => !emails.includes(email)
+    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+
+    const expirationDate = await this.getInviteExpirationDate();
+
+    const newInvites = await Promise.all(
+      newEmails.map(async (email) =>
+        this.inviteDataSource.create({
+          createdByUserId: agent!.id,
+          code: await this.generateInviteCode(),
+          email: email,
+          expiresAt: expirationDate,
+        })
+      )
+    );
+    await Promise.all(
+      newInvites.map(async (newInvite) => {
+        await this.dataAccessClaimDataSource.create(newInvite.id, proposalPk);
+        await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
+      })
+    );
+
+    const invites = [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+
+    if (invites.length > 0) {
+      await this.eventBus.publish({
+        type: Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED,
         array: invites,
         key: 'array',
         loggedInUserId: agent?.id,
@@ -316,7 +421,7 @@ export default class InviteMutations {
       );
       // already a co-proposer
       if (proposalHasUser) {
-        return;
+        continue;
       }
       await this.proposalDataSource.addProposalUser(
         claim.proposalPk,
@@ -334,6 +439,66 @@ export default class InviteMutations {
       });
     }
   }
+
+  private async processAcceptedDataAccessClaims(
+    claimerUserId: number,
+    invite: Invite
+  ) {
+    const inviteId = invite.id;
+    const dataAccessClaim =
+      await this.dataAccessClaimDataSource.findByInviteId(inviteId);
+
+    for await (const claim of dataAccessClaim) {
+      const isDataAccessUser =
+        await this.dataAccessUsersDataSource.isDataAccessUserOfProposal(
+          claimerUserId,
+          claim.proposalPk
+        );
+      // already a data access user
+      if (isDataAccessUser) {
+        continue;
+      }
+
+      // A user cannot be simultaneously a data access user and a member of the
+      // proposal, as enforced in DataAccessUsersMutations.updateDataAccessUsers.
+      // Skip the claim rather than reject, so the rest of the invite is still
+      // accepted and the user is not left unable to redeem their code.
+      const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+        claimerUserId,
+        claim.proposalPk
+      );
+      if (isMemberOfProposal) {
+        logger.logWarn(
+          'Skipped data access claim because the user is a member of the proposal',
+          { claimerUserId, proposalPk: claim.proposalPk, inviteId }
+        );
+
+        continue;
+      }
+
+      const failure = await this.dataAccessUsersDataSource.addDataAccessUser(
+        claim.proposalPk,
+        claimerUserId
+      );
+
+      // Rejection extends GraphQLError, so throwing aborts the accept before
+      // the invite is stamped as claimed.
+      if (failure) {
+        throw failure;
+      }
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted data access invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
+      });
+    }
+  }
+
   private async processAcceptedVisitRegistrationClaims(
     claimerUserId: number,
     invite: Invite

@@ -247,6 +247,24 @@ interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
   proposalPKey: number;
 }
 
+interface ProposalDataAccessInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED;
+  array: Invite[];
+  proposalPKey: number;
+}
+
+interface ProposalDataAccessInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT;
+  invite: Invite;
+  proposalPKey: number;
+}
+
+interface ProposalDataAccessInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED;
+  invite: Invite;
+  proposalPKey: number;
+}
+
 interface ProposalVisitRegistrationInvitesUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED;
   array: Invite[];
@@ -547,6 +565,9 @@ export type ApplicationEvent =
   | ProposalCoProposerInvitesUpdatedEvent
   | ProposalCoProposerInviteSentEvent
   | ProposalCoProposerInviteAcceptedEvent
+  | ProposalDataAccessInvitesUpdatedEvent
+  | ProposalDataAccessInviteSentEvent
+  | ProposalDataAccessInviteAcceptedEvent
   | ProposalVisitRegistrationInvitesUpdatedEvent
   | ProposalVisitRegistrationInviteSentEvent
   | ProposalVisitRegistrationInviteAcceptedEvent

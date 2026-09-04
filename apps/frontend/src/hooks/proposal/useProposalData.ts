@@ -35,6 +35,12 @@ export function useProposalData(
           }
           setProposalData(data.proposal);
           setLoading(false);
+        })
+        .catch(() => {
+          if (!unmounted) {
+            setProposalData(null);
+            setLoading(false);
+          }
         });
     }
 

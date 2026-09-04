@@ -145,6 +145,19 @@ export class ProposalResolver {
     return invites;
   }
 
+  @FieldResolver(() => [Invite])
+  async dataAccessInvites(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Invite[] | null> {
+    const invites = await context.queries.invite.getDataAccessInvites(
+      context.user,
+      proposal.primaryKey
+    );
+
+    return invites;
+  }
+
   @FieldResolver(() => BasicUserDetails, { nullable: true })
   async proposer(
     @Root() proposal: Proposal,

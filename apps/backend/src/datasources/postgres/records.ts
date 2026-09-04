@@ -1464,6 +1464,11 @@ export interface CoProposerClaimRecord {
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
 
+export interface DataAccessClaimRecord {
+  readonly invite_id: number;
+  readonly proposal_pk: number;
+}
+
 export interface TagRecord {
   readonly tag_id: number;
   readonly name: string;

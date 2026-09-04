@@ -8,7 +8,7 @@ export interface GetInvitesFilter {
   email?: string;
 }
 
-export interface GetCoProposerInvitesFilter extends GetInvitesFilter {
+export interface GetProposalInvitesFilter extends GetInvitesFilter {
   proposalPk?: number;
 }
 
@@ -23,16 +23,21 @@ export interface InviteDataSource {
 
   findByCode(code: string): Promise<Invite | null>;
   findById(id: number): Promise<Invite | null>;
-  findCoProposerInvites(
-    proposalPk: number,
-    isClaimed?: boolean
-  ): Promise<Invite[]>;
+  /**
+   * Invites attached to a proposal that are still waiting to be claimed. This
+   * is the single definition of "pending invites on a proposal": the read path
+   * shows exactly these, and the setXInvites mutations diff against exactly
+   * these, so the two cannot drift apart.
+   */
+  findPendingCoProposerInvites(proposalPk: number): Promise<Invite[]>;
+  findPendingDataAccessInvites(proposalPk: number): Promise<Invite[]>;
   findVisitRegistrationInvites(
     visitId: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
   getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
-  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]>;
+  getCoProposerInvites(filter: GetProposalInvitesFilter): Promise<Invite[]>;
+  getDataAccessInvites(filter: GetProposalInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;

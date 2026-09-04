@@ -92,7 +92,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         const principalInvestigator = await userDataSource.getUser(
@@ -107,7 +107,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         const claimer = await userDataSource.getUser(loggedInUserId);
@@ -120,7 +120,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
             }
           );
 
-          return;
+          continue;
         }
 
         mailService
@@ -286,20 +286,26 @@ export async function essEmailHandler(event: ApplicationEvent) {
             event,
           });
 
-          return;
+          continue;
         }
 
-        await sendInviteEmail(
-          invite,
-          inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
-        ).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
-            description: 'Visit registration invite sent',
+        try {
+          await sendInviteEmail(
             invite,
-          });
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
+          );
+        } catch {
+          // sendInviteEmail has already logged; skip the invite rather than
+          // abandoning the ones still to be sent.
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+          description: 'Visit registration invite sent',
+          invite,
         });
       }
       break;
@@ -331,20 +337,73 @@ export async function essEmailHandler(event: ApplicationEvent) {
             event,
           });
 
-          return;
+          continue;
         }
 
-        await sendInviteEmail(
-          invite,
-          inviter,
-          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
-          { proposalTitle: proposal.title, proposalId: proposal.proposalId }
-        ).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+        try {
+          await sendInviteEmail(
             invite,
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
+            { proposalTitle: proposal.title, proposalId: proposal.proposalId }
+          );
+        } catch {
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+          invite,
+        });
+      }
+      break;
+    }
+
+    case Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED: {
+      const invites = event.array;
+
+      const proposal = await proposalDataSource.get(event.proposalPKey);
+      if (!proposal) {
+        logger.logError('No proposal found when trying to send email', {
+          proposalPKey: event.proposalPKey,
+          event,
+        });
+
+        return;
+      }
+      for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
+
+        if (!inviter) {
+          logger.logError('No inviter found when trying to send email', {
+            inviter,
+            event,
           });
+
+          continue;
+        }
+
+        try {
+          await sendInviteEmail(
+            invite,
+            inviter,
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_DATA_ACCESS_USER,
+            { proposalTitle: proposal.title, proposalId: proposal.proposalId }
+          );
+        } catch {
+          continue;
+        }
+
+        await eventBus.publish({
+          ...event,
+          type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+          invite,
         });
       }
       break;
@@ -588,5 +647,8 @@ async function sendInviteEmail(
     })
     .catch((err: string) => {
       logger.logException('Failed email transmission', err);
+
+      // Rethrown so callers do not chain an "invite sent" event onto a failure.
+      throw err;
     });
 }

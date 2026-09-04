@@ -1448,14 +1448,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposals.abstract',
         'proposals.title'
       )
-      .from('co_proposer_claims')
-      .join('proposals', {
-        'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
-      })
+      .from('proposals')
       .join('users as proposer', {
         'proposals.proposer_id': 'proposer.user_id',
       })
-      .where('invite_id', inviteId)
+      .whereIn('proposals.proposal_pk', (builder) => {
+        builder
+          .select('proposal_pk')
+          .from('co_proposer_claims')
+          .where('invite_id', inviteId)
+          .union((qb) => {
+            qb.select('proposal_pk')
+              .from('data_access_claims')
+              .where('invite_id', inviteId);
+          });
+      })
       .first()
       .then((proposal: InvitedProposalRecord | undefined) =>
         proposal ? createInvitedProposalObject(proposal) : null

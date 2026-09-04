@@ -46,6 +46,7 @@ export const dummyInstitution2 = new Institution(11, 'Research Center', 2);
 
 export const dummyCountry = new Country(1, 'Denmark');
 export const dummyCountry2 = new Country(2, 'United Kingdom');
+export const dummyCountry3 = new Country(3, 'Belarus');
 
 export default class MockDataAccessUsersDataSource
   implements DataAccessUsersDataSource
@@ -120,5 +121,34 @@ export default class MockDataAccessUsersDataSource
     const userIds = this.mockData.get(proposalPk) || [];
 
     return Promise.resolve(userIds.includes(id));
+  }
+
+  async addDataAccessUser(
+    proposalPk: number,
+    userId: number
+  ): Promise<Rejection | undefined> {
+    try {
+      const existingUserIds = this.mockData.get(proposalPk) || [];
+
+      // Idempotent insert - don't add the same user twice
+      if (!existingUserIds.includes(userId)) {
+        this.mockData.set(proposalPk, [...existingUserIds, userId]);
+      }
+
+      const users = await this.findByProposalPk(proposalPk);
+      const addedUser = users.find((user) => user.id === userId);
+
+      if (!addedUser) {
+        throw new Error(`No mock user found for id ${userId}`);
+      }
+
+      return;
+    } catch (error) {
+      return new Rejection('Failed to add data access user', {
+        proposalPk,
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 }

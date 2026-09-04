@@ -2,36 +2,19 @@
 
 import { Invite } from '../../models/Invite';
 import {
-  GetCoProposerInvitesFilter,
+  GetProposalInvitesFilter,
   GetInvitesFilter,
   InviteDataSource,
 } from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 export default class PostgresInviteDataSource implements InviteDataSource {
-  findCoProposerInvites(
-    proposalPk: number,
-    isClaimed?: boolean
-  ): Promise<Invite[]> {
-    return database
-      .select('*')
-      .from('co_proposer_claims')
-      .where('proposal_pk', proposalPk)
-      .modify((query) => {
-        if (isClaimed !== undefined) {
-          if (isClaimed) {
-            query.whereNotNull('claimed_at');
-          } else {
-            query.whereNull('claimed_at');
-          }
-        }
-      })
+  findPendingCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    return this.getCoProposerInvites({ proposalPk, isClaimed: false });
+  }
 
-      .leftJoin('invites', 'co_proposer_claims.invite_id', 'invites.invite_id')
-      .catch((error: Error) => {
-        throw new Error(`Could not find invites: ${error.message}`);
-      })
-      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  findPendingDataAccessInvites(proposalPk: number): Promise<Invite[]> {
+    return this.getDataAccessInvites({ proposalPk, isClaimed: false });
   }
   findVisitRegistrationInvites(
     visitId: number,
@@ -100,8 +83,14 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          query.where('expires_at', '<', new Date());
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
         }
 
         if (filter.email) {
@@ -111,7 +100,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
 
-  getCoProposerInvites(filter: GetCoProposerInvitesFilter): Promise<Invite[]> {
+  getCoProposerInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
     return database
       .select('*')
       .from('invites')
@@ -137,8 +126,14 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
 
-        if (filter.isExpired) {
-          query.where('expires_at', '<', new Date());
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
         }
 
         if (filter.email) {
@@ -147,6 +142,53 @@ export default class PostgresInviteDataSource implements InviteDataSource {
 
         if (filter.proposalPk) {
           query.where('co_proposer_claims.proposal_pk', filter.proposalPk);
+        }
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
+
+  getDataAccessInvites(filter: GetProposalInvitesFilter): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('invites')
+      .join(
+        'data_access_claims',
+        'invites.invite_id',
+        'data_access_claims.invite_id'
+      )
+      .modify((query) => {
+        if (filter.createdBefore) {
+          query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (filter.isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+
+        if (filter.isExpired !== undefined) {
+          if (filter.isExpired) {
+            query.where('expires_at', '<', new Date());
+          } else {
+            query.where((qb) =>
+              qb.whereNull('expires_at').orWhere('expires_at', '>=', new Date())
+            );
+          }
+        }
+
+        if (filter.email) {
+          query.whereRaw('lower(email) = ?', filter.email.toLowerCase());
+        }
+
+        if (filter.proposalPk) {
+          query.where('data_access_claims.proposal_pk', filter.proposalPk);
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));

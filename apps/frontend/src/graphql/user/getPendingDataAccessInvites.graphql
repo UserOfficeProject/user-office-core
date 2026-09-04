@@ -1,0 +1,18 @@
+query getPendingDataAccessInvites {
+  me {
+    dataAccessInvites {
+      id
+      code
+      email
+      createdAt
+      createdByUserId
+      claimedAt
+      claimedByUserId
+      isEmailSent
+      expiresAt
+      proposal {
+        ...invitedProposal
+      }
+    }
+  }
+}
