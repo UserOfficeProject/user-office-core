@@ -26,6 +26,7 @@ import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
+import { OAuthClient } from '../../models/OAuthClient';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import {
   InvitedProposal,
@@ -671,6 +672,15 @@ export interface TokensAndPermissionsRecord {
   readonly access_permissions: string;
 }
 
+export interface OAuthClientRecord {
+  readonly client_id: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly access_permissions: string | null;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
 export interface VisitRecord {
   readonly visit_id: number;
   readonly proposal_pk: number;
@@ -1124,6 +1134,19 @@ export const createSettingsObject = (record: SettingsRecord) => {
     record.settings_id as SettingsId,
     record.settings_value,
     record.description
+  );
+};
+
+export const createOAuthClientObject = (record: OAuthClientRecord) => {
+  return new OAuthClient(
+    record.client_id,
+    record.name,
+    record.description,
+    record.access_permissions
+      ? JSON.stringify(record.access_permissions)
+      : null,
+    record.created_at,
+    record.updated_at
   );
 };
 
