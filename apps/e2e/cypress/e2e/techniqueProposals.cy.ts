@@ -1681,6 +1681,96 @@ context('Technique Proposal tests', () => {
         .should('not.exist');
     });
 
+    it('Scientist should be able to add a rejection comment when changing status to unsuccessful', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      });
+      cy.login(scientist1);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
+
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-rejection-comment`,
+        faker.lorem.words(10)
+      );
+
+      cy.get('[data-cy="submit-proposal-rejection-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', unsuccessfulStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('Scientist should be able to not add a rejection comment when changing status to unsuccessful', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      });
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
+      cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', unsuccessfulStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('User Officer should be able to add a rejection comment when changing status to unsuccessful', function () {
+      cy.login('officer');
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
+
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-rejection-comment`,
+        faker.lorem.words(10)
+      );
+      cy.get('[data-cy="submit-proposal-rejection-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
+    it('User Officer should be able to not add a rejection comment when changing status to unsuccessful', function () {
+      cy.login('officer');
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
+      cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
     it('Scientist can only change to specific statuses and cannot assign an instrument when the current status is submitted', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
