@@ -324,13 +324,13 @@ export const getVisitMessageData = async (
   );
   const proposalPayload = await getProposalMessageData(proposal);
 
-  const visitJsonMessage = JSON.stringify({
+  const visitJsonMessage = {
     id: visitRegistration.id,
     startAt: visitRegistration.startsAt,
     endAt: visitRegistration.endsAt,
     visitorId: visitRegistration.userId.toString(),
     proposal: JSON.parse(proposalPayload),
-  });
+  };
 
   return visitJsonMessage;
 };
@@ -555,11 +555,15 @@ export async function createPostToRabbitMQHandler() {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
         }
 
-        const visitJsonMessage = await getVisitMessageData(visitRegistration);
+        const visitMessage = await getVisitMessageData(visitRegistration);
+        const message = {
+          ...visitMessage,
+          experimentId: experiment.experimentId,
+        };
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           rabbitMQVisitEventType,
-          visitJsonMessage
+          JSON.stringify(message)
         );
 
         const experimentJsonMessage =
