@@ -278,6 +278,20 @@ export function QuestionaryComponentInstrumentPicker(
           {config.requestTime && requestTimeForInstrument && (
             <DynamicTimeFields />
           )}
+          {config.requestTime &&
+            requestTimeForInstrument &&
+            config.multiJustificationRequired && (
+              <TextField
+                key={'Multi-Instrument Justification textbox'}
+                required={config.multiJustificationRequired}
+                error={isError}
+                label={`Justify multiple instrument use:`}
+                type="string"
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  onComplete(e.target.value);
+                }}
+              />
+            )}
           {isError && <DisplayErrorMessage />}
         </FormControl>
       );
