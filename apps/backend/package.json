@@ -40,6 +40,7 @@
     "@graphql-tools/utils": "^10.1.0",
     "@isaacs/ttlcache": "^1.4.1",
     "@opentelemetry/exporter-logs-otlp-http": "^0.219.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "^0.219.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.219.0",
     "@opentelemetry/instrumentation-amqplib": "^0.60.0",
     "@opentelemetry/instrumentation-graphql": "^0.60.0",
