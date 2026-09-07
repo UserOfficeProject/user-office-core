@@ -206,11 +206,6 @@ const TemplatesTable = ({
     Object.assign(template, { id: template.templateId })
   );
 
-  const showCustomEmptyMessage =
-    !loadingTemplates &&
-    templatesWithId.length === 0 &&
-    !!emptyDataSourceMessage;
-
   return (
     <>
       <StyledDialog
@@ -247,13 +242,11 @@ const TemplatesTable = ({
         columns={columns}
         isLoading={loadingTemplates}
         data={templatesWithId}
-        // Strings only - material-table deep-merges this, and deepmerge
-        // stack-overflows on React elements under React 19.
+        // text to show when the table is empty
         localization={{
           body: {
-            emptyDataSourceMessage: emptyDataSourceMessage
-              ? ''
-              : 'No templates found',
+            emptyDataSourceMessage:
+              emptyDataSourceMessage ?? 'No templates found',
           },
         }}
         actions={[
@@ -323,7 +316,6 @@ const TemplatesTable = ({
           (rowData) => getArchivedOrUnarchivedButton(rowData),
         ]}
       />
-      {showCustomEmptyMessage && emptyDataSourceMessage}
       <ActionButtonContainer>
         <Button
           startIcon={<PublishIcon />}
