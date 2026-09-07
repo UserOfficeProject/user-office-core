@@ -1148,7 +1148,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         <Form>
                           <PromptIfDirty />
                           <Grid container spacing={2}>
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                               <Editor
                                 initialValue={''}
                                 id={`${unsuccessfullPK}-rejection-comment`}
@@ -1171,7 +1171,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                                 disabled={isSubmitting}
                               />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                               <StyledButtonContainer>
                                 <Button
                                   type="submit"
