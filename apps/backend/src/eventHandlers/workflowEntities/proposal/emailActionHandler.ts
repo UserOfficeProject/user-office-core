@@ -404,6 +404,7 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
+              rejectionComment: recipientWithData.rejectionComment,
               fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
               technicalReviews: recipientWithData.technicalReviews,
               call: recipientWithData.call,

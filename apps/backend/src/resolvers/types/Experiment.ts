@@ -5,9 +5,11 @@ import {
   Directive,
   Field,
   FieldResolver,
+  MiddlewareFn,
   ObjectType,
   Resolver,
   Root,
+  UseMiddleware,
 } from 'type-graphql';
 
 import { BasicUserDetails } from './BasicUserDetails';
@@ -18,6 +20,7 @@ import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Shipment } from './Shipment';
 import { Visit } from './Visit';
+import { VisitPerms } from './VisitPerms';
 import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { FeedbackDataSource } from '../../datasources/FeedbackDataSource';
@@ -65,6 +68,26 @@ export class Experiment implements ExperimentOrigin {
   @Field(() => Number, { nullable: true })
   public referenceNumberSequence: number | null;
 }
+
+/**
+ * Guards a field that resolves an experiment's visit: if the current user has no
+ * read rights, the visit is not resolved and `null` is returned instead.
+ */
+export const CheckVisitReadAccess: MiddlewareFn<ResolverContext> = async (
+  { root, context },
+  next
+) => {
+  const perms = await context.queries.visit.getVisitPermsByExperimentPk(
+    context.user,
+    (root as Experiment).experimentPk
+  );
+
+  if (!perms.readable) {
+    return null;
+  }
+
+  return next();
+};
 
 @Resolver(() => Experiment)
 export class ExperimentResolver {
@@ -114,7 +137,19 @@ export class ExperimentResolver {
     return proposal;
   }
 
+  @FieldResolver(() => VisitPerms)
+  async visitPerms(
+    @Root() experiment: Experiment,
+    @Ctx() context: ResolverContext
+  ): Promise<VisitPerms> {
+    return context.queries.visit.getVisitPermsByExperimentPk(
+      context.user,
+      experiment.experimentPk
+    );
+  }
+
   @FieldResolver(() => Visit, { nullable: true })
+  @UseMiddleware(CheckVisitReadAccess)
   async visit(
     @Root() experiment: Experiment,
     @Ctx() context: ResolverContext
