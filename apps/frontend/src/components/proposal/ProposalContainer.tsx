@@ -159,7 +159,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
 
   const { submitted, proposalId } = state.proposal;
 
-  let info: JSX.Element | string = (
+  let info: JSX.Element = (
     <CopyToClipboard
       text={proposalId}
       successMessage={`'${proposalId}' copied to clipboard`}
