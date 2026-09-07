@@ -35,7 +35,11 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
+  const isFapReviewer = useCheckAccess([
+    UserRole.FAP_REVIEWER,
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
   const { isInternalUser } = useContext(UserContext);
   const { user } = useContext(UserContext);
   const callHasEnded = isCallEnded(
