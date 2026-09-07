@@ -21,13 +21,7 @@ export default function SampleEsiPage() {
             templateGroup={templateGroup}
             itemCountLabel={itemCountLabel}
             isArchived={false}
-            emptyDataSourceMessage={
-              <div>
-                <strong>Warning</strong> Visit registration has no templates.
-                Users will not be able to register visits. Please create a new
-                template and mark it as active.
-              </div>
-            }
+            emptyDataSourceMessage="Visit registration has no templates. Users will not be able to register visits. Please create a new template and mark it as active."
           />
           <TableComponent
             templateGroup={templateGroup}

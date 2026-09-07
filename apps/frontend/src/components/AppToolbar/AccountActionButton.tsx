@@ -45,25 +45,15 @@ const AccountActionButton = () => {
   );
 
   useEffect(() => {
-    if (!searchParams.get('selectRoles')) {
-      return;
+    if (searchParams.get('selectRoles')) {
+      setShow(hasMultipleRoles);
+      setSearchParams((searchParams) => {
+        searchParams.delete('selectRoles');
+
+        return searchParams;
+      });
     }
-
-    // Roles are hydrated from localStorage by a dispatch, so the first render
-    // always sees an empty list. Consuming the parameter before they arrive
-    // decides `hasMultipleRoles` against an empty list and then removes the
-    // parameter, so the dialog can never open.
-    if (roles.length === 0) {
-      return;
-    }
-
-    setShow(hasMultipleRoles);
-    setSearchParams((searchParams) => {
-      searchParams.delete('selectRoles');
-
-      return searchParams;
-    });
-  }, [roles.length, hasMultipleRoles, searchParams, setSearchParams]);
+  }, [hasMultipleRoles, searchParams, setSearchParams]);
 
   const isUserImpersonated = typeof impersonatingUserId === 'number';
 
