@@ -81,7 +81,6 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-
     instruments: proposal.instruments?.map((instrument) => ({
       id: instrument?.id,
       name: instrument?.name,
@@ -89,7 +88,6 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
       managementTimeAllocation: instrument?.managementTimeAllocation,
       multipleTechReviewsEnabled: instrument?.multipleTechReviewsEnabled,
     })),
-
     technicalReviews:
       proposal.technicalReviews.map((tr) => ({
         id: tr.id,
@@ -103,7 +101,6 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
           lastname: tr.technicalReviewAssignee?.lastname,
         },
       })) || null,
-
     faps: proposal.faps,
     fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
@@ -112,7 +109,6 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
     submittedDate: proposal.submittedDate,
-
     techniques: proposal.techniques?.map((technique) => ({
       id: technique?.id,
       name: technique?.name,
