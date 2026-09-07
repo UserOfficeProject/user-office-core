@@ -25,7 +25,7 @@ const currentDayStart = DateTime.now().startOf('day');
 const closedCallStartDate = faker.date.past();
 
 export const updatedCall = {
-  shortCode: faker.random.alphaNumeric(15),
+  shortCode: faker.string.alphanumeric(15),
   sort_order: 0,
   startCall: faker.date.past().toISOString().slice(0, 10),
   endCall: faker.date.future().toISOString().slice(0, 10),
@@ -45,7 +45,7 @@ export const updatedCall = {
 };
 
 export const closedCall = {
-  shortCode: faker.random.alphaNumeric(15),
+  shortCode: faker.string.alphanumeric(15),
   startCall: closedCallStartDate.toISOString().slice(0, 10),
   endCall: closedCallStartDate.toISOString().slice(0, 10),
   startReview: currentDayStart,

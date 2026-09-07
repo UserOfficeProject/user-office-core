@@ -17,42 +17,42 @@ const selectAllProposalsFilterStatus = () => {
 
 context('Instrument tests', () => {
   const proposal1 = {
-    title: faker.random.words(2),
-    abstract: faker.random.words(5),
+    title: faker.lorem.words(2),
+    abstract: faker.lorem.words(5),
   };
 
   const proposal2 = {
-    title: faker.random.words(2),
-    abstract: faker.random.words(5),
+    title: faker.lorem.words(2),
+    abstract: faker.lorem.words(5),
   };
 
   const proposal3 = {
-    title: faker.random.words(2),
-    abstract: faker.random.words(5),
+    title: faker.lorem.words(2),
+    abstract: faker.lorem.words(5),
   };
 
   const scientist1 = initialDBData.users.user1;
   const scientist2 = initialDBData.users.user2;
 
   const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: scientist1.id,
     multipleTechReviewsEnabled: false,
   };
 
   const instrument2 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: scientist1.id,
   };
 
   const instrument3 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: scientist1.id,
     multipleTechReviewsEnabled: true,
   };
@@ -124,9 +124,9 @@ context('Instrument tests', () => {
     });
 
     it('User Officer should be able to update Instrument', () => {
-      const newName = faker.random.words(2);
-      const newShortCode = faker.random.alphaNumeric(15);
-      const newDescription = faker.random.words(5);
+      const newName = faker.lorem.words(2);
+      const newShortCode = faker.string.alphanumeric(15);
+      const newDescription = faker.lorem.words(5);
       cy.createInstrument(instrument1);
 
       cy.contains('Instruments').click();
@@ -1446,8 +1446,8 @@ context('Instrument tests', () => {
     });
 
     it('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
-      const internalComment = faker.random.words(2);
-      const publicComment = faker.random.words(2);
+      const internalComment = faker.lorem.words(2);
+      const publicComment = faker.lorem.words(2);
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
@@ -1562,8 +1562,8 @@ context('Instrument tests', () => {
         }
       });
 
-      const internalComment = faker.random.words(2);
-      const publicComment = faker.random.words(2);
+      const internalComment = faker.lorem.words(2);
+      const publicComment = faker.lorem.words(2);
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();

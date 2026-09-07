@@ -59,7 +59,7 @@ export const emailActionHandler = async (
         ${statusActionRecipients}`
       );
     }
-    emailStatusActionRecipient(
+    await emailStatusActionRecipient(
       recipientWithTemplate,
       statusAction,
       proposals,
@@ -376,7 +376,6 @@ const sendMail = async (
   const emailEventHandler = container.resolve<
     (event: ApplicationEvent) => Promise<void>
   >(Tokens.EmailEventHandler);
-
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -405,6 +404,9 @@ const sendMail = async (
               proposalTemplate: recipientWithData.proposalTemplate,
               samples: recipientWithData.samples,
               hazards: recipientWithData.hazards,
+              fapMeetingDecisions: recipientWithData.fapMeetingDecisions,
+              technicalReviews: recipientWithData.technicalReviews,
+              call: recipientWithData.call,
             },
             recipients: [{ address: recipientWithData.email }],
           });

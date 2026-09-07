@@ -61,7 +61,7 @@ const RowActionButtons = (rowData: Experiment) => {
         data-cy="view-experiment"
         onClick={() => {
           setSearchParams((searchParams) => {
-            searchParams.set('experiment', rowData.experimentId.toString());
+            searchParams.set('experiment', rowData.experimentPk.toString());
 
             return searchParams;
           });
@@ -107,7 +107,12 @@ export default function ExperimentsTable({
   const search = searchParams.get('search');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
-  const selectedExperimentId = searchParams.get('experiment');
+  const selectedExperimentPk = searchParams.get('experiment');
+  const parsedExperimentPk =
+    selectedExperimentPk !== null ? parseInt(selectedExperimentPk) : NaN;
+  const experimentPkFromUrl = Number.isInteger(parsedExperimentPk)
+    ? parsedExperimentPk
+    : null;
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
@@ -117,11 +122,15 @@ export default function ExperimentsTable({
   React.useEffect(() => {
     setSelectedExperiment(
       tableData.find(
-        (experiment) =>
-          experiment.experimentId.toString() == selectedExperimentId
+        (experiment) => experiment.experimentPk === experimentPkFromUrl
       )
     );
-  }, [selectedExperimentId, tableData]);
+  }, [experimentPkFromUrl, tableData]);
+
+  // the experiment can live outside the currently loaded page of results (e.g. a
+  // deep link), in which case ExperimentReviewContent fetches it by primary key
+  const experimentPkToReview =
+    selectedExperiment?.experimentPk ?? experimentPkFromUrl;
 
   React.useEffect(() => {
     if (isFirstRender.current) {
@@ -476,10 +485,14 @@ export default function ExperimentsTable({
         }}
       />
 
-      {selectedExperiment && (
+      {experimentPkToReview !== null && (
         <ExperimentReviewModal
-          title={`View Experiment: ${selectedExperiment?.experimentId} - (${toFormattedDateTime(selectedExperiment?.startsAt)} - ${toFormattedDateTime(selectedExperiment?.endsAt)})`}
-          modalOpen={!!selectedExperiment}
+          title={
+            selectedExperiment
+              ? `View Experiment: ${selectedExperiment.experimentId} - (${toFormattedDateTime(selectedExperiment.startsAt)} - ${toFormattedDateTime(selectedExperiment.endsAt)})`
+              : 'View Experiment'
+          }
+          modalOpen={true}
           handleClose={() => {
             setSearchParams((searchParams) => {
               searchParams.delete('experiment');
@@ -489,7 +502,7 @@ export default function ExperimentsTable({
           }}
         >
           <ExperimentReviewContent
-            experimentPk={selectedExperiment.experimentPk}
+            experimentPk={experimentPkToReview}
             tabNames={experimentReviewTabs}
             isInsideModal={true}
           />

@@ -36,7 +36,7 @@ context('Calls tests', () => {
   const twoDaysAgo = currentDayStart.plus({ days: -2 });
 
   const newCall = {
-    shortCode: faker.random.alphaNumeric(15),
+    shortCode: faker.string.alphanumeric(15),
     sort_order: 0,
     startCall: DateTime.fromJSDate(faker.date.past()),
     endCall: DateTime.fromJSDate(faker.date.future()),
@@ -60,7 +60,7 @@ context('Calls tests', () => {
   };
 
   const newInactiveCall = {
-    shortCode: faker.random.alphaNumeric(15),
+    shortCode: faker.string.alphanumeric(15),
     sort_order: 0,
     startCall: twoDaysAgo.toISO(),
     endCall: yesterday.toISO(),
@@ -80,25 +80,25 @@ context('Calls tests', () => {
   };
 
   const updatedCall = {
-    shortCode: faker.random.alphaNumeric(15),
+    shortCode: faker.string.alphanumeric(15),
     startDate: DateTime.fromJSDate(faker.date.past()),
     endDate: DateTime.fromJSDate(faker.date.future()),
   };
 
   const proposalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.PROPOSAL,
   };
   const proposalInternalWorkflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.PROPOSAL,
   };
   const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(8),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(8),
     managerUserId: initialDBData.users.user1.id,
   };
 
@@ -535,7 +535,7 @@ context('Calls tests', () => {
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').type(
-        faker.random.word().split(' ')[0]
+        faker.lorem.word().split(' ')[0]
       );
 
       cy.get('[data-cy="submit"]').click();
@@ -607,7 +607,7 @@ context('Calls tests', () => {
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy=cycle-comment] input').type(
-        faker.random.word().split(' ')[0]
+        faker.lorem.word().split(' ')[0]
       );
 
       cy.get('[data-cy="submit"]').click();

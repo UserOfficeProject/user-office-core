@@ -5,10 +5,11 @@ import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import React, { Dispatch } from 'react';
+import React, { useContext, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
+import { UserContext } from 'context/UserContextProvider';
 import { TechniqueMinimalFragment, TechniqueFilterInput } from 'generated/sdk';
 
 export enum TechniqueFilterEnum {
@@ -35,6 +36,7 @@ const TechniqueFilter = ({
   shouldShowMultiple,
   showMultiTechniqueProposals,
 }: TechniqueFilterProps) => {
+  const { roles, currentRoleId } = useContext(UserContext);
   const [, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
 
@@ -42,11 +44,16 @@ const TechniqueFilter = ({
     return null;
   }
 
+  const currentRoleTags = roles.find((r) => currentRoleId === r.id)!.tags;
+  const currentRoleFirstTagName = currentRoleTags?.length
+    ? `${currentRoleTags[0].name}.`
+    : '';
+
   return (
     <>
       <FormControl fullWidth>
         <InputLabel id="technique-select-label" shrink>
-          {t('Technique')}
+          {t(`${currentRoleFirstTagName}Technique`)}
         </InputLabel>
         {isLoading ? (
           <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>

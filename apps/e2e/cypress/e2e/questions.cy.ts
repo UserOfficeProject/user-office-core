@@ -78,7 +78,7 @@ context('Questions tests', () => {
       .first()
       .find('tbody tr')
       .first()
-      .contains('visitat_basis');
+      .contains('text_input_question');
 
     // CATEGORY
     cy.get("[data-cy='questions-table'] table")
@@ -94,7 +94,7 @@ context('Questions tests', () => {
       .first()
       .find('tbody tr')
       .first()
-      .contains('FAP_REVIEW');
+      .contains('EXPERIMENT_SAFETY_REVIEW');
 
     // # ANSWERS
     cy.get("[data-cy='questions-table'] table")

@@ -15,6 +15,13 @@ fragment fieldConfig on FieldConfig {
     defaultDate
     includeTime
   }
+
+  ... on DateTimeRangeConfig {
+    small_label
+    required
+    tooltip
+    readPermissions
+  }
   ... on EmbellishmentConfig {
     html
     plain

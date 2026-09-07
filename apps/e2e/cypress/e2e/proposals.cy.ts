@@ -1035,7 +1035,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('label', textQuestion).then(($elem) => {
-        cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
+        cy.get(`#${$elem.attr('for')}`).type(faker.lorem.word());
       });
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.notification({ text: 'Saved', variant: 'success' });
@@ -1497,7 +1497,7 @@ context('Proposal tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
 
       cy.createCall({
         ...newCall,
@@ -1535,7 +1535,7 @@ context('Proposal tests', () => {
         this.skip();
       }
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
       cy.createCall({
         ...newCall,
         shortCode: createdCallTitle,
@@ -1805,10 +1805,20 @@ context('Proposal tests', () => {
     });
 
     it('Multiple instruments should be automatically assigned to the proposal', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: true,
+        requestTime: false,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
 
@@ -1860,10 +1870,20 @@ context('Proposal tests', () => {
       cy.contains('td', instrument2.name).should('exist');
     });
     it('Capture user time request for single instrument', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: false,
+        requestTime: true,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);
@@ -1914,10 +1934,20 @@ context('Proposal tests', () => {
       ).should('exist');
     });
     it('Capture user time request for multiple instruments', () => {
+      const config = JSON.stringify({
+        small_label: '',
+        required: true,
+        tooltip: '',
+        readPermissions: [],
+        variant: 'dropdown',
+        instruments: [],
+        isMultipleSelect: true,
+        requestTime: true,
+      });
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":true,"readPermissions":[]}`,
+        config,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);

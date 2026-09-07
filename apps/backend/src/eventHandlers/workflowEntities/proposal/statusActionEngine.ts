@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { emailActionHandler } from './emailActionHandler';
@@ -32,6 +33,18 @@ export const proposalStatusActionEngine = async (
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
       const [{ workflowStatusConnectionId }] = groupedProposals;
+      const callIds = [
+        ...new Set(groupedProposals.map(({ proposal }) => proposal.callId)),
+      ];
+      const proposalPks = groupedProposals.map(
+        ({ proposal }) => proposal.primaryKey
+      );
+      const groupLogContext = {
+        workflowStatusConnectionId,
+        callIds,
+        proposalPks,
+      };
+
       const currentConnection = await workflowDataSource.getWorkflowConnection(
         workflowStatusConnectionId
       );
@@ -52,11 +65,22 @@ export const proposalStatusActionEngine = async (
             return;
           }
 
+          const logContext = {
+            ...groupLogContext,
+            actionId: statusAction.type,
+          };
+
           switch (statusAction.type) {
             case StatusActionType.EMAIL:
               emailActionHandler(
                 statusAction,
                 groupedProposals.map((proposal) => proposal.proposal)
+              ).catch((error) =>
+                logger.logException(
+                  'Error executing email status actions',
+                  error,
+                  logContext
+                )
               );
               break;
 
@@ -64,6 +88,12 @@ export const proposalStatusActionEngine = async (
               rabbitMQActionHandler(
                 statusAction,
                 groupedProposals.map((proposal) => proposal.proposal)
+              ).catch((error) =>
+                logger.logException(
+                  'Error executing RabbitMQ status actions',
+                  error,
+                  logContext
+                )
               );
               break;
 
@@ -71,6 +101,12 @@ export const proposalStatusActionEngine = async (
               pdfDownloadActionHandler(
                 statusAction,
                 groupedProposals.map((proposal) => proposal.proposal)
+              ).catch((error) =>
+                logger.logException(
+                  'Error executing proposal download status actions',
+                  error,
+                  logContext
+                )
               );
               break;
 
@@ -80,5 +116,7 @@ export const proposalStatusActionEngine = async (
         })
       );
     })
-  );
+  ).catch((error) => {
+    logger.logException('Error executing proposal status action engine', error);
+  });
 };
