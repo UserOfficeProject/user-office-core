@@ -31,7 +31,7 @@ export const RichTextInputRendererComponent = ({
   return (
     <span>
       <Tooltip title="View full text">
-        <IconButton onClick={handleClickOpen}>
+        <IconButton onClick={handleClickOpen} sx={{ 'padding-left': 0 }}>
           <VisibilityIcon />
         </IconButton>
       </Tooltip>
