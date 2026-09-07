@@ -30,7 +30,6 @@ export const getCurrentUrlValues = () => {
   };
 };
 
-// Module scope, not a ref: a ref resets on remount and the code gets replayed.
 let authorizationCodeExchange: {
   code: string;
   result: Promise<string>;
