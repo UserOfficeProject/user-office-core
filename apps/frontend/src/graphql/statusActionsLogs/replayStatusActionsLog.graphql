@@ -1,5 +1,0 @@
-mutation replayStatusActionsLog(
-  $statusActionsLogId: Int!
-) {
-  replayStatusActionsLog(statusActionsLogId: $statusActionsLogId)
-}

@@ -1,0 +1,18 @@
+query emailTemplatePreview(
+  $emailTemplatePreviewInput: EmailTemplatePreviewInput!
+) {
+  emailTemplatePreview(
+    emailTemplatePreviewInput: $emailTemplatePreviewInput
+  ) {
+    subject
+    body
+    sourceSubject
+    sourceBody
+    error {
+      source
+      message
+      line
+      column
+    }
+  }
+}

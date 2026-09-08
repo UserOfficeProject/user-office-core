@@ -108,7 +108,8 @@ export default class QuestionaryQueries {
     return this.dataSource.getCount(templateId);
   }
 
-  @Authorized()
+  // No @Authorized() - not grantable as an API key permission because it's
+  // only reachable via the already-authorised Questionary field resolver.
   async isCompleted(agent: UserWithRole | null, questionaryId: number) {
     const hasRights =
       this.userAuth.isApiToken(agent) ||

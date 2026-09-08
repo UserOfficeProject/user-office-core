@@ -6,6 +6,7 @@ import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { Proposal } from '../models/Proposal';
 import { UserWithRole } from '../models/User';
 import { Visit } from '../models/Visit';
 
@@ -37,14 +38,6 @@ export class VisitAuthorization {
 
   async hasReadRights(
     agent: UserWithRole | null,
-    visit: Visit
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
-    visitId: number
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
     visitOrVisitId: Visit | number
   ): Promise<boolean> {
     if (!agent) {
@@ -63,28 +56,24 @@ export class VisitAuthorization {
     }
 
     /*
-     * User can read the visit if he is a participant of a proposal
+     * User can read the visit if he is a PI
      * or on the visitor list
      */
-    return (
-      visit.creatorId === agent.id ||
-      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk) ||
-      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
-    );
+    const [isPI, isVisitVisitor] = await Promise.all([
+      this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
+        agent,
+        visit.proposalPk
+      ),
+      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id),
+    ]);
+
+    return visit.creatorId === agent.id || isPI || isVisitVisitor;
   }
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    visit: Visit
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    visitId: number
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
     visitOrVisitId: number | Visit
-  ) {
+  ): Promise<boolean> {
     if (!agent) {
       return false;
     }
@@ -100,13 +89,14 @@ export class VisitAuthorization {
       return false;
     }
 
-    const proposal = await this.proposalDataSource.get(visit.proposalPk);
-    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+    const isPI = await this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
       agent,
-      proposal
+      visit.proposalPk
     );
 
-    if (isMemberOfProposal === false) {
+    const isTeamLead = agent.id === visit.teamLeadUserId;
+
+    if (!isPI && !isTeamLead) {
       logger.logWarn('User tried to update visit without having write rights', {
         agent,
         visit,
@@ -116,5 +106,60 @@ export class VisitAuthorization {
     }
 
     return true;
+  }
+
+  async hasDeleteRights(
+    agent: UserWithRole | null,
+    visitOrVisitId: number | Visit
+  ): Promise<boolean> {
+    // Deleting a visit is a PI right, same as creating one. Only someone who
+    // can created visits may delete it, i.e, the current PI.
+    //
+    // Also allow User Officers delete a visit.
+    //
+    // The team lead has write rights, but not delete rights.
+
+    if (!agent) {
+      return false;
+    }
+
+    // User officer has access
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const visit = await this.resolveVisit(visitOrVisitId);
+
+    if (!visit) {
+      return false;
+    }
+
+    return this.hasCreateRights(agent, visit.proposalPk);
+  }
+
+  async hasCreateRights(
+    agent: UserWithRole | null,
+    proposalOrProposalPk: Proposal | number
+  ): Promise<boolean> {
+    // User officer has access
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const proposalPk =
+      proposalOrProposalPk instanceof Proposal
+        ? proposalOrProposalPk.primaryKey
+        : proposalOrProposalPk;
+
+    const isPi = await this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
+      agent,
+      proposalPk
+    );
+
+    if (isPi) {
+      return true;
+    }
+
+    return false;
   }
 }

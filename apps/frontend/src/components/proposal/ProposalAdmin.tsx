@@ -25,13 +25,15 @@ import { Option } from 'utils/utilTypes';
 
 export type AdministrationFormData = {
   proposalPk: number;
-  commentForUser: string;
-  commentForManagement: string;
-  finalStatus: ProposalEndStatus;
-  managementTimeAllocations: {
-    instrumentId: number;
-    value: number;
-  }[];
+  commentForUser: string | null;
+  commentForManagement: string | null;
+  finalStatus: ProposalEndStatus | null;
+  managementTimeAllocations:
+    | {
+        instrumentId: number;
+        value: number;
+      }[]
+    | null;
   managementDecisionSubmitted?: boolean;
 };
 

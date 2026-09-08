@@ -1,11 +1,10 @@
-import useTheme from '@mui/material/styles/useTheme';
-import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Field } from 'formik';
+import { getIn } from 'formik';
 import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 
-import DatePicker from 'components/common/FormikUIDatePicker';
+import DayRangePicker, {
+  DayRange,
+} from 'components/common/FormikUIDayRangePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,
@@ -21,8 +20,24 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
-function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
-  const theme = useTheme();
+// `startsAt`/`endsAt` are Luxon DateTimes once edited, but come back as ISO
+// strings when the registration is loaded from the backend.
+const toDateTime = (value: unknown): DateTime | undefined => {
+  if (value instanceof DateTime) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = DateTime.fromISO(value);
+
+    return parsed.isValid ? parsed : undefined;
+  }
+};
+
+function QuestionaryComponentVisitBasis({
+  answer,
+  formikProps,
+}: BasicComponentProps) {
   const { dispatch, state } = useContext(
     QuestionaryContext
   ) as VisitRegistrationContextType;
@@ -36,63 +51,32 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
 
   const id = answer.question.id;
 
+  const startsAtError =
+    getIn(formikProps.touched, `${id}.startsAt`) &&
+    getIn(formikProps.errors, `${id}.startsAt`);
+  const endsAtError =
+    getIn(formikProps.touched, `${id}.endsAt`) &&
+    getIn(formikProps.errors, `${id}.endsAt`);
+
   return (
-    <LocalizationProvider dateAdapter={DateAdapter}>
-      <Field
-        name={`${id}.startsAt`}
-        label="Visit start"
-        format={format}
-        component={DatePicker}
-        inputProps={{ placeholder: format }}
-        variant="inline"
-        disableToolbar
-        autoOk={true}
-        required
-        minDate={DateTime.now()}
-        textField={{
-          fullWidth: true,
-          required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        onChange={(startsAt: DateTime) => {
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { startsAt },
-          });
-        }}
-        // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-        desktopModeMediaQuery={theme.breakpoints.up('sm')}
-      />
-      <Field
-        name={`${id}.endsAt`}
-        label="Visit end"
-        format={format}
-        component={DatePicker}
-        inputProps={{ placeholder: format }}
-        variant="inline"
-        disableToolbar
-        autoOk={true}
-        required
-        minDate={state.registration.startsAt}
-        textField={{
-          fullWidth: true,
-          required: true,
-        }}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        onChange={(endsAt: DateTime) => {
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { endsAt },
-          });
-        }}
-        // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-        desktopModeMediaQuery={theme.breakpoints.up('sm')}
-      />
-    </LocalizationProvider>
+    <DayRangePicker
+      id={`${id}.dateRange`}
+      label="Visit start and end"
+      format={format}
+      required
+      minDate={DateTime.now()}
+      value={{
+        from: toDateTime(state.registration.startsAt),
+        to: toDateTime(state.registration.endsAt),
+      }}
+      error={startsAtError || endsAtError || undefined}
+      onChange={({ from, to }: DayRange) => {
+        dispatch({
+          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+          itemWithQuestionary: { startsAt: from, endsAt: to },
+        });
+      }}
+    />
   );
 }
 

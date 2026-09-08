@@ -340,25 +340,38 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalPk: number,
     instrumentId: number
   ): Promise<number> {
-    //Non-nullable, time is either requested for the instrument or it is zero.
-    const result = await database('proposals as p')
-      .sum({
-        total_time_requested: database.raw(
-          "(a.answer->'value'->>'timeRequested')::numeric"
-        ),
-      })
-      .innerJoin('questionaries as q2', 'q2.questionary_id', 'p.questionary_id')
-      .innerJoin('answers as a', 'a.questionary_id', 'q2.questionary_id')
-      .innerJoin('questions as q', 'q.question_id', 'a.question_id')
-      .where('p.proposal_pk', proposalPk)
-      .where('q.data_type', 'INSTRUMENT_PICKER')
-      .whereRaw("a.answer->'value'->>'instrumentId' = ?", [
-        instrumentId.toString(),
-      ])
-      .first();
+    const result = await database.raw(
+      `
+      SELECT sum(timeRequestedOne) AS total_time_requested FROM (
+        --First query is for handling multiInstrument picker when answers.answer.value is an array.
+        SELECT 
+          COALESCE((instrumentrequest->>'timeRequested')::numeric, 0) AS timeRequestedOne,
+          p.proposal_pk AS proposalPk,
+          x.instrumentrequest->> 'instrumentId' AS instrumentId
+        FROM proposals p
+	      INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+	      CROSS JOIN LATERAL (
+	        SELECT 
+            jsonb_array_elements(a.answer -> 'value') AS instrumentrequest) x
+	        WHERE jsonb_typeof(a.answer->'value') = 'array'
 
-    return result?.total_time_requested
-      ? Number(result.total_time_requested)
+	      UNION ALL
+	
+        --Second query is for handling single instrument picker when answers.answer.value is an object.
+        SELECT 
+          COALESCE((a.answer->'value'->>'timeRequested')::numeric, 0) AS timeRequestedOne,
+          p.proposal_pk AS proposalPk, 
+          a.answer->'value'->>'instrumentId' AS instrumentId 
+        FROM proposals p
+        INNER JOIN answers a ON a.questionary_id = p.questionary_id 
+        WHERE jsonb_typeof(a.answer -> 'value') = 'object' 
+      ) AS combinedResults
+      WHERE instrumentId = ? AND proposalpk = ?;`,
+      [instrumentId, proposalPk]
+    );
+
+    return result?.rows?.[0]?.total_time_requested
+      ? Number(result?.rows?.[0]?.total_time_requested)
       : 0;
   }
 
@@ -1073,35 +1086,33 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
+  // current user -> get related proposals -> get related users for each of those proposals
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
-    const relatedCoIs = await database
-      .select('ou.user_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', function () {
-        this.on('u.proposal_pk', 'p.proposal_pk');
-        this.andOn(function () {
-          this.onVal('u.user_id', id); // user is on the proposal
-          this.orOnVal('p.proposer_id', id); // user is the proposal PI
-        });
-      }) // this gives a list of proposals that a user is related to
-      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
+    // Proposals the user is related to, as PI or as a co-proposer
+    const relatedProposalPks = database
+      .select('proposal_pk')
+      .from('proposals')
+      .where('proposer_id', id)
+      .union([
+        database
+          .select('proposal_pk')
+          .from('proposal_user')
+          .where('user_id', id),
+      ]);
 
-    const relatedPis = await database
-      .select('p.proposer_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', {
-        'u.proposal_pk': 'p.proposal_pk',
-        'u.user_id': id,
-      }); // this gives a list of proposals that a user is related to
+    // Everyone on those proposals: PIs and co-proposers
+    const relatedUsers: { user_id: number }[] = await database
+      .select('user_id')
+      .from('proposal_user')
+      .whereIn('proposal_pk', relatedProposalPks)
+      .union([
+        database
+          .select('proposer_id as user_id')
+          .from('proposals')
+          .whereIn('proposal_pk', relatedProposalPks),
+      ]);
 
-    const relatedUsers = [
-      ...relatedCoIs.map((r) => r.user_id),
-      ...relatedPis.map((r) => r.proposer_id),
-    ];
-
-    return relatedUsers;
+    return relatedUsers.map((r) => r.user_id);
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {

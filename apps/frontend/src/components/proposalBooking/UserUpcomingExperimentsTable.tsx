@@ -1,9 +1,11 @@
 import MaterialTable, { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
 import { TFunction } from 'i18next';
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { FeatureId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
   UserExperiment,
@@ -38,7 +40,7 @@ export default function UserUpcomingExperimentsTable() {
   const {
     loading: experimentsLoading,
     userExperiments,
-    setUserUpcomingExperiments,
+    setUserExperiments,
   } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -64,9 +66,13 @@ export default function UserUpcomingExperimentsTable() {
           ? updatedExperiment
           : experiment
       );
-      setUserUpcomingExperiments(updatedExperiments);
+      setUserExperiments(updatedExperiments);
     },
   });
+
+  const context = useContext(FeatureContext);
+  const isShipmentActionEnabled = !!context.featuresMap.get(FeatureId.SHIPPING)
+    ?.isEnabled;
 
   // if there are no upcoming experiments
   // just hide the whole table altogether
@@ -89,7 +95,7 @@ export default function UserUpcomingExperimentsTable() {
           formTeamAction,
           finishEsi,
           registerVisitAction,
-          declareShipmentAction,
+          ...(isShipmentActionEnabled ? [declareShipmentAction] : []),
           giveFeedback,
         ]}
         icons={tableIcons}

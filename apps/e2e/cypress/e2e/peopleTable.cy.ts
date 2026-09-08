@@ -6,8 +6,8 @@ import initialDBData from '../support/initialDBData';
 
 context('PageTable component tests', () => {
   const emails = new Array(10).fill(0).map(() => faker.internet.email());
-  const title = faker.random.words(3);
-  const abstract = faker.random.words(8);
+  const title = faker.lorem.words(3);
+  const abstract = faker.lorem.words(8);
 
   beforeEach(function () {
     cy.resetDB();

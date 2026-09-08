@@ -328,7 +328,7 @@ const FapInstrumentProposalsTable = ({
             typeof a.proposalAverageScore === 'number' &&
             typeof b.proposalAverageScore === 'number'
           ) {
-            return a.proposalAverageScore > b.proposalAverageScore ? 1 : -1;
+            return a.proposalAverageScore < b.proposalAverageScore ? 1 : -1;
           } else {
             return -1;
           }

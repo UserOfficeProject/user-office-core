@@ -133,8 +133,7 @@ export default class StatusActionsLogsMutations {
     return true;
   }
 
-  @Authorized([Roles.USER_OFFICER])
-  async replayStatusActionsLog(
+  private async replayStatusActionsLog(
     agent: UserWithRole | null,
     statusActionsLogId: number
   ): Promise<boolean | Rejection> {
@@ -163,15 +162,16 @@ export default class StatusActionsLogsMutations {
     agent: UserWithRole | null,
     statusActionsLogIds: number[]
   ): Promise<ReplayStatusActionsLogsResult> {
+    const uniqueLogIds = [...new Set(statusActionsLogIds)];
     const successful: number[] = [];
     const failed: ReplayStatusLogFailure[] = [];
 
     logger.logInfo(
-      `Starting replay of ${statusActionsLogIds.length} status action logs.`,
+      `Starting replay of ${uniqueLogIds.length} status action logs.`,
       {}
     );
 
-    for (const logId of statusActionsLogIds) {
+    for (const logId of uniqueLogIds) {
       const result = await this.replayStatusActionsLog(agent, logId);
 
       if (result instanceof Rejection) {
@@ -182,13 +182,13 @@ export default class StatusActionsLogsMutations {
     }
 
     const results: ReplayStatusActionsLogsResult = {
-      totalRequested: statusActionsLogIds.length,
+      totalRequested: uniqueLogIds.length,
       successful,
       failed,
     };
 
     logger.logInfo(
-      `Completed replay of ${statusActionsLogIds.length} status action logs. Successful: ${results.successful.length}. Failed: ${results.failed.length}.`,
+      `Completed replay of ${uniqueLogIds.length} status action logs. Successful: ${results.successful.length}. Failed: ${results.failed.length}.`,
       { results }
     );
 

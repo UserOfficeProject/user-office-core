@@ -229,32 +229,29 @@ export default class PostgresTechniqueDataSource
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {
-    database.transaction(async (trx) => {
-      await database('technique_has_proposals')
-        .delete()
-        .where('proposal_id', proposalPk)
-        .transacting(trx);
+    try {
+      await database.transaction(async (trx) => {
+        await trx('technique_has_proposals')
+          .where('proposal_id', proposalPk)
+          .del();
 
-      await database('technique_has_proposals')
-        .insert(
-          techniqueIds.map((techniqueId) => ({
-            technique_id: techniqueId,
-            proposal_id: proposalPk,
-          }))
-        )
-        .onConflict(['proposal_id', 'technique_id'])
-        .ignore()
-        .transacting(trx)
-        .then(() => {
-          trx.commit();
-        })
-        .catch((error) => {
-          trx.rollback();
-          throw new Error(`Error assigning proposal to technique: ${error}`);
-        });
-    });
+        if (techniqueIds.length > 0) {
+          await trx('technique_has_proposals')
+            .insert(
+              techniqueIds.map((techniqueId) => ({
+                technique_id: techniqueId,
+                proposal_id: proposalPk,
+              }))
+            )
+            .onConflict(['proposal_id', 'technique_id'])
+            .ignore();
+        }
+      });
 
-    return true;
+      return true;
+    } catch (error) {
+      throw new Error(`Error assigning proposal to technique: ${error}`);
+    }
   }
 
   async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {

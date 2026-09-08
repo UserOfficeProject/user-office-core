@@ -8,14 +8,14 @@ import settings from '../support/settings';
 const scientist1 = initialDBData.users.user1;
 const scientist2 = initialDBData.users.user2;
 const instrument1 = {
-  name: faker.random.words(2),
-  shortCode: faker.random.alphaNumeric(15),
-  description: faker.random.words(5),
+  name: faker.lorem.words(2),
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(5),
   managerUserId: scientist1.id,
 };
 const proposal1 = {
-  title: faker.random.words(2),
-  abstract: faker.random.words(5),
+  title: faker.lorem.words(2),
+  abstract: faker.lorem.words(5),
 };
 let createdInstrumentId: number;
 let createdProposalPk: number;
@@ -113,7 +113,7 @@ context('Internal Review tests', () => {
   });
 
   it('User Officer should be able to create an internal review', () => {
-    const title = faker.random.words(2);
+    const title = faker.lorem.words(2);
     const comment = faker.lorem.paragraph(3);
 
     cy.login('officer');
@@ -176,9 +176,9 @@ context('Internal Review tests', () => {
   });
 
   it('User Officer should be able to update an internal review', () => {
-    const title = faker.random.words(2);
+    const title = faker.lorem.words(2);
     const comment = faker.lorem.paragraph(3);
-    const newTitle = faker.random.words(2);
+    const newTitle = faker.lorem.words(2);
 
     cy.createInternalReview({
       input: {
@@ -243,7 +243,7 @@ context('Internal Review tests', () => {
   });
 
   it('User Officer should be able to delete internal review', () => {
-    const title = faker.random.words(2);
+    const title = faker.lorem.words(2);
     const comment = faker.lorem.paragraph(3);
 
     cy.createInternalReview({
@@ -285,7 +285,7 @@ context('Internal Review tests', () => {
   });
 
   it('Internal reviewer should be able to add their review', () => {
-    const title = faker.random.words(2);
+    const title = faker.lorem.words(2);
     const comment = faker.lorem.paragraph(3);
     const newComment = faker.lorem.paragraph(3);
 
