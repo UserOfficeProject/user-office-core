@@ -55,6 +55,7 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
@@ -99,11 +100,36 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { techniques, loadingTechniques } =
     useTechniqueProposalsTechniquesData();
 
-  const instrumentIds = useMemo(() => {
-    if (loadingTechniques || !techniques) return [];
+  const {
+    instruments: instrumentsMinimal,
+    loadingInstruments: loadingInstrumentsMinimal,
+  } = useInstrumentsMinimalData();
 
-    return techniques.flatMap((t) => t.instruments.map((i) => i.id));
-  }, [loadingTechniques, techniques]);
+  const instrumentIds = useMemo(() => {
+    if (currentRole === UserRole.USER_OFFICER) {
+      if (loadingInstrumentsMinimal || !instrumentsMinimal) return [];
+
+      return instrumentsMinimal.map((i) => i.id);
+    } else {
+      if (loadingTechniques || !techniques) return [];
+
+      return techniques.flatMap((t) => t.instruments.map((i) => i.id));
+    }
+  }, [
+    loadingTechniques,
+    techniques,
+    loadingInstrumentsMinimal,
+    instrumentsMinimal,
+  ]);
+
+  const relevantTechniques =
+    currentRole === UserRole.USER_OFFICER
+      ? techniques.filter((t) =>
+          t.instruments
+            .map((ti) => ti.id)
+            .some((i) => instrumentsMinimal.map((im) => im.id).includes(i))
+        )
+      : techniques;
 
   const { calls, loadingCalls, setCallsFilter } = useCallsData(
     {
@@ -487,6 +513,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               .map((instrument) => [instrument.id, instrument])
           ).values()
         );
+
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
@@ -530,6 +557,20 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             instruments.unshift(instrument);
           }
         });
+
+        //Filter instruments not available to a User Officer with a derived role whilst preserving the current instruemnt
+        if (currentRole === UserRole.USER_OFFICER) {
+          const currentInst = fieldValue ? [instruments[0]] : [];
+          instruments = Array.from(
+            new Set(
+              currentInst.concat(
+                instruments.filter((i) =>
+                  techniqueInstruments.map((ti) => ti.id).includes(i.id)
+                )
+              )
+            ).values()
+          );
+        }
 
         return shouldBeUneditable ? (
           instruments.find((i) => i.id === fieldValue)?.name
@@ -800,7 +841,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           proposals: ProposalViewData[] | undefined;
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
-
         api()
           .getTechniqueScientistProposals({
             filter: {
@@ -1045,7 +1085,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               isLoading: loadingInstruments,
             }}
             techniques={{
-              data: techniques,
+              data: relevantTechniques,
               isLoading: loadingTechniques,
             }}
             proposalStatuses={{
