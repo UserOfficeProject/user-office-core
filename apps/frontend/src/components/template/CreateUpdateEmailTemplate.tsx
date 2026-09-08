@@ -1,6 +1,8 @@
+import InfoIcon from '@mui/icons-material/Info';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import CodeMirror from '@uiw/react-codemirror';
 import {
@@ -182,6 +184,32 @@ const CreateUpdateEmailTemplate = ({
                     </Box>
                   )}
                 </Field>
+                <Box component="div" sx={{ fontSize: '15px' }}>
+                  Avaliable Variables
+                  <Tooltip
+                    sx={{
+                      maxWidth: '30px',
+                      fontSize: '15px',
+                    }}
+                    title={
+                      <span>
+                        <p>Avaliable variables </p>
+                        <p>
+                          id<br></br> template<br></br> email<br></br> firstName
+                          <br></br>
+                          lastName<br></br> preferredName<br></br> pi
+                          <br></br>coProposers<br></br> instruments
+                          <br></br> techniques
+                          <br></br> proposalTemplate<br></br> samples
+                          <br></br>
+                          hazards
+                        </p>
+                      </span>
+                    }
+                  >
+                    <InfoIcon></InfoIcon>
+                  </Tooltip>
+                </Box>
               </Box>
 
               <EmailTemplatePreview
