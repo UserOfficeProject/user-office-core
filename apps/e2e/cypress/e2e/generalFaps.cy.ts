@@ -22,15 +22,15 @@ const fapMembers = {
 };
 
 const fap1 = {
-  code: faker.random.words(3),
-  description: faker.random.words(8),
-  gradeGuide: faker.random.words(8),
+  code: faker.lorem.words(3),
+  description: faker.lorem.words(8),
+  gradeGuide: faker.lorem.words(8),
 };
 
 const fap2 = {
-  code: faker.random.words(3),
-  description: faker.random.words(8),
-  gradeGuide: faker.random.words(8),
+  code: faker.lorem.words(3),
+  description: faker.lorem.words(8),
+  gradeGuide: faker.lorem.words(8),
 };
 
 context('General facility access panel tests', () => {
@@ -146,8 +146,8 @@ context('General facility access panel tests', () => {
         active: true,
         reviewVisibility: 1,
       });
-      const newCode = faker.random.words(3);
-      const newDescription = faker.random.words(8);
+      const newCode = faker.lorem.words(3);
+      const newDescription = faker.lorem.words(8);
 
       cy.visit('/Faps');
       cy.finishedLoading();

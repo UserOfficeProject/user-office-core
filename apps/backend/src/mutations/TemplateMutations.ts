@@ -13,10 +13,13 @@ import {
   updateTemplateValidationSchema,
   updateTopicValidationSchema,
 } from '@user-office-software/duo-validation';
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
+import * as Yup from 'yup';
 
 import { Tokens } from '../config/Tokens';
 import { ExperimentSafetyPdfTemplateDataSource } from '../datasources/ExperimentSafetyPdfTemplateDataSource';
+import database from '../datasources/postgres/database';
 import { ProposalPdfTemplateDataSource } from '../datasources/ProposalPdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
@@ -32,6 +35,7 @@ import {
   TemplateGroupId,
 } from '../models/Template';
 import { UserWithRole } from '../models/User';
+import { TemplateExport } from './../models/Template';
 import { CreateQuestionArgs } from '../resolvers/mutations/template/CreateQuestionMutation';
 import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/template/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/template/CreateTemplateMutation';
@@ -44,7 +48,6 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutatio
 import { UpdateTemplateArgs } from '../resolvers/mutations/template/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/template/UpdateTopicMutation';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
-import { TemplateExport } from './../models/Template';
 @injectable()
 export default class TemplateMutations {
   constructor(
@@ -463,6 +466,8 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: UpdateQuestionTemplateRelationSettingsArgs
   ): Promise<Template | Rejection | null> {
+    await validateConfigBeforeWrite(args.config, args.questionId);
+
     return this.dataSource
       .updateQuestionTemplateRelationSettings(args)
       .catch((error) => {
@@ -603,4 +608,48 @@ export default class TemplateMutations {
       );
     }
   }
+}
+
+export async function validateConfigBeforeWrite(
+  newConfig: any,
+  questionId: string
+) {
+  let newConfigObject;
+  try {
+    newConfigObject = JSON.parse(newConfig);
+  } catch {
+    throw new GraphQLError('Invalid JSON for config.');
+  }
+
+  const questionType = await database('questions')
+    .select('data_type')
+    .where('question_id', questionId)
+    .first();
+
+  const questionDef = getQuestionDefinition(questionType.data_type as DataType);
+
+  const configBaseYupSchema = Yup.object({
+    small_label: Yup.string(),
+    required: Yup.boolean().required(),
+    tooltip: Yup.string(),
+    readPermissions: Yup.array().of(Yup.string().required()).required(),
+  });
+
+  try {
+    //When all configs have their own schemas written this will no longer be optional.
+    if (questionDef.customYupSchema) {
+      const combinedYupSchema = configBaseYupSchema
+        .concat(questionDef.customYupSchema)
+        .noUnknown(true, 'Unknown field');
+      await combinedYupSchema.validate(newConfigObject, { strict: true });
+    }
+  } catch (error) {
+    throw new GraphQLError('Config schema not valid');
+  }
+
+  if (questionDef.validateConfig) {
+    questionDef.validateConfig(newConfigObject);
+  }
+
+  return;
 }

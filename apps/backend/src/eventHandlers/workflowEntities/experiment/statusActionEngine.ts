@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { emailActionHandler } from './emailActionHandler';
@@ -31,9 +32,17 @@ export const experimentSafetyStatusActionEngine = async (
     groupByProperties
   );
 
-  return Promise.all(
+  Promise.all(
     groupResult.map(async (groupedExperimentSafeties) => {
       const [{ workflowStatusConnectionId }] = groupedExperimentSafeties;
+      const experimentPks = groupedExperimentSafeties.map(
+        ({ experimentSafety }) => experimentSafety.experimentPk
+      );
+      const groupLogContext = {
+        workflowStatusConnectionId,
+        experimentPks,
+      };
+
       const currentConnection = await workflowDataSource.getWorkflowConnection(
         workflowStatusConnectionId
       );
@@ -55,12 +64,23 @@ export const experimentSafetyStatusActionEngine = async (
             return;
           }
 
+          const logContext = {
+            ...groupLogContext,
+            actionId: statusAction.type,
+          };
+
           switch (statusAction.type) {
             case StatusActionType.EMAIL:
               emailActionHandler(
                 statusAction,
                 groupedExperimentSafeties.map(
                   (experimentSafety) => experimentSafety.experimentSafety
+                )
+              ).catch((error) =>
+                logger.logException(
+                  'Error executing email status actions',
+                  error,
+                  logContext
                 )
               );
               break;
@@ -71,6 +91,12 @@ export const experimentSafetyStatusActionEngine = async (
                 groupedExperimentSafeties.map(
                   (experimentSafety) => experimentSafety.experimentSafety
                 )
+              ).catch((error) =>
+                logger.logException(
+                  'Error executing RabbitMQ status actions',
+                  error,
+                  logContext
+                )
               );
               break;
 
@@ -80,5 +106,10 @@ export const experimentSafetyStatusActionEngine = async (
         })
       );
     })
-  );
+  ).catch((error) => {
+    logger.logException(
+      'Error executing experiment status action engine',
+      error
+    );
+  });
 };

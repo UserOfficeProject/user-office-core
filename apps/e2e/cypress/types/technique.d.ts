@@ -16,9 +16,9 @@ declare global {
        * @memberof Chainable
        * @example
        *    cy.createTechnique({
-       *      name: faker.random.words(2),
-       *      shortCode: faker.random.alphaNumeric(15),
-       *      description: faker.random.words(5)
+       *      name: faker.lorem.words(2),
+       *      shortCode: faker.string.alphanumeric(15),
+       *      description: faker.lorem.words(5)
        *    });
        */
       createTechnique: (

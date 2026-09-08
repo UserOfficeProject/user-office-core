@@ -144,8 +144,8 @@ const instrumentScientist1 = initialDBData.users.instrumentScientist1;
 
 function createWorkflowForInstrumentScientist() {
   const workflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.EXPERIMENT,
   };
 
@@ -232,8 +232,8 @@ function createWorkflowForInstrumentScientist() {
 
 function createWorkflowForESR() {
   const workflow = {
-    name: faker.random.words(2),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.EXPERIMENT,
   };
 

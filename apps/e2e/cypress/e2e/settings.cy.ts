@@ -330,8 +330,8 @@ context('Settings tests', () => {
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
-      const proposalTitle = faker.random.words(3);
-      const editedProposalTitle = faker.random.words(3);
+      const proposalTitle = faker.lorem.words(3);
+      const editedProposalTitle = faker.lorem.words(3);
       cy.addStatusToWorkflow({
         statusId: statuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
@@ -412,9 +412,9 @@ context('Settings tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const proposalTitle = faker.random.words(3);
+      const proposalTitle = faker.lorem.words(3);
       const currentDayStart = DateTime.now().startOf('day');
-      const editedProposalTitle = faker.random.words(3);
+      const editedProposalTitle = faker.lorem.words(3);
       cy.addStatusToWorkflow({
         statusId: statuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
@@ -504,7 +504,7 @@ context('Settings tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const proposalTitle = faker.random.words(3);
+      const proposalTitle = faker.lorem.words(3);
       const currentDayStart = DateTime.now().startOf('day');
       cy.addStatusToWorkflow({
         statusId: statuses.editableSubmittedInternal.id,
@@ -859,8 +859,8 @@ context('Settings tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
-      const internalComment = faker.random.words(2);
-      const publicComment = faker.random.words(2);
+      const internalComment = faker.lorem.words(2);
+      const publicComment = faker.lorem.words(2);
       createInstrumentAndAssignItToCall();
       addWorkflowWithChangingEvents();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -1342,12 +1342,12 @@ context('Settings tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
-      const firstProposalTitle = faker.random.words(2);
-      const firstProposalAbstract = faker.random.words(5);
-      const secondProposalTitle = faker.random.words(2);
-      const secondProposalAbstract = faker.random.words(5);
-      const internalComment = faker.random.words(2);
-      const publicComment = faker.random.words(2);
+      const firstProposalTitle = faker.lorem.words(2);
+      const firstProposalAbstract = faker.lorem.words(5);
+      const secondProposalTitle = faker.lorem.words(2);
+      const secondProposalAbstract = faker.lorem.words(5);
+      const internalComment = faker.lorem.words(2);
+      const publicComment = faker.lorem.words(2);
 
       addWorkflowWithBranchesAndChangingEvents();
 

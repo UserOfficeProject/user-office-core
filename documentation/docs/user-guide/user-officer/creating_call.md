@@ -88,7 +88,7 @@ There are several different types of templates utilized within Calls:
 ??? info "Visit registration templates :material-airplane-takeoff:" 
     [**Visit registration templates :material-airplane-takeoff:**](templates/visit_template.md) are predefined forms used to gather and organize information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.
 
-    > **_NOTE:_** The visit registration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
+    > **_NOTE:_** The visit registration form will only become accessible for users to fill out after their proposal status has been set to 'accepted', the management decision has been submitted, and the experiment has been allocated a time within the scheduler. In addition, the [visit :material-airplane-takeoff:](visits.md) must have been defined by the Principal Investigator, and only the visitors named on that visit can register.
     ______________________________________________________________________________________
     
     <figure markdown="span">  

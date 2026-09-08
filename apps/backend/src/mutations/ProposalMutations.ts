@@ -42,13 +42,17 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CreateProposalRejectionCommentArgs } from '../resolvers/mutations/CreateProposalRejectionCommentMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
-import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { CloneUtils } from '../utils/CloneUtils';
+import {
+  ProposalScientistComment,
+  ProposalRejectionComment,
+} from '../resolvers/types/ProposalView';
+import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
@@ -439,6 +443,33 @@ export default class ProposalMutations {
       );
     }
 
+    // To match the UI we want to reject any attempts to submit a management decision without setting the finalStatus or existingManagementTimeAllocations.
+    // Note that both options do start as null in the database when a proposal is first submitted. finalStatus can become 'UNSET' in the database.
+    // This rejection is used in the 'Submit Management Decision' button to inform users which ones have failed.
+    if (managementDecisionSubmitted === true) {
+      if (
+        finalStatus === null &&
+        (proposal?.finalStatus === null || proposal?.finalStatus === undefined)
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no finalStatus existing in database or supplied.',
+          { args, agent }
+        );
+      }
+
+      const existingManagementTimeAllocations =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(primaryKey);
+      if (
+        managementTimeAllocations === null &&
+        !existingManagementTimeAllocations?.[0]
+      ) {
+        return rejection(
+          'Cannot submit management decision on proposal with no managementTimeAllocations existing in database or supplied.',
+          { args, agent }
+        );
+      }
+    }
+
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
@@ -453,7 +484,8 @@ export default class ProposalMutations {
       );
     }
 
-    if (finalStatus !== undefined) {
+    // Need to check for undefined and null because 0/UNSET is falsy.
+    if (finalStatus !== undefined && finalStatus !== null) {
       proposal.finalStatus = finalStatus;
     }
 
@@ -500,10 +532,38 @@ export default class ProposalMutations {
     }
 
     return await this.proposalInternalCommentsDataSource
-      .create(args)
+      .createInternalComment(args)
       .catch((error) => {
         return rejection(
           'Could not create proposal scientist comment',
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async createProposalRejectionComment(
+    agent: UserWithRole | null,
+    args: CreateProposalRejectionCommentArgs
+  ): Promise<ProposalRejectionComment | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Could not create proposal rejection comment because proposal not found',
+        {
+          agent,
+          proposalPk: args.proposalPk,
+        }
+      );
+    }
+
+    return await this.proposalInternalCommentsDataSource
+      .createRejectionComment(args)
+      .catch((error) => {
+        return rejection(
+          'Could not create proposal rejection comment',
           { agent, args: args },
           error
         );
@@ -517,7 +577,7 @@ export default class ProposalMutations {
     args: UpdateProposalScientistCommentArgs
   ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
-      .update(args)
+      .updateInternalComment(args)
       .catch((error) => {
         return rejection(
           `Could not update proposal scientist comment: '${args.commentId}'`,
@@ -1111,14 +1171,14 @@ export default class ProposalMutations {
     }
 
     if (techniqueIds) {
-      this.techniqueDataSource.assignProposalToTechniques(
+      await this.techniqueDataSource.assignProposalToTechniques(
         submittedProposal.primaryKey,
         techniqueIds
       );
     }
 
     if (instrumentId) {
-      this.instrumentDataSource.assignProposalToInstrument(
+      await this.instrumentDataSource.assignProposalToInstrument(
         submittedProposal.primaryKey,
         instrumentId
       );

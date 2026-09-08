@@ -6,6 +6,7 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
+import ApprovalIcon from '@mui/icons-material/Approval';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -26,6 +27,7 @@ import {
   getTranslation,
 } from '@user-office-software/duo-localisation';
 import { TFunction } from 'i18next';
+import { useSnackbar } from 'notistack';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
@@ -64,6 +66,7 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
@@ -85,6 +88,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import NotifyProposal from './NotifyProposal';
+import { AdministrationFormData } from './ProposalAdmin';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
@@ -666,6 +670,40 @@ const ProposalTableOfficer = ({
       refreshTableData();
     });
   };
+  let successCount = 0;
+  let failCount = 0;
+  const { enqueueSnackbar } = useSnackbar();
+  const suppressednackbarAPI = useDataApi(true);
+  const sendProposalsToManagementDecision = async (): Promise<void> => {
+    await Promise.all(
+      getSelectedProposalPks().map(async (proposalPk) => {
+        const administrationValues = {
+          proposalPk: proposalPk,
+          commentForUser: null,
+          commentForManagement: null,
+          finalStatus: null,
+          managementTimeAllocations: null,
+          managementDecisionSubmitted: true,
+        };
+        const inputvals: AdministrationFormData = administrationValues;
+        try {
+          await suppressednackbarAPI().administrationProposal(inputvals);
+          successCount += 1;
+        } catch {
+          failCount += 1;
+        }
+      })
+    );
+    refreshTableData();
+    enqueueSnackbar(
+      `${successCount} management decision(s) were submitted and ${failCount} failed.`,
+      {
+        variant: 'info',
+        className: 'snackbar-info',
+        autoHideDuration: 5000,
+      }
+    );
+  };
 
   const assignProposalsToFaps = async (
     fapInstsruments: FapInstrumentInput[]
@@ -812,11 +850,22 @@ const ProposalTableOfficer = ({
   const reviewModal = searchParams.get('reviewModal');
   const proposalId = searchParams.get('proposalId');
 
+  const parsedReviewModalPk = reviewModal != null ? parseInt(reviewModal) : NaN;
+  const reviewModalPk = Number.isInteger(parsedReviewModalPk)
+    ? parsedReviewModalPk
+    : null;
+
+  // when we receive a link redirect, this table may not have the proposal data
   const proposalToReview = tableData.find(
     (proposal) =>
-      (reviewModal != null && proposal.primaryKey === +reviewModal) ||
+      (reviewModalPk != null && proposal.primaryKey === reviewModalPk) ||
       (proposalId != null && proposal.proposalId === proposalId)
   );
+
+  // The proposal can live outside the currently loaded page of results, so fall
+  // back to the primary key from the URL. ProposalReviewContent fetches the
+  // proposal by primary key itself, it does not rely on the table data.
+  const proposalPkToReview = proposalToReview?.primaryKey ?? reviewModalPk;
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -966,6 +1015,22 @@ const ProposalTableOfficer = ({
     .map((selectedProposal) => selectedProposal.instruments);
 
   const tableActions: Action<ProposalViewData>[] = [
+    {
+      icon: ApprovalIcon,
+      tooltip: 'Submit Management Decision',
+      onClick: () => {
+        confirm(
+          () => {
+            sendProposalsToManagementDecision();
+          },
+          {
+            title: 'Submit Management Decision',
+            description: `This action will submit the management decision for ${selectedProposalsData.length} proposal(s).`,
+          }
+        )();
+      },
+      position: 'toolbarOnSelect',
+    },
     {
       icon: FileCopy,
       tooltip: 'Clone proposals to call',
@@ -1255,8 +1320,12 @@ const ProposalTableOfficer = ({
         handleClose={handleClose}
       />
       <ProposalReviewModal
-        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!proposalToReview}
+        title={
+          proposalToReview
+            ? `View proposal: ${proposalToReview.title} (${proposalToReview.proposalId})`
+            : 'View proposal'
+        }
+        proposalReviewModalOpen={proposalPkToReview != null}
         setProposalReviewModalOpen={() => {
           const from = searchParams.get('from');
 
@@ -1287,7 +1356,7 @@ const ProposalTableOfficer = ({
         }}
       >
         <ProposalReviewContent
-          proposalPk={proposalToReview?.primaryKey as number}
+          proposalPk={proposalPkToReview}
           tabNames={userOfficerProposalReviewTabs}
         />
       </ProposalReviewModal>

@@ -13,10 +13,12 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { getIn } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { ProposalContextType } from 'components/proposal/ProposalContainer';
+import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import { Answer, InstrumentPickerConfig } from 'generated/sdk';
 
 /* InstrumentIdAndTime is used to save the 
@@ -71,6 +73,8 @@ export function QuestionaryComponentInstrumentPicker(
   const [stateValue, setStateValue] = useState<
     Array<InstrumentIdAndTime> | InstrumentIdAndTime
   >(() => processInstrumentPickerValue(answer, config));
+  const { state } = useContext(QuestionaryContext) as ProposalContextType;
+  const callAllocatedTimeUnit = state?.proposal?.call?.allocationTimeUnit;
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const getValueWithInstrumentName = () => {
@@ -173,6 +177,9 @@ export function QuestionaryComponentInstrumentPicker(
     const requestTime = Array.isArray(requestTimeForInstrument)
       ? requestTimeForInstrument
       : [requestTimeForInstrument];
+    const requestTimeUnitText = callAllocatedTimeUnit
+      ? ` (${callAllocatedTimeUnit}s)`
+      : '';
 
     return (
       requestTimeForInstrument && (
@@ -185,7 +192,7 @@ export function QuestionaryComponentInstrumentPicker(
                   value={value.timeRequested === '0' ? '' : value.timeRequested}
                   required={config.required}
                   error={isError}
-                  label={`Request Time`}
+                  label={`Request Time${requestTimeUnitText}`}
                   type="number"
                   InputProps={{
                     startAdornment: (

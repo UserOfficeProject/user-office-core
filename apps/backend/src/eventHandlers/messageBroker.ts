@@ -31,7 +31,10 @@ import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
 import { Visit } from '../models/Visit';
-import { VisitRegistrationStatus } from '../models/VisitRegistration';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
 import { WorkflowEngine } from '../workflowEngine';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 
@@ -121,7 +124,7 @@ export function createListenToQueueHandler() {
   );
 }
 
-export const getProposalMessageData = async (proposal: Proposal) => {
+const buildProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -231,7 +234,21 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     );
   }
 
+  return messageData;
+};
+
+export const getProposalMessageData = async (proposal: Proposal) => {
+  const messageData = await buildProposalMessageData(proposal);
+
   return JSON.stringify(messageData);
+};
+
+export const getProposalsMessageData = async (proposals: Proposal[]) => {
+  const proposalsMessageData = await Promise.all(
+    proposals.map(buildProposalMessageData)
+  );
+
+  return JSON.stringify(proposalsMessageData);
 };
 
 export const getExperimentMessageData = async (experiment: Experiment) => {
@@ -295,6 +312,29 @@ export const getExperimentMessageData = async (experiment: Experiment) => {
   return JSON.stringify(messageData);
 };
 
+export const getVisitMessageData = async (
+  visitRegistration: VisitRegistration
+) => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  const proposal = await proposalDataSource.getProposalByVisitId(
+    visitRegistration.visitId
+  );
+  const proposalPayload = await getProposalMessageData(proposal);
+
+  const visitJsonMessage = JSON.stringify({
+    id: visitRegistration.id,
+    startAt: visitRegistration.startsAt,
+    endAt: visitRegistration.endsAt,
+    visitorId: visitRegistration.userId.toString(),
+    proposal: JSON.parse(proposalPayload),
+  });
+
+  return visitJsonMessage;
+};
+
 export async function createPostToRabbitMQHandler() {
   const rabbitMQ = await getRabbitMQMessageBroker();
 
@@ -327,6 +367,19 @@ export async function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
+        const jsonMessage = await getProposalsMessageData(
+          event.proposals.proposals
+        );
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
       case Event.PROPOSAL_CREATED:
       case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
@@ -495,7 +548,6 @@ export async function createPostToRabbitMQHandler() {
           break;
         }
 
-        const jsonMessage = await getExperimentMessageData(experiment);
         let rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_UPDATED;
         if (event.type === Event.VISIT_REGISTRATION_APPROVED) {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED;
@@ -503,17 +555,21 @@ export async function createPostToRabbitMQHandler() {
           rabbitMQVisitEventType = RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED;
         }
 
+        const visitJsonMessage = await getVisitMessageData(visitRegistration);
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           rabbitMQVisitEventType,
-          jsonMessage
+          visitJsonMessage
         );
 
+        const experimentJsonMessage =
+          await getExperimentMessageData(experiment);
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           Event.EXPERIMENT_UPDATED,
-          jsonMessage
+          experimentJsonMessage
         );
+
         break;
       }
       case Event.DATA_ACCESS_USERS_UPDATED: {

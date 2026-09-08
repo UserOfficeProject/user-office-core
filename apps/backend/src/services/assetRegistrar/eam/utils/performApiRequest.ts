@@ -1,4 +1,5 @@
 import { createAndLogError } from './createAndLogError';
+import { getAccessToken } from './getAccessToken';
 import { getEnvOrThrow } from './getEnvOrThrow';
 
 export async function performApiRequest(uri: string, requestData: object) {
@@ -6,19 +7,15 @@ export async function performApiRequest(uri: string, requestData: object) {
   let response: Response;
   let data: any;
 
-  try {
-    const base64Credentials = Buffer.from(
-      `${getEnvOrThrow('EAM_AUTH_USER')}:${getEnvOrThrow('EAM_AUTH_PASSWORD')}`
-    ).toString('base64');
+  const accessToken = await getAccessToken();
 
+  try {
     response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(requestData),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Basic ${base64Credentials}`,
-        tenant: getEnvOrThrow('EAM_AUTH_TENANT'),
-        organization: getEnvOrThrow('EAM_ORGANIZATION_CODE'),
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     data = await response.json();

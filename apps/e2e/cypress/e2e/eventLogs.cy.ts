@@ -57,7 +57,7 @@ context('Event log tests', () => {
     });
 
     it('If user updates his info, officer should be able to see the event logs for that update', () => {
-      const newFirstName = faker.name.firstName();
+      const newFirstName = faker.person.firstName();
       // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
       const updateProfileDate = DateTime.now().toFormat(
         initialDBData.getFormats().dateFormat + ' HH'

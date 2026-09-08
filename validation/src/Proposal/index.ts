@@ -24,7 +24,7 @@ export const proposalNotifyValidationSchema = submitProposalValidationSchema;
 
 export const administrationProposalValidationSchema = Yup.object().shape({
   proposalPk: Yup.number().required(),
-  finalStatus: Yup.string().required(),
+  finalStatus: Yup.string().nullable(),
   commentForUser: Yup.string().nullable(),
   commentForManagement: Yup.string().nullable(),
   managementTimeAllocations: Yup.array()
@@ -37,7 +37,7 @@ export const administrationProposalValidationSchema = Yup.object().shape({
           .nullable(),
       })
     )
-    .required()
+    .nullable()
     .min(1),
   managementDecisionSubmitted: Yup.bool().nullable(),
 });

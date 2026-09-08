@@ -6,7 +6,7 @@ context('Page tests', () => {
     cy.getAndStoreFeaturesEnabled();
   });
 
-  const faqContents = faker.random.words(2);
+  const faqContents = faker.lorem.words(2);
 
   it('Should be able update FAQ', () => {
     cy.login('officer');

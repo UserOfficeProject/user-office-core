@@ -25,7 +25,7 @@ context('Institution tests', () => {
   });
 
   it('User Officer should be able to update Institution', () => {
-    const name = faker.random.words(2);
+    const name = faker.lorem.words(2);
 
     cy.login('officer');
     cy.visit('/');
@@ -62,7 +62,7 @@ context('Institution tests', () => {
     const institutionA = 'Other';
     const personFromInstitutionA = 'David';
     const institutionB = 'Aarhus University';
-    const mergedName = faker.random.words(2);
+    const mergedName = faker.lorem.words(2);
 
     cy.login('officer');
     cy.visit('/');
