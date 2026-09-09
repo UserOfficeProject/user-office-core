@@ -36,7 +36,7 @@ const StyledSnackbarContent = styled(MaterialDesignContent)(() => ({
 }));
 
 function Root() {
-  const notistackRef = React.createRef<SnackbarProvider>();
+  const notistackRef = React.useRef<SnackbarProvider>(null);
 
   const onClickDismiss = (key: string | number | undefined) => () => {
     notistackRef.current?.closeSnackbar(key);
