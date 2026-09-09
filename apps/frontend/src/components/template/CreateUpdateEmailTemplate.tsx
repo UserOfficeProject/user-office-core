@@ -195,14 +195,24 @@ const CreateUpdateEmailTemplate = ({
                       <span>
                         <p>Avaliable variables </p>
                         <p>
-                          id<br></br> template<br></br> email<br></br> firstName
-                          <br></br>
-                          lastName<br></br> preferredName<br></br> pi
-                          <br></br>coProposers<br></br> instruments
-                          <br></br> techniques
-                          <br></br> proposalTemplate<br></br> samples
-                          <br></br>
-                          hazards
+                          id<br></br>
+                          proposals<br></br>
+                          template<br></br>
+                          email<br></br>
+                          firstName<br></br>
+                          lastName<br></br>
+                          preferredName<br></br>
+                          pi<br></br>
+                          coProposers<br></br>
+                          instruments<br></br>
+                          techniques<br></br>
+                          proposalTemplate<br></br>
+                          samples<br></br>
+                          hazards<br></br>
+                          rejectionComment<br></br>
+                          fapMeetingDecisions<br></br>
+                          technicalReviews<br></br>
+                          call
                         </p>
                       </span>
                     }
