@@ -26,7 +26,7 @@ interface WizardProps
 
 type WizardStepProps = {
   title: string;
-  validationSchema: Yup.ISchema<unknown>;
+  validationSchema: Yup.ObjectSchema<Record<string, unknown>>;
   onSubmit?: FormikConfig<FormikValues>['onSubmit'];
   children: React.ReactNode;
 };
