@@ -134,12 +134,28 @@ export default class PostgresInstrumentDataSource
 
   async getInstruments(
     first?: number,
-    offset?: number
+    offset?: number,
+    agentRoleId?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
-    return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('instruments')
-      .orderBy('instrument_id', 'desc')
+    const tags = agentRoleId
+      ? (await this.getTagsByRoleId(agentRoleId)) ?? []
+      : [];
+
+    const tagIds = tags.map((tag) => tag.id);
+
+    const instruments: InstrumentRecord[] = await database
+      .select(['i.*', database.raw('count(*) OVER() AS full_count')])
+      .from('instruments as i')
+      .modify((query) => {
+        if (tags.length > 0) {
+          query.whereIn('i.instrument_id', function () {
+            this.select('ti.instrument_id')
+              .from('tag_instrument as ti')
+              .whereIn('ti.tag_id', tagIds);
+          });
+        }
+      })
+      .orderBy('i.instrument_id', 'desc')
       .modify((query) => {
         if (first) {
           query.limit(first);
@@ -147,18 +163,18 @@ export default class PostgresInstrumentDataSource
         if (offset) {
           query.offset(offset);
         }
-      })
-      .then((instruments: InstrumentRecord[]) => {
-        const result = instruments.map((instrument) =>
-          this.createInstrumentObject(instrument)
-        );
-
-        return {
-          totalCount: instruments[0] ? instruments[0].full_count : 0,
-          instruments: result,
-        };
       });
+
+    const result = instruments.map((instrument) =>
+      this.createInstrumentObject(instrument)
+    );
+
+    return {
+      totalCount: instruments[0] ? instruments[0].full_count : 0,
+      instruments: result,
+    };
   }
+
   async getTagsByRoleId(roleId: number): Promise<Tag[]> {
     try {
       const rows = await database

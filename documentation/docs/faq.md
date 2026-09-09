@@ -57,9 +57,19 @@ ________________________________________________________________________________
     ### **Shipment declaration templates**
     * [**What are shipment declaration templates?**](user-guide/user-officer/templates/shipment_template.md#what-are-shipment-declaration-templates)
 
+??? info "**Visits**"
+    ### **Visits**
+    * [**What is a visit?**](user-guide/user-officer/visits.md#what-is-a-visit)
+    * [**Who can define a visit?**](user-guide/user-officer/visits.md#who-can-define-a-visit)
+    * [**Who can see a visit?**](user-guide/user-officer/visits.md#who-can-see-a-visit)
+    * [**Who can edit a visit?**](user-guide/user-officer/visits.md#who-can-edit-a-visit)
+    * [**Why can I not see the visit buttons?**](user-guide/user-officer/visits.md#why-can-i-not-see-the-visit-buttons)
+
 ??? info "**Visit registration templates**"
     ### **Visit registration templates**
     * [**What are visit registration templates?**](user-guide/user-officer/templates/visit_template.md#what-are-visit-registration-templates)
+    * [**Who can fill out a visit registration?**](user-guide/user-officer/templates/visit_template.md#who-can-fill-out-a-visit-registration)
+    * [**When can I edit my visit registration?**](user-guide/user-officer/visits.md#registering-for-a-visit)
 
 ??? info "**Proposal Experiment Safety Input (ESI) templates**"
     ### **Proposal ESI templates**
