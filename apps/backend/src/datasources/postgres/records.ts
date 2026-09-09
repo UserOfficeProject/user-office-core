@@ -9,6 +9,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { DataAccessClaim } from '../../models/DataAccessClaim';
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
@@ -1468,6 +1469,9 @@ export interface DataAccessClaimRecord {
   readonly invite_id: number;
   readonly proposal_pk: number;
 }
+
+export const createDataAccessClaimObject = (claim: DataAccessClaimRecord) =>
+  new DataAccessClaim(claim.invite_id, claim.proposal_pk);
 
 export interface TagRecord {
   readonly tag_id: number;

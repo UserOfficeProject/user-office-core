@@ -1,3 +1,4 @@
+import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Rejection } from '../../models/Rejection';
@@ -6,7 +7,6 @@ import {
   DataAccessUsersDataSource,
   UserWithInstitution,
 } from '../DataAccessUsersDataSource';
-import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
 
 // Mock full user objects for getDataAccessUsersWithInstitution
 export const dummyDataAccessFullUser = new User(
@@ -46,7 +46,6 @@ export const dummyInstitution2 = new Institution(11, 'Research Center', 2);
 
 export const dummyCountry = new Country(1, 'Denmark');
 export const dummyCountry2 = new Country(2, 'United Kingdom');
-export const dummyCountry3 = new Country(3, 'Belarus');
 
 export default class MockDataAccessUsersDataSource
   implements DataAccessUsersDataSource

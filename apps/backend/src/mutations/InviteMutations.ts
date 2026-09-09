@@ -179,8 +179,10 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites =
-      await this.inviteDataSource.findPendingCoProposerInvites(proposalPk);
+    const existingInvites = await this.inviteDataSource.getCoProposerInvites({
+      proposalPk,
+      isClaimed: false,
+    });
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
@@ -251,8 +253,10 @@ export default class InviteMutations {
       );
     }
 
-    const existingInvites =
-      await this.inviteDataSource.findPendingDataAccessInvites(proposalPk);
+    const existingInvites = await this.inviteDataSource.getDataAccessInvites({
+      proposalPk,
+      isClaimed: false,
+    });
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(

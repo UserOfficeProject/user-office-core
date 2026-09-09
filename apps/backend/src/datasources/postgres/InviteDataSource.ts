@@ -9,13 +9,6 @@ import {
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 export default class PostgresInviteDataSource implements InviteDataSource {
-  findPendingCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    return this.getCoProposerInvites({ proposalPk, isClaimed: false });
-  }
-
-  findPendingDataAccessInvites(proposalPk: number): Promise<Invite[]> {
-    return this.getDataAccessInvites({ proposalPk, isClaimed: false });
-  }
   findVisitRegistrationInvites(
     visitId: number,
     isClaimed?: boolean

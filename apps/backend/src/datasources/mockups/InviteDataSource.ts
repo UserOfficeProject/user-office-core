@@ -1,5 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
+import { CoProposerClaimDataSourceMock } from './CoProposerClaimDataSource';
+import { DataAccessClaimDataSourceMock } from './DataAccessClaimDataSource';
 import { Tokens } from '../../config/Tokens';
 import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Invite } from '../../models/Invite';
@@ -8,8 +10,6 @@ import {
   GetInvitesFilter,
   InviteDataSource,
 } from '../InviteDataSource';
-import { CoProposerClaimDataSourceMock } from './CoProposerClaimDataSource';
-import { DataAccessClaimDataSourceMock } from './DataAccessClaimDataSource';
 
 @injectable()
 export class InviteDataSourceMock implements InviteDataSource {
@@ -17,19 +17,11 @@ export class InviteDataSourceMock implements InviteDataSource {
 
   constructor(
     @inject(Tokens.CoProposerClaimDataSource)
-    private coProposerDataSource: CoProposerClaimDataSourceMock,
+    private coProposerClaimDataSource: CoProposerClaimDataSourceMock,
     @inject(Tokens.DataAccessClaimDataSource)
     private dataAccessDataSource: DataAccessClaimDataSourceMock
   ) {
     this.init();
-  }
-
-  async findPendingCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    return this.getCoProposerInvites({ proposalPk, isClaimed: false });
-  }
-
-  async findPendingDataAccessInvites(proposalPk: number): Promise<Invite[]> {
-    return this.getDataAccessInvites({ proposalPk, isClaimed: false });
   }
 
   async findVisitRegistrationInvites(
@@ -203,10 +195,11 @@ export class InviteDataSourceMock implements InviteDataSource {
   async getCoProposerInvites(
     filter: GetProposalInvitesFilter
   ): Promise<Invite[]> {
-    const inviteIdsOnProposal = filter.proposalPk
-      ? (
-          await this.coProposerDataSource.findByProposalPk(filter.proposalPk)
-        ).map((claim) => claim.inviteId)
+    const coProposerClaims = filter.proposalPk
+      ? await this.coProposerClaimDataSource.findByProposalPk(filter.proposalPk)
+      : null;
+    const inviteIdsOnProposal = coProposerClaims
+      ? coProposerClaims.map((claim) => claim.inviteId)
       : null;
 
     return this.invites.filter((invite) => {
