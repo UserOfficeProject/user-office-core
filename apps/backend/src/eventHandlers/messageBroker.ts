@@ -320,16 +320,26 @@ export const getVisitMessageData = async (
     Tokens.ProposalDataSource
   );
 
-  const proposal = await proposalDataSource.getProposalByVisitId(
-    visitRegistration.visitId
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
   );
+
+  const [proposal, visitor] = await Promise.all([
+    proposalDataSource.getProposalByVisitId(visitRegistration.visitId),
+    userDataSource.getUser(visitRegistration.userId),
+  ]);
+
+  if (!visitor) {
+    throw new Error(`Visitor with id ${visitRegistration.userId} not found`);
+  }
+
   const proposalPayload = await getProposalMessageData(proposal);
 
   const visitJsonMessage = JSON.stringify({
     id: visitRegistration.id,
     startAt: visitRegistration.startsAt,
     endAt: visitRegistration.endsAt,
-    visitorId: visitRegistration.userId.toString(),
+    visitorId: visitor.oidcSub,
     proposal: JSON.parse(proposalPayload),
   });
 

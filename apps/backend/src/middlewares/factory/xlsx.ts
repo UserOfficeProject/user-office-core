@@ -1,6 +1,7 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
+import i18next from '../../../i18next';
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
 import callFactoryService, {
@@ -171,13 +172,26 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
 });
 
 router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
+  const userAuthorization = container.resolve<UserAuthorization>(
+    Tokens.UserAuthorization
+  );
+
+  const userWithRole = {
+    ...res.locals.agent,
+  };
+
+  const roleTags = await userAuthorization.getCurrentRoleTags(userWithRole);
+  const translationForFirstRoleTag = !roleTags.length
+    ? ''
+    : roleTags[0].name + '.';
+
   const techniqueProposalDataColumns = [
     'Proposal ID',
     'Title',
     'Principal Investigator',
     'PI Email',
     'Date Submitted',
-    'Technique',
+    i18next.t(`${translationForFirstRoleTag}Technique`),
     'Instrument',
     'Status',
   ];
@@ -187,18 +201,10 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
       throw new Error('Not authorized');
     }
 
-    const userWithRole = {
-      ...res.locals.agent,
-    };
-
     const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
       .filter((id: number) => !isNaN(id));
-
-    const userAuthorization = container.resolve<UserAuthorization>(
-      Tokens.UserAuthorization
-    );
 
     if (
       !userAuthorization.isUserOfficer(userWithRole) &&
