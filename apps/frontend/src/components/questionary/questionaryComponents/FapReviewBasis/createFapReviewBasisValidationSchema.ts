@@ -31,7 +31,7 @@ export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinitio
 
           return isNaN(number) ? true : number >= config.minGrade;
         })
-        .test('max', `Lowest grade is ${config.maxGrade}`, (val) => {
+        .test('max', `Maximum grade is ${config.maxGrade}`, (val) => {
           if (val === undefined) return false;
 
           const number = parseFloat(val);
