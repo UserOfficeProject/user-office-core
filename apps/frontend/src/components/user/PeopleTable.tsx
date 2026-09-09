@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -174,8 +174,7 @@ const PeopleTable = ({
   const [tableEmails, setTableEmails] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchName, setSearchName] = useState('');
-  const tableRef =
-    React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
+  const tableRef = useRef<MaterialTableCore<BasicUserDetailsFragment>>(null);
 
   const sortDirection = persistUrlQueryParams
     ? searchParams.get('sortDirection')
