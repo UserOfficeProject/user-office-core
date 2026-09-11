@@ -24,7 +24,7 @@ export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinitio
     const schema = Yup.object().shape({
       comment: commentSchema,
       grade: Yup.string()
-        .test('min', `Lowest grade is ${config.minGrade}`, (val) => {
+        .test('min', `Minimum grade is ${config.minGrade}`, (val) => {
           if (val === undefined) return false;
 
           const number = parseFloat(val);
