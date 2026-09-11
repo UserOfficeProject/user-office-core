@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:22.14.0-alpine AS build-stage
+FROM node:22.23.2-alpine AS build-stage
 
 ARG ORCID_REDIRECT=
 ARG BUILD_VERSION=<unknown>
@@ -23,7 +23,7 @@ COPY apps/frontend/ /app/frontend
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginxinc/nginx-unprivileged:alpine3.23
+FROM nginxinc/nginx-unprivileged:1.31.5-alpine
 
 COPY --from=build-stage /app/frontend/build/ /usr/share/nginx/html
 COPY --from=build-stage /app/frontend/build-version.txt /usr/share/nginx/html
