@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from './UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { Feedback } from '../models/Feedback';
 import { UserWithRole } from '../models/User';
 import { VisitDataSource } from './../datasources/VisitDataSource';
-import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class FeedbackAuthorization {
@@ -53,9 +53,13 @@ export class FeedbackAuthorization {
       return true;
     }
 
+    if (this.userAuth.isApiToken(agent)) {
+      return true;
+    }
+
     const feedback = await this.resolveFeedback(feedbackOrFeedbackId);
 
-    if (!feedback) {
+    if (!feedback || !agent.id) {
       return false;
     }
 
