@@ -291,8 +291,6 @@ const ProposalTableInstrumentScientist = ({
   const dataType = searchParams.get('dataType');
   const reviewer = searchParams.get('reviewer');
   const search = searchParams.get('search');
-  // `searchParams.getAll` returns a new array on every render, so the effect
-  // below keys off the serialised value and reuses one array identity for it.
   const selectionKey = JSON.stringify(searchParams.getAll('selection'));
   const selection: string[] = useMemo(
     () => JSON.parse(selectionKey),
