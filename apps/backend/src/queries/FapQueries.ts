@@ -217,6 +217,30 @@ export default class FapQueries {
     );
   }
 
+  @Authorized()
+  async getFapReviewData(
+    agent: UserWithRole | null,
+    {
+      fapId,
+      callId,
+      instrumentId,
+    }: {
+      fapId: number;
+      callId: number;
+      instrumentId: number;
+    }
+  ) {
+    if (await this.userHasFapAccess(agent, fapId)) {
+      return await this.dataSource.getFapReviewData(
+        callId,
+        fapId,
+        instrumentId
+      );
+    }
+
+    return [];
+  }
+
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
   async getProposalFapMeetingDecisions(
     agent: UserWithRole | null,

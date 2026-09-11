@@ -1,12 +1,14 @@
-import { existsSync } from 'node:fs';
+import { existsSync } from 'fs';
 import path from 'path';
 
+import {
+  AuthenticationResult,
+  ConfidentialClientApplication,
+} from '@azure/msal-node';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
-import { Transporter } from 'nodemailer';
-import SMTPPool from 'nodemailer/lib/smtp-pool';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { createTransport } from 'nodemailer';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
@@ -24,6 +26,9 @@ import SendMailOptions, { MailService, SendMailResults } from '../MailService';
 export class SMTPMailService extends MailService {
   private emailTemplate: EmailTemplates<any>;
   private emailTemplateDataSource: EmailTemplateDataSource;
+  private attachments: any[];
+  private authToken: AuthenticationResult | null = null;
+  private transport: nodemailer.Transporter | null = null;
 
   constructor() {
     super();
@@ -34,11 +39,11 @@ export class SMTPMailService extends MailService {
       Tokens.EmailTemplateDataSource
     );
 
-    const attachments = [];
+    this.attachments = [];
 
     if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
       if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
-        attachments.push({
+        this.attachments.push({
           filename: 'logo.png',
           path: process.env.EMAIL_FOOTER_IMAGE_PATH,
           cid: 'logo1',
@@ -49,57 +54,6 @@ export class SMTPMailService extends MailService {
         });
       }
     }
-
-    let smtpTransport:
-      | Transporter<SMTPPool.SentMessageInfo>
-      | Transporter<SMTPTransport.SentMessageInfo>;
-
-    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
-      smtpTransport = nodemailer.createTransport({
-        pool: true,
-        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        ...this.getSmtpAuthOptions(),
-      });
-    } else {
-      smtpTransport = nodemailer.createTransport({
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        ...this.getSmtpAuthOptions(),
-      });
-    }
-
-    this.emailTemplate = new EmailTemplates({
-      message: {
-        from: process.env.EMAIL_SENDER,
-        attachments,
-      },
-      send: true,
-      transport: smtpTransport,
-      juice: true,
-      juiceResources: {
-        webResources: {
-          relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
-        },
-      },
-      render: (view: string) => {
-        return new Promise((resolve, reject) => {
-          const lastSlashIndex = view.lastIndexOf('/');
-          const templateBody =
-            lastSlashIndex !== -1 ? view.substring(0, lastSlashIndex) : view;
-
-          this.emailTemplate
-            .juiceResources(templateBody)
-            .then((html) => {
-              resolve(html);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        });
-      },
-    });
   }
 
   private async resolveEmailTemplate(identifier: string) {
@@ -172,22 +126,122 @@ export class SMTPMailService extends MailService {
     return result;
   }
 
-  private getSmtpAuthOptions() {
-    if (process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD) {
-      return {
-        auth: {
-          user: process.env.EMAIL_AUTH_USERNAME,
-          pass: process.env.EMAIL_AUTH_PASSWORD,
-        },
-      };
+  private isTokenExpired(): boolean {
+    return Date.now() >= this.authToken!.expiresOn!.getTime();
+  }
+
+  private async getAccessToken(): Promise<void> {
+    if (this.authToken && !this.isTokenExpired()) {
+      return;
     }
 
-    return {
-      secure: false,
-      tls: {
-        rejectUnauthorized: false,
+    const tokenRequest = {
+      scopes: [process.env.EMAIL_SCOPE || ''],
+    };
+
+    const msalConfig = {
+      auth: {
+        clientId: process.env.EMAIL_CLIENT_ID || '',
+        authority: `${process.env.EMAIL_AUTHORITY}/${process.env.EMAIL_TENANT_ID}`,
+        clientSecret: process.env.EMAIL_CLIENT_SECRET || '',
       },
     };
+
+    const cca = new ConfidentialClientApplication(msalConfig);
+    this.authToken = await cca.acquireTokenByClientCredential(tokenRequest);
+
+    if (!this.authToken?.expiresOn) {
+      throw new Error('Invalid token: Missing expiresOn property');
+    }
+
+    if (!this.authToken || !this.authToken.accessToken) {
+      throw new Error('Failed to get access token');
+    }
+  }
+
+  private async createBasicAuthTransport(): Promise<void> {
+    if (this.transport) {
+      return;
+    }
+
+    const transportOptions =
+      process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD
+        ? {
+            host: process.env.EMAIL_AUTH_HOST,
+            port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+            auth: {
+              user: process.env.EMAIL_AUTH_USERNAME,
+              pass: process.env.EMAIL_AUTH_PASSWORD,
+            },
+          }
+        : {
+            host: process.env.EMAIL_AUTH_HOST,
+            port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+            secure: false,
+            tls: {
+              rejectUnauthorized: false,
+            },
+          };
+
+    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
+      this.transport = nodemailer.createTransport({
+        pool: true,
+        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        ...transportOptions,
+      });
+    } else {
+      this.transport = nodemailer.createTransport({
+        ...transportOptions,
+      });
+    }
+  }
+
+  private async createOauth2Transport(): Promise<void> {
+    if (this.transport && this.authToken && !this.isTokenExpired()) {
+      return;
+    }
+
+    if (this.transport) {
+      this.transport.close();
+    }
+
+    await this.getAccessToken();
+
+    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
+      this.transport = createTransport({
+        pool: true,
+        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
+        secure: false,
+        requireTLS: true,
+        auth: {
+          type: 'OAuth2',
+          user: process.env.EMAIL_SENDER,
+          accessToken: this.authToken?.accessToken,
+        },
+      });
+    } else {
+      this.transport = createTransport({
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '587'),
+        secure: false,
+        requireTLS: true,
+        auth: {
+          type: 'OAuth2',
+          user: process.env.EMAIL_SENDER,
+          accessToken: this.authToken?.accessToken,
+        },
+      });
+    }
+  }
+
+  private async createTransport(): Promise<void> {
+    if (process.env.EMAIL_USE_SMTP_OAUTH_2 === 'true') {
+      await this.createOauth2Transport();
+    } else {
+      await this.createBasicAuthTransport();
+    }
   }
 
   async sendMail(options: SendMailOptions) {
@@ -211,6 +265,14 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
+    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
+      logger.logInfo('Skipping email sending', {
+        template: options.content.template,
+      });
+
+      return { results: sendMailResults };
+    }
+
     const template = await this.compileEmailTemplate(options);
 
     if (!template) {
@@ -221,13 +283,46 @@ export class SMTPMailService extends MailService {
       return { results: sendMailResults };
     }
 
-    if (process.env.SKIP_SMTP_EMAIL_SENDING === 'true') {
-      logger.logInfo('Skipping email sending', {
+    await this.createTransport();
+
+    if (!this.transport) {
+      logger.logError('Failed to create email transport', {
         template: options.content.template,
       });
 
       return { results: sendMailResults };
     }
+
+    this.emailTemplate = new EmailTemplates({
+      message: {
+        from: process.env.EMAIL_SENDER,
+        attachments: this.attachments,
+      },
+      send: true,
+      transport: this.transport,
+      juice: true,
+      juiceResources: {
+        webResources: {
+          relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
+        },
+      },
+      render: (view: string) => {
+        return new Promise((resolve, reject) => {
+          const lastSlashIndex = view.lastIndexOf('/');
+          const templateBody =
+            lastSlashIndex !== -1 ? view.substring(0, lastSlashIndex) : view;
+
+          this.emailTemplate
+            .juiceResources(templateBody)
+            .then((html) => {
+              resolve(html);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      },
+    });
 
     options.recipients.forEach((participant) => {
       emailPromises.push(
