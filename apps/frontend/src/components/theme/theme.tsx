@@ -56,8 +56,6 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         settingsMap.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
         defaultTheme.palette.info.main,
     },
-    // NOTE: This was previous default background on the body. Now it is white and that's why we are overwriting it.
-    // (https://v4.mui.com/customization/default-theme/#explore vs https://mui.com/customization/default-theme/#explore)
     background: {
       default: '#fafafa',
     },
@@ -91,26 +89,14 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
     },
   });
 
-  // NOTE: the picker component keys below are not type-checked. Registering them
-  // properly needs `import '@mui/x-date-pickers/themeAugmentation'`, which makes
-  // `tsc` run out of heap on this codebase, and the second argument of
-  // `createTheme(base, ...)` is typed as a plain object. Each key is verified to
-  // be read via `useThemeProps` in @mui/x-date-pickers 9.12.0; if you rename one,
-  // nothing will complain — it will just silently stop applying.
   const theme = responsiveFontSizes(
     createTheme(baseTheme, {
       components: {
-        // Pickers render their own PickersTextField, so they do not inherit the
-        // MuiTextField defaults above and would fall back to `outlined`.
         MuiPickersTextField: {
           defaultProps: {
             variant: 'standard',
           },
         },
-        // Forces the desktop (popover) picker from `sm` upwards, which is also
-        // what keeps Cypress able to drive the pickers:
-        // https://stackoverflow.com/a/69986695/5619063 and
-        // https://github.com/cypress-io/cypress/issues/970
         MuiDatePicker: {
           defaultProps: {
             desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
