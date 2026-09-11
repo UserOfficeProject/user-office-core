@@ -43,7 +43,10 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       <FormLabel sx={{ marginBottom: theme.spacing(2) }}>{question}</FormLabel>
       {config.max && (
         <FormLabel
-          sx={{ marginBottom: theme.spacing(2) }}
+          sx={[
+            { marginBottom: theme.spacing(2) },
+            { '& .MuiFormLabel-asterisk': { display: 'none' } },
+          ]}
           data-cy="rich-text-char-count"
         >
           Characters: {numberOfChars} / {config.max}
