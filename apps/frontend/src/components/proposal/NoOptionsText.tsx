@@ -40,9 +40,6 @@ function NoOptionsText({
     allowInviteByEmail && isEmailInviteFeatureEnabled;
 
   if (exactEmailMatch) {
-    // Rendered inside an Autocomplete's listbox, so this must not be a
-    // MenuItem: Material UI v9 makes MenuItem throw ("MenuListContext is
-    // missing") anywhere outside a Menu or MenuList.
     return (
       <ListItemButton onClick={() => onAddUser(exactEmailMatch)}>
         {getFullUserNameWithInstitution(exactEmailMatch)}
