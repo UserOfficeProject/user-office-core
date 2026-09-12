@@ -9,6 +9,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { addUserThroughModal } from '../support/peopleSelector';
 
 context('Technique tests', () => {
   const title = faker.word.words(5);
@@ -659,9 +660,7 @@ context('Technique tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.contains(scientist2.lastName).parent().find('[type=checkbox]').click();
-
-      cy.contains('Update').click();
+      addUserThroughModal(scientist2.lastName);
 
       cy.notification({
         variant: 'success',
