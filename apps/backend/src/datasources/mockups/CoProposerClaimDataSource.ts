@@ -9,6 +9,8 @@ export class CoProposerClaimDataSourceMock
   init() {
     this.invites = [
       new CoProposerClaim(1, 1),
+      // Invite 2 is the co-proposer invite on proposal 1 in InviteDataSourceMock
+      new CoProposerClaim(2, 1),
       new CoProposerClaim(2, 2),
       new CoProposerClaim(3, 3),
     ];

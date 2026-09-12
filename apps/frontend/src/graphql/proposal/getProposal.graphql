@@ -84,5 +84,8 @@ query getProposal($primaryKey: Int!) {
     coProposerInvites {
       ...invite
     }
+    dataAccessInvites {
+      ...invite
+    }
   }
 }

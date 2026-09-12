@@ -11,12 +11,20 @@ export type UserWithInstitution = {
 
 export interface DataAccessUsersDataSource {
   findByProposalPk(proposalPk: number): Promise<BasicUserDetails[]>;
+
   getDataAccessUsersWithInstitution(
     proposalPk: number
   ): Promise<UserWithInstitution[]>;
+
+  addDataAccessUser(
+    proposalPk: number,
+    userId: number
+  ): Promise<Rejection | undefined>;
+
   updateDataAccessUsers(
     proposalPk: number,
     userIds: number[]
   ): Promise<BasicUserDetails[] | Rejection>;
+
   isDataAccessUserOfProposal(id: number, proposalPk: number): Promise<boolean>;
 }
