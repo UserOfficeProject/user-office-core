@@ -753,13 +753,9 @@ const ProposalTableInstrumentScientist = ({
         : undefined
   );
 
-  const GetAppIconComponent = (): JSX.Element => (
-    <GetAppIcon data-cy="download-proposals" />
-  );
-  const DoneAllIcon = (): JSX.Element => (
-    <DoneAll data-cy="submit-proposal-reviews" />
-  );
-  const ReduceCapacityIconComponent = (): JSX.Element => (
+  const GetAppIconComponent = () => <GetAppIcon data-cy="download-proposals" />;
+  const DoneAllIcon = () => <DoneAll data-cy="submit-proposal-reviews" />;
+  const ReduceCapacityIconComponent = () => (
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 

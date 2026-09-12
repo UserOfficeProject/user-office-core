@@ -212,7 +212,7 @@ const ProposalReviewContent = ({
           ) || []
         }
       >
-        {technicalReviewsContent as JSX.Element[]}
+        {technicalReviewsContent as React.ReactNode[]}
       </SimpleTabs>
     ) : (
       technicalReviewsContent

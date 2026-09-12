@@ -284,11 +284,11 @@ export const DownloadContextProvider = ({
   };
 
   return (
-    <DownloadContext.Provider value={{ prepareDownload }}>
+    <DownloadContext value={{ prepareDownload }}>
       {children}
       {isLoggedIn && inProgress.length > 0 && (
         <DownloadMonitorDialog items={inProgress} cancel={cancelDownload} />
       )}
-    </DownloadContext.Provider>
+    </DownloadContext>
   );
 };

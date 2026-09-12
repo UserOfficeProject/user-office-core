@@ -7,7 +7,7 @@ import {
 } from 'graphql-request';
 import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/legacy/helpers/types';
 import { jwtDecode } from 'jwt-decode';
-import { useSnackbar, WithSnackbarProps } from 'notistack';
+import { useSnackbar, ProviderContext } from 'notistack';
 import { useCallback, useContext } from 'react';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -40,7 +40,7 @@ export async function sendClientLog(
 }
 
 const notifyAndLog = async (
-  enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
+  enqueueSnackbar: ProviderContext['enqueueSnackbar'],
   userMessage: string,
   error: ClientError | string,
   suppressedSnackbar: boolean,
@@ -71,7 +71,7 @@ export function getUnauthorizedApi() {
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
-    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar']
+    private enqueueSnackbar: ProviderContext['enqueueSnackbar']
   ) {
     super(endpoint);
     this.setHeader(clientNameHeader, clientName);
@@ -124,7 +124,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
     private token: string,
-    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
+    private enqueueSnackbar: ProviderContext['enqueueSnackbar'],
     private onSessionExpired: () => void,
     private handleUserActive: () => void,
     private isIdle: boolean,

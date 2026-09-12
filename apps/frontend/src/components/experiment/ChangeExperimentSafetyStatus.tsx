@@ -192,7 +192,7 @@ const ChangeExperimentSafetyStatusForm = ({
         }}
         validationSchema={ChangeExperimentSafetyStatusValidationSchema}
       >
-        {({ isSubmitting, values, setFieldValue }): JSX.Element => {
+        {({ isSubmitting, values, setFieldValue }) => {
           const incomingConnections = getConnectionsToStatus(
             values.selectedWorkflowStatusId
           );

@@ -168,7 +168,7 @@ const AddStatusActionsToConnection = ({
         addStatusActionsToConnection(connectionActions);
       }}
     >
-      {({ isSubmitting, values }): JSX.Element => (
+      {({ isSubmitting, values }) => (
         <Form>
           <Typography
             sx={{

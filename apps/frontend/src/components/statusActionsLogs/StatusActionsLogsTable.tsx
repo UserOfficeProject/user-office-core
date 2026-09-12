@@ -42,17 +42,17 @@ const StatusActionsLogsTable = ({
 }: StatusActionsLogsTableProps) => {
   const [statusActionType] = useState<StatusActionType>(propStatusActionType);
   const { toFormattedDateTime } = useFormattedDateTime();
-  const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
+  const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>(undefined);
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
   const { calls, loadingCalls } = useCallsData();
   const [selectedCallName, setSelectedCallName] = useState<string | undefined>(
     undefined
   );
-  const ReplayAllIcon = (): JSX.Element => (
+  const ReplayAllIcon = () => (
     <ReplayCircleFilledIcon data-cy="replay_all_status_action_icon" />
   );
-  const RefreshIcon = (): JSX.Element => <Refresh />;
+  const RefreshIcon = () => <Refresh />;
   const [currentPageLogIds, setCurrentPageLogIds] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams({
     statusActionsLogStatus: StatusActionsLogStatus.ALL,

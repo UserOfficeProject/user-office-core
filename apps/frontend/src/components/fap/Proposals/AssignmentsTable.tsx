@@ -285,7 +285,7 @@ const AssignmentsTable = ({
         pIInstitutionConflictMap.size > 0 ||
         coIInstitutionConflictMap.size > 0);
 
-    const alertText: JSX.Element[] = [];
+    const alertText: React.ReactNode[] = [];
 
     const selectedProposalPks = selectedProposals.map(
       (selectedProposal) => selectedProposal.proposalPk

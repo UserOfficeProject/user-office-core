@@ -48,8 +48,8 @@ export const FeatureContextProvider = (props: {
   }, new Map<FeatureId, Feature>());
 
   return (
-    <FeatureContext.Provider value={{ featuresMap, features, setFeatures }}>
+    <FeatureContext value={{ featuresMap, features, setFeatures }}>
       {props.children}
-    </FeatureContext.Provider>
+    </FeatureContext>
   );
 };

@@ -12,21 +12,20 @@ import React from 'react';
 import { Proposal } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = ({
+  ref,
+  ...props
+}: TransitionProps & {
+  children: React.ReactElement;
+  ref?: React.Ref<unknown>;
+}) => <Slide direction="up" ref={ref} {...props} />;
 
 type ProposalReviewModalProps = {
   proposalReviewModalOpen: boolean;
   setProposalReviewModalOpen: (updatedProposal?: Proposal) => void;
   title: string;
   reviewItemId?: number | null;
-  children: React.ReactElement;
+  children: React.ReactElement<{ isInsideModal?: boolean }>;
 };
 
 const ProposalReviewModal = ({
