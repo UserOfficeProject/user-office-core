@@ -23,7 +23,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
-import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
+import ProposalPeopleSelectorModal, {
+  AddParticipantsData,
+} from 'components/proposal/ProposalPeopleSelectorModal';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -35,6 +37,8 @@ import { getFullUserName, getPreferredName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
+
+type OpenModal = 'reviewer' | 'chair' | 'secretary';
 
 type FapMembersProps = {
   data: Fap;
@@ -66,16 +70,12 @@ const FapMembers = ({
   onFapUpdate,
   confirm,
 }: FapMembersProps) => {
-  const [modalOpen, setOpen] = useState(false);
-  const [fapChairModalOpen, setFapChairModalOpen] = useState(false);
-  const [fapSecretaryModalOpen, setFapSecretaryModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState<OpenModal | null>(null);
+  const closeModal = () => setModalOpen(null);
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const { loadingMembers, FapReviewersData, setFapReviewersData } =
-    useFapReviewersData(
-      fapData.id,
-      modalOpen || fapChairModalOpen || fapSecretaryModalOpen
-    );
+    useFapReviewersData(fapData.id, modalOpen !== null);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -85,85 +85,62 @@ const FapMembers = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
 
-  const sendFapChairUpdate = async (
-    value: BasicUserDetails[]
-  ): Promise<void> => {
-    const [fapChair] = value;
+  const assignChairOrSecretary =
+    (roleId: UserRole.FAP_CHAIR | UserRole.FAP_SECRETARY) =>
+    async ({ users }: AddParticipantsData): Promise<void> => {
+      const [selectedUser] = users;
+      const isChair = roleId === UserRole.FAP_CHAIR;
 
-    await api({
-      toastSuccessMessage: `${t('Fap')} chair assigned successfully!`,
-    }).assignChairOrSecretary({
-      assignChairOrSecretaryToFapInput: {
-        fapId: fapData.id,
-        roleId: UserRole.FAP_CHAIR,
-        userId: fapChair.id,
-      },
-    });
+      await api({
+        toastSuccessMessage: `${t('Fap')} ${
+          isChair ? 'chair' : 'secretary'
+        } assigned successfully!`,
+      }).assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: fapData.id,
+          roleId,
+          userId: selectedUser.id,
+        },
+      });
 
-    setOpen(false);
+      closeModal();
 
-    setFapChairModalOpen(false);
-    onFapUpdate({
-      ...fapData,
-      fapChairs: fapData.fapChairs?.concat([fapChair]) ?? fapData.fapChairs,
-      fapChairsCurrentProposalCounts:
-        fapData.fapChairsCurrentProposalCounts.concat([
-          {
-            userId: fapChair.id,
-            count: 0,
-          },
-        ]),
-    });
+      const currentMembers = isChair
+        ? fapData.fapChairs
+        : fapData.fapSecretaries;
 
-    if (
-      fapChair.id === user.id ||
-      fapData.fapChairs?.find((chair) => chair.id === user.id)
-    ) {
-      setRenewTokenValue();
-    }
-  };
+      if (isChair) {
+        onFapUpdate({
+          ...fapData,
+          fapChairs:
+            fapData.fapChairs?.concat([selectedUser]) ?? fapData.fapChairs,
+          fapChairsCurrentProposalCounts:
+            fapData.fapChairsCurrentProposalCounts.concat([
+              { userId: selectedUser.id, count: 0 },
+            ]),
+        });
+      } else {
+        onFapUpdate({
+          ...fapData,
+          fapSecretaries:
+            fapData.fapSecretaries?.concat([selectedUser]) ??
+            fapData.fapSecretaries,
+          fapSecretariesCurrentProposalCounts:
+            fapData.fapSecretariesCurrentProposalCounts.concat([
+              { userId: selectedUser.id, count: 0 },
+            ]),
+        });
+      }
 
-  const sendFapSecretaryUpdate = async (
-    value: BasicUserDetails[]
-  ): Promise<void> => {
-    const [fapSecretary] = value;
+      if (
+        selectedUser.id === user.id ||
+        currentMembers?.find((member) => member.id === user.id)
+      ) {
+        setRenewTokenValue();
+      }
+    };
 
-    await api({
-      toastSuccessMessage: `${t('Fap')} secretary assigned successfully!`,
-    }).assignChairOrSecretary({
-      assignChairOrSecretaryToFapInput: {
-        fapId: fapData.id,
-        roleId: UserRole.FAP_SECRETARY,
-        userId: fapSecretary.id,
-      },
-    });
-
-    setOpen(false);
-
-    setFapSecretaryModalOpen(false);
-    onFapUpdate({
-      ...fapData,
-      fapSecretaries:
-        fapData.fapSecretaries?.concat([fapSecretary]) ??
-        fapData.fapSecretaries,
-      fapSecretariesCurrentProposalCounts:
-        fapData.fapSecretariesCurrentProposalCounts.concat([
-          {
-            userId: fapSecretary.id,
-            count: 0,
-          },
-        ]),
-    });
-
-    if (
-      fapSecretary.id === user.id ||
-      fapData.fapSecretaries?.find((sec) => sec.id === user.id)
-    ) {
-      setRenewTokenValue();
-    }
-  };
-
-  const addMember = async (users: BasicUserDetails[]): Promise<void> => {
+  const addMember = async ({ users }: AddParticipantsData): Promise<void> => {
     await api({
       toastSuccessMessage: `${t('Fap')} member assigned successfully!`,
     }).assignReviewersToFap({
@@ -171,7 +148,7 @@ const FapMembers = ({
       fapId: fapData.id,
     });
 
-    setOpen(false);
+    closeModal();
 
     setFapReviewersData((fapReviewers) => [
       ...fapReviewers,
@@ -302,9 +279,7 @@ const FapMembers = ({
                             <IconButton
                               edge="start"
                               onClick={() =>
-                                isChair
-                                  ? setFapChairModalOpen(true)
-                                  : setFapSecretaryModalOpen(true)
+                                setModalOpen(isChair ? 'chair' : 'secretary')
                               }
                             >
                               <Person />
@@ -331,33 +306,32 @@ const FapMembers = ({
 
   return (
     <>
-      <PeopleSelectorModal
-        show={modalOpen}
-        close={(): void => setOpen(false)}
-        addParticipants={addMember}
-        selectedUsers={alreadySelectedMembers}
-        selection={true}
-        title={'Reviewer'}
-        invitationUserRole={UserRole.FAP_REVIEWER}
-        userRole={UserRole.FAP_REVIEWER}
+      <ProposalPeopleSelectorModal
+        modalOpen={modalOpen === 'reviewer'}
+        onClose={closeModal}
+        onAddParticipants={addMember}
+        excludeUserIds={alreadySelectedMembers}
+        title="Add Reviewers"
+        filterRole={UserRole.FAP_REVIEWER}
+        multiple
       />
-      <PeopleSelectorModal
-        show={fapChairModalOpen}
-        close={(): void => setFapChairModalOpen(false)}
-        addParticipants={sendFapChairUpdate}
-        selectedUsers={alreadySelectedMembers}
-        title={`${t('Fap')} Chair`}
-        invitationUserRole={UserRole.FAP_CHAIR}
-        userRole={UserRole.FAP_REVIEWER}
+      <ProposalPeopleSelectorModal
+        modalOpen={modalOpen === 'chair'}
+        onClose={closeModal}
+        onAddParticipants={assignChairOrSecretary(UserRole.FAP_CHAIR)}
+        excludeUserIds={alreadySelectedMembers}
+        title={`Set ${t('Fap')} Chair`}
+        filterRole={UserRole.FAP_REVIEWER}
+        multiple={false}
       />
-      <PeopleSelectorModal
-        show={fapSecretaryModalOpen}
-        close={(): void => setFapSecretaryModalOpen(false)}
-        addParticipants={sendFapSecretaryUpdate}
-        selectedUsers={alreadySelectedMembers}
-        title={`${t('Fap')} Secretary`}
-        invitationUserRole={UserRole.FAP_SECRETARY}
-        userRole={UserRole.FAP_REVIEWER}
+      <ProposalPeopleSelectorModal
+        modalOpen={modalOpen === 'secretary'}
+        onClose={closeModal}
+        onAddParticipants={assignChairOrSecretary(UserRole.FAP_SECRETARY)}
+        excludeUserIds={alreadySelectedMembers}
+        title={`Set ${t('Fap')} Secretary`}
+        filterRole={UserRole.FAP_REVIEWER}
+        multiple={false}
       />
       <Typography variant="h6" component="h2" gutterBottom>
         {`${fapData.code} - ${t('Fap')} Members`}
@@ -379,14 +353,14 @@ const FapMembers = ({
           marginBottom={'10px'}
         >
           <Button
-            onClick={() => setFapChairModalOpen(true)}
+            onClick={() => setModalOpen('chair')}
             aria-label={`Add New ${t('Fap')} Chair Button`}
             data-cy="add-chair-button"
           >
             Add Chair
           </Button>
           <Button
-            onClick={() => setFapSecretaryModalOpen(true)}
+            onClick={() => setModalOpen('secretary')}
             aria-label={`Add New ${t('Fap')} Secretary Button`}
             data-cy="add-secretary-button"
           >
@@ -429,7 +403,7 @@ const FapMembers = ({
             <ActionButtonContainer>
               <Button
                 variant="outlined"
-                onClick={() => setOpen(true)}
+                onClick={() => setModalOpen('reviewer')}
                 data-cy="add-participant-button"
                 startIcon={<AddPersonIcon />}
               >
