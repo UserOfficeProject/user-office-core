@@ -357,6 +357,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         (usersData) =>
           ({
             ...usersData,
+
             reviews: usersData?.reviews.map((review) => {
               const submittedReview = submitProposalReviewsInput.find(
                 (submittedReviewItem) =>
@@ -434,20 +435,35 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     <>
       <Grid container spacing={2}>
         {isFapReviewer && (
-          <Grid item sm={3} xs={12}>
+          <Grid
+            size={{
+              sm: 3,
+              xs: 12,
+            }}
+          >
             <ReviewerFilterComponent
               reviewer={reviewer}
               onChange={handleReviewerFilterChange}
             />
           </Grid>
         )}
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <ReviewStatusFilter
             reviewStatus={reviewStatus}
             onChange={handleStatusFilterChange}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <CallFilter
             shouldShowAll
             calls={calls}
@@ -459,7 +475,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             }}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <InstrumentFilter
             shouldShowAll
             instruments={instruments}
@@ -519,11 +540,13 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
           search: false,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           selectionProps: (rowData: UserWithReview) => ({
-            inputProps: {
-              'aria-label': `${rowData.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.title}-select`,
+              },
             },
           }),
         }}

@@ -29,7 +29,9 @@ export const QuestionTemplateRelationGenericTemplateBasisForm = (
               label="Question"
               component={TextField}
               type="text"
-              inputProps={{ 'data-cy': 'question' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'question' },
+              }}
             />
           </TitledContainer>
         </>

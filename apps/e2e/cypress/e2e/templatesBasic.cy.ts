@@ -266,7 +266,7 @@ context('Template Basic tests', () => {
 
       cy.contains(multipleChoiceQuestion.answers[0])
         .parent()
-        .find('[aria-label=Up]')
+        .find('[aria-label="Up"] button, button[aria-label="Up"]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[0])
@@ -281,7 +281,7 @@ context('Template Basic tests', () => {
 
       cy.contains(multipleChoiceQuestion.answers[2])
         .parent()
-        .find('[aria-label=Down]')
+        .find('[aria-label="Down"] button, button[aria-label="Down"]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[2])
@@ -553,7 +553,7 @@ context('Template Basic tests', () => {
                       .contains(alternateTitle)
                       .should('not.exist');
 
-                    cy.get('[data-testid="CloseIcon"').click();
+                    cy.get('[data-cy=close-modal-btn]').click();
 
                     // Only the new proposal should count against the new call and appear when the count is clicked
                     cy.get(
@@ -619,9 +619,9 @@ context('Template Basic tests', () => {
 
       cy.get('[data-cy=question]').clear().type(dateQuestion.title);
 
-      cy.get('[data-cy="minDate"] input').type(minDate);
-      cy.get('[data-cy="maxDate"] input').type(maxDate);
-      cy.get('[data-cy="defaultDate"] input').type(defaultDate);
+      cy.setDatePickerValue('[data-cy="minDate"] input', minDate);
+      cy.setDatePickerValue('[data-cy="maxDate"] input', maxDate);
+      cy.setDatePickerValue('[data-cy="defaultDate"] input', defaultDate);
 
       cy.contains('Save').click();
 
@@ -645,9 +645,9 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="maxDate"] input').should('have.value', maxDate);
       cy.get('[data-cy="defaultDate"] input').should('have.value', defaultDate);
 
-      cy.get('[data-cy="minDate"] input').clear().type(minDate);
-      cy.get('[data-cy="maxDate"] input').clear().type(maxDate);
-      cy.get('[data-cy="defaultDate"] input').clear().type(defaultDate);
+      cy.setDatePickerValue('[data-cy="minDate"] input', minDate);
+      cy.setDatePickerValue('[data-cy="maxDate"] input', maxDate);
+      cy.setDatePickerValue('[data-cy="defaultDate"] input', defaultDate);
 
       cy.contains('Update').click();
 
@@ -705,7 +705,7 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="unit-symbol"]').clear().type(numberQuestion);
       cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
       cy.get('[data-cy=unit-modal] [data-cy=submit]').click();
-      cy.get('[data-tag-index=0] > span').should(
+      cy.get('[data-item-index=0] > span').should(
         'include.text',
         numberQuestion
       );
@@ -1301,7 +1301,7 @@ context('Template Basic tests', () => {
       cy.visit('/');
 
       cy.visit('/ProposalTemplates');
-      cy.get('[data-testid="EditIcon"]').first().click();
+      cy.get('[aria-label="Edit"]').first().click();
 
       cy.createBooleanQuestion(booleanQuestion);
 

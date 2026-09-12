@@ -26,7 +26,12 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
         Administration
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <Paper
             elevation={0}
             sx={(theme) => ({
@@ -43,7 +48,12 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <Paper
             elevation={0}
             sx={(theme) => ({
@@ -63,7 +73,7 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper
             elevation={0}
             sx={(theme) => ({
@@ -98,7 +108,7 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper
             elevation={0}
             sx={(theme) => ({
@@ -119,7 +129,7 @@ const ProposalAdminReadOnly = ({ data }: ProposalAdminReadOnlyProps) => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper
             elevation={0}
             sx={(theme) => ({

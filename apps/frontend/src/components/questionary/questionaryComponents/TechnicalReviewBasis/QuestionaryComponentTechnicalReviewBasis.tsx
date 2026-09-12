@@ -109,7 +109,12 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
         <Box sx={{ margin: theme.spacing(2, 0) }}>
           <CssBaseline />
           <Grid container spacing={2}>
-            <Grid item sm={6} xs={12}>
+            <Grid
+              size={{
+                sm: 6,
+                xs: 12,
+              }}
+            >
               <Field
                 name={statusFieldId}
                 value={localStatus}
@@ -131,7 +136,12 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 }}
               />
             </Grid>
-            <Grid item sm={6} xs={12}>
+            <Grid
+              size={{
+                sm: 6,
+                xs: 12,
+              }}
+            >
               <Field
                 name={timeAllocationFieldId}
                 value={localTimeAllocation}
@@ -153,7 +163,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <InputLabel
                 htmlFor="publicComment"
                 margin="dense"
@@ -195,7 +205,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
             {(isUserOfficer ||
               isInstrumentScientist ||
               fapSecOrChairCanEdit) && (
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <InputLabel
                   htmlFor="comment"
                   margin="dense"
@@ -253,7 +263,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
             {(isUserOfficer ||
               isInstrumentScientist ||
               fapSecOrChairCanEdit) && (
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <InputLabel
                   htmlFor="comment"
                   margin="dense"

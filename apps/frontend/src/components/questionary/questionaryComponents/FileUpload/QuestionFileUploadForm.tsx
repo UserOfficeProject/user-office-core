@@ -57,7 +57,9 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'natural_key' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'natural_key' },
+              }}
             />
             <Field
               name="question"
@@ -66,7 +68,9 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'question' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'question' },
+              }}
             />
             <TitledContainer label="Options">
               <Field
@@ -144,9 +148,11 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                 component={TextField}
                 fullWidth
                 required
-                InputProps={{ inputProps: { min: 0 } }}
                 data-cy="max_files"
                 helperText="Use 0 for unlimited files"
+                slotProps={{
+                  input: { inputProps: { min: 0 } },
+                }}
               />
               {fileType.includes('.pdf') && (
                 <Field
@@ -157,9 +163,11 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                   component={TextField}
                   fullWidth
                   required
-                  InputProps={{ inputProps: { min: 0 } }}
                   data-cy="pdf_page_limit"
                   helperText="Use 0 for unlimited pages"
+                  slotProps={{
+                    input: { inputProps: { min: 0 } },
+                  }}
                 />
               )}
             </TitledContainer>

@@ -247,8 +247,10 @@ const AddStatusActionsToConnection = ({
                                   )
                                 }
                                 data-cy={`${statusAction.type}-status-action`}
-                                inputProps={{
-                                  'aria-label': 'primary checkbox',
+                                slotProps={{
+                                  input: {
+                                    'aria-label': 'primary checkbox',
+                                  },
                                 }}
                               />
                             }
@@ -281,12 +283,23 @@ const AddStatusActionsToConnection = ({
               />
             )}
           </Grid>
-          <Grid container justifyContent="flex-end" spacing={1} paddingTop={1}>
-            <Grid item marginTop={1}>
+          <Grid
+            container
+            spacing={1}
+            sx={{
+              justifyContent: 'flex-end',
+              paddingTop: 1,
+            }}
+          >
+            <Grid
+              sx={{
+                marginTop: 1,
+              }}
+            >
               <ErrorMessage name="selectedStatusActions" />
               <ErrorMessage name="emailStatusActionConfig.recipientsWithEmailTemplate" />
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 type="submit"
                 disabled={isSubmitting || loadingStatusActions || isLoading}

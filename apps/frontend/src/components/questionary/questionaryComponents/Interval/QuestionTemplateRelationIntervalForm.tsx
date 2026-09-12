@@ -61,7 +61,9 @@ export const QuestionTemplateRelationIntervalForm = (
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'small-label' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'small-label' },
+              }}
             />
             <TitledContainer label="Constraints">
               <Field
@@ -71,7 +73,9 @@ export const QuestionTemplateRelationIntervalForm = (
                 Label={{
                   label: 'Is required',
                 }}
-                InputProps={{ 'data-cy': 'required' }}
+                slotProps={{
+                  input: { 'data-cy': 'required' },
+                }}
               />
 
               <Autocomplete

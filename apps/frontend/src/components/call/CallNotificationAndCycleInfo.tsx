@@ -1,4 +1,3 @@
-import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
@@ -14,7 +13,6 @@ import {
 } from 'generated/sdk';
 
 const CallCycleInfo = () => {
-  const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
 
@@ -34,12 +32,10 @@ const CallCycleInfo = () => {
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -51,12 +47,10 @@ const CallCycleInfo = () => {
           minDate={startNotify}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -66,14 +60,12 @@ const CallCycleInfo = () => {
           format={dateFormat}
           ampm={false}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             'data-cy': 'start-cycle',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -84,14 +76,12 @@ const CallCycleInfo = () => {
           ampm={false}
           minDate={startCycle}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             'data-cy': 'end-cycle',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
       </LocalizationProvider>
@@ -104,7 +94,9 @@ const CallCycleInfo = () => {
         required
         fullWidth
         data-cy="cycle-comment"
-        inputProps={{ maxLength: '100' }}
+        slotProps={{
+          htmlInput: { maxLength: '100' },
+        }}
       />
       <Field
         name="submissionMessage"
