@@ -8,6 +8,7 @@ import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
+import VpnLock from '@mui/icons-material/VpnLock';
 import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -26,6 +27,7 @@ const menuMap = {
   ProposalStatuses: '/ProposalStatuses',
   ExperimentWorkflows: '/ExperimentWorkflows',
   ApiAccessTokens: '/ApiAccessTokens',
+  OAuthClients: '/OAuthClients',
   Features: '/Features',
   Settings: '/Settings',
   RoleManagement: '/admin/roles',
@@ -126,6 +128,14 @@ const SettingsMenuListItem = () => {
               <VpnKey />
             </ListItemIcon>
             <ListItemText primary="API access tokens" />
+          </ListItemButton>
+        </Tooltip>
+        <Tooltip title="OAuth clients">
+          <ListItemButton component={NavLink} to={menuMap['OAuthClients']}>
+            <ListItemIcon>
+              <VpnLock />
+            </ListItemIcon>
+            <ListItemText primary="OAuth clients" />
           </ListItemButton>
         </Tooltip>
         <Tooltip title="Role management">

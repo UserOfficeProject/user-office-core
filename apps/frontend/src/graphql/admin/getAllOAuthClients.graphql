@@ -1,0 +1,10 @@
+query getAllOAuthClients {
+  allOAuthClients {
+    id
+    name
+    description
+    accessPermissions
+    createdAt
+    updatedAt
+  }
+}

@@ -18,6 +18,7 @@ import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
 import jwtErrorHandler from './src/middlewares/jwtErrorHandler';
 import metrics from './src/middlewares/metrics/metrics';
+import oauthClientAuthorization from './src/middlewares/oauthClientAuthorization';
 import readinessCheck from './src/middlewares/readinessCheck';
 
 async function bootstrap() {
@@ -27,6 +28,7 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: false }));
   app
     .use(metrics(app))
+    .use(oauthClientAuthorization())
     .use(authorization())
     .use(jwtErrorHandler)
     .use(files())

@@ -41,11 +41,19 @@ export const context: ContextFunction<
   let user = null;
   const userId = req.user?.user?.id as number;
   const accessTokenId = req.user?.accessTokenId;
+  const oauthClient = req.oauthClient;
   const userAuthorization = container.resolve<UserAuthorization>(
     Tokens.UserAuthorization
   );
 
-  if (req.user) {
+  if (oauthClient) {
+    user = {
+      accessPermissions: oauthClient.accessPermissions
+        ? JSON.parse(oauthClient.accessPermissions)
+        : null,
+      isApiAccessToken: true,
+    } as UserWithRole;
+  } else if (req.user) {
     if (accessTokenId) {
       const { accessPermissions } =
         await baseContext.queries.admin.getPermissionsByToken(accessTokenId);

@@ -1,0 +1,3 @@
+mutation deleteOAuthClient($clientId: String!) {
+  deleteOAuthClient(deleteOAuthClientInput: { clientId: $clientId })
+}
