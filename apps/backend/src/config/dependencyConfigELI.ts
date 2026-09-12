@@ -62,7 +62,7 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -126,7 +126,7 @@ mapClass(Tokens.UserAuthorization, ELIUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
-mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
+mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 
