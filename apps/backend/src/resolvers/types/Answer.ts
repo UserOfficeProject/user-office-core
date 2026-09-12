@@ -10,7 +10,7 @@ export class Answer
   implements Partial<AnswerOrigin>
 {
   @Field(() => Int, { nullable: true })
-  public answerId: number;
+  public answerId: number | null;
 
   @Field(() => IntStringDateBoolArray, { nullable: true })
   public value?: AnswerType;
