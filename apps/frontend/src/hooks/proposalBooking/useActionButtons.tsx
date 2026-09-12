@@ -5,6 +5,11 @@ import GroupIcon from '@mui/icons-material/Group';
 import React, { ReactNode, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  CardTask,
+  CardTaskId,
+  CardTaskStatus,
+} from 'components/common/cards/CardTask';
 import BoxIcon from 'components/common/icons/BoxIcon';
 import EsiIcon from 'components/common/icons/EsiIcon';
 import ActionButton, {
@@ -25,27 +30,64 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) =>
   event.proposal?.proposer?.id === user.id ||
   event.proposal?.users.some((coProposer) => coProposer.id === user.id);
+/** An action carrying the checklist metadata the mobile experiment card needs. */
+export type ExperimentAction = Action<UserExperiment> & { task?: CardTask };
+
+const TASK_STATUS: Record<ActionButtonState, CardTaskStatus | null> = {
+  completed: 'done',
+  active: 'todo',
+  neutral: 'todo',
+  pending: 'waiting',
+  inactive: 'locked',
+  cancelled: 'locked',
+  invisible: null,
+};
+
+const createTask = (
+  id: CardTaskId,
+  state: ActionButtonState,
+  label: string,
+  stateReason: string | null,
+  badgedIcon: React.ReactNode
+): CardTask | undefined => {
+  const status = TASK_STATUS[state];
+
+  if (!status) {
+    return undefined;
+  }
+
+  return {
+    id,
+    status,
+    label,
+    helperText: stateReason ?? undefined,
+    icon: badgedIcon,
+  };
+};
 
 const isTeamlead = (user: UserJwt, event: UserExperiment) =>
   event.visit && event.visit.teamLead?.id === user.id;
 
-//---------------------------------------------------------------------
-
 const createActionButton = (
-  tooltip: string,
+  taskId: CardTaskId,
+  label: string,
   icon: React.ReactNode,
   state: ActionButtonState,
+  stateReason: string | null,
   onClick: () => void | undefined
-): Action<UserExperiment> => ({
-  tooltip,
-  icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
-  hidden: state === 'invisible',
-  onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
-    ? onClick
-    : () => {},
-});
+): ExperimentAction => {
+  const badgedIcon = <ActionButton variant={state}>{icon}</ActionButton>;
 
-//---------------------------------------------------------------------
+  return {
+    tooltip: stateReason ? `${label} (${stateReason})` : label,
+    icon: () => badgedIcon,
+    hidden: state === 'invisible',
+    onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
+      ? onClick
+      : () => {},
+    task: createTask(taskId, state, label, stateReason, badgedIcon),
+  };
+};
 
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
@@ -87,9 +129,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define who is coming ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'formTeam',
+      'Define who is coming',
       <GroupIcon data-cy="define-visit-icon" />,
       buttonState,
+      stateReason,
       () => {
         openModal(
           <CreateUpdateVisit
@@ -132,9 +176,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Finish experiment safety form ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'finishEsi',
+      'Finish experiment safety form',
       <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
+      stateReason,
       () => {
         if (event.experimentSafety) {
           // If experiment safety already exists, navigate directly
@@ -199,9 +245,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define your visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      'registerVisit',
+      'Define your visit',
       <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
+      stateReason,
       () => {
         openModal(
           <CreateUpdateCancelVisitRegistration
@@ -245,6 +293,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const declareShipmentAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (
       event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
@@ -253,12 +302,18 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'neutral';
     } else {
       buttonState = 'inactive';
+      // TODO: wording invented to give the locked state a reason, which this
+      // action never had. Confirm the real precondition with the user office.
+      stateReason =
+        'This action is disabled because proposal is not accepted or missing management decision';
     }
 
     return createActionButton(
+      'declareShipment',
       'Declare shipment(s)',
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
+      stateReason,
       () => {
         navigate(`/Experiments/${event.experimentPk}/Shipments`);
       }
@@ -267,6 +322,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   const giveFeedback = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
+    let stateReason: string | null = null;
 
     if (isTeamlead(user, event)) {
       if (event.status === 'COMPLETED') {
@@ -278,15 +334,20 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         }
       } else {
         buttonState = 'inactive';
+        // TODO: wording invented, same as declareShipment above.
+        stateReason =
+          'This action is disabled because the experiment is not completed';
       }
     } else {
       buttonState = 'invisible';
     }
 
     return createActionButton(
+      'giveFeedback',
       'Provide feedback',
       <FeedbackIcon data-cy="provide-feedback-icon" />,
       buttonState,
+      stateReason,
       () => {
         if (event?.feedback) {
           navigate(`/UpdateFeedback/${event.feedback.id}`);

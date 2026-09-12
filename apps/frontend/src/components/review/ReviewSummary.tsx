@@ -109,6 +109,66 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
     submitted: fapReview.status === ReviewStatus.SUBMITTED,
   };
 
+  const back = {
+    label: 'Back',
+    onClick: () => dispatch({ type: 'BACK_CLICKED' }),
+    disabled: state.stepIndex === 0,
+    isBusy: isSubmitting,
+  };
+  const submit = !isUserOfficer
+    ? {
+        label:
+          fapReview.status === ReviewStatus.SUBMITTED
+            ? '✔ Submitted'
+            : 'Submit',
+        onClick: () => {
+          confirm(
+            async () => {
+              setIsSubmitting(true);
+              try {
+                const { updateReview } = await api({
+                  toastSuccessMessage:
+                    'Your review has been submitted successfully.',
+                }).updateReview({
+                  reviewID: state.fapReview.id,
+                  grade: state.fapReview.grade || '0',
+                  comment: state.fapReview.comment || '',
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: state.fapReview.fapID,
+                  questionaryID: state.fapReview.questionaryID,
+                });
+
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: updateReview,
+                });
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: updateReview,
+                });
+                dispatch({
+                  type: 'CLEAN_DIRTY_STATE',
+                });
+              } finally {
+                setSubmitDisabled(true);
+                setIsSubmitting(false);
+              }
+            },
+            {
+              title: 'Please confirm',
+              description: submitButtonMessage,
+            }
+          )();
+        },
+        disabled: submitDisabled,
+        isBusy: isSubmitting,
+      }
+    : undefined;
+
+  // The submitted checkbox and the save button have no slot in the mobile bar,
+  // so the user officer keeps the desktop row.
+  const actions = submit ? { back, primary: submit } : undefined;
+
   return (
     <>
       <Formik
@@ -118,7 +178,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
       >
         <Form>
           <ReviewQuestionaryReview data={fapReview} />
-          <NavigationFragment isLoading={isSubmitting}>
+          <NavigationFragment isLoading={isSubmitting} actions={actions}>
             {isUserOfficer && (
               <Field
                 id="submitted"
@@ -144,11 +204,11 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
             )}
             <NavigButton
               data-cy="back-button"
-              onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-              disabled={state.stepIndex === 0}
-              isBusy={isSubmitting}
+              onClick={back.onClick}
+              disabled={back.disabled}
+              isBusy={back.isBusy}
             >
-              Back
+              {back.label}
             </NavigButton>
             {isUserOfficer && (
               <NavigButton
@@ -186,54 +246,14 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
                 Save
               </NavigButton>
             )}
-            {!isUserOfficer && (
+            {submit && (
               <NavigButton
-                onClick={() => {
-                  confirm(
-                    async () => {
-                      setIsSubmitting(true);
-                      try {
-                        const { updateReview } = await api({
-                          toastSuccessMessage:
-                            'Your review has been submitted successfully.',
-                        }).updateReview({
-                          reviewID: state.fapReview.id,
-                          grade: state.fapReview.grade || '0',
-                          comment: state.fapReview.comment || '',
-                          status: ReviewStatus.SUBMITTED,
-                          fapID: state.fapReview.fapID,
-                          questionaryID: state.fapReview.questionaryID,
-                        });
-
-                        dispatch({
-                          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                          itemWithQuestionary: updateReview,
-                        });
-                        dispatch({
-                          type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                          itemWithQuestionary: updateReview,
-                        });
-                        dispatch({
-                          type: 'CLEAN_DIRTY_STATE',
-                        });
-                      } finally {
-                        setSubmitDisabled(true);
-                        setIsSubmitting(false);
-                      }
-                    },
-                    {
-                      title: 'Please confirm',
-                      description: submitButtonMessage,
-                    }
-                  )();
-                }}
-                disabled={submitDisabled}
-                isBusy={isSubmitting}
+                onClick={submit.onClick}
+                disabled={submit.disabled}
+                isBusy={submit.isBusy}
                 data-cy="button-submit-proposal"
               >
-                {fapReview.status === ReviewStatus.SUBMITTED
-                  ? '✔ Submitted'
-                  : 'Submit'}
+                {submit.label}
               </NavigButton>
             )}
           </NavigationFragment>

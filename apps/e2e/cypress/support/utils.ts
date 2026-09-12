@@ -140,13 +140,18 @@ const closeModal = () => {
 };
 
 const finishedLoading = () => {
-  cy.get('[role="progressbar"]')
+  // The questionary renders a permanent determinate progress bar on mobile,
+  // which MUI gives role="progressbar". It is not a loading indicator, so it
+  // must not be treated as one.
+  cy.get('[role="progressbar"]:not([data-cy="questionary-progress"])')
     .should('not.exist')
     .get('[data-cy="loading"]')
     .should('not.exist')
     .get('[data-cy="UO-loader"]')
     .should('not.exist')
-    .get('.MuiPaper-root [role="progressbar"]')
+    .get(
+      '.MuiPaper-root [role="progressbar"]:not([data-cy="questionary-progress"])'
+    )
     .should('not.exist');
 };
 

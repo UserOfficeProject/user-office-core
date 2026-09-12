@@ -1,6 +1,8 @@
 import {
   GetSettingsQuery,
   PrepareDbMutation,
+  SetPageContentMutation,
+  SetPageContentMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -25,5 +27,15 @@ const getAndStoreAppSettings = (): Cypress.Chainable<GetSettingsQuery> => {
   return cy.wrap(request);
 };
 
+const setPageContent = (
+  setPageContentInput: SetPageContentMutationVariables
+): Cypress.Chainable<SetPageContentMutation> => {
+  const api = getE2EApi();
+  const request = api.setPageContent(setPageContentInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('resetDB', resetDB);
+Cypress.Commands.add('setPageContent', setPageContent);
 Cypress.Commands.add('getAndStoreAppSettings', getAndStoreAppSettings);

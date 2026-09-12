@@ -2,9 +2,10 @@ import Box from '@mui/material/Box';
 import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { useIsMobile } from 'hooks/common/useResponsive';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -71,7 +72,7 @@ const SimpleTabs = ({
   ...other
 }: SimpleTabsProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery('(max-width: 500px)');
+  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const tab = searchParams.get('tab') ?? '0';

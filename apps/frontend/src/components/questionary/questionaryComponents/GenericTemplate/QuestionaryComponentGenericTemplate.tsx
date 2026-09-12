@@ -294,6 +294,10 @@ function QuestionaryComponentGenericTemplate(
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
               title={selectedGenericTemplate?.title || ''}
+              nesting={{
+                collection: answer.question.question,
+                parent: 'proposal',
+              }}
             >
               <DialogContent>
                 {selectedGenericTemplate ? (

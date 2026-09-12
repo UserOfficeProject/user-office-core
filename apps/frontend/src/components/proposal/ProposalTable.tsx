@@ -3,22 +3,30 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import FileCopy from '@mui/icons-material/FileCopy';
+import FolderOffIcon from '@mui/icons-material/FolderOff';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
-import Dialog from '@mui/material/Dialog';
+import { Box, Link, Typography } from '@mui/material';
 import DialogContent from '@mui/material/DialogContent';
 import React, { useContext, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { CardActionSheetItem } from 'components/common/cards/CardActionSheet';
+import CardEmptyState from 'components/common/cards/CardEmptyState';
+import ProposalCard from 'components/common/cards/ProposalCard';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import {
+  belowCompactUi,
+  minTouchTarget,
+  useCardRows,
+} from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { isCallEnded } from 'utils/helperFunctions';
@@ -90,10 +98,12 @@ const ProposalTable = ({
   const tableRef =
     React.useRef<MaterialTableCore<PartialProposalsDataType>>(undefined);
   const { api } = useDataApiWithFeedback();
+  const navigate = useNavigate();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
     PartialProposalsDataType[] | undefined
   >([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [openCallSelection, setOpenCallSelection] = useState(false);
   const [proposalToClone, setProposalToClone] = useState<Pick<
     ProposalData,
@@ -104,6 +114,8 @@ const ProposalTable = ({
   const [selectedProposalPk, setSelectedProposalPk] = useState<
     number | undefined
   >();
+
+  const asCards = useCardRows();
 
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -117,11 +129,7 @@ const ProposalTable = ({
     FeatureId.DATA_ACCESS_USERS
   )?.isEnabled;
 
-  const [editProposalPk, setEditProposalPk] = useState(0);
   const { isInternalUser } = useContext(UserContext);
-  if (editProposalPk) {
-    return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
-  }
 
   const showReferenceText = (
     proposalData: PartialProposalsDataType[]
@@ -151,6 +159,92 @@ const ProposalTable = ({
 
     return readonly;
   };
+  // Behaviour shared by the desktop row icons and the mobile card, so the two
+  // presentations cannot drift apart.
+  const isReadOnly = (rowData: PartialProposalsDataType) =>
+    isCallEnded(
+      rowData.call?.startCall,
+      isInternalUser ? rowData.call?.endCallInternal : rowData.call?.endCall
+    ) || getProposalReadonlyStatus(rowData);
+
+  const isProposer = (rowData: PartialProposalsDataType) =>
+    rowData.proposerId === userContext.user.id;
+
+  const canViewDataAccessUsers = (rowData: PartialProposalsDataType) =>
+    isDataAccessUsersEnabled !== false &&
+    isProposer(rowData) &&
+    rowData.publicStatus === ProposalPublicStatus.ACCEPTED;
+
+  const canDeleteProposal = (rowData: PartialProposalsDataType) =>
+    isProposer(rowData) && !rowData.submitted;
+
+  // Navigated from the handler rather than by rendering <Navigate/> from state:
+  // Navigate redirects inside an effect, which StrictMode runs twice, leaving two
+  // history entries so the first press of Back appears to do nothing.
+  const openProposal = (rowData: PartialProposalsDataType) =>
+    navigate(`/ProposalEdit/${rowData.primaryKey}`);
+
+  const cloneProposal = (rowData: PartialProposalsDataType) => {
+    api()
+      .getProposalToClone({ primaryKey: rowData.primaryKey })
+      .then((result) => {
+        setProposalToClone(result.proposal);
+        setOpenCallSelection(true);
+      });
+  };
+
+  const downloadProposal = (rowData: PartialProposalsDataType) =>
+    downloadPDFProposal([rowData.primaryKey], rowData.title);
+
+  const openDataAccessUsers = (rowData: PartialProposalsDataType) => {
+    setSelectedProposalPk(rowData.primaryKey);
+    setIsDataAccessUsersModalOpen(true);
+  };
+
+  const deleteProposal = (rowData: PartialProposalsDataType) =>
+    confirm(
+      async () => {
+        const { deleteProposal } = await api().deleteProposal({
+          proposalPk: rowData.primaryKey,
+        });
+        if (deleteProposal) {
+          refreshTableData();
+        }
+      },
+      {
+        title: 'Are you sure?',
+        description: `Are you sure you want to delete proposal '${rowData.title}'`,
+      }
+    )();
+
+  const sheetItemsFor = (
+    rowData: PartialProposalsDataType
+  ): CardActionSheetItem[] => [
+    {
+      key: 'clone',
+      label: 'Clone proposal',
+      icon: <FileCopy />,
+      onClick: () => cloneProposal(rowData),
+    },
+    {
+      key: 'download',
+      label: 'Download PDF',
+      icon: <GetAppIcon />,
+      onClick: () => downloadProposal(rowData),
+    },
+    ...(canDeleteProposal(rowData)
+      ? [
+          {
+            key: 'delete',
+            label: 'Delete proposal',
+            icon: <DeleteIcon />,
+            onClick: () => deleteProposal(rowData),
+            destructive: true,
+          },
+        ]
+      : []),
+  ];
+
   const cloneProposalsToCall = async (call: Call) => {
     setProposalToClone(null);
 
@@ -172,12 +266,12 @@ const ProposalTable = ({
     }
   };
   const data = partialProposalsData as PartialProposalsDataType[];
+  const showEmptyState = asCards && isLoaded && data.length === 0;
 
   return (
     <div data-cy="proposal-table">
-      <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+      <StyledDialog
+        title="Clone proposal"
         open={openCallSelection}
         onClose={(): void => setOpenCallSelection(false)}
       >
@@ -187,25 +281,85 @@ const ProposalTable = ({
             close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
       <DataAccessUsersModal
         open={isDataAccessUsersModalOpen}
         onClose={() => setIsDataAccessUsersModalOpen(false)}
         proposalPk={selectedProposalPk}
       />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          // Matches the inset of the rows below: MUI TableCell pads 16px, and
+          // MaterialTableCardRow's cell pads none on the card path.
+          paddingX: asCards ? 0 : 1,
+          paddingBottom: asCards ? 1 : 2,
+        }}
+      >
+        <Typography
+          variant="h5"
+          component="h2"
+          sx={(theme) => ({
+            fontWeight: 500,
+            [belowCompactUi(theme)]: { fontSize: 18 },
+          })}
+        >
+          {title}
+        </Typography>
+        {isEmailInviteEnabled && (
+          <ButtonWithDialog
+            label="Join proposal"
+            data-cy="join-proposal-btn"
+            startIcon={<AddIcon />}
+            title="Join proposal"
+            sx={(theme) => ({
+              minHeight: minTouchTarget(theme),
+              flexShrink: 0,
+            })}
+          >
+            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
+          </ButtonWithDialog>
+        )}
+      </Box>
+      {/* A sibling, not localization.body.emptyDataSourceMessage: material-table
+          deep-merges localization and deepmerge stack-overflows on React
+          elements under React 19. Same workaround as TemplatesTable. */}
+      {showEmptyState && (
+        <CardEmptyState
+          icon={<FolderOffIcon fontSize="large" color="disabled" />}
+          title="No proposals yet"
+          description="Create one below or join one using the invite code."
+          action={
+            <Link
+              component={RouterLink}
+              to="/ProposalSelectType"
+              data-cy="empty-new-proposal-link"
+              sx={(theme) => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: minTouchTarget(theme),
+              })}
+            >
+              New proposal
+            </Link>
+          }
+        />
+      )}
       <MaterialTable
         tableRef={tableRef}
         icons={tableIcons}
         localization={tableLocalization}
-        title={
-          <Typography variant="h6" component="h2">
-            {title}
-          </Typography>
-        }
         columns={columns}
+        // Kept mounted rather than swapped out: tableRef drives refreshTableData
+        // after a proposal is joined by code, which is reachable from empty.
+        style={showEmptyState ? { display: 'none' } : undefined}
         data={(query) =>
           searchQuery(query.page, query.pageSize).then((result) => {
             setPartialProposalsData(result.data ?? []);
+            setIsLoaded(true);
 
             return {
               data: result.data ?? [],
@@ -217,120 +371,80 @@ const ProposalTable = ({
         options={{
           search: search,
           debounceInterval: 400,
+          toolbar: false,
         }}
         actions={[
           (rowData) => {
-            const callHasEnded = isCallEnded(
-              rowData.call?.startCall,
-              isInternalUser
-                ? rowData.call?.endCallInternal
-                : rowData.call?.endCall
-            );
-            const readOnly = callHasEnded || getProposalReadonlyStatus(rowData);
+            const readOnly = isReadOnly(rowData);
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
               tooltip: readOnly ? 'View proposal' : 'Edit proposal',
-              onClick: (event, rowData) =>
-                setEditProposalPk(
-                  (rowData as PartialProposalsDataType).primaryKey
-                ),
+              onClick: (_event, rowData) =>
+                openProposal(rowData as PartialProposalsDataType),
             };
           },
           {
             icon: FileCopy,
             tooltip: 'Clone proposal',
-            onClick: (_event, rowData) => {
-              api()
-                .getProposalToClone({
-                  primaryKey: (rowData as PartialProposalsDataType).primaryKey,
-                })
-                .then((result) => {
-                  setProposalToClone(result.proposal);
-                  setOpenCallSelection(true);
-                });
-            },
+            onClick: (_event, rowData) =>
+              cloneProposal(rowData as PartialProposalsDataType),
           },
-          (rowData) => {
-            const isPI = rowData.proposerId === userContext.user.id;
-
-            return {
-              icon: PeopleIcon,
-              tooltip: 'View data access users',
-              hidden:
-                isDataAccessUsersEnabled === false ||
-                isPI === false ||
-                rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
-              onClick: (_event, rowData) => {
-                setSelectedProposalPk(
-                  (rowData as PartialProposalsDataType).primaryKey
-                );
-                setIsDataAccessUsersModalOpen(true);
-              },
-            };
-          },
+          (rowData) => ({
+            icon: () => <PeopleIcon />,
+            tooltip: 'View data access users',
+            hidden: !canViewDataAccessUsers(rowData),
+            onClick: (_event, rowData) =>
+              openDataAccessUsers(rowData as PartialProposalsDataType),
+          }),
           {
             icon: GetAppIcon,
             tooltip: 'Download proposal',
-            onClick: (event, rowData) =>
-              downloadPDFProposal(
-                [(rowData as PartialProposalsDataType).primaryKey],
-                (rowData as PartialProposalsDataType).title
-              ),
+            onClick: (_event, rowData) =>
+              downloadProposal(rowData as PartialProposalsDataType),
           },
-          (rowData) => {
-            const isPI = rowData.proposerId === userContext.user.id;
-            const isSubmitted = rowData.submitted;
-            const canDelete = isPI && !isSubmitted;
-
-            return {
-              icon: DeleteIcon,
-              tooltip: isSubmitted
-                ? 'Only draft proposals can be deleted'
-                : !isPI
-                  ? 'Only PI can delete proposal'
-                  : 'Delete proposal',
-              hidden: !canDelete,
-              onClick: (_event, rowData) =>
-                confirm(
-                  async () => {
-                    const { deleteProposal } = await api().deleteProposal({
-                      proposalPk: (rowData as PartialProposalsDataType)
-                        .primaryKey,
-                    });
-                    if (deleteProposal) {
-                      refreshTableData();
-                    }
-                  },
-                  {
-                    title: 'Are you sure?',
-                    description: `Are you sure you want to delete proposal '${
-                      (rowData as PartialProposalsDataType).title
-                    }'`,
-                  }
-                )(),
-            };
-          },
+          (rowData) => ({
+            icon: () => <DeleteIcon />,
+            tooltip: rowData.submitted
+              ? 'Only draft proposals can be deleted'
+              : !isProposer(rowData)
+                ? 'Only PI can delete proposal'
+                : 'Delete proposal',
+            hidden: !canDeleteProposal(rowData),
+            onClick: (_event, rowData) =>
+              deleteProposal(rowData as PartialProposalsDataType),
+          }),
         ]}
+        cardRow={(proposal) => (
+          <ProposalCard
+            proposal={proposal}
+            readOnly={isReadOnly(proposal)}
+            onOpen={() => openProposal(proposal)}
+            onOpenDataAccess={
+              canViewDataAccessUsers(proposal)
+                ? () => openDataAccessUsers(proposal)
+                : undefined
+            }
+            sheetItems={sheetItemsFor(proposal)}
+          />
+        )}
       />
-      {isEmailInviteEnabled && (
-        <ActionButtonContainer>
-          <ButtonWithDialog
-            label="Join proposal"
-            data-cy="join-proposal-btn"
-            startIcon={<AddIcon />}
-            title="Join proposal"
+      {showReferenceText(data) &&
+        (asCards ? (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            component="p"
+            sx={{ paddingX: 1, paddingTop: 1.5 }}
           >
-            <AcceptInviteWithCode onAccepted={() => refreshTableData()} />
-          </ButtonWithDialog>
-        </ActionButtonContainer>
-      )}
-      {showReferenceText(data) && (
-        <span>
-          <br />* Pre-submission reference. Reference will change upon
-          submission.
-        </span>
-      )}
+            * Pre-submission reference. Reference will change upon submission.
+          </Typography>
+        ) : (
+          <span>
+            <br />* Pre-submission reference. Reference will change upon
+            submission.
+          </span>
+        ))}
     </div>
   );
 };
