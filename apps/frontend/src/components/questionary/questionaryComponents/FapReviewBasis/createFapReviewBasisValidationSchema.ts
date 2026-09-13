@@ -24,14 +24,14 @@ export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinitio
     const schema = Yup.object().shape({
       comment: commentSchema,
       grade: Yup.string()
-        .test('min', `Lowest grade is ${config.minGrade}`, (val) => {
+        .test('min', `Minimum grade is ${config.minGrade}`, (val) => {
           if (val === undefined) return false;
 
           const number = parseFloat(val);
 
           return isNaN(number) ? true : number >= config.minGrade;
         })
-        .test('max', `Lowest grade is ${config.maxGrade}`, (val) => {
+        .test('max', `Maximum grade is ${config.maxGrade}`, (val) => {
           if (val === undefined) return false;
 
           const number = parseFloat(val);
