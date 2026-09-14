@@ -341,7 +341,7 @@ const AssignmentsTable = ({
 
     if (shouldShowWarning) {
       confirm(() => assignMembersToFapProposals(memberUsers, proposalPks), {
-        title: `${t('Fap')} reviewers assignment`,
+        title: `${t('FAP')} reviewers assignment`,
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
@@ -349,7 +349,7 @@ const AssignmentsTable = ({
             Some of the selected reviewers are already part of the proposal(s)
             as a PI/Co-proposer or belong to the same institution{' '}
             <strong>{alertText}</strong>
-            {`Are you sure you want to assign all selected users to the ${t('Fap')} proposal(s)?`}
+            {`Are you sure you want to assign all selected users to the ${t('FAP')} proposal(s)?`}
           </>
         ),
       })();

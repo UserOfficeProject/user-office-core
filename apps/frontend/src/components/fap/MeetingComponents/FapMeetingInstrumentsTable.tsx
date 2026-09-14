@@ -140,7 +140,7 @@ const FapMeetingInstrumentsTable = ({
         }
       } else {
         enqueueSnackbar(
-          `All proposal ${t('Fap')} meetings should be submitted`,
+          `All proposal ${t('FAP')} meetings should be submitted`,
           {
             variant: 'error',
             className: 'snackbar-error',
@@ -177,7 +177,7 @@ const FapMeetingInstrumentsTable = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar(`Proposal ${t('Fap')} instrument is not submitted`, {
+        enqueueSnackbar(`Proposal ${t('FAP')} instrument is not submitted`, {
           variant: 'error',
           className: 'snackbar-error',
         });

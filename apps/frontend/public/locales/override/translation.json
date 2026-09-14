@@ -1,15 +1,14 @@
 {
   "instrument": "Instrument",
   "instrumentSci": "Instrument Scientist",
-  "Fap": "Fap",
   "FAP": "FAP",
   "Facility access panel": "Facility access panel",
   "FAP reviews": "FAP reviews",
   "FAP Review": "FAP Review",
   "FAP Review Template": "FAP Review Template",
   "FAP Review template": "FAP Review template",
-  "Start of Fap review": "Start of Fap review",
-  "End of Fap review": "End of Fap review",
+  "Start of Fap review": "Start of FAP review",
+  "End of Fap review": "End of FAP review",
   "Instrument Contact": "Instrument Contact",
   "Technique Proposals": "Technique Proposals",
   "technique proposals": "technique proposals"
