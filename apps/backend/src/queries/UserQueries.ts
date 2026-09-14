@@ -17,7 +17,6 @@ import {
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { verifyToken } from '../utils/jwt';
 import { PaginationSortDirection } from '../utils/pagination';
-import { RoleDataSource } from '../datasources/RoleDataSource';
 
 @injectable()
 export default class UserQueries {
@@ -27,9 +26,7 @@ export default class UserQueries {
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.BasicUserDetailsLoader)
-    private basicLoader: BasicUserDetailsLoader,
-    @inject(Tokens.RoleDataSource)
-    private roleDataSource: RoleDataSource
+    private basicLoader: BasicUserDetailsLoader
   ) {}
 
   async getAgent(id: number) {
@@ -168,8 +165,12 @@ export default class UserQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: UserWithRole | null) {
-    const userRoleTagIds = agent?.currentRole?.id != null ? (await this.roleDataSource.getTagsByRoleId(agent?.currentRole?.id)).map(t => t.id) : [];
-    return this.dataSource.getRoles(userRoleTagIds);
+    return this.dataSource.getRoles();
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getRolesByTags(agent: UserWithRole | null, tagIds: number[]) {
+    return this.dataSource.getRolesByTags(tagIds);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])

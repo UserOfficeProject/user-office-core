@@ -1,0 +1,16 @@
+query getRolesByTags($tagIds: [Int!]) {
+  rolesByTags(tagIds: $tagIds) {
+    id
+    shortCode
+    title
+    description
+    isRootRole
+    config {
+      ...roleConfig
+    }
+    tags {
+      id
+      name
+    }
+  }
+}

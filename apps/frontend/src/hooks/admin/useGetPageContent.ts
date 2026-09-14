@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { PageName } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
+export const FALLBACK_ROLE_FOR_PAGE_CONTENT = -1;
+
 export function useGetPageContent(pageName: PageName, roleId?: number) {
   const [pageContent, setPageContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
@@ -15,14 +17,14 @@ export function useGetPageContent(pageName: PageName, roleId?: number) {
     api()
       .getPageContent({
         pageId: pageName,
-        roleId: roleId === 0 ? undefined : roleId
+        roleId: roleId === FALLBACK_ROLE_FOR_PAGE_CONTENT ? undefined : roleId,
       })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        setPageContent(data.pageContent ?? "");
+        setPageContent(data.pageContent ?? '');
         setLoading(false);
       });
 

@@ -119,7 +119,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     throw new GraphQLError('Could not update user. Check your Inputs.');
   }
 
-  async getRoles(roleTags?: number[]): Promise<Role[]> {
+  async getRoles(): Promise<Role[]> {
+    return database
+      .select()
+      .from('roles')
+      .then((roles: RoleRecord[]) => roles.map(createRoleObject));
+  }
+
+  async getRolesByTags(roleTags?: number[]): Promise<Role[]> {
     return database
       .select('r.*')
       .from('roles as r')

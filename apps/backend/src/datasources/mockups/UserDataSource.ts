@@ -634,7 +634,28 @@ export class UserDataSourceMock implements UserDataSource {
     }
   }
 
-  async getRoles(roleTags?: number[]): Promise<Role[]> {
+  async getRoles(): Promise<Role[]> {
+    return [
+      {
+        id: 1,
+        shortCode: 'user_officer',
+        title: 'User Officer',
+        description: '',
+        config: {},
+        isRootRole: true,
+      },
+      {
+        id: 2,
+        shortCode: 'user',
+        title: 'User',
+        description: '',
+        config: {},
+        isRootRole: true,
+      },
+    ];
+  }
+
+  async getRolesByTags(roleTags?: number[]): Promise<Role[]> {
     return [
       {
         id: 1,

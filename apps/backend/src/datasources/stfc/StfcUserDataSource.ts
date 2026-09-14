@@ -529,8 +529,12 @@ export class StfcUserDataSource implements UserDataSource {
     return mappedRoles;
   }
 
-  async getRoles(roleTags?: number[]): Promise<Role[]> {
-    return await postgresUserDataSource.getRoles(roleTags);
+  async getRoles(): Promise<Role[]> {
+    return await postgresUserDataSource.getRoles();
+  }
+
+  async getRolesByTags(roleTags?: number[]): Promise<Role[]> {
+    return await postgresUserDataSource.getRolesByTags(roleTags);
   }
 
   async update(user: UpdateUserByIdArgs): Promise<User> {

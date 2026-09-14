@@ -1,18 +1,22 @@
 import { t } from 'i18next';
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
-import { PageName, UserRole } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { PageName, UserRole, GetRolesQuery } from 'generated/sdk';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
+import { useRolesData } from 'hooks/user/useRolesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import PageInputBox from './PageInputBox';
 import RoleFilter from './RoleFilter';
-import { useSearchParams } from 'react-router-dom';
 
-export type RoleFilter = {
-    roleId: number | undefined
-  }
+export type RoleFilterArgs = {
+  roleId: number | undefined;
+  rolesData: GetRolesQuery | null;
+  loading: boolean;
+};
 
 export default function PageEditor() {
   const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
@@ -20,10 +24,29 @@ export default function PageEditor() {
   ]);
   const [searchParams] = useSearchParams();
   const roleId = searchParams.get('role');
+  const { roles, currentRoleId } = useContext(UserContext);
+  const isBaseUserOfficer = roles.filter(
+    (r) =>
+      r.id == currentRoleId &&
+      r.shortCode == 'user_officer' &&
+      (!r.tags || !r.tags.length)
+  ).length;
+  const currentRoleTags = roles
+    .find((r) => currentRoleId === r.id)!
+    .tags?.map((t) => t.id);
+  const { rolesData, loading } = useRolesData(currentRoleTags);
 
-  const [roleIdFilter, setroleIdFilter] = React.useState<RoleFilter>({
-    roleId: roleId ? +roleId : undefined,
-  })
+  const [roleFilter, setRoleFilter] = React.useState<RoleFilterArgs>({
+    roleId: roleId
+      ? +roleId
+      : isBaseUserOfficer
+        ? undefined
+        : rolesData != null
+          ? rolesData[0].id
+          : currentRoleId,
+    rolesData: { roles: rolesData },
+    loading: loading,
+  });
 
   return (
     <StyledContainer maxWidth={false}>
@@ -46,58 +69,61 @@ export default function PageEditor() {
           <PageInputBox
             pageName={PageName.HOMEPAGE}
             heading={'Set user homepage'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.REVIEWPAGE}
             heading={'Set reviewer homepage'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.HELPPAGE}
             heading={'Set help page'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.PRIVACYPAGE}
             heading={'Set privacy agreement'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.COOKIEPAGE}
             heading={'Set cookie policy'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.FOOTERCONTENT}
             heading={'Set footer content'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.LOGINHELPPAGE}
             heading={'Set login help page'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           <PageInputBox
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
-            roleFilter={roleIdFilter}
+            roleFilter={roleFilter}
           />
           {isTechniqueProposalsEnabled && (
             <PageInputBox
               pageName={PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE}
               heading={`Set ${t('technique proposals')} management page notice`}
-              roleFilter={roleIdFilter}
+              roleFilter={roleFilter}
             />
           )}
         </SimpleTabs>
-        <roleFilter
-            onChange={
-              (roleId) => {
-            setRoleIdFilter({
+        <RoleFilter
+          roleFilter={roleFilter}
+          onChange={(roleId) => {
+            setRoleFilter({
               roleId: roleId,
+              rolesData: { roles: rolesData },
+              loading: loading,
             });
-          }}/>
+          }}
+        />
       </StyledPaper>
     </StyledContainer>
   );

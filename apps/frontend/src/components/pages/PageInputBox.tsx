@@ -5,18 +5,23 @@ import React, { useState, useEffect } from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import {
+  FALLBACK_ROLE_FOR_PAGE_CONTENT,
+  useGetPageContent,
+} from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { RoleFilter } from './PageEditor';
-import { useSearchParams } from 'react-router-dom';
+
+import { RoleFilterArgs } from './PageEditor';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
-  roleFilter: RoleFilter;
+  roleFilter: RoleFilterArgs;
 }) {
-
-  const [loading, pageContent] = useGetPageContent(props.pageName, props.roleFilter.roleId);
+  const [loading, pageContent] = useGetPageContent(
+    props.pageName,
+    props.roleFilter.roleId
+  );
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
@@ -54,14 +59,16 @@ export default function PageInputBox(props: {
             marginTop: '25px',
             marginLeft: '10px',
           }}
-          onClick={() =>{
+          onClick={() => {
             api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
               pageId: props.pageName,
               text: content,
-              roleId: props.roleFilter.roleId !== 0 ? props.roleFilter.roleId : undefined,
-            })
-          }
-          }
+              roleId:
+                props.roleFilter.roleId !== FALLBACK_ROLE_FOR_PAGE_CONTENT
+                  ? props.roleFilter.roleId
+                  : undefined,
+            });
+          }}
         >
           Update
         </Button>
