@@ -13,5 +13,5 @@
   "Instrument Contact": "Instrument Contact",
   "Technique Proposals": "Technique Proposals",
   "technique proposals": "technique proposals",
-  "_commentXYZ": "'FAP' and 'fap' both show up as 'FAP' in the UI by default. But for translations 'fap' is used inside a sentence while 'FAP' should be capitalised." 
+  "_commentXYZ": "'FAP' and 'fap' both show up as 'FAP' in the UI by default. But for translations 'fap' is used inside a sentence while 'FAP' should have the first letter capitalised." 
 }
