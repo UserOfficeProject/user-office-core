@@ -2,6 +2,7 @@
   "instrument": "Instrument",
   "instrumentSci": "Instrument Scientist",
   "FAP": "FAP",
+  "fap": "FAP",  
   "Facility access panel": "Facility access panel",
   "FAP reviews": "FAP reviews",
   "FAP Review": "FAP Review",
@@ -11,5 +12,6 @@
   "End of Fap review": "End of FAP review",
   "Instrument Contact": "Instrument Contact",
   "Technique Proposals": "Technique Proposals",
-  "technique proposals": "technique proposals"
+  "technique proposals": "technique proposals",
+  "_commentXYZ": "'FAP' and 'fap' both show up as 'FAP' in the UI by default. But for translations 'fap' is used inside a sentence while 'FAP' should be capitalised." 
 }

@@ -95,8 +95,8 @@ const AssignmentsTable = ({
 
     const fapMemberPluralMsg =
       assignedMembers.length === 1
-        ? `The ${t('FAP')} member is`
-        : `All ${t('FAP')} members are`;
+        ? `The ${t('fap')} member is`
+        : `All ${t('fap')} members are`;
     const proposalPluralMsg = proposalPks.length === 1 ? '' : 's';
 
     if (proposalAssignments.length === 0) {

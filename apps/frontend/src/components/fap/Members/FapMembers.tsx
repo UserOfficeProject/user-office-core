@@ -224,10 +224,10 @@ const FapMembers = ({
         });
       },
       {
-        title: `Remove ${t('FAP')} member`,
+        title: `Remove ${t('fap')} member`,
         description: `Are you sure you want to remove ${getFullUserName(
           memberToRemove
-        )} from this ${t('FAP')}?`,
+        )} from this ${t('fap')}?`,
       }
     )();
   };

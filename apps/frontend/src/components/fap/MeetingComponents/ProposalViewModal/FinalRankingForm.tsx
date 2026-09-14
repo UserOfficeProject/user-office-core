@@ -129,7 +129,7 @@ const FinalRankingForm = ({
                   },
                   {
                     title: 'Please confirm',
-                    description: `I am aware that no further changes to the ${t('FAP')} meeting are possible after submission.`,
+                    description: `I am aware that no further changes to the ${t('fap')} meeting are possible after submission.`,
                   }
                 )();
               } else {

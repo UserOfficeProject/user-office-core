@@ -718,7 +718,7 @@ const ProposalTableOfficer = ({
       }
 
       await api({
-        toastSuccessMessage: `Proposal/s assigned to the selected ${t('FAP')} successfully!`,
+        toastSuccessMessage: `Proposal/s assigned to the selected ${t('fap')} successfully!`,
       }).assignProposalsToFaps({
         proposalPks: getSelectedProposalPks(),
         fapInstruments: fapInstsruments,

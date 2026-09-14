@@ -320,7 +320,7 @@ const FapProposalsAndAssignmentsTable = ({
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
       title: `Remove ${t('FAP')} assignment/s`,
-      description: `Are you sure you want to remove the selected proposal/s from this ${t('FAP')}?`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('fap')}?`,
     })();
   };
 
