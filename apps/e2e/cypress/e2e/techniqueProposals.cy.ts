@@ -241,6 +241,8 @@ context('Technique Proposal tests', () => {
     abstract: faker.word.words(5),
   };
 
+  let derivedUserOfficerRoleId: number;
+
   beforeEach(function () {
     cy.resetDB();
 
@@ -575,6 +577,34 @@ context('Technique Proposal tests', () => {
           });
         });
       }
+    });
+
+    cy.createTag({ name: 'Tag', shortCode: 'tag' }).then((tagResult) => {
+      cy.assignCallsToTag({
+        callIds: initialDBData.call.id,
+        tagId: tagResult.createTag.id,
+      });
+      cy.addInstrumentToTag({
+        instrumentIds: createdInstrumentId1,
+        tagId: tagResult.createTag.id,
+      });
+      cy.createRole({
+        args: {
+          title: 'Derived User Officer',
+          shortCode: 'user_officer',
+          description: '',
+        },
+      }).then((roleResult) => {
+        derivedUserOfficerRoleId = roleResult.createRole.id;
+        cy.updateRoleTags({
+          roleId: roleResult.createRole.id,
+          tagIds: tagResult.createTag.id,
+        });
+        cy.updateUserRoles({
+          id: initialDBData.users.officer.id,
+          roles: [roleResult.createRole.id],
+        });
+      });
     });
   });
 
@@ -2139,6 +2169,194 @@ context('Technique Proposal tests', () => {
           expect(response.status).to.eq(500);
         });
       });
+    });
+  });
+
+  describe('Technique proposal tags tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
+    it('Base User Officer role can see all call filter options', () => {
+      cy.createCall({
+        shortCode: 'untagged call',
+        cycleComment: 'This is cycle comment',
+        allocationTimeUnit: AllocationTimeUnits.DAY,
+        endCall: DateTime.fromJSDate(faker.date.future()),
+        endCycle: DateTime.fromJSDate(faker.date.future()),
+        endNotify: DateTime.fromJSDate(faker.date.future()),
+        endReview: DateTime.fromJSDate(faker.date.future()),
+        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+        startCall: DateTime.fromJSDate(faker.date.past()),
+        startCycle: DateTime.fromJSDate(faker.date.past()),
+        startNotify: DateTime.fromJSDate(faker.date.past()),
+        startReview: DateTime.fromJSDate(faker.date.past()),
+        templateId: initialDBData.template.id,
+      }).then((result) =>
+        cy.updateCall({
+          id: result.createCall.id,
+          proposalWorkflowId: callWorkflowId,
+        })
+      );
+
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('untagged call');
+      cy.get('[role="listbox"]').contains('call 1');
+    });
+
+    it('Base User Officer role can see all technique filter options', () => {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]').contains(technique1.name);
+      cy.get('[role="listbox"]').contains(technique2.name);
+      cy.get('[role="listbox"]').contains(technique3.name);
+      cy.get('[role="listbox"]').contains(technique4.name);
+      cy.get('[role="listbox"]').contains(technique5.name);
+    });
+
+    it('Base User Officer role can see all instrument filter options', () => {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      //the call dropdown will default to a call with no proposals
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').contains(instrument3.name);
+      cy.get('[role="listbox"]').contains(instrument4.name);
+      cy.get('[role="listbox"]').contains(instrument5.name);
+    });
+
+    it('Base User Officer role can see all proposals', () => {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      //the call dropdown will default to a call with no proposals
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+      cy.should('not.contain', proposal4.title);
+      cy.contains(proposal5.title);
+    });
+
+    it('Derived User Officer role can only see appropriately tagged call filter options', () => {
+      cy.createCall({
+        shortCode: 'untagged call',
+        cycleComment: 'This is cycle comment',
+        allocationTimeUnit: AllocationTimeUnits.DAY,
+        endCall: DateTime.fromJSDate(faker.date.future()),
+        endCycle: DateTime.fromJSDate(faker.date.future()),
+        endNotify: DateTime.fromJSDate(faker.date.future()),
+        endReview: DateTime.fromJSDate(faker.date.future()),
+        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+        startCall: DateTime.fromJSDate(faker.date.past()),
+        startCycle: DateTime.fromJSDate(faker.date.past()),
+        startNotify: DateTime.fromJSDate(faker.date.past()),
+        startReview: DateTime.fromJSDate(faker.date.past()),
+        templateId: initialDBData.template.id,
+      }).then((result) =>
+        cy.updateCall({
+          id: result.createCall.id,
+          proposalWorkflowId: callWorkflowId,
+        })
+      );
+
+      cy.login('officer');
+      cy.changeActiveRole(derivedUserOfficerRoleId);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('untagged call').should('not.exist');
+      cy.get('[role="listbox"]').contains('call 1');
+    });
+
+    it('Derived User Officer role can only see appropriate technique filter options', () => {
+      cy.login('officer');
+      cy.changeActiveRole(derivedUserOfficerRoleId);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]').contains(technique1.name);
+      cy.get('[role="listbox"]').contains(technique2.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(technique3.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(technique4.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(technique5.name).should('not.exist');
+    });
+
+    it('Derived User Officer role can only see appropriately tagged instrument filter options', () => {
+      cy.login('officer');
+      cy.changeActiveRole(derivedUserOfficerRoleId);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(instrument3.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(instrument4.name).should('not.exist');
+      cy.get('[role="listbox"]').contains(instrument5.name).should('not.exist');
+    });
+
+    it('Derived User Officer role can only see appropriate tagged proposals', () => {
+      cy.login('officer');
+      cy.changeActiveRole(derivedUserOfficerRoleId);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Technique Proposals').click();
+
+      cy.contains(proposal1.title);
+      cy.should('not.contain', proposal2.title);
+      cy.should('not.contain', proposal3.title);
+      cy.should('not.contain', proposal4.title);
+      cy.should('not.contain', proposal5.title);
     });
   });
 });
