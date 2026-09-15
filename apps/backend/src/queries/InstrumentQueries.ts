@@ -5,7 +5,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import { Instrument, InstrumentWithManagementTime } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -39,16 +39,13 @@ export default class InstrumentQueries {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async getAll(agent: UserWithRole | null, callIds: number[]) {
-    const agentRoleId = this.userAuth.isApiToken(agent)
-      ? undefined
-      : agent?.currentRole?.id;
+  async getAll(
+    agent: UserWithRole | null,
+    callIds: number[],
+    @AgentTags tags?: number[]
+  ) {
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getInstruments(
-        undefined,
-        undefined,
-        agentRoleId
-      );
+      return await this.dataSource.getInstruments(undefined, undefined, tags);
     } else {
       const instrumentsByCallIds =
         await this.dataSource.getInstrumentsByCallId(callIds);

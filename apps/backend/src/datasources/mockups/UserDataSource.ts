@@ -103,6 +103,19 @@ export const dummyUserOfficerWithRole: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyUserOfficerWithDerivedRole: UserWithRole = {
+  ...dummyUserOfficer,
+  currentRole: {
+    id: 11,
+    title: 'Derived User Officer',
+    shortCode: 'user_officer',
+    description: '',
+    config: {},
+    isRootRole: false,
+  },
+  externalTokenValid: true,
+};
+
 export const dummyUser = new User(
   2,
   'Dr.',
