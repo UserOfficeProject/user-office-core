@@ -237,6 +237,18 @@ export const dummyInstrumentScientist: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyInstrumentScientistWithDerivedRole: UserWithRole = {
+  ...dummyInstrumentScientist,
+  currentRole: {
+    id: 12,
+    title: 'Derived Instrument Scientist',
+    shortCode: 'instrument_scientist',
+    description: '',
+    config: {},
+    isRootRole: false,
+  },
+};
+
 export const dummyProposalReaderWithLogAccess: UserWithRole = {
   ...dummyUser,
   id: 103,

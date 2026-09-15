@@ -9,6 +9,7 @@ import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
   dummyUserOfficerWithDerivedRole,
+  dummyInstrumentScientistWithDerivedRole,
 } from '../datasources/mockups/UserDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 
@@ -49,6 +50,38 @@ describe('Test Instrument Queries', () => {
     const getInstruments = jest.spyOn(instrumentDataSource, 'getInstruments');
 
     await InstrumentQueriesInstance.getAll(dummyUserOfficerWithDerivedRole, []);
+
+    expect(getInstruments).toHaveBeenCalledWith(undefined, undefined, [1]);
+  });
+
+  test('getUserInstruments filters user instruments by derived role tags', async () => {
+    jest
+      .spyOn(roleDataSource, 'getTagsByRoleId')
+      .mockResolvedValue([{ id: 1, name: 'Tag1', shortCode: 'T1' }]);
+    const getUserInstruments = jest.spyOn(
+      instrumentDataSource,
+      'getUserInstruments'
+    );
+
+    await InstrumentQueriesInstance.getUserInstruments(
+      dummyInstrumentScientistWithDerivedRole
+    );
+
+    expect(getUserInstruments).toHaveBeenCalledWith(
+      dummyInstrumentScientistWithDerivedRole.id,
+      [1]
+    );
+  });
+
+  test('getUserInstruments filters all instruments by derived user officer role tags', async () => {
+    jest
+      .spyOn(roleDataSource, 'getTagsByRoleId')
+      .mockResolvedValue([{ id: 1, name: 'Tag1', shortCode: 'T1' }]);
+    const getInstruments = jest.spyOn(instrumentDataSource, 'getInstruments');
+
+    await InstrumentQueriesInstance.getUserInstruments(
+      dummyUserOfficerWithDerivedRole
+    );
 
     expect(getInstruments).toHaveBeenCalledWith(undefined, undefined, [1]);
   });

@@ -59,13 +59,17 @@ export default class InstrumentQueries {
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getUserInstruments(
-    agent: UserWithRole | null
+    agent: UserWithRole | null,
+    @AgentTags tags?: number[]
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getInstruments();
+      return this.dataSource.getInstruments(undefined, undefined, tags);
     }
 
-    const instruments = await this.dataSource.getUserInstruments(agent!.id);
+    const instruments = await this.dataSource.getUserInstruments(
+      agent!.id,
+      tags
+    );
 
     return { totalCount: instruments.length, instruments };
   }
