@@ -16,7 +16,8 @@ export class RolesByTagsQuery {
   @Query(() => [Role], { nullable: true })
   rolesByTags(
     @Ctx() context: ResolverContext,
-    @Arg('tagIds', () => [Int!], { nullable: true }) tagIds: number[]) {
+    @Arg('tagIds', () => [Int!], { nullable: true }) tagIds: number[]
+  ) {
     return context.queries.user.getRolesByTags(context.user, tagIds);
   }
 }

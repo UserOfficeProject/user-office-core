@@ -22,7 +22,9 @@ describe('Test Admin Queries', () => {
   });
 
   test('A user can get page text', () => {
-    return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
+    return expect(adminQueries.getPageText({ pageId: 1 })).resolves.toBe(
+      'HELLO WORLD'
+    );
   });
 
   test('A user can get features', () => {

@@ -181,8 +181,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     );
   }
 
-  async setPageText(pageId: number, content: string, roleId?: number): Promise<Page> {
-    const pageTextId = await database.select('pagetext_id')
+  async setPageText(
+    pageId: number,
+    content: string,
+    roleId?: number
+  ): Promise<Page> {
+    const pageTextId = await database
+      .select('pagetext_id')
       .from('pagetext')
       .where('page_id', pageId)
       .modify((query) => {
@@ -194,16 +199,19 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       })
       .first();
 
-    const dbDataToInsert = pageTextId != null ? {
-        pagetext_id: pageTextId.pagetext_id,
-        page_id: pageId,
-        content: content,
-        role_id: roleId == null ? null : roleId
-      } : {
-        page_id: pageId,
-        content: content,
-        role_id: roleId == null ? null : roleId
-      }
+    const dbDataToInsert =
+      pageTextId != null
+        ? {
+            pagetext_id: pageTextId.pagetext_id,
+            page_id: pageId,
+            content: content,
+            role_id: roleId == null ? null : roleId,
+          }
+        : {
+            page_id: pageId,
+            content: content,
+            role_id: roleId == null ? null : roleId,
+          };
 
     const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
       .insert(dbDataToInsert)
@@ -214,7 +222,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const roleIdErrorMsg = roleId != null ? ` and role id:${roleId}` : '';
 
     if (!pagetextRecord) {
-      throw new GraphQLError(`Could not update page with page id:${pageId}${roleIdErrorMsg}`);
+      throw new GraphQLError(
+        `Could not update page with page id:${pageId}${roleIdErrorMsg}`
+      );
     }
 
     return createPageObject(pagetextRecord);

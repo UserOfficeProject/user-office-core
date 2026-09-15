@@ -11,16 +11,14 @@ import {
 } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { RoleFilterArgs } from './PageEditor';
-
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
-  roleFilter: RoleFilterArgs;
+  roleId: number | undefined;
 }) {
   const [loading, pageContent] = useGetPageContent(
     props.pageName,
-    props.roleFilter.roleId
+    props.roleId
   );
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
@@ -64,8 +62,8 @@ export default function PageInputBox(props: {
               pageId: props.pageName,
               text: content,
               roleId:
-                props.roleFilter.roleId !== FALLBACK_ROLE_FOR_PAGE_CONTENT
-                  ? props.roleFilter.roleId
+                props.roleId !== FALLBACK_ROLE_FOR_PAGE_CONTENT
+                  ? props.roleId
                   : undefined,
             });
           }}

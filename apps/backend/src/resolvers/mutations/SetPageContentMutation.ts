@@ -11,8 +11,12 @@ export class SetPageContentMutation {
     @Ctx() context: ResolverContext,
     @Arg('pageId', () => PageName) pageId: PageName,
     @Arg('text', () => String) text: string,
-    @Arg('roleId', () => Int, { nullable: true }) roleId: number,
+    @Arg('roleId', () => Int, { nullable: true }) roleId: number
   ) {
-    return context.mutations.admin.setPageText(context.user, { pageId, text, roleId });
+    return context.mutations.admin.setPageText(context.user, {
+      pageId,
+      text,
+      roleId,
+    });
   }
 }

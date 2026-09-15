@@ -6,30 +6,39 @@ import Select from '@mui/material/Select';
 import React, { Dispatch } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { Role } from 'generated/sdk';
 import { FALLBACK_ROLE_FOR_PAGE_CONTENT } from 'hooks/admin/useGetPageContent';
 
-import { RoleFilterArgs } from './PageEditor';
-
-type RoleStatusFilterProps = {
-  roleFilter: RoleFilterArgs;
+type RoleFilterProps = {
+  roles?: Pick<Role, 'id' | 'title'>[];
+  isLoading?: boolean;
   onChange: Dispatch<number>;
+  roleId?: number;
+  userIsBaseOfficer: boolean;
+  currentRoleId: number;
 };
 
-const RoleFilter = ({ roleFilter, onChange }: RoleStatusFilterProps) => {
-  const { roleId, rolesData, loading } = roleFilter;
+const RoleFilter = ({
+  roles,
+  isLoading,
+  onChange,
+  roleId,
+  userIsBaseOfficer,
+  currentRoleId,
+}: RoleFilterProps) => {
   const [, setSearchParams] = useSearchParams();
 
-  if (rolesData == null || rolesData.roles == null) {
+  if (roles == null) {
     return null;
   }
 
-  const sortedRoles = [...rolesData.roles];
-  sortedRoles.sort((a, b) => a.shortCode.localeCompare(b.shortCode));
+  const sortedRoles = [...roles];
+  sortedRoles.sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <FormControl>
       <InputLabel id="role-select-label">Role</InputLabel>
-      {loading ? (
+      {isLoading ? (
         <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>
       ) : (
         <Select
@@ -45,22 +54,21 @@ const RoleFilter = ({ roleFilter, onChange }: RoleStatusFilterProps) => {
             onChange?.(e.target.value as number);
           }}
           defaultValue={
-            roleId
+            roleId != null
               ? +roleId
-              : rolesData.roles.filter((r) => !r.tags?.length).length
+              : userIsBaseOfficer
                 ? FALLBACK_ROLE_FOR_PAGE_CONTENT
-                : rolesData.roles[0].id
+                : currentRoleId
           }
           data-cy="role-filter"
         >
-          {!loading &&
-            rolesData.roles.filter((r) => !r.tags?.length).length && (
-              <MenuItem key={'Default'} value={FALLBACK_ROLE_FOR_PAGE_CONTENT}>
-                Default
-              </MenuItem>
-            )}
-          {!loading &&
-            rolesData.roles.map((r) => (
+          {!isLoading && userIsBaseOfficer && (
+            <MenuItem key={'Default'} value={FALLBACK_ROLE_FOR_PAGE_CONTENT}>
+              Default
+            </MenuItem>
+          )}
+          {!isLoading &&
+            roles.map((r) => (
               <MenuItem key={r.id} value={r.id}>
                 {r.title}
               </MenuItem>

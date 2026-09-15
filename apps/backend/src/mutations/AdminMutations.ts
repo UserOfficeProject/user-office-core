@@ -8,7 +8,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { RoleDataSource } from '../datasources/RoleDataSource'
+import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Feature } from '../models/Feature';
@@ -68,24 +68,49 @@ export default class AdminMutations {
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,
-    { pageId, text, roleId }: { pageId: number; text: string, roleId?: number }
+    { pageId, text, roleId }: { pageId: number; text: string; roleId?: number }
   ): Promise<Page | Rejection> {
-    const agentRoleTags = agent?.currentRole?.id != null ? await this.roleDataSource.getTagsByRoleId(agent?.currentRole?.id) : [];
-    const pageRoleTags = roleId != null ? await this.roleDataSource.getTagsByRoleId(roleId) : [];
+    const agentRoleTagIds =
+      agent?.currentRole?.id != null
+        ? (
+            await this.roleDataSource.getTagsByRoleId(agent?.currentRole?.id)
+          ).map((t) => t.id)
+        : [];
+    const pageRoleTagIds =
+      roleId != null
+        ? (await this.roleDataSource.getTagsByRoleId(roleId)).map((t) => t.id)
+        : [];
 
     //A derived user officer role is trying to edit a fallback notice for all roles
-    if (agentRoleTags.length && roleId == null) {
-      return rejection('Insufficient permission to update page notice', { agent, pageId, roleId })
+    if (agentRoleTagIds.length && roleId == null) {
+      return rejection('Insufficient permission to update page notice', {
+        agent,
+        pageId,
+        roleId,
+      });
     }
 
     //A derived user officer role is trying to edit a notice for a base role
-    if (agentRoleTags.length && roleId != null && !pageRoleTags.length) {
-      return rejection('Insufficient permission to update page notice', { agent, pageId, roleId })
+    if (agentRoleTagIds.length && roleId != null && !pageRoleTagIds.length) {
+      return rejection('Insufficient permission to update page notice', {
+        agent,
+        pageId,
+        roleId,
+      });
     }
 
     //A derived user officer role is trying to edit the notice for a derived role they're not allowed to
-    if (agentRoleTags.length && !agentRoleTags.filter(agentRoleTag => pageRoleTags.includes(agentRoleTag)).length) {
-      return rejection('Insufficient permission to update page notice', { agent, pageId, roleId })
+    if (
+      agentRoleTagIds.length &&
+      !agentRoleTagIds.filter((agentRoleTag) =>
+        pageRoleTagIds.includes(agentRoleTag)
+      ).length
+    ) {
+      return rejection('Insufficient permission to update page notice', {
+        agent,
+        pageId,
+        roleId,
+      });
     }
 
     return this.adminDataSource
@@ -94,7 +119,11 @@ export default class AdminMutations {
         return page;
       })
       .catch((error) => {
-        return rejection('Could not set page text', { agent, pageId, roleId }, error);
+        return rejection(
+          'Could not set page text',
+          { agent, pageId, roleId },
+          error
+        );
       });
   }
 
@@ -193,7 +222,9 @@ export default class AdminMutations {
     args: DeleteApiAccessTokenInput
   ) {
     try {
-      return await this.adminDataSource.deleteApiAccessToken(args.accessTokenId);
+      return await this.adminDataSource.deleteApiAccessToken(
+        args.accessTokenId
+      );
     } catch (error) {
       return rejection(
         'Could not remove api access token',

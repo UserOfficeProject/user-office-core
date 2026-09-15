@@ -29,7 +29,7 @@ export interface AdminDataSource {
   getInstitutionByName(institutionName: string): Promise<Institution | null>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
-  get(pageId: number, roleId?: number): Promise<string | null>
+  get(pageId: number, roleId?: number): Promise<string | null>;
   setPageText(id: number, text: string, roleId?: number): Promise<Page>;
   resetDB(includeSeeds: boolean): Promise<string[]>;
   applyPatches(): Promise<string[]>;

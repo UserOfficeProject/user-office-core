@@ -9,7 +9,7 @@ export class PageContentQuery {
   pageContent(
     @Ctx() context: ResolverContext,
     @Arg('pageId', () => PageName) pageId: PageName,
-    @Arg('roleId', () => Int, { nullable: true }) roleId?: number,
+    @Arg('roleId', () => Int, { nullable: true }) roleId?: number
   ) {
     return context.queries.admin.getPageText({
       pageId,

@@ -28,13 +28,16 @@ const updatedSetting = {
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
     return expect(
-      adminMutations.setPageText(null, { id: 1, text: 'New page contents' })
+      adminMutations.setPageText(null, { pageId: 1, text: 'New page contents' })
     ).resolves.not.toBeInstanceOf(Page);
   });
 
   test('A user officer can set page text', () => {
     return expect(
-      adminMutations.setPageText(dummyUserOfficerWithRole, { id: 1, text: '' })
+      adminMutations.setPageText(dummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+      })
     ).resolves.toBeInstanceOf(Page);
   });
 

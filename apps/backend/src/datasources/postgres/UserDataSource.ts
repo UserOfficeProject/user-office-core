@@ -132,8 +132,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('roles as r')
       .modify((query) => {
         if (roleTags && roleTags.length) {
-          query.join('roles_has_tags as rht', {'r.role_id': 'rht.role_id'})
-          .whereIn('rht.tag_id', roleTags)
+          query
+            .join('roles_has_tags as rht', { 'r.role_id': 'rht.role_id' })
+            .whereIn('rht.tag_id', roleTags);
         }
       })
       .then((roles: RoleRecord[]) => roles.map(createRoleObject));

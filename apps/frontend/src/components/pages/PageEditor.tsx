@@ -23,30 +23,27 @@ export default function PageEditor() {
     UserRole.USER_OFFICER,
   ]);
   const [searchParams] = useSearchParams();
-  const roleId = searchParams.get('role');
+  const roleIdQueryParam = searchParams.get('role');
   const { roles, currentRoleId } = useContext(UserContext);
-  const isBaseUserOfficer = roles.filter(
-    (r) =>
-      r.id == currentRoleId &&
-      r.shortCode == 'user_officer' &&
-      (!r.tags || !r.tags.length)
-  ).length;
+  const isBaseUserOfficer =
+    roles.filter(
+      (r) =>
+        r.id == currentRoleId &&
+        r.shortCode == 'user_officer' &&
+        (!r.tags || !r.tags.length)
+    ).length > 0;
   const currentRoleTags = roles
     .find((r) => currentRoleId === r.id)!
     .tags?.map((t) => t.id);
   const { rolesData, loading } = useRolesData(currentRoleTags);
 
-  const [roleFilter, setRoleFilter] = React.useState<RoleFilterArgs>({
-    roleId: roleId
-      ? +roleId
+  const [roleId, setRoleId] = React.useState<number | undefined>(
+    roleIdQueryParam
+      ? +roleIdQueryParam
       : isBaseUserOfficer
         ? undefined
-        : rolesData != null
-          ? rolesData[0].id
-          : currentRoleId,
-    rolesData: { roles: rolesData },
-    loading: loading,
-  });
+        : currentRoleId
+  );
 
   return (
     <StyledContainer maxWidth={false}>
@@ -69,59 +66,59 @@ export default function PageEditor() {
           <PageInputBox
             pageName={PageName.HOMEPAGE}
             heading={'Set user homepage'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.REVIEWPAGE}
             heading={'Set reviewer homepage'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.HELPPAGE}
             heading={'Set help page'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.PRIVACYPAGE}
             heading={'Set privacy agreement'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.COOKIEPAGE}
             heading={'Set cookie policy'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.FOOTERCONTENT}
             heading={'Set footer content'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.LOGINHELPPAGE}
             heading={'Set login help page'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           <PageInputBox
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
-            roleFilter={roleFilter}
+            roleId={roleId}
           />
           {isTechniqueProposalsEnabled && (
             <PageInputBox
               pageName={PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE}
               heading={`Set ${t('technique proposals')} management page notice`}
-              roleFilter={roleFilter}
+              roleId={roleId}
             />
           )}
         </SimpleTabs>
         <RoleFilter
-          roleFilter={roleFilter}
+          roleId={roleId}
+          roles={rolesData ?? undefined}
+          isLoading={loading}
+          userIsBaseOfficer={isBaseUserOfficer}
+          currentRoleId={currentRoleId}
           onChange={(roleId) => {
-            setRoleFilter({
-              roleId: roleId,
-              rolesData: { roles: rolesData },
-              loading: loading,
-            });
+            setRoleId(roleId);
           }}
         />
       </StyledPaper>
