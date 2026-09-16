@@ -742,6 +742,127 @@ context('Status actions tests', () => {
           );
         });
     });
+
+    it.only('Status actions should execute automatically when workflow transition is triggered by an event', () => {
+      const proposalTitle = faker.lorem.words(3);
+      const proposalAbstract = faker.lorem.paragraph();
+      const statusActionEmail = faker.internet.email();
+      let createdProposalPk: number;
+      let connectionId: number;
+
+      const emailStatusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.OTHER,
+              description:
+                'Other email recipients manually added by their email',
+            },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            otherRecipientEmails: [statusActionEmail],
+          },
+        ],
+      };
+
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
+      }).then((result) => {
+        connectionId = result.createWorkflowConnection.id;
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: connectionId,
+          statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
+        });
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(emailStatusActionConfig),
+            },
+          ],
+          connectionId,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+          });
+
+          cy.submitProposal({ proposalPk: createdProposalPk });
+        }
+      });
+
+      cy.waitUntil(
+        () =>
+          cy
+            .getStatusActionsLogs({
+              filter: {
+                connectionIds: [connectionId],
+                statusActionType: StatusActionType.EMAIL,
+              },
+            })
+            .then((result) => {
+              const logs = result.statusActionsLogs?.statusActionsLogs ?? [];
+
+              return logs.some(
+                (log) =>
+                  log.statusActionsSuccessful &&
+                  log.proposals.some((p) => p.primaryKey === createdProposalPk)
+              );
+            }),
+        {
+          timeout: 20000,
+          interval: 1000,
+          errorMsg:
+            'Status action logs were not created for workflow event transition',
+        }
+      );
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposalTitle)
+        .parent()
+        .contains(initialDBData.proposalStatuses.feasibilityReview.name);
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+
+      cy.finishedLoading();
+
+      cy.contains('PROPOSAL_STATUS_CHANGED_BY_WORKFLOW')
+        .parent()
+        .contains('FEASIBILITY_REVIEW');
+
+      cy.get('[data-cy="event-logs-table"]')
+        .invoke('text')
+        .then((tableText) => {
+          expect(tableText).to.contain(
+            'PROPOSAL_STATUS_ACTION_EXECUTEDEmail successfully sent'
+          );
+        });
+    });
   });
 
   describe('Status actions logs tests', () => {

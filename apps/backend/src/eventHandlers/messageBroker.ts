@@ -35,8 +35,8 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import { WorkflowEngine } from '../workflowEngine';
 import proposalWorkflowEntity from './workflowEntities/proposal';
+import { startWorkflow } from './workflowHandler';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -361,10 +361,6 @@ export async function createPostToRabbitMQHandler() {
       Tokens.CoProposerClaimDataSource
     );
 
-  const userDataSource = container.resolve<UserDataSource>(
-    Tokens.UserDataSource
-  );
-
   const experimentDataSource = container.resolve<ExperimentDataSource>(
     Tokens.ExperimentDataSource
   );
@@ -619,8 +615,6 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const workflowEngine = container.resolve(WorkflowEngine);
-
   const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -629,11 +623,9 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await workflowEngine.run(
-      {
-        event: eventType,
-        entities: [proposalPk],
-      },
+    await startWorkflow(
+      { type: eventType },
+      proposalPk,
       proposalWorkflowEntity
     );
   };
