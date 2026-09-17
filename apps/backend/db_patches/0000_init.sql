@@ -550,7 +550,7 @@ INSERT INTO users (
                       );
 
     INSERT INTO role_user (role_id, user_id) VALUES (1, 6);
-    
+
     INSERT INTO call(
               call_short_code 
             , start_call 

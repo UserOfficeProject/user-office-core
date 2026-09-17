@@ -44,7 +44,12 @@ export default function ProposalQuestionaryReview(
     },
     {
       label: 'Co-Proposers',
-      value: <UserList users={users} />,
+      value: (
+        <UserList
+          users={users}
+          invitedEmails={data.coProposerInvites?.map((invite) => invite.email)}
+        />
+      ),
     },
     ...(isDataAccessUsersEnabled && data.dataAccessUsers
       ? [
@@ -53,19 +58,12 @@ export default function ProposalQuestionaryReview(
             value: (
               <UserList
                 users={data.dataAccessUsers}
+                invitedEmails={data.dataAccessInvites?.map(
+                  (invite) => invite.email
+                )}
                 data-cy="data-access-users-list"
               />
             ),
-          },
-        ]
-      : []),
-    ...(data.coProposerInvites?.length > 0
-      ? [
-          {
-            label: 'Invited',
-            value: data.coProposerInvites
-              .map((invite) => invite.email)
-              .join(', '),
           },
         ]
       : []),
