@@ -223,6 +223,16 @@ context('Proposal tests', () => {
     });
 
     it('Principal investigator in the proposal table should not be empty', () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.updateUserDetails({
+        id: proposer.id,
+        firstname: proposer.firstName,
+        userTitle: 'Dr.',
+        lastname: '',
+        institutionId: 1,
+        email: proposer.email,
+      });
+
       cy.login('officer');
       cy.visit('/');
 
