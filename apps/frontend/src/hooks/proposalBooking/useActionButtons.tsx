@@ -27,7 +27,7 @@ const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) =>
   event.proposal?.users.some((coProposer) => coProposer.id === user.id);
 
 const isTeamlead = (user: UserJwt, event: UserExperiment) =>
-  event.visit !== null && event.visit.teamLead.id === user.id;
+  event.visit && event.visit.teamLead?.id === user.id;
 
 //---------------------------------------------------------------------
 
