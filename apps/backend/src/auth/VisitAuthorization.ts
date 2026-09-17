@@ -49,9 +49,13 @@ export class VisitAuthorization {
       return true;
     }
 
+    if (this.userAuth.isApiToken(agent)) {
+      return true;
+    }
+
     const visit = await this.resolveVisit(visitOrVisitId);
 
-    if (!visit) {
+    if (!visit || !agent.id) {
       return false;
     }
 
