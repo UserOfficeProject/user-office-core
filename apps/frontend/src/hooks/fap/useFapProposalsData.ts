@@ -49,7 +49,7 @@ export function useFapProposalsData(
     return () => {
       cancelled = true;
     };
-  }, [fapId, api, callId, instrumentId]);
+  }, [fapId, api, callId, instrumentId, legacy]);
 
   return {
     loadingFapProposals,

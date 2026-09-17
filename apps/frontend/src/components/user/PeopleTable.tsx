@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -58,7 +58,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   invitationUserRole?: UserRole;
   action?: {
     fn: (data: T | T[]) => void;
-    actionIcon: JSX.Element;
+    actionIcon: React.ReactNode;
     actionText: string;
   };
   isFreeAction?: boolean;
@@ -174,8 +174,7 @@ const PeopleTable = ({
   const [tableEmails, setTableEmails] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchName, setSearchName] = useState('');
-  const tableRef =
-    React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
+  const tableRef = useRef<MaterialTableCore<BasicUserDetailsFragment>>(null);
 
   const sortDirection = persistUrlQueryParams
     ? searchParams.get('sortDirection')
@@ -203,7 +202,7 @@ const PeopleTable = ({
       isFreeAction: isFreeAction,
       tooltip: action.actionText,
       onClick: (
-        event: React.MouseEvent<JSX.Element>,
+        event: React.MouseEvent<HTMLElement>,
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });

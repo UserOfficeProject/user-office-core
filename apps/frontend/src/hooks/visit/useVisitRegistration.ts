@@ -28,7 +28,7 @@ export function useVisitRegistration(visitId: number, userId: number) {
     return () => {
       unmounted = true;
     };
-  }, [api, visitId]);
+  }, [api, visitId, userId]);
 
   return { registration };
 }

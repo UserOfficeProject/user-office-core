@@ -13,7 +13,7 @@ type IdleTimeoutPromptProps = {
   onConfirm: () => void;
 };
 
-function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
+function IdleTimeoutPrompt(props: IdleTimeoutPromptProps) {
   return (
     <StyledDialog
       fullWidth
