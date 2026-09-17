@@ -22,11 +22,11 @@ export default class PostgresDataAccessUsersDataSource
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .join('countries as c', { 'i.country_id': 'c.country_id' })
       .join('data_access_user_has_proposal as dauhp', {
         'u.user_id': 'dauhp.user_id',
       })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .where('dauhp.proposal_pk', proposalPk)
       .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
         users.map((user) => createBasicUserObject(user))
@@ -85,6 +85,24 @@ export default class PostgresDataAccessUsersDataSource
       return new Rejection('Failed to update data access users', {
         proposalPk,
         userIds,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  async addDataAccessUser(
+    proposalPk: number,
+    userId: number
+  ): Promise<undefined | Rejection> {
+    try {
+      await database('data_access_user_has_proposal')
+        .insert({ proposal_pk: proposalPk, user_id: userId })
+        .onConflict(['proposal_pk', 'user_id'])
+        .ignore();
+    } catch (error) {
+      return new Rejection('Failed to update data access users', {
+        proposalPk,
+        userId,
         error: error instanceof Error ? error.message : String(error),
       });
     }

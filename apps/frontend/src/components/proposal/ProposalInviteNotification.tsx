@@ -16,17 +16,19 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     proposalInvites,
+    dataAccessInvites,
     loading,
     processingInviteId,
     acceptCoProposerInvite,
+    acceptDataAccessInvite,
   } = useProposalInvites();
   const { enqueueSnackbar } = useSnackbar();
 
-  if (proposalInvites.length === 0) {
+  if (proposalInvites.length === 0 && dataAccessInvites.length === 0) {
     return null;
   }
 
-  const inviteCount = proposalInvites.length;
+  const inviteCount = proposalInvites.length + dataAccessInvites.length;
 
   const handleAcceptCoProposerInvite = async (inviteId: number) => {
     try {
@@ -41,6 +43,26 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
     } catch {
       enqueueSnackbar(
         `Failed to accept the invitation for the proposal "${proposalInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}". Please try again later.`,
+        {
+          variant: 'error',
+        }
+      );
+    }
+  };
+
+  const handleAcceptDataAccessInvite = async (inviteId: number) => {
+    try {
+      await acceptDataAccessInvite(inviteId);
+      enqueueSnackbar(
+        `Data access invitation for the Proposal "${dataAccessInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}" accepted successfully.`,
+        {
+          variant: 'success',
+        }
+      );
+      onAccept();
+    } catch {
+      enqueueSnackbar(
+        `Failed to accept the data access invitation for the proposal "${dataAccessInvites.find((invite) => invite.id === inviteId)?.proposal?.title || ''}". Please try again later.`,
         {
           variant: 'error',
         }
@@ -96,61 +118,115 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           <Typography variant="h6">Proposal Invitations</Typography>
         </DialogTitle>
         <DialogContent>
-          {proposalInvites.length === 0 ? (
+          {proposalInvites.length === 0 && dataAccessInvites.length === 0 ? (
             <Typography variant="body1" color="textSecondary">
               No pending invitations found.
             </Typography>
           ) : (
-            proposalInvites.map((invite) => (
-              <>
-                {invite.proposal && (
-                  <Box
-                    key={invite.id}
-                    sx={{
-                      backgroundColor: (theme) =>
-                        alpha(theme.palette.info.main, 0.12),
-                      border: (theme) =>
-                        `1px solid ${alpha(theme.palette.info.main, 0.5)}`,
-                      color: 'info.main',
-                      borderRadius: 1,
-                      padding: 2,
-                      marginBottom: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}
-                  >
-                    <div>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        {invite.proposal.title || 'No Title'}
-                      </Typography>
-                      <Typography variant="body1" color="textSecondary">
-                        Principal Investigator: {invite.proposal.proposerName}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Invited on:
-                        {new Date(invite.createdAt).toLocaleDateString()}
-                      </Typography>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <Button
-                        data-testid={`accept-invite-btn-${invite.id}`}
-                        color="primary"
-                        size="small"
-                        variant="contained"
-                        onClick={() => handleAcceptCoProposerInvite(invite.id)}
-                        disabled={processingInviteId === invite.id}
-                      >
-                        {processingInviteId === invite.id
-                          ? 'Processing...'
-                          : 'Accept'}
-                      </Button>
-                    </div>
-                  </Box>
-                )}
-              </>
-            ))
+            <>
+              {proposalInvites.map((invite) => (
+                <React.Fragment key={invite.id}>
+                  {invite.proposal && (
+                    <Box
+                      sx={{
+                        backgroundColor: (theme) =>
+                          alpha(theme.palette.info.main, 0.12),
+                        border: (theme) =>
+                          `1px solid ${alpha(theme.palette.info.main, 0.5)}`,
+                        color: 'info.main',
+                        borderRadius: 1,
+                        padding: 2,
+                        marginBottom: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <div>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {invite.proposal.title || 'No Title'}
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary">
+                          Principal Investigator: {invite.proposal.proposerName}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {new Date(invite.createdAt).toLocaleDateString()}{' '}
+                          (Co-Proposer)
+                        </Typography>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <Button
+                          data-testid={`accept-invite-btn-${invite.id}`}
+                          color="primary"
+                          size="small"
+                          variant="contained"
+                          onClick={() =>
+                            handleAcceptCoProposerInvite(invite.id)
+                          }
+                          disabled={processingInviteId === invite.id}
+                        >
+                          {processingInviteId === invite.id
+                            ? 'Processing...'
+                            : 'Accept'}
+                        </Button>
+                      </div>
+                    </Box>
+                  )}
+                </React.Fragment>
+              ))}
+              {dataAccessInvites.map((invite) => (
+                <React.Fragment key={invite.id}>
+                  {invite.proposal && (
+                    <Box
+                      sx={{
+                        backgroundColor: (theme) =>
+                          alpha(theme.palette.info.main, 0.12),
+                        border: (theme) =>
+                          `1px solid ${alpha(theme.palette.info.main, 0.5)}`,
+                        color: 'info.main',
+                        borderRadius: 1,
+                        padding: 2,
+                        marginBottom: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <div>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {invite.proposal.title || 'No Title'}
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary">
+                          Principal Investigator: {invite.proposal.proposerName}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {new Date(invite.createdAt).toLocaleDateString()}{' '}
+                          (Data Access User)
+                        </Typography>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <Button
+                          data-testid={`accept-data-access-invite-btn-${invite.id}`}
+                          color="primary"
+                          size="small"
+                          variant="contained"
+                          onClick={() =>
+                            handleAcceptDataAccessInvite(invite.id)
+                          }
+                          disabled={processingInviteId === invite.id}
+                        >
+                          {processingInviteId === invite.id
+                            ? 'Processing...'
+                            : 'Accept'}
+                        </Button>
+                      </div>
+                    </Box>
+                  )}
+                </React.Fragment>
+              ))}
+            </>
           )}
         </DialogContent>
         <DialogActions>
