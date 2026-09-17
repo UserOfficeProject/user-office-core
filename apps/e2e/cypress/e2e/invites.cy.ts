@@ -62,10 +62,11 @@ context('Invites tests', () => {
       cy.get('#title-input').type(faker.lorem.words(2));
       cy.get('#abstract-input').type(faker.lorem.words(3));
       cy.get('[data-cy="save-and-continue-button"]').click();
+      // Invitees are listed in the row for the role they were invited to, with
+      // an "(invited)" marker after the email.
       cy.get('[data-cy="questionary-details-view"]')
-        .contains('Invited')
-        .closest('tr')
-        .contains(email);
+        .contains('tr', 'Co-Proposers')
+        .should('contain.text', `${email} (invited)`);
     });
 
     it('Should be able to invite user by email', function () {
@@ -514,6 +515,88 @@ context('Invites tests', () => {
       cy.get('[data-cy="proposal-table"]').should(
         'contain.text',
         initialDBData.proposal.title
+      );
+    });
+  });
+
+  describe('Inviting data access users', () => {
+    // Not a seeded user: an email that already belongs to one is resolved by
+    // the selector and added as a data access user outright, so no invite is
+    // created.
+    const email = 'jane@example.com';
+
+    // Scoped twice over: the upcoming experiments table above this one also has
+    // a Proposal ID column, and the seed leaves user1 as PI on two accepted
+    // proposals, so neither the table nor the row can be left implicit.
+    const openDataAccessUsers = () =>
+      cy
+        .get('[data-cy="proposal-table"]')
+        .contains('tr', initialDBData.proposal.shortCode)
+        .find('[data-cy="view-data-access-users-icon"]')
+        .click();
+
+    beforeEach(function () {
+      cy.resetDB(true);
+      // DATA_ACCESS_USERS defaults to disabled, so it has to be turned on
+      // explicitly rather than assumed.
+      cy.updateFeature({
+        action: FeatureUpdateAction.ENABLE,
+        featureIds: [FeatureId.DATA_ACCESS_USERS],
+      });
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+          this.skip();
+        }
+      });
+
+      // "View data access users" is only offered to the PI of a proposal whose
+      // public status is ACCEPTED, which needs the proposal submitted and its
+      // final status accepted. The seeded proposal is already all three —
+      // proposer_id 1 (user1), submitted, final_status ACCEPTED — so setting it
+      // up again here only earns a "Proposal has been submitted already".
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.finishedLoading();
+    });
+
+    it('PI should be able to invite a data access user by email', () => {
+      openDataAccessUsers();
+
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.contains(`Invite ${email} via email`).should('exist');
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]').click();
+
+      cy.get('[data-cy="invites-chips"]').should('contain.text', email);
+
+      cy.get('[data-cy="save-data-access-users-modal"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Data access users updated successfully!',
+      });
+
+      // Reopening reads the invite back off the proposal, so this is what
+      // proves it was persisted rather than only held in component state.
+      openDataAccessUsers();
+      cy.get('[data-cy="invites-chips"]').should('contain.text', email);
+      cy.get('[data-cy="close-data-access-users-modal"]').click();
+
+      // It should also reach the proposal summary, listed under data access
+      // users rather than co-proposers.
+      cy.get('[data-cy="proposal-table"]')
+        .contains('tr', initialDBData.proposal.shortCode)
+        .find('[data-testid="VisibilityIcon"]')
+        .click();
+
+      // The seeded proposal is notified, so it opens behind Comment/Proposal
+      // tabs and lands on Comment.
+      cy.contains('[role="tab"]', 'Proposal').click();
+
+      cy.get('[data-cy="questionary-details-view"]').should('exist');
+      cy.get('[data-cy="data-access-users-list"]').should(
+        'contain.text',
+        `${email} (invited)`
       );
     });
   });
