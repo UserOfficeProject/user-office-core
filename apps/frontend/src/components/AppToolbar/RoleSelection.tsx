@@ -1,10 +1,12 @@
 import MaterialTable, { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
+import { Theme } from '@mui/material/styles';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Role } from 'generated/sdk';
+import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 import { useMeData } from 'hooks/user/useMeData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -24,6 +26,10 @@ const columns: Column<Partial<Role>>[] = [
     field: 'description',
   },
 ];
+
+const roleActionSx = (theme: Theme) => ({
+  [belowCompactUi(theme)]: { minHeight: minTouchTarget(theme) },
+});
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
   const { currentRoleId, token } = useContext(UserContext);
@@ -56,6 +62,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
           variant="text"
           disabled
           data-cy={`selected-role-${rowData.shortCode}`}
+          sx={roleActionSx}
         >
           In Use
         </Button>
@@ -65,6 +72,7 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
           disabled={loading}
           onClick={() => selectUserRole(rowData as Role)}
           data-cy={`select-role-${rowData.shortCode}`}
+          sx={roleActionSx}
         >
           Use
         </Button>

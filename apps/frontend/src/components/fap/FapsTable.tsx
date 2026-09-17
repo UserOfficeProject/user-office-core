@@ -3,9 +3,9 @@ import Edit from '@mui/icons-material/Edit';
 import Visibility from '@mui/icons-material/Visibility';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
@@ -61,7 +61,19 @@ const FapsTable = () => {
     active: isActiveFilter,
     role: currentRole as UserRole,
   });
+  // Only createModal sets this, because it has to redirect from inside a render.
+  // Rendering <Navigate/> instead redirects from an effect, which StrictMode runs
+  // twice, leaving two history entries so the first press of Back does nothing.
   const [editFapID, setEditFapID] = useState(0);
+
+  useEffect(() => {
+    if (!editFapID) {
+      return;
+    }
+
+    setEditFapID(0);
+    navigate(`/FapPage/${editFapID}`);
+  }, [editFapID, navigate]);
 
   const [searchParam, setSearchParam] = useSearchParams();
   const fapStatus = searchParam.get('fapStatus');
@@ -88,10 +100,6 @@ const FapsTable = () => {
       setIsActiveFilter(fapStatus === FapStatus.ACTIVE ? true : false);
     }
   };
-
-  if (editFapID) {
-    return <Navigate to={`/FapPage/${editFapID}`} />;
-  }
 
   const EditIcon = () => <Edit />;
   const ViewIcon = () => <Visibility />;
@@ -177,7 +185,7 @@ const FapsTable = () => {
             icon: canEdit ? EditIcon : ViewIcon,
             tooltip: canEdit ? t('Edit') : t('View'),
             onClick: (event, rowData): void =>
-              setEditFapID((rowData as Fap).id),
+              navigate(`/FapPage/${(rowData as Fap).id}`),
             position: 'row',
           },
         ]}

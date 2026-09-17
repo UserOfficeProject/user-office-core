@@ -71,6 +71,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
         <WrappedComponent {...(props as T)} confirm={confirm} />
         <StyledDialog
           fullWidth
+          fullScreen={false}
           {...dialogProps}
           open={!!onConfirm}
           onClose={handleCancel}

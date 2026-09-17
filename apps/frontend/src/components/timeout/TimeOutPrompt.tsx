@@ -17,6 +17,7 @@ function IdleTimeoutPrompt(props: IdleTimeoutPromptProps) {
   return (
     <StyledDialog
       fullWidth
+      fullScreen={false}
       maxWidth="md"
       data-cy="timeout-dialog"
       open={props.isIdle}

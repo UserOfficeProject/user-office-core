@@ -1,0 +1,115 @@
+import { Column } from '@material-table/core';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import React from 'react';
+
+import { useCardRowRenderer } from 'components/common/cards/CardRowContext';
+
+type MaterialTableCardRowProps<RowData extends object> = {
+  data: RowData;
+  columns: Column<RowData>[];
+  actions?: unknown[];
+  components: Record<string, React.ComponentType<Record<string, unknown>>>;
+  getFieldValue: (rowData: RowData, columnDef: Column<RowData>) => unknown;
+};
+
+function renderColumnValue<RowData extends object>(
+  data: RowData,
+  columnDef: Column<RowData>,
+  getFieldValue: MaterialTableCardRowProps<RowData>['getFieldValue']
+): React.ReactNode {
+  const value = getFieldValue(data, columnDef);
+
+  if (
+    columnDef.emptyValue !== undefined &&
+    (value === undefined || value === null)
+  ) {
+    return typeof columnDef.emptyValue === 'function'
+      ? (columnDef.emptyValue(data) as React.ReactNode)
+      : (columnDef.emptyValue as React.ReactNode);
+  }
+
+  return columnDef.render ? columnDef.render(data) : (value as React.ReactNode);
+}
+
+export default function MaterialTableCardRow<RowData extends object>({
+  data,
+  columns,
+  actions,
+  components,
+  getFieldValue,
+}: MaterialTableCardRowProps<RowData>) {
+  const visibleColumns = columns.filter((columnDef) => !columnDef.hidden);
+  const [primaryColumn, ...detailColumns] = visibleColumns;
+  const Actions = components.Actions;
+  const cardRow = useCardRowRenderer();
+
+  if (cardRow) {
+    return (
+      <TableRow>
+        <TableCell
+          colSpan={visibleColumns.length + 1}
+          sx={{ paddingX: 0, paddingY: 0.75, borderBottom: 'none' }}
+        >
+          {cardRow(data as never)}
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell
+        colSpan={visibleColumns.length + 1}
+        sx={{ paddingX: 0, paddingY: 0.75, borderBottom: 'none' }}
+      >
+        <Card variant="outlined">
+          <CardContent sx={{ paddingBottom: 0 }}>
+            {primaryColumn && (
+              <Typography variant="subtitle1" component="h3" gutterBottom>
+                {renderColumnValue(data, primaryColumn, getFieldValue)}
+              </Typography>
+            )}
+            {detailColumns.map((columnDef, index) => (
+              <Box
+                key={`card-field-${index}`}
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '40% 1fr',
+                  columnGap: 1,
+                  paddingY: 0.25,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  component="span"
+                >
+                  {columnDef.title}
+                </Typography>
+                <Typography variant="body2" component="span">
+                  {renderColumnValue(data, columnDef, getFieldValue)}
+                </Typography>
+              </Box>
+            ))}
+          </CardContent>
+          {!!actions?.length && (
+            <CardActions sx={{ justifyContent: 'flex-end' }}>
+              <Actions
+                data={data}
+                actions={actions}
+                components={components}
+                size="small"
+              />
+            </CardActions>
+          )}
+        </Card>
+      </TableCell>
+    </TableRow>
+  );
+}

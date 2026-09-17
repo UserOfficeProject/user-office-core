@@ -5,7 +5,7 @@ import { Unit } from 'generated/sdk';
 
 const NumberInputAnswerRenderer: AnswerRenderer = (answer) => {
   if (!answer.value.value) {
-    return <span>Left blank</span>;
+    return null;
   }
 
   const value = answer.value.value;
