@@ -30,16 +30,18 @@ const AvailabilityTimeEditComponent = (
     data-cy="availability-time"
     value={instTime}
     onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-    InputProps={{
-      inputProps: {
-        max: MAX_32_BIT_INTEGER - 1,
-        min: 0,
-      },
-    }}
     required
     sx={{ width }}
     margin="none"
     placeholder="Enter in Days"
+    slotProps={{
+      input: {
+        inputProps: {
+          max: MAX_32_BIT_INTEGER - 1,
+          min: 0,
+        },
+      },
+    }}
   />
 );
 
@@ -78,9 +80,9 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
         >
           <Form style={{ padding: '10px', alignContent: 'center' }}>
             <Grid
-              direction="column"
               sx={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}

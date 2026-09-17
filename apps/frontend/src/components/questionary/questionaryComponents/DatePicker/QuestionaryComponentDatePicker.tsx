@@ -1,5 +1,4 @@
 import FormControl from '@mui/material/FormControl';
-import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -15,7 +14,6 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import Hint from '../Hint';
 
 export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
-  const theme = useTheme();
   const { answer, onComplete } = props;
   const {
     question: { id, question },
@@ -47,7 +45,6 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           label={question}
           format={format}
           component={component}
-          inputProps={{ placeholder: format }}
           ampm={false}
           onChange={(date: DateTime) =>
             date &&
@@ -62,7 +59,6 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           }}
           minDate={fieldMinDate}
           maxDate={fieldMaxDate}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
       </LocalizationProvider>
       <Hint>{tooltip}</Hint>

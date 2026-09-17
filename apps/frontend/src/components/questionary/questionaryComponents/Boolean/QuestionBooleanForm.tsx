@@ -32,8 +32,10 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
             id="boolean-key-input"
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -41,8 +43,10 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
             id="boolean-question-input"
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
           <TitledContainer label="Constraints">
             <Field

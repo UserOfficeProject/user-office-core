@@ -71,6 +71,13 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
 
+  const handleGradeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { grade: event.target.value },
+    });
+  };
+
   return (
     <div>
       <Box sx={{ margin: theme.spacing(2, 0) }}>
@@ -135,7 +142,12 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             </ToggleButtonGroup>
           )}
 
-          <Box marginTop={1} width={150}>
+          <Box
+            sx={{
+              marginTop: 1,
+              width: 150,
+            }}
+          >
             <Field
               name={gradeFieldId}
               label={
@@ -148,12 +160,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                   : TextField
               }
               MenuProps={{ 'data-cy': 'grade-proposal-options' }}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: { grade: event.target.value },
-                });
-              }}
+              onChange={handleGradeChange}
               formControl={{
                 fullWidth: true,
                 required: true,
@@ -164,13 +171,20 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                   ? {
                       id: 'grade-proposal',
                     }
+                  : undefined
+              }
+              slotProps={
+                gradeType === 'Classification' || config.decimalPoints === 0
+                  ? undefined
                   : {
-                      id: 'grade-proposal',
-                      step: Math.pow(10, -config.decimalPoints).toString(),
-                      inputMode: 'decimal',
-                      type: 'number',
-                      min: '1',
-                      max: '10',
+                      htmlInput: {
+                        id: 'grade-proposal',
+                        step: Math.pow(10, -config.decimalPoints).toString(),
+                        inputMode: 'decimal',
+                        type: 'number',
+                        min: '1',
+                        max: '10',
+                      },
                     }
               }
               data-cy="grade-proposal"

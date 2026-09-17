@@ -97,7 +97,7 @@ const AssignInstrumentsToTechniques = ({
             </Typography>
 
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormikUIAutocomplete
                   name="selectedInstrumentIds"
                   label={

@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { DialogContent } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -107,7 +107,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -116,7 +118,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
           <Field
             name="config.small_label"
@@ -125,7 +129,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'small-label' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'small-label' },
+            }}
           />
           <TitledContainer label="Constraints">
             <Field
@@ -135,7 +141,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               Label={{
                 label: 'Is required',
               }}
-              InputProps={{ 'data-cy': 'required' }}
+              slotProps={{
+                input: { 'data-cy': 'required' },
+              }}
             />
             <FormControl fullWidth>
               <Autocomplete
@@ -222,7 +230,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               type="number"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'numberMin' }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value =
                   e.target.value === '' ? null : Number(e.target.value);
@@ -235,6 +242,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 e.target.value === '' &&
                   setFieldValue('config.numberMinInclusive', false);
               }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'numberMin' },
+              }}
             />
             {(values.config as NumberInputConfig).numberMin !== null && (
               <Field
@@ -245,7 +255,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 Label={{
                   label: 'Minimum is inclusive',
                 }}
-                inputProps={{ 'data-cy': 'numberMinInclusive' }}
+                slotProps={{
+                  input: { 'data-cy': 'numberMinInclusive' },
+                }}
               />
             )}
             <Field
@@ -255,7 +267,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               type="number"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'numberMax' }}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value =
                   e.target.value === '' ? null : Number(e.target.value);
@@ -264,6 +275,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                 e.target.value === '' &&
                   setFieldValue('config.numberMaxInclusive', false);
+              }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'numberMax' },
               }}
             />
             {(values.config as NumberInputConfig).numberMax !== null && (
@@ -275,7 +289,9 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 Label={{
                   label: 'Maximum is inclusive',
                 }}
-                inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+                slotProps={{
+                  input: { 'data-cy': 'numberMaxInclusive' },
+                }}
               />
             )}
           </TitledContainer>

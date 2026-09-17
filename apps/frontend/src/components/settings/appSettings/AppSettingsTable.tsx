@@ -58,8 +58,10 @@ const AppSettingsTable = () => {
           search: true,
           debounceInterval: 400,
           selectionProps: (rowData: Settings) => ({
-            inputProps: {
-              'aria-label': `${rowData.id}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowData.id}-select`,
+              },
             },
           }),
           pageSize: 20,

@@ -105,7 +105,6 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
           handleCharacterCount(editor);
         }}
       />
-
       {isError && <FormHelperText>{fieldError}</FormHelperText>}
       {paragraphSpacingError && (
         <FormHelperText sx={{ color: theme.palette.error.main }}>

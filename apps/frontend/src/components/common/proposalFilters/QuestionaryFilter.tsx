@@ -116,7 +116,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
 
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Autocomplete
           id={'question-list'}
           options={questions}
@@ -146,7 +146,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
           data-cy="question-list"
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Collapse in={!!selectedQuestion}>
           {selectedQuestion && (
             <SearchCriteriaComponent
@@ -164,7 +164,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
           )}
         </Collapse>
       </Grid>
-      <Grid item xs={12} style={{ textAlign: 'right' }}>
+      <Grid style={{ textAlign: 'right' }} size={12}>
         {selectedQuestion && (
           <Button
             style={{ marginTop: '8px' }}

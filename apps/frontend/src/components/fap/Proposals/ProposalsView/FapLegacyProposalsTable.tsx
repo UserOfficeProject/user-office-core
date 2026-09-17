@@ -162,7 +162,7 @@ const FapLegacyProposalsTable = ({
   const { t } = useTranslation();
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
     '[data-cy="fap-assignments-table"]',
-    [loadingFapProposals]
+    loadingFapProposals
   );
 
   const translatedColumns = FapProposalColumns.map((column) =>
@@ -394,9 +394,11 @@ const FapLegacyProposalsTable = ({
             initialPage: page ? +page : 0,
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
-              inputProps: {
-                'aria-label': 'Select all rows',
-                id: 'select-all-table-rows',
+              slotProps: {
+                input: {
+                  'aria-label': 'Select all rows',
+                  id: 'select-all-table-rows',
+                },
               },
             },
           }}

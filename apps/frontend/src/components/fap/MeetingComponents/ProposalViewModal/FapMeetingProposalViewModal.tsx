@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
-import { TransitionProps } from '@mui/material/transitions/transition';
+import { TransitionProps } from '@mui/material/transitions';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,8 +84,10 @@ const FapMeetingProposalViewModal = ({
         open={proposalViewModalOpen}
         fullScreen
         onClose={(): void => handleClose()}
-        TransitionComponent={Transition}
         data-cy="Fap-meeting-modal"
+        slots={{
+          transition: Transition,
+        }}
       >
         <AppBar
           sx={{
@@ -117,7 +119,7 @@ const FapMeetingProposalViewModal = ({
         </AppBar>
         <DialogContent>
           <Grid container>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <div data-cy="Fap-meeting-components-proposal-view">
                 {loading || !fapProposalData || !proposalData ? (
                   <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />

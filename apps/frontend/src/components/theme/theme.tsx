@@ -56,39 +56,60 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
         settingsMap.get(SettingsId.PALETTE_INFO_MAIN)?.settingsValue ||
         defaultTheme.palette.info.main,
     },
-    // NOTE: This was previous default background on the body. Now it is white and that's why we are overwriting it.
-    // (https://v4.mui.com/customization/default-theme/#explore vs https://mui.com/customization/default-theme/#explore)
     background: {
       default: '#fafafa',
     },
   };
 
-  // NOTE: If DatePicker/DateTimePicker are added here later we can add the desktopModeMediaQuery as default to fix this:
-  // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
+  const baseTheme = createTheme({
+    palette: palette,
+    components: {
+      MuiTextField: {
+        defaultProps: {
+          variant: 'standard',
+          margin: 'normal',
+        },
+      },
+      MuiButton: {
+        defaultProps: {
+          variant: 'contained',
+        },
+      },
+      MuiSelect: {
+        defaultProps: {
+          variant: 'standard',
+        },
+      },
+      MuiFormControl: {
+        defaultProps: {
+          variant: 'standard',
+          margin: 'none',
+        },
+      },
+    },
+  });
+
   const theme = responsiveFontSizes(
-    createTheme({
-      palette: palette,
+    createTheme(baseTheme, {
       components: {
-        MuiTextField: {
-          defaultProps: {
-            variant: 'standard',
-            margin: 'normal',
-          },
-        },
-        MuiButton: {
-          defaultProps: {
-            variant: 'contained',
-          },
-        },
-        MuiSelect: {
+        MuiPickersTextField: {
           defaultProps: {
             variant: 'standard',
           },
         },
-        MuiFormControl: {
+        MuiDatePicker: {
           defaultProps: {
-            variant: 'standard',
-            margin: 'none',
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
+          },
+        },
+        MuiDateTimePicker: {
+          defaultProps: {
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
+          },
+        },
+        MuiTimePicker: {
+          defaultProps: {
+            desktopModeMediaQuery: baseTheme.breakpoints.up('sm'),
           },
         },
       },

@@ -36,7 +36,9 @@ export const QuestionTemplateRelationFapReviewBasisForm = (
             type="number"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'min_score' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'min_score' },
+            }}
           />
           <Field
             name="config.maxGrade"
@@ -45,7 +47,9 @@ export const QuestionTemplateRelationFapReviewBasisForm = (
             type="number"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'max_score' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'max_score' },
+            }}
           />
           <Field
             name="config.decimalPoints"
@@ -54,7 +58,9 @@ export const QuestionTemplateRelationFapReviewBasisForm = (
             type="number"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'decimal_points' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'decimal_points' },
+            }}
           />
           <TitledContainer label="Non Numeric Options">
             <Field

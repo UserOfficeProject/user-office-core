@@ -62,12 +62,12 @@ const AssignTagsForm = ({ role, close, onAssign }: AssignTagsFormProps) => {
             onChange={(_event, newValue) => {
               setFieldValue('selectedTags', newValue);
             }}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getItemProps) =>
               value.map((option, index) => (
                 <Chip
                   label={option.name}
                   sx={{ gap: '3px', padding: '6px', margin: '6px' }}
-                  {...getTagProps({ index })}
+                  {...getItemProps({ index })}
                   key={option.id}
                 />
               ))

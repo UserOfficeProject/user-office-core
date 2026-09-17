@@ -70,7 +70,9 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -79,7 +81,9 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
 
           <TitledContainer label="Options">
@@ -149,7 +153,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               label="Min entries"
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="number"
-              inputProps={{ min: 0 }}
               component={TextField}
               fullWidth
               data-cy="min-entries"
@@ -163,6 +166,9 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               value={
                 (values.config as SampleDeclarationConfig).minEntries ?? ''
               }
+              slotProps={{
+                htmlInput: { min: 0 },
+              }}
             />
             <Field
               name="config.maxEntries"
@@ -172,7 +178,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               type="number"
               component={TextField}
               fullWidth
-              inputProps={{ min: 1 }}
               data-cy="max-entries"
               // NOTE: This is needed to prevent sending empty string when there is no value
               onChange={({
@@ -184,6 +189,9 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               value={
                 (values.config as SampleDeclarationConfig).maxEntries ?? ''
               }
+              slotProps={{
+                htmlInput: { min: 1 },
+              }}
             />
           </TitledContainer>
         </>

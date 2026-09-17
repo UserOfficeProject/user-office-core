@@ -61,21 +61,22 @@ const FormikUIPredefinedMessagesTextField = ({
           setFormFieldValue={helpers.setValue}
         />
       )}
-
       <MuiTextField
         {...configTextField}
-        InputProps={{
-          endAdornment: (
-            <Tooltip title="Select from predefined messages">
-              <IconButton
-                aria-label="Select from predefined messages"
-                onClick={openPredefinedMessagesModal}
-                data-cy="select-predefined-message"
-              >
-                <AddCommentIcon />
-              </IconButton>
-            </Tooltip>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: (
+              <Tooltip title="Select from predefined messages">
+                <IconButton
+                  aria-label="Select from predefined messages"
+                  onClick={openPredefinedMessagesModal}
+                  data-cy="select-predefined-message"
+                >
+                  <AddCommentIcon />
+                </IconButton>
+              </Tooltip>
+            ),
+          },
         }}
       />
     </>

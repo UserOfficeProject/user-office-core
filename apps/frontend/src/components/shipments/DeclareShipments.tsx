@@ -129,7 +129,11 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
         Declare Shipments
       </Typography>
       <Stack spacing={4} direction="row">
-        <Stack flex={1}>
+        <Stack
+          sx={{
+            flex: 1,
+          }}
+        >
           <Typography variant="h6" component="h2" sx={{ paddingBottom: 3 }}>
             Shipment guide
           </Typography>
@@ -147,7 +151,11 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
           )}
         </Stack>
         <Divider orientation="vertical" flexItem />
-        <Stack flex={1}>
+        <Stack
+          sx={{
+            flex: 1,
+          }}
+        >
           <Typography variant="h6" component="h2" sx={{ paddingBottom: 3 }}>
             My shipment list
           </Typography>

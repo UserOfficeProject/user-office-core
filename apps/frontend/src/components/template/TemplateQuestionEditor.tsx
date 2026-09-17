@@ -132,8 +132,6 @@ export default function TemplateQuestionEditor(props: {
           data-cy="question-container"
         >
           <Grid
-            item
-            xs={10}
             sx={{
               fontSize: '12px',
               fontWeight: 'bold',
@@ -141,26 +139,25 @@ export default function TemplateQuestionEditor(props: {
               wordBreak: 'break-word',
             }}
             data-cy="proposal-question-id"
+            size={10}
           >
             {props.data.naturalKey}
           </Grid>
           <Grid
-            item
-            xs={2}
             sx={{
               color: theme.palette.grey[400],
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
             }}
+            size={2}
           >
             {getTemplateFieldIcon(props.data.dataType)}
           </Grid>
 
           <Grid
-            item
-            xs={10}
             sx={{ color: '#000', fontSize: '13px', padding: '6px 0' }}
+            size={10}
           >
             {questionDefinition.renderers
               ? questionDefinition.renderers.questionRenderer(props.data)
@@ -168,8 +165,6 @@ export default function TemplateQuestionEditor(props: {
           </Grid>
 
           <Grid
-            item
-            xs={12}
             sx={{
               fontSize: '12px',
               color: theme.palette.grey[900],
@@ -197,6 +192,7 @@ export default function TemplateQuestionEditor(props: {
                 },
               },
             }}
+            size={12}
           >
             {dependencyJsx}
           </Grid>

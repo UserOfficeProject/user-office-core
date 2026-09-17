@@ -294,10 +294,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
       <MTableToolbar {...props} />
       {tableHasData && !!selectAllAction && allItemsSelectedOnThePage && (
         <Box
-          textAlign="center"
-          padding={1}
-          bgcolor={(theme) => theme.palette.background.default}
           data-cy="select-all-proposals"
+          sx={{
+            textAlign: 'center',
+            padding: 1,
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
         >
           {selectAllAction.iconProps?.hidden ? (
             <>
@@ -614,7 +616,12 @@ const ProposalTableOfficer = ({
       confirm(action, {
         title: 'Are you sure? Multiple proposals selected!',
         description: (
-          <Box display="flex" alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Warning color="warning" sx={{ marginRight: 1 }} />
             <span>
               <b>{selectedCount}</b> proposals are selected. This action will
@@ -1429,13 +1436,15 @@ const ProposalTableOfficer = ({
           searchText: search || undefined,
           selection: isReadOnly ? false : true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
+            slotProps: { input: { 'aria-label': 'Select All Rows' } },
           },
           debounceInterval: 600,
           columnsButton: true,
           selectionProps: (rowdata: ProposalViewData) => ({
-            inputProps: {
-              'aria-label': `${rowdata.title}-select`,
+            slotProps: {
+              input: {
+                'aria-label': `${rowdata.title}-select`,
+              },
             },
           }),
           pageSize: pageSize ? +pageSize : undefined,
