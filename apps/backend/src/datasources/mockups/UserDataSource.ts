@@ -1,6 +1,7 @@
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
+import { Tag } from '../../models/Tag';
 import {
   BasicUserDetails,
   User,
@@ -74,6 +75,40 @@ const allBasicUserDetails = [
   basicDummyThirdVisitor,
 ];
 
+export const tags: Tag[] = [
+  { name: 'tag 1', shortCode: 'tag 1', id: 1 },
+  { name: 'tag 2', shortCode: 'tag 2', id: 2 },
+];
+
+export const roles: Role[] = [
+  {
+    id: 1,
+    shortCode: 'user',
+    title: 'Base User',
+    description: '',
+    config: {},
+    isRootRole: true,
+  },
+  {
+    id: 4,
+    shortCode: 'user_officer',
+    title: 'Derived User Officer 1',
+    description: '',
+    config: {},
+    isRootRole: false,
+    tags: [tags[0]],
+  },
+  {
+    id: 3,
+    shortCode: 'user',
+    title: 'Derived User 2',
+    description: '',
+    config: {},
+    isRootRole: false,
+    tags: [tags[1]],
+  },
+];
+
 export const dummyUserOfficer = new User(
   4,
   'Mr.',
@@ -100,6 +135,12 @@ export const dummyUserOfficerWithRole: UserWithRole = {
     config: {},
     isRootRole: true,
   },
+  externalTokenValid: true,
+};
+
+export const derivedDummyUserOfficerWithRole: UserWithRole = {
+  ...dummyUserOfficer,
+  currentRole: roles[1],
   externalTokenValid: true,
 };
 
@@ -142,6 +183,20 @@ export const dummyUserWithRole: UserWithRole = {
     description: '',
     config: {},
     isRootRole: true,
+  },
+  externalTokenValid: true,
+};
+
+export const derivedDummyUserWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: {
+    id: 1,
+    title: 'User',
+    shortCode: 'user',
+    description: '',
+    config: {},
+    isRootRole: false,
+    tags: [tags[0]],
   },
   externalTokenValid: true,
 };
@@ -635,45 +690,19 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async getRoles(): Promise<Role[]> {
-    return [
-      {
-        id: 1,
-        shortCode: 'user_officer',
-        title: 'User Officer',
-        description: '',
-        config: {},
-        isRootRole: true,
-      },
-      {
-        id: 2,
-        shortCode: 'user',
-        title: 'User',
-        description: '',
-        config: {},
-        isRootRole: true,
-      },
-    ];
+    return roles;
   }
 
   async getRolesByTags(roleTags?: number[]): Promise<Role[]> {
-    return [
-      {
-        id: 1,
-        shortCode: 'user_officer',
-        title: 'User Officer',
-        description: '',
-        config: {},
-        isRootRole: true,
-      },
-      {
-        id: 2,
-        shortCode: 'user',
-        title: 'User',
-        description: '',
-        config: {},
-        isRootRole: true,
-      },
-    ];
+    const tag = roleTags == null ? undefined : roleTags[0];
+    switch (tag) {
+      case undefined:
+        return roles;
+      case 1:
+        return [roles[1]];
+      default:
+        return [];
+    }
   }
 
   async update(user: UpdateUserByIdArgs): Promise<User> {

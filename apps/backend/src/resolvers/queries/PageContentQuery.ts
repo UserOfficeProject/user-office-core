@@ -13,6 +13,7 @@ export class PageContentQuery {
   ) {
     return context.queries.admin.getPageText({
       pageId,
+      agent: context.user,
       roleId,
     });
   }

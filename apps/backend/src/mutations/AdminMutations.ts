@@ -81,30 +81,10 @@ export default class AdminMutations {
         ? (await this.roleDataSource.getTagsByRoleId(roleId)).map((t) => t.id)
         : [];
 
-    //A derived user officer role is trying to edit a fallback notice for all roles
-    if (agentRoleTagIds.length && roleId == null) {
-      return rejection('Insufficient permission to update page notice', {
-        agent,
-        pageId,
-        roleId,
-      });
-    }
-
-    //A derived user officer role is trying to edit a notice for a base role
-    if (agentRoleTagIds.length && roleId != null && !pageRoleTagIds.length) {
-      return rejection('Insufficient permission to update page notice', {
-        agent,
-        pageId,
-        roleId,
-      });
-    }
-
-    //A derived user officer role is trying to edit the notice for a derived role they're not allowed to
+    //A derived user officer role is trying to edit the notice for a role they're not allowed to
     if (
-      agentRoleTagIds.length &&
-      !agentRoleTagIds.filter((agentRoleTag) =>
-        pageRoleTagIds.includes(agentRoleTag)
-      ).length
+      !agent?.currentRole?.isRootRole &&
+      !agentRoleTagIds.filter((t) => pageRoleTagIds.includes(t)).length
     ) {
       return rejection('Insufficient permission to update page notice', {
         agent,

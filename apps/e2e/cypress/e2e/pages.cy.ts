@@ -82,8 +82,7 @@ context('Page tests', () => {
   });
 
   it('Derived User Officer should not be able update a default page', () => {
-    cy.login('officer');
-    cy.changeActiveRole(derivedUserOfficerRoleId);
+    cy.login('officer', derivedUserOfficerRoleId);
 
     cy.visit('/');
     cy.contains('Configuration Settings').click();
@@ -95,15 +94,14 @@ context('Page tests', () => {
   });
 
   it('Derived User Officer should be able update a derived role page with a shared tag', () => {
-    cy.login('officer');
-    cy.changeActiveRole(derivedUserOfficerRoleId);
+    cy.login('officer', derivedUserOfficerRoleId);
 
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
+    cy.contains('Set user homepage');
 
     cy.get('[data-cy="role-filter"]').contains('Derived User Officer');
-    cy.contains('Set user homepage');
 
     cy.setTinyMceContent('HOMEPAGE', faqContents);
 
