@@ -743,7 +743,7 @@ context('Status actions tests', () => {
         });
     });
 
-    it.only('Status actions should execute automatically when workflow transition is triggered by an event', () => {
+    it('Status actions should execute automatically when workflow transition is triggered by an event', () => {
       const proposalTitle = faker.lorem.words(3);
       const proposalAbstract = faker.lorem.paragraph();
       const statusActionEmail = faker.internet.email();
