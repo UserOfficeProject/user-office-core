@@ -8,6 +8,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { addUserThroughModal } from '../support/peopleSelector';
 import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
@@ -307,13 +308,7 @@ context('Instrument tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.get('[data-cy="co-proposers"]')
-        .contains(scientist2.lastName)
-        .parent()
-        .find('input[type="checkbox"]')
-        .check();
-
-      cy.get('.MuiDialog-root [data-cy="assign-selected-users"]').click();
+      addUserThroughModal(scientist2.lastName);
 
       cy.notification({
         variant: 'success',
