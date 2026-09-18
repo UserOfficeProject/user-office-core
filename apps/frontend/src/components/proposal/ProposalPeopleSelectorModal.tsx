@@ -20,7 +20,7 @@ import React, {
 
 import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
+import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
@@ -29,6 +29,10 @@ import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 import NoOptionsText from './NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
+export type AddParticipantsData = {
+  users: BasicUserDetails[];
+  invites: Invite[];
+};
 
 const keyOf = (u: UserOrEmail) =>
   typeof u === 'string' ? `email:${u.toLowerCase()}` : `id:${String(u.id)}`;
@@ -40,15 +44,13 @@ interface ProposalPeopleSelectorModalProps {
   modalOpen: boolean;
   title?: string;
   onClose?: () => void;
-  onAddParticipants?: (data: {
-    users: BasicUserDetails[];
-    invites: Invite[];
-  }) => void;
+  onAddParticipants?: (data: AddParticipantsData) => void;
   excludeUserIds?: number[];
   excludeEmails?: string[];
   preset?: UserOrEmail[];
   multiple?: boolean;
   allowInviteByEmail?: boolean;
+  filterRole?: UserRole;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -73,6 +75,7 @@ function ProposalPeopleSelectorModal({
   confirm,
   preset = [],
   multiple = true,
+  filterRole,
 }: ProposalPeopleSelectorModalProps & WithConfirmProps) {
   const api = useDataApi();
   const [query, setQuery] = useState('');
@@ -103,6 +106,7 @@ function ProposalPeopleSelectorModal({
 
       const { previousCollaborators } = await api().getPreviousCollaborators({
         subtractUsers: excludedUserIds,
+        userRole: filterRole,
       });
 
       setOptions(previousCollaborators?.users || []);
@@ -125,7 +129,10 @@ function ProposalPeopleSelectorModal({
       if (isValidEmail(query)) {
         setExactEmailMatch(undefined);
         const { basicUserDetailsByEmail } =
-          await api().getBasicUserDetailsByEmail({ email: query });
+          await api().getBasicUserDetailsByEmail({
+            email: query,
+            role: filterRole,
+          });
         const selectedUsers = categorizeSelectedItems(selectedItems).users;
 
         const userAlreadyExists =
@@ -154,6 +161,7 @@ function ProposalPeopleSelectorModal({
         const { users } = await api().getUsers({
           subtractUsers: excludedUserIds,
           searchText: query,
+          userRole: filterRole,
         });
 
         setOptions(users?.users || []);
@@ -164,7 +172,14 @@ function ProposalPeopleSelectorModal({
       isPendingSearch.current = false;
       setLoading(false);
     }
-  }, [api, query, excludeUserIds, selectedItems, isEmailSearchOnly]);
+  }, [
+    api,
+    query,
+    excludeUserIds,
+    selectedItems,
+    isEmailSearchOnly,
+    filterRole,
+  ]);
 
   // Debounce effect for search queries
   useEffect(() => {
