@@ -25,13 +25,10 @@ export default function PageEditor() {
   const [searchParams] = useSearchParams();
   const roleIdQueryParam = searchParams.get('role');
   const { roles, currentRoleId } = useContext(UserContext);
-  const isBaseUserOfficer =
-    roles.filter(
-      (r) =>
-        r.id == currentRoleId &&
-        r.shortCode == 'user_officer' &&
-        (!r.tags || !r.tags.length)
-    ).length > 0;
+  const isBaseUserOfficer = roles.some(
+    (r) =>
+      r.id == currentRoleId && r.shortCode == 'user_officer' && r.isRootRole
+  );
   const currentRoleTags = roles
     .find((r) => currentRoleId === r.id)!
     .tags?.map((t) => t.id);
