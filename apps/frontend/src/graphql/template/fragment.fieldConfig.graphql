@@ -220,6 +220,7 @@ fragment fieldConfig on FieldConfig {
     readPermissions
     isMultipleSelect
     requestTime
+    multiJustificationRequired
     instruments {
       id
       name
