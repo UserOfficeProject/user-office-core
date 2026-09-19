@@ -87,6 +87,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.TAGS,
       FeatureId.TECHNIQUE_PROPOSALS,
       FeatureId.PREGENERATED_PROPOSAL_PDF,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
     ],
     true
   );
