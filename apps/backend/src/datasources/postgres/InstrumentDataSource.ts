@@ -567,6 +567,7 @@ export default class PostgresInstrumentDataSource
           'chi.instrument_id': 'i.instrument_id',
           'chi.call_id': callId,
         })
+        .where('fp.call_id', callId)
         .groupBy(['i.instrument_id', 'chi.availability_time']);
 
     const fapInstrumentQuery = (query: Knex.QueryBuilder) =>
@@ -591,6 +592,7 @@ export default class PostgresInstrumentDataSource
           'chi.instrument_id': 'i.instrument_id',
           'chi.call_id': callId,
         })
+        .where('fp.call_id', callId)
         .groupBy(['i.instrument_id']);
 
     return database
