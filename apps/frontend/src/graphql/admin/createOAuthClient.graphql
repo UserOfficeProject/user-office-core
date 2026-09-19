@@ -1,0 +1,22 @@
+mutation createOAuthClient(
+  $clientId: String!
+  $name: String!
+  $description: String
+  $accessPermissions: String!
+) {
+  createOAuthClient(
+    createOAuthClientInput: {
+      clientId: $clientId
+      name: $name
+      description: $description
+      accessPermissions: $accessPermissions
+    }
+  ) {
+    id
+    name
+    description
+    accessPermissions
+    createdAt
+    updatedAt
+  }
+}
