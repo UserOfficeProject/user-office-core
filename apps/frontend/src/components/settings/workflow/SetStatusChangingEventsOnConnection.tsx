@@ -66,7 +66,7 @@ const SetStatusChangingEventsOnConnection = ({
       }}
       validationSchema={setStatusChangingEventsOnConnectionValidationSchema}
     >
-      {({ isSubmitting, values }): JSX.Element => (
+      {({ isSubmitting, values }) => (
         <Form>
           <Typography
             sx={{

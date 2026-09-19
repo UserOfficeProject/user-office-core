@@ -7,7 +7,7 @@ const NavigationFragment = (props: {
   isLoading?: boolean;
   disabled?: boolean;
   children?: React.ReactNode;
-}): JSX.Element | null => {
+}) => {
   if (props.disabled) {
     return null;
   }

@@ -10,10 +10,7 @@ interface UserRoleConfigFormProps {
   onChange: (value: UserRoleConfig) => void;
 }
 
-const UserRoleConfigForm: React.FC<UserRoleConfigFormProps> = ({
-  value,
-  onChange,
-}) => (
+const UserRoleConfigForm = ({ value, onChange }: UserRoleConfigFormProps) => (
   <TextField
     label="Note"
     value={value.note}

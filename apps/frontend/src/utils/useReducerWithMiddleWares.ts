@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  useState,
-  Reducer,
-  ReducerState,
-  Dispatch,
-  ReducerAction,
-} from 'react';
+import { useState, Dispatch } from 'react';
 
 import { FunctionType } from './utilTypes';
 
@@ -24,15 +18,15 @@ function compose(
 
 //TODO: Learn more about this
 // I agree idk what this is doing either
-export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
-  reducer: R,
-  initialState: ReducerState<R>,
-  middlewares: Array<ReducerMiddleware<any, any>> = []
-): [ReducerState<R>, Dispatch<ReducerAction<R>>] {
+export function useReducerWithMiddleWares<S, A>(
+  reducer: (state: S, action: A) => S,
+  initialState: S,
+  middlewares: Array<ReducerMiddleware<S, A>> = []
+): [S, Dispatch<A>] {
   const hook = useState(initialState);
   let state = hook[0];
   const setState = hook[1];
-  const dispatch = (action: any): ReducerAction<R> => {
+  const dispatch = (action: A): A => {
     // eslint-disable-next-line react-hooks/immutability
     state = reducer(state, action);
     setState(state);
@@ -42,9 +36,8 @@ export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   // eslint-disable-next-line prefer-const
   let enhancedDispatch: any;
   const store = {
-    getState: (): ReducerState<R> => state,
-    dispatch: (...args: any): Dispatch<ReducerAction<R>> =>
-      enhancedDispatch(...args),
+    getState: (): S => state,
+    dispatch: (...args: any): Dispatch<A> => enhancedDispatch(...args),
   };
   const chain = middlewares.map((middleware) => middleware(store));
   enhancedDispatch = compose(...chain)(dispatch);
