@@ -10,6 +10,7 @@ import {
 } from 'type-graphql';
 
 import { customAuthChecker } from './custom-auth-checker';
+import { isDevelopment } from './helperFunctions';
 
 export async function buildFederatedSchema(
   options: Omit<BuildSchemaOptions, 'skipCheck'>,
@@ -20,6 +21,7 @@ export async function buildFederatedSchema(
     skipCheck: true,
     authChecker: customAuthChecker,
     authMode: 'null',
+    emitSchemaFile: isDevelopment,
   });
 
   const federatedSchema = buildSubgraphSchema({
