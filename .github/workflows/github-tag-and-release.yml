@@ -69,5 +69,7 @@ jobs:
           context: ./
           platforms: linux/amd64,linux/arm64/v8
           file: ./apps/frontend/Dockerfile
+          build-args: |
+            BUILD_VERSION=${{ steps.tag_version.outputs.new_tag }}
           push: true
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ steps.tag_version.outputs.new_tag }}
