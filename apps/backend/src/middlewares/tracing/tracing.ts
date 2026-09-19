@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { AmqplibInstrumentation } from '@opentelemetry/instrumentation-amqplib';
 import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
@@ -13,12 +14,15 @@ import {
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { NodeSDK, NodeSDKConfiguration } from '@opentelemetry/sdk-node';
 import {
   BatchSpanProcessor,
   ReadableSpan,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
+
+import { PromClientMetricProducer } from '../metrics/PromClientMetricProducer';
 
 const OTEL_CONFIG = {
   logProcessor: {
@@ -96,9 +100,11 @@ class AttributeFilterProcessor implements SpanProcessor {
 const initializeExporters = (): {
   traceExporter: OTLPTraceExporter;
   logsExporter: OTLPLogExporter | null;
+  metricExporter: OTLPMetricExporter | null;
 } | null => {
   const tracesEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
   const logsEndpoint = process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
+  const metricsEndpoint = process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
   if (!tracesEndpoint) {
     return null;
   }
@@ -112,8 +118,13 @@ const initializeExporters = (): {
           url: logsEndpoint,
         })
       : null;
+    const metricExporter = metricsEndpoint
+      ? new OTLPMetricExporter({
+          url: metricsEndpoint,
+        })
+      : null;
 
-    return { traceExporter, logsExporter };
+    return { traceExporter, logsExporter, metricExporter };
   } catch (error) {
     console.error(
       'Failed to initialize OpenTelemetry exporters:',
@@ -166,6 +177,15 @@ const initializeSDK = (): NodeSDK | null => {
           exporters.logsExporter,
           OTEL_CONFIG.logProcessor
         ),
+      ];
+    }
+
+    if (exporters.metricExporter) {
+      sdkConfig.metricReaders = [
+        new PeriodicExportingMetricReader({
+          exporter: exporters.metricExporter,
+          metricProducers: [new PromClientMetricProducer()],
+        }),
       ];
     }
 
@@ -223,6 +243,10 @@ export default async function startTracing(): Promise<void> {
     }
     if (process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT) {
       tracingConfig.logsEndpoint = process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
+    }
+    if (process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT) {
+      tracingConfig.metricsEndpoint =
+        process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
     }
 
     console.log('Starting OpenTelemetry tracing with configuration:', {
