@@ -32,17 +32,17 @@ export function useFapProposalsByInstrument(
 
     let canceled = false;
     setLoadingInstrumentProposals(true);
+    const legacy = false;
+    //gets the data here for Instruments with proposals
     api()
-      .fapProposalsByInstrument({ instrumentId, fapId, callId })
+      .getFapProposals({ fapId, callId, instrumentId, legacy })
       .then((data) => {
         if (canceled) {
           return;
         }
 
-        if (data.fapProposalsByInstrument) {
-          setInstrumentProposalsData(
-            data.fapProposalsByInstrument as FapProposal[]
-          );
+        if (data.fapProposals) {
+          setInstrumentProposalsData(data.fapProposals as FapProposal[]);
         }
         setLoadingInstrumentProposals(false);
       });
