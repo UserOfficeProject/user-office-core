@@ -344,7 +344,7 @@ const FapLegacyProposalsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title={`${t('Fap')} - Proposal View`}
+        title={`${t('FAP')} - Proposal View`}
         proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
           setSearchParams((searchParams) => {
@@ -370,7 +370,7 @@ const FapLegacyProposalsTable = ({
           columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${data.code} - ${t('Fap')} Proposals`}
+              {`${data.code} - ${t('FAP')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}
