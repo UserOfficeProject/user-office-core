@@ -33,7 +33,6 @@ export function useFapProposalsByInstrument(
     let canceled = false;
     setLoadingInstrumentProposals(true);
     const legacy = false;
-    //gets the data here for Instruments with proposals
     api()
       .getFapProposals({ fapId, callId, instrumentId, legacy })
       .then((data) => {

@@ -33,7 +33,6 @@ export function useFapProposalsData(
   useEffect(() => {
     let cancelled = false;
     setLoadingFapProposals(true);
-    //proposals and assignments
     api()
       .getFapProposals({ fapId, callId, instrumentId, legacy })
       .then((data) => {
