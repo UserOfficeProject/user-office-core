@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+import path from 'node:path';
+
 import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
-import path from 'node:path';
 
 const dependencyConfig = process.env.DEPENDENCY_CONFIG || 'default';
 
