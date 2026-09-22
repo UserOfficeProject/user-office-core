@@ -4119,6 +4119,36 @@ context('Fap meeting components tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
 
+    it('Fap Reviewer grade options should use the configured grade range', () => {
+      cy.login(initialDBData.users.officer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
+
+      cy.get('[aria-label="Edit"]').click();
+      cy.contains('fap_review_basis').click();
+      cy.get('[data-cy="min_score"]').clear().type('3');
+      cy.get('[data-cy="max_score"]').clear().type('7');
+      cy.get('[data-cy="decimal_points"]').clear().type('0');
+      cy.get('[data-cy="submit"]').click();
+
+      cy.logout();
+
+      cy.login(fapMembers.reviewer);
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-proposal"]').click();
+
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .then(($options) =>
+          [...$options].map((option) => option.textContent?.trim())
+        )
+        .should('deep.equal', ['3', '4', '5', '6', '7']);
+    });
+
     it('Fap Reviewer should be able to give non integer review', () => {
       cy.login(initialDBData.users.officer);
       cy.visit('/');
