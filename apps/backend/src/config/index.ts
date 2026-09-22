@@ -1,33 +1,30 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { logger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
+import path from 'node:path';
 
-switch (process.env.DEPENDENCY_CONFIG) {
-  case 'e2e':
-    require('./dependencyConfigE2E');
-    break;
-  case 'ess':
-    require('./dependencyConfigESS');
-    break;
-  case 'stfc':
-    require('./dependencyConfigSTFC');
-    break;
-  case 'eli':
-    require('./dependencyConfigELI');
-    break;
-  case 'dls':
-    require('./dependencyConfigDLS');
-    break;
+const dependencyConfig = process.env.DEPENDENCY_CONFIG || 'default';
+
+switch (dependencyConfig) {
   case 'test':
     require('./dependencyConfigTest');
     break;
-  default:
-    logger.logInfo(
-      'Invalid or no value was provided for the DEPENDENCY_CONFIG. Using the default config',
-      { DEPENDENCY_CONFIG: process.env.DEPENDENCY_CONFIG }
-    );
+  default: {
+    const configPath = path.resolve(process.cwd(), dependencyConfig);
 
-    require('./dependencyConfigDefault');
+    try {
+      require.resolve(configPath);
+    } catch {
+      logger.logInfo(
+        'Could not find the configured dependency config. Using the default config',
+        { DEPENDENCY_CONFIG: dependencyConfig, resolvedPath: configPath }
+      );
+      require('./dependencyConfigDefault');
+      break;
+    }
+
+    require(configPath);
+  }
 }
 
 export {};
