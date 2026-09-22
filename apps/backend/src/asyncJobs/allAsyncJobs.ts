@@ -4,7 +4,7 @@ import checkCallsReviewEndedJob from './jobs/checkCallsReviewEnded';
 import checkInviteReminderJob from './jobs/checkInviteReminderJob';
 import { UserOfficeAsyncJob } from './startAsyncJobs';
 
-const ALL_ASYNC_JOBS: UserOfficeAsyncJob[] = [
+const ALL_ASYNC_JOBS:  UserOfficeAsyncJob[] = [
   checkAllCallsEndedJob,
   checkCallsReviewEndedJob,
   checkCallsFAPReviewEndedJob,
