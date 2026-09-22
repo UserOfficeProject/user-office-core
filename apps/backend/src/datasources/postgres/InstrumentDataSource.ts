@@ -131,14 +131,17 @@ export default class PostgresInstrumentDataSource
   }
 
   async getInstruments(
-    first?: number,
-    offset?: number,
-    tagIds?: number[]
+    args: {
+      first?: number;
+      offset?: number;
+      tagIds?: number[];
+    } = {}
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     const instruments: InstrumentRecord[] = await database
       .select(['i.*', database.raw('count(*) OVER() AS full_count')])
       .from('instruments as i')
       .modify((query) => {
+        const tagIds = args.tagIds;
         if (tagIds?.length) {
           query.whereIn('i.instrument_id', function () {
             this.select('ti.instrument_id')
@@ -149,11 +152,11 @@ export default class PostgresInstrumentDataSource
       })
       .orderBy('i.instrument_id', 'desc')
       .modify((query) => {
-        if (first) {
-          query.limit(first);
+        if (args.first) {
+          query.limit(args.first);
         }
-        if (offset) {
-          query.offset(offset);
+        if (args.offset) {
+          query.offset(args.offset);
         }
       });
 

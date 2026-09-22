@@ -51,7 +51,7 @@ describe('Test Instrument Queries', () => {
 
     await InstrumentQueriesInstance.getAll(dummyUserOfficerWithDerivedRole, []);
 
-    expect(getInstruments).toHaveBeenCalledWith(undefined, undefined, [1]);
+    expect(getInstruments).toHaveBeenCalledWith({ tagIds: [1] });
   });
 
   test('getUserInstruments filters user instruments by derived role tags', async () => {
@@ -83,6 +83,6 @@ describe('Test Instrument Queries', () => {
       dummyUserOfficerWithDerivedRole
     );
 
-    expect(getInstruments).toHaveBeenCalledWith(undefined, undefined, [1]);
+    expect(getInstruments).toHaveBeenCalledWith({ tagIds: [1] });
   });
 });

@@ -45,7 +45,7 @@ export default class InstrumentQueries {
     @AgentTags tags?: number[]
   ) {
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getInstruments(undefined, undefined, tags);
+      return await this.dataSource.getInstruments({ tagIds: tags });
     } else {
       const instrumentsByCallIds =
         await this.dataSource.getInstrumentsByCallId(callIds);
@@ -63,7 +63,7 @@ export default class InstrumentQueries {
     @AgentTags tags?: number[]
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getInstruments(undefined, undefined, tags);
+      return this.dataSource.getInstruments({ tagIds: tags });
     }
 
     const instruments = await this.dataSource.getUserInstruments(
