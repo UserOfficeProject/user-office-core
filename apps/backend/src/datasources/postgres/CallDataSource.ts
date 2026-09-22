@@ -64,12 +64,11 @@ export default class PostgresCallDataSource implements CallDataSource {
     ]);
 
     if (tagIds?.length) {
-      const calls = await database<CallRecord>('call as c')
-        .join('tag_call as tc', 'c.call_id', 'tc.call_id')
-        .whereIn('tc.tag_id', tagIds)
-        .select('c.*');
-
-      return calls.map(createCallObject);
+      query.whereIn('call.call_id', function () {
+        this.select('tc.call_id')
+          .from('tag_call as tc')
+          .whereIn('tc.tag_id', tagIds);
+      });
     }
 
     if (filter?.shortCode) {
