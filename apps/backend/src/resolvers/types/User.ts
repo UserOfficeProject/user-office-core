@@ -26,6 +26,21 @@ import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { User as UserOrigin } from '../../models/User';
 import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
+@InputType()
+export class OrderByCollection {
+  @Field(() => Int)
+  orderBy: number;
+
+  @Field()
+  orderDirection: string;
+
+  //On inital load of page materialUI sets this value as undefined.
+  @Field(() => Int, { nullable: true })
+  sortOrder?: number;
+
+  @Field()
+  orderByField: string;
+}
 
 @InputType()
 export class UserProposalsFilter {
@@ -165,18 +180,15 @@ export class UserResolver {
     filter: UserProposalsFilter,
     @Arg('first', () => Int, { nullable: true }) first?: number,
     @Arg('offset', () => Int, { nullable: true }) offset?: number,
-    @Arg('orderByField', () => String, { nullable: true })
-    orderByField?: string,
-    @Arg('orderDirection', () => String, { nullable: true })
-    orderDirection?: string
+    @Arg('orderByCollectionList', () => [OrderByCollection], { nullable: true })
+    orderByCollectionList?: [OrderByCollection]
   ) {
     return context.queries.proposal.dataSource.getUserProposals(
       user.id,
       filter,
       first,
       offset,
-      orderByField,
-      orderDirection
+      orderByCollectionList
     );
   }
 

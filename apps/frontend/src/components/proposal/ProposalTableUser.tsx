@@ -48,14 +48,11 @@ const ProposalTableUser = () => {
       pageSize: number,
       orderByCollection: OrderByCollection[]
     ) => {
-      console.log('orderByCollection', orderByCollection);
-
       return api()
         .getUserProposals({
           first: pageSize,
           offset: page * pageSize,
-          orderByField: orderByCollection?.[0]?.orderByField,
-          orderDirection: orderByCollection?.[0]?.orderDirection,
+          orderByCollectionList: orderByCollection,
         })
         .then((data) => {
           return {
