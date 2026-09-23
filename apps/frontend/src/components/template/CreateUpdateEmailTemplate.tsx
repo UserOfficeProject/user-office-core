@@ -1,6 +1,9 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import CodeMirror from '@uiw/react-codemirror';
 import {
@@ -8,7 +11,7 @@ import {
   updateEmailTemplateValidationSchema,
 } from '@user-office-software/duo-validation';
 import { Field, FieldProps, Form, Formik } from 'formik';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -19,10 +22,11 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
-import { EmailTemplateFragment } from 'generated/sdk';
+import { EmailTemplateFragment, TemplateVersion } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import EmailTemplatePreview from './EmailTemplatePreview';
+import EmailTemplateVersionViewer from './EmailTemplateVersions';
 
 type CreateUpdateEmailTemplateProps = {
   close: (emailTemplateAdded: EmailTemplateFragment | null) => void;
@@ -37,6 +41,31 @@ const CreateUpdateEmailTemplate = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const [, setSearchParams] = useSearchParams();
   const didResetModalTab = useRef(false);
+  const [versionNumber, setVersionNumber] = useState(-1);
+  const [emailTemplatesVersions, setEmailTemplatesVersions] = useState<
+    TemplateVersion[]
+  >([]);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    api()
+      .getEmailVersions({ emailTemplateId: emailTemplate?.id ?? -1 })
+      .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
+        if (data.emailVersions) {
+          setEmailTemplatesVersions(data.emailVersions?.emailVersions);
+        }
+      });
+
+    return () => {
+      // used to avoid unmounted component state update error
+      unmounted = true;
+    };
+  }, [api]);
 
   useEffect(() => {
     if (didResetModalTab.current) {
@@ -113,7 +142,7 @@ const CreateUpdateEmailTemplate = ({
             </Typography>
 
             <SimpleTabs
-              tabNames={['Edit', 'Preview']}
+              tabNames={['Edit', 'Preview', 'Version History']}
               isInsideModal
               tabPanelPadding={1}
             >
@@ -190,6 +219,42 @@ const CreateUpdateEmailTemplate = ({
                 body={values.body ?? ''}
                 useTemplateFile={values.useTemplateFile}
               />
+              <Box>
+                <FormControl fullWidth>
+                  <InputLabel id="version-select-label" shrink>
+                    Version Number
+                  </InputLabel>
+
+                  <Select
+                    id="version-select"
+                    aria-labelledby="version-select-label"
+                    onChange={(version) => {
+                      setVersionNumber(Number(version.target.value));
+                    }}
+                    value={versionNumber.toString()}
+                    data-cy="version-select"
+                    disabled={!emailTemplatesVersions.length}
+                  >
+                    {emailTemplatesVersions.map((version) => (
+                      <MenuItem
+                        key={version.versionNumber}
+                        value={version.versionNumber}
+                      >
+                        {version.versionNumber}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {versionNumber != -1 ? (
+                  <EmailTemplateVersionViewer
+                    emailTemplateId={emailTemplate?.id}
+                    emailTemplateVersionNumber={versionNumber}
+                  ></EmailTemplateVersionViewer>
+                ) : (
+                  <Typography>Please select a version number</Typography>
+                )}
+              </Box>
             </SimpleTabs>
 
             <Button

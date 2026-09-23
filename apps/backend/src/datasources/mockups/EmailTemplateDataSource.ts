@@ -1,5 +1,6 @@
 import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { EmailTemplate } from '../../models/EmailTemplate';
+import { TemplateVersion } from '../../models/TemplateVersion';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
 
@@ -12,6 +13,15 @@ export const dummyEmailTemplate = {
   body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
   createdAt: '',
   useTemplateFile: false,
+};
+
+export const dummyEmailTemplateVersion = {
+  templateVersionId: 1,
+  templateId: 1,
+  body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
+  subject: 'Welcome to Our Service',
+  versionNumber: 1,
+  templateType: 'EMAIL',
 };
 
 export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
@@ -143,6 +153,19 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     );
   }
 
+  async getEmailVersions(
+    id: number
+  ): Promise<{ totalCount: number; emailVersions: TemplateVersion[] }> {
+    return { totalCount: 1, emailVersions: [dummyEmailTemplateVersion] };
+  }
+
+  async getEmailVersion(
+    id: number,
+    versionNumber: number
+  ): Promise<TemplateVersion | null> {
+    return dummyEmailTemplateVersion;
+  }
+
   async create(
     createdByUserId: number,
     name: string,
@@ -152,6 +175,13 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     body?: string
   ): Promise<EmailTemplate> {
     return dummyEmailTemplate;
+  }
+  async createNewVersion(
+    emailTemplateId: number,
+    subject?: string,
+    body?: string
+  ): Promise<TemplateVersion> {
+    return dummyEmailTemplateVersion;
   }
 
   async update(

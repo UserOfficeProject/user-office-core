@@ -65,6 +65,7 @@ import {
   TemplateGroupId,
   Topic,
 } from '../../models/Template';
+import { TemplateVersion } from '../../models/TemplateVersion';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit } from '../../models/Visit';
@@ -352,6 +353,14 @@ export interface EmailTemplateRecord {
   readonly use_template_file: boolean;
   readonly subject?: string | null;
   readonly body?: string | null;
+}
+
+export interface TemplateVersionRecord {
+  readonly template_version_id: number;
+  readonly template_id: number;
+  readonly template: string;
+  readonly version_number: number;
+  readonly template_type: string;
 }
 
 export interface PageTextRecord {
@@ -1038,6 +1047,21 @@ export const createEmailTemplateObject = (
     emailTemplate.use_template_file,
     emailTemplate.subject,
     emailTemplate.body
+  );
+};
+
+export const createEmailVersionsObject = (
+  templateVersions: TemplateVersionRecord
+) => {
+  const template = JSON.parse(JSON.stringify(templateVersions.template));
+
+  return new TemplateVersion(
+    templateVersions.template_version_id,
+    templateVersions.template_id,
+    template.body,
+    template.subject,
+    templateVersions.version_number,
+    templateVersions.template_type
   );
 };
 
