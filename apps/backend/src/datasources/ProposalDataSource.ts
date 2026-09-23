@@ -39,7 +39,9 @@ export interface ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    orderByField?: string,
+    orderDirection?: string
   ): Promise<{ userProposals: Proposal[]; totalCount: number }>;
   getProposalsByPks(pks: number[]): Promise<Proposal[]>;
   getProposalByVisitId(visitId: number): Promise<Proposal>;

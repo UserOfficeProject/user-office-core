@@ -930,8 +930,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    orderByField?: string,
+    orderDirection?: string
   ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
+    const sortableFields: { [key: string]: string } = {
+      proposalId: 'p.proposal_pk',
+      title: 'p.title',
+      publicStatus: 'p.final_status',
+      created: 'p.created_at',
+    };
+
     return (
       database
         .select('p.*', database.raw('count(*) OVER() AS full_count'))
@@ -981,6 +990,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .modify((qb) => {
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
+          if (orderByField && orderDirection) {
+            if (sortableFields.hasOwnProperty(orderByField)) {
+              orderByField = sortableFields[orderByField];
+              qb.orderBy(orderByField, orderDirection);
+            } else if (orderByField === 'call.shortcode') {
+              // Nothing (not implemented yet)
+            } else {
+              throw new GraphQLError(`Bad sort field given: ${orderByField}`);
+            }
+          }
         })
         .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
           userProposals: proposals.map((proposal) =>

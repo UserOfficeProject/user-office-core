@@ -164,13 +164,19 @@ export class UserResolver {
     @Arg('filter', () => UserProposalsFilter, { nullable: true })
     filter: UserProposalsFilter,
     @Arg('first', () => Int, { nullable: true }) first?: number,
-    @Arg('offset', () => Int, { nullable: true }) offset?: number
+    @Arg('offset', () => Int, { nullable: true }) offset?: number,
+    @Arg('orderByField', () => String, { nullable: true })
+    orderByField?: string,
+    @Arg('orderDirection', () => String, { nullable: true })
+    orderDirection?: string
   ) {
     return context.queries.proposal.dataSource.getUserProposals(
       user.id,
       filter,
       first,
-      offset
+      offset,
+      orderByField,
+      orderDirection
     );
   }
 

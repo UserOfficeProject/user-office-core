@@ -1,3 +1,4 @@
+import { OrderByCollection } from '@material-table/core';
 import React, { useCallback, useState } from 'react';
 
 import ProposalInviteNotification from 'components/proposal/ProposalInviteNotification';
@@ -42,9 +43,20 @@ const ProposalTableUser = () => {
   const api = useDataApi();
   const [refreshTableKey, setRefreshTableKey] = useState(0);
   const sendUserProposalRequest = useCallback(
-    async (page: number, pageSize: number) => {
+    async (
+      page: number,
+      pageSize: number,
+      orderByCollection: OrderByCollection[]
+    ) => {
+      console.log('orderByCollection', orderByCollection);
+
       return api()
-        .getUserProposals({ first: pageSize, offset: page * pageSize })
+        .getUserProposals({
+          first: pageSize,
+          offset: page * pageSize,
+          orderByField: orderByCollection?.[0]?.orderByField,
+          orderDirection: orderByCollection?.[0]?.orderDirection,
+        })
         .then((data) => {
           return {
             page,
