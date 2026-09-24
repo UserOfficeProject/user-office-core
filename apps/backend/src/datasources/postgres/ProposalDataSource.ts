@@ -934,7 +934,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number,
     orderByCollectionList?: OrderByCollection[]
   ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
-    const sortableFields: { [key: string]: string } = {
+    const fieldsInUIToDB: { [key: string]: string } = {
       proposalId: 'p.proposal_id',
       title: 'p.title',
       publicStatus: 'p.final_status',
@@ -989,25 +989,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .groupBy('p.proposal_pk')
         .modify((qb) => {
           if (orderByCollectionList && orderByCollectionList[0]) {
-            const orderByField = orderByCollectionList[0].orderByField;
-            if (sortableFields.hasOwnProperty(orderByField)) {
-              const databaseColumnToSort = sortableFields[orderByField];
+            const uiColumn = orderByCollectionList[0].orderByField;
+            if (fieldsInUIToDB.hasOwnProperty(uiColumn)) {
+              const dbColumn = fieldsInUIToDB[uiColumn];
               // Makes the arrow on the UI shows the order the data is listed in, not what it will become.
               let orderDirection = 'asc';
               if (orderByCollectionList[0].orderDirection === 'asc') {
                 orderDirection = 'desc';
               }
-              if (orderByField === 'p.title') {
-                qb.orderByRaw(`LOWER(??) ${orderDirection.toUpperCase()}`, [
-                  databaseColumnToSort,
-                ]);
+              if (dbColumn === 'p.title') {
+                qb.orderByRaw(
+                  `LOWER(COALESCE(??, '')) ${orderDirection.toUpperCase()}`,
+                  [dbColumn]
+                );
               } else {
-                qb.orderBy(databaseColumnToSort, orderDirection);
+                qb.orderBy(dbColumn, orderDirection);
               }
-            } else if (orderByField === 'call.shortCode') {
+            } else if (uiColumn === 'call.shortCode') {
               // Nothing (shortCode comes from diffent db query when paginatedProposals requested)
             } else {
-              throw new GraphQLError(`Bad sort field given: ${orderByField}`);
+              throw new GraphQLError(`Bad sort field given: ${uiColumn}`);
             }
           }
           if (first) qb.limit(first);
