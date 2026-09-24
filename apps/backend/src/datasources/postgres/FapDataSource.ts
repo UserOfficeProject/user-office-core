@@ -331,7 +331,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         ),
         /* eslint-disable quotes */
         database.raw(
-          `STRING_AGG(DISTINCT i.short_code, ',') as instrument_shortcodes`
+          `STRING_AGG(DISTINCT i.short_code, ', ') as instrument_shortcodes`
         ),
       ])
       .from('fap_proposals as fp')
