@@ -91,6 +91,20 @@ export default function createLoggingHandler() {
 
           break;
         }
+        case Event.PROPOSAL_DATA_ACCESS_INVITE_SENT: {
+          const { invite, proposalPKey } = event;
+
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Data access invite issued to ${invite.email} by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
         case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
           const { invite, proposalPKey: proposalPk } = event;
 
