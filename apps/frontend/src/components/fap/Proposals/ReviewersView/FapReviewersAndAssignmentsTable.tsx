@@ -1,9 +1,11 @@
 import MaterialTable, { Action, Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import GridOnIcon from '@mui/icons-material/GetApp';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Fap } from 'generated/sdk';
+import { useDownloadXLSXFapReviews } from 'hooks/fap/useDownloadXLSXFapReviews';
 import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import { FapMember, useFapMembersData } from 'hooks/fap/useFapMembersData';
 import {
@@ -122,11 +124,14 @@ const FapReviewersAndAssignmentsTable = ({
 
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
+  const call = searchParams.get('call');
 
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
     '[data-cy="fap-reviewers-assignments-table"]',
     [loadingMembers, loadingFapProposals]
   );
+
+  const downloadFapReviewsXLSX = useDownloadXLSXFapReviews();
 
   const reviewersAndProposals: ReviewerAndProposals[] = FapMembersData.map(
     (member) => {
@@ -237,11 +242,54 @@ const FapReviewersAndAssignmentsTable = ({
     setMembersToAssign(fapMemberUsersToAssign);
   };
 
+  const handleBulkDownloadClick = (
+    event: React.MouseEventHandler<HTMLButtonElement>,
+    rowData: ReviewerAndProposals | ReviewerAndProposals[]
+  ) => {
+    if (!Array.isArray(rowData)) {
+      return;
+    }
+    const reviewerProposalMap = new Map<number, number[]>();
+    // const reviewerIds = rowData.map((reviewer) => reviewer.user.userId);
+    // const reviewerRole = rowData.map((data) => data.user.role);
+
+    rowData.forEach((reviewer) => {
+      reviewer.assignedProposals.forEach(({ assignment }) => {
+        const reviewerId = assignment.fapMemberUserId;
+        const proposalPk = assignment.proposalPk;
+
+        if (reviewerId === null) {
+          return;
+        }
+
+        const proposals = reviewerProposalMap.get(reviewerId) ?? [];
+
+        proposals.push(proposalPk);
+
+        reviewerProposalMap.set(reviewerId, proposals);
+      });
+    });
+    const reviewerProposals = Object.fromEntries(reviewerProposalMap);
+    reviewerProposalMap.forEach((key, value) => {
+      console.log('reviewerid  ' + key + `proposals ` + value);
+    });
+
+    downloadFapReviewsXLSX(fap.id, Number(call), 'fap-review.xlsx', {
+      reviewerProposals,
+    });
+  };
+
   const tableActions: Action<ReviewerAndProposals>[] = [];
   tableActions.push({
     icon: () => <AssignmentInd data-cy="assign-proposals-to-member" />,
     tooltip: `Assign Proposals to Member`,
     onClick: handleAssignProposalsToMembers,
+    position: 'toolbarOnSelect',
+  });
+  tableActions.push({
+    icon: () => <GridOnIcon data-cy="export-reviews-in-excel" />,
+    tooltip: 'Export reviews in excel',
+    onClick: handleBulkDownloadClick,
     position: 'toolbarOnSelect',
   });
 

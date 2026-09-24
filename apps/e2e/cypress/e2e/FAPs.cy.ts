@@ -1266,7 +1266,7 @@ context('Fap reviews tests', () => {
       cy.contains(firstCreatedProposalId).should('be.visible');
     });
 
-    it.only('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
+    it('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
@@ -4071,6 +4071,152 @@ context('Fap meeting components tests', () => {
         cy.get('[data-cy="proposal-' + proposalId + '"]').should('exist');
       });
     });
+
+    it('FAP Secretary should be able to download the fap reviews excel sheet', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+      cy.assignFapReviewersToProposals({
+        assignments: [
+          {
+            memberId: fapMembers.reviewer.id,
+            proposalPk: firstCreatedProposalPk,
+          },
+          {
+            memberId: fapMembers.reviewer2.id,
+            proposalPk: firstCreatedProposalPk,
+          },
+        ],
+        fapId: createdFapId,
+      });
+      cy.changeProposalsStatus({
+        workflowStatusId: fapReviewWorkflowStatusId,
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.getProposalReviews({
+        proposalPk: firstCreatedProposalPk,
+      }).then(({ proposalReviews }) => {
+        if (proposalReviews) {
+          proposalReviews.forEach((review, index) => {
+            cy.updateReview({
+              reviewID: review.id,
+              comment: comment1,
+              // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+              grade: index ? '2' : '4',
+              status: ReviewStatus.SUBMITTED,
+              fapID: createdFapId,
+              questionaryID: review.questionaryID,
+            });
+          });
+        }
+      });
+
+      cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
+      cy.finishedLoading();
+
+      cy.contains(fapMembers.reviewer.lastName).should('be.visible');
+      cy.contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="export-reviews-in-excel"]').click();
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        'fap-reviews.xlsx'
+      );
+    });
+  });
+
+  it.only('Check the contents of the FAP reviews excel sheet', function () {
+    cy.assignProposalsToFaps({
+      fapInstruments: [
+        { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+      ],
+      proposalPks: [firstCreatedProposalPk],
+    });
+    cy.assignReviewersToFap({
+      fapId: createdFapId,
+      memberIds: [fapMembers.reviewer.id],
+    });
+    cy.assignFapReviewersToProposals({
+      assignments: [
+        {
+          memberId: fapMembers.reviewer.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        {
+          memberId: fapMembers.reviewer2.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+      ],
+      fapId: createdFapId,
+    });
+    cy.changeProposalsStatus({
+      workflowStatusId: fapReviewWorkflowStatusId,
+      proposalPks: [firstCreatedProposalPk],
+    });
+
+    cy.getProposalReviews({
+      proposalPk: firstCreatedProposalPk,
+    }).then(({ proposalReviews }) => {
+      if (proposalReviews) {
+        proposalReviews.forEach((review, index) => {
+          cy.updateReview({
+            reviewID: review.id,
+            comment: comment1,
+            // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+            grade: index ? '2' : '4',
+            status: ReviewStatus.SUBMITTED,
+            fapID: createdFapId,
+            questionaryID: review.questionaryID,
+          });
+        });
+      }
+    });
+    cy.login(fapMembers.secretary);
+    cy.changeActiveRole(initialDBData.roles.fapSecretary);
+    cy.visit(`/FapPage/${createdFapId}?tab=4`);
+    cy.finishedLoading();
+
+    cy.contains(fapMembers.reviewer.lastName).should('be.visible');
+    cy.contains(fapMembers.reviewer.lastName)
+      .parent()
+      .find('input[type="checkbox"]')
+      .click();
+
+    cy.get('[data-cy="export-reviews-in-excel"]').click();
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+
+    const downloadsFolder = Cypress.config('downloadsFolder');
+    const fileName = `fap_reviews.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
+
+    cy.readFile(`${downloadsFolder}/${fileName}`)
+      .should('exist')
+      .then(() => {
+        cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+          (actualExport) => {
+            cy.fixture('exampleFapReviewsExport.json').then(
+              (expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          }
+        );
+      });
+
+    cy.task('deleteFile', fileUri);
   });
 
   describe('Fap Reviewer role', () => {

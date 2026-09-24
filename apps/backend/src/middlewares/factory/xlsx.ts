@@ -14,7 +14,10 @@ import {
   DefaultCallExtraFapDataColumns,
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
-import { collectFapXLSXData } from '../../factory/xlsx/fap';
+import {
+  collectFapXLSXData,
+  collectFapReviewXLSXData,
+} from '../../factory/xlsx/fap';
 import { collectManagementDecisionXLSXData } from '../../factory/xlsx/managementDecision';
 import {
   collectProposalXLSXData,
@@ -129,6 +132,79 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     next(e);
   }
 });
+
+router.get(
+  `/${XLSXType.FAP_REVIEWS}/:fap_id/call/:call_id`,
+  async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new Error('Not authorized');
+      }
+
+      const userWithRole = {
+        ...res.locals.agent,
+      };
+
+      const fapId = parseInt(req.params.fap_id);
+      const callId = parseInt(req.params.call_id);
+
+      if (isNaN(fapId) || isNaN(callId)) {
+        throw new Error(
+          `Invalid Fap or call ID: Fap ${req.params.fap_id}, Call ${req.params.call_id}`
+        );
+      }
+
+      const reviewerProposalsParam = req.query.reviewerProposals;
+
+      if (typeof reviewerProposalsParam !== 'string') {
+        throw new Error('reviewerProposals is required');
+      }
+
+      const reviewerProposals: Record<number, number[]> = JSON.parse(
+        reviewerProposalsParam
+      );
+
+      const { data, filename } = await collectFapReviewXLSXData(
+        fapId,
+        callId,
+        reviewerProposals,
+        userWithRole
+      );
+
+      const meta: XLSXMetaBase = {
+        singleFilename: filename,
+        collectionFilename: filename,
+        columns: [
+          'Proposal ID',
+          'Proposal title',
+          'Instrument',
+          'Date assigned',
+          'Rank',
+          'Grade',
+          'Comment',
+          'Status',
+        ],
+      };
+
+      const userRole = req.user.currentRole;
+
+      callFactoryService(
+        DownloadType.XLSX,
+        XLSXType.FAP_REVIEWS,
+        {
+          data,
+          meta,
+          userRole,
+        },
+        req,
+        res,
+        next
+      );
+    } catch (e) {
+      next(e);
+    }
+  }
+);
 
 router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
   try {

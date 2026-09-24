@@ -287,13 +287,13 @@ export default class PostgresFapDataSource implements FapDataSource {
   ): Promise<FapAssignment[]> {
     const fapAssignments: ReviewRecord[] = await database
       .from('fap_reviews')
+      .where('fap_id', fapId)
+      .andWhere('proposal_pk', proposalPk)
       .modify((query) => {
         if (reviewerId !== null) {
-          query.where('user_id', reviewerId);
+          query.andWhere('user_id', reviewerId);
         }
-      })
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk);
+      });
 
     return fapAssignments.map((fapAssignment) =>
       createFapAssignmentObject(fapAssignment)
@@ -1322,20 +1322,21 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number,
     instrumentId?: number | null
   ): Promise<FapReviewsRecord[]> {
-    if (instrumentId) {
-      return await database
-        .select('*')
-        .from('review_data')
-        .where('fap_id', fapId)
-        .andWhere('call_id', callId)
-        .andWhere('instrument_id', instrumentId);
-    }
-
-    return await database
+    logger.logInfo(`Chilllllllllllllllll callid ${callId}`, {});
+    const query = database
       .select('*')
       .from('review_data')
-      .where('fap_id', fapId)
-      .andWhere('call_id', callId);
+      .where('fap_id', fapId);
+
+    if (callId != 0) {
+      query.andWhere('call_id', callId);
+    }
+
+    if (instrumentId != null) {
+      query.andWhere('instrument_id', instrumentId);
+    }
+
+    return await query;
   }
 
   async submitFapMeetings(

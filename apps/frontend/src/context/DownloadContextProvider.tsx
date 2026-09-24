@@ -118,12 +118,19 @@ export enum PREPARE_DOWNLOAD_TYPE {
   XLSX_PROPOSAL,
   XLSX_FAP,
   XLSX_CALL_FAP,
+  XLSX_FAP_REVIEWS,
   XLSX_PROPOSAL_TECHNIQUE,
   XLSX_MANAGEMENT_DECISION,
 }
 
+export type ReviewerProposalData = {
+  proposalPks: number[];
+  role: string | null;
+};
+
 export type DownloadOptions = {
   questionIds?: string;
+  reviewerProposals?: Record<number, number[]>;
 };
 
 export interface DownloadContextData {
@@ -174,6 +181,20 @@ function generateLink(
       const [fapId, callId] = params;
 
       return `/download/xlsx/fap/${fapId}/call/${callId}`;
+    case PREPARE_DOWNLOAD_TYPE.XLSX_FAP_REVIEWS: {
+      // const [params] = ids;
+
+      // if (!Array.isArray(params)) {
+      //   throw new Error('Invalid params: ' + params);
+      // }
+
+      const [fapId, callId] = ids;
+      const reviewerProposals = encodeURIComponent(
+        JSON.stringify(options?.reviewerProposals ?? {})
+      );
+
+      return `/download/xlsx/fap_reviews/${fapId}/call/${callId}?reviewerProposals=${reviewerProposals}`;
+    }
     case PREPARE_DOWNLOAD_TYPE.ZIP_ATTACHMENT:
       if (!options?.questionIds) {
         throw new Error('Question ids are require');
