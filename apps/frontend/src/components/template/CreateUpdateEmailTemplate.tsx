@@ -240,7 +240,9 @@ const CreateUpdateEmailTemplate = ({
                         key={version.versionNumber}
                         value={version.versionNumber}
                       >
-                        {version.versionNumber}
+                        {version.versionNumber +
+                          ': ' +
+                          version.createdTimeStamp}
                       </MenuItem>
                     ))}
                   </Select>

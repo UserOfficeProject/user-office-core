@@ -5,4 +5,5 @@ fragment emailVersion on TemplateVersion {
  subject
  versionNumber
  templateType
+ createdTimeStamp
  }

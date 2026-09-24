@@ -19,4 +19,7 @@ export class TemplateVersion {
 
   @Field(() => String)
   public templateType: string;
+
+  @Field(() => String)
+  public createdTimeStamp: string;
 }
