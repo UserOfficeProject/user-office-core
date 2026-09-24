@@ -99,7 +99,7 @@ const FapsTable = () => {
   const deleteFap = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: `${t('Fap')} deleted successfully`,
+        toastSuccessMessage: `${t('FAP')} deleted successfully`,
       }).deleteFap({
         id: id as number,
       });

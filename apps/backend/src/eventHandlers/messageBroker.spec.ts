@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import {
   getExperimentMessageData,
   getProposalMessageData,
+  getVisitMessageData,
 } from './messageBroker';
 import { Tokens } from '../config/Tokens';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -30,6 +31,10 @@ import {
   dummyUser,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
 
 describe('messageBroker', () => {
   describe('getProposalMessageData', () => {
@@ -120,6 +125,26 @@ describe('messageBroker', () => {
       const data = JSON.parse(result);
 
       expect(data.newStatus).toBeDefined();
+    });
+  });
+
+  describe('getVisitMessageData', () => {
+    it('should use visitor oidcSub as visitorId', async () => {
+      const visitRegistration = new VisitRegistration(
+        'registration-id',
+        1,
+        dummyUser.id,
+        null,
+        new Date('2026-01-01T10:00:00Z'),
+        new Date('2026-01-01T12:00:00Z'),
+        VisitRegistrationStatus.APPROVED
+      );
+
+      const result = await getVisitMessageData(visitRegistration);
+      const data = JSON.parse(result);
+
+      expect(data.visitorId).toBe(dummyUser.oidcSub);
+      expect(data.visitorId).not.toBe(dummyUser.id.toString());
     });
   });
 
