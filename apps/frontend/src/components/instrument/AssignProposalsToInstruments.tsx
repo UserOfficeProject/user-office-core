@@ -94,7 +94,7 @@ const AssignProposalsToInstruments = ({
               <strong>{'technical reviews'}</strong>
               {', '}
               <strong>{`${t('fap')} reviews`}</strong>
-              {' and '}
+              {' or '}
               <strong>{'management time allocation'}</strong>
               {' will permanently delete the corresponding data. '}
               <strong>{`This action is irreversible.`}</strong>
