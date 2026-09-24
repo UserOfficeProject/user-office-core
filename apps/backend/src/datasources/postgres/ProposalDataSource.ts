@@ -1014,7 +1014,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
         })
-
         .then((proposals: (ProposalRecord & { full_count: number })[]) => {
           return {
             userProposals: proposals.map((proposal) =>
