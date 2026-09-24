@@ -133,50 +133,50 @@ const secondProposalNewTimeAllocation = 25;
 
 const fap1 = {
   code: faker.lorem.word(10),
-  description: faker.random.words(8),
-  gradeGuide: faker.random.words(8),
+  description: faker.lorem.words(8),
+  gradeGuide: faker.lorem.words(8),
 };
 
 const fap2 = {
   code: faker.lorem.words(1),
-  description: faker.random.words(8),
-  gradeGuide: faker.random.words(8),
+  description: faker.lorem.words(8),
+  gradeGuide: faker.lorem.words(8),
 };
 
 const proposal1 = {
-  title: faker.random.words(3),
-  abstract: faker.random.words(5),
+  title: faker.lorem.words(3),
+  abstract: faker.lorem.words(5),
 };
 
 const proposal2 = {
-  title: faker.random.words(3),
-  abstract: faker.random.words(5),
+  title: faker.lorem.words(3),
+  abstract: faker.lorem.words(5),
 };
 const proposal3 = {
-  title: faker.random.words(3),
-  abstract: faker.random.words(5),
+  title: faker.lorem.words(3),
+  abstract: faker.lorem.words(5),
 };
 
 const scientist = initialDBData.users.user1;
 
 const instrument = {
-  name: faker.random.words(2),
-  shortCode: faker.random.alphaNumeric(15),
-  description: faker.random.words(8),
+  name: faker.lorem.words(2),
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(8),
   managerUserId: scientist.id,
 };
 
 const scientist1 = initialDBData.users.user1;
 const instrument1 = {
-  name: faker.random.words(2),
-  shortCode: faker.random.alphaNumeric(15),
-  description: faker.random.words(5),
+  name: faker.lorem.words(2),
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(5),
   managerUserId: scientist1.id,
 };
 const instrument2 = {
-  name: faker.random.words(2),
-  shortCode: faker.random.alphaNumeric(15),
-  description: faker.random.words(5),
+  name: faker.lorem.words(2),
+  shortCode: faker.string.alphanumeric(15),
+  description: faker.lorem.words(5),
   managerUserId: scientist1.id,
 };
 
@@ -4119,6 +4119,36 @@ context('Fap meeting components tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
 
+    it('Fap Reviewer grade options should use the configured grade range', () => {
+      cy.login(initialDBData.users.officer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Templates').click();
+      cy.get('[data-cy="officer-menu-items"]').contains('FAP Review').click();
+
+      cy.get('[aria-label="Edit"]').click();
+      cy.contains('fap_review_basis').click();
+      cy.get('[data-cy="min_score"]').clear().type('3');
+      cy.get('[data-cy="max_score"]').clear().type('7');
+      cy.get('[data-cy="decimal_points"]').clear().type('0');
+      cy.get('[data-cy="submit"]').click();
+
+      cy.logout();
+
+      cy.login(fapMembers.reviewer);
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.get('[data-cy="grade-proposal-icon"]').click();
+      cy.get('[data-cy="grade-proposal"]').click();
+
+      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
+        .then(($options) =>
+          [...$options].map((option) => option.textContent?.trim())
+        )
+        .should('deep.equal', ['3', '4', '5', '6', '7']);
+    });
+
     it('Fap Reviewer should be able to give non integer review', () => {
       cy.login(initialDBData.users.officer);
       cy.visit('/');
@@ -4148,7 +4178,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Lowest grade is 1');
+      cy.contains('Minimum grade is 1');
 
       cy.get('#grade-proposal').click().clear().clear().type('1.001');
 
@@ -4211,15 +4241,15 @@ context('Automatic Fap assignment to Proposal', () => {
   let firstAutoAssignProposalId: string;
   const scientist1 = initialDBData.users.user1;
   const instrument1 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: scientist1.id,
   };
   const instrument2 = {
-    name: faker.random.words(2),
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: faker.lorem.words(2),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: scientist1.id,
   };
 
@@ -4363,8 +4393,8 @@ context(
     const title = faker.lorem.words(2);
     const abstract = faker.lorem.words(3);
     const proposalWorkflow = {
-      name: faker.random.words(2),
-      description: faker.random.words(5),
+      name: faker.lorem.words(2),
+      description: faker.lorem.words(5),
     };
 
     const instrumentPickerQuestion = 'Select your Instrument';

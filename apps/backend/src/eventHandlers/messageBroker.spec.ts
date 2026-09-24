@@ -131,6 +131,26 @@ describe('messageBroker', () => {
     });
   });
 
+  describe('getVisitMessageData', () => {
+    it('should use visitor oidcSub as visitorId', async () => {
+      const visitRegistration = new VisitRegistration(
+        'registration-id',
+        1,
+        dummyUser.id,
+        null,
+        new Date('2026-01-01T10:00:00Z'),
+        new Date('2026-01-01T12:00:00Z'),
+        VisitRegistrationStatus.APPROVED
+      );
+
+      const result = await getVisitMessageData(visitRegistration);
+      const data = JSON.parse(result);
+
+      expect(data.visitorId).toBe(dummyUser.oidcSub);
+      expect(data.visitorId).not.toBe(dummyUser.id.toString());
+    });
+  });
+
   describe('getExperimentMessageData', () => {
     let mockExperimentDataSource: ExperimentDataSourceMock;
     let mockSampleDataSource: SampleDataSourceMock;

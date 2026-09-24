@@ -1,6 +1,7 @@
 import { StfcUserDataSource } from './StfcUserDataSource';
 import { Roles, createRole } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
+import RoleDataSource from '../postgres/RoleDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 
 jest.mock('../postgres/UserDataSource.ts');
@@ -164,6 +165,12 @@ describe('Role tests', () => {
     );
     mockGetUserRoles.mockImplementation(() => Promise.resolve([]));
 
+    const mockGetTagsByRoleId = jest.spyOn(
+      RoleDataSource.prototype,
+      'getTagsByRoleId'
+    );
+    mockGetTagsByRoleId.mockImplementation(() => Promise.resolve([]));
+
     const mockEnsureDummyUserExists = jest.spyOn(
       StfcUserDataSource.prototype,
       'ensureDummyUserExists'
@@ -187,6 +194,7 @@ describe('Role tests', () => {
         title: 'User',
         description: '',
         isRootRole: true,
+        tags: [],
       })
     );
   });
@@ -198,16 +206,25 @@ describe('Role tests', () => {
       userdataSource.getUserRoles(dummyUserNumber)
     ).resolves.toEqual(
       expect.arrayContaining([
-        createRole(1, Roles.USER, 'User', '', { note: '' }, true),
-        createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
-        createRole(
-          3,
-          Roles.INSTRUMENT_SCIENTIST,
-          'Instrument Scientist',
-          '',
-          {},
-          true
-        ),
+        {
+          ...createRole(1, Roles.USER, 'User', '', { note: '' }, true),
+          tags: [],
+        },
+        {
+          ...createRole(2, Roles.USER_OFFICER, 'User Officer', '', {}, true),
+          tags: [],
+        },
+        {
+          ...createRole(
+            3,
+            Roles.INSTRUMENT_SCIENTIST,
+            'Instrument Scientist',
+            '',
+            {},
+            true
+          ),
+          tags: [],
+        },
       ])
     );
   });

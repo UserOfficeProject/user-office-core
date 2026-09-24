@@ -9,6 +9,7 @@ import { AllocationTimeUnitConverter } from '../config/base/allocationTimeUnitCo
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../datasources/DataAccessClaimDataSource';
 import {
   DataAccessUsersDataSource,
   UserWithInstitution,
@@ -332,9 +333,19 @@ export const getVisitMessageData = async (
     Tokens.TemplateDataSource
   );
 
-  const proposal = await proposalDataSource.getProposalByVisitId(
-    visitRegistration.visitId
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
   );
+
+  const [proposal, visitor] = await Promise.all([
+    proposalDataSource.getProposalByVisitId(visitRegistration.visitId),
+    userDataSource.getUser(visitRegistration.userId),
+  ]);
+
+  if (!visitor) {
+    throw new Error(`Visitor with id ${visitRegistration.userId} not found`);
+  }
+
   const proposalPayload = await getProposalMessageData(proposal);
 
   const registrationAnswers: VisitRegistrationAnswerMessageData[] = [];
@@ -366,7 +377,7 @@ export const getVisitMessageData = async (
     id: visitRegistration.id,
     startAt: visitRegistration.startsAt,
     endAt: visitRegistration.endsAt,
-    visitorId: visitRegistration.userId.toString(),
+    visitorId: visitor.oidcSub,
     proposal: JSON.parse(proposalPayload),
     registrationAnswers,
   });
@@ -388,6 +399,11 @@ export async function createPostToRabbitMQHandler() {
   const coProposerClaimDataSource =
     container.resolve<CoProposerClaimDataSource>(
       Tokens.CoProposerClaimDataSource
+    );
+
+  const dataAccessClaimDataSource =
+    container.resolve<DataAccessClaimDataSource>(
+      Tokens.DataAccessClaimDataSource
     );
 
   const userDataSource = container.resolve<UserDataSource>(
@@ -459,6 +475,29 @@ export async function createPostToRabbitMQHandler() {
           const proposal = await proposalDataSource.get(claim.proposalPk);
           if (!proposal) {
             return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
+        break;
+      }
+      case Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED: {
+        const { invite } = event;
+
+        const claims = await dataAccessClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            continue;
           }
 
           const jsonMessage = await getProposalMessageData(proposal);

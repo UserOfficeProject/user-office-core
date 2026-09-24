@@ -20,6 +20,7 @@ const columns: (
 ) => Column<UserExperiment>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
+  { title: 'Experiment Number', field: 'experimentId' },
   { title: t('instrument') as string, field: 'instrument.name' },
   {
     title: 'Local contact',
@@ -48,6 +49,7 @@ export default function ExperimentsTimesTable({
 
   const experimentsWithFormattedDates = experiments.map((event) => ({
     ...event,
+    experimentId: event.experimentId,
     startsAtFormatted: toFormattedDateTime(event.startsAt),
     endsAtFormatted: toFormattedDateTime(event.endsAt),
     localContactFormatted: getFullUserName(event.localContact),

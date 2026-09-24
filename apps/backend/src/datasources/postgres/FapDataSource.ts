@@ -1319,8 +1319,18 @@ export default class PostgresFapDataSource implements FapDataSource {
 
   async getFapReviewData(
     callId: number,
-    fapId: number
+    fapId: number,
+    instrumentId?: number | null
   ): Promise<FapReviewsRecord[]> {
+    if (instrumentId) {
+      return await database
+        .select('*')
+        .from('review_data')
+        .where('fap_id', fapId)
+        .andWhere('call_id', callId)
+        .andWhere('instrument_id', instrumentId);
+    }
+
     return await database
       .select('*')
       .from('review_data')

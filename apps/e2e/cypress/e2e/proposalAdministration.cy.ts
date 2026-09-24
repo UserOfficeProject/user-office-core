@@ -33,15 +33,15 @@ context('Proposal administration tests', () => {
   let createdInstrumentId: number;
 
   const instrument1 = {
-    name: `0000. ${faker.random.words(2)}`,
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: `0000. ${faker.lorem.words(2)}`,
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: existingUserId,
   };
   const instrument2 = {
-    name: `1111. ${faker.random.words(2)}`,
-    shortCode: faker.random.alphaNumeric(15),
-    description: faker.random.words(5),
+    name: `1111. ${faker.lorem.words(2)}`,
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.lorem.words(5),
     managerUserId: existingUserId,
   };
 

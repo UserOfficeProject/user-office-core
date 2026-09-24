@@ -108,7 +108,8 @@ export default class QuestionaryQueries {
     return this.dataSource.getCount(templateId);
   }
 
-  @Authorized()
+  // No @Authorized() - not grantable as an API key permission because it's
+  // only reachable via the already-authorised Questionary field resolver.
   async isCompleted(agent: UserWithRole | null, questionaryId: number) {
     const hasRights =
       this.userAuth.isApiToken(agent) ||
@@ -129,14 +130,19 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     templateId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionarySteps(templateId);
+    const steps = await this.dataSource.getBlankQuestionarySteps(templateId);
+
+    return this.filterQuestionaryForReadPermissions(agent, steps);
   }
 
   async getBlankQuestionaryStepsByCallId(
     agent: UserWithRole | null,
     callId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+    const steps =
+      await this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+
+    return this.filterQuestionaryForReadPermissions(agent, steps);
   }
 
   async getQuestionaryStepsOrDefault(

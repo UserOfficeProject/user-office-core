@@ -13,6 +13,7 @@ import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
+import PostgresDataAccessClaimDataSource from '../datasources/postgres/DataAccessClaimDataSource';
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
 import PostgresEmailTemplateDataSource from '../datasources/postgres/EmailTemplateDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -62,13 +63,14 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
+mapClass(Tokens.DataAccessClaimDataSource, PostgresDataAccessClaimDataSource);
 mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
@@ -126,7 +128,7 @@ mapClass(Tokens.UserAuthorization, ELIUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
-mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
+mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 

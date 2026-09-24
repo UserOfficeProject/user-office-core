@@ -36,8 +36,8 @@ context('GenericTemplates tests', () => {
     faker.lorem.words(3),
   ];
   const proposalWorkflow = {
-    name: faker.random.words(3),
-    description: faker.random.words(5),
+    name: faker.lorem.words(3),
+    description: faker.lorem.words(5),
     entityType: WorkflowType.PROPOSAL,
   };
   const selectQuestion = 'Select option';

@@ -488,6 +488,7 @@ jobs:
           FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
           PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
           EXTERNAL_AUTH_HOMEPAGE_URL: http://localhost:9003/auth/Menu.aspx
+          TRANSLATION_PATH: /config/locales/
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
@@ -519,10 +520,14 @@ jobs:
           BUILD_TAG: ${{ github.sha }}
           CYPRESS_CACHE_FOLDER: .cache/Cypress
           EAM_API_URL: https://ios.esss.lu.se
-          EAM_AUTH_USER: dummyAuthUser
-          EAM_AUTH_PASSWORD: dummyEAMsecret
-          EAM_AUTH_TENANT: dummyTenant
-          EAM_AUTH_ORGANIZATION: dummyOrg
+          EAM_OAUTH_TOKEN_URL: https://authentication.example.ess.eu:9031/as/token.oauth2
+          EAM_AUTH_CLIENT_ID: dummyClientId
+          EAM_AUTH_CLIENT_SECRET: dummyClientSecret
+          EAM_OAUTH_SCOPE: uos.api.read
+          EAM_OAUTH_AUDIENCE: https://ios.esss.lu.se/
+          EAM_ORGANIZATION_CODE: XXX
+          EAM_ORGANIZATION_NAME: YYYYY
+          EAM_LOCATION_CODE: ZZZZ
           EAM_EQUIPMENT_PART_CODE: 12413
           AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
           AUTH_CLIENT_ID: useroffice

@@ -205,7 +205,8 @@ export class FapDataSourceMock implements FapDataSource {
     fapId?: number
   ): Promise<Fap[]> {
     if (userId && role) {
-      return userId === 3 ? [] : dummyFaps;
+      // User 3 and the plain proposal member (113) are deliberately on no Fap.
+      return [3, 113].includes(userId) ? [] : dummyFaps;
     }
 
     return [];

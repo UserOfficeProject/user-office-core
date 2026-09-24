@@ -8,6 +8,7 @@ import {
   StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
+import 'cypress-wait-until';
 
 import initialDBData from '../support/initialDBData';
 
@@ -836,21 +837,66 @@ context('Status actions tests', () => {
         }
       });
 
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(2000); // wait until status actions are executed
+      // Wait for the status actions to complete successfully since
+      // they can take some time (proposal download especially).
+      const waitForSuccessfulActionLogs = (
+        statusActionType: StatusActionType
+      ) =>
+        cy.waitUntil(
+          () =>
+            cy
+              .getStatusActionsLogs({
+                filter: {
+                  connectionIds: [statusActionsConnectionId],
+                  statusActionType,
+                },
+              })
+              .then((result) => {
+                const logs = result.statusActionsLogs?.statusActionsLogs ?? [];
+
+                const successfulProposalIds = new Set(
+                  logs
+                    .filter((log) => log.statusActionsSuccessful)
+                    .flatMap((log) => log.proposals.map((p) => p.proposalId))
+                );
+
+                return (
+                  successfulProposalIds.has(proposal1Id) &&
+                  successfulProposalIds.has(proposal2Id)
+                );
+              }),
+          {
+            timeout: 20000,
+            interval: 1000,
+            errorMsg: `${statusActionType} status action logs did not complete successfully in time`,
+          }
+        );
+
+      // RabbitMQ status actions aren't logged so are excluded.
+      waitForSuccessfulActionLogs(StatusActionType.EMAIL);
+      waitForSuccessfulActionLogs(StatusActionType.PROPOSALDOWNLOAD);
     });
 
-    it('User Officer should be able to view and replay email status actions', () => {
+    it('User Officer should be able to select and replay an email status action', () => {
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToStatusActionLogsSubmenu('Email');
 
-      cy.get('[data-cy="replay_status_action_icon"]')
-        .first()
-        .click({ force: true });
+      cy.finishedLoading();
 
-      cy.contains('duplicate emails').should('exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'Any selected status action log(s) that can no longer be replayed will be skipped.'
+      ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -860,17 +906,26 @@ context('Status actions tests', () => {
       });
     });
 
-    it('User Officer should be able to view and replay proposal download status actions', () => {
+    it('User Officer should be able to select and replay a proposal download status action(s)', () => {
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-      cy.get('[data-cy="replay_status_action_icon"]')
-        .first()
-        .click({ force: true });
+      cy.finishedLoading();
 
-      cy.contains('unexpected behaviour').should('exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
+      });
+
+      cy.contains(
+        'Any selected status action log(s) that can no longer be replayed will be skipped.'
+      ).should('exist');
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -880,7 +935,7 @@ context('Status actions tests', () => {
       });
     });
 
-    it('User Officer should see status actions logs whose connection configuration was later removed, with replay disabled', () => {
+    it('User Officer should see status actions logs whose connection configuration was later removed, with selection disabled', () => {
       cy.addConnectionStatusActions({
         actions: [],
         connectionId: statusActionsConnectionId,
@@ -899,11 +954,19 @@ context('Status actions tests', () => {
         .filter(':contains("SUCCESSFUL")')
         .should('have.length.greaterThan', 0);
 
-      cy.get('[data-cy="replay_status_action_icon"]')
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
         .first()
-        .click({ force: true });
+        .find('input[type="checkbox"]')
+        .should('be.disabled');
 
-      cy.get('[data-cy="confirm-ok"]').should('not.exist');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('.MuiCheckbox-root')
+        .should(
+          'have.attr',
+          'title',
+          'This status action can no longer be replayed'
+        );
     });
 
     it('User Officer should be able to replay all email status actions in a call', () => {
@@ -1153,39 +1216,135 @@ context('Status actions tests', () => {
       assertProposalPresentInTable(String(proposal2Id));
     });
 
-    it('User Officer should be able to access the proposal from the link in status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+    it('User Officer should be able to persist row selection across page changes', () => {
+      cy.login('officer');
+      cy.visit('/EmailStatusActionsLogs?pageSize=2');
 
-            cy.login('officer');
-            cy.visit('/');
+      cy.finishedLoading();
 
-            cy.finishedLoading();
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
 
-            cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
 
-            cy.contains(proposal.proposalId).click();
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
 
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
+      cy.get('button[aria-label="Next Page"]').click();
 
-            cy.visit('/');
+      cy.finishedLoading();
 
-            cy.navigateToStatusActionLogsSubmenu('Email');
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
 
-            cy.contains(proposal.proposalId).click();
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('exist');
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '1');
 
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
-          });
-        }
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '2');
+
+      cy.get('button[aria-label="Previous Page"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('exist');
+      cy.get('[data-cy="replay_selected_status_actions_count"]')
+        .find('.MuiBadge-badge')
+        .should('have.text', '2');
+
+      cy.get('button[aria-label="Next Page"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .first()
+        .find('input[type="checkbox"]')
+        .should('be.checked');
+    });
+
+    it('User Officer should be able to replay multiple selected email status actions', () => {
+      cy.login('officer');
+      cy.visit('/EmailStatusActionsLogs');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(0)
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(1)
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.contains('2 row(s) selected').should('exist');
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').click({
+        force: true,
       });
+
+      cy.contains(
+        'You are about to send a status action replay request for 2 selected status action log(s).'
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Status action replay successfully sent.',
+      });
+
+      cy.contains('row(s) selected').should('not.exist');
+
+      cy.get('[data-cy="status-actions-logs-table"] tbody tr')
+        .eq(0)
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
+    });
+
+    it('User Officer should be able to access the proposal from the link in status actions logs', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+      cy.contains(proposal2Id).click();
+
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
+
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Email');
+
+      cy.contains(proposal2Id).click();
+
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
     });
   });
 });

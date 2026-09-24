@@ -355,7 +355,7 @@ describe('experimentSafetyWorkflowEntity.onWorkflowStatusChange', () => {
 
     statusActionEngineSpy = jest
       .spyOn(statusActionEngineModule, 'experimentSafetyStatusActionEngine')
-      .mockResolvedValue([]);
+      .mockResolvedValue(undefined);
 
     experimentDataSource = container.resolve(Tokens.ExperimentDataSource);
     getExperimentSafetySpy = jest.spyOn(

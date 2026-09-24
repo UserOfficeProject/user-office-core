@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 
+import { createUOWSClient } from './UOWSClient';
 import { BasicPersonDetailsDTO } from '../../../generated/models/BasicPersonDetailsDTO';
 import { PermissionUserGroupDTO } from '../../../generated/models/PermissionUserGroupDTO';
 import { RoleDTO } from '../../../generated/models/RoleDTO';
@@ -12,11 +13,12 @@ import { UpdateUserByIdArgs } from '../../resolvers/mutations/UpdateUserMutation
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
 import { PaginationSortDirection } from '../../utils/pagination';
+import RoleDataSource from '../postgres/RoleDataSource';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
-import { createUOWSClient } from './UOWSClient';
 
 const postgresUserDataSource = new PostgresUserDataSource();
+const roleDataSource = new RoleDataSource();
 
 const UOWSClient = createUOWSClient();
 
@@ -454,6 +456,7 @@ export class StfcUserDataSource implements UserDataSource {
 
     return stfcRawRolesRequest!;
   }
+
   async getUserRoles(id: number): Promise<Role[]> {
     const cachedRoles = this.uopRolesCache.get(String(id));
     if (cachedRoles) {
@@ -477,6 +480,8 @@ export class StfcUserDataSource implements UserDataSource {
       return [];
     }
 
+    userRole.tags = await roleDataSource.getTagsByRoleId(userRole.id);
+
     if (!stfcRoles || stfcRoles.length == 0) {
       return [userRole];
     }
@@ -489,6 +494,12 @@ export class StfcUserDataSource implements UserDataSource {
     const combinedUserRoles = [...externalRoles, ...assignedSystemUserRoles];
 
     const uniqueRoles: Role[] = [...new Set(combinedUserRoles)];
+
+    for (let i = 0; i < uniqueRoles.length; i++) {
+      uniqueRoles[i].tags = await roleDataSource.getTagsByRoleId(
+        uniqueRoles[i].id
+      );
+    }
 
     uniqueRoles.sort((a, b) => a.id - b.id);
 

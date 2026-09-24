@@ -1035,7 +1035,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('label', textQuestion).then(($elem) => {
-        cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
+        cy.get(`#${$elem.attr('for')}`).type(faker.lorem.word());
       });
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.notification({ text: 'Saved', variant: 'success' });
@@ -1497,7 +1497,7 @@ context('Proposal tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
 
       cy.createCall({
         ...newCall,
@@ -1535,7 +1535,7 @@ context('Proposal tests', () => {
         this.skip();
       }
       let createdCallId: number;
-      const createdCallTitle = faker.random.alphaNumeric(15);
+      const createdCallTitle = faker.string.alphanumeric(15);
       cy.createCall({
         ...newCall,
         shortCode: createdCallTitle,
