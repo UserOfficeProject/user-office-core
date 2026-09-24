@@ -991,31 +991,37 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           if (orderByCollectionList && orderByCollectionList[0]) {
             const orderByField = orderByCollectionList[0].orderByField;
             if (sortableFields.hasOwnProperty(orderByField)) {
-              const databaseColumnToSort =
-                sortableFields[orderByCollectionList[0].orderByField];
+              const databaseColumnToSort = sortableFields[orderByField];
               // Makes the arrow on the UI shows the order the data is listed in, not what it will become.
+              let orderDirection = 'asc';
               if (orderByCollectionList[0].orderDirection === 'asc') {
-                qb.orderBy(databaseColumnToSort, 'desc');
+                orderDirection = 'desc';
+              }
+              if (orderByField === 'p.title') {
+                qb.orderByRaw(`LOWER(??) ${orderDirection.toUpperCase()}`, [
+                  databaseColumnToSort,
+                ]);
               } else {
-                qb.orderBy(databaseColumnToSort, 'asc');
+                qb.orderBy(databaseColumnToSort, orderDirection);
               }
             } else if (orderByField === 'call.shortCode') {
               // Nothing (shortCode comes from diffent db query when paginatedProposals requested)
             } else {
-              throw new GraphQLError(
-                `Bad sort field given: ${orderByCollectionList[0].orderByField}`
-              );
+              throw new GraphQLError(`Bad sort field given: ${orderByField}`);
             }
           }
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
         })
-        .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
-          userProposals: proposals.map((proposal) =>
-            createProposalObject(proposal)
-          ),
-          totalCount: proposals[0]?.full_count ?? 0,
-        }))
+
+        .then((proposals: (ProposalRecord & { full_count: number })[]) => {
+          return {
+            userProposals: proposals.map((proposal) =>
+              createProposalObject(proposal)
+            ),
+            totalCount: proposals[0]?.full_count ?? 0,
+          };
+        })
     );
   }
 
