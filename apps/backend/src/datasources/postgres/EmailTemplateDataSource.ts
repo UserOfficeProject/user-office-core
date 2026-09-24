@@ -134,8 +134,8 @@ export default class PostgresEmailTemplateDataSource
 
   async createNewVersion(
     emailTemplateId: number,
-    subject?: string,
-    body?: string
+    subject?: string | null,
+    body?: string | null
   ): Promise<TemplateVersion> {
     const template = {
       body: body,
@@ -182,7 +182,12 @@ export default class PostgresEmailTemplateDataSource
     subject?: string,
     body?: string
   ): Promise<EmailTemplate> {
-    await this.createNewVersion(emailTemplateId, subject, body);
+    const currentTemplate = await this.getEmailTemplate(emailTemplateId);
+    await this.createNewVersion(
+      emailTemplateId,
+      currentTemplate?.subject,
+      currentTemplate?.body
+    );
 
     return database
       .update(
