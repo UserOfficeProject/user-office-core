@@ -1,0 +1,5 @@
+mutation setDataAccessInvites($input: SetDataAccessInvitesInput!) {
+  setDataAccessInvites(input: $input) {
+    ...invite
+  }
+}

@@ -55,13 +55,13 @@ context('General facility access panel tests', () => {
     cy.get('@userMenuItems').should('not.contain', 'FAPs');
   });
 
-  describe('Fap basic tests as user officer role', () => {
+  describe('FAP basic tests as user officer role', () => {
     beforeEach(function () {
       cy.login('officer');
       cy.visit('/');
     });
 
-    it('Officer should be able to assign Fap Reviewer role', function () {
+    it('Officer should be able to assign FAP Reviewer role', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
       }
@@ -112,7 +112,7 @@ context('General facility access panel tests', () => {
 
       cy.get('[aria-label="Save"]').click();
 
-      cy.notification({ variant: 'success', text: 'Fap deleted successfully' });
+      cy.notification({ variant: 'success', text: 'FAP deleted successfully' });
     });
 
     it('Officer should be able to create Fap', () => {
@@ -131,7 +131,7 @@ context('General facility access panel tests', () => {
 
       cy.get('[data-cy="submit"]').click();
 
-      cy.notification({ variant: 'success', text: 'Fap created successfully' });
+      cy.notification({ variant: 'success', text: 'FAP created successfully' });
       cy.contains('Update Fap');
       cy.get('#code').should('contain.value', code);
       cy.get('#description').should('contain.value', description);
@@ -159,7 +159,7 @@ context('General facility access panel tests', () => {
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
-      cy.notification({ variant: 'success', text: 'Fap updated successfully' });
+      cy.notification({ variant: 'success', text: 'FAP updated successfully' });
 
       cy.contains('FAPs').click();
 
@@ -189,7 +189,7 @@ context('General facility access panel tests', () => {
     });
   });
 
-  describe('Fap members manipulation tests as user officer role', () => {
+  describe('FAP members manipulation tests as user officer role', () => {
     let createdFapId: number;
 
     beforeEach(function () {
@@ -252,7 +252,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap chair assigned successfully',
+        text: 'FAP chair assigned successfully',
       });
 
       cy.reload();
@@ -286,7 +286,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap secretary assigned successfully',
+        text: 'FAP secretary assigned successfully',
       });
 
       cy.get('button[role="tab"]').contains('Logs').click();
@@ -322,7 +322,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap secretary assigned successfully',
+        text: 'FAP secretary assigned successfully',
       });
 
       cy.get('input[id="FapSecretary-' + fapMembers.reviewer.id + '"]').should(
@@ -370,22 +370,22 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Remove Fap Chair"]').click();
+      cy.get('[aria-label="Remove FAP Chair"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member removed successfully',
+        text: 'FAP member removed successfully',
       });
 
-      cy.get('[aria-label="Remove Fap Secretary"]').click();
+      cy.get('[aria-label="Remove FAP Secretary"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member removed successfully',
+        text: 'FAP member removed successfully',
       });
     });
 
@@ -411,7 +411,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member assigned successfully',
+        text: 'FAP member assigned successfully',
       });
 
       cy.contains(fapMembers.reviewer.lastName);
@@ -441,7 +441,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member removed successfully',
+        text: 'FAP member removed successfully',
       });
 
       cy.get('button[role="tab"]').contains('Logs').click();
@@ -552,7 +552,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member assigned successfully',
+        text: 'FAP member assigned successfully',
       });
 
       cy.contains(fapMembers.reviewer.lastName);
@@ -564,7 +564,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member removed successfully',
+        text: 'FAP member removed successfully',
       });
 
       cy.get('body').should('not.contain', fapMembers.reviewer.lastName);
@@ -680,7 +680,7 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member assigned successfully',
+        text: 'FAP member assigned successfully',
       });
 
       cy.contains(fapMembers.reviewer.lastName);
@@ -692,14 +692,14 @@ context('General facility access panel tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap member removed successfully',
+        text: 'FAP member removed successfully',
       });
 
       cy.get('body').should('not.contain', fapMembers.reviewer.lastName);
       cy.contains('No records to display');
     });
 
-    it('Fap Secretary should only see Faps where they have Fap Secretary role', () => {
+    it('FAP Secretary should only see Faps where they have Fap Secretary role', () => {
       cy.changeActiveRole(initialDBData.roles.fapSecretary);
 
       cy.visit('/');
@@ -713,7 +713,7 @@ context('General facility access panel tests', () => {
     });
   });
 
-  describe('Fap document store tests', () => {
+  describe('FAP document store tests', () => {
     it('Officer should be able to upload documents to the document store', () => {
       const fileName1 = 'pdf_5_pages.pdf';
       const fileName2 = 'pdf_3_pages.pdf';
@@ -768,7 +768,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName2).should('not.exist');
     });
 
-    it('Fap Secretary should be able to see uploaded documents', () => {
+    it('FAP Secretary should be able to see uploaded documents', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: fapMembers.secretary.id,
@@ -813,7 +813,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName1).should('exist');
     });
 
-    it('Fap Chair should be able to see uploaded documents', () => {
+    it('FAP Chair should be able to see uploaded documents', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: fapMembers.chair.id,
@@ -858,7 +858,7 @@ context('General facility access panel tests', () => {
       cy.contains(fileName1).should('exist');
     });
 
-    it('Fap Reviewer should be able to see uploaded documents', () => {
+    it('FAP Reviewer should be able to see uploaded documents', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: fapMembers.reviewer.id,

@@ -319,8 +319,8 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
-      title: `Remove ${t('Fap')} assignment/s`,
-      description: `Are you sure you want to remove the selected proposal/s from this ${t('Fap')}?`,
+      title: `Remove ${t('FAP')} assignment/s`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('fap')}?`,
     })();
   };
 
@@ -329,7 +329,7 @@ const FapProposalsAndAssignmentsTable = ({
   hasRightToAssignReviewers &&
     tableActions.push({
       icon: () => <AssignmentInd data-cy="assign-fap-members" />,
-      tooltip: `Assign ${t('Fap')} members`,
+      tooltip: `Assign ${t('FAP')} members`,
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
@@ -444,7 +444,7 @@ const FapProposalsAndAssignmentsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title={`${t('Fap')} - Proposal View`}
+        title={`${t('FAP')} - Proposal View`}
         proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
           setSearchParams((searchParams) => {
@@ -479,7 +479,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${fap.code} - ${t('Fap')} Proposals`}
+              {`${fap.code} - ${t('FAP')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}

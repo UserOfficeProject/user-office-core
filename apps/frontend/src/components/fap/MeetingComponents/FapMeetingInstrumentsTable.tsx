@@ -122,7 +122,7 @@ const FapMeetingInstrumentsTable = ({
 
       if (allProposalsOnInstrumentHaveRankings) {
         const { submitInstrumentInFap } = await api({
-          toastSuccessMessage: `Instrument submitted in ${t('FAP')}!`,
+          toastSuccessMessage: `Instrument submitted in ${t('fap')}!`,
         }).submitInstrumentInFap({
           callId: selectedCall.id,
           instrumentId: instrumentToSubmit.id,
@@ -140,7 +140,7 @@ const FapMeetingInstrumentsTable = ({
         }
       } else {
         enqueueSnackbar(
-          `All proposal ${t('Fap')} meetings should be submitted`,
+          `All proposal ${t('fap')} meetings should be submitted`,
           {
             variant: 'error',
             className: 'snackbar-error',
@@ -177,7 +177,7 @@ const FapMeetingInstrumentsTable = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar(`Proposal ${t('Fap')} instrument is not submitted`, {
+        enqueueSnackbar(`Proposal ${t('fap')} instrument is not submitted`, {
           variant: 'error',
           className: 'snackbar-error',
         });
@@ -212,7 +212,7 @@ const FapMeetingInstrumentsTable = ({
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to ${t('FAP')} meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
+              description: `No further changes to ${t('fap')} meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
                 'instrument'
               )}?`,
             }

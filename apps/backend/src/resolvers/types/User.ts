@@ -179,6 +179,11 @@ export class UserResolver {
     return context.queries.invite.getPendingCoProposerInvites(context.user);
   }
 
+  @FieldResolver(() => [Invite])
+  async dataAccessInvites(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.invite.getPendingDataAccessInvites(context.user);
+  }
+
   @FieldResolver(() => [Experiment])
   async experiments(
     @Root() user: User,
