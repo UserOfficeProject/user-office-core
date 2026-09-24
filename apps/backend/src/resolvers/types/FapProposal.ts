@@ -29,6 +29,9 @@ export class FapProposal {
 
   @Field(() => Int)
   public instrumentId: number | null;
+
+  @Field(() => String)
+  public instrument_shortcodes: string | null;
 }
 
 @Resolver(() => FapProposal)

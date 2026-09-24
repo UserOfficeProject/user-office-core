@@ -51,7 +51,8 @@ export class FapProposal {
     public fapTimeAllocation: number | null,
     public instrumentId: number | null,
     public callId: number,
-    public fapInstrumentMeetingSubmitted: boolean
+    public fapInstrumentMeetingSubmitted: boolean,
+    public instrument_shortcodes: string | null
   ) {}
 }
 

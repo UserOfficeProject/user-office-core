@@ -445,6 +445,7 @@ export interface FapProposalRecord {
   readonly instrument_id: number | null;
   readonly call_id: number;
   readonly fap_meeting_instrument_submitted: boolean;
+  readonly instrument_shortcodes: string;
 }
 
 export type AssignProposalsToFapsInput = Pick<
@@ -1179,7 +1180,8 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.fap_time_allocation,
     fapProposal.instrument_id,
     fapProposal.call_id,
-    fapProposal.fap_meeting_instrument_submitted
+    fapProposal.fap_meeting_instrument_submitted,
+    fapProposal.instrument_shortcodes
   );
 };
 export const createFapAssignmentObject = (fapAssignment: ReviewRecord) => {
