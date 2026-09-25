@@ -322,18 +322,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     // This means that instrument_id and fap_meeting_instrument_submitted cannot be useful given they are
     // potentially combining multiple seperate value into one.
     const fapProposals: FapProposalRecord[] = await database
-      .select([
-        database.raw('MIN(fp.fap_proposal_id) as fap_proposal_id'),
-        database.raw('MIN(fp.proposal_pk) as proposal_pk'),
-        database.raw('MIN(fp.fap_id) as fap_id'),
-        database.raw('MIN(fp.date_assigned) as date_assigned'),
-        database.raw('MIN(fp.fap_time_allocation) as fap_time_allocation'),
-        database.raw('MIN(fp.instrument_id) as instrument_id'),
-        database.raw('MIN(fp.call_id) as call_id'),
-        database.raw(
-          'BOOL_OR(fp.fap_meeting_instrument_submitted) as fap_meeting_instrument_submitted'
-        ),
-      ])
+      .select(['fp.*'])
       .from('fap_proposals as fp')
       .modify((query) => {
         query
@@ -345,9 +334,6 @@ export default class PostgresFapDataSource implements FapDataSource {
           })
           .join('statuses as s', {
             'whs.status_id': 's.status_id',
-          })
-          .join('instruments as i', {
-            'i.instrument_id': 'fp.instrument_id',
           })
           .where(function () {
             this.where('s.status_id', 'ilike', 'FAP_%');
@@ -361,7 +347,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         }
       })
       .where('fp.fap_id', filter.fapId)
-      .groupBy('fp.proposal_pk');
+      .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
