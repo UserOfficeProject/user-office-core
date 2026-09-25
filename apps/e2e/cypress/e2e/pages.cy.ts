@@ -23,7 +23,7 @@ context('Page tests', () => {
         });
         cy.updateUserRoles({
           id: initialDBData.users.officer.id,
-          roles: [roleResult.createRole.id],
+          roles: [initialDBData.roles.userOfficer, roleResult.createRole.id],
         });
       });
     });
@@ -32,7 +32,7 @@ context('Page tests', () => {
   const faqContents = faker.lorem.words(2);
 
   it('Should be able update FAQ', () => {
-    cy.login('officer');
+    cy.login('officer', initialDBData.roles.userOfficer);
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
@@ -61,7 +61,7 @@ context('Page tests', () => {
   });
 
   it('Base User Officer should be able update a default page', () => {
-    cy.login('officer');
+    cy.login('officer', initialDBData.roles.userOfficer);
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
