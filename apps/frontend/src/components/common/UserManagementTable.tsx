@@ -1,4 +1,7 @@
-import MaterialTable from '@material-table/core';
+import MaterialTable, {
+  Action,
+  MaterialTableProps,
+} from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
@@ -25,6 +28,7 @@ export type UserManagementTableProps = {
   setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
   title: string;
+  readonly?: boolean;
   addButtonLabel?: string;
   addButtonTooltip?: string;
   /** Header shown at the top of the invite/selector modal */
@@ -41,6 +45,7 @@ export type UserManagementTableProps = {
 const UserManagementTable = ({
   users,
   setUsers,
+  readonly,
   invites = [],
   setInvites,
   sx,
@@ -56,13 +61,13 @@ const UserManagementTable = ({
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
 
+  const openModal = () => {
+    setOpen(true);
+  };
+
   const removeUser = (user: BasicUserDetails) => {
     const newUsers = users.filter((u) => u.id !== user.id);
     setUsers(newUsers);
-  };
-
-  const openModal = () => {
-    setOpen(true);
   };
 
   const handleAddParticipants = (props: {
@@ -77,6 +82,50 @@ const UserManagementTable = ({
   const handleDeleteInvite = (invite: Invite) => {
     setInvites?.(invites.filter((i) => i.email !== invite.email));
   };
+
+  // material-table decides whether to render the actions column from the
+  // registered actions, not from their `hidden` flag, so in readonly mode we
+  // register none at all to drop the column altogether
+  const rowActions: Action<BasicUserDetails>[] = !!readonly
+    ? []
+    : [
+        {
+          hidden: !onUserAction,
+          icon: () => (
+            <Button
+              data-cy="assign-as-pi"
+              component="a"
+              href="#"
+              variant="text"
+            >
+              Assign <br /> as PI
+            </Button>
+          ),
+          tooltip: 'Set Principal Investigator',
+          onClick: (
+            event: React.MouseEvent<JSX.Element>,
+            rowData: BasicUserDetails | BasicUserDetails[]
+          ) => {
+            event.preventDefault();
+
+            return new Promise<void>(() => {
+              const user = Array.isArray(rowData) ? rowData[0] : rowData;
+              removeUser(user);
+              onUserAction?.('setPrincipalInvestigator', user);
+            });
+          },
+        },
+      ];
+
+  const editable: MaterialTableProps<BasicUserDetails>['editable'] = !!readonly
+    ? {}
+    : {
+        onRowDelete: (oldData) =>
+          new Promise<void>((resolve) => {
+            removeUser(oldData);
+            resolve();
+          }),
+      };
 
   const InviteComponent = (
     <ProposalPeopleSelectorModal
@@ -119,41 +168,8 @@ const UserManagementTable = ({
               paging: true,
               pageSize: 10,
             }}
-            actions={[
-              {
-                hidden: !onUserAction,
-                icon: () => (
-                  <Button
-                    data-cy="assign-as-pi"
-                    component="a"
-                    href="#"
-                    variant="text"
-                  >
-                    Assign <br /> as PI
-                  </Button>
-                ),
-                tooltip: 'Set Principal Investigator',
-                onClick: (
-                  event: React.MouseEvent<JSX.Element>,
-                  rowData: BasicUserDetails | BasicUserDetails[]
-                ) => {
-                  event.preventDefault();
-
-                  return new Promise<void>(() => {
-                    const user = Array.isArray(rowData) ? rowData[0] : rowData;
-                    removeUser(user);
-                    onUserAction?.('setPrincipalInvestigator', user);
-                  });
-                },
-              },
-            ]}
-            editable={{
-              onRowDelete: (oldData) =>
-                new Promise<void>((resolve) => {
-                  removeUser(oldData);
-                  resolve();
-                }),
-            }}
+            actions={rowActions}
+            editable={editable}
           />
 
           {invites.length > 0 && (
@@ -205,7 +221,7 @@ const UserManagementTable = ({
                 data-cy="add-participant-button"
                 size="small"
                 startIcon={<PersonAddIcon />}
-                disabled={disabled}
+                disabled={disabled || !!readonly}
               >
                 {addButtonLabel}
               </Button>

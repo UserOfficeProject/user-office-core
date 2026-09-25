@@ -8,6 +8,7 @@ import {
   StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
+import 'cypress-wait-until';
 
 import initialDBData from '../support/initialDBData';
 
@@ -741,6 +742,127 @@ context('Status actions tests', () => {
           );
         });
     });
+
+    it('Status actions should execute automatically when workflow transition is triggered by an event', () => {
+      const proposalTitle = faker.lorem.words(3);
+      const proposalAbstract = faker.lorem.paragraph();
+      const statusActionEmail = faker.internet.email();
+      let createdProposalPk: number;
+      let connectionId: number;
+
+      const emailStatusActionConfig = {
+        recipientsWithEmailTemplate: [
+          {
+            recipient: {
+              name: EmailStatusActionRecipients.OTHER,
+              description:
+                'Other email recipients manually added by their email',
+            },
+            emailTemplate: {
+              id: testEmailTemplate1Id,
+              name: initialDBData.emailTemplates.template1.name,
+            },
+            otherRecipientEmails: [statusActionEmail],
+          },
+        ],
+      };
+
+      cy.addStatusToWorkflow({
+        statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        workflowId: initialDBData.workflows.defaultWorkflow.id,
+        prevId:
+          initialDBData.workflows.defaultWorkflow.workflowStatuses.draft.id,
+      }).then((result) => {
+        connectionId = result.createWorkflowConnection.id;
+        cy.setStatusChangingEventsOnConnection({
+          workflowConnectionId: connectionId,
+          statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
+        });
+        cy.addConnectionStatusActions({
+          actions: [
+            {
+              actionId: 1,
+              actionType: StatusActionType.EMAIL,
+              config: JSON.stringify(emailStatusActionConfig),
+            },
+          ],
+          connectionId,
+          workflowId: initialDBData.workflows.defaultWorkflow.id,
+        });
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+          });
+
+          cy.submitProposal({ proposalPk: createdProposalPk });
+        }
+      });
+
+      cy.waitUntil(
+        () =>
+          cy
+            .getStatusActionsLogs({
+              filter: {
+                connectionIds: [connectionId],
+                statusActionType: StatusActionType.EMAIL,
+              },
+            })
+            .then((result) => {
+              const logs = result.statusActionsLogs?.statusActionsLogs ?? [];
+
+              return logs.some(
+                (log) =>
+                  log.statusActionsSuccessful &&
+                  log.proposals.some((p) => p.primaryKey === createdProposalPk)
+              );
+            }),
+        {
+          timeout: 20000,
+          interval: 1000,
+          errorMsg:
+            'Status action logs were not created for workflow event transition',
+        }
+      );
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposalTitle)
+        .parent()
+        .contains(initialDBData.proposalStatuses.feasibilityReview.name);
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+
+      cy.finishedLoading();
+
+      cy.contains('PROPOSAL_STATUS_CHANGED_BY_WORKFLOW')
+        .parent()
+        .contains('FEASIBILITY_REVIEW');
+
+      cy.get('[data-cy="event-logs-table"]')
+        .invoke('text')
+        .then((tableText) => {
+          expect(tableText).to.contain(
+            'PROPOSAL_STATUS_ACTION_EXECUTEDEmail successfully sent'
+          );
+        });
+    });
   });
 
   describe('Status actions logs tests', () => {
@@ -836,8 +958,44 @@ context('Status actions tests', () => {
         }
       });
 
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(2000); // wait until status actions are executed
+      // Wait for the status actions to complete successfully since
+      // they can take some time (proposal download especially).
+      const waitForSuccessfulActionLogs = (
+        statusActionType: StatusActionType
+      ) =>
+        cy.waitUntil(
+          () =>
+            cy
+              .getStatusActionsLogs({
+                filter: {
+                  connectionIds: [statusActionsConnectionId],
+                  statusActionType,
+                },
+              })
+              .then((result) => {
+                const logs = result.statusActionsLogs?.statusActionsLogs ?? [];
+
+                const successfulProposalIds = new Set(
+                  logs
+                    .filter((log) => log.statusActionsSuccessful)
+                    .flatMap((log) => log.proposals.map((p) => p.proposalId))
+                );
+
+                return (
+                  successfulProposalIds.has(proposal1Id) &&
+                  successfulProposalIds.has(proposal2Id)
+                );
+              }),
+          {
+            timeout: 20000,
+            interval: 1000,
+            errorMsg: `${statusActionType} status action logs did not complete successfully in time`,
+          }
+        );
+
+      // RabbitMQ status actions aren't logged so are excluded.
+      waitForSuccessfulActionLogs(StatusActionType.EMAIL);
+      waitForSuccessfulActionLogs(StatusActionType.PROPOSALDOWNLOAD);
     });
 
     it('User Officer should be able to select and replay an email status action', () => {
@@ -1286,38 +1444,28 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to access the proposal from the link in status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(5000); // wait until status actions are executed. Speciffically downloading the proposal PDF takes some time.
+      cy.login('officer');
+      cy.visit('/');
 
-            cy.login('officer');
-            cy.visit('/');
+      cy.finishedLoading();
 
-            cy.finishedLoading();
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
 
-            cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+      cy.contains(proposal2Id).click();
 
-            cy.contains(proposal.proposalId).click();
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
 
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
+      cy.visit('/');
 
-            cy.visit('/');
+      cy.navigateToStatusActionLogsSubmenu('Email');
 
-            cy.navigateToStatusActionLogsSubmenu('Email');
+      cy.contains(proposal2Id).click();
 
-            cy.contains(proposal.proposalId).click();
-
-            cy.get('h1')
-              .should('contain.text', 'View proposal')
-              .should('contain.text', proposal.proposalId);
-          });
-        }
-      });
+      cy.get('h1')
+        .should('contain.text', 'View proposal')
+        .should('contain.text', proposal2Id);
     });
   });
 });

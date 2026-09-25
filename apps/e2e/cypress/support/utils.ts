@@ -288,6 +288,11 @@ const testActionButton = (
     case 'invisible':
       getIconByCyTag(iconCyTag).should('not.exist');
       break;
+    case 'cancelled':
+      getButtonByIconCyTag(iconCyTag).find('.MuiBadge-badge').contains('✖');
+      break;
+    default:
+      throw new Error(`testActionButton: unhandled state ${state}`);
   }
 };
 
