@@ -48,8 +48,8 @@ export const SettingsContextProvider = (props: {
   }, new Map<SettingsId, Settings>());
 
   return (
-    <SettingsContext.Provider value={{ settings, settingsMap, setSettings }}>
+    <SettingsContext value={{ settings, settingsMap, setSettings }}>
       {props.children}
-    </SettingsContext.Provider>
+    </SettingsContext>
   );
 };

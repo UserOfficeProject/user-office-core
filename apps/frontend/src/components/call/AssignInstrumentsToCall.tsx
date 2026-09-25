@@ -1,6 +1,5 @@
 import { Autocomplete, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import PropTypes from 'prop-types';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -172,12 +171,6 @@ const AssignInstrumentsToCall = ({
       </ActionButtonContainer>
     </>
   );
-};
-
-AssignInstrumentsToCall.propTypes = {
-  assignInstrumentsToCall: PropTypes.func.isRequired,
-  callId: PropTypes.number.isRequired,
-  assignedInstruments: PropTypes.array,
 };
 
 export default AssignInstrumentsToCall;

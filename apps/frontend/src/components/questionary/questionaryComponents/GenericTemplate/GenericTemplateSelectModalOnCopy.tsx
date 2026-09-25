@@ -9,7 +9,6 @@ import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
@@ -244,16 +243,6 @@ const GenericTemplateSelectModalOnCopy = ({
       </Box>
     </>
   );
-};
-
-GenericTemplateSelectModalOnCopy.propTypes = {
-  close: PropTypes.func.isRequired,
-  filter: PropTypes.object.isRequired,
-  currentProposalPk: PropTypes.number.isRequired,
-  copyButtonLabel: PropTypes.string,
-  question: PropTypes.string.isRequired,
-  isMultipleCopySelect: PropTypes.bool.isRequired,
-  handleGenericTemplateOnCopy: PropTypes.func.isRequired,
 };
 
 export default GenericTemplateSelectModalOnCopy;

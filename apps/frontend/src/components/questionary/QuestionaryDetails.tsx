@@ -22,7 +22,7 @@ export interface QuestionaryDetailsProps
   questionaryData?: Questionary; // If provided, it will be used instead of fetching the questionary
   additionalDetails?: Array<TableRowData>;
   title?: string;
-  answerRenderer?: (answer: Answer) => JSX.Element | null;
+  answerRenderer?: (answer: Answer) => React.ReactNode;
 }
 
 function QuestionaryDetails(props: QuestionaryDetailsProps) {

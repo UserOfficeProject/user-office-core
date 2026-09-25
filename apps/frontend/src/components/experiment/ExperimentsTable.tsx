@@ -73,14 +73,14 @@ const RowActionButtons = (rowData: Experiment) => {
   );
 };
 
-const ChangeExperimentSafetyStatusIcon = (): JSX.Element => (
+const ChangeExperimentSafetyStatusIcon = () => (
   <ListStatusIcon data-cy="change-experiment-safety-status" />
 );
 
 export default function ExperimentsTable({
   experimentsFilter,
 }: ExperimentsTableProps) {
-  const tableRef = React.useRef<MaterialTable<Experiment>>();
+  const tableRef = React.useRef<MaterialTable<Experiment>>(undefined);
 
   const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();

@@ -39,7 +39,7 @@ interface EntryID {
   id: number | string;
 }
 
-export function SuperMaterialTable<Entry extends EntryID>({
+function SuperMaterialTable<Entry extends EntryID>({
   hasAccess = {
     create: true,
     remove: true,
@@ -144,7 +144,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
     }
   };
 
-  const EditIcon = (): JSX.Element => <Edit />;
+  const EditIcon = () => <Edit />;
   let localActions: (
     | import('@material-table/core').Action<Entry>
     | ((rowData: Entry) => import('@material-table/core').Action<Entry>)
@@ -205,7 +205,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
                   icon: EditIcon,
                   tooltip: 'Edit',
                   onClick: (
-                    _event: React.MouseEvent<JSX.Element>,
+                    _event: React.MouseEvent<HTMLElement>,
                     rowData: Entry | Entry[]
                   ) => {
                     setShow(true);
