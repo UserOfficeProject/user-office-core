@@ -317,6 +317,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId?: number | null;
     instrumentId?: number | null;
   }): Promise<FapProposal[]> {
+    // This query is fundermentally flawed, as it is grouping fap_proposals by proposal_pk
+    // One proposal can have multiple instruments + fap_proposal records.
+    // This means that instrument_id and fap_meeting_instrument_submitted cannot be useful given they are
+    // potentially combining multiple seperate value into one.
     const fapProposals: FapProposalRecord[] = await database
       .select([
         database.raw('MIN(fp.fap_proposal_id) as fap_proposal_id'),
