@@ -156,8 +156,7 @@ export const dummyFapProposal = new FapProposal(
   null,
   1,
   1,
-  false,
-  null
+  false
 );
 
 export const anotherDummyFapProposal = new FapProposal(
@@ -168,8 +167,7 @@ export const anotherDummyFapProposal = new FapProposal(
   null,
   2,
   1,
-  true,
-  null
+  true
 );
 
 export const dummyFapMeetingDecision = new FapMeetingDecision(

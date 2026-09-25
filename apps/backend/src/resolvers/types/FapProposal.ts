@@ -29,9 +29,6 @@ export class FapProposal {
 
   @Field(() => Int)
   public instrumentId: number | null;
-
-  @Field(() => String)
-  public instrument_shortcodes: string | null;
 }
 
 @Resolver(() => FapProposal)
@@ -74,5 +71,13 @@ export class FapProposalResolver {
     return fapProposal.instrumentId
       ? context.queries.instrument.get(context.user, fapProposal.instrumentId)
       : null;
+  }
+
+  @FieldResolver(() => String)
+  async instrument_shortcodes(
+    @Root() fapProposal: FapProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return 'test';
   }
 }
