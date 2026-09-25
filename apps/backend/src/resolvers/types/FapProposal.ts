@@ -78,6 +78,9 @@ export class FapProposalResolver {
     @Root() fapProposal: FapProposal,
     @Ctx() context: ResolverContext
   ) {
-    return 'test';
+    return context.queries.fap.dataSource.getInstrumentCodes(
+      fapProposal.fapId,
+      fapProposal.proposalPk
+    );
   }
 }

@@ -185,7 +185,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       ),
   },
   {
-    title: 'Instrument',
+    title: 'Instrument(s)',
     field: 'instrument_shortcodes',
   },
 ];

@@ -1289,6 +1289,31 @@ export default class PostgresFapDataSource implements FapDataSource {
     };
   }
 
+  async getInstrumentCodes(fapId: number, proposalPk: number) {
+    type result = {
+      instrument_shortcodes: string;
+    };
+    const codes: result = await database
+      .select(
+        /* eslint-disable quotes */
+        database.raw(
+          `STRING_AGG(DISTINCT i.short_code, ', ') as instrument_shortcodes`
+        )
+      )
+      .from('fap_proposals as fp')
+      .modify((query) => {
+        query.join('instruments as i', {
+          'i.instrument_id': 'fp.instrument_id',
+        });
+      })
+      .where('fp.fap_id', fapId)
+      .where('fp.proposal_pk', proposalPk)
+      .groupBy('fp.proposal_pk')
+      .first();
+
+    return codes.instrument_shortcodes;
+  }
+
   async isFapProposalInstrumentSubmitted(
     proposalPk: number,
     instrumentId?: number | null
