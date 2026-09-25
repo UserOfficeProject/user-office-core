@@ -1,11 +1,13 @@
 query getUserProposals(
   $first: Int, 
-  $offset: Int
+  $offset: Int,
+  $orderByCollectionList: [OrderByCollection!],
 ) {
   me {
     paginatedProposals(
       first: $first, 
-      offset: $offset
+      offset: $offset,
+      orderByCollectionList: $orderByCollectionList
     ) {
       totalCount
       userProposals {

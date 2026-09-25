@@ -1,3 +1,4 @@
+import { OrderByCollection } from '@material-table/core';
 import React, { useCallback, useState } from 'react';
 
 import ProposalInviteNotification from 'components/proposal/ProposalInviteNotification';
@@ -42,20 +43,23 @@ const ProposalTableUser = () => {
   const api = useDataApi();
   const [refreshTableKey, setRefreshTableKey] = useState(0);
   const sendUserProposalRequest = useCallback(
-    async (page: number, pageSize: number) => {
+    async (
+      page: number,
+      pageSize: number,
+      orderByCollection: OrderByCollection[]
+    ) => {
       return api()
-        .getUserProposals({ first: pageSize, offset: page * pageSize })
+        .getUserProposals({
+          first: pageSize,
+          offset: page * pageSize,
+          orderByCollectionList: orderByCollection,
+        })
         .then((data) => {
           return {
             page,
             totalCount: data?.me?.paginatedProposals?.totalCount,
-            data: data?.me?.paginatedProposals?.userProposals
-              .sort((a, b) => {
-                return (
-                  new Date(b.created).getTime() - new Date(a.created).getTime()
-                );
-              })
-              .map((proposal) => {
+            data: data?.me?.paginatedProposals?.userProposals.map(
+              (proposal) => {
                 const hasReferenceNumberFormat =
                   !!proposal.call?.referenceNumberFormat;
 
@@ -74,7 +78,8 @@ const ProposalTableUser = () => {
                   proposerId: proposal.proposer?.id,
                   call: proposal.call,
                 };
-              }),
+              }
+            ),
           };
         });
     },

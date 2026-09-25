@@ -4,29 +4,6 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
-import { Call } from '../../models/Call';
-import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
-import { ProposalView } from '../../models/ProposalView';
-import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
-import { ReviewerFilter } from '../../models/Review';
-import { Roles } from '../../models/Role';
-import { SettingsId } from '../../models/Settings';
-import { TechnicalReview } from '../../models/TechnicalReview';
-import { Technique } from '../../models/Technique';
-import { UserWithRole } from '../../models/User';
-import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import { UserProposalsFilter } from '../../resolvers/types/User';
-import { PaginationSortDirection } from '../../utils/pagination';
-import { AdminDataSource } from '../AdminDataSource';
-import { ProposalDataSource } from '../ProposalDataSource';
-import { TagDataSource } from '../TagDataSource';
-import { WorkflowDataSource } from '../WorkflowDataSource';
-import {
-  InstrumentFilterInput,
-  ProposalsFilter,
-  QuestionFilterInput,
-} from './../../resolvers/queries/ProposalsQuery';
 import CallDataSource from './CallDataSource';
 import database from './database';
 import {
@@ -42,6 +19,30 @@ import {
   TechniqueRecord,
   WorkflowStatusRecord,
 } from './records';
+import { Tokens } from '../../config/Tokens';
+import { Call } from '../../models/Call';
+import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
+import { ProposalView } from '../../models/ProposalView';
+import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
+import { SettingsId } from '../../models/Settings';
+import { TechnicalReview } from '../../models/TechnicalReview';
+import { Technique } from '../../models/Technique';
+import { UserWithRole } from '../../models/User';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
+import { UserProposalsFilter } from '../../resolvers/types/User';
+import { OrderByCollection } from '../../resolvers/types/User';
+import { PaginationSortDirection } from '../../utils/pagination';
+import { AdminDataSource } from '../AdminDataSource';
+import { ProposalDataSource } from '../ProposalDataSource';
+import { TagDataSource } from '../TagDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
+import {
+  InstrumentFilterInput,
+  ProposalsFilter,
+  QuestionFilterInput,
+} from './../../resolvers/queries/ProposalsQuery';
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
@@ -930,8 +931,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    orderByCollectionList?: OrderByCollection[]
   ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
+    const fieldsInUIToDB: { [key: string]: string } = {
+      proposalId: 'p.proposal_id',
+      title: 'p.title',
+      publicStatus: 'p.final_status',
+      created: 'p.created_at',
+    };
+
     return (
       database
         .select('p.*', database.raw('count(*) OVER() AS full_count'))
@@ -979,15 +988,40 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         .groupBy('p.proposal_pk')
         .modify((qb) => {
+          if (orderByCollectionList && orderByCollectionList[0]) {
+            const uiColumn = orderByCollectionList[0].orderByField;
+            if (fieldsInUIToDB.hasOwnProperty(uiColumn)) {
+              const dbColumn = fieldsInUIToDB[uiColumn];
+              // Makes the arrow on the UI shows the order the data is listed in, not what it will become.
+              let orderDirection = 'asc';
+              if (orderByCollectionList[0].orderDirection === 'asc') {
+                orderDirection = 'desc';
+              }
+              if (dbColumn === 'p.title') {
+                qb.orderByRaw(
+                  `LOWER(COALESCE(??, '')) ${orderDirection.toUpperCase()}`,
+                  [dbColumn]
+                );
+              } else {
+                qb.orderBy(dbColumn, orderDirection);
+              }
+            } else if (uiColumn === 'call.shortCode') {
+              // Nothing (shortCode comes from diffent db query when paginatedProposals requested)
+            } else {
+              throw new GraphQLError(`Bad sort field given: ${uiColumn}`);
+            }
+          }
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
         })
-        .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
-          userProposals: proposals.map((proposal) =>
-            createProposalObject(proposal)
-          ),
-          totalCount: proposals[0]?.full_count ?? 0,
-        }))
+        .then((proposals: (ProposalRecord & { full_count: number })[]) => {
+          return {
+            userProposals: proposals.map((proposal) =>
+              createProposalObject(proposal)
+            ),
+            totalCount: proposals[0]?.full_count ?? 0,
+          };
+        })
     );
   }
 
