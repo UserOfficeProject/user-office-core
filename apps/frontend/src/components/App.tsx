@@ -1,8 +1,9 @@
 import Close from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { SnackbarProvider } from 'notistack';
-import React, { ErrorInfo, Suspense } from 'react';
+import { SnackbarProvider, useSnackbar } from 'notistack';
+import React, { ErrorInfo, Suspense, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
@@ -15,6 +16,33 @@ import clearSession from 'utils/clearSession';
 
 import AppRoutes from './AppRoutes';
 import Theme from './theme/theme';
+
+const DYNAMIC_IMPORT_ERROR_EVENT = 'dynamic-import-error';
+
+function DynamicImportErrorSnackbar() {
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    const showError = () => {
+      enqueueSnackbar('Unable to load this page.', {
+        variant: 'error',
+        action: () => (
+          <Button color="inherit" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        ),
+      });
+    };
+
+    window.addEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showError);
+
+    return () => {
+      window.removeEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showError);
+    };
+  }, [enqueueSnackbar]);
+
+  return null;
+}
 
 function Root() {
   const notistackRef = React.createRef<SnackbarProvider>();
@@ -51,6 +79,7 @@ function Root() {
             </IconButton>
           )}
         >
+          <DynamicImportErrorSnackbar />
           <SettingsContextProvider>
             <Theme>
               <FeatureContextProvider>
