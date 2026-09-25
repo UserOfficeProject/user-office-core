@@ -1,0 +1,5 @@
+query getEmailVersion($emailTemplateId: Int!, $versionNumber: Int!) {
+  emailVersion(emailTemplateId: $emailTemplateId, versionNumber: $versionNumber) {
+  ...emailVersion
+  }
+}

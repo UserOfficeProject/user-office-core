@@ -32,6 +32,20 @@ export default class EmailTemplateQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  async getVersions(agent: UserWithRole | null, id: number) {
+    return await this.dataSource.getEmailVersions(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getVersion(
+    agent: UserWithRole | null,
+    id: number,
+    versionNumber: number
+  ) {
+    return await this.dataSource.getEmailVersion(id, versionNumber);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async getAll(agent: UserWithRole | null, filter: EmailTemplatesFilter) {
     return this.dataSource.getEmailTemplates(filter);
   }

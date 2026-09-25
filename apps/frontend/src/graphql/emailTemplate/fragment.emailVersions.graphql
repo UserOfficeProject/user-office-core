@@ -1,0 +1,9 @@
+fragment emailVersion on TemplateVersion {
+ templateVersionId
+ templateId
+ body
+ subject
+ versionNumber
+ templateType
+ createdTimeStamp
+ }
