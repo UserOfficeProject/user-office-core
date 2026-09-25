@@ -321,6 +321,38 @@ context('Instrument tests', () => {
       });
     });
 
+    it('User Officer should be able to assign scientist to instrument after searching in the instruments table', () => {
+      cy.contains('Instruments').click();
+
+      cy.get('[data-cy="instruments-table"] [placeholder="Search"]').type(
+        instrument1.name
+      );
+
+      cy.url().should('contain', 'search=');
+
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Assign scientist"]')
+        .click();
+
+      cy.get('[data-cy="co-proposers"]')
+        .contains(scientist2.lastName)
+        .should('exist');
+
+      cy.get('[data-cy="co-proposers"]')
+        .contains(scientist2.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('.MuiDialog-root [data-cy="assign-selected-users"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist assigned to instrument',
+      });
+    });
+
     it('User Officer should be able to see who submitted the technical review', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
