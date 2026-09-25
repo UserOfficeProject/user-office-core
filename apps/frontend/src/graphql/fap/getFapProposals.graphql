@@ -5,6 +5,7 @@ query getFapProposals($fapId: Int!, $callId: Int, $instrumentId: Int, $legacy: B
     fapId
     fapTimeAllocation
     instrumentSubmitted
+    instrument_shortcodes
     proposal {
       title
       primaryKey

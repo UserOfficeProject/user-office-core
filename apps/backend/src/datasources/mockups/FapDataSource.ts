@@ -224,6 +224,10 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`Fap not found ${args.fapId}`);
   }
 
+  async getInstrumentCodes(fapId: number, proposalPk: number): Promise<string> {
+    return 'INST1, INST2';
+  }
+
   async assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap> {
     const fap = dummyFaps.find((element) => element.id === args.fapId);
 

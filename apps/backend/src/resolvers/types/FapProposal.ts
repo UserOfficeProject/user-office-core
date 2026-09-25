@@ -72,4 +72,15 @@ export class FapProposalResolver {
       ? context.queries.instrument.get(context.user, fapProposal.instrumentId)
       : null;
   }
+
+  @FieldResolver(() => String)
+  async instrument_shortcodes(
+    @Root() fapProposal: FapProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.fap.dataSource.getInstrumentCodes(
+      fapProposal.fapId,
+      fapProposal.proposalPk
+    );
+  }
 }
