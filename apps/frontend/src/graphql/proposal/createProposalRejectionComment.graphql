@@ -1,0 +1,7 @@
+mutation createProposalRejectionComment($proposalPk: Int!, $comment: String!) {
+  createProposalRejectionComment(proposalPk: $proposalPk, comment: $comment) {
+    commentId
+    proposalPk
+    comment
+  }
+}
