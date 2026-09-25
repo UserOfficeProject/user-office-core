@@ -136,13 +136,15 @@ let columns: Column<ProposalViewData>[] = [
     sorting: false,
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname ? (
+      proposalView.principalInvestigator ? (
         <RoleBasedLink
           roleRoutes={{
             [UserRole.USER_OFFICER]: `/People/${proposalView.principalInvestigator.id}`,
           }}
         >
-          {`${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`}
+          {proposalView.principalInvestigator.lastname
+            ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+            : getPreferredName(proposalView.principalInvestigator)}
         </RoleBasedLink>
       ) : (
         ''

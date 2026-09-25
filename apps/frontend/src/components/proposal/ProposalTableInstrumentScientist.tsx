@@ -112,8 +112,10 @@ let columns: Column<ProposalViewData>[] = [
     field: 'principalInvestigator',
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname
-        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+      proposalView.principalInvestigator
+        ? proposalView.principalInvestigator.lastname
+          ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+          : getPreferredName(proposalView.principalInvestigator)
         : '',
   },
   {
