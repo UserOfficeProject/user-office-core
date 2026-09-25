@@ -168,6 +168,26 @@ export default class UserQueries {
     return this.dataSource.getRoles();
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async getRolesByTags(agent: UserWithRole | null, tagIds?: number[]) {
+    const currentRoleTagIds = agent?.currentRole?.tags?.map((t) => t.id);
+
+    if (
+      agent?.currentRole?.isRootRole ||
+      (currentRoleTagIds &&
+        tagIds &&
+        tagIds.every((t) => currentRoleTagIds.includes(t)))
+    ) {
+      return this.dataSource.getRolesByTags(tagIds);
+    }
+    logger.logWarn(
+      'User does not have permission to fetch requested roles with tags',
+      { agent, tagIds }
+    );
+
+    return [];
+  }
+
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getUser(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);

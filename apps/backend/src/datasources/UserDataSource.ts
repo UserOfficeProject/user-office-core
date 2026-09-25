@@ -45,6 +45,7 @@ export interface UserDataSource {
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
+  getRolesByTags(roleTags?: number[]): Promise<Role[]>;
   getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]>;
   getProposalUsersFull(proposalPk: number): Promise<User[]>;
   getProposalUsersWithInstitution(proposalPk: number): Promise<

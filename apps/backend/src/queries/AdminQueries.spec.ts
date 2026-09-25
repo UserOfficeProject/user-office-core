@@ -10,6 +10,7 @@ import {
   dummyApiAccessTokens,
 } from '../datasources/mockups/AdminDataSource';
 import {
+  derivedDummyUserOfficerWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -21,8 +22,60 @@ describe('Test Admin Queries', () => {
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
   });
 
-  test('A user can get page text', () => {
-    return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
+  test('A user can get default page text', () => {
+    return expect(
+      adminQueries.getPageText({ agent: dummyUserWithRole, pageId: 1 })
+    ).resolves.toBe('Default Page Notice');
+  });
+
+  test('A user can get page text for their role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleId: 1,
+      })
+    ).resolves.toBe('Derived Page Notice 1');
+  });
+
+  test('A user cannot get page text for another role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleId: 2,
+      })
+    ).resolves.toBe(null);
+  });
+
+  test('A base user officer can get page text for another role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserOfficerWithRole,
+        pageId: 1,
+        roleId: 2,
+      })
+    ).resolves.toBe('Derived Page Notice 2');
+  });
+
+  test('A derived user officer can get page text for a role with a shared tag', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: derivedDummyUserOfficerWithRole,
+        pageId: 1,
+        roleId: 1,
+      })
+    ).resolves.toBe('Derived Page Notice 1');
+  });
+
+  test('A derived user officer cannot get page text for a role without a shared tag', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: derivedDummyUserOfficerWithRole,
+        pageId: 1,
+        roleId: 2,
+      })
+    ).resolves.toBe(null);
   });
 
   test('A user can get features', () => {

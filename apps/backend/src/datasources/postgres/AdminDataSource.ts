@@ -138,11 +138,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return createInstitutionObject(institutionRecord);
   }
 
-  async get(id: number): Promise<string | null> {
+  async get(pageId: number, roleId?: number): Promise<string | null> {
     return database
       .select('content')
       .from('pagetext')
-      .where('pagetext_id', id)
+      .where('page_id', pageId)
+      .modify((query) => {
+        if (roleId == null) {
+          query.whereNull('role_id');
+        } else {
+          query.where('role_id', roleId);
+        }
+      })
       .first()
       .then((res) => (res ? res.content : null));
   }
@@ -174,18 +181,50 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     );
   }
 
-  async setPageText(id: number, content: string): Promise<Page> {
-    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
-      .insert({
-        pagetext_id: id,
-        content: content,
+  async setPageText(
+    pageId: number,
+    content: string,
+    roleId?: number
+  ): Promise<Page> {
+    const pageTextId = await database
+      .select('pagetext_id')
+      .from('pagetext')
+      .where('page_id', pageId)
+      .modify((query) => {
+        if (roleId == null) {
+          query.whereNull('role_id');
+        } else {
+          query.where('role_id', roleId);
+        }
       })
+      .first();
+
+    const dbDataToInsert =
+      pageTextId != null
+        ? {
+            pagetext_id: pageTextId.pagetext_id,
+            page_id: pageId,
+            content: content,
+            role_id: roleId == null ? null : roleId,
+          }
+        : {
+            page_id: pageId,
+            content: content,
+            role_id: roleId == null ? null : roleId,
+          };
+
+    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
+      .insert(dbDataToInsert)
       .onConflict('pagetext_id')
       .merge()
       .returning('*');
 
+    const roleIdErrorMsg = roleId != null ? ` and role id:${roleId}` : '';
+
     if (!pagetextRecord) {
-      throw new GraphQLError(`Could not update page with id:${id}`);
+      throw new GraphQLError(
+        `Could not update page with page id:${pageId}${roleIdErrorMsg}`
+      );
     }
 
     return createPageObject(pagetextRecord);

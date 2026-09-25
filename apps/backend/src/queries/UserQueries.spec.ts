@@ -16,6 +16,7 @@ import { Tokens } from '../config/Tokens';
 import {
   basicDummyUser,
   basicDummyUserNotOnProposal,
+  derivedDummyUserOfficerWithRole,
   dummyProposalMemberWithRole,
   dummySecondVisitorWithRole,
   dummyThirdVisitorWithRole,
@@ -26,6 +27,8 @@ import {
   dummyUserWithRole,
   dummyVisitorWithRole,
   dummyVisitTeamLeadWithRole,
+  roles,
+  tags,
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import {
@@ -80,6 +83,30 @@ describe('UserQueries', () => {
 
   test('A user is not allowed to fetch roles', () => {
     return expect(userQueries.getRoles(dummyUserWithRole)).resolves.toBe(null);
+  });
+
+  test('A base user officer is allowed to fetch all roles', () => {
+    return expect(
+      userQueries.getRolesByTags(dummyUserOfficerWithRole)
+    ).resolves.toBe(roles);
+  });
+
+  test('A derived user officer is not allowed to fetch all roles', () => {
+    return expect(
+      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole)
+    ).resolves.toStrictEqual([]);
+  });
+
+  test('A derived user officer is allowed to fetch roles with the same tag', () => {
+    return expect(
+      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole, [tags[0].id])
+    ).resolves.toStrictEqual([roles[1]]);
+  });
+
+  test('A derived user officer is not allowed to fetch roles with a different tag', () => {
+    return expect(
+      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole, [tags[1].id])
+    ).resolves.toStrictEqual([]);
   });
 
   /*

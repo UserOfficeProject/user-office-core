@@ -1,6 +1,6 @@
 export class Page {
   constructor(
-    public id: number,
+    public pageId: number,
     public content: string
   ) {}
 }

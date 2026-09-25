@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import AdminMutations from './AdminMutations';
 import { dummyInstitution } from '../datasources/mockups/AdminDataSource';
 import {
+  derivedDummyUserOfficerWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -28,14 +29,46 @@ const updatedSetting = {
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
     return expect(
-      adminMutations.setPageText(null, { id: 1, text: 'New page contents' })
+      adminMutations.setPageText(null, { pageId: 1, text: 'New page contents' })
     ).resolves.not.toBeInstanceOf(Page);
   });
 
-  test('A user officer can set page text', () => {
+  test('A base user officer can set default page text', () => {
     return expect(
-      adminMutations.setPageText(dummyUserOfficerWithRole, { id: 1, text: '' })
+      adminMutations.setPageText(dummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+      })
     ).resolves.toBeInstanceOf(Page);
+  });
+
+  test('A derived user officer can not set default page text', () => {
+    return expect(
+      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+      })
+    ).resolves.not.toBeInstanceOf(Page);
+  });
+
+  test('A derived user officer can set page text for a role with a shared tag', () => {
+    return expect(
+      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+        roleId: 1,
+      })
+    ).resolves.toBeInstanceOf(Page);
+  });
+
+  test('A derived user officer can not set page text for a role without a shared tag', () => {
+    return expect(
+      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+        roleId: 2,
+      })
+    ).resolves.not.toBeInstanceOf(Page);
   });
 
   test('A user officer can delete a institution', () => {
