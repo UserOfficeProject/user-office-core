@@ -5,7 +5,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import { Instrument, InstrumentWithManagementTime } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -39,16 +39,13 @@ export default class InstrumentQueries {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async getAll(agent: UserWithRole | null, callIds: number[]) {
-    const agentRoleId = this.userAuth.isApiToken(agent)
-      ? undefined
-      : agent?.currentRole?.id;
+  async getAll(
+    agent: UserWithRole | null,
+    callIds: number[],
+    @AgentTags tags?: number[]
+  ) {
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getInstruments(
-        undefined,
-        undefined,
-        agentRoleId
-      );
+      return await this.dataSource.getInstruments({ tagIds: tags });
     } else {
       const instrumentsByCallIds =
         await this.dataSource.getInstrumentsByCallId(callIds);
@@ -62,13 +59,17 @@ export default class InstrumentQueries {
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getUserInstruments(
-    agent: UserWithRole | null
+    agent: UserWithRole | null,
+    @AgentTags tags?: number[]
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getInstruments();
+      return this.dataSource.getInstruments({ tagIds: tags });
     }
 
-    const instruments = await this.dataSource.getUserInstruments(agent!.id);
+    const instruments = await this.dataSource.getUserInstruments(
+      agent!.id,
+      tags
+    );
 
     return { totalCount: instruments.length, instruments };
   }

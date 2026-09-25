@@ -103,6 +103,19 @@ export const dummyUserOfficerWithRole: UserWithRole = {
   externalTokenValid: true,
 };
 
+export const dummyUserOfficerWithDerivedRole: UserWithRole = {
+  ...dummyUserOfficer,
+  currentRole: {
+    id: 11,
+    title: 'Derived User Officer',
+    shortCode: 'user_officer',
+    description: '',
+    config: {},
+    isRootRole: false,
+  },
+  externalTokenValid: true,
+};
+
 export const dummyUser = new User(
   2,
   'Dr.',
@@ -222,6 +235,18 @@ export const dummyInstrumentScientist: UserWithRole = {
     isRootRole: true,
   },
   externalTokenValid: true,
+};
+
+export const dummyInstrumentScientistWithDerivedRole: UserWithRole = {
+  ...dummyInstrumentScientist,
+  currentRole: {
+    id: 12,
+    title: 'Derived Instrument Scientist',
+    shortCode: 'instrument_scientist',
+    description: '',
+    config: {},
+    isRootRole: false,
+  },
 };
 
 export const dummyProposalReaderWithLogAccess: UserWithRole = {
