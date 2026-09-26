@@ -1,3 +1,4 @@
+import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Rejection } from '../../models/Rejection';
@@ -6,7 +7,6 @@ import {
   DataAccessUsersDataSource,
   UserWithInstitution,
 } from '../DataAccessUsersDataSource';
-import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
 
 // Mock full user objects for getDataAccessUsersWithInstitution
 export const dummyDataAccessFullUser = new User(
@@ -120,5 +120,34 @@ export default class MockDataAccessUsersDataSource
     const userIds = this.mockData.get(proposalPk) || [];
 
     return Promise.resolve(userIds.includes(id));
+  }
+
+  async addDataAccessUser(
+    proposalPk: number,
+    userId: number
+  ): Promise<Rejection | undefined> {
+    try {
+      const existingUserIds = this.mockData.get(proposalPk) || [];
+
+      // Idempotent insert - don't add the same user twice
+      if (!existingUserIds.includes(userId)) {
+        this.mockData.set(proposalPk, [...existingUserIds, userId]);
+      }
+
+      const users = await this.findByProposalPk(proposalPk);
+      const addedUser = users.find((user) => user.id === userId);
+
+      if (!addedUser) {
+        throw new Error(`No mock user found for id ${userId}`);
+      }
+
+      return;
+    } catch (error) {
+      return new Rejection('Failed to add data access user', {
+        proposalPk,
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 }

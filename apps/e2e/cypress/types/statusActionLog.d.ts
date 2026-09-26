@@ -1,4 +1,8 @@
-import { GetEmailTemplateQuery } from '@user-office-software-libs/shared-types';
+import {
+  GetEmailTemplateQuery,
+  GetStatusActionsLogsQuery,
+  GetStatusActionsLogsQueryVariables,
+} from '@user-office-software-libs/shared-types';
 
 declare global {
   namespace Cypress {
@@ -24,6 +28,18 @@ declare global {
       getEmailTemplate: (
         getEmailTemplatesInput: GetEmailTemplateQueryVariables
       ) => Cypress.Chainable<GetEmailTemplateQuery>;
+
+      /**
+       * Gets status actions logs
+       *
+       * @returns {typeof getStatusActionsLogs}
+       * @memberof Chainable
+       * @example
+       *    cy.getStatusActionsLogs(getStatusActionsLogsInput: GetStatusActionsLogsQueryVariables)
+       */
+      getStatusActionsLogs: (
+        getStatusActionsLogsInput: GetStatusActionsLogsQueryVariables
+      ) => Cypress.Chainable<GetStatusActionsLogsQuery>;
     }
   }
 }

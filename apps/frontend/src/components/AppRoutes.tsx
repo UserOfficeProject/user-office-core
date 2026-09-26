@@ -322,7 +322,7 @@ const AppRoutes = () => {
         {isFapEnabled && (
           <Route
             path="/FapPage/:id"
-            element={<TitledRoute title={t('Fap')} element={<FapPage />} />}
+            element={<TitledRoute title={t('FAP')} element={<FapPage />} />}
           />
         )}
         {isFapEnabled && (
@@ -330,7 +330,7 @@ const AppRoutes = () => {
             path="/Faps"
             element={
               <TitledRoute
-                title={i18n.format(t('Fap'), 'plural')}
+                title={i18n.format(t('FAP'), 'plural')}
                 element={<FapsPage />}
               />
             }
