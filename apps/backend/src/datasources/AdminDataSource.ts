@@ -3,14 +3,17 @@ import { Country } from '../models/Country';
 import { Entry } from '../models/Entry';
 import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
+import { OAuthClient } from '../models/OAuthClient';
 import { Permissions } from '../models/Permissions';
 import { Settings, SettingsId } from '../models/Settings';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateOAuthClientInput } from '../resolvers/mutations/CreateOAuthClientMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
+import { UpdateOAuthClientInput } from '../resolvers/mutations/UpdateOAuthClientMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
@@ -52,6 +55,11 @@ export interface AdminDataSource {
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;
+  createOAuthClient(args: CreateOAuthClientInput): Promise<OAuthClient>;
+  updateOAuthClient(args: UpdateOAuthClientInput): Promise<OAuthClient>;
+  deleteOAuthClient(clientId: string): Promise<boolean>;
+  getOAuthClient(clientId: string): Promise<OAuthClient | null>;
+  getAllOAuthClients(): Promise<OAuthClient[]>;
   waitForDBUpgrade(): Promise<void>;
   updateRole(
     role: string,

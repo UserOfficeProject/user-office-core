@@ -3,6 +3,8 @@ import {
   setPageTextValidationSchema,
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
+  createOAuthClientValidationSchema,
+  updateOAuthClientValidationSchema,
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
@@ -17,12 +19,15 @@ import { Roles } from '../models/Role';
 import { Settings } from '../models/Settings';
 import { UserWithRole } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateOAuthClientInput } from '../resolvers/mutations/CreateOAuthClientMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
+import { DeleteOAuthClientInput } from '../resolvers/mutations/DeleteOAuthClientMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
+import { UpdateOAuthClientInput } from '../resolvers/mutations/UpdateOAuthClientMutation';
 import { generateUniqueId, isProduction } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
@@ -180,6 +185,54 @@ export default class AdminMutations {
         { agent, args },
         error
       );
+    }
+  }
+
+  @ValidateArgs(createOAuthClientValidationSchema(IS_BACKEND_VALIDATION))
+  @Authorized([Roles.USER_OFFICER])
+  async createOAuthClient(
+    agent: UserWithRole | null,
+    args: CreateOAuthClientInput
+  ) {
+    try {
+      const accessPermissions = JSON.parse(args.accessPermissions);
+
+      return await this.dataSource.createOAuthClient({
+        ...args,
+        accessPermissions,
+      });
+    } catch (error) {
+      return rejection('Could not create oauth client', { agent, args }, error);
+    }
+  }
+
+  @ValidateArgs(updateOAuthClientValidationSchema(IS_BACKEND_VALIDATION))
+  @Authorized([Roles.USER_OFFICER])
+  async updateOAuthClient(
+    agent: UserWithRole | null,
+    args: UpdateOAuthClientInput
+  ) {
+    try {
+      const accessPermissions = JSON.parse(args.accessPermissions);
+
+      return await this.dataSource.updateOAuthClient({
+        ...args,
+        accessPermissions,
+      });
+    } catch (error) {
+      return rejection('Could not update oauth client', { agent, args }, error);
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteOAuthClient(
+    agent: UserWithRole | null,
+    args: DeleteOAuthClientInput
+  ) {
+    try {
+      return await this.dataSource.deleteOAuthClient(args.clientId);
+    } catch (error) {
+      return rejection('Could not remove oauth client', { agent, args }, error);
     }
   }
 
