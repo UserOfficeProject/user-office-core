@@ -122,8 +122,9 @@ const FapReviewersAndAssignmentsTable = ({
     fapProposals;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const page = searchParams.get('page');
-  const pageSize = searchParams.get('pageSize');
+  const page = searchParams.get('ra-page');
+  const pageSize = searchParams.get('ra-pageSize');
+  const selection = searchParams.getAll('ra-selection');
   const call = searchParams.get('call');
 
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
@@ -161,6 +162,9 @@ const FapReviewersAndAssignmentsTable = ({
       return {
         user: member,
         assignedProposals,
+        tableData: {
+          checked: selection.includes(member.userId.toString()),
+        },
       };
     }
   );
@@ -334,15 +338,29 @@ const FapReviewersAndAssignmentsTable = ({
               nRowsSelected: (rowCount) => `${rowCount} reviewer(s) selected`,
             },
           }}
+          onPageChange={(page) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('ra-page', page.toString());
+
+              return searchParams;
+            });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('ra-pageSize', pageSize.toString());
+
+              return searchParams;
+            });
+          }}
           onSelectionChange={(selectedItems) => {
             const selectedReviewers = selectedItems.map(
               (item) => item.user.userId
             );
 
             setSearchParams((searchParams) => {
-              searchParams.delete('selection');
-              selectedReviewers.forEach((pk) =>
-                searchParams.append('selection', pk.toString())
+              searchParams.delete('ra-selection');
+              selectedReviewers.forEach((rev) =>
+                searchParams.append('ra-selection', rev.toString())
               );
 
               return searchParams;
