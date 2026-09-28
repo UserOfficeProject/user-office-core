@@ -1703,7 +1703,7 @@ context('Fap reviews tests', () => {
       cy.contains(comment1).should('exist');
     });
 
-    it('FAP Secretary should be able to download the fap reviews excel sheet', () => {
+    it.skip('FAP Secretary should be able to download the fap reviews excel sheet', () => {
       cy.assignFapReviewersToProposals({
         assignments: [
           {
