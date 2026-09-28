@@ -1322,7 +1322,6 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number,
     instrumentId?: number | null
   ): Promise<FapReviewsRecord[]> {
-    logger.logInfo(`Chilllllllllllllllll callid ${callId}`, {});
     const query = database
       .select('*')
       .from('review_data')

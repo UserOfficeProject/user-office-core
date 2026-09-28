@@ -224,7 +224,7 @@ export const collectFapReviewXLSXData = async (
           rank: assignment.rank ?? null,
           grade: assignment.grade,
           comment: stripHtml(assignment.comment ?? '-'),
-          status: assignment.status == 1 ? 'Complete' : 'Draft',
+          status: assignment.status == 1 ? 'Submitted' : 'Draft',
         })
       );
     }
