@@ -74,7 +74,7 @@ export class FapProposalResolver {
   }
 
   @FieldResolver(() => String)
-  async instrument_shortcodes(
+  async instrumentShortcodes(
     @Root() fapProposal: FapProposal,
     @Ctx() context: ResolverContext
   ) {

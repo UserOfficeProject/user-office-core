@@ -1280,7 +1280,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .select(
         /* eslint-disable quotes */
         database.raw(
-          `STRING_AGG(DISTINCT i.short_code, ', ') as instrument_shortcodes`
+          `STRING_AGG(DISTINCT i.short_code, ', ') as instrumentShortcodes`
         )
       )
       .from('fap_proposals as fp')
@@ -1290,7 +1290,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .groupBy('fp.proposal_pk')
       .first();
 
-    return result?.instrument_shortcodes ?? '';
+    return result?.instrumentShortcodes ?? '';
   }
 
   async isFapProposalInstrumentSubmitted(
