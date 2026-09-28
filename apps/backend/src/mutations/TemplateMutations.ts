@@ -466,7 +466,22 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: UpdateQuestionTemplateRelationSettingsArgs
   ): Promise<Template | Rejection | null> {
-    await validateConfigBeforeWrite(args.config, args.questionId);
+    const template = await this.dataSource.getTemplate(args.templateId);
+    if (!template) {
+      return rejection(
+        'Could not update question settings because the template was not found',
+        {
+          agent,
+          args,
+        }
+      );
+    }
+
+    await validateConfigBeforeWrite(
+      args.config,
+      args.questionId,
+      template.groupId
+    );
 
     return this.dataSource
       .updateQuestionTemplateRelationSettings(args)
@@ -610,9 +625,21 @@ export default class TemplateMutations {
   }
 }
 
+const USER_FACING_TEMPLATE_GROUPS = new Set([
+  TemplateGroupId.PROPOSAL,
+  TemplateGroupId.PROPOSAL_ESI,
+  TemplateGroupId.SAMPLE,
+  TemplateGroupId.SAMPLE_ESI,
+  TemplateGroupId.SHIPMENT,
+  TemplateGroupId.VISIT_REGISTRATION,
+  TemplateGroupId.GENERIC_TEMPLATE,
+  TemplateGroupId.FEEDBACK,
+]);
+
 export async function validateConfigBeforeWrite(
   newConfig: any,
-  questionId: string
+  questionId: string,
+  templateGroupId: TemplateGroupId
 ) {
   let newConfigObject;
   try {
@@ -649,6 +676,18 @@ export async function validateConfigBeforeWrite(
 
   if (questionDef.validateConfig) {
     questionDef.validateConfig(newConfigObject);
+  }
+
+  if (
+    USER_FACING_TEMPLATE_GROUPS.has(templateGroupId) &&
+    newConfigObject.required === true &&
+    Array.isArray(newConfigObject.readPermissions) &&
+    newConfigObject.readPermissions.length > 0 &&
+    !newConfigObject.readPermissions.includes(Roles.USER)
+  ) {
+    throw new GraphQLError(
+      'Required questions must be readable by the user role'
+    );
   }
 
   return;
