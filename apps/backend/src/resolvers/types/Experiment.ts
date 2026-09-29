@@ -50,6 +50,9 @@ export class Experiment implements ExperimentOrigin {
   @Field(() => String, { nullable: true })
   public externalScheduledEventId: string | null;
 
+  @Field(() => String, { nullable: true })
+  public externalScheduledEventSourceSystem: string | null;
+
   @Field(() => Number)
   public proposalPk: number;
 

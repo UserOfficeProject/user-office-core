@@ -1494,6 +1494,7 @@ export interface ExperimentRecord {
   readonly ends_at: Date;
   readonly scheduled_event_id: number;
   readonly external_scheduled_event_id: string | null;
+  readonly external_scheduled_event_source_system: string | null;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
   readonly local_contact_id: number;
@@ -1510,6 +1511,7 @@ export interface ExperimentPaginatedRecord {
   readonly ends_at: Date;
   readonly scheduled_event_id: number;
   readonly external_scheduled_event_id: string | null;
+  readonly external_scheduled_event_source_system: string | null;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
   readonly local_contact_id: number;
@@ -1530,6 +1532,7 @@ export const createExperimentPaginatedObject = (
     experiment.ends_at,
     experiment.scheduled_event_id,
     experiment.external_scheduled_event_id,
+    experiment.external_scheduled_event_source_system,
     experiment.proposal_pk,
     experiment.status,
     experiment.local_contact_id,

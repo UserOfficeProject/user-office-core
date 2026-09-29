@@ -27,7 +27,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { Country } from '../models/Country';
-import { Experiment } from '../models/Experiment';
+import { Experiment, ExperimentStatus } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Sample } from '../models/Sample';
@@ -149,6 +149,8 @@ export const handleProposalBookingTimeSlotAdded = async (
     endsAt: message.endsAt,
     scheduledEventId: message.id,
     externalScheduledEventId: message.externalScheduledEventId ?? null,
+    externalScheduledEventSourceSystem:
+      message.externalScheduledEventSourceSystem ?? null,
     proposalPk: message.proposalPk,
     status: message.status,
     localContactId: message.localContactId,
@@ -205,8 +207,10 @@ export async function handleExternalProposalBookingTimeSlotAdded(
     endsAt: message.endsAt,
     id: 0,
     externalScheduledEventId: message.externalScheduledEventId,
+    externalScheduledEventSourceSystem:
+      message.externalScheduledEventSourceSystem,
     proposalPk: proposal.primaryKey,
-    status: '',
+    status: ExperimentStatus.DRAFT,
     localContactId: localContact?.id ?? null,
     instrumentId: instrument.id,
   });
