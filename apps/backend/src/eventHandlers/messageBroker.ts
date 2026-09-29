@@ -210,7 +210,7 @@ export async function handleExternalProposalBookingTimeSlotAdded(
     externalScheduledEventSourceSystem:
       message.externalScheduledEventSourceSystem,
     proposalPk: proposal.primaryKey,
-    status: ExperimentStatus.DRAFT,
+    status: ExperimentStatus.ACTIVE,
     localContactId: localContact?.id ?? null,
     instrumentId: instrument.id,
   });

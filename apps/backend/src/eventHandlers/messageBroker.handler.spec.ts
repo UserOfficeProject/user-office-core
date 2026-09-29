@@ -19,8 +19,10 @@ import {
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
+import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import { Event } from '../events/event.enum';
+import { ExperimentStatus } from '../models/Experiment';
 import { WorkflowEngine } from '../workflowEngine';
 
 const buildProposalSubmittedEvent = (isRejection = false) => ({
@@ -165,6 +167,32 @@ describe('messageBroker handlers', () => {
         dummyProposal.primaryKey,
         proposalWorkflowEntity
       );
+    });
+
+    it('should translate an external booking message before creating the experiment', async () => {
+      await createListenToRabbitMQHandler();
+
+      await listenCallback(Event.EXTERNAL_PROPOSAL_BOOKING_TIME_SLOT_ADDED, {
+        startsAt: new Date('2026-06-01'),
+        endsAt: new Date('2026-06-02'),
+        proposalId: dummyProposal.proposalId,
+        instrumentShortCode: 'instrument_1',
+        oidcSub: dummyUser.oidcSub,
+        externalScheduledEventId: 'external-event-123',
+        externalScheduledEventSourceSystem: 'external-scheduler',
+      });
+
+      expect(mockExperimentDataSource.create).toHaveBeenCalledWith({
+        startsAt: new Date('2026-06-01'),
+        endsAt: new Date('2026-06-02'),
+        scheduledEventId: 0,
+        externalScheduledEventId: 'external-event-123',
+        externalScheduledEventSourceSystem: 'external-scheduler',
+        proposalPk: dummyProposal.primaryKey,
+        status: ExperimentStatus.ACTIVE,
+        localContactId: dummyUser.id,
+        instrumentId: 1,
+      });
     });
 
     it('should trigger startWorkflow on PROPOSAL_BOOKING_TIME_SLOTS_REMOVED', async () => {
