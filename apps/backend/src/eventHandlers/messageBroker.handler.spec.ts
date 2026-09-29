@@ -189,7 +189,7 @@ describe('messageBroker handlers', () => {
         externalScheduledEventId: 'external-event-123',
         externalScheduledEventSourceSystem: 'external-scheduler',
         proposalPk: dummyProposal.primaryKey,
-        status: ExperimentStatus.ACTIVE,
+        status: ExperimentStatus.DRAFT,
         localContactId: dummyUser.id,
         instrumentId: 1,
       });
