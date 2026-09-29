@@ -11,6 +11,7 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 export interface InstrumentDataSource {
   create(args: CreateInstrumentArgs): Promise<Instrument>;
   getInstrument(instrumentId: number): Promise<Instrument | null>;
+  getInstrumentByShortCode(shortCode: string): Promise<Instrument | null>;
   getInstrumentsByNames(instrumentNames: string[]): Promise<Instrument[]>;
   getInstrumentsByIds(instrumentIds: number[]): Promise<Instrument[]>;
   getInstruments(

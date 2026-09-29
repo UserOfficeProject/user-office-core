@@ -20,6 +20,7 @@ export class Experiment {
     public startsAt: Date,
     public endsAt: Date,
     public scheduledEventId: number,
+    public externalScheduledEventId: string | null,
     public proposalPk: number,
     public status: ExperimentStatus,
     public localContactId: number | null,

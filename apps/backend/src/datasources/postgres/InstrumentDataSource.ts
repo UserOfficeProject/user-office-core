@@ -110,6 +110,19 @@ export default class PostgresInstrumentDataSource
       );
   }
 
+  async getInstrumentByShortCode(
+    shortCode: string
+  ): Promise<Instrument | null> {
+    return database
+      .select()
+      .from('instruments')
+      .where('short_code', shortCode)
+      .first()
+      .then((instrument: InstrumentRecord | null) =>
+        instrument ? this.createInstrumentObject(instrument) : null
+      );
+  }
+
   async getInstrumentsByNames(
     instrumentNames: string[]
   ): Promise<Instrument[]> {

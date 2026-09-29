@@ -35,6 +35,7 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.starts_at,
     record.ends_at,
     record.scheduled_event_id,
+    record.external_scheduled_event_id,
     record.proposal_pk,
     record.status,
     record.local_contact_id,
@@ -152,6 +153,8 @@ export default class PostgresExperimentDataSource
                 starts_at: createExperimentPayload.startsAt,
                 ends_at: createExperimentPayload.endsAt,
                 scheduled_event_id: createExperimentPayload.scheduledEventId,
+                external_scheduled_event_id:
+                  createExperimentPayload.externalScheduledEventId,
                 proposal_pk: createExperimentPayload.proposalPk,
                 status: createExperimentPayload.status,
                 local_contact_id: createExperimentPayload.localContactId,

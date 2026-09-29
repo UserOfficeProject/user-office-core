@@ -125,6 +125,93 @@ export function createListenToQueueHandler() {
   );
 }
 
+const handleProposalWorkflowEngineChange = async (
+  eventType: Event,
+  proposalPk: number | null
+) => {
+  if (!proposalPk) {
+    throw new Error('Proposal id not found in the message');
+  }
+
+  await startWorkflow({ type: eventType }, proposalPk, proposalWorkflowEntity);
+};
+
+export const handleProposalBookingTimeSlotAdded = async (
+  message: Record<string, any>
+) => {
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+  const rabbitMQ = await getRabbitMQMessageBroker();
+
+  const experimentToAdd = {
+    startsAt: message.startsAt,
+    endsAt: message.endsAt,
+    scheduledEventId: message.id,
+    externalScheduledEventId: message.externalScheduledEventId ?? null,
+    proposalPk: message.proposalPk,
+    status: message.status,
+    localContactId: message.localContactId,
+    instrumentId: message.instrumentId,
+  } as Omit<
+    Experiment,
+    'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+  >;
+
+  const experiment = await experimentDataSource.create(experimentToAdd);
+
+  await handleProposalWorkflowEngineChange(
+    Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED,
+    experimentToAdd.proposalPk
+  );
+
+  const jsonMessage = await getExperimentMessageData(experiment);
+  await rabbitMQ.sendMessageToExchange(
+    EXCHANGE_NAME,
+    'EXPERIMENT_CREATED',
+    jsonMessage
+  );
+};
+
+export async function handleExternalProposalBookingTimeSlotAdded(
+  message: Record<string, any>
+): Promise<void> {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
+  const proposal = await proposalDataSource.getProposalById(message.proposalId);
+  if (!proposal) {
+    throw new Error(`Proposal not found: ${message.proposalId}`);
+  }
+
+  const instrument = await instrumentDataSource.getInstrumentByShortCode(
+    message.instrumentShortCode
+  );
+  if (!instrument) {
+    throw new Error(`Instrument not found: ${message.instrumentShortCode}`);
+  }
+
+  const localContact = await userDataSource.getByOIDCSub(message.oidcSub);
+
+  await handleProposalBookingTimeSlotAdded({
+    startsAt: message.startsAt,
+    endsAt: message.endsAt,
+    id: 0,
+    externalScheduledEventId: message.externalScheduledEventId,
+    proposalPk: proposal.primaryKey,
+    status: '',
+    localContactId: localContact?.id ?? null,
+    instrumentId: instrument.id,
+  });
+}
+
 const buildProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
@@ -648,21 +735,6 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const handleProposalWorkflowEngineChange = async (
-    eventType: Event,
-    proposalPk: number | null
-  ) => {
-    if (!proposalPk) {
-      throw new Error('Proposal id not found in the message');
-    }
-
-    await startWorkflow(
-      { type: eventType },
-      proposalPk,
-      proposalWorkflowEntity
-    );
-  };
-
   const cancelVisit = async (visit: Visit) => {
     const visitRegistrations = await visitDataSource.getRegistrations({
       visitId: visit.id,
@@ -691,6 +763,14 @@ export async function createListenToRabbitMQHandler() {
   };
   rabbitMQ.listenOn(QUEUE_NAME, async (type, message) => {
     switch (type) {
+      case Event.EXTERNAL_PROPOSAL_BOOKING_TIME_SLOT_ADDED:
+        try {
+          await handleExternalProposalBookingTimeSlotAdded(message);
+        } catch (error) {
+          logger.logException(`Error while handling event ${type}: `, error);
+        }
+
+        return;
       case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
         try {
           logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
@@ -698,32 +778,7 @@ export async function createListenToRabbitMQHandler() {
             message,
           });
 
-          const experimentToAdd = {
-            startsAt: message.startsAt,
-            endsAt: message.endsAt,
-            scheduledEventId: message.id,
-            proposalPk: message.proposalPk,
-            status: message.status,
-            localContactId: message.localContactId,
-            instrumentId: message.instrumentId,
-          } as Omit<
-            Experiment,
-            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-          >;
-
-          const experiment = await experimentDataSource.create(experimentToAdd);
-
-          await handleProposalWorkflowEngineChange(
-            type,
-            experimentToAdd.proposalPk
-          );
-
-          const jsonMessage = await getExperimentMessageData(experiment);
-          await rabbitMQ.sendMessageToExchange(
-            EXCHANGE_NAME,
-            'EXPERIMENT_CREATED',
-            jsonMessage
-          );
+          await handleProposalBookingTimeSlotAdded(message);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

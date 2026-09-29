@@ -127,6 +127,16 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     }
   }
 
+  async getInstrumentByShortCode(
+    shortCode: string
+  ): Promise<Instrument | null> {
+    return (
+      dummyInstruments.find(
+        (dummyInstrumentItem) => dummyInstrumentItem.shortCode === shortCode
+      ) || null
+    );
+  }
+
   async getInstruments(
     first?: number,
     offset?: number,
