@@ -1086,35 +1086,33 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
+  // current user -> get related proposals -> get related users for each of those proposals
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
-    const relatedCoIs = await database
-      .select('ou.user_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', function () {
-        this.on('u.proposal_pk', 'p.proposal_pk');
-        this.andOn(function () {
-          this.onVal('u.user_id', id); // user is on the proposal
-          this.orOnVal('p.proposer_id', id); // user is the proposal PI
-        });
-      }) // this gives a list of proposals that a user is related to
-      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
+    // Proposals the user is related to, as PI or as a co-proposer
+    const relatedProposalPks = database
+      .select('proposal_pk')
+      .from('proposals')
+      .where('proposer_id', id)
+      .union([
+        database
+          .select('proposal_pk')
+          .from('proposal_user')
+          .where('user_id', id),
+      ]);
 
-    const relatedPis = await database
-      .select('p.proposer_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', {
-        'u.proposal_pk': 'p.proposal_pk',
-        'u.user_id': id,
-      }); // this gives a list of proposals that a user is related to
+    // Everyone on those proposals: PIs and co-proposers
+    const relatedUsers: { user_id: number }[] = await database
+      .select('user_id')
+      .from('proposal_user')
+      .whereIn('proposal_pk', relatedProposalPks)
+      .union([
+        database
+          .select('proposer_id as user_id')
+          .from('proposals')
+          .whereIn('proposal_pk', relatedProposalPks),
+      ]);
 
-    const relatedUsers = [
-      ...relatedCoIs.map((r) => r.user_id),
-      ...relatedPis.map((r) => r.proposer_id),
-    ];
-
-    return relatedUsers;
+    return relatedUsers.map((r) => r.user_id);
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
@@ -1448,14 +1446,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposals.abstract',
         'proposals.title'
       )
-      .from('co_proposer_claims')
-      .join('proposals', {
-        'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
-      })
+      .from('proposals')
       .join('users as proposer', {
         'proposals.proposer_id': 'proposer.user_id',
       })
-      .where('invite_id', inviteId)
+      .whereIn('proposals.proposal_pk', (builder) => {
+        builder
+          .select('proposal_pk')
+          .from('co_proposer_claims')
+          .where('invite_id', inviteId)
+          .union((qb) => {
+            qb.select('proposal_pk')
+              .from('data_access_claims')
+              .where('invite_id', inviteId);
+          });
+      })
       .first()
       .then((proposal: InvitedProposalRecord | undefined) =>
         proposal ? createInvitedProposalObject(proposal) : null

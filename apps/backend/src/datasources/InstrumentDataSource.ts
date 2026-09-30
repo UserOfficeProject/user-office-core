@@ -15,7 +15,8 @@ export interface InstrumentDataSource {
   getInstrumentsByIds(instrumentIds: number[]): Promise<Instrument[]>;
   getInstruments(
     first?: number,
-    offset?: number
+    offset?: number,
+    agentId?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
   getUserInstruments(userId: number, agentId?: number): Promise<Instrument[]>;
   getInstrumentsByCallId(

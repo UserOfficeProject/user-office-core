@@ -129,7 +129,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async getInstruments(
     first?: number,
-    offset?: number
+    offset?: number,
+    agentId?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     return { totalCount: 1, instruments: [dummyInstrument] };
   }

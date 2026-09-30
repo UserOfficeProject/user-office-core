@@ -24,7 +24,7 @@ export const dummyProposalInternalComments: ProposalInternalComment[] = [
 export class PostgresProposalInternalCommentsDataSourceMock
   implements ProposalInternalCommentsDataSource
 {
-  async create(
+  async createInternalComment(
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     return {
@@ -32,13 +32,30 @@ export class PostgresProposalInternalCommentsDataSourceMock
     } as ProposalInternalComment;
   }
 
-  async update(
+  async updateInternalComment(
     args: UpdateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment | null> {
     return {
       ...dummyProposalInternalCommentOne,
       ...args,
     } as ProposalInternalComment;
+  }
+  async createRejectionComment(
+    args: CreateProposalInternalCommentArgs
+  ): Promise<ProposalInternalComment> {
+    return {
+      ...args,
+    } as ProposalInternalComment;
+  }
+
+  async getProposalRejectionComment(
+    proposalPk: number
+  ): Promise<ProposalInternalComment | null> {
+    return (
+      dummyProposalInternalComments.find(
+        (comment) => comment.proposalPk === proposalPk
+      ) || null
+    );
   }
 
   async getProposalInternalComment(

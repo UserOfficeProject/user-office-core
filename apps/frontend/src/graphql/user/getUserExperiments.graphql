@@ -29,6 +29,11 @@ query getUserExperiments($filter: UserExperimentsFilter) {
       }
       createdAt
       updatedAt
+      visitPerms {
+        readable
+        writeable
+        createable
+      }
       visit {
         ...visit
         teamLead {

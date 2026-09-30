@@ -54,7 +54,7 @@ const FapPage = () => {
   if (!fap) {
     return (
       <StyledContainer maxWidth={false}>
-        <StyledPaper>{t('Fap')} not found</StyledPaper>
+        <StyledPaper>{t('FAP')} not found</StyledPaper>
       </StyledContainer>
     );
   }

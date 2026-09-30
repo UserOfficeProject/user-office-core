@@ -204,6 +204,21 @@ export default class ProposalQueries {
         );
       });
   }
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async getProposalRejectionComment(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ) {
+    return await this.proposalInternalCommentsDataSource
+      .getProposalRejectionComment(proposalPk)
+      .catch((error) => {
+        return rejection(
+          `Could not get proposal rejection comment proposal: '${proposalPk}'`,
+          { agent, args: proposalPk },
+          error
+        );
+      });
+  }
 
   @Authorized()
   async getExperimentsByProposalPk(
