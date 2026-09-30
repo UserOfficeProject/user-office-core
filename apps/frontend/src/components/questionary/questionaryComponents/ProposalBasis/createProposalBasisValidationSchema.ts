@@ -6,8 +6,13 @@ import { UserRole } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
   () => {
+    //settingsMap
     const MAX_TITLE_LEN = 175;
-    const MAX_ABSTRACT_LEN = 1500;
+    //const { settingsMap } = useContext(SettingsContext);
+    // const maxAbstractLength = parseInt(settingsMap.get(
+    //     SettingsId.MAX_ABSTRACT_LEN
+    //   )?.settingsValue || '1500', 10) || 1500;
+    const maxAbstractLength = 1500;
     const currentUser = getCurrentUser();
     const isUserOfficer =
       currentUser?.roles
@@ -25,8 +30,8 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
       abstract: Yup.string()
         .trim()
         .max(
-          MAX_ABSTRACT_LEN,
-          `Please make abstract at most ${MAX_ABSTRACT_LEN} characters long`
+          maxAbstractLength,
+          `Please make abstract at most ${maxAbstractLength} characters long`
         )
         .required('Proposal Abstract is required'),
       proposer: Yup.number().required('Please specify principal investigator'),
