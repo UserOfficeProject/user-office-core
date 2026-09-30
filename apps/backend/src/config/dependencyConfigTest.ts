@@ -12,6 +12,7 @@ import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConv
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import { DataAccessClaimDataSourceMock } from '../datasources/mockups/DataAccessClaimDataSource';
 import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { EmailTemplateDataSourceMock } from '../datasources/mockups/EmailTemplateDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
@@ -61,6 +62,7 @@ import { mapClass, mapValue } from './utils';
 mapClass(Tokens.RoleDataSource, RoleDataSourceMock);
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
+mapClass(Tokens.DataAccessClaimDataSource, DataAccessClaimDataSourceMock);
 mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);

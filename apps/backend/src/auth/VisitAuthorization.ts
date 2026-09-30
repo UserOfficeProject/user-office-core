@@ -49,9 +49,13 @@ export class VisitAuthorization {
       return true;
     }
 
+    if (this.userAuth.isApiToken(agent)) {
+      return true;
+    }
+
     const visit = await this.resolveVisit(visitOrVisitId);
 
-    if (!visit) {
+    if (!visit || !agent.id) {
       return false;
     }
 
@@ -59,7 +63,7 @@ export class VisitAuthorization {
      * User can read the visit if he is a PI
      * or on the visitor list
      */
-    const [isPI, isVisitVisitor] = await Promise.all([
+    const [isPI, isVisitor] = await Promise.all([
       this.proposalAuth.isPrincipalInvestigatorOfProposalPk(
         agent,
         visit.proposalPk
@@ -67,7 +71,7 @@ export class VisitAuthorization {
       this.visitDataSource.isVisitorOfVisit(agent.id, visit.id),
     ]);
 
-    return visit.creatorId === agent.id || isPI || isVisitVisitor;
+    return visit.creatorId === agent.id || isPI || isVisitor;
   }
 
   async hasWriteRights(

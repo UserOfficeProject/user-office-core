@@ -107,6 +107,9 @@ export enum Event {
   PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
   PROPOSAL_CO_PROPOSER_INVITE_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_SENT',
   PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
+  PROPOSAL_DATA_ACCESS_INVITES_UPDATED = 'PROPOSAL_DATA_ACCESS_INVITES_UPDATED',
+  PROPOSAL_DATA_ACCESS_INVITE_SENT = 'PROPOSAL_DATA_ACCESS_INVITE_SENT',
+  PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED = 'PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED',
   PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED = 'PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED',
   PROPOSAL_VISIT_REGISTRATION_INVITE_SENT = 'PROPOSAL_VISIT_REGISTRATION_INVITE_SENT',
   PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED',
@@ -486,6 +489,24 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when user accepts the co-proposer claim for a proposal',
+    },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED,
+    {
+      label:
+        'Event occurs when data access user invites are updated for a proposal',
+    },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+    { label: 'Event occurs when data access user invite is sent to a user' },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+    {
+      label:
+        'Event occurs when user accepts the data access claim for a proposal',
     },
   ],
   [

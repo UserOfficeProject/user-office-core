@@ -8,6 +8,8 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import { DataAccessClaimDataSourceMock } from '../datasources/mockups/DataAccessClaimDataSource';
+import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import {
@@ -27,6 +29,10 @@ const inviteMutations = container.resolve(InviteMutations);
 const visitDataSource = container.resolve<VisitDataSource>(
   Tokens.VisitDataSource
 );
+const dataAccessUsersDataSource =
+  container.resolve<MockDataAccessUsersDataSource>(
+    Tokens.DataAccessUsersDataSource
+  );
 
 describe('Test Invite Mutations', () => {
   beforeEach(() => {
@@ -37,8 +43,12 @@ describe('Test Invite Mutations', () => {
     container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
+    container
+      .resolve<DataAccessClaimDataSourceMock>(Tokens.DataAccessClaimDataSource)
+      .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
     container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
+    dataAccessUsersDataSource.updateDataAccessUsers(1, []);
   });
 
   afterEach(() => {
@@ -407,6 +417,67 @@ describe('Test Invite Mutations', () => {
 
   test('A user cannot accept a non existing co proposer invite for an existing proposal without code', async () => {
     const invite = await inviteMutations.acceptCoProposerInvite(
+      dummyUserWithRole,
+      'no-invite'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
+  });
+
+  test('A user can accept valid data access invite without code', async () => {
+    const claimer = {
+      ...dummyUserNotOnProposalWithRole,
+      email: 'test_dau@example.com',
+    };
+
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      claimer,
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Invite);
+    await expect(
+      dataAccessUsersDataSource.isDataAccessUserOfProposal(claimer.id, 1)
+    ).resolves.toBe(true);
+  });
+
+  test('A member of the proposal is not granted data access on accept', async () => {
+    const claimer = { ...dummyUserWithRole, email: 'test_dau@example.com' };
+
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      claimer,
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Invite);
+    await expect(
+      dataAccessUsersDataSource.isDataAccessUserOfProposal(claimer.id, 1)
+    ).resolves.toBe(false);
+  });
+
+  test('A user can not accept data access invite without code if email does not match', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      { ...dummyUserWithRole, email: 'mismatch@example.com' },
+      'shortCode'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Invite not found');
+  });
+
+  test('A user can not accept data access invite without code if proposal is invalid', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
+      dummyUserWithRole,
+      'invalid-short-code'
+    );
+
+    expect(invite).toBeInstanceOf(Rejection);
+    expect((invite as Rejection).reason).toBe('Proposal not found');
+  });
+
+  test('A user cannot accept a non-existent data access invite for an existing proposal without code', async () => {
+    const invite = await inviteMutations.acceptDataAccessInvite(
       dummyUserWithRole,
       'no-invite'
     );

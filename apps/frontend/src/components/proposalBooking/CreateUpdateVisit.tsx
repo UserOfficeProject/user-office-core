@@ -40,7 +40,7 @@ function CreateUpdateVisit({
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
-    teamLeadUserId: visit?.teamLead.id || null,
+    teamLeadUserId: visit?.teamLead?.id || null,
     inviteEmails: visit?.registrationInvites || [],
   };
 
@@ -89,8 +89,8 @@ function CreateUpdateVisit({
 
           const teamLeadChanged = () => {
             return (
-              user.id === visit.teamLead.id &&
-              values.teamLeadUserId !== visit.teamLead.id
+              user.id === visit.teamLead?.id &&
+              values.teamLeadUserId !== visit.teamLead?.id
             );
           };
 

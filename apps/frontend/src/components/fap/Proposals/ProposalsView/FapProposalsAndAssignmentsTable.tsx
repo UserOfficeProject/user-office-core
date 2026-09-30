@@ -232,9 +232,9 @@ const FapProposalsAndAssignmentsTable = ({
       : column
   );
 
-  const page = searchParams.get('page');
-  const pageSize = searchParams.get('pageSize');
-  const selection = searchParams.getAll('selection');
+  const page = searchParams.get('pa-page');
+  const pageSize = searchParams.get('pa-pageSize');
+  const selection = searchParams.getAll('pa-selection');
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -319,8 +319,8 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
-      title: `Remove ${t('Fap')} assignment/s`,
-      description: `Are you sure you want to remove the selected proposal/s from this ${t('Fap')}?`,
+      title: `Remove ${t('FAP')} assignment/s`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('fap')}?`,
     })();
   };
 
@@ -329,7 +329,7 @@ const FapProposalsAndAssignmentsTable = ({
   hasRightToAssignReviewers &&
     tableActions.push({
       icon: () => <AssignmentInd data-cy="assign-fap-members" />,
-      tooltip: `Assign ${t('Fap')} members`,
+      tooltip: `Assign ${t('FAP')} members`,
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
@@ -444,7 +444,7 @@ const FapProposalsAndAssignmentsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title={`${t('Fap')} - Proposal View`}
+        title={`${t('FAP')} - Proposal View`}
         proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
           setSearchParams((searchParams) => {
@@ -479,7 +479,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${fap.code} - ${t('Fap')} Proposals`}
+              {`${fap.code} - ${t('FAP')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}
@@ -512,14 +512,14 @@ const FapProposalsAndAssignmentsTable = ({
           }}
           onPageChange={(page) => {
             setSearchParams((searchParams) => {
-              searchParams.set('page', page.toString());
+              searchParams.set('pa-page', page.toString());
 
               return searchParams;
             });
           }}
           onRowsPerPageChange={(pageSize) => {
             setSearchParams((searchParams) => {
-              searchParams.set('pageSize', pageSize.toString());
+              searchParams.set('pa-pageSize', pageSize.toString());
 
               return searchParams;
             });
@@ -530,9 +530,9 @@ const FapProposalsAndAssignmentsTable = ({
             );
 
             setSearchParams((searchParams) => {
-              searchParams.delete('selection');
+              searchParams.delete('pa-selection');
               selectedProposalPks.forEach((pk) =>
-                searchParams.append('selection', pk.toString())
+                searchParams.append('pa-selection', pk.toString())
               );
 
               return searchParams;
