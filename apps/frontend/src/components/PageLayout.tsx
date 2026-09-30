@@ -58,7 +58,7 @@ const PageLayout = ({
       : !isTabletOrMobile
   );
 
-  const { currentRole } = useContext(UserContext);
+  const { currentRole, currentRoleId } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
   const drawer = {
@@ -112,7 +112,11 @@ const PageLayout = ({
       ?.settingsValue === 'true';
   const displayFAQLink =
     settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
-  const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
+  const [, footerContent] = useGetPageContent(
+    PageName.FOOTERCONTENT,
+    true,
+    currentRoleId
+  );
 
   return (
     <div className="App">

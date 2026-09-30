@@ -1,13 +1,17 @@
 import parse from 'html-react-parser';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { UserContext } from 'context/UserContextProvider';
 import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function TechniqueProposalNotice() {
+  const { currentRoleId } = useContext(UserContext);
   const [loadingContent, pageContent] = useGetPageContent(
-    PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE
+    PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE,
+    true,
+    currentRoleId
   );
 
   return (

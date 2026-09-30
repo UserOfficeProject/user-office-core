@@ -14,6 +14,7 @@ import { getContextKeys } from '../utils/helperFunctions';
 type GetPageTextArgs = {
   pageId: number;
   agent: UserWithRole | null;
+  useDefaultIfNotFound: boolean;
   roleId?: number;
 };
 
@@ -27,6 +28,7 @@ export default class AdminQueries {
   async getPageText({
     pageId,
     agent,
+    useDefaultIfNotFound,
     roleId,
   }: GetPageTextArgs): Promise<string | null> {
     if (agent == null || !agent.currentRole) {
@@ -47,7 +49,13 @@ export default class AdminQueries {
           (userRole.tags &&
             userRole.tags.filter((t) => roleTagIds.includes(t.id)).length)))
     ) {
-      return await this.adminDataSource.get(pageId, roleId);
+      let pageNotice = await this.adminDataSource.get(pageId, roleId);
+
+      if (roleId != null && pageNotice == null && useDefaultIfNotFound) {
+        pageNotice = await this.adminDataSource.get(pageId);
+      }
+
+      return pageNotice;
     }
     logger.logWarn(
       'User does not have permission to fetch requested page notice',

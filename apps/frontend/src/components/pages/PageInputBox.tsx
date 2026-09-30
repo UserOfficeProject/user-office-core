@@ -18,6 +18,7 @@ export default function PageInputBox(props: {
 }) {
   const [loading, pageContent] = useGetPageContent(
     props.pageName,
+    false,
     props.roleId
   );
   const [content, setPageContent] = useState('');

@@ -8,6 +8,7 @@ import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -26,8 +27,11 @@ const Paper = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function OverviewPage(props: { userRole: UserRole }) {
+  const { currentRoleId } = useContext(UserContext);
   const [loadingContent, pageContent] = useGetPageContent(
-    props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
+    props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE,
+    true,
+    currentRoleId
   );
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;

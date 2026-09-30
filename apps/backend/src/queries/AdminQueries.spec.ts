@@ -24,7 +24,11 @@ describe('Test Admin Queries', () => {
 
   test('A user can get default page text', () => {
     return expect(
-      adminQueries.getPageText({ agent: dummyUserWithRole, pageId: 1 })
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
+        pageId: 1,
+      })
     ).resolves.toBe('Default Page Notice');
   });
 
@@ -32,6 +36,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleId: 1,
       })
@@ -42,6 +47,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleId: 2,
       })
@@ -52,6 +58,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserOfficerWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleId: 2,
       })
@@ -62,6 +69,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: derivedDummyUserOfficerWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleId: 1,
       })
@@ -72,6 +80,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: derivedDummyUserOfficerWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleId: 2,
       })

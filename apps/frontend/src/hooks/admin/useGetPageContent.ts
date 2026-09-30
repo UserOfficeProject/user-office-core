@@ -5,7 +5,11 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export const FALLBACK_ROLE_FOR_PAGE_CONTENT = -1;
 
-export function useGetPageContent(pageName: PageName, roleId?: number) {
+export function useGetPageContent(
+  pageName: PageName,
+  useDefaultIfNotFound: boolean = false,
+  roleId?: number
+) {
   const [pageContent, setPageContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -18,6 +22,7 @@ export function useGetPageContent(pageName: PageName, roleId?: number) {
       .getPageContent({
         pageId: pageName,
         roleId: roleId === FALLBACK_ROLE_FOR_PAGE_CONTENT ? undefined : roleId,
+        useDefaultIfNotFound: useDefaultIfNotFound,
       })
       .then((data) => {
         if (unmounted) {
