@@ -437,7 +437,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       ? connectionsWithActions[0].id
                       : undefined;
                   if (value === StatusCode.UNSUCCESSFUL && comment != '') {
-                    api({
+                    return api({
                       toastSuccessMessage:
                         'Proposal rejection comment successfully created',
                     })
@@ -446,14 +446,14 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         comment: comment ?? '',
                       })
                       .then(() => {
-                        updateProposalStatus(
+                        return updateProposalStatus(
                           primaryKey,
                           selectedWorkflowStatus.workflowStatusId,
                           statusActionsWorkflowConnectionId
                         );
                       });
                   } else
-                    updateProposalStatus(
+                    return updateProposalStatus(
                       primaryKey,
                       selectedWorkflowStatus.workflowStatusId,
                       statusActionsWorkflowConnectionId
