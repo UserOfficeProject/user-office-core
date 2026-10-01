@@ -33,7 +33,8 @@ import {
   dummyUser,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { Template, TemplateGroupId } from '../models/Template';
+import { EvaluatorOperator } from '../models/ConditionEvaluator';
+import { DataType, Template, TemplateGroupId } from '../models/Template';
 import {
   VisitRegistration,
   VisitRegistrationStatus,
@@ -300,12 +301,18 @@ describe('messageBroker', () => {
             fields: [
               {
                 answerId: 10,
-                question: { naturalKey: 'arrival_transport' },
+                question: {
+                  id: 'arrival_transport',
+                  naturalKey: 'arrival_transport',
+                },
                 value: 'train',
               },
               {
                 answerId: null,
-                question: { naturalKey: 'unanswered_question' },
+                question: {
+                  id: 'unanswered_question',
+                  naturalKey: 'unanswered_question',
+                },
                 value: 'default value',
               },
             ],
@@ -333,6 +340,85 @@ describe('messageBroker', () => {
         mockQuestionaryDataSource.getQuestionarySteps
       ).toHaveBeenCalledWith(visitRegistration.registrationQuestionaryId);
     });
+
+    it.each([
+      {
+        transport: 'train',
+        answerId: 11,
+        value: 'stored details',
+        included: true,
+      },
+      {
+        transport: 'train',
+        answerId: null,
+        value: 'default details',
+        included: true,
+      },
+      {
+        transport: 'bus',
+        answerId: 11,
+        value: 'stored details',
+        included: false,
+      },
+      {
+        transport: 'bus',
+        answerId: null,
+        value: 'default details',
+        included: false,
+      },
+    ])(
+      'should respect dependencies across topics for $transport with $value',
+      async ({ transport, answerId, value, included }) => {
+        jest
+          .spyOn(mockQuestionaryDataSource, 'getQuestionarySteps')
+          .mockResolvedValue([
+            {
+              fields: [
+                {
+                  answerId: 10,
+                  question: {
+                    id: 'arrival_transport',
+                    naturalKey: 'arrival_transport',
+                    dataType: DataType.TEXT_INPUT,
+                  },
+                  value: transport,
+                },
+              ],
+            },
+            {
+              fields: [
+                {
+                  answerId,
+                  question: {
+                    id: 'train_details',
+                    naturalKey: 'train_details',
+                    dataType: DataType.TEXT_INPUT,
+                  },
+                  value,
+                  dependencies: [
+                    {
+                      dependencyId: 'arrival_transport',
+                      condition: {
+                        condition: EvaluatorOperator.eq,
+                        params: 'train',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ] as any);
+
+        const result = await getVisitMessageData(visitRegistration);
+        const data = JSON.parse(result);
+
+        // Inactive questions are excluded, even with stored answers. Active unanswered questions still include default values.
+        expect(data.registrationAnswers).toEqual([
+          { questionNaturalKey: 'arrival_transport', value: transport },
+          ...(included ? [{ questionNaturalKey: 'train_details', value }] : []),
+        ]);
+      }
+    );
 
     it('should exclude answers from a non-visit template', async () => {
       jest

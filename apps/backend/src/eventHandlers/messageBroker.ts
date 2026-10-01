@@ -31,6 +31,7 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { areDependenciesSatisfied } from '../models/ProposalModelFunctions';
 import { Sample } from '../models/Sample';
 import { TemplateGroupId } from '../models/Template';
 import { Visit } from '../models/Visit';
@@ -364,10 +365,14 @@ export const getVisitMessageData = async (
 
       registrationAnswers.push(
         ...questionarySteps.flatMap((step) =>
-          step.fields.map((field) => ({
-            questionNaturalKey: field.question.naturalKey,
-            value: field.value,
-          }))
+          step.fields
+            .filter((field) =>
+              areDependenciesSatisfied(questionarySteps, field.question.id)
+            )
+            .map((field) => ({
+              questionNaturalKey: field.question.naturalKey,
+              value: field.value,
+            }))
         )
       );
     }
