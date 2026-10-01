@@ -48,7 +48,7 @@ const FapMeetingDecision = ({
               })}
               gutterBottom
             >
-              {getFapCodeById(fmd.fapId)} - {t('Fap')} Meeting decision
+              {getFapCodeById(fmd.fapId)} - {t('FAP')} Meeting decision
               (Instrument: {getInstrumentNameById(fmd.instrumentId)})
             </Typography>
             <Table>
@@ -59,7 +59,7 @@ const FapMeetingDecision = ({
                   </TableCell>
                   <TableCell width="25%">{fmd.rankOrder || '-'}</TableCell>
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
-                    {t('Fap')} meeting recommendation
+                    {t('FAP')} meeting recommendation
                   </TableCell>
                   <TableCell width="25%">{fmd.recommendation || '-'}</TableCell>
                 </TableRow>

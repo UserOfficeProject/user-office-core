@@ -508,7 +508,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
             }),
             (rowData) => ({
               icon: GridOnIcon,
-              tooltip: `Export ${t('Fap')} Data`,
+              tooltip: `Export ${t('FAP')} Data`,
               onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
               position: 'row',
             }),

@@ -65,7 +65,7 @@ export class VisitResolver {
     );
   }
 
-  @FieldResolver(() => BasicUserDetails)
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async teamLead(
     @Root() visit: Visit,
     @Ctx() context: ResolverContext

@@ -1,6 +1,8 @@
 import {
   GetEmailTemplateQuery,
   GetEmailTemplateQueryVariables,
+  GetStatusActionsLogsQuery,
+  GetStatusActionsLogsQueryVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -25,9 +27,20 @@ const getEmailTemplate = (
   return cy.wrap(request);
 };
 
+const getStatusActionsLogs = (
+  getStatusActionsLogsInput: GetStatusActionsLogsQueryVariables
+): Cypress.Chainable<GetStatusActionsLogsQuery> => {
+  const api = getE2EApi();
+  const request = api.getStatusActionsLogs(getStatusActionsLogsInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add(
   'navigateToStatusActionLogsSubmenu',
   navigateToStatusActionLogsSubmenu
 );
 
 Cypress.Commands.add('getEmailTemplate', getEmailTemplate);
+
+Cypress.Commands.add('getStatusActionsLogs', getStatusActionsLogs);

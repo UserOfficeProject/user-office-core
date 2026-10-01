@@ -129,8 +129,8 @@ const AssignProposalsToFaps = ({
 
             {proposalFapInstruments?.[0] && !hasEmptyValue(values) && (
               <Alert severity="warning" data-cy="remove-fap-alert">
-                {`Be aware that leaving ${t('FAP')} selection empty will remove assigned
-                ${t('FAP')} from proposal/s and delete all ${t('FAP')} reviews on that
+                {`Be aware that leaving ${t('fap')} selection empty will remove assigned
+                ${t('fap')} from proposal/s and delete all ${t('fap')} reviews on that
                 assignment.`}
               </Alert>
             )}
