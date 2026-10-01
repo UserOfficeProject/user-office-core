@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
@@ -64,19 +65,19 @@ export default class PostgresProposalInternalCommentsDataSource
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     try {
-      database.transaction(async (trx) => {
-        await trx<ProposalInternalCommentRecord>('proposal_rejection_comments')
-          .where('proposal_pk', args.proposalPk)
-          .del();
-      });
-
       const [proposalRejectionComment]: ProposalInternalCommentRecord[] =
-        await database('proposal_rejection_comments')
-          .insert({
-            proposal_pk: args.proposalPk,
-            comment: args.comment,
-          })
-          .returning('*');
+        await database.transaction(async (trx) => {
+          await trx('proposal_rejection_comments')
+            .where('proposal_pk', args.proposalPk)
+            .del();
+
+          return trx('proposal_rejection_comments')
+            .insert({
+              proposal_pk: args.proposalPk,
+              comment: args.comment,
+            })
+            .returning('*');
+        });
       if (!proposalRejectionComment) {
         throw new GraphQLError(
           'Proposal rejection comment could not be created'
@@ -85,6 +86,10 @@ export default class PostgresProposalInternalCommentsDataSource
 
       return createProposalInternalCommentObject(proposalRejectionComment);
     } catch (error) {
+      logger.logException(
+        `Could not create proposal rejection comment with args: '${JSON.stringify(args)}'`,
+        error
+      );
       throw new GraphQLError('Error while creating proposal rejection comment');
     }
   }
