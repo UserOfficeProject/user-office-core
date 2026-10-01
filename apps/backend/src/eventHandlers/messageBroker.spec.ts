@@ -319,7 +319,7 @@ describe('messageBroker', () => {
         id: visitRegistration.id,
         startAt: visitRegistration.startsAt!.toISOString(),
         endAt: visitRegistration.endsAt!.toISOString(),
-        visitorId: visitRegistration.userId.toString(),
+        visitorId: dummyUser.oidcSub,
         registrationAnswers: [
           { questionNaturalKey: 'arrival_transport', value: 'train' },
           {
