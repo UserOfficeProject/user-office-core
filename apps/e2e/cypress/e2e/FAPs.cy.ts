@@ -4983,6 +4983,17 @@ context('Fap meeting exports test', () => {
         cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
           (actualExport) => {
             cy.fixture('exampleFapExportSTFC.json').then((expectedExport) => {
+              expectedExport[0]['Instrument Name'] = instrument1.name;
+              expectedExport[0]['Proposal Title'] = proposal1.title;
+              expectedExport[0]['Technical Review Comment'] = comment1;
+              expectedExport[0]['Reviewer 1 review comment'] = comment1;
+              expectedExport[0]['Reviewer 2 review comment'] = comment1;
+
+              expectedExport[1]['Instrument Name'] = instrument1.name;
+              expectedExport[1]['Proposal Title'] = proposal2.title;
+              expectedExport[1]['Technical Review Comment'] = comment2;
+              expectedExport[1]['Reviewer 1 review comment'] = comment2;
+              expectedExport[1]['Reviewer 2 review comment'] = comment2;
               expect(expectedExport).to.deep.equal(actualExport);
             });
           }
@@ -5004,7 +5015,7 @@ context('Fap meeting exports test', () => {
 
     cy.contains(updatedCall.shortCode)
       .parent()
-      .find('[aria-label="Export Fap Data"]')
+      .find('[aria-label="Export FAP Data"]')
       .click();
 
     cy.get('[data-cy=preparing-download-dialog').should('not.exist');
@@ -5020,6 +5031,21 @@ context('Fap meeting exports test', () => {
           (actualExport) => {
             cy.fixture('exampleCallFapExportSTFC.json').then(
               (expectedExport) => {
+                expectedExport[0]['Proposal Reference Number'] =
+                  instrument1.name;
+
+                expectedExport[1]['Instrument Name'] = instrument1.name;
+                expectedExport[1]['Proposal Title'] = proposal1.title;
+                expectedExport[1]['Technical Review Comment'] = comment1;
+                expectedExport[1]['Reviewer 1 review comment'] = comment1;
+                expectedExport[1]['Reviewer 2 review comment'] = comment1;
+
+                expectedExport[2]['Instrument Name'] = instrument1.name;
+                expectedExport[2]['Proposal Title'] = proposal2.title;
+                expectedExport[2]['Technical Review Comment'] = comment2;
+                expectedExport[2]['Reviewer 1 review comment'] = comment2;
+                expectedExport[2]['Reviewer 2 review comment'] = comment2;
+
                 expect(expectedExport).to.deep.equal(actualExport);
               }
             );

@@ -182,12 +182,6 @@ function generateLink(
 
       return `/download/xlsx/fap/${fapId}/call/${callId}`;
     case PREPARE_DOWNLOAD_TYPE.XLSX_FAP_REVIEWS: {
-      // const [params] = ids;
-
-      // if (!Array.isArray(params)) {
-      //   throw new Error('Invalid params: ' + params);
-      // }
-
       const [fapId, callId] = ids;
       const reviewerProposals = encodeURIComponent(
         JSON.stringify(options?.reviewerProposals ?? {})
