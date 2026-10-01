@@ -17,13 +17,13 @@ import clearSession from 'utils/clearSession';
 import AppRoutes from './AppRoutes';
 import Theme from './theme/theme';
 
-const DYNAMIC_IMPORT_ERROR_EVENT = 'dynamic-import-error';
+export const DYNAMIC_IMPORT_ERROR_EVENT = 'dynamic-import-error';
 
 function DynamicImportErrorSnackbar() {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    const showError = () => {
+    const showPageLoadError = () => {
       enqueueSnackbar('Unable to load this page.', {
         variant: 'error',
         action: () => (
@@ -34,10 +34,10 @@ function DynamicImportErrorSnackbar() {
       });
     };
 
-    window.addEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showError);
+    window.addEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showPageLoadError);
 
     return () => {
-      window.removeEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showError);
+      window.removeEventListener(DYNAMIC_IMPORT_ERROR_EVENT, showPageLoadError);
     };
   }, [enqueueSnackbar]);
 

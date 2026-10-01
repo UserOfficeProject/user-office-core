@@ -1,12 +1,12 @@
 import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
+import { sendClientLog } from 'hooks/common/useDataApi';
+
 import './index.css';
-import App from './components/App';
+import App, { DYNAMIC_IMPORT_ERROR_EVENT } from './components/App';
 import * as serviceWorker from './serviceWorker';
 import './i18n';
-
-const DYNAMIC_IMPORT_ERROR_EVENT = 'dynamic-import-error';
 
 const fetchBuildVersion = async (): Promise<string> => {
   const response = await fetch('/build-version.txt');
@@ -24,7 +24,12 @@ void fetchBuildVersion()
   .then((version) => {
     buildVersion = version;
   })
-  .catch(() => {});
+  .catch((error) => {
+    void sendClientLog(
+      `Failed to fetch build version: ${String(error)}`,
+      localStorage.getItem('token')
+    );
+  });
 
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();
