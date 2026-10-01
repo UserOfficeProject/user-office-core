@@ -2,17 +2,19 @@ import * as Yup from 'yup';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { getCurrentUser } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
+import { UserRole, SettingsId } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
-  () => {
-    //settingsMap
-    const MAX_TITLE_LEN = 175;
-    //const { settingsMap } = useContext(SettingsContext);
-    // const maxAbstractLength = parseInt(settingsMap.get(
-    //     SettingsId.MAX_ABSTRACT_LEN
-    //   )?.settingsValue || '1500', 10) || 1500;
-    const maxAbstractLength = 1500;
+  (_a, _b, _c, settingsMap) => {
+    let maxAbstractLength = 1500;
+    if (settingsMap) {
+      maxAbstractLength =
+        parseInt(
+          settingsMap.get(SettingsId.MAX_ABSTRACT_LEN)?.settingsValue || '1500',
+          10
+        ) || 1500;
+    }
+
     const currentUser = getCurrentUser();
     const isUserOfficer =
       currentUser?.roles
@@ -23,8 +25,8 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
       title: Yup.string()
         .trim()
         .max(
-          MAX_TITLE_LEN,
-          `Please make title at most ${MAX_TITLE_LEN} characters long`
+          maxAbstractLength,
+          `Please make title at most ${maxAbstractLength} characters long`
         )
         .required('Proposal Title is required'),
       abstract: Yup.string()

@@ -8,6 +8,7 @@ import { NavigButton } from 'components/common/NavigButton';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useFapData } from 'hooks/fap/useFapData';
@@ -49,8 +50,9 @@ export const createFormikConfigObjects = (
       answer.question.dataType
     );
     if (definition.createYupValidationSchema) {
+      const { settingsMap } = useContext(SettingsContext);
       validationSchema[answer.question.id] =
-        definition.createYupValidationSchema(answer, state, api);
+        definition.createYupValidationSchema(answer, state, api, settingsMap);
       initialValues[answer.question.id] = definition.getYupInitialValue({
         answer,
         state,
