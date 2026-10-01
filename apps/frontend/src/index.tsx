@@ -20,12 +20,12 @@ const fetchBuildVersion = async (): Promise<string> => {
 
 let buildVersion: string | undefined;
 
-void fetchBuildVersion()
+fetchBuildVersion()
   .then((version) => {
     buildVersion = version;
   })
   .catch((error) => {
-    void sendClientLog(
+    sendClientLog(
       `Failed to fetch build version: ${String(error)}`,
       localStorage.getItem('token')
     );
@@ -34,7 +34,7 @@ void fetchBuildVersion()
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();
 
-  void fetchBuildVersion()
+  fetchBuildVersion()
     .then((version) => {
       if (buildVersion !== undefined && buildVersion !== version) {
         window.location.reload();
