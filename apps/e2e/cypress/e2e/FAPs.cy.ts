@@ -1266,7 +1266,7 @@ context('Fap reviews tests', () => {
       cy.contains(firstCreatedProposalId).should('be.visible');
     });
 
-    it.only('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
+    it('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
