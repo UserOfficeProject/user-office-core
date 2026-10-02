@@ -254,9 +254,6 @@ const FapReviewersAndAssignmentsTable = ({
       return;
     }
     const reviewerProposalMap = new Map<number, number[]>();
-    // const reviewerIds = rowData.map((reviewer) => reviewer.user.userId);
-    // const reviewerRole = rowData.map((data) => data.user.role);
-
     rowData.forEach((reviewer) => {
       reviewer.assignedProposals.forEach(({ assignment }) => {
         const reviewerId = assignment.fapMemberUserId;
@@ -274,9 +271,6 @@ const FapReviewersAndAssignmentsTable = ({
       });
     });
     const reviewerProposals = Object.fromEntries(reviewerProposalMap);
-    reviewerProposalMap.forEach((key, value) => {
-      console.log('reviewerid  ' + key + `proposals ` + value);
-    });
 
     downloadFapReviewsXLSX(fap.id, Number(call), 'fap-review.xlsx', {
       reviewerProposals,
