@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { Roles } from '../models/Role';
 import {
@@ -169,14 +169,14 @@ export default class UserQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getRolesByTags(agent: UserWithRole | null, tagIds?: number[]) {
-    const currentRoleTagIds = agent?.currentRole?.tags?.map((t) => t.id);
-
+  async getRolesByTags(
+    agent: UserWithRole | null,
+    @AgentTags tags?: number[],
+    tagIds?: number[]
+  ) {
     if (
       agent?.currentRole?.isRootRole ||
-      (currentRoleTagIds &&
-        tagIds &&
-        tagIds.every((t) => currentRoleTagIds.includes(t)))
+      (tags && tagIds && tagIds.every((t) => tags.includes(t)))
     ) {
       return this.dataSource.getRolesByTags(tagIds);
     }

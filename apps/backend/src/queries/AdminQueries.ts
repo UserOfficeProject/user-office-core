@@ -42,7 +42,7 @@ export default class AdminQueries {
     if (
       roleId == null ||
       userRole.id === roleId ||
-      (userRole.shortCode === 'user_officer' &&
+      (userRole.shortCode === Roles.USER_OFFICER &&
         (userRole.isRootRole ||
           (userRole.tags &&
             userRole.tags.filter((t) => roleTagIds.includes(t.id)).length)))
@@ -51,7 +51,7 @@ export default class AdminQueries {
     }
     logger.logWarn(
       'User does not have permission to fetch requested page notice',
-      { agent, pageId }
+      { agent, pageId, roleId }
     );
 
     return null;
