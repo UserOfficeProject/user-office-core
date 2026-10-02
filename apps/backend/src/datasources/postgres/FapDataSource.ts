@@ -1280,8 +1280,9 @@ export default class PostgresFapDataSource implements FapDataSource {
       .select(
         /* eslint-disable quotes */
         database.raw(
-          `STRING_AGG(DISTINCT i.short_code, ', ') as instrumentShortcodes`
+          `STRING_AGG(DISTINCT i.short_code, ', ' ORDER BY i.short_code) as "instrumentShortcodes"`
         )
+        /* eslint-enable quotes */
       )
       .from('fap_proposals as fp')
       .join('instruments as i', 'i.instrument_id', 'fp.instrument_id')
