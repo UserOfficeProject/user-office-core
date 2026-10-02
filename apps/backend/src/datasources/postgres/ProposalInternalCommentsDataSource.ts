@@ -87,8 +87,9 @@ export default class PostgresProposalInternalCommentsDataSource
       return createProposalInternalCommentObject(proposalRejectionComment);
     } catch (error) {
       logger.logException(
-        `Could not create proposal rejection comment with args: '${JSON.stringify(args)}'`,
-        error
+        'Could not create proposal rejection comment',
+        error,
+        { args }
       );
       throw new GraphQLError('Error while creating proposal rejection comment');
     }
