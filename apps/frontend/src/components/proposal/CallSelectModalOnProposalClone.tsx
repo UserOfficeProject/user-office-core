@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik, Field } from 'formik';
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { ChangeEvent } from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -24,19 +24,7 @@ const CallSelectModalOnProposalsClone = ({
   close,
   cloneProposalsToCall,
 }: CallSelectModalOnProposalsCloneProps) => {
-  const [showAllCalls, setShowAllCalls] = useState(false);
   const callsData = useCallsData();
-  useEffect(() => {
-    callsData.setCallsFilter(
-      showAllCalls
-        ? {}
-        : {
-            isActive: true,
-            isActiveInternal: true,
-            isEnded: false,
-          }
-    );
-  }, [showAllCalls]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -44,7 +32,6 @@ const CallSelectModalOnProposalsClone = ({
         initialValues={{
           selectedCallId: null,
           showAllCalls: false,
-          callData: callsData,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedCall = callsData.calls.find(
@@ -62,7 +49,7 @@ const CallSelectModalOnProposalsClone = ({
         }}
         validationSchema={callSelectModalOnProposalsCloneValidationSchema}
       >
-        {({ isSubmitting, values, handleChange }): JSX.Element => (
+        {({ isSubmitting, handleChange }): JSX.Element => (
           <Form>
             <Typography
               variant="h6"
@@ -108,11 +95,19 @@ const CallSelectModalOnProposalsClone = ({
               component={CheckboxWithLabel}
               type="checkbox"
               Label={{
-                label: `Show all calls ${values.showAllCalls}`,
+                label: `Show all calls`,
               }}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e);
-                setShowAllCalls(e.target.checked);
+                callsData.setCallsFilter(
+                  e.target.checked
+                    ? {}
+                    : {
+                        isActive: true,
+                        isActiveInternal: true,
+                        isEnded: false,
+                      }
+                );
               }}
             />
           </Form>
