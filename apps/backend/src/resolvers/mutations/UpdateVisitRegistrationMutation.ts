@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import {
   Args,
   ArgsType,
@@ -10,6 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { VisitRegistrationStatus } from '../../models/VisitRegistration';
+import { DateWithoutTimezone } from '../CustomScalars';
 import { VisitRegistration } from '../types/VisitRegistration';
 
 @ArgsType()
@@ -20,11 +22,11 @@ export class UpdateVisitRegistrationArgs {
   @Field(() => Int!)
   visitId: number;
 
-  @Field(() => Date, { nullable: true })
-  startsAt?: Date | null;
+  @Field(() => DateWithoutTimezone, { nullable: true })
+  startsAt?: DateTime | null;
 
-  @Field(() => Date, { nullable: true })
-  endsAt?: Date | null;
+  @Field(() => DateWithoutTimezone, { nullable: true })
+  endsAt?: DateTime | null;
 
   status?: VisitRegistrationStatus;
   registrationQuestionaryId?: number;
