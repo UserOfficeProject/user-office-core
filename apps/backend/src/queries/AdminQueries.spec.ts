@@ -10,7 +10,7 @@ import {
   dummyApiAccessTokens,
 } from '../datasources/mockups/AdminDataSource';
 import {
-  derivedDummyUserOfficerWithRole,
+  dummyUserOfficerWithDerivedRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -61,7 +61,7 @@ describe('Test Admin Queries', () => {
   test('A derived user officer can get page text for a role with a shared tag', () => {
     return expect(
       adminQueries.getPageText({
-        agent: derivedDummyUserOfficerWithRole,
+        agent: dummyUserOfficerWithDerivedRole,
         pageId: 1,
         roleId: 1,
       })
@@ -71,7 +71,7 @@ describe('Test Admin Queries', () => {
   test('A derived user officer cannot get page text for a role without a shared tag', () => {
     return expect(
       adminQueries.getPageText({
-        agent: derivedDummyUserOfficerWithRole,
+        agent: dummyUserOfficerWithDerivedRole,
         pageId: 1,
         roleId: 2,
       })

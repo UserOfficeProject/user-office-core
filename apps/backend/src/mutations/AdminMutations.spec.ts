@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import AdminMutations from './AdminMutations';
 import { dummyInstitution } from '../datasources/mockups/AdminDataSource';
 import {
-  derivedDummyUserOfficerWithRole,
+  dummyUserOfficerWithDerivedRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -44,7 +44,7 @@ describe('Test Admin Mutations', () => {
 
   test('A derived user officer can not set default page text', () => {
     return expect(
-      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
       })
@@ -53,7 +53,7 @@ describe('Test Admin Mutations', () => {
 
   test('A derived user officer can set page text for a role with a shared tag', () => {
     return expect(
-      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
         roleId: 1,
@@ -63,7 +63,7 @@ describe('Test Admin Mutations', () => {
 
   test('A derived user officer can not set page text for a role without a shared tag', () => {
     return expect(
-      adminMutations.setPageText(derivedDummyUserOfficerWithRole, {
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
         roleId: 2,

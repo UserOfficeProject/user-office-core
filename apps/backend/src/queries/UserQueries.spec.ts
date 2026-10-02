@@ -16,7 +16,7 @@ import { Tokens } from '../config/Tokens';
 import {
   basicDummyUser,
   basicDummyUserNotOnProposal,
-  derivedDummyUserOfficerWithRole,
+  dummyUserOfficerWithDerivedRole,
   dummyProposalMemberWithRole,
   dummySecondVisitorWithRole,
   dummyThirdVisitorWithRole,
@@ -93,19 +93,19 @@ describe('UserQueries', () => {
 
   test('A derived user officer is not allowed to fetch all roles', () => {
     return expect(
-      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole)
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole)
     ).resolves.toStrictEqual([]);
   });
 
   test('A derived user officer is allowed to fetch roles with the same tag', () => {
     return expect(
-      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole, [tags[0].id])
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole, [tags[0].id])
     ).resolves.toStrictEqual([roles[1]]);
   });
 
   test('A derived user officer is not allowed to fetch roles with a different tag', () => {
     return expect(
-      userQueries.getRolesByTags(derivedDummyUserOfficerWithRole, [tags[1].id])
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole, [tags[1].id])
     ).resolves.toStrictEqual([]);
   });
 
