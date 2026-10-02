@@ -1,9 +1,11 @@
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
@@ -23,11 +25,30 @@ const CallSelectModalOnProposalsClone = ({
   close,
   cloneProposalsToCall,
 }: CallSelectModalOnProposalsCloneProps) => {
-  const { calls, loadingCalls } = useCallsData({
+  const [showAllCalls, setShowAllCalls] = useState(false);
+  const { calls, loadingCalls, setCallsFilter } = useCallsData({
     isActive: true,
     isActiveInternal: true,
     isEnded: false,
   });
+
+  const handleShowAllCallsChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const isChecked = event.target.checked;
+    setShowAllCalls(isChecked);
+
+    // Clear the filter to show all calls if checked, otherwise reset to default
+    setCallsFilter(
+      isChecked
+        ? undefined
+        : {
+            isActive: true,
+            isActiveInternal: true,
+            isEnded: false,
+          }
+    );
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -77,6 +98,19 @@ const CallSelectModalOnProposalsClone = ({
                   loading={loadingCalls}
                   required
                   data-cy="call-selection"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showAllCalls}
+                      onChange={handleShowAllCallsChange}
+                      color="primary"
+                      data-cy="show-all-calls-checkbox"
+                    />
+                  }
+                  label="Show all calls"
                 />
               </Grid>
             </Grid>
