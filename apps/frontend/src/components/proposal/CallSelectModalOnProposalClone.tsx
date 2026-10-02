@@ -2,11 +2,12 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Form, Formik } from 'formik';
-import React from 'react';
+import { Form, Formik, Field } from 'formik';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import { Call } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 
@@ -23,20 +24,30 @@ const CallSelectModalOnProposalsClone = ({
   close,
   cloneProposalsToCall,
 }: CallSelectModalOnProposalsCloneProps) => {
-  const { calls, loadingCalls } = useCallsData({
-    isActive: true,
-    isActiveInternal: true,
-    isEnded: false,
-  });
+  const [showAllCalls, setShowAllCalls] = useState(false);
+  const callsData = useCallsData();
+  useEffect(() => {
+    callsData.setCallsFilter(
+      showAllCalls
+        ? {}
+        : {
+            isActive: true,
+            isActiveInternal: true,
+            isEnded: false,
+          }
+    );
+  }, [showAllCalls]);
 
   return (
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
           selectedCallId: null,
+          showAllCalls: false,
+          callData: callsData,
         }}
         onSubmit={async (values, actions): Promise<void> => {
-          const selectedCall = calls.find(
+          const selectedCall = callsData.calls.find(
             (call) => call.id === values.selectedCallId
           );
 
@@ -51,7 +62,7 @@ const CallSelectModalOnProposalsClone = ({
         }}
         validationSchema={callSelectModalOnProposalsCloneValidationSchema}
       >
-        {({ isSubmitting }): JSX.Element => (
+        {({ isSubmitting, values, handleChange }): JSX.Element => (
           <Form>
             <Typography
               variant="h6"
@@ -70,11 +81,11 @@ const CallSelectModalOnProposalsClone = ({
                 <FormikUIAutocomplete
                   name="selectedCallId"
                   label="Select call"
-                  items={calls.map((call) => ({
+                  items={callsData.calls.map((call) => ({
                     value: call.id,
                     text: call.shortCode,
                   }))}
-                  loading={loadingCalls}
+                  loading={callsData.loadingCalls}
                   required
                   data-cy="call-selection"
                 />
@@ -91,6 +102,19 @@ const CallSelectModalOnProposalsClone = ({
             >
               Clone to call
             </Button>
+
+            <Field
+              name="showAllCalls"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: `Show all calls ${values.showAllCalls}`,
+              }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                handleChange(e);
+                setShowAllCalls(e.target.checked);
+              }}
+            />
           </Form>
         )}
       </Formik>
