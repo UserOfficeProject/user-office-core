@@ -1526,7 +1526,7 @@ context('Technique Proposal tests', () => {
       */
       cy.get('[role="listbox"]')
         .contains(draftStatus.name)
-        .should('be.selected');
+        .should('have.class', 'Mui-selected');
       cy.get('[role="listbox"]').contains(finishedStatus.name).click();
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1548,7 +1548,7 @@ context('Technique Proposal tests', () => {
 
       cy.get('[role="listbox"]')
         .contains(finishedStatus.name)
-        .should('be.selected');
+        .should('have.class', 'Mui-selected');
       cy.get('[role="listbox"]').contains(submittedStatus.name).click();
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1821,7 +1821,7 @@ context('Technique Proposal tests', () => {
 
       cy.get('[role="listbox"]')
         .contains(submittedStatus.name)
-        .should('be.selected');
+        .should('have.class', 'Mui-selected');
 
       cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
 
@@ -1871,7 +1871,7 @@ context('Technique Proposal tests', () => {
 
       cy.get('[role="listbox"]')
         .contains(underReviewStatus.name)
-        .should('be.selected');
+        .should('have.class', 'Mui-selected');
 
       /*
       Without instrument assigned
@@ -1968,7 +1968,7 @@ context('Technique Proposal tests', () => {
 
       cy.get('[role="listbox"]')
         .contains(approvedStatus.name)
-        .should('be.selected');
+        .should('have.class', 'Mui-selected');
 
       cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
 

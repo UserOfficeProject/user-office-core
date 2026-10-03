@@ -144,7 +144,7 @@ const FinalRankingForm = ({
             }
           }}
         >
-          {({ isSubmitting, setFieldValue, values }): JSX.Element => (
+          {({ isSubmitting, setFieldValue, values }) => (
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>

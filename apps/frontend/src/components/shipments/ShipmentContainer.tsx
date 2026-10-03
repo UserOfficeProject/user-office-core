@@ -1,4 +1,4 @@
-import { default as React, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -45,17 +45,19 @@ export default function ShipmentContainer(props: {
     customEventHandlers,
   ]);
 
+  const { onDirtyStateChange } = props;
+
   useEffect(() => {
-    props.onDirtyStateChange?.(state.isDirty);
-  }, [state.isDirty, props.onDirtyStateChange]);
+    onDirtyStateChange?.(state.isDirty);
+  }, [state.isDirty, onDirtyStateChange]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={state.shipment.title || 'New Shipment'}
         info={state.shipment.status}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }
