@@ -1107,9 +1107,14 @@ export default class PostgresFapDataSource implements FapDataSource {
       updateQuery.push('submitted = EXCLUDED.submitted');
     }
 
+    if (saveFapMeetingDecisionInput.fapId !== undefined) {
+      dataToUpsert.fap_id = saveFapMeetingDecisionInput.fapId;
+      updateQuery.push('fap_id = EXCLUDED.fap_id');
+    }
+
     const [fapMeetingDecisionRecord]: FapMeetingDecisionRecord[] = (
       await database.raw(
-        `? ON CONFLICT (proposal_pk, instrument_id)
+        `? ON CONFLICT (proposal_pk, instrument_id, fap_id)
         DO UPDATE SET
         ${updateQuery.join(',')}
         RETURNING *;`,
@@ -1118,11 +1123,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     ).rows;
 
     if (!fapMeetingDecisionRecord) {
-      logger.logError('Could not update/insert fap meeting decision', {
+      logger.logError('Could not update/insert FAP meeting decision', {
         dataToUpsert,
       });
 
-      throw new GraphQLError('Could not update/insert fap meeting decision');
+      throw new GraphQLError('Could not update/insert FAP meeting decision');
     }
 
     return createFapMeetingDecisionObject(fapMeetingDecisionRecord);
