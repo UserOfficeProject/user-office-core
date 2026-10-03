@@ -105,6 +105,20 @@ export default function createLoggingHandler() {
 
           break;
         }
+        case Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED: {
+          const { invite, proposalPKey } = event;
+
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Data access invite issued to ${invite.email} accepted by userId ${event.loggedInUserId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
         case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
           const { invite, proposalPKey: proposalPk } = event;
 
@@ -441,19 +455,26 @@ export default function createLoggingHandler() {
           break;
         default: {
           let changedObjectId: number;
-          if (typeof (event as any)[event.key].primaryKey === 'number') {
+          if (typeof (event as any)[event.key]?.primaryKey === 'number') {
             changedObjectId = (event as any)[event.key].primaryKey;
-          } else if (typeof (event as any)[event.key].proposalPk === 'number') {
+          } else if (
+            typeof (event as any)[event.key]?.proposalPk === 'number'
+          ) {
             changedObjectId = (event as any)[event.key].proposalPk;
           } else if (
-            typeof (event as any)[event.key].experimentPk === 'number'
+            typeof (event as any)[event.key]?.experimentPk === 'number'
           ) {
             changedObjectId = (event as any)[event.key].experimentPk;
           } else {
-            changedObjectId = (event as any)[event.key].id;
+            changedObjectId = (event as any)[event.key]?.id;
           }
 
           if (!changedObjectId) {
+            logger.logWarn(
+              `Unable to determine changed object ID for event ${event.type}`,
+              { event }
+            );
+
             return;
           }
           const description = event.description || '';
