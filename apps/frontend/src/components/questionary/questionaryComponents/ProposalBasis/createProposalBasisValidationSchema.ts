@@ -2,12 +2,19 @@ import * as Yup from 'yup';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { getCurrentUser } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
+import { UserRole, SettingsId } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
-  () => {
-    const MAX_TITLE_LEN = 175;
-    const MAX_ABSTRACT_LEN = 1500;
+  (_a, _b, _c, settingsMap) => {
+    let maxAbstractLength = 1500;
+    if (settingsMap) {
+      maxAbstractLength =
+        parseInt(
+          settingsMap.get(SettingsId.MAX_ABSTRACT_LEN)?.settingsValue || '1500',
+          10
+        ) || 1500;
+    }
+
     const currentUser = getCurrentUser();
     const isUserOfficer =
       currentUser?.roles
@@ -18,15 +25,15 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
       title: Yup.string()
         .trim()
         .max(
-          MAX_TITLE_LEN,
-          `Please make title at most ${MAX_TITLE_LEN} characters long`
+          maxAbstractLength,
+          `Please make title at most ${maxAbstractLength} characters long`
         )
         .required('Proposal Title is required'),
       abstract: Yup.string()
         .trim()
         .max(
-          MAX_ABSTRACT_LEN,
-          `Please make abstract at most ${MAX_ABSTRACT_LEN} characters long`
+          maxAbstractLength,
+          `Please make abstract at most ${maxAbstractLength} characters long`
         )
         .required('Proposal Abstract is required'),
       proposer: Yup.number().required('Please specify principal investigator'),

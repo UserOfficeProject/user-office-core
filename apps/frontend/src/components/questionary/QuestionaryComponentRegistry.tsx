@@ -11,8 +11,10 @@ import {
   Question,
   QuestionTemplateRelation,
   Sdk,
+  Settings,
   Template,
   TemplateFragment,
+  SettingsId,
 } from 'generated/sdk';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
@@ -76,7 +78,8 @@ export type CreateYupValidation =
   | ((
       field: Answer,
       state: QuestionarySubmissionState,
-      api?: () => Sdk
+      api?: () => Sdk,
+      settings?: Map<SettingsId, Settings>
     ) => Yup.AnySchema)
   | null;
 
