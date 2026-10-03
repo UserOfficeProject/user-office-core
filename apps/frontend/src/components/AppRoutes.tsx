@@ -1,4 +1,4 @@
-import React, { lazy, useContext } from 'react';
+import React, { lazy as reactLazy, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
@@ -20,6 +20,14 @@ import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lazy = <T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) =>
+  reactLazy(
+    async () => (await factory()) ?? new Promise<{ default: T }>(() => {})
+  );
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
