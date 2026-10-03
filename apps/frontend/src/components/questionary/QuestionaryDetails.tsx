@@ -13,8 +13,8 @@ import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistr
 import { StepView } from './StepView';
 
 export interface TableRowData {
-  label: JSX.Element | string | null;
-  value: JSX.Element | string | null;
+  label: React.ReactNode;
+  value: React.ReactNode;
 }
 export interface QuestionaryDetailsProps
   extends TableProps<(props: unknown) => ReactElement> {
