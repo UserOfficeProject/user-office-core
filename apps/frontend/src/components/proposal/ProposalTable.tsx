@@ -1,4 +1,7 @@
-import MaterialTableCore, { Column } from '@material-table/core';
+import MaterialTableCore, {
+  Column,
+  OrderByCollection,
+} from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -46,7 +49,8 @@ type ProposalTableProps = {
   /** Function for getting data. */
   searchQuery: (
     page: number,
-    pageSize: number
+    pageSize: number,
+    orderByCollection: OrderByCollection[]
   ) => Promise<UserProposalDataType>;
   confirm: WithConfirmType;
 };
@@ -204,15 +208,17 @@ const ProposalTable = ({
         }
         columns={columns}
         data={(query) =>
-          searchQuery(query.page, query.pageSize).then((result) => {
-            setPartialProposalsData(result.data ?? []);
+          searchQuery(query.page, query.pageSize, query.orderByCollection).then(
+            (result) => {
+              setPartialProposalsData(result.data ?? []);
 
-            return {
-              data: result.data ?? [],
-              page: result.page,
-              totalCount: result.totalCount ?? 0,
-            };
-          })
+              return {
+                data: result.data ?? [],
+                page: result.page,
+                totalCount: result.totalCount ?? 0,
+              };
+            }
+          )
         }
         options={{
           search: search,
