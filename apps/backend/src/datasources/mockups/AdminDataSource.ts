@@ -3,13 +3,16 @@ import { Country } from '../../models/Country';
 import { Entry } from '../../models/Entry';
 import { Feature, FeatureId, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
+import { OAuthClient } from '../../models/OAuthClient';
 import { Permissions } from '../../models/Permissions';
 import { Settings, SettingsId } from '../../models/Settings';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateOAuthClientInput } from '../../resolvers/mutations/CreateOAuthClientMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
+import { UpdateOAuthClientInput } from '../../resolvers/mutations/UpdateOAuthClientMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
 export const dummyInstitution = new Institution(1, 'ESS', 1);
@@ -22,6 +25,17 @@ export const dummyApiAccessToken = new Permissions(
 );
 
 export const dummyApiAccessTokens = [dummyApiAccessToken];
+
+export const dummyOAuthClient = new OAuthClient(
+  'nitis-integration-client',
+  'NITIS integration client',
+  'Machine client registered in the external identity provider',
+  '{"ProposalQueries.getAll": true}',
+  new Date('2026-09-03T00:00:00.000Z'),
+  new Date('2026-09-03T00:00:00.000Z')
+);
+
+export const dummyOAuthClients = [dummyOAuthClient];
 
 export const dummyFeature = new Feature(
   FeatureId.SHIPPING,
@@ -216,6 +230,45 @@ export class AdminDataSourceMock implements AdminDataSource {
 
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {
     return true;
+  }
+
+  async createOAuthClient(args: CreateOAuthClientInput): Promise<OAuthClient> {
+    return new OAuthClient(
+      args.clientId,
+      args.name,
+      args.description,
+      args.accessPermissions,
+      new Date(),
+      new Date()
+    );
+  }
+
+  async updateOAuthClient(args: UpdateOAuthClientInput): Promise<OAuthClient> {
+    const oauthClient = dummyOAuthClients.find(
+      (client) => client.id === args.clientId
+    );
+
+    if (!oauthClient) {
+      throw new Error(`OAuth client with id ${args.clientId} not found`);
+    }
+
+    oauthClient.name = args.name;
+    oauthClient.description = args.description;
+    oauthClient.accessPermissions = args.accessPermissions;
+
+    return oauthClient;
+  }
+
+  async deleteOAuthClient(clientId: string): Promise<boolean> {
+    return true;
+  }
+
+  async getOAuthClient(clientId: string): Promise<OAuthClient | null> {
+    return dummyOAuthClients.find((client) => client.id === clientId) ?? null;
+  }
+
+  async getAllOAuthClients(): Promise<OAuthClient[]> {
+    return dummyOAuthClients;
   }
 
   async mergeInstitutions(

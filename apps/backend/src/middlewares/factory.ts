@@ -6,6 +6,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
 import { Tokens } from '../config/Tokens';
 import { DownloadType } from '../factory/service';
+import { OAuthClient } from '../models/OAuthClient';
 import { AuthJwtPayload, UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf/download';
 import pdfPreview from './factory/pdf/preview';
@@ -48,7 +49,27 @@ const getUserWithRoleFromAccessTokenId = async (
     isApiAccessToken: true,
   } as UserWithRole;
 };
+const getUserWithRoleFromOAuthClient = (
+  oauthClient: OAuthClient
+): UserWithRole =>
+  ({
+    accessPermissions: oauthClient.accessPermissions
+      ? JSON.parse(oauthClient.accessPermissions)
+      : null,
+    isApiAccessToken: true,
+  }) as UserWithRole;
+
 const getLogContextFromRequest = (req: Request) => {
+  if (req?.oauthClient) {
+    return {
+      originalUrl: req.originalUrl,
+      user: {
+        clientId: req.oauthClient.id,
+        isApiAccessToken: true,
+      },
+    };
+  }
+
   if (req?.user) {
     const userReq = req.user?.accessTokenId
       ? {
@@ -132,6 +153,21 @@ export default function factory() {
   ) => {
     const accessTokenId = req.user?.accessTokenId;
     const decodedUser = req.user;
+
+    // A request authorized as an OAuth client of the external identity
+    // provider carries its permissions on the client rather than on a token.
+    if (req.oauthClient) {
+      const userWithRole = getUserWithRoleFromOAuthClient(req.oauthClient);
+
+      if (!userWithRole.accessPermissions) {
+        return res.status(401).send('INSUFFICIENT_PERMISSIONS');
+      }
+
+      res.locals.agent = userWithRole;
+
+      return next();
+    }
+
     if (decodedUser) {
       if (accessTokenId) {
         await getUserWithRoleFromAccessTokenId(accessTokenId)
