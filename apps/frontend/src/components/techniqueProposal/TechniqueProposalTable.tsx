@@ -330,8 +330,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'principalInvestigator',
       sorting: false,
       render: (proposalView: ProposalViewData) => {
-        if (proposalView.principalInvestigator?.lastname) {
-          return `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`;
+        if (proposalView.principalInvestigator) {
+          return proposalView.principalInvestigator.lastname
+            ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+            : getPreferredName(proposalView.principalInvestigator);
         }
 
         return '';
