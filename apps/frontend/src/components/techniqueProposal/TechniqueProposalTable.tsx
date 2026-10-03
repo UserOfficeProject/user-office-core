@@ -436,21 +436,28 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     connectionsWithActions.length === 1
                       ? connectionsWithActions[0].id
                       : undefined;
-                  updateProposalStatus(
-                    primaryKey,
-                    selectedWorkflowStatus.workflowStatusId,
-                    statusActionsWorkflowConnectionId
-                  ).then(() => {
-                    if (value === StatusCode.UNSUCCESSFUL && comment != '') {
-                      api({
-                        toastSuccessMessage:
-                          'Proposal rejection comment successfully created',
-                      }).createProposalRejectionComment({
+                  if (value === StatusCode.UNSUCCESSFUL && comment != '') {
+                    return api({
+                      toastSuccessMessage:
+                        'Proposal rejection comment successfully created',
+                    })
+                      .createProposalRejectionComment({
                         proposalPk: unsuccessfullPK,
                         comment: comment ?? '',
+                      })
+                      .then(() => {
+                        return updateProposalStatus(
+                          primaryKey,
+                          selectedWorkflowStatus.workflowStatusId,
+                          statusActionsWorkflowConnectionId
+                        );
                       });
-                    }
-                  });
+                  } else
+                    return updateProposalStatus(
+                      primaryKey,
+                      selectedWorkflowStatus.workflowStatusId,
+                      statusActionsWorkflowConnectionId
+                    );
                 });
             });
         },
