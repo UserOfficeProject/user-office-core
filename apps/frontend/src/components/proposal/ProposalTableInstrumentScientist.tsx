@@ -108,6 +108,14 @@ let columns: Column<ProposalViewData>[] = [
     ...{ width: 'auto' },
   },
   {
+    title: 'Submitted date',
+    field: 'submittedDate',
+    render: (rowData) =>
+      rowData.submittedDate
+        ? new Date(rowData.submittedDate).toLocaleDateString()
+        : '',
+  },
+  {
     title: 'Principal Investigator',
     field: 'principalInvestigator',
     emptyValue: '-',

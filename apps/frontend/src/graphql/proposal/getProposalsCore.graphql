@@ -22,6 +22,7 @@ query getProposalsCore(
       statusName
       statusDescription
       proposalId
+      submittedDate
       finalStatus
       notified
       submitted

@@ -12,6 +12,7 @@ query getInstrumentScientistProposals(
       primaryKey
       proposalId
       title
+      submittedDate
       submitted
       finalStatus
       statusName
