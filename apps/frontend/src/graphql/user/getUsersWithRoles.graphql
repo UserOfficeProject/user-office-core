@@ -1,0 +1,34 @@
+query getUsersWithRoles(
+  $first: Int
+  $offset: Int
+  $subtractUsers: [Int!]
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+  $searchText: String
+) {
+  usersWithRoles(
+    first: $first
+    offset: $offset
+    subtractUsers: $subtractUsers
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+  ) {
+    users {
+      id
+      firstname
+      lastname
+      preferredname
+      institution
+      institutionId
+      created
+      email
+      country
+      oidcSub
+      roles {
+        title
+      }
+    }
+    totalCount
+  }
+}
