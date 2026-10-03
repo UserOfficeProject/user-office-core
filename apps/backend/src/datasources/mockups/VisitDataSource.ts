@@ -1,3 +1,12 @@
+import {
+  dummyPrincipalInvestigatorWithRole,
+  dummyProposalMemberWithRole,
+  dummySecondVisitorWithRole,
+  dummyThirdVisitorWithRole,
+  dummyUserWithRole,
+  dummyVisitorWithRole,
+  dummyVisitTeamLeadWithRole,
+} from './UserDataSource';
 import { Visit } from '../../models/Visit';
 import {
   VisitRegistration,
@@ -9,15 +18,6 @@ import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVis
 import { VisitsFilter } from '../../resolvers/queries/VisitsQuery';
 import { VisitDataSource } from '../VisitDataSource';
 import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation';
-import {
-  dummyPrincipalInvestigatorWithRole,
-  dummyProposalMemberWithRole,
-  dummySecondVisitorWithRole,
-  dummyThirdVisitorWithRole,
-  dummyUserWithRole,
-  dummyVisitorWithRole,
-  dummyVisitTeamLeadWithRole,
-} from './UserDataSource';
 
 /*
  * Who counts as a member of each proposal, mirroring the proposal fixtures:
@@ -235,8 +235,9 @@ export class VisitDataSourceMock implements VisitDataSource {
     const registration = await this.getRegistration(args.userId, args.visitId);
 
     if (registration) {
-      registration.startsAt = args.startsAt ?? registration.startsAt;
-      registration.endsAt = args.endsAt ?? registration.endsAt;
+      registration.startsAt =
+        args.startsAt?.toJSDate() ?? registration.startsAt;
+      registration.endsAt = args.endsAt?.toJSDate() ?? registration.endsAt;
       registration.status = args.status ?? registration.status;
 
       return registration;
