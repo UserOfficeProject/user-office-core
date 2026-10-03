@@ -417,16 +417,11 @@ context('Fap reviews tests', () => {
         'not.have.class',
         'Mui-disabled'
       );
-      cy.get('[data-cy="fap-selection"]').contains(instrument.name);
       cy.get('[data-cy="fap-selection"]').click();
+      cy.get('[data-cy="fap-selection"]').contains(instrument.name);
       cy.get('[role="listbox"] li[role="option"]').contains(fap1.code).click();
 
       cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        text: 'Proposal/s assigned to the selected Fap successfully',
-        variant: 'success',
-      });
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
@@ -531,7 +526,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3&pageSize=5`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3&pa-page=0&pa-pageSize=5`);
       //should go to the second page
       cy.get('button[aria-label="Next Page"]').click();
       cy.contains(proposal1.title).should('not.exist');
@@ -1266,7 +1261,7 @@ context('Fap reviews tests', () => {
       cy.contains(firstCreatedProposalId).should('be.visible');
     });
 
-    it.only('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
+    it('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
@@ -1414,7 +1409,7 @@ context('Fap reviews tests', () => {
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
-    it('Fap Chair should be able to read/write/submit non-submitted reviews', () => {
+    it('Fap Chair should be able to read/write non-submitted reviews', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1444,9 +1439,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').click();
-      cy.contains('OK').click();
-      cy.contains('Submitted').should('be.disabled');
+      cy.contains('Submit').should('be.disabled');
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
@@ -1577,9 +1570,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').click();
-      cy.contains('OK').click();
-      cy.contains('Submitted').should('be.disabled');
+      cy.contains('Submit').should('be.disabled');
 
       cy.finishedLoading();
     });
@@ -1701,6 +1692,85 @@ context('Fap reviews tests', () => {
 
       cy.contains('Technical reviews').click();
       cy.contains(comment1).should('exist');
+    });
+
+    it('FAP Secretary should be able to download the fap reviews excel sheet', () => {
+      cy.assignFapReviewersToProposals({
+        assignments: [
+          {
+            memberId: fapMembers.reviewer.id,
+            proposalPk: firstCreatedProposalPk,
+            rank: 1,
+          },
+          {
+            memberId: fapMembers.reviewer2.id,
+            proposalPk: firstCreatedProposalPk,
+            rank: 2,
+          },
+        ],
+        fapId: createdFapId,
+      });
+      cy.changeProposalsStatus({
+        workflowStatusId: fapReviewWorkflowStatusId,
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.getProposalReviews({
+        proposalPk: firstCreatedProposalPk,
+      }).then(({ proposalReviews }) => {
+        if (proposalReviews) {
+          proposalReviews.forEach((review, index) => {
+            cy.updateReview({
+              reviewID: review.id,
+              comment: index === 0 ? comment1 : comment2,
+              grade: index == 0 ? '4' : '6',
+              status: index == 0 ? ReviewStatus.SUBMITTED : ReviewStatus.DRAFT,
+              fapID: createdFapId,
+              questionaryID: review.questionaryID,
+            });
+          });
+        }
+      });
+
+      cy.login(fapMembers.secretary);
+      cy.visit(`/FapPage/2?tab=4`);
+      cy.finishedLoading();
+
+      cy.contains(fapMembers.reviewer.lastName).should('be.visible');
+      cy.contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer2.lastName).should('be.visible');
+      cy.contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="export-reviews-in-excel"]').click();
+      cy.readFile(`${Cypress.config('downloadsFolder')}/fap_reviews.xlsx`)
+        .should('exist')
+        .then(() => {
+          cy.task(
+            'convertXlsxToJson',
+            `${Cypress.config('downloadsFolder')}/fap_reviews.xlsx`
+          ).then((actualExport) => {
+            const today = new Date();
+            const currentDate = [
+              String(today.getDate()).padStart(2, '0'),
+              String(today.getMonth() + 1).padStart(2, '0'),
+              today.getFullYear(),
+            ].join('-');
+            cy.fixture('exampleFapReviewsExport.json').then(
+              (expectedExport) => {
+                expectedExport[0][0]['Date assigned'] = currentDate;
+                expectedExport[1][0]['Date assigned'] = currentDate;
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          });
+        });
     });
   });
 
@@ -4538,7 +4608,7 @@ context(
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"instruments": [],"readPermissions":[]}`,
         dependencies: [],
       });
 
@@ -4913,6 +4983,17 @@ context('Fap meeting exports test', () => {
         cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
           (actualExport) => {
             cy.fixture('exampleFapExportSTFC.json').then((expectedExport) => {
+              expectedExport[0]['Instrument Name'] = instrument1.name;
+              expectedExport[0]['Proposal Title'] = proposal1.title;
+              expectedExport[0]['Technical Review Comment'] = comment1;
+              expectedExport[0]['Reviewer 1 review comment'] = comment1;
+              expectedExport[0]['Reviewer 2 review comment'] = comment1;
+
+              expectedExport[1]['Instrument Name'] = instrument1.name;
+              expectedExport[1]['Proposal Title'] = proposal2.title;
+              expectedExport[1]['Technical Review Comment'] = comment2;
+              expectedExport[1]['Reviewer 1 review comment'] = comment2;
+              expectedExport[1]['Reviewer 2 review comment'] = comment2;
               expect(expectedExport).to.deep.equal(actualExport);
             });
           }
@@ -4934,7 +5015,7 @@ context('Fap meeting exports test', () => {
 
     cy.contains(updatedCall.shortCode)
       .parent()
-      .find('[aria-label="Export Fap Data"]')
+      .find('[aria-label="Export FAP Data"]')
       .click();
 
     cy.get('[data-cy=preparing-download-dialog').should('not.exist');
@@ -4950,6 +5031,21 @@ context('Fap meeting exports test', () => {
           (actualExport) => {
             cy.fixture('exampleCallFapExportSTFC.json').then(
               (expectedExport) => {
+                expectedExport[0]['Proposal Reference Number'] =
+                  instrument1.name;
+
+                expectedExport[1]['Instrument Name'] = instrument1.name;
+                expectedExport[1]['Proposal Title'] = proposal1.title;
+                expectedExport[1]['Technical Review Comment'] = comment1;
+                expectedExport[1]['Reviewer 1 review comment'] = comment1;
+                expectedExport[1]['Reviewer 2 review comment'] = comment1;
+
+                expectedExport[2]['Instrument Name'] = instrument1.name;
+                expectedExport[2]['Proposal Title'] = proposal2.title;
+                expectedExport[2]['Technical Review Comment'] = comment2;
+                expectedExport[2]['Reviewer 1 review comment'] = comment2;
+                expectedExport[2]['Reviewer 2 review comment'] = comment2;
+
                 expect(expectedExport).to.deep.equal(actualExport);
               }
             );
