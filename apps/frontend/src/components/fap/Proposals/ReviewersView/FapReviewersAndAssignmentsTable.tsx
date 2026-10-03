@@ -3,7 +3,7 @@ import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Fap } from 'generated/sdk';
+import { Fap, ReviewStatus } from 'generated/sdk';
 import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
 import { FapMember, useFapMembersData } from 'hooks/fap/useFapMembersData';
 import {
@@ -90,10 +90,11 @@ const FapReviewersAndAssignmentsTableColumns: Column<ReviewerAndProposals>[] = [
     title: 'Reviews Completed',
     render: (rowData) => {
       const totalReviews = rowData.assignedProposals.length;
-      const gradedProposals = rowData.assignedProposals.filter(
-        (proposal) => proposal.assignment.review?.grade !== null
+      const submittedReviews = rowData.assignedProposals.filter(
+        (proposal) =>
+          proposal.assignment.review?.status === ReviewStatus.SUBMITTED
       );
-      const countReviews = gradedProposals?.length || 0;
+      const countReviews = submittedReviews?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
     },
