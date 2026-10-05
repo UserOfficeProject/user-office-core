@@ -141,14 +141,14 @@ export default class PostgresEmailTemplateDataSource
       body: body,
       subject: subject,
     };
-    const templates = this.getEmailVersions(emailTemplateId);
+    const templates = await this.getEmailVersions(emailTemplateId);
     const versionNumbers: number[] = [];
-    (await templates).emailVersions.map((t) =>
-      versionNumbers.push(t.versionNumber)
-    );
-    const sortVersionNumbers = versionNumbers.sort((n1, n2) => n2 - n1);
-    let newVersionNumber = sortVersionNumbers[0] + 1;
-    if (isNaN(newVersionNumber)) {
+    let newVersionNumber;
+    templates.emailVersions.map((t) => versionNumbers.push(t.versionNumber));
+
+    if (versionNumbers.length != 0) {
+      newVersionNumber = Math.max(...versionNumbers) + 1;
+    } else {
       newVersionNumber = 1;
     }
 
