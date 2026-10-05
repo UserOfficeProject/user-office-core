@@ -41,25 +41,26 @@ const CreateUpdateEmailTemplate = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const [, setSearchParams] = useSearchParams();
   const didResetModalTab = useRef(false);
-  const [versionNumber, setVersionNumber] = useState(-1);
+  const [versionNumber, setVersionNumber] = useState('');
   const [emailTemplatesVersions, setEmailTemplatesVersions] = useState<
     TemplateVersion[]
   >([]);
 
   useEffect(() => {
     let unmounted = false;
+    if (emailTemplate?.id) {
+      api()
+        .getEmailVersions({ emailTemplateId: emailTemplate?.id })
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
 
-    api()
-      .getEmailVersions({ emailTemplateId: emailTemplate?.id ?? -1 })
-      .then((data) => {
-        if (unmounted) {
-          return;
-        }
-
-        if (data.emailVersions) {
-          setEmailTemplatesVersions(data.emailVersions?.emailVersions);
-        }
-      });
+          if (data.emailVersions) {
+            setEmailTemplatesVersions(data.emailVersions?.emailVersions);
+          }
+        });
+    }
 
     return () => {
       // used to avoid unmounted component state update error
@@ -229,9 +230,9 @@ const CreateUpdateEmailTemplate = ({
                     id="version-select"
                     aria-labelledby="version-select-label"
                     onChange={(version) => {
-                      setVersionNumber(Number(version.target.value));
+                      setVersionNumber(version.target.value);
                     }}
-                    value={versionNumber.toString()}
+                    value={versionNumber}
                     data-cy="version-select"
                     disabled={!emailTemplatesVersions.length}
                   >
@@ -248,10 +249,10 @@ const CreateUpdateEmailTemplate = ({
                   </Select>
                 </FormControl>
 
-                {versionNumber != -1 ? (
+                {versionNumber ? (
                   <EmailTemplateVersionViewer
                     emailTemplateId={emailTemplate?.id}
-                    emailTemplateVersionNumber={versionNumber}
+                    emailTemplateVersionNumber={Number(versionNumber)}
                   ></EmailTemplateVersionViewer>
                 ) : (
                   <Typography>Please select a version number</Typography>

@@ -357,11 +357,11 @@ export interface EmailTemplateRecord {
 }
 
 export interface TemplateVersionRecord {
-  readonly template_version_id: number;
-  readonly template_id: number;
-  readonly template: string;
-  readonly version_number: number;
+  readonly template_version_pk: number;
   readonly template_type: string;
+  readonly template_id: number;
+  readonly version_number: number;
+  readonly template: string;
   readonly created_at: Date;
 }
 
@@ -1058,7 +1058,7 @@ export const createEmailVersionsObject = (
   const template = JSON.parse(JSON.stringify(templateVersions.template));
 
   return new TemplateVersion(
-    templateVersions.template_version_id,
+    templateVersions.template_version_pk,
     templateVersions.template_id,
     template.body,
     template.subject,
