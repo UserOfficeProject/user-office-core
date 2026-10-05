@@ -6,6 +6,7 @@ import { UserRole, SettingsId } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
   (_a, _b, _c, settingsMap) => {
+    const MAX_TITLE_LEN = 175;
     let maxAbstractLength = 1500;
     if (settingsMap) {
       maxAbstractLength =
@@ -25,8 +26,8 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
       title: Yup.string()
         .trim()
         .max(
-          maxAbstractLength,
-          `Please make title at most ${maxAbstractLength} characters long`
+          MAX_TITLE_LEN,
+          `Please make title at most ${MAX_TITLE_LEN} characters long`
         )
         .required('Proposal Title is required'),
       abstract: Yup.string()
