@@ -171,8 +171,8 @@ export default class UserQueries {
   @Authorized([Roles.USER_OFFICER])
   async getRolesByTags(
     agent: UserWithRole | null,
-    @AgentTags tags?: number[],
-    tagIds?: number[]
+    tagIds?: number[],
+    @AgentTags tags?: number[]
   ) {
     if (
       agent?.currentRole?.isRootRole ||
