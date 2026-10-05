@@ -18,13 +18,22 @@ const callSelectModalOnProposalsCloneValidationSchema = yup.object().shape({
 type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
   cloneProposalsToCall: (call: Call) => Promise<void>;
+  isUserOfficeView: boolean;
 };
 
 const CallSelectModalOnProposalsClone = ({
   close,
   cloneProposalsToCall,
+  isUserOfficeView,
 }: CallSelectModalOnProposalsCloneProps) => {
-  const callsData = useCallsData();
+  const standardProposalsFilter = {
+    isActive: true,
+    isActiveInternal: true,
+    isEnded: false,
+  };
+  const allProposalsFilter = {};
+
+  const callsData = useCallsData(standardProposalsFilter);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -90,26 +99,24 @@ const CallSelectModalOnProposalsClone = ({
               Clone to call
             </Button>
 
-            <Field
-              name="showAllCalls"
-              component={CheckboxWithLabel}
-              type="checkbox"
-              Label={{
-                label: `Show all calls`,
-              }}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                handleChange(e);
-                callsData.setCallsFilter(
-                  e.target.checked
-                    ? {}
-                    : {
-                        isActive: true,
-                        isActiveInternal: true,
-                        isEnded: false,
-                      }
-                );
-              }}
-            />
+            {isUserOfficeView && (
+              <Field
+                name="showAllCalls"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: `Show all calls`,
+                }}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  callsData.setCallsFilter(
+                    e.target.checked
+                      ? allProposalsFilter
+                      : standardProposalsFilter
+                  );
+                }}
+              />
+            )}
           </Form>
         )}
       </Formik>

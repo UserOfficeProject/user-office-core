@@ -185,6 +185,7 @@ const ProposalTable = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
+            isUserOfficeView={false}
           />
         </DialogContent>
       </Dialog>
