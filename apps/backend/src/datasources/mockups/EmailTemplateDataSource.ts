@@ -181,7 +181,7 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     emailTemplateId: number,
     subject?: string,
     body?: string
-  ): Promise<TemplateVersion> {
+  ): Promise<TemplateVersion | void> {
     return dummyEmailTemplateVersion;
   }
 

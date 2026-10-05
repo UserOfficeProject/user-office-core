@@ -29,7 +29,7 @@ export interface EmailTemplateDataSource {
     emailTemplateId: number,
     subject?: string,
     body?: string
-  ): Promise<TemplateVersion>;
+  ): Promise<TemplateVersion | void>;
 
   update(
     id: number,

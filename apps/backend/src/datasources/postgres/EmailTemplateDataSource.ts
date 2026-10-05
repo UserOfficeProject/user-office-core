@@ -136,11 +136,14 @@ export default class PostgresEmailTemplateDataSource
     emailTemplateId: number,
     subject?: string | null,
     body?: string | null
-  ): Promise<TemplateVersion> {
+  ): Promise<TemplateVersion | void> {
     const template = {
       body: body,
       subject: subject,
     };
+    if (body == '' && subject == '') {
+      return;
+    }
     const templates = await this.getEmailVersions(emailTemplateId);
     const versionNumbers: number[] = [];
     let newVersionNumber;
