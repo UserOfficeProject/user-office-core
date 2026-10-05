@@ -14,7 +14,6 @@ import {
   InstitutionRecord,
   FapProposalRecord,
   CountryRecord,
-  createTagObject,
 } from './records';
 import { Tokens } from '../../config/Tokens';
 import {
@@ -23,7 +22,6 @@ import {
   InstrumentWithAvailabilityTime,
   InstrumentWithManagementTime,
 } from '../../models/Instrument';
-import { Tag } from '../../models/Tag';
 import { BasicUserDetails } from '../../models/User';
 import { ManagementTimeAllocationsInput } from '../../resolvers/mutations/AdministrationProposalMutation';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
@@ -133,21 +131,18 @@ export default class PostgresInstrumentDataSource
   }
 
   async getInstruments(
-    first?: number,
-    offset?: number,
-    agentRoleId?: number
+    args: {
+      first?: number;
+      offset?: number;
+      tagIds?: number[];
+    } = {}
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
-    const tags = agentRoleId
-      ? (await this.getTagsByRoleId(agentRoleId)) ?? []
-      : [];
-
-    const tagIds = tags.map((tag) => tag.id);
-
     const instruments: InstrumentRecord[] = await database
       .select(['i.*', database.raw('count(*) OVER() AS full_count')])
       .from('instruments as i')
       .modify((query) => {
-        if (tags.length > 0) {
+        const tagIds = args.tagIds;
+        if (tagIds?.length) {
           query.whereIn('i.instrument_id', function () {
             this.select('ti.instrument_id')
               .from('tag_instrument as ti')
@@ -157,11 +152,11 @@ export default class PostgresInstrumentDataSource
       })
       .orderBy('i.instrument_id', 'desc')
       .modify((query) => {
-        if (first) {
-          query.limit(first);
+        if (args.first) {
+          query.limit(args.first);
         }
-        if (offset) {
-          query.offset(offset);
+        if (args.offset) {
+          query.offset(args.offset);
         }
       });
 
@@ -175,22 +170,6 @@ export default class PostgresInstrumentDataSource
     };
   }
 
-  async getTagsByRoleId(roleId: number): Promise<Tag[]> {
-    try {
-      const rows = await database
-        .select('t.tag_id', 't.name')
-        .from('roles_has_tags as rht')
-        .join('tag as t', 't.tag_id', 'rht.tag_id')
-        .where('rht.role_id', roleId);
-
-      return rows.map(createTagObject);
-    } catch (error) {
-      logger.logError('Failed to get tags by role id', {
-        roleId,
-      });
-      throw error;
-    }
-  }
   async getInstrumentsByCallId(
     callIds: number[],
     selectableOnly?: boolean
@@ -300,41 +279,32 @@ export default class PostgresInstrumentDataSource
 
   async getUserInstruments(
     userId: number,
-    agentId?: number
+    tagIds?: number[]
   ): Promise<Instrument[]> {
-    const tags = agentId ? (await this.getTagsByRoleId(agentId)) ?? [] : [];
-    if (tags.length != 0) {
-      const tagIds = tags.map((tag) => tag.id);
-      if (tagIds.length != 0) {
-        const instruments = await database<InstrumentRecord>(
-          'tag_instrument as ti'
-        )
-          .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
-          .whereIn('tag_id', tagIds)
-          .select('i.*');
+    if (tagIds?.length) {
+      const instruments = await database<InstrumentRecord>(
+        'tag_instrument as ti'
+      )
+        .join('instruments as i', 'ti.instrument_id', 'i.instrument_id')
+        .whereIn('tag_id', tagIds)
+        .select('i.*');
 
-        const managerInstruments = await database<InstrumentRecord>(
-          'instruments as i'
-        )
-          .where('i.manager_user_id', userId)
-          .select('i.*');
+      const managerInstruments = await database<InstrumentRecord>(
+        'instruments as i'
+      )
+        .where('i.manager_user_id', userId)
+        .select('i.*');
 
-        const allInstruments = [...instruments, ...managerInstruments];
-        const uniqueInstruments = allInstruments.filter(
-          (inst, index, self) =>
-            self.findIndex((i) => i.instrument_id === inst.instrument_id) ===
-            index
-        );
+      const allInstruments = [...instruments, ...managerInstruments];
+      const uniqueInstruments = allInstruments.filter(
+        (inst, index, self) =>
+          self.findIndex((i) => i.instrument_id === inst.instrument_id) ===
+          index
+      );
 
-        return uniqueInstruments.map(
-          this.createInstrumentWithAvailabilityTimeObject
-        );
-      } else {
-        const instruments =
-          await database<InstrumentRecord>('instruments as i').select('i.*');
-
-        return instruments.map(this.createInstrumentWithAvailabilityTimeObject);
-      }
+      return uniqueInstruments.map(
+        this.createInstrumentWithAvailabilityTimeObject
+      );
     }
 
     return database
