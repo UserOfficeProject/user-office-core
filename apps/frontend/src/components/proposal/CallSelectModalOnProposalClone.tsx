@@ -31,7 +31,9 @@ const CallSelectModalOnProposalsClone = ({
     isActiveInternal: true,
     isEnded: false,
   };
-  const allProposalsFilter = {};
+  const allProposalsFilter = {
+    isActive: true,
+  };
 
   const callsData = useCallsData(standardProposalsFilter);
 
