@@ -157,7 +157,7 @@ router.get(
       const reviewerProposalsParam = req.query.reviewerProposals;
 
       if (typeof reviewerProposalsParam !== 'string') {
-        throw new Error('reviewerProposals is required');
+        throw new Error('Proposal reviewer is required');
       }
 
       const reviewerProposals: Record<number, number[]> = JSON.parse(
