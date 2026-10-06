@@ -317,6 +317,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId?: number | null;
     instrumentId?: number | null;
   }): Promise<FapProposal[]> {
+    // This query is fundamentally flawed, as it groups fap_proposals by proposal_pk.
+    // One proposal can have multiple instruments and fap_proposal records.
+    // This means instrument_id and fap_meeting_instrument_submitted are not useful,
+    // as they potentially combine multiple separate values into one.
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -1274,6 +1278,25 @@ export default class PostgresFapDataSource implements FapDataSource {
       fapSecretariesUserIds: recordSec.map((sec) => sec.user_id),
       fapChairUserIds: recordChair.map((chair) => chair.user_id),
     };
+  }
+
+  async getInstrumentCodes(fapId: number, proposalPk: number) {
+    const result = await database
+      .select(
+        /* eslint-disable quotes */
+        database.raw(
+          `STRING_AGG(DISTINCT i.short_code, ', ' ORDER BY i.short_code) as "instrumentShortcodes"`
+        )
+        /* eslint-enable quotes */
+      )
+      .from('fap_proposals as fp')
+      .join('instruments as i', 'i.instrument_id', 'fp.instrument_id')
+      .where('fp.fap_id', fapId)
+      .where('fp.proposal_pk', proposalPk)
+      .groupBy('fp.proposal_pk')
+      .first();
+
+    return result?.instrumentShortcodes ?? '';
   }
 
   async isFapProposalInstrumentSubmitted(
