@@ -223,6 +223,14 @@ const ProposalTable = ({
         options={{
           search: search,
           debounceInterval: 400,
+          defaultOrderByCollection: [
+            {
+              orderBy: 4,
+              orderDirection: 'asc',
+              sortOrder: 1,
+              orderByField: 'created',
+            },
+          ],
         }}
         actions={[
           (rowData) => {
