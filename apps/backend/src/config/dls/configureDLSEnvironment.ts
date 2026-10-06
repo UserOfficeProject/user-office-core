@@ -95,7 +95,6 @@ async function enableDefaultDLSFeatures() {
         FeatureId.TECHNICAL_REVIEW,
         FeatureId.USER_MANAGEMENT,
         FeatureId.FAP_REVIEW,
-        FeatureId.USER_SEARCH_FILTER,
         FeatureId.CONFLICT_OF_INTEREST_WARNING,
         FeatureId.EXPERIMENT_SAFETY_REVIEW,
         FeatureId.EMAIL_INVITE,

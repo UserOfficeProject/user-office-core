@@ -138,13 +138,11 @@ context('Internal Review tests', () => {
       .clear()
       .type(title);
 
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-      cy.get('[data-cy="create-modal"]')
-        .find('[data-cy="internal-reviewer-surname"] input')
-        .type(scientist2.lastName);
+    cy.get('[data-cy="create-modal"]')
+      .find('[data-cy="internal-reviewer-surname"] input')
+      .type(scientist2.lastName);
 
-      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
-    }
+    cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
 
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')
@@ -216,13 +214,11 @@ context('Internal Review tests', () => {
       .clear()
       .type(newTitle);
 
-    if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-      cy.get('[data-cy="create-modal"]')
-        .find('[data-cy="internal-reviewer-surname"] input')
-        .type(scientist2.lastName);
+    cy.get('[data-cy="create-modal"]')
+      .find('[data-cy="internal-reviewer-surname"] input')
+      .type(scientist2.lastName);
 
-      cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
-    }
+    cy.get('[data-cy="create-modal"]').find('[data-cy="findUser"]').click();
 
     cy.get('[data-cy="create-modal"]')
       .find('[data-cy="internal-reviewer"] input')

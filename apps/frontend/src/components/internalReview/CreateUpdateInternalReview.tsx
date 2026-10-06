@@ -4,15 +4,14 @@ import Stack from '@mui/material/Stack';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { FeatureId, InternalReview, UserRole } from 'generated/sdk';
+import { InternalReview, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -37,11 +36,6 @@ const CreateUpdateInternalReview = ({
   const [usersData, setUsersData] = useState(
     internalReview?.reviewerId ? [internalReview?.reviewer] : []
   );
-  const featureContext = useContext(FeatureContext);
-  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
-    FeatureId.USER_SEARCH_FILTER
-  )?.isEnabled;
-
   const initialValues = internalReview
     ? {
         title: internalReview.title,
@@ -61,16 +55,6 @@ const CreateUpdateInternalReview = ({
   const formDisabled =
     (isInternalReviewer && user.id !== internalReview?.reviewerId) ||
     (isInternalReviewer && technicalReviewSubmitted);
-
-  useEffect(() => {
-    if (!isUserSurnameSearchEnabled) {
-      api()
-        .getUsers({ userRole: UserRole.INTERNAL_REVIEWER })
-        .then((data) => {
-          setUsersData(data.users?.users || []);
-        });
-    }
-  }, [isUserSurnameSearchEnabled, api]);
 
   const findUserBySurname = async (
     value: string,
@@ -104,7 +88,7 @@ const CreateUpdateInternalReview = ({
   const SurnameSearchField = (props: formikProps) => {
     const { values, setFieldError } = props;
 
-    return isUserSurnameSearchEnabled ? (
+    return (
       <Stack direction="row" spacing={1} alignItems="baseline">
         <Field
           id="surname"
@@ -126,7 +110,7 @@ const CreateUpdateInternalReview = ({
           Find User
         </Button>
       </Stack>
-    ) : null;
+    );
   };
 
   return (

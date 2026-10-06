@@ -10,7 +10,7 @@ import {
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik, FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
@@ -18,10 +18,8 @@ import i18n from 'i18n';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   BasicUserDetailsFragment,
-  FeatureId,
   InstrumentFragment,
   UserRole,
 } from 'generated/sdk';
@@ -40,10 +38,6 @@ const CreateUpdateInstrument = ({
   instrument,
   confirm,
 }: CreateUpdateInstrumentProps) => {
-  const featureContext = useContext(FeatureContext);
-  const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
-    FeatureId.USER_SEARCH_FILTER
-  )?.isEnabled;
   const { t } = useTranslation();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const [usersData, setUsersData] = useState(
@@ -62,16 +56,6 @@ const CreateUpdateInstrument = ({
         selectable: true,
         multipleTechReviewsEnabled: false,
       };
-
-  useEffect(() => {
-    if (!isUserSurnameSearchEnabled) {
-      api()
-        .getUsers({ userRole: UserRole.INSTRUMENT_SCIENTIST })
-        .then((data) => {
-          setUsersData(data.users?.users || []);
-        });
-    }
-  }, [isUserSurnameSearchEnabled, api]);
 
   const findUserBySurname = async (
     value: string,
@@ -109,7 +93,7 @@ const CreateUpdateInstrument = ({
   ) => {
     const { values, setFieldError } = formikProps;
 
-    return isUserSurnameSearchEnabled ? (
+    return (
       <Stack direction="row" spacing={1} alignItems="baseline">
         <Field
           id="surname"
@@ -131,7 +115,7 @@ const CreateUpdateInstrument = ({
           Find User
         </Button>
       </Stack>
-    ) : null;
+    );
   };
 
   const handleConfirmSubmit = async (values: typeof initialValues) => {

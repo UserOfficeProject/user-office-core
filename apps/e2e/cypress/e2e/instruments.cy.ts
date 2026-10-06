@@ -103,13 +103,9 @@ context('Instrument tests', () => {
       cy.get('#shortCode').type(instrument1.shortCode);
       cy.get('#description').type(instrument1.description);
 
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        cy.get('[data-cy=instrument-contact-surname]').type(
-          scientist1.lastName
-        );
-        cy.realPress('Enter');
-        cy.get('[data-cy=findUser]').click();
-      }
+      cy.get('[data-cy=instrument-contact-surname]').type(scientist1.lastName);
+      cy.realPress('Enter');
+      cy.get('[data-cy=findUser]').click();
 
       cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist1.lastName).click();
@@ -569,11 +565,7 @@ context('Instrument tests', () => {
         'have.length',
         numberOfScientistsAndManagerAssignedToCreatedInstrument
       );
-      const reassignDisplayName = featureFlags
-        .getEnabledFeatures()
-        .get(FeatureId.USER_SEARCH_FILTER)
-        ? scientist2.preferredName
-        : scientist2.firstName;
+      const reassignDisplayName = scientist2.preferredName;
 
       cy.get('[title="user-list-options"]')
         .contains(reassignDisplayName)
@@ -775,12 +767,8 @@ context('Instrument tests', () => {
         .parent()
         .find('[aria-label="Edit"]')
         .click();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        cy.get('[data-cy=instrument-contact-surname]').type(
-          scientist2.lastName
-        );
-        cy.get('[data-cy=findUser]').click();
-      }
+      cy.get('[data-cy=instrument-contact-surname]').type(scientist2.lastName);
+      cy.get('[data-cy=findUser]').click();
       cy.get('[data-cy=instrument-contact]').click();
       cy.get('[role=presentation]').contains(scientist2.lastName).click();
 
@@ -950,10 +938,7 @@ context('Instrument tests', () => {
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
-      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
-      }
+      const updatedContact = `${scientist2.preferredName} ${scientist2.lastName} (${scientist2.email})`;
 
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
@@ -983,13 +968,11 @@ context('Instrument tests', () => {
 
       cy.get('[aria-label="Edit"]').eq(0).click();
 
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        cy.get('[data-cy=instrument-contact-surname]')
-          .type(scientist2.lastName)
-          .get('[data-cy=findUser]')
-          .click();
-        cy.finishedLoading();
-      }
+      cy.get('[data-cy=instrument-contact-surname]')
+        .type(scientist2.lastName)
+        .get('[data-cy=findUser]')
+        .click();
+      cy.finishedLoading();
 
       cy.get('[aria-label="Open"]').first().click();
       cy.contains(updatedContact).click();
@@ -1046,11 +1029,7 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
-      const contactDisplayName = featureFlags
-        .getEnabledFeatures()
-        .get(FeatureId.USER_SEARCH_FILTER)
-        ? scientist2.preferredName
-        : scientist2.firstName;
+      const contactDisplayName = scientist2.preferredName;
       const updatedContact = `${contactDisplayName} ${scientist2.lastName} (${scientist2.email})`;
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
@@ -1075,13 +1054,9 @@ context('Instrument tests', () => {
       cy.visit(`/Instruments`);
 
       cy.get('[aria-label="Edit"]').eq(0).click();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        cy.get('[data-cy=instrument-contact-surname]').type(
-          scientist2.lastName
-        );
-        cy.get('[data-cy=findUser]').click();
-        cy.finishedLoading();
-      }
+      cy.get('[data-cy=instrument-contact-surname]').type(scientist2.lastName);
+      cy.get('[data-cy=findUser]').click();
+      cy.finishedLoading();
 
       cy.get('[aria-label="Open"]').first().click();
       cy.contains(updatedContact).click();
