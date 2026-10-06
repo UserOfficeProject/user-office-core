@@ -193,7 +193,11 @@ export const collectFapReviewXLSXData = async (
 
     const reviewerName =
       `${reviewer?.firstname ?? ''} ${reviewer?.lastname ?? ''}`.trim();
-    const rows: Array<Array<string | number>> = [];
+    const rankedRows: Array<{
+      rank: number | null;
+      grade: number | null;
+      row: Array<string | number>;
+    }> = [];
     for (const proposalPk of proposalPks) {
       const review = reviewData.find((item) => item.proposal_pk === proposalPk);
 
@@ -215,8 +219,11 @@ export const collectFapReviewXLSXData = async (
         continue;
       }
 
-      rows.push(
-        buildReviewRow({
+      const grade = Number(assignment.grade);
+      rankedRows.push({
+        rank: assignment.rank,
+        grade: Number.isFinite(grade) ? grade : null,
+        row: buildReviewRow({
           proposalId: review.proposal_id,
           title: review.title ?? '-',
           instrumentName: review.instrument_name ?? '-',
@@ -225,9 +232,32 @@ export const collectFapReviewXLSXData = async (
           grade: assignment.grade,
           comment: stripHtml(assignment.comment ?? '-'),
           status: assignment.status == 1 ? 'Submitted' : 'Draft',
-        })
-      );
+        }),
+      });
     }
+
+    const rows = rankedRows
+      .sort((a, b) => {
+        if (a.rank === null || b.rank === null) {
+          if (a.rank !== b.rank) {
+            return a.rank === null ? 1 : -1;
+          }
+        } else if (a.rank !== b.rank) {
+          return a.rank - b.rank;
+        }
+
+        if (a.grade === null || b.grade === null) {
+          if (a.grade !== b.grade) {
+            return a.grade === null ? 1 : -1;
+          }
+        } else if (a.grade !== b.grade) {
+          return b.grade - a.grade;
+        }
+
+        return 0;
+      })
+      .map(({ row }) => row);
+
     data.push({
       sheetName: reviewerName.substring(0, 31),
       rows,
