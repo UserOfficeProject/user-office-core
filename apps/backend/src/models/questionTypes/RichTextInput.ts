@@ -101,6 +101,7 @@ export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
     config.small_label = '';
     config.tooltip = '';
     config.max = null;
+    config.maxWords = null;
     config.allowImages = false;
     config.readPermissions = [];
 
