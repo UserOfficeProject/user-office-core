@@ -207,19 +207,27 @@ const ProposalTable = ({
           </Typography>
         }
         columns={columns}
-        data={(query) =>
-          searchQuery(query.page, query.pageSize, query.orderByCollection).then(
-            (result) => {
-              setPartialProposalsData(result.data ?? []);
+        data={(query) => {
+          // On inital load all columns are sent to the backend including ones not ordered. This filters
+          // out all columns except defaultOrderByCollection
+          const filteredOrderByCollection = query.orderByCollection.filter(
+            (col) => col.orderDirection !== ''
+          );
 
-              return {
-                data: result.data ?? [],
-                page: result.page,
-                totalCount: result.totalCount ?? 0,
-              };
-            }
-          )
-        }
+          return searchQuery(
+            query.page,
+            query.pageSize,
+            filteredOrderByCollection
+          ).then((result) => {
+            setPartialProposalsData(result.data ?? []);
+
+            return {
+              data: result.data ?? [],
+              page: result.page,
+              totalCount: result.totalCount ?? 0,
+            };
+          });
+        }}
         options={{
           search: search,
           debounceInterval: 400,
@@ -227,7 +235,7 @@ const ProposalTable = ({
             {
               orderBy: 4,
               orderDirection: 'asc',
-              sortOrder: 1,
+              sortOrder: 1, // Not consumed by backend
               orderByField: 'created',
             },
           ],

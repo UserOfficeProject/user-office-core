@@ -1011,6 +1011,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               throw new GraphQLError(`Bad sort field given: ${uiColumn}`);
             }
           }
+          // Default ordering when nothing selected in frontend
+          else {
+            qb.orderBy('p.created_at', 'DESC');
+          }
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
         })
