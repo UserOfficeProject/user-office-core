@@ -442,7 +442,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         'Proposal rejection comment successfully created',
                     })
                       .createProposalRejectionComment({
-                        proposalPk: unsuccessfullPK,
+                        proposalPk: primaryKey,
                         comment: comment ?? '',
                       })
                       .then(() => {
