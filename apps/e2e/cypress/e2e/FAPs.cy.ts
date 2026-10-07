@@ -570,7 +570,9 @@ context('Fap reviews tests', () => {
       cy.get('[role=presentation]').contains(instrument.name).click();
       cy.get('body').type('{esc}');
 
-      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+      cy.get('[data-cy="fap-assignments-table"]').contains(
+        instrument.shortCode
+      );
       cy.get('[data-cy="fap-assignments-table"]').contains(
         firstCreatedProposalPk
       );
