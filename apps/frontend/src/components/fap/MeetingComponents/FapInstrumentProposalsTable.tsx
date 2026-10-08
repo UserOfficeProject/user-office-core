@@ -143,7 +143,7 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
-      title: t('Fap') + ' meeting submitted',
+      title: t('FAP') + ' meeting submitted',
       render: (rowData: FapProposal) => {
         const submitted = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
