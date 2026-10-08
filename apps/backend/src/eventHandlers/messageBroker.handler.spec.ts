@@ -178,16 +178,14 @@ describe('messageBroker handlers', () => {
         proposalId: dummyProposal.proposalId,
         instrumentShortCode: 'instrument_1',
         oidcSub: dummyUser.oidcSub,
-        externalScheduledEventId: 'external-event-123',
-        externalScheduledEventSourceSystem: 'external-scheduler',
+        experimentId: 'external-experiment-123',
       });
 
       expect(mockExperimentDataSource.create).toHaveBeenCalledWith({
         startsAt: new Date('2026-06-01'),
         endsAt: new Date('2026-06-02'),
         scheduledEventId: 0,
-        externalScheduledEventId: 'external-event-123',
-        externalScheduledEventSourceSystem: 'external-scheduler',
+        experimentId: 'external-experiment-123',
         proposalPk: dummyProposal.primaryKey,
         status: ExperimentStatus.DRAFT,
         localContactId: dummyUser.id,

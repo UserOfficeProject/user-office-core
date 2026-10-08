@@ -15,13 +15,15 @@ import {
 } from '../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../utils/pagination';
 
+export type ExperimentCreateInput = Omit<
+  Experiment,
+  'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+> & {
+  experimentId?: string;
+};
+
 export interface ExperimentDataSource {
-  create(
-    experiment: Omit<
-      Experiment,
-      'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-    >
-  ): Promise<Experiment>;
+  create(experiment: ExperimentCreateInput): Promise<Experiment>;
   updateByScheduledEventId(
     experiment: Omit<
       Experiment,

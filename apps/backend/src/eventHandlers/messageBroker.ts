@@ -14,7 +14,10 @@ import {
   DataAccessUsersDataSource,
   UserWithInstitution,
 } from '../datasources/DataAccessUsersDataSource';
-import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import {
+  ExperimentCreateInput,
+  ExperimentDataSource,
+} from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -148,17 +151,12 @@ export const handleProposalBookingTimeSlotAdded = async (
     startsAt: message.startsAt,
     endsAt: message.endsAt,
     scheduledEventId: message.id,
-    externalScheduledEventId: message.externalScheduledEventId ?? null,
-    externalScheduledEventSourceSystem:
-      message.externalScheduledEventSourceSystem ?? null,
+    experimentId: message.experimentId,
     proposalPk: message.proposalPk,
     status: message.status,
     localContactId: message.localContactId,
     instrumentId: message.instrumentId,
-  } as Omit<
-    Experiment,
-    'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-  >;
+  } as ExperimentCreateInput;
 
   const experiment = await experimentDataSource.create(experimentToAdd);
 
@@ -206,9 +204,7 @@ export async function handleExternalProposalBookingTimeSlotAdded(
     startsAt: message.startsAt,
     endsAt: message.endsAt,
     id: 0,
-    externalScheduledEventId: message.externalScheduledEventId,
-    externalScheduledEventSourceSystem:
-      message.externalScheduledEventSourceSystem,
+    experimentId: message.experimentId,
     proposalPk: proposal.primaryKey,
     status:
       typeof message.status === 'string'

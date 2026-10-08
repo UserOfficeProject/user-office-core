@@ -17,7 +17,10 @@ import {
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { ExperimentDataSource } from '../ExperimentDataSource';
+import {
+  ExperimentCreateInput,
+  ExperimentDataSource,
+} from '../ExperimentDataSource';
 import database from './database';
 import {
   ExperimentSafetyEventsRecord,
@@ -35,8 +38,6 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.starts_at,
     record.ends_at,
     record.scheduled_event_id,
-    record.external_scheduled_event_id,
-    record.external_scheduled_event_source_system,
     record.proposal_pk,
     record.status,
     record.local_contact_id,
@@ -112,10 +113,7 @@ export default class PostgresExperimentDataSource
   constructor() {}
 
   async create(
-    createExperimentPayload: Omit<
-      Experiment,
-      'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-    >
+    createExperimentPayload: ExperimentCreateInput
   ): Promise<Experiment> {
     const experiment: ExperimentRecord[] | undefined =
       await database.transaction(async (trx) => {
@@ -129,16 +127,16 @@ export default class PostgresExperimentDataSource
 
           if (!proposal) {
             logger.logError('Could not find proposal for experiment', {
-              experiment,
+              experimentId: createExperimentPayload.experimentId,
+              proposalPk: createExperimentPayload.proposalPk,
             });
             throw new GraphQLError('Failed to find proposal for experiment');
           }
           const { proposal_id: proposalNumber, experiment_sequence: sequence } =
             proposal;
-          const experimentId = await generateExperimentId(
-            proposalNumber,
-            sequence ?? 1
-          );
+          const experimentId =
+            createExperimentPayload.experimentId ??
+            (await generateExperimentId(proposalNumber, sequence ?? 1));
 
           await database('proposals')
             .where('proposal_pk', createExperimentPayload.proposalPk)
@@ -154,10 +152,6 @@ export default class PostgresExperimentDataSource
                 starts_at: createExperimentPayload.startsAt,
                 ends_at: createExperimentPayload.endsAt,
                 scheduled_event_id: createExperimentPayload.scheduledEventId,
-                external_scheduled_event_id:
-                  createExperimentPayload.externalScheduledEventId,
-                external_scheduled_event_source_system:
-                  createExperimentPayload.externalScheduledEventSourceSystem,
                 proposal_pk: createExperimentPayload.proposalPk,
                 status: createExperimentPayload.status,
                 local_contact_id: createExperimentPayload.localContactId,
@@ -173,13 +167,16 @@ export default class PostgresExperimentDataSource
           await trx.rollback();
           logger.logError('Failed to create Experiment', {
             error,
+            experimentId: createExperimentPayload.experimentId,
+            proposalPk: createExperimentPayload.proposalPk,
           });
         }
       });
 
     if (!experiment || experiment.length === 0) {
       logger.logError('Failed to create Experiment', {
-        experiment,
+        experimentId: createExperimentPayload.experimentId,
+        proposalPk: createExperimentPayload.proposalPk,
       });
       throw new GraphQLError('Failed to create experiment');
     }
