@@ -3,10 +3,11 @@ import * as ReactDOM from 'react-dom/client';
 
 import { sendClientLog } from 'hooks/common/useDataApi';
 
-import './index.css';
+import '@custom-css';
 import App, { DYNAMIC_IMPORT_ERROR_EVENT } from './components/App';
-import * as serviceWorker from './serviceWorker';
 import './i18n';
+import './index.css';
+import * as serviceWorker from './serviceWorker';
 
 const fetchBuildVersion = async (): Promise<string> => {
   const response = await fetch('/build-version.txt');

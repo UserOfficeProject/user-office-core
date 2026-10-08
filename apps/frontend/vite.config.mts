@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react';
 import {
   defineConfig,
-  splitVendorChunkPlugin,
   loadEnv,
+  splitVendorChunkPlugin,
   UserConfig,
 } from 'vite';
 
@@ -48,6 +48,8 @@ export default ({ mode }): UserConfig => {
         models: '/src/models',
         units: '/src/units',
         images: '/src/images',
+        '@custom-css':
+          env.VITE_CUSTOM_CSS_PATH || '/src/styles/custom-default.css',
       },
     },
     build: {
