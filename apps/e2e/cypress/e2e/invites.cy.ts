@@ -23,6 +23,43 @@ context('Invites tests', () => {
       cy.get('[data-cy=call-list]').find('li:first-child').click();
     });
 
+    it('Should show a compact co-proposer table with the add button above it', () => {
+      cy.get('[data-cy="co-proposers"]').within(() => {
+        cy.get('input[type="search"]').should('not.exist');
+        cy.get('[aria-label="Search"]').should('not.exist');
+        cy.get('tbody tr').should('have.length', 1);
+        cy.get('[data-cy="add-participant-button"]')
+          .should('be.visible')
+          .and('have.text', 'Add co-proposer')
+          .then(($button) => {
+            cy.get('table').then(($table) => {
+              expect($button[0].getBoundingClientRect().bottom).to.be.at.most(
+                $table[0].getBoundingClientRect().top
+              );
+            });
+          });
+      });
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="participant-selector"]').should(
+        'contain.text',
+        'Add co-proposers'
+      );
+    });
+
+    it('Should show search guidance matching the enabled search mode', () => {
+      const emailSearchOnly = featureFlags
+        .getEnabledFeatures()
+        .get(FeatureId.EMAIL_SEARCH);
+
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').should(
+        'contain.text',
+        emailSearchOnly
+          ? 'Search users by email address: ex. john@gmail.com'
+          : 'Search users by name or email address: ex. John or john@gmail.com'
+      );
+    });
+
     it('Should be able to delete invite', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
@@ -99,6 +136,7 @@ context('Invites tests', () => {
         .click();
 
       cy.get('[data-cy="co-proposers"]').contains(lastName);
+      cy.get('[data-cy="co-proposers"] tbody tr').should('have.length', 1);
       cy.get('[data-cy="invites-chips"]').should('not.exist');
     });
 
@@ -382,6 +420,16 @@ context('Invites tests', () => {
       cy.visit('/');
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
+    });
+
+    it('Should describe email-only search without suggesting names', () => {
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .should(
+          'contain.text',
+          'Search users by email address: ex. john@gmail.com'
+        )
+        .and('not.contain.text', 'Search users by name');
     });
 
     it('Should be able to add user by knowing exact email', function () {
