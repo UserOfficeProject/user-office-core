@@ -44,6 +44,16 @@ context('Invites tests', () => {
         'contain.text',
         'Add co-proposers'
       );
+      cy.get(
+        '[data-cy="invite-user-autocomplete"] .MuiOutlinedInput-root'
+      ).then(($input) => {
+        const inputBounds = $input[0].getBoundingClientRect();
+        cy.get('[data-cy="invite-user-submit-button"]').then(($button) => {
+          const buttonBounds = $button[0].getBoundingClientRect();
+          expect(buttonBounds.top).to.be.closeTo(inputBounds.top, 1);
+          expect(buttonBounds.height).to.be.closeTo(inputBounds.height, 1);
+        });
+      });
     });
 
     it('Should show search guidance matching the enabled search mode', () => {

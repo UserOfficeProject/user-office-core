@@ -356,6 +356,7 @@ function ProposalPeopleSelectorModal({
               }
               helperText={labelText}
               variant="outlined"
+              margin="none"
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Backspace') {
                   event.stopPropagation();
@@ -410,7 +411,8 @@ function ProposalPeopleSelectorModal({
           variant="contained"
           onClick={handleSubmit}
           sx={{
-            margin: { xs: '0 0 8px', sm: '16px 0 8px' },
+            marginBottom: 1,
+            minHeight: { sm: 56 },
             alignSelf: { xs: 'flex-end', sm: 'flex-start' },
           }}
           startIcon={<AddIcon />}
