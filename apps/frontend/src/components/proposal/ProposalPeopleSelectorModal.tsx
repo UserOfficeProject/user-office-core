@@ -350,7 +350,9 @@ function ProposalPeopleSelectorModal({
             <TextField
               {...params}
               label={
-                isEmailSearchOnly ? 'Email address' : 'Name or email address'
+                isEmailSearchOnly
+                  ? 'Search by email address'
+                  : 'Search by name or email address'
               }
               helperText={labelText}
               variant="outlined"

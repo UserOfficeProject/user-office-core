@@ -52,6 +52,12 @@ context('Invites tests', () => {
         .get(FeatureId.EMAIL_SEARCH);
 
       cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"] label').should(
+        'have.text',
+        emailSearchOnly
+          ? 'Search by email address'
+          : 'Search by name or email address'
+      );
       cy.get('[data-cy="invite-user-autocomplete"]').should(
         'contain.text',
         emailSearchOnly
@@ -424,6 +430,10 @@ context('Invites tests', () => {
 
     it('Should describe email-only search without suggesting names', () => {
       cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"] label').should(
+        'have.text',
+        'Search by email address'
+      );
       cy.get('[data-cy="invite-user-autocomplete"]')
         .should(
           'contain.text',
