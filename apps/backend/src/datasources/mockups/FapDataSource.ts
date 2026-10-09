@@ -296,6 +296,7 @@ export class FapDataSourceMock implements FapDataSource {
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal> {
     throw new Error('Method not implemented: updateTimeAllocation');
