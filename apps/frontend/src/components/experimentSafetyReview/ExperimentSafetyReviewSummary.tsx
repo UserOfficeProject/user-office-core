@@ -120,6 +120,103 @@ function ExperimentSafetyReviewSummary({
     throw new Error('Experiment safety review questionary not found');
   }
 
+  const back = {
+    label: 'Back',
+    onClick: () => dispatch({ type: 'BACK_CLICKED' }),
+    disabled: state.stepIndex === 0,
+  };
+  const save = {
+    label: 'Download Safety Review Document',
+    onClick: () =>
+      downloadExperimentSafety(
+        [state.experimentSafety.experimentPk],
+        'Experiment Safety Review'
+      ),
+    disabled: !isDownloadEnabled,
+  };
+  const changeDecision = {
+    label: 'Change Decision',
+    onClick: () => setIsFormLocked(false),
+  };
+  const submit = {
+    label: !decision ? '✔ Submitted' : 'Submit',
+    onClick: () => {
+      confirm(
+        async () => {
+          setIsSubmitting(true);
+          try {
+            if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+              // Call the instrument scientist mutation
+              const { submitInstrumentScientistExperimentSafetyReview } =
+                await api({
+                  toastSuccessMessage: 'Safety review submitted successfully',
+                }).submitInstrumentScientistExperimentSafetyReview({
+                  experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+                  decision: decision as InstrumentScientistDecisionEnum,
+                  comment: comment,
+                });
+
+              dispatch({
+                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                itemWithQuestionary:
+                  submitInstrumentScientistExperimentSafetyReview,
+              });
+              dispatch({
+                type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                itemWithQuestionary:
+                  submitInstrumentScientistExperimentSafetyReview,
+              });
+
+              // Update download enabled state based on the actual status
+              setIsDownloadEnabled(
+                submitInstrumentScientistExperimentSafetyReview?.status?.id ===
+                  'ESF_APPROVED'
+              );
+            } else {
+              // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
+              const { submitExperimentSafetyReviewerExperimentSafetyReview } =
+                await api({
+                  toastSuccessMessage: 'Safety review submitted successfully',
+                }).submitExperimentSafetyReviewerExperimentSafetyReview({
+                  experimentSafetyPk: state.experimentSafety.experimentSafetyPk,
+                  decision: decision as ExperimentSafetyReviewerDecisionEnum,
+                  comment: comment,
+                });
+
+              dispatch({
+                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                itemWithQuestionary:
+                  submitExperimentSafetyReviewerExperimentSafetyReview,
+              });
+              dispatch({
+                type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                itemWithQuestionary:
+                  submitExperimentSafetyReviewerExperimentSafetyReview,
+              });
+
+              // Update download enabled state based on the actual status
+              setIsDownloadEnabled(
+                submitExperimentSafetyReviewerExperimentSafetyReview?.status
+                  ?.id === 'ESF_APPROVED'
+              );
+            }
+            // Lock the form after successful submission
+            setIsFormLocked(true);
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+        {
+          title: 'Please confirm',
+          description:
+            'Are you sure want to submit the Experiment Safety Review?',
+        }
+      )();
+    },
+    disabled: !decision,
+    isBusy: isSubmitting,
+  };
+
   return (
     <>
       <ExperimentSafetyReviewQuestionaryReview
@@ -167,120 +264,39 @@ function ExperimentSafetyReviewSummary({
       </FormControl>
 
       <Divider sx={{ margin: '1rem 0' }} />
-      <NavigationFragment>
-        <NavigButton
-          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-          disabled={state.stepIndex === 0}
-        >
-          Back
+      <NavigationFragment
+        actions={{
+          back,
+          save,
+          primary: isFormLocked ? changeDecision : submit,
+        }}
+      >
+        <NavigButton onClick={back.onClick} disabled={back.disabled}>
+          {back.label}
         </NavigButton>
         {isFormLocked ? (
           <NavigButton
-            onClick={() => setIsFormLocked(false)}
+            onClick={changeDecision.onClick}
             data-cy="button-change-decision"
           >
-            Change Decision
+            {changeDecision.label}
           </NavigButton>
         ) : (
           <NavigButton
-            onClick={() => {
-              confirm(
-                async () => {
-                  setIsSubmitting(true);
-                  try {
-                    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
-                      // Call the instrument scientist mutation
-                      const {
-                        submitInstrumentScientistExperimentSafetyReview,
-                      } = await api({
-                        toastSuccessMessage:
-                          'Safety review submitted successfully',
-                      }).submitInstrumentScientistExperimentSafetyReview({
-                        experimentSafetyPk:
-                          state.experimentSafety.experimentSafetyPk,
-                        decision: decision as InstrumentScientistDecisionEnum,
-                        comment: comment,
-                      });
-
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                        itemWithQuestionary:
-                          submitInstrumentScientistExperimentSafetyReview,
-                      });
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                        itemWithQuestionary:
-                          submitInstrumentScientistExperimentSafetyReview,
-                      });
-
-                      // Update download enabled state based on the actual status
-                      setIsDownloadEnabled(
-                        submitInstrumentScientistExperimentSafetyReview?.status
-                          ?.id === 'ESF_APPROVED'
-                      );
-                    } else {
-                      // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
-                      const {
-                        submitExperimentSafetyReviewerExperimentSafetyReview,
-                      } = await api({
-                        toastSuccessMessage:
-                          'Safety review submitted successfully',
-                      }).submitExperimentSafetyReviewerExperimentSafetyReview({
-                        experimentSafetyPk:
-                          state.experimentSafety.experimentSafetyPk,
-                        decision:
-                          decision as ExperimentSafetyReviewerDecisionEnum,
-                        comment: comment,
-                      });
-
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                        itemWithQuestionary:
-                          submitExperimentSafetyReviewerExperimentSafetyReview,
-                      });
-                      dispatch({
-                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                        itemWithQuestionary:
-                          submitExperimentSafetyReviewerExperimentSafetyReview,
-                      });
-
-                      // Update download enabled state based on the actual status
-                      setIsDownloadEnabled(
-                        submitExperimentSafetyReviewerExperimentSafetyReview
-                          ?.status?.id === 'ESF_APPROVED'
-                      );
-                    }
-                    // Lock the form after successful submission
-                    setIsFormLocked(true);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                },
-                {
-                  title: 'Please confirm',
-                  description:
-                    'Are you sure want to submit the Experiment Safety Review?',
-                }
-              )();
-            }}
-            isBusy={isSubmitting}
-            disabled={!decision}
+            onClick={submit.onClick}
+            isBusy={submit.isBusy}
+            disabled={submit.disabled}
             data-cy="button-submit-experiment-safety-review"
           >
-            {!decision ? '✔ Submitted' : 'Submit'}
+            {submit.label}
           </NavigButton>
         )}
         <Button
-          onClick={() =>
-            downloadExperimentSafety(
-              [state.experimentSafety.experimentPk],
-              'Experiment Safety Review'
-            )
-          }
+          onClick={save.onClick}
           color="secondary"
-          disabled={!isDownloadEnabled}
+          disabled={save.disabled}
         >
-          Download Safety Review Document
+          {save.label}
         </Button>
       </NavigationFragment>
     </>

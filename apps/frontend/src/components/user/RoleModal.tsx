@@ -1,7 +1,7 @@
-import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
 
+import StyledDialog from 'components/common/StyledDialog';
 import { Role as RoleSDK } from 'generated/sdk';
 
 import RoleTable from './RoleTable';
@@ -17,9 +17,7 @@ type RoleModalProps = {
 
 const RoleModal = ({ show, close, add, activeRoles }: RoleModalProps) => {
   return (
-    <Dialog
-      aria-labelledby="simple-modal-title"
-      aria-describedby="simple-modal-description"
+    <StyledDialog
       open={show}
       onClose={() => close()}
       disableScrollLock={true}
@@ -28,7 +26,7 @@ const RoleModal = ({ show, close, add, activeRoles }: RoleModalProps) => {
       <DialogContent>
         <RoleTable add={add} activeRoles={activeRoles} />
       </DialogContent>
-    </Dialog>
+    </StyledDialog>
   );
 };
 

@@ -1,8 +1,9 @@
-import MaterialTable, { Column, Options } from '@material-table/core';
+import { Column, Options } from '@material-table/core';
 import { TFunction } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/ResponsiveMaterialTable';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import { tableIcons } from 'utils/materialIcons';

@@ -1,4 +1,6 @@
-import parse from 'html-react-parser';
+import EventIcon from '@mui/icons-material/Event';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import InfoIcon from '@mui/icons-material/Info';
 import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
@@ -10,20 +12,75 @@ import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
-import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer } from 'styles/StyledComponents';
 
-const Paper = ({ children }: { children: React.ReactNode }) => (
-  <StyledPaper
-    margin={[0, 0, 2, 0]}
-    sx={{
-      '&:empty': {
-        display: 'none',
-      },
-    }}
-  >
-    {children}
-  </StyledPaper>
-);
+import DashboardInfoSection from './DashboardInfoSection';
+import DashboardSections, { DashboardSection } from './DashboardSections';
+
+const getSections = (
+  userRole: UserRole,
+  isSchedulerEnabled: boolean
+): DashboardSection[] => {
+  switch (userRole) {
+    case UserRole.USER: {
+      const experiments: DashboardSection = {
+        id: 'experiments',
+        label: 'Experiments',
+        icon: <EventIcon />,
+        render: ({ canHideWhenEmpty }) => (
+          <UserUpcomingExperimentsTable hideIfEmpty={canHideWhenEmpty} />
+        ),
+      };
+      const proposals: DashboardSection = {
+        id: 'proposals',
+        label: 'Proposals',
+        icon: <FolderOpenIcon />,
+        render: () => <ProposalTableUser />,
+      };
+
+      return isSchedulerEnabled ? [experiments, proposals] : [proposals];
+    }
+    case UserRole.INSTRUMENT_SCIENTIST:
+    case UserRole.INTERNAL_REVIEWER:
+      return [
+        {
+          id: 'proposals',
+          render: () => <ProposalTableInstrumentScientist />,
+        },
+      ];
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+    case UserRole.FAP_CHAIR:
+    case UserRole.FAP_REVIEWER:
+    case UserRole.FAP_SECRETARY:
+      return [
+        {
+          id: 'proposals',
+          render: () => <ProposalTableReviewer />,
+        },
+      ];
+    case UserRole.PROPOSAL_READER:
+      return [
+        {
+          id: 'proposals',
+          render: () => <ProposalTableReader />,
+        },
+      ];
+    default:
+      return [
+        {
+          id: 'proposals',
+          render: () => (
+            <ProposalTableOfficer
+              proposalFilter={{}}
+              setProposalFilter={function (): void {
+                throw new Error('Function not implemented.');
+              }}
+            />
+          ),
+        },
+      ];
+  }
+};
 
 export default function OverviewPage(props: { userRole: UserRole }) {
   const [loadingContent, pageContent] = useGetPageContent(
@@ -32,76 +89,34 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
 
-  let roleBasedOverView = null;
+  const showPageContent =
+    props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+    props.userRole !== UserRole.PROPOSAL_READER &&
+    Object.values(UserRole).includes(props.userRole);
 
-  switch (props.userRole) {
-    case UserRole.USER:
-      roleBasedOverView = (
-        <>
-          {isSchedulerEnabled && (
-            <Paper>
-              <UserUpcomingExperimentsTable />
-            </Paper>
-          )}
-          <Paper>
-            <ProposalTableUser />
-          </Paper>
-        </>
-      );
-      break;
-    case UserRole.INSTRUMENT_SCIENTIST:
-    case UserRole.INTERNAL_REVIEWER:
-      roleBasedOverView = (
-        <Paper>
-          <ProposalTableInstrumentScientist />
-        </Paper>
-      );
-      break;
-    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
-    case UserRole.FAP_CHAIR:
-    case UserRole.FAP_REVIEWER:
-    case UserRole.FAP_SECRETARY:
-      roleBasedOverView = (
-        <Paper>
-          <ProposalTableReviewer />
-        </Paper>
-      );
-      break;
-    case UserRole.PROPOSAL_READER:
-      roleBasedOverView = (
-        <Paper>
-          <ProposalTableReader />
-        </Paper>
-      );
-      break;
-    default:
-      roleBasedOverView = (
-        <Paper>
-          <ProposalTableOfficer
-            proposalFilter={{}}
-            setProposalFilter={function (): void {
-              throw new Error('Function not implemented.');
-            }}
-          />
-        </Paper>
-      );
-      break;
-  }
+  // Kept mounted while loading so the desktop panel still shows its placeholder;
+  // the section drops out entirely if the instance has no homepage content.
+  const infoSection: DashboardSection | null =
+    showPageContent && (loadingContent || !!pageContent)
+      ? {
+          id: 'info',
+          label: 'Info',
+          icon: <InfoIcon />,
+          render: () =>
+            loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              <DashboardInfoSection pageContent={pageContent} />
+            ),
+        }
+      : null;
 
   return (
     <StyledContainer maxWidth={false}>
-      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
-        props.userRole !== UserRole.PROPOSAL_READER &&
-        Object.values(UserRole).includes(props.userRole) && (
-          <Paper>
-            {loadingContent ? (
-              <div>Loading...</div>
-            ) : (
-              parse(pageContent as string)
-            )}
-          </Paper>
-        )}
-      {roleBasedOverView}
+      <DashboardSections
+        sections={getSections(props.userRole, !!isSchedulerEnabled)}
+        infoSection={infoSection}
+      />
     </StyledContainer>
   );
 }

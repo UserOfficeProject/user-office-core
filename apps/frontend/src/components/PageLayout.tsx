@@ -8,14 +8,21 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import parse from 'html-react-parser';
 import React, { Suspense, useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, SettingsId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import {
+  drawerRailWidth,
+  drawerWidth,
+  toolbarHeight,
+  useIsMobile,
+  useIsTabletOrMobile,
+} from 'hooks/common/useResponsive';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import MenuItems from './menu/MenuItems';
@@ -49,9 +56,10 @@ const PageLayout = ({
   header: string;
   children: React.ReactNode;
 }) => {
-  const drawerWidth = 250;
   const theme = useTheme();
-  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
+  const isTabletOrMobile = useIsTabletOrMobile();
+  const isMobile = useIsMobile();
+  const location = useLocation();
   const [open, setOpen] = React.useState(
     localStorage.drawerOpen
       ? localStorage.drawerOpen === '1'
@@ -61,29 +69,53 @@ const PageLayout = ({
   const { currentRole } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
+  const toolbar = toolbarHeight(theme);
   const drawer = {
-    width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    '.MuiDrawer-paper': {
-      width: 'inherit',
-    },
   };
-  const drawerOpen = () => ({
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  });
-  const drawerClose = () => ({
-    transition: theme.transitions.create('width', {
+  const menuLabel = {
+    transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+  };
+  const paper = {
+    overflowX: 'hidden',
+    boxSizing: 'border-box',
+    '.MuiListItemText-root': menuLabel,
+  };
+  const openWidth = {
+    width: drawerWidth(theme),
+  };
+  const closedWidth = {
+    width: drawerRailWidth(theme),
+  };
+  const widthTransition = (duration: number) =>
+    theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration,
+    });
+  const drawerOpen = () => ({
+    ...openWidth,
+    transition: widthTransition(theme.transitions.duration.enteringScreen),
+    '.MuiDrawer-paper': {
+      ...paper,
+      ...openWidth,
+      transition: widthTransition(theme.transitions.duration.enteringScreen),
+    },
+  });
+  const drawerClose = () => ({
+    ...closedWidth,
+    transition: widthTransition(theme.transitions.duration.leavingScreen),
+    '.MuiDrawer-paper': {
+      ...paper,
+      ...closedWidth,
+      transition: widthTransition(theme.transitions.duration.leavingScreen),
+      '.MuiListItemText-root': {
+        ...menuLabel,
+        opacity: 0,
+      },
     },
   });
 
@@ -107,10 +139,16 @@ const PageLayout = ({
     }
   }, [isTabletOrMobile]);
 
+  // TODO: these sit directly above the dashboard's sticky section nav on a phone
+  // and are easy to hit by accident, so they are suppressed there for now. Where
+  // they should live on mobile is still open.
+  const showFooterLinks = !(isMobile && location.pathname === '/');
   const displayPrivacyPageLink =
+    showFooterLinks &&
     settingsMap.get(SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK)
       ?.settingsValue === 'true';
   const displayFAQLink =
+    showFooterLinks &&
     settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
   const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
 
@@ -178,9 +216,12 @@ const PageLayout = ({
           component="main"
           sx={{
             flexGrow: 1,
-            height: 'calc(100vh - 64px)',
-            marginTop: '64px',
-            width: `calc(100% - ${drawerWidth}px)`,
+            marginTop: toolbar,
+            height: {
+              xs: `calc(100vh - ${toolbar.xs})`,
+              sm: `calc(100vh - ${toolbar.sm})`,
+            },
+            minWidth: 0,
           }}
         >
           <Suspense
