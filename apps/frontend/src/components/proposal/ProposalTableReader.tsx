@@ -32,6 +32,14 @@ const columns: Column<ProposalViewData>[] = [
   },
 
   { title: 'Title', field: 'title' },
+  {
+    title: 'Submitted date',
+    field: 'submittedDate',
+    render: (rowData) =>
+      rowData.submittedDate
+        ? new Date(rowData.submittedDate).toLocaleDateString()
+        : '',
+  },
   { title: 'Status', field: 'statusName' },
   {
     title: t('instrument'),
