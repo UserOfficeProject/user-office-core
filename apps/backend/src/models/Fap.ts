@@ -72,6 +72,9 @@ export class FapAssignment {
     public reassigned: boolean,
     public dateReassigned: Date | null,
     public emailSent: boolean,
-    public rank: number | null
+    public rank: number | null,
+    public comment: string,
+    public grade: string,
+    public status: number
   ) {}
 }

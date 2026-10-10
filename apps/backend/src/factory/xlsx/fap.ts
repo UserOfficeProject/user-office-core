@@ -1,8 +1,9 @@
 import { groupBy } from 'lodash';
+import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
 import { collectCallFapXLSXData } from './callFaps';
-import { FapDataRow, FapDataRowInput } from './FapDataRow';
+import { buildReviewRow, FapDataRow, FapDataRowInput } from './FapDataRow';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
@@ -173,4 +174,109 @@ export const collectFapXLSXData = async (
     filename: filename.replace(/\s+/g, '_'),
     data: transformedData,
   };
+};
+export const collectFapReviewXLSXData = async (
+  fapId: number,
+  callId: number,
+  reviewerProposals: Record<number, number[]>,
+  user: UserWithRole
+): Promise<{ data: FapXLSXData; filename: string }> => {
+  const reviewData = await fapDataSource.getFapReviewData(callId, fapId);
+
+  const data: FapXLSXData = [];
+  for (const [reviewerIdString, proposalPks] of Object.entries(
+    reviewerProposals
+  )) {
+    const reviewerId = Number(reviewerIdString);
+
+    const reviewer = await baseContext.queries.user.getBasic(user, reviewerId);
+
+    const reviewerName =
+      `${reviewer?.firstname ?? ''} ${reviewer?.lastname ?? ''}`.trim();
+    const rankedRows: Array<{
+      rank: number | null;
+      grade: number | null;
+      row: Array<string | number>;
+    }> = [];
+    for (const proposalPk of proposalPks) {
+      const review = reviewData.find((item) => item.proposal_pk === proposalPk);
+
+      if (!review) {
+        continue;
+      }
+
+      const assignments = await fapDataSource.getFapProposalAssignments(
+        fapId,
+        proposalPk,
+        reviewerId
+      );
+
+      const assignment = assignments.find(
+        (item) => item.fapMemberUserId === reviewerId
+      );
+
+      if (!assignment) {
+        continue;
+      }
+
+      const grade = Number(assignment.grade);
+      rankedRows.push({
+        rank: assignment.rank,
+        grade: Number.isFinite(grade) ? grade : null,
+        row: buildReviewRow({
+          proposalId: review.proposal_id,
+          title: review.title ?? '-',
+          instrumentName: review.instrument_name ?? '-',
+          dateAssigned: formatDate(assignment.dateAssigned),
+          rank: assignment.rank ?? null,
+          grade: assignment.grade,
+          comment: stripHtml(assignment.comment ?? '-'),
+          status: assignment.status == 1 ? 'Submitted' : 'Draft',
+        }),
+      });
+    }
+
+    const rows = rankedRows
+      .sort((a, b) => {
+        if (a.rank === null || b.rank === null) {
+          if (a.rank !== b.rank) {
+            return a.rank === null ? 1 : -1;
+          }
+        } else if (a.rank !== b.rank) {
+          return a.rank - b.rank;
+        }
+
+        if (a.grade === null || b.grade === null) {
+          if (a.grade !== b.grade) {
+            return a.grade === null ? 1 : -1;
+          }
+        } else if (a.grade !== b.grade) {
+          return b.grade - a.grade;
+        }
+
+        return 0;
+      })
+      .map(({ row }) => row);
+
+    data.push({
+      sheetName: reviewerName.substring(0, 31),
+      rows,
+    });
+  }
+
+  return {
+    filename: 'fap_reviews.xlsx',
+    data,
+  };
+};
+
+const formatDate = (value: string | Date | null | undefined): string => {
+  if (!value) return '-';
+
+  const dt =
+    typeof value === 'string'
+      ? DateTime.fromISO(value)
+      : DateTime.fromJSDate(value);
+
+  return dt.isValid ? dt.toFormat('dd-MM-yyyy') : '-';
 };
