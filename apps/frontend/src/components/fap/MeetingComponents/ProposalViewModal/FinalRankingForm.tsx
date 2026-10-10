@@ -52,7 +52,7 @@ const FinalRankingForm = ({
   const { t } = useTranslation();
 
   const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
-    (fmd) => fmd.instrumentId === instrumentId
+    (fmd) => fmd.instrumentId === instrumentId && fmd.fapId === fapId
   );
 
   const initialData = {
