@@ -36,7 +36,12 @@ const FapMeetingComponentsView = ({
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <CallFilter
             calls={calls}
             isLoading={loadingCalls}

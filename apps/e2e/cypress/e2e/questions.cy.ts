@@ -244,7 +244,7 @@ context('Questions tests', () => {
     cy.get('[data-cy=questions-table]')
       .contains(textQuestion)
       .closest('tr')
-      .find('[data-testid=EditIcon]')
+      .find('[aria-label="Edit Question"]')
       .click();
 
     cy.finishedLoading();

@@ -1,4 +1,3 @@
-import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -22,7 +21,6 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 export const QuestionTemplateRelationDateForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
-  const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
 
   const dateTimeFormat = settingsMap.get(
@@ -86,7 +84,9 @@ export const QuestionTemplateRelationDateForm = (
               Label={{
                 label: 'Include time',
               }}
-              inputProps={{ 'data-cy': 'includeTime' }}
+              slotProps={{
+                input: { 'data-cy': 'includeTime' },
+              }}
             />
             <Field
               name="config.tooltip"
@@ -121,7 +121,6 @@ export const QuestionTemplateRelationDateForm = (
                     fullWidth: true,
                     'data-cy': 'minDate',
                   }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
                 <Field
                   name="config.maxDate"
@@ -135,7 +134,6 @@ export const QuestionTemplateRelationDateForm = (
                     fullWidth: true,
                     'data-cy': 'maxDate',
                   }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
                 <Field
                   name="config.defaultDate"
@@ -150,7 +148,6 @@ export const QuestionTemplateRelationDateForm = (
                     fullWidth: true,
                     'data-cy': 'defaultDate',
                   }}
-                  desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
               </LocalizationProvider>
             </TitledContainer>

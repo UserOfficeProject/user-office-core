@@ -33,7 +33,7 @@ function IntervalSearchCriteriaComponent({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={5}>
+      <Grid size={5}>
         <FormControl fullWidth>
           <InputLabel shrink id="comparator-label">
             Operator
@@ -61,7 +61,7 @@ function IntervalSearchCriteriaComponent({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid size={3}>
         <TextField
           name="value"
           label="Value"
@@ -76,7 +76,7 @@ function IntervalSearchCriteriaComponent({
           data-cy="value"
         />
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControl fullWidth>
           <InputLabel shrink id="unit-label">
             Unit

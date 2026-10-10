@@ -251,10 +251,12 @@ const CallGeneralInfo = ({
         id="short-code-input"
         type="text"
         component={TextField}
-        inputProps={{ maxLength: '20' }}
         fullWidth
         required
         data-cy="short-code"
+        slotProps={{
+          htmlInput: { maxLength: '20' },
+        }}
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
@@ -264,7 +266,6 @@ const CallGeneralInfo = ({
           format={dateTimeFormat}
           ampm={false}
           component={DayTimeRangePicker}
-          inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
@@ -272,7 +273,6 @@ const CallGeneralInfo = ({
             'data-cy': 'start-end-date',
           }}
           // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -282,75 +282,84 @@ const CallGeneralInfo = ({
           id="reference-number-format-input"
           type="text"
           component={TextField}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClickOpen}>
-                  <HelpIcon />
-                </IconButton>
-                <StyledDialog
-                  onClose={handleClose}
-                  aria-labelledby="customized-dialog-title"
-                  open={open}
-                  title="Reference Number Format"
-                >
-                  <DialogContent dividers>
-                    <Typography gutterBottom color="inherit" variant="body1">
-                      A reference number format determines how reference numbers
-                      are generated. It consists of a <strong>prefix </strong>
-                      and <strong> digits parameter</strong>.<br></br>
-                      <br></br>
-                      The<strong> prefix</strong> can contain alphanumeric
-                      characters and is what all generated reference numbers
-                      will begin with. For example, <code>21a</code>.<br></br>
-                      <br></br>
-                      The <strong> digits parameter</strong> is a numerical
-                      value that determines how many digits a proposal&apos;s
-                      sequence number is, including padding.It is written as
-                      <code>{'{digits:x}'}</code>, where x is a the value of the
-                      number. For example, if parameter is 6 (
-                      <code>{'{digits:6}'}</code>), the first proposal will be
-                      numbered 000001, the second 000002, and so on.
-                      <h3>Valid examples</h3>
-                      <TableContainer component={Paper}>
-                        <Table aria-label="customized table">
-                          <TableHead>
-                            <StyledTableRow>
-                              <StyledTableCell>
-                                <strong>Format</strong>
-                              </StyledTableCell>
-                              <StyledTableCell align="right">
-                                <strong>Generated reference numbers</strong>
-                              </StyledTableCell>
-                            </StyledTableRow>
-                          </TableHead>
-                          <TableBody>
-                            {rows.map((row) => (
-                              <StyledTableRow key={row.format}>
-                                <StyledTableCell component="th" scope="row">
-                                  {row.format}
-                                </StyledTableCell>
-                                <StyledTableCell align="right">
-                                  {row.refNumber}
-                                </StyledTableCell>
-                              </StyledTableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </Typography>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button autoFocus variant="text" onClick={handleClose}>
-                      Close
-                    </Button>
-                  </DialogActions>
-                </StyledDialog>
-              </InputAdornment>
-            ),
-          }}
           fullWidth
           data-cy="reference-number-format"
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickOpen}>
+                    <HelpIcon />
+                  </IconButton>
+                  <StyledDialog
+                    onClose={handleClose}
+                    aria-labelledby="customized-dialog-title"
+                    open={open}
+                    title="Reference Number Format"
+                  >
+                    <DialogContent dividers>
+                      <Typography
+                        gutterBottom
+                        variant="body1"
+                        sx={{
+                          color: 'inherit',
+                        }}
+                      >
+                        A reference number format determines how reference
+                        numbers are generated. It consists of a{' '}
+                        <strong>prefix </strong>
+                        and <strong> digits parameter</strong>.<br></br>
+                        <br></br>
+                        The<strong> prefix</strong> can contain alphanumeric
+                        characters and is what all generated reference numbers
+                        will begin with. For example, <code>21a</code>.<br></br>
+                        <br></br>
+                        The <strong> digits parameter</strong> is a numerical
+                        value that determines how many digits a proposal&apos;s
+                        sequence number is, including padding.It is written as
+                        <code>{'{digits:x}'}</code>, where x is a the value of
+                        the number. For example, if parameter is 6 (
+                        <code>{'{digits:6}'}</code>), the first proposal will be
+                        numbered 000001, the second 000002, and so on.
+                        <h3>Valid examples</h3>
+                        <TableContainer component={Paper}>
+                          <Table aria-label="customized table">
+                            <TableHead>
+                              <StyledTableRow>
+                                <StyledTableCell>
+                                  <strong>Format</strong>
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                  <strong>Generated reference numbers</strong>
+                                </StyledTableCell>
+                              </StyledTableRow>
+                            </TableHead>
+                            <TableBody>
+                              {rows.map((row) => (
+                                <StyledTableRow key={row.format}>
+                                  <StyledTableCell component="th" scope="row">
+                                    {row.format}
+                                  </StyledTableCell>
+                                  <StyledTableCell align="right">
+                                    {row.refNumber}
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button autoFocus variant="text" onClick={handleClose}>
+                        Close
+                      </Button>
+                    </DialogActions>
+                  </StyledDialog>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </LocalizationProvider>
       <FormControl fullWidth>
@@ -508,7 +517,6 @@ const CallGeneralInfo = ({
             ampm={false}
             allowSameDateSelection
             component={DateTimePicker}
-            inputProps={{ placeholder: dateTimeFormat }}
             textField={{
               fullWidth: true,
               required: true,
@@ -516,7 +524,6 @@ const CallGeneralInfo = ({
             }}
             // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
             // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
-            desktopModeMediaQuery={theme.breakpoints.up('sm')}
             minDate={startEndDate.to}
             required
           />
@@ -535,8 +542,10 @@ const CallGeneralInfo = ({
         type="text"
         component={TextField}
         fullWidth
-        inputProps={{ maxLength: '100' }}
         data-cy="title"
+        slotProps={{
+          htmlInput: { maxLength: '100' },
+        }}
       />
       <Field
         name="description"

@@ -33,7 +33,12 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
       <FormControl fullWidth>
         <Grid container spacing={2}>
           <LocalizationProvider dateAdapter={DateAdapter}>
-            <Grid item sm={3} xs={12}>
+            <Grid
+              size={{
+                sm: 3,
+                xs: 12,
+              }}
+            >
               <DatePicker
                 format={inputDateFormat}
                 label="From date"
@@ -78,7 +83,12 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
               />
             </Grid>
 
-            <Grid item sm={3} xs={12}>
+            <Grid
+              size={{
+                sm: 3,
+                xs: 12,
+              }}
+            >
               <DatePicker
                 format={inputDateFormat}
                 label="To date"

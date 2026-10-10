@@ -51,12 +51,12 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
     <StyledContainer>
       <StyledPaper>
         <Grid container>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <h1>Merge Institutions</h1>
             Merge two institutions into one. All the relevant data from both
             institutions will be merged.
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <InstitutionSelect
               id="select-from-institution"
               data-cy="select-from-institution"
@@ -86,7 +86,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
               value={institutionInto}
             />
           </Grid>
-          <Grid item xs={1} style={{ position: 'relative' }}>
+          <Grid style={{ position: 'relative' }} size={1}>
             <MergeType
               sx={{
                 position: 'absolute',
@@ -98,7 +98,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
               }}
             />
           </Grid>
-          <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid sx={{ display: 'flex', alignItems: 'center' }} size={6}>
             <TextField
               fullWidth
               label="Merged Institution Name"
@@ -107,7 +107,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
               onChange={(e) => setMergedInstitutionName(e.target.value)}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <ActionButtonContainer>
               <Button
                 type="button"

@@ -17,7 +17,7 @@ const FapGradeGuide = ({ fap, onFapUpdate }: FapGradeGuideProps) => {
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   return (
-    <Grid item sm={25} xs={12}>
+    <Grid size={12}>
       <Editor
         initialValue={fap.gradeGuide || ''}
         init={{

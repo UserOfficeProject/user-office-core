@@ -47,6 +47,7 @@ const CopyToClipboard = (props: CopyToClipboardProps) => {
     >
       {children}
       <ContentCopyIcon
+        data-cy="copy-to-clipboard"
         sx={{
           ...{
             position: 'absolute',
