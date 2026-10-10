@@ -294,16 +294,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
-      )}
+      <Tooltip title="Experiments">
+        <ListItemButton component={NavLink} to={`/Experiments`}>
+          <ListItemIcon>
+            <EventIcon />
+          </ListItemIcon>
+          <ListItemText primary="Experiments" />
+        </ListItemButton>
+      </Tooltip>
     </div>
   );
 
