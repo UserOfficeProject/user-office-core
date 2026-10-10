@@ -15,7 +15,8 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import { SettingsId, BasicUserDetails, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
@@ -82,7 +83,13 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         .concat(proposer as BasicUserDetails)
     );
   };
-  const counter = `Characters: ${textLen}/1500`;
+  const { settingsMap } = useContext(SettingsContext);
+  const maxAbstractLength =
+    parseInt(
+      settingsMap.get(SettingsId.MAX_ABSTRACT_LEN)?.settingsValue || '1500',
+      10
+    ) || 1500;
+  const counter = `Characters: ${textLen}/${maxAbstractLength}`;
 
   return (
     <div>
