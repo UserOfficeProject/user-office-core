@@ -1266,6 +1266,7 @@ const ProposalTableOfficer = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
+            isUserOfficeView={true}
           />
         </DialogContent>
       </Dialog>
