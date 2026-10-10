@@ -64,3 +64,34 @@ export const sanitizeHtmlAndCleanText = (htmlString: string) => {
 
   return sanitizedCleaned;
 };
+
+export const countWordsInHtml = (htmlString: string) => {
+  const sanitized = sanitizeHtml(htmlString, {
+    ...sanitizerValidationConfig,
+    allowedTags: [
+      'br',
+      'div',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'li',
+      'ol',
+      'p',
+      'ul',
+    ],
+  });
+  const text = sanitized.replace(
+    /<\/?(?:br|div|h[1-6]|li|ol|p|ul)\b[^>]*>/gi,
+    ' '
+  );
+
+  return text
+    .split(/\s+/)
+    .reduce(
+      (wordCount, segment) => wordCount + (segment.match(/\w+/g)?.length ?? 0),
+      0
+    );
+};
