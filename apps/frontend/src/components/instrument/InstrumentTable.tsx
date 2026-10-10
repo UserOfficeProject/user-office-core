@@ -94,7 +94,7 @@ const InstrumentTable = () => {
     setAssigningInstrumentId(null);
   };
 
-  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
+  const AssignmentIndIcon = () => <AssignmentInd />;
 
   const AssignedScientists = React.useCallback(
     ({ rowData }: { rowData: InstrumentFragment }) => {

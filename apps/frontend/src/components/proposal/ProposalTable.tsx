@@ -12,7 +12,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import { Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import PropTypes from 'prop-types';
 import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -92,7 +91,8 @@ const ProposalTable = ({
 }: ProposalTableProps) => {
   const userContext = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
-  const tableRef = React.useRef<MaterialTableCore<PartialProposalsDataType>>();
+  const tableRef =
+    React.useRef<MaterialTableCore<PartialProposalsDataType>>(undefined);
   const { api } = useDataApiWithFeedback();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsData] = useState<
@@ -355,12 +355,6 @@ const ProposalTable = ({
       )}
     </div>
   );
-};
-
-ProposalTable.propTypes = {
-  title: PropTypes.string.isRequired,
-  search: PropTypes.bool.isRequired,
-  searchQuery: PropTypes.func.isRequired,
 };
 
 export default withConfirm(ProposalTable);

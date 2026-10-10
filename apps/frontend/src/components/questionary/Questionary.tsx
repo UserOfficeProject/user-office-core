@@ -19,7 +19,7 @@ import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 interface QuestionaryProps {
   title: string;
-  info?: JSX.Element | string;
+  info?: React.ReactNode;
   previewMode?: boolean;
   confirm: WithConfirmType;
 }
