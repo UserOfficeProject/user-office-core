@@ -4532,7 +4532,7 @@ context(
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"instruments": [],"requestTime":false,"readPermissions":[]}`,
         dependencies: [],
       });
 
