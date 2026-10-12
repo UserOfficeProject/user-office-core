@@ -177,12 +177,14 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                 gradeType === 'Classification' || config.decimalPoints === 0
                   ? undefined
                   : {
-                      id: 'grade-proposal',
-                      step: Math.pow(10, -config.decimalPoints).toString(),
-                      inputMode: 'decimal',
-                      type: 'number',
-                      min: config.minGrade.toString(),
-                      max: config.maxGrade.toString(),
+                      htmlInput: {
+                        id: 'grade-proposal',
+                        step: Math.pow(10, -config.decimalPoints).toString(),
+                        inputMode: 'decimal',
+                        type: 'number',
+                        min: config.minGrade.toString(),
+                        max: config.maxGrade.toString(),
+                      },
                     }
               }
               data-cy="grade-proposal"
