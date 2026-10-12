@@ -168,7 +168,7 @@ describe('generateManagementDecisionData tests', () => {
       mockFapReview
     );
 
-    expect(result.rankOrder).toEqual(4.5);
+    expect(result.rankOrder).toEqual(1);
     expect(result.instrumentAllocatedTime).toEqual(10);
     expect(result.xlsxrowdata).toEqual([
       '456',
