@@ -417,11 +417,16 @@ context('Fap reviews tests', () => {
         'not.have.class',
         'Mui-disabled'
       );
-      cy.get('[data-cy="fap-selection"]').click();
       cy.get('[data-cy="fap-selection"]').contains(instrument.name);
+      cy.get('[data-cy="fap-selection"]').click();
       cy.get('[role="listbox"] li[role="option"]').contains(fap1.code).click();
 
       cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        text: 'Proposal/s assigned to the selected Fap successfully',
+        variant: 'success',
+      });
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
@@ -526,7 +531,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3&pa-page=0&pa-pageSize=5`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3&pageSize=5`);
       //should go to the second page
       cy.get('button[aria-label="Next Page"]').click();
       cy.contains(proposal1.title).should('not.exist');
@@ -570,9 +575,7 @@ context('Fap reviews tests', () => {
       cy.get('[role=presentation]').contains(instrument.name).click();
       cy.get('body').type('{esc}');
 
-      cy.get('[data-cy="fap-assignments-table"]').contains(
-        instrument.shortCode
-      );
+      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
       cy.get('[data-cy="fap-assignments-table"]').contains(
         firstCreatedProposalPk
       );
@@ -1411,7 +1414,7 @@ context('Fap reviews tests', () => {
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
-    it('Fap Chair should be able to read/write non-submitted reviews', () => {
+    it('Fap Chair should be able to read/write/submit non-submitted reviews', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1441,7 +1444,9 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').should('be.disabled');
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
@@ -1572,7 +1577,9 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').should('be.disabled');
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.finishedLoading();
     });
@@ -4610,7 +4617,7 @@ context(
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"instruments": [],"readPermissions":[]}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
         dependencies: [],
       });
 
@@ -5017,7 +5024,7 @@ context('Fap meeting exports test', () => {
 
     cy.contains(updatedCall.shortCode)
       .parent()
-      .find('[aria-label="Export FAP Data"]')
+      .find('[aria-label="Export Fap Data"]')
       .click();
 
     cy.get('[data-cy=preparing-download-dialog').should('not.exist');
