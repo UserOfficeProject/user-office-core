@@ -74,6 +74,10 @@ async function setELIColourTheme() {
     settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
     settingsValue: 'true',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.ICON_PACK,
+    settingsValue: 'eli',
+  });
 }
 
 async function enableDefaultELIFeatures() {
