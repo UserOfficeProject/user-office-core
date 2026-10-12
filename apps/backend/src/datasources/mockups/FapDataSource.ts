@@ -153,7 +153,6 @@ export const dummyFapProposal = new FapProposal(
   1,
   1,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null,
   1,
   1,
   false
@@ -164,7 +163,6 @@ export const anotherDummyFapProposal = new FapProposal(
   2,
   2,
   new Date('2020-04-20 08:25:12.23043+00'),
-  null,
   2,
   1,
   true
@@ -177,6 +175,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   'Dummy comment for user',
   'Dummy comment for management',
   true,
+  1,
+  1,
   1,
   1,
   1
@@ -287,14 +287,6 @@ export class FapDataSourceMock implements FapDataSource {
     instrumentId?: number | null;
   }): Promise<FapProposal[]> {
     throw new Error('Method not implemented.');
-  }
-
-  updateTimeAllocation(
-    fapId: number,
-    proposalPk: number,
-    fapTimeAllocation: number | null
-  ): Promise<FapProposal> {
-    throw new Error('Method not implemented: updateTimeAllocation');
   }
 
   async isMemberOfFap(agent: User | null, fapId: number) {
@@ -587,7 +579,7 @@ export class FapDataSourceMock implements FapDataSource {
   async getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
-    return [new FapProposalWithReviewGradesAndRanking(1, 1, [7])];
+    return [new FapProposalWithReviewGradesAndRanking(1, 1, [7], 1)];
   }
 
   async getRelatedUsersOnFap(id: number): Promise<number[]> {
@@ -645,6 +637,17 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  getFapMeetingDecision(
+    fapProposalId: number
+  ): Promise<FapMeetingDecision | null> {
+    throw new Error('Method not implemented.');
+  }
+  isFapProposalInstrumentSubmittedById(
+    fapProposalId: number
+  ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

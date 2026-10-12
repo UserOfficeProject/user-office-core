@@ -133,11 +133,6 @@ export interface FapDataSource {
     assignments: { proposalPk: number; memberId: number }[],
     fapId: number
   ): Promise<Fap>;
-  updateTimeAllocation(
-    fapId: number,
-    proposalPk: number,
-    fapTimeAllocation: number | null
-  ): Promise<FapProposal>;
   isChairOrSecretaryOfFap(userId: number, fapId: number): Promise<boolean>;
   isChairOrSecretaryOfProposal(
     userId: number,
@@ -155,6 +150,9 @@ export interface FapDataSource {
     proposalPks: number[],
     fapId?: number
   ): Promise<FapMeetingDecision[]>;
+  getFapMeetingDecision(
+    fapProposalId: number
+  ): Promise<FapMeetingDecision | null>;
   getAllFapMeetingDecisions(fapId: number): Promise<FapMeetingDecision[]>;
   getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
@@ -162,8 +160,9 @@ export interface FapDataSource {
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   isFapProposalInstrumentSubmitted(
     proposalPk: number,
-    instrumentId?: number | null
+    instrumentId: number
   ): Promise<boolean>;
+  isFapProposalInstrumentSubmittedById(fapProposalId: number): Promise<boolean>;
   setReviewerRank(
     fapReviewId: number,
     reviewerId: number,

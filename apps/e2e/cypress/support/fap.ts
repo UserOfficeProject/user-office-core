@@ -12,13 +12,14 @@ import {
   GetProposalReviewsQuery,
   GetProposalReviewsQueryVariables,
   SaveFapMeetingDecisionMutation,
-  SaveFapMeetingDecisionMutationVariables,
   UpdateReviewMutation,
   UpdateReviewMutationVariables,
   ReorderFapMeetingDecisionProposalsMutation,
   ReorderFapMeetingDecisionProposalsMutationVariables,
   UpdateFapMutation,
   UpdateFapMutationVariables,
+  SaveFapMeetingDecisionInput,
+  Exact,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -92,11 +93,29 @@ const getProposalReviews = (
 };
 
 const saveFapMeetingDecision = (
-  saveFapMeetingDecisionInput: SaveFapMeetingDecisionMutationVariables
+  saveFapMeetingDecisionInput: Exact<{
+    saveFapMeetingDecisionInput: Omit<
+      SaveFapMeetingDecisionInput,
+      'fapProposalId'
+    >;
+  }>
 ): Cypress.Chainable<SaveFapMeetingDecisionMutation> => {
-  const request = api.saveFapMeetingDecision(saveFapMeetingDecisionInput);
-
-  return cy.wrap(request);
+  return cy.wrap(
+    api
+      .getFapProposal({
+        fapId: saveFapMeetingDecisionInput.saveFapMeetingDecisionInput.fapId,
+        proposalPk:
+          saveFapMeetingDecisionInput.saveFapMeetingDecisionInput.proposalPk,
+      })
+      .then((fapProposal) => {
+        return api.saveFapMeetingDecision({
+          saveFapMeetingDecisionInput: {
+            ...saveFapMeetingDecisionInput.saveFapMeetingDecisionInput,
+            fapProposalId: fapProposal.fapProposal?.fapProposalId as number,
+          },
+        });
+      })
+  );
 };
 
 const reorderFapMeetingDecisionProposals = (

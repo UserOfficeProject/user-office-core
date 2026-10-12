@@ -9,6 +9,7 @@ query fapProposalsByInstrument(
     callId: $callId
   ) {
     fapTimeAllocation
+    proposalTimeRequested
     proposal {
       primaryKey
       title

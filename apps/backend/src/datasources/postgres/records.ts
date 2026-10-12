@@ -441,7 +441,6 @@ export interface FapProposalRecord {
   readonly proposal_pk: number;
   readonly fap_id: number;
   readonly date_assigned: Date;
-  readonly fap_time_allocation: number | null;
   readonly instrument_id: number | null;
   readonly call_id: number;
   readonly fap_meeting_instrument_submitted: boolean;
@@ -450,7 +449,7 @@ export interface FapProposalRecord {
 export type AssignProposalsToFapsInput = Pick<
   FapProposalRecord,
   'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
-> & { instrument_has_proposals_id: number };
+>;
 
 export interface FapAssignmentRecord {
   readonly proposal_pk: number;
@@ -641,12 +640,18 @@ export interface FapMeetingDecisionRecord {
   readonly submitted_by: number | null;
   readonly instrument_id: number;
   readonly fap_id: number;
+  readonly recommended_time_allocation: number | null;
+  readonly meeting_status: string;
+  readonly meeting_notes: string | null;
+  readonly meeting_score: string | null;
+  readonly fap_proposal_id: number;
 }
 
 export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
+  readonly fap_proposal_id: number;
 }
 
 export interface FeatureRecord {
@@ -1166,7 +1171,9 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.submitted,
     fapMeetingDecisionRecord.submitted_by,
     fapMeetingDecisionRecord.instrument_id,
-    fapMeetingDecisionRecord.fap_id
+    fapMeetingDecisionRecord.fap_id,
+    fapMeetingDecisionRecord.recommended_time_allocation,
+    fapMeetingDecisionRecord.fap_proposal_id
   );
 };
 
@@ -1176,7 +1183,6 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.proposal_pk,
     fapProposal.fap_id,
     fapProposal.date_assigned,
-    fapProposal.fap_time_allocation,
     fapProposal.instrument_id,
     fapProposal.call_id,
     fapProposal.fap_meeting_instrument_submitted

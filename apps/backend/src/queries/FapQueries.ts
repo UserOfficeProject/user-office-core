@@ -292,6 +292,17 @@ export default class FapQueries {
     return this.dataSource.getFapsByProposalPk(proposalPk);
   }
 
+  @Authorized()
+  async getFapProposalTimeAllocation(
+    agent: UserWithRole | null,
+    fapProposalId: number
+  ): Promise<number | null> {
+    const fapMeetingDecision =
+      await this.dataSource.getFapMeetingDecision(fapProposalId);
+
+    return fapMeetingDecision?.recommendedTimeAllocation ?? null;
+  }
+
   private async userHasFapAccess(
     agent: UserWithRole | null,
     fapId: number

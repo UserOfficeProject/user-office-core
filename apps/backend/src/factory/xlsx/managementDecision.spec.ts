@@ -58,7 +58,9 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   789, // instrumentId
-  101 // fapId
+  101, // fapId,
+  1, // recommendedTimeAllocation
+  1 // fapProposalId
 );
 
 const mockFapReview: FapReviewsRecord = {
