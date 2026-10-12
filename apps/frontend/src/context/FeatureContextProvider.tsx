@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import React from 'react';
 
 import { Feature, FeatureId } from 'generated/sdk';
@@ -22,24 +21,7 @@ export const FeatureContext =
 export const FeatureContextProvider = (props: {
   children: React.ReactNode;
 }) => {
-  const { features, loadingFeatures, setFeatures } = useFeatures();
-
-  if (loadingFeatures) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100vw',
-          height: '100vh',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        data-cy="loading"
-      >
-        Loading...
-      </Box>
-    );
-  }
+  const { features, setFeatures } = useFeatures();
 
   const featuresMap = features?.reduce(function (featuresMap, feature) {
     featuresMap.set(feature.id, feature);
