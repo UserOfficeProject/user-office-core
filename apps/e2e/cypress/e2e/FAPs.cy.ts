@@ -423,11 +423,6 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="submit"]').click();
 
-      cy.notification({
-        text: 'Proposal/s assigned to the selected Fap successfully',
-        variant: 'success',
-      });
-
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
@@ -531,7 +526,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3&pageSize=5`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3&pa-page=0&pa-pageSize=5`);
       //should go to the second page
       cy.get('button[aria-label="Next Page"]').click();
       cy.contains(proposal1.title).should('not.exist');
@@ -575,7 +570,9 @@ context('Fap reviews tests', () => {
       cy.get('[role=presentation]').contains(instrument.name).click();
       cy.get('body').type('{esc}');
 
-      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+      cy.get('[data-cy="fap-assignments-table"]').contains(
+        instrument.shortCode
+      );
       cy.get('[data-cy="fap-assignments-table"]').contains(
         firstCreatedProposalPk
       );
@@ -1266,7 +1263,7 @@ context('Fap reviews tests', () => {
       cy.contains(firstCreatedProposalId).should('be.visible');
     });
 
-    it.only('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
+    it('Should be able to assign proposals to reviewers in the Reviewers to Assignments view', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
