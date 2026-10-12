@@ -101,7 +101,7 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
               component={TextField}
               fullWidth
               data-cy="max-words"
-              inputProps={{ min: 1, step: 1 }}
+              slotProps={{ htmlInput: { min: 1, step: 1 } }}
               onChange={({
                 target: { value },
               }: ChangeEvent<HTMLInputElement>) => {
