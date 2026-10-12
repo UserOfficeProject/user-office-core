@@ -210,7 +210,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         : {
             page_id: pageId,
             content: content,
-            role_id: roleId == null ? null : roleId,
+            role_id: roleId ?? null,
           };
 
     const [pagetextRecord]: PageTextRecord[] = await database('pagetext')

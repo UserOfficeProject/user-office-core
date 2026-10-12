@@ -68,7 +68,7 @@ const RoleFilter = ({
             </MenuItem>
           )}
           {!isLoading &&
-            roles.map((r) => (
+            sortedRoles.map((r) => (
               <MenuItem key={r.id} value={r.id}>
                 {r.title}
               </MenuItem>

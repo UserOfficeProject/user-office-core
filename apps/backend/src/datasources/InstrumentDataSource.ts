@@ -13,12 +13,12 @@ export interface InstrumentDataSource {
   getInstrument(instrumentId: number): Promise<Instrument | null>;
   getInstrumentsByNames(instrumentNames: string[]): Promise<Instrument[]>;
   getInstrumentsByIds(instrumentIds: number[]): Promise<Instrument[]>;
-  getInstruments(
-    first?: number,
-    offset?: number,
-    agentId?: number
-  ): Promise<{ totalCount: number; instruments: Instrument[] }>;
-  getUserInstruments(userId: number, agentId?: number): Promise<Instrument[]>;
+  getInstruments(args?: {
+    first?: number;
+    offset?: number;
+    tagIds?: number[];
+  }): Promise<{ totalCount: number; instruments: Instrument[] }>;
+  getUserInstruments(userId: number, tagIds?: number[]): Promise<Instrument[]>;
   getInstrumentsByCallId(
     callIds: number[],
     selectableOnly?: boolean

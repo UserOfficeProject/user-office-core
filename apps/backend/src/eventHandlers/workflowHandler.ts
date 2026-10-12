@@ -43,7 +43,7 @@ const extractEntityFromEvent = (
 };
 
 export const startWorkflow = async (
-  event: ApplicationEvent,
+  event: { type: Event },
   entityIdentifier: number | number[],
   workflowEntity: WorkFlowEntity
 ) => {

@@ -20,7 +20,7 @@ const checkValidJson = (value: string | null | undefined) => {
 export const setPageTextValidationSchema = Yup.object().shape({
   pageId: Yup.number().required(),
   text: Yup.string().notRequired(),
-  roleId: Yup.string().notRequired(),
+  roleId: Yup.number().notRequired(),
 });
 
 export const createApiAccessTokenValidationSchema = (

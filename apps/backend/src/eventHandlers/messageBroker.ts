@@ -17,6 +17,7 @@ import {
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -30,14 +31,16 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { areDependenciesSatisfied } from '../models/ProposalModelFunctions';
 import { Sample } from '../models/Sample';
+import { TemplateGroupId } from '../models/Template';
 import { Visit } from '../models/Visit';
 import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import { WorkflowEngine } from '../workflowEngine';
 import proposalWorkflowEntity from './workflowEntities/proposal';
+import { startWorkflow } from './workflowHandler';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -88,6 +91,11 @@ type ExperimentMessageData = {
   proposal?: ProposalMessageData;
   samples?: Pick<Sample, 'id' | 'title'>[];
   instrument?: { id: number; name: string; shortCode: string };
+};
+
+type VisitRegistrationAnswerMessageData = {
+  questionNaturalKey: string;
+  value: unknown;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -319,6 +327,12 @@ export const getVisitMessageData = async (
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+  const templateDataSource = container.resolve<TemplateDataSource>(
+    Tokens.TemplateDataSource
+  );
 
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
@@ -335,12 +349,42 @@ export const getVisitMessageData = async (
 
   const proposalPayload = await getProposalMessageData(proposal);
 
+  const registrationAnswers: VisitRegistrationAnswerMessageData[] = [];
+  if (visitRegistration.registrationQuestionaryId !== null) {
+    const questionary = await questionaryDataSource.getQuestionary(
+      visitRegistration.registrationQuestionaryId
+    );
+    const template = questionary
+      ? await templateDataSource.getTemplate(questionary.templateId)
+      : null;
+
+    if (template?.groupId === TemplateGroupId.VISIT_REGISTRATION) {
+      const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+        visitRegistration.registrationQuestionaryId
+      );
+
+      registrationAnswers.push(
+        ...questionarySteps.flatMap((step) =>
+          step.fields
+            .filter((field) =>
+              areDependenciesSatisfied(questionarySteps, field.question.id)
+            )
+            .map((field) => ({
+              questionNaturalKey: field.question.naturalKey,
+              value: field.value,
+            }))
+        )
+      );
+    }
+  }
+
   const visitJsonMessage = JSON.stringify({
     id: visitRegistration.id,
     startAt: visitRegistration.startsAt,
     endAt: visitRegistration.endsAt,
     visitorId: visitor.oidcSub,
     proposal: JSON.parse(proposalPayload),
+    registrationAnswers,
   });
 
   return visitJsonMessage;
@@ -648,8 +692,6 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const workflowEngine = container.resolve(WorkflowEngine);
-
   const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -658,11 +700,9 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await workflowEngine.run(
-      {
-        event: eventType,
-        entities: [proposalPk],
-      },
+    await startWorkflow(
+      { type: eventType },
+      proposalPk,
       proposalWorkflowEntity
     );
   };

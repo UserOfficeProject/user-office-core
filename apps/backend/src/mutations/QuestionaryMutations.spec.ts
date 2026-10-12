@@ -72,6 +72,84 @@ it('User should not be able to answer topic questions if proposal has no active 
   expect(isRejection(result)).toBe(true);
 });
 
+it('User can not answer a question that is not part of the submitted topic', async () => {
+  const questionaryDataSource = container.resolve<QuestionaryDataSourceMock>(
+    Tokens.QuestionaryDataSource
+  );
+  const { firstStep, questionaryId } = await getDummyUsersProposal();
+  const crossTopicAnswer = firstStep.fields[1];
+  const deleteAnswersSpy = jest.spyOn(questionaryDataSource, 'deleteAnswers');
+
+  jest
+    .spyOn(questionaryDataSource, 'getQuestionarySteps')
+    .mockResolvedValueOnce([
+      {
+        ...firstStep,
+        fields: firstStep.fields.filter(
+          (field) => field.question.id !== crossTopicAnswer.question.id
+        ),
+      },
+      {
+        ...firstStep,
+        topic: { ...firstStep.topic, id: firstStep.topic.id + 1 },
+        fields: [crossTopicAnswer],
+      },
+    ]);
+
+  const result = await mutations.answerTopic(dummyUserWithRole, {
+    questionaryId,
+    topicId: firstStep.topic.id,
+    answers: [
+      {
+        questionId: crossTopicAnswer.question.id,
+        value: JSON.stringify({ value: 'answer' }),
+      },
+    ],
+  });
+
+  expect(isRejection(result)).toBe(true);
+  expect(deleteAnswersSpy).not.toHaveBeenCalled();
+});
+
+it('User can not answer a question without its read role', async () => {
+  const questionaryDataSource = container.resolve<QuestionaryDataSourceMock>(
+    Tokens.QuestionaryDataSource
+  );
+  const { firstAnswer, firstStep, questionaryId } =
+    await getDummyUsersProposal();
+  const restrictedAnswer = {
+    ...firstAnswer,
+    config: {
+      ...firstAnswer.config,
+      readPermissions: ['user_officer'],
+    },
+  };
+  const deleteAnswersSpy = jest.spyOn(questionaryDataSource, 'deleteAnswers');
+
+  jest
+    .spyOn(questionaryDataSource, 'getQuestionarySteps')
+    .mockResolvedValueOnce([
+      {
+        ...firstStep,
+        fields: [restrictedAnswer],
+      },
+    ]);
+
+  const result = await mutations.answerTopic(dummyUserWithRole, {
+    questionaryId,
+    topicId: firstStep.topic.id,
+    answers: [
+      {
+        questionId: restrictedAnswer.question.id,
+        value: JSON.stringify({ value: 'answer' }),
+      },
+    ],
+  });
+
+  expect(isRejection(result)).toBe(true);
+  expect(deleteAnswersSpy).not.toHaveBeenCalled();
+});
+
 it('User should update question', async () => {
   const NEW_ANSWER = 'NEW_ANSWER';
   const { firstAnswer, questionaryId } = await getDummyUsersProposal();

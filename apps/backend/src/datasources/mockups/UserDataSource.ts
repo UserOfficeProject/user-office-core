@@ -138,7 +138,7 @@ export const dummyUserOfficerWithRole: UserWithRole = {
   externalTokenValid: true,
 };
 
-export const derivedDummyUserOfficerWithRole: UserWithRole = {
+export const dummyUserOfficerWithDerivedRole: UserWithRole = {
   ...dummyUserOfficer,
   currentRole: roles[1],
   externalTokenValid: true,
@@ -277,6 +277,18 @@ export const dummyInstrumentScientist: UserWithRole = {
     isRootRole: true,
   },
   externalTokenValid: true,
+};
+
+export const dummyInstrumentScientistWithDerivedRole: UserWithRole = {
+  ...dummyInstrumentScientist,
+  currentRole: {
+    id: 12,
+    title: 'Derived Instrument Scientist',
+    shortCode: 'instrument_scientist',
+    description: '',
+    config: {},
+    isRootRole: false,
+  },
 };
 
 export const dummyProposalReaderWithLogAccess: UserWithRole = {

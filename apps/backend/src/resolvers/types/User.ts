@@ -211,11 +211,16 @@ export class UserResolver {
 
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
-    const agentId = context.user?.currentRole?.id;
+    const agentRoleId = context.user?.currentRole?.id;
+    const tags = agentRoleId
+      ? await context.queries.instrument.roleDataSource.getTagsByRoleId(
+          agentRoleId
+        )
+      : [];
 
     return context.queries.instrument.dataSource.getUserInstruments(
       user.id,
-      agentId!
+      tags.map((tag) => tag.id)
     );
   }
 
