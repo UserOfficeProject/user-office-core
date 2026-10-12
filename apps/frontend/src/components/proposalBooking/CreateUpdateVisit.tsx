@@ -40,6 +40,12 @@ function CreateUpdateVisit({
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
+    // team: visit?.registrations.map((registration) => {
+    //   return {
+    //     'submittedSafetyForm': true,
+    //     ...registration.user!
+    //   }
+    // }) || [],
     teamLeadUserId: visit?.teamLead?.id || null,
     inviteEmails: visit?.registrationInvites || [],
   };

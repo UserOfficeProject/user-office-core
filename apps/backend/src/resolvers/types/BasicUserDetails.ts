@@ -46,6 +46,15 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public userTitle?: string;
 }
 
+@ObjectType()
+@Directive('@key(fields: "id")')
+export class extendedUserDetails extends BasicUserDetails  {
+    @Field(() => String, { nullable: true })
+  public userTitle2?: string;
+}
+
+
+
 export async function resolveBasicUserDetailsReference(
   ...params: any
 ): Promise<BasicUserDetails> {

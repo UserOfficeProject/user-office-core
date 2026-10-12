@@ -19,9 +19,14 @@ import { BasicUserDetails, Invite } from 'generated/sdk';
 
 import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
+export type ExtendedUserDetails = BasicUserDetails & {
+  hasUserPassedSafetyCheck: boolean | null | undefined;
+};
+
+
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */
-  users: BasicUserDetails[];
+  users: ExtendedUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
   invites?: Invite[];
@@ -74,8 +79,12 @@ const UserManagementTable = ({
     users: BasicUserDetails[];
     invites: Invite[];
   }) => {
-    setUsers([...users, ...props.users]);
-    setInvites?.([...invites, ...props.invites]);
+    const formattedNewUsers: ExtendedUserDetails[] = users.map((u) => ({
+      ...u,
+      hasUserPassedSafetyCheck: undefined, // or default value
+    }));
+    setUsers([...formattedNewUsers, ...props.users]);
+    setInvites?.([...invites, ...props.invites, ]);
     setOpen(false);
   };
 

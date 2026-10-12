@@ -151,7 +151,7 @@ async function configureDLSEnvironment() {
   }
   if (isDevelopment) {
     await Promise.all([
-      enableDefaultDLSFeatures(),
+      //enableDefaultDLSFeatures(),
       setTimezone(),
       setDateTimeFormats(),
       updateOIDCSettings(),
