@@ -1,41 +1,28 @@
-import { useEffect, useState } from 'react';
+import { use, useState } from 'react';
 
 import { Settings } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
+let settingsPromise: Promise<Settings[]> | undefined;
+
+function loadSettings(api: ReturnType<typeof useDataApi>): Promise<Settings[]> {
+  if (!settingsPromise) {
+    settingsPromise = api()
+      .getSettings()
+      .then((data) => data.settings);
+  }
+
+  return settingsPromise;
+}
+
 export function useSettings(): {
-  loadingSettings: boolean;
   settings: Settings[];
   setSettings: React.Dispatch<React.SetStateAction<Settings[]>>;
 } {
-  const [settings, setSettings] = useState<Settings[]>([]);
-  const [loadingSettings, setLoadingSettings] = useState(true);
-
   const api = useDataApi();
 
-  useEffect(() => {
-    let unmounted = false;
+  const initialSettings = use(loadSettings(api));
+  const [settings, setSettings] = useState(initialSettings);
 
-    setLoadingSettings(true);
-    api()
-      .getSettings()
-      .then((data) => {
-        if (unmounted) {
-          return;
-        }
-
-        setSettings(data.settings);
-        setLoadingSettings(false);
-      })
-      .catch(() => {
-        setSettings([]);
-        setLoadingSettings(false);
-      });
-
-    return () => {
-      unmounted = true;
-    };
-  }, [api]);
-
-  return { loadingSettings, settings, setSettings };
+  return { settings, setSettings };
 }
