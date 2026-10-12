@@ -31,8 +31,6 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
     updateCssPalette();
   }, [updateCssPalette]);
 
-  if (settingsMap.size == 0) return null;
-
   const palette = {
     primary: {
       dark:
