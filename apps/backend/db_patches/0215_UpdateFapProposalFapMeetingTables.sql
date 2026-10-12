@@ -31,6 +31,9 @@ BEGIN
 		ALTER TABLE fap_meeting_decisions
 			ADD COLUMN IF NOT EXISTS meeting_score VARCHAR(50);
 
+        ALTER TABLE fap_meeting_decisions DROP CONSTRAINT fap_meeting_decisions_pkey;
+        ALTER TABLE fap_meeting_decisions ADD PRIMARY KEY (fap_proposal_id);
+
         DROP VIEW IF EXISTS review_data;
 
         CREATE VIEW review_data AS
