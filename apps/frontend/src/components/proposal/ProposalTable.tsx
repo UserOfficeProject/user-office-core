@@ -1,4 +1,7 @@
-import MaterialTableCore, { Column } from '@material-table/core';
+import MaterialTableCore, {
+  Column,
+  OrderByCollection,
+} from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -46,7 +49,8 @@ type ProposalTableProps = {
   /** Function for getting data. */
   searchQuery: (
     page: number,
-    pageSize: number
+    pageSize: number,
+    orderByCollection: OrderByCollection[]
   ) => Promise<UserProposalDataType>;
   confirm: WithConfirmType;
 };
@@ -203,8 +207,18 @@ const ProposalTable = ({
           </Typography>
         }
         columns={columns}
-        data={(query) =>
-          searchQuery(query.page, query.pageSize).then((result) => {
+        data={(query) => {
+          // On inital load all columns are sent to the backend including ones not ordered. This filters
+          // out all columns except defaultOrderByCollection
+          const filteredOrderByCollection = query.orderByCollection.filter(
+            (col) => col.orderDirection !== ''
+          );
+
+          return searchQuery(
+            query.page,
+            query.pageSize,
+            filteredOrderByCollection
+          ).then((result) => {
             setPartialProposalsData(result.data ?? []);
 
             return {
@@ -212,11 +226,19 @@ const ProposalTable = ({
               page: result.page,
               totalCount: result.totalCount ?? 0,
             };
-          })
-        }
+          });
+        }}
         options={{
           search: search,
           debounceInterval: 400,
+          defaultOrderByCollection: [
+            {
+              orderBy: 4,
+              orderDirection: 'asc',
+              sortOrder: 1, // Not consumed by backend
+              orderByField: 'created',
+            },
+          ],
         }}
         actions={[
           (rowData) => {

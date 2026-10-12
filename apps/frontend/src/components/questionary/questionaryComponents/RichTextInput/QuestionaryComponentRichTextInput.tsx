@@ -2,6 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
 import { useTheme } from '@mui/material/styles';
+import { util } from '@user-office-software/duo-validation';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
@@ -27,9 +28,11 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
 
   const theme = useTheme();
   const [numberOfChars, setNumberOfChars] = useState(0);
+  const [numberOfWords, setNumberOfWords] = useState(0);
   const handleCharacterCount = (editor: TinyMCEEditor) => {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
+    setNumberOfWords(util.countWordsInHtml(editor.getContent()));
   };
   const [paragraphSpacingError, setParagraphSpacingError] = useState(false);
 
@@ -50,6 +53,14 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
           data-cy="rich-text-char-count"
         >
           Characters: {numberOfChars} / {config.max}
+        </FormLabel>
+      )}
+      {config.maxWords != null && (
+        <FormLabel
+          sx={{ marginBottom: theme.spacing(2) }}
+          data-cy="rich-text-word-count"
+        >
+          Words: {numberOfWords} / {config.maxWords}
         </FormLabel>
       )}
       <Editor

@@ -163,6 +163,7 @@ export interface FapDataSource {
     instrumentId: number
   ): Promise<boolean>;
   isFapProposalInstrumentSubmittedById(fapProposalId: number): Promise<boolean>;
+  getInstrumentCodes(fapId: number, proposalPk: number): Promise<string>;
   setReviewerRank(
     fapReviewId: number,
     reviewerId: number,
