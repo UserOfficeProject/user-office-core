@@ -424,7 +424,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({
-        text: 'Proposal/s assigned to the selected Fap successfully',
+        text: 'Proposal/s assigned to the selected FAP successfully',
         variant: 'success',
       });
 
@@ -531,7 +531,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3&pageSize=5`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3&pa-pageSize=5`);
       //should go to the second page
       cy.get('button[aria-label="Next Page"]').click();
       cy.contains(proposal1.title).should('not.exist');
@@ -1414,7 +1414,7 @@ context('Fap reviews tests', () => {
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
-    it('Fap Chair should be able to read/write/submit non-submitted reviews', () => {
+    it('Fap Chair should be able to read/write but not submit non-submitted reviews of other members', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1444,13 +1444,12 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').click();
-      cy.contains('OK').click();
-      cy.contains('Submitted').should('be.disabled');
+      // NOTE: Chair can only submit reviews where they are the reviewer.
+      cy.get('[data-cy="button-submit-proposal"]').should('be.disabled');
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
-      cy.contains('1 / 1').should('be.visible');
+      cy.contains('0 / 1').should('be.visible');
     });
 
     it('Fap Chair should not be able to see private technical comments', () => {
@@ -1549,7 +1548,7 @@ context('Fap reviews tests', () => {
       );
     });
 
-    it('Fap Secretary should be able to read/write non-submitted reviews', () => {
+    it('Fap Secretary should be able to read/write but not submit non-submitted reviews of other members', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1577,11 +1576,8 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').click();
-      cy.contains('OK').click();
-      cy.contains('Submitted').should('be.disabled');
-
-      cy.finishedLoading();
+      // NOTE: Secretary can only submit reviews where they are the reviewer.
+      cy.get('[data-cy="button-submit-proposal"]').should('be.disabled');
     });
 
     it('Fap Secretary should be able to edit only comments of technical reviews', function () {
@@ -4538,7 +4534,7 @@ context(
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        config: `{"variant":"dropdown","instruments":[],"isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
         dependencies: [],
       });
 
@@ -4867,7 +4863,7 @@ context('Fap meeting exports test', () => {
 
     cy.contains(updatedCall.shortCode)
       .parent()
-      .find('[aria-label="Export Fap Data"]')
+      .find('[aria-label="Export FAP Data"]')
       .click();
 
     cy.get('[data-cy=preparing-download-dialog').should('not.exist');
@@ -4934,7 +4930,7 @@ context('Fap meeting exports test', () => {
 
     cy.contains(updatedCall.shortCode)
       .parent()
-      .find('[aria-label="Export Fap Data"]')
+      .find('[aria-label="Export FAP Data"]')
       .click();
 
     cy.get('[data-cy=preparing-download-dialog').should('not.exist');
