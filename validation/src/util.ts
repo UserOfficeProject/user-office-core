@@ -91,7 +91,7 @@ export const countWordsInHtml = (htmlString: string) => {
   return text
     .split(/\s+/)
     .reduce(
-      (wordCount, segment) => wordCount + (segment.match(/\w+/g)?.length ?? 0),
+      (wordCount, segment) => wordCount + (segment.match(/[\w\u2019\u00C0-\u00FF'-]+/g)?.length ?? 0),
       0
     );
 };
