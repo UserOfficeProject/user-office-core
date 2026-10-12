@@ -33,7 +33,7 @@ export const QuestionDateTimeForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'natural_key' }}
+              slotProps={{ htmlInput: { 'data-cy': 'natural_key' } }}
             />
             <Field
               name="question"
@@ -42,7 +42,7 @@ export const QuestionDateTimeForm = (props: QuestionFormProps) => {
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'question' }}
+              slotProps={{ htmlInput: { 'data-cy': 'question' } }}
             />
 
             <TitledContainer label="Constraints">
