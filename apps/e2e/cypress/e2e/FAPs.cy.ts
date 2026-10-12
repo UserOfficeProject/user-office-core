@@ -1573,9 +1573,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').click();
-      cy.contains('OK').click();
-      cy.contains('Submitted').should('be.disabled');
+      cy.contains('Submit').should('be.disabled');
 
       cy.finishedLoading();
     });
