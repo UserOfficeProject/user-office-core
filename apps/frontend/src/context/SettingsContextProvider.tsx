@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import React from 'react';
 
 import { Settings, SettingsId } from 'generated/sdk';
@@ -22,24 +21,7 @@ export const SettingsContext =
 export const SettingsContextProvider = (props: {
   children: React.ReactNode;
 }) => {
-  const { settings, loadingSettings, setSettings } = useSettings();
-
-  if (loadingSettings) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100vw',
-          height: '100vh',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        data-cy="loading"
-      >
-        Loading...
-      </Box>
-    );
-  }
+  const { settings, setSettings } = useSettings();
 
   const settingsMap = settings.reduce(function (settingsMap, settings) {
     settingsMap.set(settings.id, settings);
