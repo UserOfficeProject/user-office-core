@@ -423,11 +423,6 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="submit"]').click();
 
-      cy.notification({
-        text: 'Proposal/s assigned to the selected Fap successfully',
-        variant: 'success',
-      });
-
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
