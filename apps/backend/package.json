@@ -56,7 +56,7 @@
     "@user-office-software/duo-validation": "file:../../validation",
     "@user-office-software/openid": "^1.4.0",
     "await-to-js": "^2.1.1",
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.3",
     "clamscan": "^2.1.2",
     "class-validator": "^0.14.0",
@@ -95,7 +95,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.5.0",
-    "@types/bcryptjs": "^2.4.2",
+    "@types/bcryptjs": "^3.0.0",
     "@types/clamscan": "^2.0.8",
     "@types/content-disposition": "^0.5.4",
     "@types/cors": "^2.8.13",
