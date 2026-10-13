@@ -61,7 +61,3 @@ export function useIsMobile(): boolean {
 export function useIsPortrait(): boolean {
   return useMediaQuery('(orientation: portrait)');
 }
-
-export function useCardRows(): boolean {
-  return useIsMobile();
-}

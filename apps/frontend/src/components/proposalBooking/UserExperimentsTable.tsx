@@ -2,7 +2,7 @@ import EventBusyIcon from '@mui/icons-material/EventBusy';
 import React from 'react';
 
 import CardEmptyState from 'components/common/cards/CardEmptyState';
-import { useCardRows } from 'hooks/common/useResponsive';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { useUserExperiments } from 'hooks/experiment/useUserExperiments';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -10,12 +10,12 @@ import ExperimentsTimesTable from './ExperimentTimesTable';
 
 export default function UserExperimentTimesTable() {
   const { loading, userExperiments } = useUserExperiments({ notDraft: true });
-  const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        {asCards && !loading && userExperiments.length === 0 ? (
+        {isMobile && !loading && userExperiments.length === 0 ? (
           <CardEmptyState
             icon={<EventBusyIcon fontSize="large" color="disabled" />}
             title="No experiment times"

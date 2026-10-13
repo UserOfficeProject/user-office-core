@@ -14,11 +14,7 @@ import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import {
-  minTouchTarget,
-  useCardRows,
-  useIsMobile,
-} from 'hooks/common/useResponsive';
+import { minTouchTarget, useIsMobile } from 'hooks/common/useResponsive';
 import {
   UserExperiment,
   useUserExperiments,
@@ -67,7 +63,6 @@ export default function UserUpcomingExperimentsTable({
     shouldUseTimeZone: true,
   });
   const { t } = useTranslation();
-  const asCards = useCardRows();
   const isMobile = useIsMobile();
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
@@ -140,7 +135,7 @@ export default function UserUpcomingExperimentsTable({
 
   return (
     <div data-cy="upcoming-experiments">
-      {asCards && (
+      {isMobile && (
         <Box
           sx={{
             display: 'flex',
@@ -154,7 +149,7 @@ export default function UserUpcomingExperimentsTable({
           </Typography>
         </Box>
       )}
-      {asCards && !experimentsLoading && userExperiments.length === 0 ? (
+      {isMobile && !experimentsLoading && userExperiments.length === 0 ? (
         <CardEmptyState
           icon={<EventBusyIcon fontSize="large" color="disabled" />}
           title="No upcoming experiments"
@@ -191,7 +186,7 @@ export default function UserUpcomingExperimentsTable({
             emptyRowsWhenPaging: false,
             paging: false,
             actionsColumnIndex: -1,
-            toolbar: !asCards,
+            toolbar: !isMobile,
           }}
         />
       )}

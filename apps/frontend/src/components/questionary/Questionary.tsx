@@ -170,7 +170,7 @@ function Questionary({
             title={title}
             subtitle={appBarSubtitle}
             onBack={() => navigate(-1)}
-            sheetItems={header?.menuItems ?? []}
+            actionItems={header?.menuItems ?? []}
           />
         )}
         {stepCount > 1 && (

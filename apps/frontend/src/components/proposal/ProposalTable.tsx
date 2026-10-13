@@ -28,7 +28,7 @@ import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import {
   belowCompactUi,
   minTouchTarget,
-  useCardRows,
+  useIsMobile,
 } from 'hooks/common/useResponsive';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -119,7 +119,7 @@ const ProposalTable = ({
     number | undefined
   >();
 
-  const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -221,7 +221,7 @@ const ProposalTable = ({
       }
     )();
 
-  const sheetItemsFor = (
+  const actionItems = (
     rowData: PartialProposalsDataType
   ): CardActionSheetItem[] => [
     {
@@ -270,7 +270,7 @@ const ProposalTable = ({
     }
   };
   const data = partialProposalsData as PartialProposalsDataType[];
-  const showEmptyState = asCards && isLoaded && data.length === 0;
+  const showEmptyState = isMobile && isLoaded && data.length === 0;
 
   return (
     <div data-cy="proposal-table">
@@ -296,24 +296,26 @@ const ProposalTable = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: isMobile ? 'space-between' : 'flex-end',
           gap: 2,
           // Matches the inset of the rows below: MUI TableCell pads 16px, and
           // MaterialTableCardRow's cell pads none on the card path.
-          paddingX: asCards ? 0 : 1,
-          paddingBottom: asCards ? 1 : 2,
+          paddingX: isMobile ? 0 : 1,
+          paddingBottom: isMobile ? 1 : 2,
         }}
       >
-        <Typography
-          variant="h5"
-          component="h2"
-          sx={(theme) => ({
-            fontWeight: 500,
-            [belowCompactUi(theme)]: { fontSize: 18 },
-          })}
-        >
-          {title}
-        </Typography>
+        {isMobile && (
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={(theme) => ({
+              fontWeight: 500,
+              [belowCompactUi(theme)]: { fontSize: 18 },
+            })}
+          >
+            {title}
+          </Typography>
+        )}
         {isEmailInviteEnabled && (
           <ButtonWithDialog
             label="Join proposal"
@@ -329,9 +331,7 @@ const ProposalTable = ({
           </ButtonWithDialog>
         )}
       </Box>
-      {/* A sibling, not localization.body.emptyDataSourceMessage: material-table
-          deep-merges localization and deepmerge stack-overflows on React
-          elements under React 19. Same workaround as TemplatesTable. */}
+
       {showEmptyState && (
         <CardEmptyState
           icon={<FolderOffIcon fontSize="large" color="disabled" />}
@@ -362,8 +362,7 @@ const ProposalTable = ({
             {title}
           </Typography>
         }
-        columns={columns} // Kept mounted rather than swapped out: tableRef drives refreshTableData
-        // after a proposal is joined by code, which is reachable from empty.
+        columns={columns}
         style={showEmptyState ? { display: 'none' } : undefined}
         data={(query) => {
           // On inital load all columns are sent to the backend including ones not ordered. This filters
@@ -398,7 +397,7 @@ const ProposalTable = ({
               orderByField: 'created',
             },
           ],
-          toolbar: !asCards,
+          toolbar: !isMobile,
         }}
         actions={[
           (rowData) => {
@@ -452,12 +451,12 @@ const ProposalTable = ({
                 ? () => openDataAccessUsers(proposal)
                 : undefined
             }
-            sheetItems={sheetItemsFor(proposal)}
+            actionItems={actionItems(proposal)}
           />
         )}
       />
       {showReferenceText(data) &&
-        (asCards ? (
+        (isMobile ? (
           <Typography
             variant="caption"
             color="text.secondary"
