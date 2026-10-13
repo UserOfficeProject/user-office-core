@@ -107,7 +107,7 @@ const CallSelectModalOnProposalsClone = ({
                 component={CheckboxWithLabel}
                 type="checkbox"
                 Label={{
-                  label: `Show all calls`,
+                  label: `Include finished calls`,
                 }}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleChange(e);
