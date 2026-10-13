@@ -7,7 +7,7 @@ import React from 'react';
 
 import { CardRowProvider } from 'components/common/cards/CardRowContext';
 import MaterialTableCardRow from 'components/common/MaterialTableCardRow';
-import { useCardRows } from 'hooks/common/useResponsive';
+import { useIsMobile } from 'hooks/common/useResponsive';
 
 // material-table ignores a falsy `components`, so it never reverts to the
 // default Row. Both states must be named, and the references must be stable.
@@ -44,23 +44,23 @@ function ResponsiveMaterialTable<RowData extends object>({
   cardRow,
   ...props
 }: ResponsiveMaterialTableProps<RowData>) {
-  const asCards = useCardRows();
+  const isMobile = useIsMobile();
 
   const table = (
     <MaterialTable
       {...props}
-      components={asCards ? CARD_ROW : DEFAULT_ROW}
+      components={isMobile ? CARD_ROW : DEFAULT_ROW}
       options={{
-        header: !asCards,
-        ...(asCards ? CARD_PAGING : {}),
+        header: !isMobile,
+        ...(isMobile ? CARD_PAGING : {}),
         ...props.options,
       }}
     />
   );
 
   return (
-    <CardRowProvider value={asCards ? cardRow ?? null : null}>
-      {asCards ? <Box sx={FLATTEN_CONTAINER}>{table}</Box> : table}
+    <CardRowProvider value={isMobile ? cardRow ?? null : null}>
+      {isMobile ? <Box sx={FLATTEN_CONTAINER}>{table}</Box> : table}
     </CardRowProvider>
   );
 }

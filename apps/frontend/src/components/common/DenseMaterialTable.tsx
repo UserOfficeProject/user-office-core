@@ -3,7 +3,7 @@ import React from 'react';
 import ResponsiveMaterialTable, {
   ResponsiveMaterialTableProps,
 } from 'components/common/ResponsiveMaterialTable';
-import { useCardRows } from 'hooks/common/useResponsive';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { denseTableColumns } from 'utils/helperFunctions';
 
 /**NOTE:
@@ -13,8 +13,8 @@ import { denseTableColumns } from 'utils/helperFunctions';
 function DenseMaterialTable<RowData extends object>(
   props: ResponsiveMaterialTableProps<RowData>
 ) {
-  const asCards = useCardRows();
-  const columns = asCards ? props.columns : denseTableColumns(props.columns);
+  const isMobile = useIsMobile();
+  const columns = isMobile ? props.columns : denseTableColumns(props.columns);
 
   return (
     <ResponsiveMaterialTable
