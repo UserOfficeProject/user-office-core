@@ -1031,7 +1031,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected Fap successfully',
+        text: 'Proposal/s assigned to the selected FAP successfully',
       });
 
       cy.should('not.contain', 'FAP_SELECTION');
