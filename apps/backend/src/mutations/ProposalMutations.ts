@@ -489,11 +489,11 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
-    if (commentForUser !== undefined) {
+    if (commentForUser !== undefined && finalStatus !== null) {
       proposal.commentForUser = commentForUser;
     }
 
-    if (commentForManagement !== undefined) {
+    if (commentForManagement !== undefined && finalStatus !== null) {
       proposal.commentForManagement = commentForManagement;
     }
 
