@@ -13,7 +13,6 @@ import Email from '@mui/icons-material/Email';
 import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 import Warning from '@mui/icons-material/Warning';
 import { IconButton, Tooltip, Link } from '@mui/material';
@@ -37,8 +36,8 @@ import i18n from 'i18n';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
-import ScienceIcon from 'components/common/icons/ScienceIcon';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
@@ -488,10 +487,10 @@ const ProposalTableOfficer = ({
     <GetAppIcon data-cy="download-proposals" />
   );
   const DeleteIcon = (): JSX.Element => <Delete />;
-  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
+  const GroupWorkIcon = (): JSX.Element => <IconPackIcon icon="FAP" />;
   const EmailIcon = (): JSX.Element => <Email />;
   const ScienceIconComponent = (): JSX.Element => (
-    <ScienceIcon data-cy="assign-remove-instrument" />
+    <IconPackIcon icon="Instrument" data-cy="assign-remove-instrument" />
   );
   const ChangeProposalStatusIcon = (): JSX.Element => (
     <ListStatusIcon data-cy="change-proposal-status" />

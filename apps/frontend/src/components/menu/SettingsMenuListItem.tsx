@@ -1,13 +1,4 @@
-import { Science } from '@mui/icons-material';
-import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import FunctionsIcon from '@mui/icons-material/Functions';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import Settings from '@mui/icons-material/Settings';
-import SettingsApplications from '@mui/icons-material/SettingsApplications';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import VpnKey from '@mui/icons-material/VpnKey';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -15,11 +6,10 @@ import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
-
-import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
 
 const menuMap = {
   Units: '/Units',
@@ -57,12 +47,12 @@ const SettingsMenuListItem = () => {
           <ListItemIcon>
             {isExpanded ? (
               <>
-                <Settings />
+                <IconPackIcon icon="ConfigurationSettings" />
                 <ExpandLess fontSize="small" />
               </>
             ) : (
               <>
-                <Settings />
+                <IconPackIcon icon="ConfigurationSettings" />
                 <ExpandMore fontSize="small" />
               </>
             )}
@@ -75,7 +65,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="Units">
           <ListItemButton component={NavLink} to={menuMap['Units']}>
             <ListItemIcon>
-              <FunctionsIcon />
+              <IconPackIcon icon="Unit" />
             </ListItemIcon>
             <ListItemText primary="Units" />
           </ListItemButton>
@@ -83,7 +73,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="Pages">
           <ListItemButton component={NavLink} to="/PageEditor">
             <ListItemIcon>
-              <SettingsApplications />
+              <IconPackIcon icon="Page" />
             </ListItemIcon>
             <ListItemText primary="Pages" />
           </ListItemButton>
@@ -96,7 +86,7 @@ const SettingsMenuListItem = () => {
             selected={location.pathname.includes('/ProposalStatuses')}
           >
             <ListItemIcon>
-              <ProposalSettingsIcon />
+              <IconPackIcon icon="ProposalStatuses" />
             </ListItemIcon>
             <ListItemText primary="Proposal statuses" />
           </ListItemButton>
@@ -113,7 +103,7 @@ const SettingsMenuListItem = () => {
               to={menuMap['ExperimentWorkflows']}
             >
               <ListItemIcon>
-                <Science />
+                <IconPackIcon icon="ExperimentWorkflows" />
               </ListItemIcon>
               <ListItemText primary="Experiment workflows" />
             </ListItemButton>
@@ -123,7 +113,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="API access tokens">
           <ListItemButton component={NavLink} to={menuMap['ApiAccessTokens']}>
             <ListItemIcon>
-              <VpnKey />
+              <IconPackIcon icon="APIAccessToken" />
             </ListItemIcon>
             <ListItemText primary="API access tokens" />
           </ListItemButton>
@@ -131,7 +121,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="Role management">
           <ListItemButton component={NavLink} to={menuMap['RoleManagement']}>
             <ListItemIcon>
-              <ManageAccountsIcon />
+              <IconPackIcon icon="RoleManagement" />
             </ListItemIcon>
             <ListItemText primary="Role management" />
           </ListItemButton>
@@ -139,7 +129,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="Features">
           <ListItemButton component={NavLink} to={menuMap['Features']}>
             <ListItemIcon>
-              <ViewModuleIcon />
+              <IconPackIcon icon="Feature" />
             </ListItemIcon>
             <ListItemText primary="Features" />
           </ListItemButton>
@@ -147,7 +137,7 @@ const SettingsMenuListItem = () => {
         <Tooltip title="App settings">
           <ListItemButton component={NavLink} to={menuMap['Settings']}>
             <ListItemIcon>
-              <DisplaySettingsIcon />
+              <IconPackIcon icon="AppSettings" />
             </ListItemIcon>
             <ListItemText primary="App settings" />
           </ListItemButton>

@@ -1,9 +1,4 @@
-import { ExitToApp, ManageAccounts } from '@mui/icons-material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
-import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import { Chip, Divider } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
@@ -17,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
@@ -146,7 +142,7 @@ const AccountActionButton = () => {
               fontSize: '1rem',
             }}
           >
-            <AccountCircle />
+            <IconPackIcon icon="Account" />
           </IconButton>
         </Badge>
         <Menu
@@ -164,7 +160,7 @@ const AccountActionButton = () => {
             data-cy="manage-account-button"
           >
             <Box paddingRight={1} paddingTop={1}>
-              <ManageAccounts />
+              <IconPackIcon icon="ManageAccounts" />
             </Box>
             Manage account
           </MenuItem>
@@ -177,7 +173,7 @@ const AccountActionButton = () => {
               data-cy="change-roles-button"
             >
               <Box paddingRight={1} paddingTop={1}>
-                <SupervisedUserCircleIcon />
+                <IconPackIcon icon="Roles" />
               </Box>
               <Box
                 sx={{
@@ -207,7 +203,7 @@ const AccountActionButton = () => {
                 userId={impersonatingUserId}
                 data-cy="un-impersonate"
                 variant="text"
-                startIcon={<SwitchAccountOutlinedIcon />}
+                startIcon={<IconPackIcon icon="UnImpersonate" />}
                 sx={{
                   textTransform: 'none',
                   fontSize: '1rem',
@@ -227,7 +223,7 @@ const AccountActionButton = () => {
               data-cy="external-homepage-button"
             >
               <Box paddingRight={1} paddingTop={1}>
-                <HomeOutlinedIcon />
+                <IconPackIcon icon="FacilitiesHomepage" />
               </Box>
               Facilities Homepage
             </MenuItem>
@@ -238,7 +234,11 @@ const AccountActionButton = () => {
             disabled={isLoggingOut}
           >
             <Box paddingRight={1} paddingTop={1}>
-              {isLoggingOut ? <UOLoader size={24} /> : <ExitToApp />}
+              {isLoggingOut ? (
+                <UOLoader size={24} />
+              ) : (
+                <IconPackIcon icon="Logout" />
+              )}
             </Box>
             Logout
           </MenuItem>

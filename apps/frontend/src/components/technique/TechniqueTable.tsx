@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
 
-import ScienceIcon from 'components/common/icons/ScienceIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
@@ -78,7 +78,9 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignmentInstrumentIcon = (): JSX.Element => <ScienceIcon />;
+  const AssignmentInstrumentIcon = (): JSX.Element => (
+    <IconPackIcon icon="Instrument" />
+  );
   const AssignmentScientistIcon = (): JSX.Element => <AssignmentInd />;
 
   function setAssigningTechniqueId(technique: TechniqueFragment): void {

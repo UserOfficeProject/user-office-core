@@ -1,7 +1,7 @@
 import { Box, Chip, DialogContent, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
-import TagIcon from 'components/common/icons/TagIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Role, Tag } from 'generated/sdk';
@@ -169,7 +169,7 @@ const RoleManagement: React.FC = () => {
           }}
           actions={[
             (rowData: RoleRow) => ({
-              icon: () => <TagIcon />,
+              icon: () => <IconPackIcon icon="Tag" />,
               tooltip: 'Assign Tags',
               onClick: (event, rowData) => {
                 setSelectedRole(rowData as RoleRow);

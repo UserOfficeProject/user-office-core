@@ -1,14 +1,4 @@
-import DescriptionIcon from '@mui/icons-material/Description';
-import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
-import EmailIcon from '@mui/icons-material/Email';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
-import InboxIcon from '@mui/icons-material/Inbox';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -17,7 +7,7 @@ import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
 
-import EsiIcon from 'components/common/icons/EsiIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
@@ -47,7 +37,7 @@ function EsiTemplatesMenuListItem() {
       <Tooltip title="Experiment Safety Input (ESI)">
         <ListItemButton onClick={() => setIsExpanded(!isExpanded)}>
           <ListItemIcon>
-            <EsiIcon />
+            <IconPackIcon icon="ESITemplate" />
             {isExpanded ? (
               <ExpandLess fontSize="small" />
             ) : (
@@ -67,7 +57,7 @@ function EsiTemplatesMenuListItem() {
         <Tooltip title="Experiment Safety Input (Proposal)">
           <ListItemButton component={NavLink} to={menuMap['EsiTemplates']}>
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="ESIProposalTemplate" />
             </ListItemIcon>
             <ListItemText primary="Proposal ESI" title="Proposal ESI" />
           </ListItemButton>
@@ -78,7 +68,7 @@ function EsiTemplatesMenuListItem() {
             to={menuMap['SampleEsiTemplates']}
           >
             <ListItemIcon>
-              <InboxIcon />
+              <IconPackIcon icon="ESISampleTemplate" />
             </ListItemIcon>
             <ListItemText primary="Sample ESI" title="Sample ESI" />
           </ListItemButton>
@@ -96,7 +86,7 @@ function PdfTemplatesMenuListItem() {
       <Tooltip title="PDF Templates">
         <ListItemButton onClick={() => setIsExpanded(!isExpanded)}>
           <ListItemIcon>
-            <PictureAsPdfIcon />
+            <IconPackIcon icon="PDFTemplate" />
             {isExpanded ? (
               <ExpandLess fontSize="small" />
             ) : (
@@ -119,7 +109,7 @@ function PdfTemplatesMenuListItem() {
             to={menuMap['ProposalPdfTemplates']}
           >
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="PDFProposalTemplate" />
             </ListItemIcon>
             <ListItemText primary="Proposal" title="Proposal" />
           </ListItemButton>
@@ -130,7 +120,7 @@ function PdfTemplatesMenuListItem() {
             to={menuMap['ExperimentSafetyPdfTemplates']}
           >
             <ListItemIcon>
-              <InboxIcon />
+              <IconPackIcon icon="PDFExperimentSafetyTemplate" />
             </ListItemIcon>
             <ListItemText
               primary="Experiment Safety"
@@ -172,7 +162,7 @@ export function TemplateMenuListItem() {
       <Tooltip title="Templates">
         <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
-            <LibraryBooksIcon />
+            <IconPackIcon icon="Template" />
             {isExpanded ? (
               <ExpandLess fontSize="small" />
             ) : (
@@ -190,7 +180,7 @@ export function TemplateMenuListItem() {
             to={menuMap['ExperimentSafetyReviewTemplates']}
           >
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="ExpSafetyReviewTemplate" />
             </ListItemIcon>
             <ListItemText primary="Exp Safety Review" />
           </ListItemButton>
@@ -199,7 +189,7 @@ export function TemplateMenuListItem() {
         <Tooltip title="Proposal">
           <ListItemButton component={NavLink} to={menuMap['ProposalTemplates']}>
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="ProposalTemplate" />
             </ListItemIcon>
             <ListItemText primary="Proposal" />
           </ListItemButton>
@@ -211,7 +201,7 @@ export function TemplateMenuListItem() {
             to={menuMap['FapReviewTemplates']}
           >
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="FAPReviewTemplate" />
             </ListItemIcon>
             <ListItemText primary={t('FAP Review')} />
           </ListItemButton>
@@ -223,7 +213,7 @@ export function TemplateMenuListItem() {
             to={menuMap['TechnicalReviewTemplates']}
           >
             <ListItemIcon>
-              <DescriptionIcon />
+              <IconPackIcon icon="TechnicalReviewTemplate" />
             </ListItemIcon>
             <ListItemText primary="Technical Review" />
           </ListItemButton>
@@ -235,7 +225,7 @@ export function TemplateMenuListItem() {
             to={menuMap['SampleDeclarationTemplates']}
           >
             <ListItemIcon>
-              <InboxIcon />
+              <IconPackIcon icon="SampleDeclarationTemplate" />
             </ListItemIcon>
             <ListItemText primary="Sample declaration" />
           </ListItemButton>
@@ -244,7 +234,7 @@ export function TemplateMenuListItem() {
         <Tooltip title="Email">
           <ListItemButton component={NavLink} to={menuMap['EmailTemplates']}>
             <ListItemIcon>
-              <EmailIcon />
+              <IconPackIcon icon="EmailTemplate" />
             </ListItemIcon>
             <ListItemText primary="Email" />
           </ListItemButton>
@@ -253,7 +243,7 @@ export function TemplateMenuListItem() {
         <Tooltip title="Sub Template">
           <ListItemButton component={NavLink} to={menuMap['GenericTemplates']}>
             <ListItemIcon>
-              <DynamicFeedIcon />
+              <IconPackIcon icon="SubTemplate" />
             </ListItemIcon>
             <ListItemText primary="Sub Template" />
           </ListItemButton>
@@ -266,7 +256,7 @@ export function TemplateMenuListItem() {
               to={menuMap['ShipmentDeclarationTemplates']}
             >
               <ListItemIcon>
-                <LocalShippingIcon />
+                <IconPackIcon icon="ShipmentDeclarationTemplate" />
               </ListItemIcon>
               <ListItemText primary="Shipment declaration" />
             </ListItemButton>
@@ -276,7 +266,7 @@ export function TemplateMenuListItem() {
           <Tooltip title="Visit registration">
             <ListItemButton component={NavLink} to={menuMap['VisitTemplates']}>
               <ListItemIcon>
-                <FlightTakeoffIcon />
+                <IconPackIcon icon="VisitRegistrationTemplate" />
               </ListItemIcon>
               <ListItemText primary="Visit registration" />
             </ListItemButton>
@@ -288,7 +278,7 @@ export function TemplateMenuListItem() {
         <Tooltip title="Feedback">
           <ListItemButton component={NavLink} to={menuMap['FeedbackTemplates']}>
             <ListItemIcon>
-              <FeedbackIcon />
+              <IconPackIcon icon="FeedbackTemplate" />
             </ListItemIcon>
             <ListItemText primary="Feedback" />
           </ListItemButton>

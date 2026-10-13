@@ -1,6 +1,6 @@
-import FeedbackIcon from '@mui/icons-material/Feedback';
 import React from 'react';
 
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentFeedbackBasis } from './QuestionaryComponentFeedbackBasis';
@@ -16,7 +16,7 @@ export const feedbackBasisDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationFeedbackBasisForm,
   readonly: true,
   creatable: false,
-  icon: <FeedbackIcon />,
+  icon: <IconPackIcon icon="FeedbackTemplate" />,
   createYupValidationSchema: null,
   getYupInitialValue: () => null,
 };

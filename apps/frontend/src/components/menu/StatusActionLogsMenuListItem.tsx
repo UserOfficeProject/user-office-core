@@ -1,8 +1,5 @@
-import EventNoteIcon from '@mui/icons-material/EventNote';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import MailIcon from '@mui/icons-material/Mail';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -10,6 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
@@ -41,7 +39,7 @@ export function StatusActionLogsMenuListItem() {
       <Tooltip title="Status Action Logs">
         <ListItemButton component={NavLink} to={menuMap['email']}>
           <ListItemIcon>
-            <MailIcon />
+            <IconPackIcon icon="StatusActionLogsSingle" />
           </ListItemIcon>
           <ListItemText primary="Status Action Logs" />
         </ListItemButton>
@@ -55,7 +53,7 @@ export function StatusActionLogsMenuListItem() {
       <Tooltip title="Status Action Logs">
         <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
-            <EventNoteIcon />
+            <IconPackIcon icon="StatusActionLogsExpandable" />
             {isExpanded ? (
               <ExpandLess fontSize="small" />
             ) : (
@@ -70,7 +68,7 @@ export function StatusActionLogsMenuListItem() {
         <Tooltip title="Email">
           <ListItemButton component={NavLink} to={menuMap['email']}>
             <ListItemIcon>
-              <MailIcon />
+              <IconPackIcon icon="StatusActionLogsEmail" />
             </ListItemIcon>
             <ListItemText primary="Email" />
           </ListItemButton>
@@ -79,7 +77,7 @@ export function StatusActionLogsMenuListItem() {
         <Tooltip title="Proposal Download">
           <ListItemButton component={NavLink} to={menuMap['proposalDownload']}>
             <ListItemIcon>
-              <PictureAsPdfIcon />
+              <IconPackIcon icon="StatusActionLogsProposalDownload" />
             </ListItemIcon>
             <ListItemText primary="Proposal Download" />
           </ListItemButton>

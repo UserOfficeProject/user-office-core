@@ -1,13 +1,3 @@
-import { Science, Topic } from '@mui/icons-material';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import CalendarToday from '@mui/icons-material/CalendarToday';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import EventIcon from '@mui/icons-material/Event';
-import FolderOpen from '@mui/icons-material/FolderOpen';
-import GroupWorkIcon from '@mui/icons-material/GroupWork';
-import Help from '@mui/icons-material/Help';
-import NoteAdd from '@mui/icons-material/NoteAdd';
-import People from '@mui/icons-material/People';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -17,7 +7,7 @@ import { NavLink } from 'react-router-dom';
 
 import i18n from 'i18n';
 
-import TagIcon from 'components/common/icons/TagIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
@@ -26,9 +16,6 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
-import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
-import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
-import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
@@ -39,7 +26,7 @@ const ProposalsMenuListItem = () => {
     <Tooltip title="Review Proposals">
       <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
-          <FolderOpen />
+          <IconPackIcon icon="ReviewProposals" />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItemButton>
@@ -74,7 +61,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Dashboard">
         <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
-            <DashboardIcon />
+            <IconPackIcon icon="Dashboard" />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
@@ -82,7 +69,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="New Proposal">
         <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
-            <NoteAdd />
+            <IconPackIcon icon="NewProposal" />
           </ListItemIcon>
           <ListItemText primary="New Proposal" />
         </ListItemButton>
@@ -91,7 +78,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Experiment Times">
           <ListItemButton component={NavLink} to="/ExperimentTimes">
             <ListItemIcon>
-              <EventIcon />
+              <IconPackIcon icon="ExperimentTimes" />
             </ListItemIcon>
             <ListItemText primary="Experiment Times" />
           </ListItemButton>
@@ -101,7 +88,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Help">
         <ListItemButton component={NavLink} to="/HelpPage">
           <ListItemIcon>
-            <Help />
+            <IconPackIcon icon="Help" />
           </ListItemIcon>
           <ListItemText primary="Help" />
         </ListItemButton>
@@ -114,7 +101,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Calls">
         <ListItemButton component={NavLink} to="/Calls">
           <ListItemIcon>
-            <CalendarToday />
+            <IconPackIcon icon="Call" />
           </ListItemIcon>
           <ListItemText primary="Calls" />
         </ListItemButton>
@@ -122,7 +109,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Proposals">
         <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
-            <FolderOpen />
+            <IconPackIcon icon="Proposal" />
           </ListItemIcon>
           <ListItemText primary="Proposals" />
         </ListItemButton>
@@ -131,7 +118,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title={t('Technique Proposals')}>
           <ListItemButton component={NavLink} to={`/TechniqueProposals`}>
             <ListItemIcon>
-              <Topic />
+              <IconPackIcon icon="TechniqueProposal" />
             </ListItemIcon>
             <ListItemText primary={t('Technique Proposals')} />
           </ListItemButton>
@@ -141,7 +128,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
-              <EventIcon />
+              <IconPackIcon icon="Experiment" />
             </ListItemIcon>
             <ListItemText primary="Experiments" />
           </ListItemButton>
@@ -151,7 +138,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
-              <GroupWorkIcon />
+              <IconPackIcon icon="FAP" />
             </ListItemIcon>
             <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
           </ListItemButton>
@@ -161,7 +148,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
-              <ScienceIcon />
+              <IconPackIcon icon="Instrument" />
             </ListItemIcon>
             <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
           </ListItemButton>
@@ -171,7 +158,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Techniques">
         <ListItemButton component={NavLink} to="/Techniques">
           <ListItemIcon>
-            <Science />
+            <IconPackIcon icon="Technique" />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
@@ -180,7 +167,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Tags">
           <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
-              <TagIcon />
+              <IconPackIcon icon="Tag" />
             </ListItemIcon>
             <ListItemText primary={'Tags'} />
           </ListItemButton>
@@ -196,7 +183,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           to={'/ProposalWorkflows'}
         >
           <ListItemIcon>
-            <ProposalWorkflowIcon />
+            <IconPackIcon icon="ProposalWorkflow" />
           </ListItemIcon>
           <ListItemText primary="Proposal workflows" />
         </ListItemButton>
@@ -206,7 +193,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Institutions">
           <ListItemButton component={NavLink} to="/Institutions">
             <ListItemIcon>
-              <AccountBalanceIcon />
+              <IconPackIcon icon="Institution" />
             </ListItemIcon>
             <ListItemText primary="Institutions" />
           </ListItemButton>
@@ -218,7 +205,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="People">
           <ListItemButton component={NavLink} to="/People">
             <ListItemIcon>
-              <People />
+              <IconPackIcon icon="People" />
             </ListItemIcon>
             <ListItemText primary="People" />
           </ListItemButton>
@@ -227,7 +214,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       <Tooltip title="Questions">
         <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
-            <CommentQuestionIcon />
+            <IconPackIcon icon="Questions" />
           </ListItemIcon>
           <ListItemText primary="Questions" />
         </ListItemButton>
@@ -240,13 +227,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     <div data-cy="FapRoles-menu-items">
       <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
-          <FolderOpen />
+          <IconPackIcon icon="ReviewProposals" />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItemButton>
       <ListItemButton component={NavLink} to="/Faps">
         <ListItemIcon>
-          <GroupWorkIcon />
+          <IconPackIcon icon="FAP" />
         </ListItemIcon>
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemText primary={i18n.format(t('FAP'), 'plural')} />
@@ -259,14 +246,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     <div data-cy="instrument-scientist-menu-items">
       <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
-          <FolderOpen />
+          <IconPackIcon icon="Proposal" />
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItemButton>
       {isTechniqueProposalsEnabled && (
         <ListItemButton component={NavLink} to={`/TechniqueProposals`}>
           <ListItemIcon>
-            <Topic />
+            <IconPackIcon icon="TechniqueProposal" />
           </ListItemIcon>
           <ListItemText primary={t('Technique Proposals')} />
         </ListItemButton>
@@ -275,7 +262,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
-              <EventIcon />
+              <IconPackIcon icon="Experiment" />
             </ListItemIcon>
             <ListItemText primary="Experiments" />
           </ListItemButton>
@@ -284,7 +271,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
-            <GroupWorkIcon />
+            <IconPackIcon icon="InstrumentScientistInstruments" />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
@@ -298,7 +285,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <Tooltip title="Experiments">
           <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
-              <EventIcon />
+              <IconPackIcon icon="Experiment" />
             </ListItemIcon>
             <ListItemText primary="Experiments" />
           </ListItemButton>
@@ -317,7 +304,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     <div data-cy="instrument-scientist-menu-items">
       <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
-          <FolderOpen />
+          <IconPackIcon icon="Proposal" />
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItemButton>

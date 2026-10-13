@@ -17,7 +17,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
-import ScienceIcon from 'components/common/icons/ScienceIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
@@ -262,7 +262,9 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     }
   };
 
-  const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;
+  const ScienceIconComponent = (): JSX.Element => (
+    <IconPackIcon icon="Instrument" />
+  );
 
   const AssignedInstruments = React.useCallback(
     ({ rowData }: Record<'rowData', Call>) => {

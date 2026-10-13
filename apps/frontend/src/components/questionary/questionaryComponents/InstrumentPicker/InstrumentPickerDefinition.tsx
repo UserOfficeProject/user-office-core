@@ -1,7 +1,7 @@
 import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
-import ScienceIcon from 'components/common/icons/ScienceIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType, InstrumentPickerConfig } from 'generated/sdk';
 
@@ -24,7 +24,7 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
     QuestionTemplateRelationInstrumentPickerForm,
   readonly: false,
   creatable: true,
-  icon: <ScienceIcon />,
+  icon: <IconPackIcon icon="Instrument" />,
   renderers: {
     answerRenderer: (answer) => <InstrumentPickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,

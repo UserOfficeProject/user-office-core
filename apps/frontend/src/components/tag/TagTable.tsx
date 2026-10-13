@@ -2,7 +2,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ScienceIcon from 'components/common/icons/ScienceIcon';
+import { IconPackIcon } from 'components/common/icons/IconPackIcon';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Call, InstrumentMinimalFragment } from 'generated/sdk';
 import { TagData, useTagsData } from 'hooks/tag/useTagsData';
@@ -88,7 +88,9 @@ const TagTable = () => {
     setAssigningCallTagId(null);
   };
 
-  const AssignInstrumentIcon = (): JSX.Element => <ScienceIcon />;
+  const AssignInstrumentIcon = (): JSX.Element => (
+    <IconPackIcon icon="Instrument" />
+  );
 
   const AssignCallIcon = (): JSX.Element => <CalendarTodayIcon />;
 
