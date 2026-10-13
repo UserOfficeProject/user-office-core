@@ -157,7 +157,14 @@ function Questionary({
     const appBarSubtitle = state.isDirty ? 'unsaved changes' : undefined;
 
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box
+        sx={{
+          width: '100%',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {!hasDialogAppBar && (
           <MobileAppBar
             title={title}
@@ -166,18 +173,20 @@ function Questionary({
             sheetItems={header?.menuItems ?? []}
           />
         )}
-        <LinearProgress
-          variant="determinate"
-          value={((state.stepIndex + 1) / stepCount) * 100}
-          color={errorCount > 0 ? 'error' : 'primary'}
-          sx={{
-            height: PROGRESS_HEIGHT,
-            position: 'sticky',
-            top: progressStickyTop,
-            zIndex: theme.zIndex.appBar - 1,
-          }}
-          data-cy="questionary-progress"
-        />
+        {stepCount > 1 && (
+          <LinearProgress
+            variant="determinate"
+            value={((state.stepIndex + 1) / stepCount) * 100}
+            color={errorCount > 0 ? 'error' : 'primary'}
+            sx={{
+              height: PROGRESS_HEIGHT,
+              position: 'sticky',
+              top: progressStickyTop,
+              zIndex: theme.zIndex.appBar - 1,
+            }}
+            data-cy="questionary-progress"
+          />
+        )}
         {stepCount > 1 && (
           <WizardStepBar
             stepIndex={state.stepIndex}
@@ -188,7 +197,22 @@ function Questionary({
             stickyTop={stepBarStickyTop}
           />
         )}
-        <Box sx={{ paddingX: 2, paddingY: 2.5 }}>{getStepContent()}</Box>
+        <Box
+          sx={{
+            paddingX: 2,
+            paddingY: 2.5,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            '& > div': {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+            },
+          }}
+        >
+          {getStepContent()}
+        </Box>
         <WizardStepNavigator
           open={navigatorOpen}
           onClose={() => setNavigatorOpen(false)}
