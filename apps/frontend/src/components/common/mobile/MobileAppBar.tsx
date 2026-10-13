@@ -17,7 +17,7 @@ type MobileAppBarProps = {
   title: string;
   subtitle?: string;
   onBack: () => void;
-  sheetItems?: CardActionSheetItem[];
+  actionItems?: CardActionSheetItem[];
   variant?: 'page' | 'dialog';
   /** Trailing content, for dialogs that put their own control in the header. */
   extra?: React.ReactNode;
@@ -28,7 +28,7 @@ export default function MobileAppBar({
   title,
   subtitle,
   onBack,
-  sheetItems = [],
+  actionItems = [],
   variant = 'page',
   extra,
   error,
@@ -103,7 +103,7 @@ export default function MobileAppBar({
           )}
         </Box>
         {extra}
-        {sheetItems.length > 0 && (
+        {actionItems.length > 0 && (
           <IconButton
             aria-label="More actions"
             onClick={() => setSheetOpen(true)}
@@ -119,12 +119,12 @@ export default function MobileAppBar({
           </IconButton>
         )}
       </Toolbar>
-      {sheetItems.length > 0 && (
+      {actionItems.length > 0 && (
         <CardActionSheet
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
           title={title}
-          items={sheetItems}
+          items={actionItems}
         />
       )}
     </AppBar>

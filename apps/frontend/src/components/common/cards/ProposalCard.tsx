@@ -37,7 +37,7 @@ type ProposalCardProps = {
   readOnly: boolean;
   onOpen: () => void;
   onOpenDataAccess?: () => void;
-  sheetItems: CardActionSheetItem[];
+  actionItems: CardActionSheetItem[];
 };
 
 export default function ProposalCard({
@@ -45,7 +45,7 @@ export default function ProposalCard({
   readOnly,
   onOpen,
   onOpenDataAccess,
-  sheetItems,
+  actionItems,
 }: ProposalCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -125,7 +125,7 @@ export default function ProposalCard({
             <PeopleIcon fontSize="small" />
           </IconButton>
         )}
-        {sheetItems.length > 0 && (
+        {actionItems.length > 0 && (
           <IconButton
             aria-label={`More actions for ${proposal.title}`}
             onClick={() => setSheetOpen(true)}
@@ -148,7 +148,7 @@ export default function ProposalCard({
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         title={proposal.title}
-        items={sheetItems}
+        items={actionItems}
       />
     </Card>
   );
