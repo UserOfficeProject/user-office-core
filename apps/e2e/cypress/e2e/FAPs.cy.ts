@@ -2225,11 +2225,6 @@ context('Fap meeting components tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        this.skip();
-      }
-    });
-    cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
@@ -2330,7 +2325,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains(instrument1.name);
 
-      cy.get("[aria-label='Submit instrument']").should('exist');
+      cy.get("[aria-label='Submit experimental area']").should('exist');
 
       cy.get("[aria-label='Detail panel visibility toggle']").first().click();
 
@@ -2344,9 +2339,10 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains('Fap Meeting form');
+      cy.contains('FAP Meeting form');
       cy.contains('Proposal details');
       cy.contains('External reviews');
+      cy.contains('Technical review info');
 
       cy.closeModal();
     });
@@ -2357,13 +2353,13 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit experimental area']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         variant: 'error',
-        text: 'All proposal Fap meetings should be submitted',
+        text: 'All proposal fap meetings should be submitted',
       });
 
       cy.contains('Proposals and Assignments').click();
@@ -2374,7 +2370,9 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"]').should('not.be.disabled');
+      cy.get('[aria-label="Submit experimental area"]').should(
+        'not.be.disabled'
+      );
     });
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
@@ -2413,6 +2411,21 @@ context('Fap meeting components tests', () => {
                 cy.changeProposalsStatus({
                   workflowStatusId: fapReviewWorkflowStatusId,
                   proposalPks: [createdProposal.primaryKey],
+                });
+                cy.addProposalTechnicalReview({
+                  proposalPk: createdProposal.primaryKey,
+                  status: TechnicalReviewStatus.FEASIBLE,
+                  timeAllocation: firstProposalTimeAllocation,
+                  submitted: true,
+                  reviewerId: 0,
+                  instrumentId: createdInstrument2Id,
+                  questionaryId: initialDBData.technicalReview.questionaryId,
+                });
+
+                cy.setInstrumentAvailabilityTime({
+                  callId: initialDBData.call.id,
+                  instrumentId: createdInstrument2Id,
+                  availabilityTime: instrumentAvailabilityTime,
                 });
               }
             }
@@ -2661,7 +2674,7 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.get(
         '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
-      ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+      ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
     });
 
     it('Officer should be able to update avaliblity time', () => {
@@ -2670,7 +2683,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update instrument Time']").click();
+      cy.get("[aria-label='Update experimental area Time']").click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
@@ -2910,6 +2923,24 @@ context('Fap meeting components tests', () => {
         ],
         proposalPks: [firstCreatedProposalPk],
       });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
 
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
@@ -2973,6 +3004,24 @@ context('Fap meeting components tests', () => {
             proposalPks: [firstCreatedProposalPk],
           });
         }
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.login('officer');
@@ -3072,7 +3121,7 @@ context('Fap meeting components tests', () => {
 
       cy.get(
         '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
-      ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+      ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
 
       cy.get(
         '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
@@ -3270,10 +3319,10 @@ context('Fap meeting components tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Fap meeting decision submitted successfully',
+        text: 'FAP meeting decision submitted successfully',
       });
 
-      cy.get("[aria-label='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit experimental area']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -3299,8 +3348,10 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').should('exist');
 
-      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
-      cy.get('button[aria-label="Unsubmit instrument"]')
+      cy.get('button[aria-label="Submit experimental area"]').should(
+        'not.exist'
+      );
+      cy.get('button[aria-label="Unsubmit experimental area"]')
         .should('exist')
         .and('not.be.disabled');
 
@@ -3369,8 +3420,10 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
-      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
+      cy.get('button[aria-label="Submit experimental area"]').should(
+        'not.exist'
+      );
+      cy.get('button[aria-label="Unsubmit experimental area"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -3450,7 +3503,10 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="confirmation-dialog"]')
         .should('exist')
-        .and('contain.text', 'Remove Fap assignment');
+        .and(
+          'contain.text',
+          'Remove FAP assignment/sAre you sure you want to remove the selected proposal/s from this fap?'
+        );
 
       cy.get('[data-cy="confirm-ok"]').click();
 
