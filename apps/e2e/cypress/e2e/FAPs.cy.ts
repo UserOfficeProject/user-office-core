@@ -3743,7 +3743,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update instrument Time']").click();
+      cy.get("[aria-label='Update experimental area Time']").click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
@@ -3977,7 +3977,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update instrument Time']").click();
+      cy.get("[aria-label='Update experimental area Time']").click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
@@ -4144,6 +4144,7 @@ context('Fap meeting components tests', () => {
     });
     it('Fap Reviewer should be able to give review', () => {
       cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
@@ -4187,6 +4188,7 @@ context('Fap meeting components tests', () => {
       cy.logout();
 
       cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
@@ -4218,6 +4220,7 @@ context('Fap meeting components tests', () => {
       cy.logout();
 
       cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
       cy.finishedLoading();
 
@@ -4265,6 +4268,7 @@ context('Fap meeting components tests', () => {
       cy.logout();
 
       cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
       cy.finishedLoading();
 
