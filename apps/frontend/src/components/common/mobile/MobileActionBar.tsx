@@ -83,16 +83,12 @@ export default function MobileActionBar({
     <Box
       data-cy="mobile-action-bar"
       sx={{
-        position: 'sticky',
-        bottom: 0,
         display: 'flex',
         alignItems: 'center',
         gap: 1,
-        paddingTop: 1.25,
-        paddingBottom: 2,
+        marginTop: 'auto',
+        paddingTop: 1,
         backgroundColor: 'background.paper',
-        borderTop: 1,
-        borderColor: 'divider',
       }}
     >
       {back && (

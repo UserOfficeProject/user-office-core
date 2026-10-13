@@ -31,8 +31,7 @@
  */
 
 import CloseIcon from '@mui/icons-material/Close';
-import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
-import { Box, DialogTitle, IconButton, Typography } from '@mui/material';
+import { DialogTitle, IconButton } from '@mui/material';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import React from 'react';
@@ -47,20 +46,18 @@ const DialogHeader = styled('div')({
   alignContent: 'center',
 });
 
-export type DialogNesting = {
-  collection: string;
-  parent: string;
-};
-
-/** Parent app bar (56px) plus the peek that shows it is still there. */
-const NESTED_TOP_OFFSET = 84;
+const ResponsiveDialog = styled(Dialog)({
+  '& .MuiDialog-paperFullScreen > .MuiDialogContent-root': {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
 
 type StyledDialogProps = {
   title?: string;
   error?: boolean;
   extra?: React.ReactNode;
   tooltip?: React.ReactNode;
-  nesting?: DialogNesting;
 } & DialogProps;
 
 /**
@@ -70,33 +67,12 @@ type StyledDialogProps = {
 export const DialogAppBarContext = React.createContext(false);
 
 function StyledDialog(props: StyledDialogProps) {
-  const { extra, error, title, tooltip, nesting, slotProps, ...dialogProps } =
-    props;
+  const { extra, error, title, tooltip, ...dialogProps } = props;
   const isMobile = useIsMobile();
   const asFullScreen = props.fullScreen ?? isMobile;
-  const sheet = asFullScreen ? nesting : undefined;
 
   return (
-    <Dialog
-      {...dialogProps}
-      fullScreen={asFullScreen}
-      slotProps={
-        sheet
-          ? {
-              ...slotProps,
-              backdrop: { sx: { backgroundColor: 'rgba(0,0,0,.45)' } },
-              paper: {
-                sx: {
-                  marginTop: `${NESTED_TOP_OFFSET}px`,
-                  height: `calc(100% - ${NESTED_TOP_OFFSET}px)`,
-                  borderRadius: '16px 16px 0 0',
-                  boxShadow: '0 -6px 20px rgba(0,0,0,.3)',
-                },
-              },
-            }
-          : slotProps
-      }
-    >
+    <ResponsiveDialog {...dialogProps} fullScreen={asFullScreen}>
       {asFullScreen ? (
         <MobileAppBar
           title={title ?? ''}
@@ -140,33 +116,10 @@ function StyledDialog(props: StyledDialogProps) {
           )}
         </DialogHeader>
       )}
-      {sheet && (
-        <Box
-          data-cy="dialog-nesting-strip"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            padding: '10px 16px',
-            backgroundColor: 'rgba(0,0,0,.05)',
-          }}
-        >
-          <SubdirectoryArrowRightIcon
-            sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }}
-          />
-          <Typography sx={{ fontSize: 12, lineHeight: 1.4 }}>
-            Adding to{' '}
-            <Box component="span" sx={{ fontWeight: 500 }}>
-              {sheet.collection}
-            </Box>
-            {` · ${sheet.parent} stays open`}
-          </Typography>
-        </Box>
-      )}
       <DialogAppBarContext.Provider value={asFullScreen}>
         {props.children}
       </DialogAppBarContext.Provider>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
 
