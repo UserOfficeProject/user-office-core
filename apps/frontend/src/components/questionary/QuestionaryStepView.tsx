@@ -383,6 +383,11 @@ function QuestionaryStepView(props: {
         return (
           <form
             style={{
+              ...(isMobile && {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+              }),
               ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
             }}
           >
