@@ -97,7 +97,7 @@ export function addDecreasingInstrumentAvailTime(
   }[],
   instrumentAvailableTime: number
 ) {
-  //Sort by grade so the rows are in order, and the allocated time decreases from first to last.
+  // Sort by rank so the rows are in order, and the allocated time decreases from first to last.
   managementDecisionData.sort((a, b) => a.rankOrder - b.rankOrder);
   let remainingInstrumentTime = instrumentAvailableTime;
   for (let i = 0; i < managementDecisionData.length; i++) {
