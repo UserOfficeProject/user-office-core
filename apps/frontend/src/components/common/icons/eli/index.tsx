@@ -1,8 +1,5 @@
 import { IconPack } from '../IconPackIcon';
-import TestIcon from './TestIcon';
 
-const eliIconPack: IconPack = {
-  Call: TestIcon,
-};
+const eliIconPack: IconPack = {};
 
 export default eliIconPack;
