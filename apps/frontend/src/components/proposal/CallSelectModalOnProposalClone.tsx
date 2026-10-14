@@ -60,7 +60,7 @@ const CallSelectModalOnProposalsClone = ({
         }}
         validationSchema={callSelectModalOnProposalsCloneValidationSchema}
       >
-        {({ isSubmitting, handleChange }): JSX.Element => (
+        {({ isSubmitting, handleChange }) => (
           <Form>
             <Typography
               variant="h6"

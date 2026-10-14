@@ -26,6 +26,8 @@ context('App settings tests', () => {
 
       cy.visit('/Calls');
 
+      cy.finishedLoading();
+
       cy.get('[data-cy="calls-table"] [data-cy="create-new-entry"]').click();
 
       cy.get('[data-cy="start-end-call-input"]').should('exist');
@@ -85,7 +87,10 @@ context('App settings tests', () => {
       cy.login('officer');
       cy.visit('/Settings');
 
+      cy.finishedLoading();
+
       cy.get('[placeholder="Search"]')
+        .should('be.enabled')
         .clear()
         .type('EXTERNAL_AUTH_HOMEPAGE_URL');
 
@@ -103,6 +108,7 @@ context('App settings tests', () => {
       cy.notification({ text: 'Settings updated', variant: 'success' });
 
       cy.visit('/');
+      cy.finishedLoading();
       cy.get('[data-cy="profile-page-btn"]').click();
       cy.get('[data-cy="external-homepage-button"]')
         .should('exist')

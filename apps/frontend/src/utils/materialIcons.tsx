@@ -14,23 +14,30 @@ import Remove from '@mui/icons-material/Remove';
 import SaveAlt from '@mui/icons-material/SaveAlt';
 import Search from '@mui/icons-material/Search';
 import ViewColumn from '@mui/icons-material/ViewColumn';
+import { SvgIconProps } from '@mui/material/SvgIcon';
+import React, { forwardRef } from 'react';
+
+const createTableIcon = (Icon: typeof AddBox) =>
+  forwardRef<SVGSVGElement, SvgIconProps>(function TableIcon(props, ref) {
+    return <Icon {...props} ref={ref} />;
+  });
 
 export const tableIcons: Icons<never> = {
-  Add: (props) => <AddBox {...props} />,
-  Check: (props) => <Check {...props} />,
-  Clear: (props) => <Clear {...props} />,
-  Delete: (props) => <DeleteOutline {...props} />,
-  DetailPanel: (props) => <ChevronRight {...props} />,
-  Edit: (props) => <Edit {...props} />,
-  Export: (props) => <SaveAlt {...props} />,
-  Filter: (props) => <FilterList {...props} />,
-  FirstPage: (props) => <FirstPage {...props} />,
-  LastPage: (props) => <LastPage {...props} />,
-  NextPage: (props) => <ChevronRight {...props} />,
-  PreviousPage: (props) => <ChevronLeft {...props} />,
-  ResetSearch: (props) => <Clear {...props} />,
-  Search: (props) => <Search {...props} />,
-  SortArrow: (props) => <ArrowUpward {...props} />,
-  ThirdStateCheck: (props) => <Remove {...props} />,
-  ViewColumn: (props) => <ViewColumn {...props} />,
+  Add: createTableIcon(AddBox),
+  Check: createTableIcon(Check),
+  Clear: createTableIcon(Clear),
+  Delete: createTableIcon(DeleteOutline),
+  DetailPanel: createTableIcon(ChevronRight),
+  Edit: createTableIcon(Edit),
+  Export: createTableIcon(SaveAlt),
+  Filter: createTableIcon(FilterList),
+  FirstPage: createTableIcon(FirstPage),
+  LastPage: createTableIcon(LastPage),
+  NextPage: createTableIcon(ChevronRight),
+  PreviousPage: createTableIcon(ChevronLeft),
+  ResetSearch: createTableIcon(Clear),
+  Search: createTableIcon(Search),
+  SortArrow: createTableIcon(ArrowUpward),
+  ThirdStateCheck: createTableIcon(Remove),
+  ViewColumn: createTableIcon(ViewColumn),
 };
