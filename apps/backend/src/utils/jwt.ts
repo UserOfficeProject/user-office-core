@@ -6,7 +6,7 @@ import jsonwebtoken, {
 } from 'jsonwebtoken';
 
 const secret = process.env.JWT_SECRET as string;
-const expiresIn = process.env.JWT_TOKEN_LIFE as string;
+const expiresIn = process.env.JWT_TOKEN_LIFE as SignOptions['expiresIn'];
 
 if (!secret) {
   logger.logError(
