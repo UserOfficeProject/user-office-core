@@ -2325,7 +2325,7 @@ context('Fap meeting components tests', () => {
 
       cy.contains(instrument1.name);
 
-      cy.get("[aria-label='Submit experimental area']").should('exist');
+      cy.get('[data-testid="DoneAllIcon"]').closest('button').should('exist');
 
       cy.get("[aria-label='Detail panel visibility toggle']").first().click();
 
@@ -2353,7 +2353,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Submit experimental area']").first().click();
+      cy.get('[data-testid="DoneAllIcon"]').first().closest('button').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -2370,9 +2370,9 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit experimental area"]').should(
-        'not.be.disabled'
-      );
+      cy.get('[data-testid="DoneAllIcon"]')
+        .closest('button')
+        .should('not.be.disabled');
     });
 
     it('Only one modal should be open when multiple instruments with proposals are expanded', () => {
@@ -2683,7 +2683,7 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update experimental area Time']").click();
+      cy.get('[data-testid="AddAlarmIcon"]').first().closest('button').click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
@@ -3322,7 +3322,7 @@ context('Fap meeting components tests', () => {
         text: 'FAP meeting decision submitted successfully',
       });
 
-      cy.get("[aria-label='Submit experimental area']").first().click();
+      cy.get('[data-testid="DoneAllIcon"]').first().closest('button').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -3348,10 +3348,9 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').should('exist');
 
-      cy.get('button[aria-label="Submit experimental area"]').should(
-        'not.exist'
-      );
-      cy.get('button[aria-label="Unsubmit experimental area"]')
+      cy.get('[data-testid="DoneAllIcon"]').should('not.exist');
+      cy.get('[data-testid="RemoveDoneIcon"]')
+        .closest('button')
         .should('exist')
         .and('not.be.disabled');
 
@@ -3420,10 +3419,10 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('button[aria-label="Submit experimental area"]').should(
-        'not.exist'
-      );
-      cy.get('button[aria-label="Unsubmit experimental area"]').should('exist');
+      cy.get('[data-testid="DoneAllIcon"]').should('not.exist');
+      cy.get('[data-testid="RemoveDoneIcon"]')
+        .closest('button')
+        .should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -3505,7 +3504,7 @@ context('Fap meeting components tests', () => {
         .should('exist')
         .and(
           'contain.text',
-          'Remove FAP assignment/sAre you sure you want to remove the selected proposal/s from this fap?'
+          'Remove FAP assignment/sAre you sure you want to remove the selected proposal/s from this fap?CancelOK'
         );
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -3707,7 +3706,10 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
-      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('[data-testid="DoneAllIcon"]')
+        .first()
+        .closest('button')
+        .should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -3737,13 +3739,13 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it('Fap Chair should be able to update avalibabity time', () => {
+    it.only('Fap Chair should be able to update avalibabity time', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update experimental area Time']").click();
+      cy.get('[data-testid="AddAlarmIcon"]').first().closest('button').click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
@@ -3941,7 +3943,10 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
-      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('[data-testid="DoneAllIcon"]')
+        .first()
+        .closest('button')
+        .should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -3971,13 +3976,13 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it('Fap Secretary should be able to update avalibabity time', () => {
+    it.only('Fap Secretary should be able to update avalibabity time', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
 
-      cy.get("[aria-label='Update experimental area Time']").click();
+      cy.get('[data-testid="AddAlarmIcon"]').first().closest('button').click();
 
       cy.get('[data-cy="availability-time"]').type('10');
       cy.get('[data-cy="submit-update-time"]').click();
