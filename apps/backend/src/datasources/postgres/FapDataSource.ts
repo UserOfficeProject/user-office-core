@@ -1101,7 +1101,7 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     const [fapMeetingDecisionRecord]: FapMeetingDecisionRecord[] = (
       await database.raw(
-        `? ON CONFLICT (proposal_pk, instrument_id)
+        `? ON CONFLICT (fap_proposal_id)
         DO UPDATE SET
         ${updateQuery.join(',')}
         RETURNING *;`,
