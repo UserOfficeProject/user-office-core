@@ -8,12 +8,12 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, GetBasicUserDetailsDocument } from 'generated/sdk';
 
 import { ProposalContextType } from './ProposalContainer';
 
 type CoProposersProps = Pick<
-  UserManagementTableProps,
+  UserManagementTableProps<BasicUserDetails>,
   'setInvites' | 'setUsers' | 'disabled'
 > & {
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
