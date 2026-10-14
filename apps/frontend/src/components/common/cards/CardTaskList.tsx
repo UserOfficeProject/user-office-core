@@ -14,8 +14,6 @@ export type CardTaskItem = {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
-// Only `locked` is inert, matching the desktop action buttons — a completed step
-// can still be reopened to redo it.
 const TaskRow = ({ task, onClick }: CardTaskItem) => {
   const actionable = task.status !== 'locked' && !!onClick;
 
