@@ -2667,9 +2667,17 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-      cy.get(
-        '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
-      ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
+      cy.getAndStoreFeaturesEnabled().then(function () {
+        if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+          cy.get(
+            '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
+          ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+        } else {
+          cy.get(
+            '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
+          ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
+        }
+      });
     });
 
     it('Officer should be able to update avaliblity time', () => {
@@ -3114,9 +3122,17 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
-      cy.get(
-        '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
-      ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
+      cy.getAndStoreFeaturesEnabled().then(function () {
+        if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+          cy.get(
+            '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
+          ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+        } else {
+          cy.get(
+            '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
+          ).should('have.css', 'background-color', 'rgb(186, 72, 87)');
+        }
+      });
 
       cy.get(
         '[data-cy="fap-instrument-proposals-table"] tbody tr:last-child'
