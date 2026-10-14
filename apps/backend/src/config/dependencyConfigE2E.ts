@@ -48,7 +48,7 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
-import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
+import { e2eEmailHandler } from '../eventHandlers/email/e2eEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -134,7 +134,7 @@ mapValue(Tokens.FapDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
 mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 
-mapValue(Tokens.EmailEventHandler, essEmailHandler);
+mapValue(Tokens.EmailEventHandler, e2eEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.LoggingHandler, createLoggingHandler());

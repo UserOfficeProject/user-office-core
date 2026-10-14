@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   DataType,
   EmailStatusActionRecipients,
+  Event,
   FeatureId,
   ProposalEndStatus,
   SettingsId,
@@ -2225,6 +2226,83 @@ context('Proposal tests', () => {
           });
         }
       });
+    });
+  });
+
+  describe('Co-Proposer Event Tests', () => {
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    function addCoProposer(
+      user: keyof typeof initialDBData.users,
+      isEdit = false
+    ) {
+      cy.visit(isEdit ? '/ProposalEdit/3' : '/ProposalCreate/1/1');
+      cy.login('user1', initialDBData.roles.user);
+
+      if (!isEdit) {
+        cy.get('[data-cy="title"]').type('Test Proposal');
+        cy.get('[data-cy="abstract"]').type('Test Proposal Abstract');
+      }
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        initialDBData.users[user].email
+      );
+      cy.contains(
+        `${initialDBData.users[user].firstName} ${initialDBData.users[user].lastName}`
+      ).should('exist');
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[data-cy="invite-user-submit-button"]').click();
+      cy.get('[data-cy="save-button"]').click();
+    }
+
+    function removeCoProposer() {
+      cy.visit('/ProposalEdit/3');
+      cy.login('user1', initialDBData.roles.user);
+
+      cy.get('td button[aria-label="Delete"]').first().click();
+      cy.get('td button[aria-label="Save"]').first().click();
+      cy.get('[data-cy="save-button"]').click();
+    }
+
+    function checkCoProposerEventCount(targetCount: number) {
+      cy.logout();
+      cy.login('officer');
+      cy.visit('/?reviewModal=3&modalTab=4');
+      cy.get(
+        `td[value="${Event.PROPOSAL_CO_PROPOSER_NOTIFICATION_SENT}"]`
+      ).should('have.length', targetCount);
+    }
+
+    it('Can add first co-proposer', () => {
+      addCoProposer('user3');
+    });
+
+    it('Generated one event', () => {
+      checkCoProposerEventCount(1);
+    });
+
+    it('Can add one more co-proposer', () => {
+      addCoProposer('user2', true);
+    });
+
+    it('Generated one more event', () => {
+      checkCoProposerEventCount(2);
+    });
+
+    it('Can remove a co-proposer', () => {
+      removeCoProposer();
+    });
+
+    it('Didnt generate any new events', () => {
+      checkCoProposerEventCount(2);
     });
   });
 });
