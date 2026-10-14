@@ -92,8 +92,6 @@ export default function UserUpcomingExperimentsTable({
   const isShipmentActionEnabled = !!context.featuresMap.get(FeatureId.SHIPPING)
     ?.isEnabled;
 
-  // One list feeds both views, so the shipping feature flag hides the action
-  // on the cards as well as in the table.
   const actions = [
     formTeamAction,
     finishEsi,
@@ -119,8 +117,6 @@ export default function UserUpcomingExperimentsTable({
       ];
     });
 
-  // if there are no upcoming experiments, the dashboard hides the table
-  // altogether; the standalone page keeps it and shows its empty state
   if (hideIfEmpty && userExperiments.length === 0) {
     return null;
   }

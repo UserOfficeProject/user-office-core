@@ -139,9 +139,6 @@ const PageLayout = ({
     }
   }, [isTabletOrMobile]);
 
-  // TODO: these sit directly above the dashboard's sticky section nav on a phone
-  // and are easy to hit by accident, so they are suppressed there for now. Where
-  // they should live on mobile is still open.
   const showFooterLinks = !(isMobile && location.pathname === '/');
   const displayPrivacyPageLink =
     showFooterLinks &&

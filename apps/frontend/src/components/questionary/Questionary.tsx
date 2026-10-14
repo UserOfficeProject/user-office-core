@@ -130,8 +130,6 @@ function Questionary({
     const stepCount = stepsMetadata.length;
     const errorCount = header?.errorCount ?? 0;
 
-    // A full-screen dialog's header sits outside the scrolling box, so these
-    // offsets start at zero rather than below our own app bar.
     const toolbar = toolbarHeight(theme);
     const progressStickyTop = hasDialogAppBar ? 0 : toolbar;
     const stepBarStickyTop = hasDialogAppBar
