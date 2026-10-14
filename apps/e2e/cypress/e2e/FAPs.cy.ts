@@ -3701,10 +3701,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
-      cy.get('[data-testid="DoneAllIcon"]')
-        .first()
-        .closest('button')
-        .should('not.exist');
+      cy.get('[data-testid="DoneAllIcon"]').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -3938,10 +3935,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
-      cy.get('[data-testid="DoneAllIcon"]')
-        .first()
-        .closest('button')
-        .should('not.exist');
+      cy.get('[data-testid="DoneAllIcon"]').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
