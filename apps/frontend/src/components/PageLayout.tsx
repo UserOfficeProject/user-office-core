@@ -204,7 +204,19 @@ const PageLayout = ({
             </IconButton>
           </Box>
           <Divider />
-          <List disablePadding sx={{ overflowX: 'hidden' }}>
+          <List
+            disablePadding
+            sx={{ overflowX: 'hidden' }}
+            onClick={(event) => {
+              if (
+                isTabletOrMobile &&
+                event.target instanceof Element &&
+                event.target.closest('a[href]')
+              ) {
+                handleDrawerClose();
+              }
+            }}
+          >
             <MenuItems currentRole={currentRole} />
           </List>
           <Divider />
