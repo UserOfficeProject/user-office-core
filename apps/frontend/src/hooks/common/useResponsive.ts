@@ -4,18 +4,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 export const DRAWER_OVERLAY_BREAKPOINT: Breakpoint = 'lg';
 export const COMPACT_UI_BREAKPOINT: Breakpoint = 'md';
 
-/** For `sx` keys, where a media query is cheaper than re-rendering on a hook. */
 export const belowCompactUi = (theme: Theme) =>
   theme.breakpoints.down(COMPACT_UI_BREAKPOINT);
 
-/** WCAG 2.5.5 minimum hit target, on the theme spacing scale rather than in px. */
 export const minTouchTarget = (theme: Theme) => theme.spacing(5.5);
 
-/**
- * A control that renders shorter than `minTouchTarget` but still meets it, by
- * growing its pointer area with a pseudo-element. `height` is on the spacing
- * scale, like the rest of this module.
- */
 export const compactTouchTarget = (theme: Theme, height: number) => {
   const size = theme.spacing(height);
 
@@ -31,7 +24,6 @@ export const compactTouchTarget = (theme: Theme, height: number) => {
   };
 };
 
-/** MUI's own BottomNavigation height, for clearing the fixed dashboard nav. */
 export const bottomNavHeight = (theme: Theme) => theme.spacing(7);
 
 export const toolbarHeight = (theme: Theme) => ({

@@ -52,7 +52,6 @@ context('Mobile experiment card tests', () => {
   beforeEach(function () {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled().then(() => {
-      // NOTE: We can check features after they are stored to the local storage
       if (
         !featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER) ||
         !featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)
@@ -99,8 +98,6 @@ context('Mobile experiment card tests', () => {
     });
 
     it('Completes the team step and unlocks the registration once a visit exists', () => {
-      // createVisit inserts a visits_has_users row per team member, so the
-      // registrations the card reads exist without a separate call.
       cy.createVisit({
         experimentPk: activeExperiment.experimentPk,
         team: [PI.id],
@@ -168,14 +165,10 @@ context('Mobile experiment card tests', () => {
       shouldBeAbsent(activeExperiment.experimentId, 'finishEsi');
       shouldBeAbsent(activeExperiment.experimentId, 'giveFeedback');
       shouldBeEnabled(activeExperiment.experimentId, 'registerVisit');
-      // NOTE: declareShipment is the only action with no PI or co-proposer
-      // gate, so a plain visitor gets it too.
       shouldBeEnabled(activeExperiment.experimentId, 'declareShipment');
     });
 
     it('Offers feedback to the team lead only once the experiment is completed', () => {
-      // The team lead is a property of the visit, so both experiments need one
-      // before the completed status is the only thing separating them.
       cy.createVisit({
         experimentPk: activeExperiment.experimentPk,
         team: [PI.id],
@@ -221,8 +214,6 @@ context('Mobile experiment card tests', () => {
         .find('[data-cy="team-lead-user-dropdown"]')
         .should('exist');
 
-      // The dialog is full screen at this width, so its only close control is
-      // the back button in the mobile app bar.
       cy.get('[role="dialog"] [data-cy="mobile-app-bar-back"]').click();
       cy.get('[role="dialog"]').should('not.exist');
     });
@@ -232,8 +223,6 @@ context('Mobile experiment card tests', () => {
     it('Shows an empty state to a user with no upcoming experiments', () => {
       openMobileDashboard('user2');
 
-      // Scoped to the experiments section: the hidden proposals panel renders an
-      // empty state with a link of the same name.
       cy.get('[data-cy="upcoming-experiments"]')
         .find('[data-cy="card-empty-state"]')
         .should('be.visible');
