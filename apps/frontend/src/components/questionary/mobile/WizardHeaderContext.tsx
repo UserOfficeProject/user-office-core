@@ -11,12 +11,6 @@ type WizardHeaderValue = {
 
 const WizardHeaderContext = createContext<WizardHeaderValue | null>(null);
 
-/**
- * What the active step contributes to the wizard header: overflow items for the
- * app bar menu, and the error count that colours the progress bar. The step form
- * cannot pass these up as props, because the wizard renders it through
- * `displayElementFactory.getDisplayElement()`.
- */
 export function useWizardHeader() {
   return useContext(WizardHeaderContext);
 }

@@ -86,8 +86,9 @@ const NavigationFragment = (props: {
 
   return (
     <Stack
-      direction="row"
+      direction={isMobile ? 'column' : 'row'}
       spacing={1}
+      useFlexGap
       data-cy="navigation-fragment"
       sx={{
         justifyContent: 'flex-end',
@@ -96,7 +97,7 @@ const NavigationFragment = (props: {
       }}
     >
       {props.isLoading && <UOLoader size="2em" />}
-      <>{props.children}</>
+      {props.children}
     </Stack>
   );
 };

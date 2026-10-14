@@ -94,8 +94,6 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     props.userRole !== UserRole.PROPOSAL_READER &&
     Object.values(UserRole).includes(props.userRole);
 
-  // Kept mounted while loading so the desktop panel still shows its placeholder;
-  // the section drops out entirely if the instance has no homepage content.
   const infoSection: DashboardSection | null =
     showPageContent && (loadingContent || !!pageContent)
       ? {

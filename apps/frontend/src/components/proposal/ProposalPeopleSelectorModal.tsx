@@ -320,8 +320,6 @@ function ProposalPeopleSelectorModal({
   const submitDisabled =
     !selectedItems.length || isSameParticipants(selectedItems, preset || []);
 
-  // Mirrors what Autocomplete does to `options` on the desktop branch:
-  // `filterSelectedOptions`, then its default label-substring filter.
   const visibleOptions = filterByLabel(
     options.filter(
       (option) =>
