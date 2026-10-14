@@ -11,14 +11,18 @@ import {
 } from '../datasources/mockups/ProposalDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
+  basicDummyUser,
   dummyInstrumentScientist,
   dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
+import * as eventBusModule from '../events';
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
@@ -28,13 +32,25 @@ import { WorkflowStatus } from '../models/WorkflowStatus';
 const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
+let userDataSource: UserDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
 let workflowDataSource: WorkflowDataSourceMock;
+
+const mockPublish = jest.fn().mockImplementation(async () => {});
+let userDataSourceSpy: jest.SpyInstance;
+
+beforeAll(() => {
+  jest
+    .spyOn(eventBusModule, 'resolveApplicationEventBus')
+    .mockReturnValue({ publish: mockPublish } as never);
+});
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
     Tokens.ProposalDataSource
   );
+  userDataSource = container.resolve<UserDataSourceMock>(Tokens.UserDataSource);
+  userDataSourceSpy = jest.spyOn(userDataSource, 'getProposalUsers');
   proposalDataSource.init();
 
   statusDataSource = container.resolve<StatusDataSourceMock>(
@@ -44,6 +60,11 @@ beforeEach(() => {
   workflowDataSource = container.resolve<WorkflowDataSourceMock>(
     Tokens.WorkflowDataSource
   );
+});
+
+afterEach(() => {
+  mockPublish.mockClear();
+  userDataSourceSpy.mockRestore();
 });
 
 test('A user on the proposal can update its title if it is in edit mode', () => {
@@ -213,6 +234,100 @@ test('A proposal PI cannot also be a co-proposer', async () => {
       }),
     })
   );
+});
+
+describe('Co-proposal notifications', () => {
+  test('Adding a new user to a proposal triggers event', async () => {
+    const args = {
+      proposalPk: 1,
+      title: 'newTitle',
+      abstract: 'newAbstract',
+      users: [3],
+    };
+
+    await proposalMutations.update(dummyUserWithRole, args);
+
+    expect(mockPublish).toHaveBeenCalledTimes(2);
+    expect(mockPublish).toHaveBeenCalledWith({
+      array: args.users,
+      impersonatingUserId: dummyUserWithRole.impersonatingUserId,
+      inputArgs: JSON.stringify(args),
+      key: 'array',
+      loggedInUserId: dummyUserWithRole.id,
+      proposalPKey: args.proposalPk,
+      type: Event.PROPOSAL_CO_PROPOSERS_ADDED,
+    });
+  });
+
+  test('Adding the same user as co-proposer doesnt retrigger event', async () => {
+    const user3 = await userDataSource.getBasicUserInfo(3);
+
+    userDataSourceSpy.mockImplementation(async () => [basicDummyUser, user3!]);
+
+    const args = {
+      proposalPk: 1,
+      title: 'newTitle',
+      abstract: 'newAbstract',
+      users: [3],
+    };
+
+    await proposalMutations.update(dummyUserWithRole, args);
+
+    expect(mockPublish).toHaveBeenCalledTimes(1);
+    expect(mockPublish.mock.calls[0]).toMatchObject([
+      {
+        type: Event.PROPOSAL_UPDATED,
+      },
+    ]);
+  });
+
+  test('Adding a new user as co-proposer triggers event only for that user', async () => {
+    const user3 = await userDataSource.getBasicUserInfo(3);
+
+    userDataSourceSpy.mockImplementation(async () => [basicDummyUser, user3!]);
+
+    const args = {
+      proposalPk: 1,
+      title: 'newTitle',
+      abstract: 'newAbstract',
+      users: [3, 5],
+    };
+
+    await proposalMutations.update(dummyUserWithRole, args);
+
+    expect(mockPublish).toHaveBeenCalledTimes(2);
+    expect(mockPublish).toHaveBeenCalledWith({
+      array: [5],
+      impersonatingUserId: dummyUserWithRole.impersonatingUserId,
+      inputArgs: JSON.stringify(args),
+      key: 'array',
+      loggedInUserId: dummyUserWithRole.id,
+      proposalPKey: args.proposalPk,
+      type: Event.PROPOSAL_CO_PROPOSERS_ADDED,
+    });
+  });
+
+  test('Co-proposer removal doesnt trigger event', async () => {
+    const user3 = await userDataSource.getBasicUserInfo(3);
+
+    userDataSourceSpy.mockImplementation(async () => [basicDummyUser, user3!]);
+
+    const args = {
+      proposalPk: 1,
+      title: 'newTitle',
+      abstract: 'newAbstract',
+      users: [],
+    };
+
+    await proposalMutations.update(dummyUserWithRole, args);
+
+    expect(mockPublish).toHaveBeenCalledTimes(1);
+    expect(mockPublish.mock.calls[0]).toMatchObject([
+      {
+        type: Event.PROPOSAL_UPDATED,
+      },
+    ]);
+  });
 });
 
 //Submit

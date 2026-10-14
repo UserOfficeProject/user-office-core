@@ -7,7 +7,9 @@ import { EmailTemplateId } from './emailTemplateId';
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import { EmailTemplateDataSourceMock } from '../../datasources/mockups/EmailTemplateDataSource';
+import { ProposalDataSourceMock } from '../../datasources/mockups/ProposalDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
+import * as eventBusModule from '../../events';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 
@@ -16,10 +18,19 @@ const mockMailService = {
   sendMail: jest.fn(),
 };
 
+const mockPublish = jest.fn().mockImplementation(async () => {});
+
+beforeAll(() => {
+  jest
+    .spyOn(eventBusModule, 'resolveApplicationEventBus')
+    .mockReturnValue({ publish: mockPublish } as never);
+});
+
 describe('eliEmailHandler', () => {
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
   let roleClaimDataSourceMock: RoleClaimDataSourceMock;
   let emailTemplateDataSourceMock: EmailTemplateDataSourceMock;
+  let proposalDataSourceMock: ProposalDataSourceMock;
 
   beforeAll(() => {
     container.registerInstance(Tokens.MailService, mockMailService);
@@ -29,6 +40,9 @@ describe('eliEmailHandler', () => {
     // Initialize mocks
     coProposerDataSourceMock = container.resolve<CoProposerClaimDataSourceMock>(
       Tokens.CoProposerClaimDataSource
+    );
+    proposalDataSourceMock = container.resolve<ProposalDataSourceMock>(
+      Tokens.ProposalDataSource
     );
     roleClaimDataSourceMock = container.resolve<RoleClaimDataSourceMock>(
       Tokens.RoleClaimDataSource
@@ -40,6 +54,7 @@ describe('eliEmailHandler', () => {
 
     coProposerDataSourceMock.init();
     roleClaimDataSourceMock.init();
+    proposalDataSourceMock.init();
 
     // Reset mock
     mockMailService.sendMail.mockClear();
@@ -323,6 +338,42 @@ describe('eliEmailHandler', () => {
           },
         })
       );
+    });
+
+    test('should use template co-proposer-notification', async () => {
+      // Create a mock event for PROPOSAL_CO_PROPOSERS_ADDED
+      const mockEvent: ApplicationEvent = {
+        type: Event.PROPOSAL_CO_PROPOSERS_ADDED,
+        key: 'proposal-co-proposers-added',
+        loggedInUserId: faker.number.int({ min: 1, max: 100 }),
+        isRejection: false,
+        array: [1],
+        proposalPKey: 1,
+      };
+
+      const expectedEmailTemplate =
+        await emailTemplateDataSourceMock.getEmailTemplateByName(
+          EmailTemplateId.CO_PROPOSER_NOTIFICATION
+        );
+
+      // Call the eliEmailHandler with the mock event
+      await eliEmailHandler(mockEvent);
+
+      // Verify that sendMail was called with the correct template_id
+      expect(mockMailService.sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: {
+            template: expectedEmailTemplate?.id.toString(),
+          },
+        })
+      );
+      // Verify that event log is created
+      expect(mockPublish).toHaveBeenCalledTimes(1);
+      expect(mockPublish).toHaveBeenCalledWith({
+        ...mockEvent,
+        type: Event.PROPOSAL_CO_PROPOSER_NOTIFICATION_SENT,
+        userId: mockEvent.array[0],
+      });
     });
   });
 });
