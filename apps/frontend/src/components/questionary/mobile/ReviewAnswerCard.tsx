@@ -40,7 +40,7 @@ type ReviewAnswerCardProps = {
   storageKey?: string;
 };
 
-export default function ReviewAnswerCard({
+export default function ReviewAnsNewerCard({
   title,
   rows,
   onEdit,
