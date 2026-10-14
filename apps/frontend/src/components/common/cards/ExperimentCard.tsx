@@ -95,8 +95,6 @@ export default function ExperimentCard({
             label="Dates"
             stacked
           >
-            {/* Stacked above, so the pair has the full width and the arrow
-                keeps both dates on one line. */}
             <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
               {toFormattedDateTime(experiment.startsAt)} &rarr;
             </Box>{' '}
