@@ -52,6 +52,21 @@ context('Mobile proposal tests', () => {
       createDraftProposal();
     });
 
+    it('Should close the mobile sidebar after selecting a menu link', () => {
+      visitProposalsSection();
+
+      cy.get('[data-cy="open-drawer"]').click();
+      cy.get('[data-cy="user-menu-items"]').contains('a', 'Dashboard').click();
+      cy.get('[data-cy="close-drawer"]').should('not.exist');
+
+      cy.get('[data-cy="open-drawer"]').click();
+      cy.get('[data-cy="user-menu-items"]')
+        .contains('a', 'New Proposal')
+        .click();
+      cy.location('pathname').should('eq', '/ProposalSelectType');
+      cy.get('[data-cy="close-drawer"]').should('not.exist');
+    });
+
     it('Should open a draft proposal for editing from its card', () => {
       visitProposalsSection();
 
