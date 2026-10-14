@@ -47,7 +47,7 @@ export default function ProposalCard({
   onOpenDataAccess,
   actionItems,
 }: ProposalCardProps) {
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
 
   return (
     <Card variant="outlined" data-cy="proposal-card" sx={{ borderRadius: 2 }}>
@@ -128,7 +128,7 @@ export default function ProposalCard({
         {actionItems.length > 0 && (
           <IconButton
             aria-label={`More actions for ${proposal.title}`}
-            onClick={() => setSheetOpen(true)}
+            onClick={() => setActionSheetOpen(true)}
             size="small"
             sx={(theme) => ({
               ...compactTouchTarget(theme, 3.5),
@@ -145,8 +145,8 @@ export default function ProposalCard({
         )}
       </CardActions>
       <CardActionSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
+        open={actionSheetOpen}
+        onClose={() => setActionSheetOpen(false)}
         title={proposal.title}
         items={actionItems}
       />
