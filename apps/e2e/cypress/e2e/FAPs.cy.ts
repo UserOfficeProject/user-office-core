@@ -3739,7 +3739,7 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it.only('Fap Chair should be able to update avalibabity time', () => {
+    it('Fap Chair should be able to update avalibabity time', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
@@ -3976,7 +3976,7 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it.only('Fap Secretary should be able to update avalibabity time', () => {
+    it('Fap Secretary should be able to update avalibabity time', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
