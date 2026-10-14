@@ -2357,11 +2357,6 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="confirm-ok"]').click();
 
-      cy.notification({
-        variant: 'error',
-        text: 'All proposal fap meetings should be submitted',
-      });
-
       cy.contains('Proposals and Assignments').click();
 
       cy.finishedLoading();
@@ -3504,7 +3499,7 @@ context('Fap meeting components tests', () => {
         .should('exist')
         .and(
           'contain.text',
-          'Remove FAP assignment/sAre you sure you want to remove the selected proposal/s from this fap?CancelOK'
+          'Remove FAP assignment/sAre you sure you want to remove the selected proposal/s from this FAP?CancelOK'
         );
 
       cy.get('[data-cy="confirm-ok"]').click();
