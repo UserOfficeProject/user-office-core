@@ -24,6 +24,11 @@ type ProposalSummaryProps = {
   confirm: WithConfirmType;
 };
 
+const actionButtonSx = {
+  width: '14rem',
+  maxWidth: '100%',
+};
+
 function ProposalReview({ confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -145,6 +150,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
         isLoading={isSubmitting}
       >
         <NavigButton
+          sx={actionButtonSx}
           onClick={() => dispatch({ type: 'BACK_CLICKED' })}
           disabled={state.stepIndex === 0}
           isBusy={isSubmitting}
@@ -152,6 +158,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           Back
         </NavigButton>
         <NavigButton
+          sx={actionButtonSx}
           onClick={() => {
             confirm(
               async () => {
@@ -189,6 +196,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           {proposal.submitted ? '✔ Submitted' : 'Submit'}
         </NavigButton>
         <Button
+          sx={actionButtonSx}
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
