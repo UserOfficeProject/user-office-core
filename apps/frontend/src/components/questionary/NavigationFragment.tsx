@@ -33,15 +33,12 @@ const NavigationFragment = (props: {
   const setMenuItems = header?.setMenuItems;
 
   const reset = props.actions?.reset;
-  // The handler is a new closure every render; the sheet item must not be, or
-  // publishing it would loop through the provider.
   const resetRef = useRef(reset);
 
   useEffect(() => {
     resetRef.current = reset;
   });
 
-  // The sheet has no disabled state, so a reset that cannot run is left out.
   const resetLabel =
     isMobile && !props.disabled && !reset?.disabled ? reset?.label : undefined;
 
