@@ -169,8 +169,6 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
       }
     : undefined;
 
-  // The submitted checkbox and the save button have no slot in the mobile bar,
-  // so the user officer keeps the desktop row.
   const actions = submit ? { back, primary: submit } : undefined;
 
   return (

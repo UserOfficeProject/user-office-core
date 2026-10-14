@@ -220,9 +220,6 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="submit"]').should('not.exist');
 
-      // NOTE: The accessible picker field cannot hold a malformed date, so an
-      // emptied field reports as required rather than tripping the
-      // TYPE_ERR_INVALID_DATE typeError this used to assert on.
       cy.get('[data-cy="create-modal"]')
         .contains('End review date is required')
         .should('exist');

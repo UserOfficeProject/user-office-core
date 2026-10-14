@@ -102,8 +102,6 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
       rows.unshift(...additionalDetails);
     }
 
-    // Resolve by topic, not by the index of this map: the review step is
-    // appended, so the two lists need not line up.
     const wizardIndex =
       state?.wizardSteps.findIndex(
         (wizardStep) => wizardStep.payload?.topicId === step.topic.id

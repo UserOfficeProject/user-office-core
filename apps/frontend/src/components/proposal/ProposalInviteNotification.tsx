@@ -85,7 +85,6 @@ const ProposalInviteNotification = ({ onAccept }: { onAccept: () => void }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
-          // A space-between row squeezes the message to a few words at 390px.
           [belowCompactUi(theme)]: {
             flexDirection: 'column',
             alignItems: 'stretch',

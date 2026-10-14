@@ -209,7 +209,6 @@ export default {
     questionaryId: 2,
     shortCode: '999999',
   },
-  // NOTE: The second proposal from db_seeds/0001_ProposalForScheduling.sql.
   proposal2: {
     id: 2,
     title: 'Test proposal 2',
@@ -495,8 +494,6 @@ export default {
       endsAt: '07-02-2030 13:00',
     },
   },
-  // NOTE: The pending co-proposer invites from db_seeds/0007_CoProposersInvite.sql,
-  // in the order they are inserted, which is the order the invite ids follow.
   coProposerInvites: {
     user3OnProposal1: { id: 1, code: 'DAVE001', proposalPk: 1 },
     user2OnProposal1: { id: 2, code: 'BEN001', proposalPk: 1 },

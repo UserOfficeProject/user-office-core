@@ -8,18 +8,8 @@ const invites = initialDBData.coProposerInvites;
 const PLURAL_INVITE_TEXT = '2 outstanding invitations to join proposals.';
 const SINGULAR_INVITE_TEXT = '1 outstanding invitation to join proposal.';
 
-/*
- * Mobile counterpart of the "Accepting co-proposer invites without code"
- * tests in invites.cy.ts.
- *
- * Below the compact breakpoint the dashboard shows one
- * section at a time, so both the invite notification and the proposals list
- * are only reachable through the Proposals tab.
- */
 context('Mobile co-proposer invites tests', () => {
   const openProposalsSection = () => {
-    // Without the scheduler the user has a single stacked section, so there is
-    // no tab bar to go through. The invites themselves do not depend on it.
     if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
       cy.get('[data-cy="dashboard-section-nav"]').should('be.visible');
       cy.get('[data-cy="dashboard-section-proposals"]').click();
@@ -149,7 +139,6 @@ context('Mobile co-proposer invites tests', () => {
 
     closeInvitationsDialog();
 
-    // Reloading avoids race conditions and asserts what was actually persisted.
     cy.reload();
     cy.finishedLoading();
     openProposalsSection();

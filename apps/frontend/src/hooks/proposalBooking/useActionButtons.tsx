@@ -30,7 +30,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) =>
   event.proposal?.proposer?.id === user.id ||
   event.proposal?.users.some((coProposer) => coProposer.id === user.id);
-/** An action carrying the checklist metadata the mobile experiment card needs. */
 export type ExperimentAction = Action<UserExperiment> & { task?: CardTask };
 
 const TASK_STATUS: Record<ActionButtonState, CardTaskStatus | null> = {
@@ -302,8 +301,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'neutral';
     } else {
       buttonState = 'inactive';
-      // TODO: wording invented to give the locked state a reason, which this
-      // action never had. Confirm the real precondition with the user office.
       stateReason =
         'This action is disabled because proposal is not accepted or missing management decision';
     }
@@ -334,7 +331,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         }
       } else {
         buttonState = 'inactive';
-        // TODO: wording invented, same as declareShipment above.
         stateReason =
           'This action is disabled because the experiment is not completed';
       }

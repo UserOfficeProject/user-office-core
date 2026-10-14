@@ -13,7 +13,6 @@ type WizardStepBarProps = {
   title: string;
   onOpenNavigator: () => void;
   navigatorOpen?: boolean;
-  /** Accepts a responsive object, e.g. `toolbarHeight(theme)`. */
   stickyTop?: number | string | Record<string, number | string>;
 };
 
@@ -39,9 +38,6 @@ export default function WizardStepBar({
 
     let observer: IntersectionObserver | undefined;
 
-    // The sentinel only clears the viewport once it has passed the sticky
-    // offset, so without the matching rootMargin the shadow arrives that many
-    // pixels late. Read it off the element, since `top` may be responsive.
     const observe = () => {
       observer?.disconnect();
       const offset = parseFloat(window.getComputedStyle(bar).top) || 0;
@@ -84,8 +80,6 @@ export default function WizardStepBar({
           paddingX: 2,
           backgroundColor: 'background.paper',
           boxShadow: scrolled ? '0 2px 4px rgba(0,0,0,.12)' : 'none',
-          // Inset to the content gutter so the rule lines up with the fields
-          // and the action bar rather than running the full bleed.
           '&::after': {
             content: '""',
             position: 'absolute',
