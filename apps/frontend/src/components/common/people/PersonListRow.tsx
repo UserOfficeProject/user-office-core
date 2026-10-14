@@ -11,7 +11,6 @@ import { minTouchTarget } from 'hooks/common/useResponsive';
 export type PersonListRowProps = {
   primary: string;
   secondary?: string;
-  /** Markers such as the team lead or an invitation state. */
   chips?: React.ReactNode;
   onOpenActions?: () => void;
   actionsLabel?: string;
