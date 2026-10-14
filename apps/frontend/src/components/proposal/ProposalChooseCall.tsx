@@ -126,8 +126,6 @@ const ProposalChooseCall = () => {
                     edge="end"
                     aria-label={'Select ' + call.shortCode}
                     onClick={(event) => {
-                      // Without this the click also reaches the row, which
-                      // navigates a second time and doubles the history entry.
                       event.stopPropagation();
                       handleSelect(call.id, call.templateId);
                     }}

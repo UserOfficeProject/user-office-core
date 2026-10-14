@@ -4,9 +4,6 @@ import React from 'react';
 
 import { belowCompactUi, minTouchTarget } from 'hooks/common/useResponsive';
 
-// The content is admin-authored HTML, so it is restyled from the outside rather
-// than rewritten. Scoped to the compact breakpoint because above it this is still
-// the desktop welcome panel, which must render as before.
 export default function DashboardInfoSection({
   pageContent,
 }: {
