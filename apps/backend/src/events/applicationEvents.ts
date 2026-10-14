@@ -235,6 +235,18 @@ interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
   proposalPKey: number;
 }
 
+interface ProposalCoProposersAdded extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSERS_ADDED;
+  array: number[];
+  proposalPKey: number;
+}
+
+interface ProposalCoProposerNotificationSent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_NOTIFICATION_SENT;
+  userId: number;
+  proposalPKey: number;
+}
+
 interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
   invite: Invite;
@@ -563,6 +575,8 @@ export type ApplicationEvent =
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
   | ProposalCoProposerInvitesUpdatedEvent
+  | ProposalCoProposersAdded
+  | ProposalCoProposerNotificationSent
   | ProposalCoProposerInviteSentEvent
   | ProposalCoProposerInviteAcceptedEvent
   | ProposalDataAccessInvitesUpdatedEvent

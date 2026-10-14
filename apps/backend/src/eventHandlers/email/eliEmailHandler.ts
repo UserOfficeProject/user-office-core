@@ -10,9 +10,9 @@ import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
+import { resolveApplicationEventBus } from '../../events';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
@@ -35,9 +35,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   const technicalReviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
-  const eventBus = container.resolve<EventBus<ApplicationEvent>>(
-    Tokens.EventBus
-  );
+  const eventBus = resolveApplicationEventBus();
 
   const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
     Tokens.EmailTemplateDataSource
@@ -48,6 +46,25 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
+    case Event.PROPOSAL_CO_PROPOSERS_ADDED: {
+      const userIdsToNotify = event.array;
+
+      await Promise.allSettled(
+        userIdsToNotify.map((userIdToNotify) =>
+          sendCoProposerNotification(event.proposalPKey, userIdToNotify).then(
+            async () => {
+              await eventBus.publish({
+                ...event,
+                type: Event.PROPOSAL_CO_PROPOSER_NOTIFICATION_SENT,
+                userId: userIdToNotify,
+              });
+            }
+          )
+        )
+      );
+
+      break;
+    }
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -348,6 +365,63 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         });
     }
   }
+}
+
+async function sendCoProposerNotification(
+  proposalPk: number,
+  userId: number,
+  template = EmailTemplateId.CO_PROPOSER_NOTIFICATION
+) {
+  const mailService = container.resolve<MailService>(Tokens.MailService);
+  const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+    Tokens.EmailTemplateDataSource
+  );
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  const emailTemplate =
+    await emailTemplateDataSource.getEmailTemplateByName(template);
+
+  if (!emailTemplate) {
+    logger.logError('Email template not found', {
+      template: template,
+    });
+
+    return;
+  }
+
+  const user = await userDataSource.getUser(userId);
+  if (!user) {
+    logger.logError('User not found', { userId });
+
+    return;
+  }
+
+  const proposal = await proposalDataSource.get(proposalPk);
+  if (!proposal) {
+    logger.logError('Proposal not found', { proposalPk });
+
+    return;
+  }
+
+  return mailService
+    .sendMail({
+      content: {
+        template: emailTemplate.id.toString(),
+      },
+      substitution_data: {
+        preferredName: user.preferredname,
+        proposalTitle: proposal.title,
+      },
+      recipients: [{ address: user.email }],
+    })
+    .catch((err: string) => {
+      logger.logException('Failed email transmission', err);
+    });
 }
 
 async function sendInviteEmail(

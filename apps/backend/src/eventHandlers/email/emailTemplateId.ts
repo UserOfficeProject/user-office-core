@@ -1,5 +1,6 @@
 export enum EmailTemplateId {
   CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
+  CO_PROPOSER_NOTIFICATION = 'co-proposer-notification',
   PROPOSAL_SUBMITTED = 'proposal-submitted',
   PROPOSAL_CREATED = 'proposal-created',
   ACCEPTED_PROPOSAL = 'Accepted-Proposal',

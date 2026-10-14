@@ -77,6 +77,21 @@ export default function createLoggingHandler() {
 
           break;
         }
+
+        case Event.PROPOSAL_CO_PROPOSER_NOTIFICATION_SENT: {
+          const { userId, proposalPKey } = event;
+
+          eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer notification sent to user ${userId}`,
+            event.impersonatingUserId
+          );
+
+          break;
+        }
         case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
           const { invite, proposalPKey } = event;
 

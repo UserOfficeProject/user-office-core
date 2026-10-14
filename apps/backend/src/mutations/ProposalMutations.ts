@@ -33,6 +33,8 @@ import {
   proposalStatusActionEngine,
   ProposalWithWorkflowStatusConnectionId,
 } from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
+import { resolveApplicationEventBus } from '../events';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
@@ -184,6 +186,32 @@ export default class ProposalMutations {
       proposal.created = created;
     }
 
+    if (proposerId !== undefined) {
+      proposal.proposerId = proposerId;
+    }
+
+    let updatedProposal: Proposal;
+    try {
+      updatedProposal = await this.proposalDataSource.update(proposal);
+      logger.logInfo('User Updated Proposal Details:', {
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
+      });
+    } catch (err) {
+      return rejection(
+        'Could not update proposal',
+        {
+          agent,
+          primaryKey: proposalPk,
+          proposalId: proposal.proposalId,
+          title: proposal.title,
+          userId: proposal.proposerId,
+        },
+        err
+      );
+    }
+
     if (users !== undefined) {
       const allUsers = [proposerId, ...users];
       const uniqueUsers = new Set(allUsers);
@@ -208,6 +236,15 @@ export default class ProposalMutations {
         return rejection('Proposal contains a duplicate user', errorContext);
       }
 
+      const newProposalUsers = await this.getNewCoProposers(
+        agent,
+        proposalPk,
+        users
+      );
+      if (newProposalUsers instanceof Rejection) {
+        return newProposalUsers;
+      }
+
       await this.proposalDataSource
         .setProposalUsers(proposalPk, users)
         .catch((error) => {
@@ -217,34 +254,53 @@ export default class ProposalMutations {
             error
           );
         });
+
+      if (newProposalUsers.length > 0) {
+        logger.logInfo('Creating email event for new co-proposers', {
+          proposalId: proposal.proposalId,
+          newProposalUsers,
+        });
+
+        const eventBus = resolveApplicationEventBus();
+        await eventBus.publish({
+          type: Event.PROPOSAL_CO_PROPOSERS_ADDED,
+          array: newProposalUsers,
+          key: 'array',
+          loggedInUserId: agent?.id,
+          inputArgs: JSON.stringify(args),
+          impersonatingUserId: agent ? agent.impersonatingUserId : null,
+          proposalPKey: proposalPk,
+        } as ApplicationEvent);
+      }
     }
 
-    if (proposerId !== undefined) {
-      proposal.proposerId = proposerId;
-    }
+    return updatedProposal;
+  }
 
-    try {
-      const updatedProposal = await this.proposalDataSource.update(proposal);
-      logger.logInfo('User Updated Proposal Details:', {
-        proposalId: proposal.proposalId,
-        title: proposal.title,
-        userId: proposal.proposerId,
+  private async getNewCoProposers(
+    agent: UserWithRole | null,
+    proposalPk: number,
+    newUsers: number[]
+  ) {
+    const previousProposalUsers = await this.userDataSource
+      .getProposalUsers(proposalPk)
+      .catch((error) => {
+        return rejection(
+          'Could not update proposal co-proposers',
+          { primaryKey: proposalPk, agent },
+          error
+        );
       });
 
-      return updatedProposal;
-    } catch (err) {
-      return rejection(
-        'Could not update proposal',
-        {
-          agent,
-          primaryKey: proposalPk,
-          proposalId: proposal.proposalId,
-          title: proposal.title,
-          userId: proposal.proposerId,
-        },
-        err
-      );
+    if (previousProposalUsers instanceof Rejection) {
+      return previousProposalUsers;
     }
+
+    const previousProposalUsersSet = new Set(
+      previousProposalUsers.map((u) => u.id)
+    );
+
+    return newUsers.filter((userId) => !previousProposalUsersSet.has(userId));
   }
 
   @ValidateArgs(submitProposalValidationSchema)
