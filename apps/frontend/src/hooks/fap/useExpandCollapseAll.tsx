@@ -4,12 +4,6 @@ import { IconButton, Tooltip } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * `isLoading` exists so the effect re-probes the DOM once the table has
- * rendered its header. It replaces a caller-supplied dependency list, which
- * `react-hooks/exhaustive-deps` cannot verify and which left `tableSelector`
- * out of the dependencies.
- */
 export function useExpandCollapseAll(
   tableSelector: string,
   isLoading: boolean

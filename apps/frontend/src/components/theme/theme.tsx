@@ -10,10 +10,6 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 import { belowCompactUi } from 'hooks/common/useResponsive';
 
-// A grey that behaves like the rest of the palette, so components can ask for it
-// through their `color` prop instead of overriding text and border by hand. It is
-// fixed rather than instance-configurable: the PALETTE_* settings cover only the
-// six semantic colours.
 declare module '@mui/material/styles' {
   interface Palette {
     neutral: Palette['primary'];
@@ -35,8 +31,6 @@ declare module '@mui/material/Button' {
   }
 }
 
-// The type scale the mobile cards and the questionary review are built from.
-// Kept here rather than as constants beside each card, so the two stay in step.
 declare module '@mui/material/styles' {
   interface TypographyVariants {
     cardTitle: React.CSSProperties;
@@ -193,8 +187,6 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
           variant: 'contained',
         },
         variants: [
-          // An outlined button that carries no palette colour, for sitting
-          // beside a plain IconButton without outshouting it.
           {
             props: { variant: 'quiet' },
             style: {

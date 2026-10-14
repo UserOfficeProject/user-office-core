@@ -45,8 +45,6 @@ const preProcessorOptions = {
 
 module.exports = defineConfig({
   video: false,
-  // React 19 uses more renderer memory and the CI runner executes each shard
-  // twice, which was enough to crash Chrome part-way through a spec.
   experimentalMemoryManagement: true,
   viewportWidth: 1920,
   viewportHeight: 1080,

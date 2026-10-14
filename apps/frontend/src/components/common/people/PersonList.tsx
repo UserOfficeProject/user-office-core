@@ -11,7 +11,6 @@ import { minTouchTarget } from 'hooks/common/useResponsive';
 
 type PersonListProps = {
   title: string;
-  /** One entry per person; build them with `PersonListRow`. */
   children: React.ReactNode;
   count: number;
   emptyState?: React.ReactNode;

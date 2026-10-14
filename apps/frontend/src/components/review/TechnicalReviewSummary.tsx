@@ -197,8 +197,6 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
       }
     : undefined;
 
-  // The submitted checkbox and the save button have no slot in the mobile bar,
-  // so the roles that see them keep the desktop row.
   const actions =
     submit && !(isUserOfficer || isFapChairOrSec)
       ? { back, primary: submit }

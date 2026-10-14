@@ -19,7 +19,6 @@ type MobileAppBarProps = {
   onBack: () => void;
   actionItems?: CardActionSheetItem[];
   variant?: 'page' | 'dialog';
-  /** Trailing content, for dialogs that put their own control in the header. */
   extra?: React.ReactNode;
   error?: boolean;
 };

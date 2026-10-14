@@ -163,8 +163,6 @@ const ProposalTable = ({
 
     return readonly;
   };
-  // Behaviour shared by the desktop row icons and the mobile card, so the two
-  // presentations cannot drift apart.
   const isReadOnly = (rowData: PartialProposalsDataType) =>
     isCallEnded(
       rowData.call?.startCall,
@@ -182,9 +180,6 @@ const ProposalTable = ({
   const canDeleteProposal = (rowData: PartialProposalsDataType) =>
     isProposer(rowData) && !rowData.submitted;
 
-  // Navigated from the handler rather than by rendering <Navigate/> from state:
-  // Navigate redirects inside an effect, which StrictMode runs twice, leaving two
-  // history entries so the first press of Back appears to do nothing.
   const openProposal = (rowData: PartialProposalsDataType) =>
     navigate(`/ProposalEdit/${rowData.primaryKey}`);
 
@@ -298,8 +293,6 @@ const ProposalTable = ({
           alignItems: 'center',
           justifyContent: isMobile ? 'space-between' : 'flex-end',
           gap: 2,
-          // Matches the inset of the rows below: MUI TableCell pads 16px, and
-          // MaterialTableCardRow's cell pads none on the card path.
           paddingX: isMobile ? 0 : 1,
           paddingBottom: isMobile ? 1 : 2,
         }}

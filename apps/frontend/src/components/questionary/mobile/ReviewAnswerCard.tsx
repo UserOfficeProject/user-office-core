@@ -8,13 +8,8 @@ import React, { useState } from 'react';
 
 import { TableRowData } from '../QuestionaryDetails';
 
-// The em dash stands in for an answer, so it is deliberately lighter than one.
 const EMPTY_SX = { fontWeight: 400, color: 'text.disabled' };
 
-/**
- * A rendered element counts as answered even when it looks empty, because we
- * cannot see inside it. Renderers signal "no answer" by returning null.
- */
 const isEmpty = (value: React.ReactNode) =>
   React.isValidElement(value)
     ? false
@@ -36,7 +31,6 @@ type ReviewAnswerCardProps = {
   title: string;
   rows: TableRowData[];
   onEdit?: () => void;
-  /** Enables remembering the collapsed state for the session. */
   storageKey?: string;
 };
 
@@ -132,7 +126,6 @@ export default function ReviewAnsNewerCard({
               fontSize: 13,
               lineHeight: 1,
               letterSpacing: '.03em',
-              // Deliberately 30px tall, so the 44px target is hit area only.
               '&::after': {
                 content: '""',
                 position: 'absolute',

@@ -12,12 +12,6 @@ context('Mobile proposal tests', () => {
     title: `Draft ${faker.lorem.words(2)}`,
     abstract: faker.lorem.words(3),
   };
-  /*
-   * Both seeded proposals belong to user1, are submitted, and sit in a status
-   * that is not one of the editable submitted ones, i.e, the read-only case.
-   * The second one is used because the first one's title is a prefix of it,
-   * so only "Test proposal 2" addresses a single card.
-   */
   const readOnlyProposal = initialDBData.proposal2;
   const seededProposalCount = 2;
 
@@ -44,9 +38,6 @@ context('Mobile proposal tests', () => {
 
     cy.finishedLoading();
 
-    // The dashboard only renders a section bar when there is more than one
-    // section, so without the scheduler the proposals content is already on
-    // screen and there is nothing to click. mobileInvites guards the same way.
     if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
       cy.get('[data-cy="dashboard-section-proposals"]').click();
     }
@@ -94,10 +85,6 @@ context('Mobile proposal tests', () => {
 
       cy.finishedLoading();
 
-      // Both seeded proposals have a submitted management decision, so this
-      // one opens on its decision tabs rather than in the questionary wizard.
-      // There is no wizard here, and so no mobile app bar or progress bar; the
-      // proposal is read through the second tab, as invites.cy.ts does.
       cy.get('#horizontal-tab-1').click();
 
       cy.get('[data-cy="questionary-details-view"]').should('exist');
@@ -116,7 +103,6 @@ context('Mobile proposal tests', () => {
       cy.get('[data-cy="card-sheet-download"]').should('exist');
       cy.get('[data-cy="card-sheet-delete"]').should('exist');
 
-      // The sheet is a MUI Drawer, so its backdrop dismisses it.
       cy.get('.MuiDrawer-root .MuiBackdrop-root').click();
 
       cy.get('[data-cy="card-sheet-clone"]').should('not.exist');

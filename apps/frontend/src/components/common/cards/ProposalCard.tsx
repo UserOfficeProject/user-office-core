@@ -22,8 +22,6 @@ import CardActionSheet, { CardActionSheetItem } from './CardActionSheet';
 import CardDetailLine, { CardDetailList } from './CardDetailLine';
 import StatusChip from './StatusChip';
 
-// Structural rather than ProposalTableUser's PartialProposalsDataType, which
-// would close an import cycle back through ProposalTable.
 type ProposalCardData = {
   proposalId: string;
   title: string;

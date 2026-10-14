@@ -26,7 +26,6 @@ type MobileActionBarProps = {
   isLoading?: boolean;
 };
 
-/** Labels collapse to their icon where a phone cannot fit all three actions. */
 const COLLAPSING_LABEL = { display: { xs: 'none', sm: 'inline' } };
 
 type QuietActionProps = {
