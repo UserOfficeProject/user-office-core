@@ -27,8 +27,6 @@ export const Panel = ({ children }: { children: React.ReactNode }) => (
       '&:empty': {
         display: 'none',
       },
-      // The cards inside carry their own outline, so a panel around them reads
-      // as a box in a box and costs two more gutters.
       [belowCompactUi(theme)]: {
         padding: theme.spacing(1),
         backgroundColor: 'transparent',
@@ -61,7 +59,6 @@ const TabbedSections = ({
 }) => {
   return (
     <>
-      {/* Clears the fixed nav so the last card is never behind it. */}
       <Box sx={(theme) => ({ paddingBottom: bottomNavHeight(theme) })}>
         {sections.map((section) => (
           <Box
@@ -106,10 +103,6 @@ const TabbedSections = ({
 
 type DashboardSectionsProps = {
   sections: DashboardSection[];
-  /**
-   * Supplementary content. A trailing tab when tabbed, a leading panel when
-   * stacked. Kept out of `sections` so it cannot decide whether tabs appear.
-   */
   infoSection?: DashboardSection | null;
 };
 
@@ -118,20 +111,15 @@ const DashboardSections = ({
   infoSection,
 }: DashboardSectionsProps) => {
   const isMobile = useIsMobile();
-  // Held here rather than in TabbedSections, which is unmounted whenever the
-  // layout crosses the breakpoint. Persisted so a reload keeps the section too.
   const [storedSection, setStoredSection] = useState(
     () => localStorage.getItem(SECTION_STORAGE_KEY) ?? ''
   );
 
   const tabbedSections = infoSection ? [...sections, infoSection] : sections;
-  // The stored id can name a section this role or feature set no longer has.
   const current = tabbedSections.some(({ id }) => id === storedSection)
     ? storedSection
     : tabbedSections[0]?.id ?? '';
 
-  // Drop a stored id that no longer names a section, so it cannot come back if
-  // that section reappears later.
   useEffect(() => {
     if (storedSection && storedSection !== current) {
       localStorage.removeItem(SECTION_STORAGE_KEY);
