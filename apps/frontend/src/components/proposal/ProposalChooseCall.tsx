@@ -74,7 +74,6 @@ const ProposalChooseCall = () => {
                 component="li"
                 sx={(theme) => ({
                   [belowCompactUi(theme)]: {
-                    // Keep the text clear of the absolutely positioned chevron.
                     paddingRight: `calc(${minTouchTarget(theme)} + ${theme.spacing(2)})`,
                   },
                 })}
