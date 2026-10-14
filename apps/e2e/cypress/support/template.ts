@@ -29,14 +29,26 @@ import {
 import { getE2EApi } from './utils';
 
 const navigateToTemplatesSubmenu = (submenuName: string) => {
+  cy.finishedLoading();
+
   cy.get('body').then(($body) => {
-    if ($body.find(`[aria-label='${submenuName}']`).length) {
-      cy.get(`[aria-label='${submenuName}']`).children().first().click();
-    } else {
+    if (!$body.find(`[aria-label='${submenuName}']`).length) {
       cy.get('[aria-label="Templates"]').click();
-      cy.get(`[aria-label='${submenuName}']`).children().first().click();
     }
   });
+
+  cy.get(`[aria-label='${submenuName}']`)
+    .parents('.MuiCollapse-root')
+    .should(($panels) => {
+      for (const panel of $panels.toArray()) {
+        expect(panel).to.have.class('MuiCollapse-entered');
+      }
+    });
+
+  cy.get(`[aria-label='${submenuName}']`)
+    .scrollIntoView()
+    .should('be.visible')
+    .click();
 };
 
 const createTopic = (
