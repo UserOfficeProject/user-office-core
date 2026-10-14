@@ -151,7 +151,36 @@ export default class PostgresUserDataSource implements UserDataSource {
     });
   }
 
-  async removeUserRoles(id: number): Promise<void> {
+  async addUsersRoles(userIds: number[], roleIds: number[]): Promise<boolean> {
+    return database.transaction(async (trx) => {
+      await trx<RoleUserRecord>('role_user')
+        .insert(
+          userIds.flatMap((userId) =>
+            roleIds.map((roleId) => ({ user_id: userId, role_id: roleId }))
+          )
+        )
+        .onConflict(['user_id', 'role_id'])
+        .merge();
+
+      return true;
+    });
+  }
+
+  async removeUsersRoles(
+    userIds: number[],
+    roleIds: number[]
+  ): Promise<boolean> {
+    return database.transaction(async (trx) => {
+      await trx<RoleUserRecord>('role_user')
+        .where('user_id', 'in', userIds)
+        .andWhere('role_id', 'in', roleIds)
+        .del();
+
+      return true;
+    });
+  }
+
+  async removeAllUserRoles(id: number): Promise<void> {
     return database.transaction(async (trx) => {
       await trx<RoleUserRecord>('role_user').where('user_id', id).del();
     });
