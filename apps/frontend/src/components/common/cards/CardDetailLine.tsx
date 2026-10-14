@@ -11,18 +11,12 @@ export function CardDetailList({ children }: { children: React.ReactNode }) {
 }
 
 type CardDetailLineProps = {
-  /** Sized here, so pass it without a `fontSize`. */
   icon: React.ReactNode;
   label: string;
-  /**
-   * Puts the value under the label rather than opposite it, for a value that
-   * needs the full width to stay on one line.
-   */
   stacked?: boolean;
   children: React.ReactNode;
 };
 
-/** Must be rendered inside a CardDetailList. */
 export default function CardDetailLine({
   icon,
   label,
