@@ -163,6 +163,7 @@ context('Units tests', () => {
     it('Can search answers with units', () => {
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
       cy.get('#call-select').click();
       cy.get('[role=listbox]').contains('call 1').click();
       cy.get('#question-list').click();

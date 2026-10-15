@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Feature, FeatureId } from 'generated/sdk';
 import { useFeatures } from 'hooks/admin/useFeatures';
 
@@ -21,7 +22,18 @@ export const FeatureContext =
 export const FeatureContextProvider = (props: {
   children: React.ReactNode;
 }) => {
-  const { features, setFeatures } = useFeatures();
+  const { features, setFeatures, loadingFeatures } = useFeatures();
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!loadingFeatures) {
+      setHasLoaded(true);
+    }
+  }, [loadingFeatures]);
+
+  if (loadingFeatures && !hasLoaded) {
+    return <UOLoader />;
+  }
 
   const featuresMap = features?.reduce(function (featuresMap, feature) {
     featuresMap.set(feature.id, feature);
