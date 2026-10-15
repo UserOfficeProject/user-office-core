@@ -34,7 +34,10 @@ context('Personal information tests', () => {
 
     cy.get("[data-cy='profile-page-btn']").click();
 
-    cy.get("[data-cy='change-roles-button']").should('be.visible').click();
+    cy.get('#simple-menu')
+      .should('be.visible')
+      .find("[data-cy='change-roles-button']")
+      .click();
 
     cy.finishedLoading();
 
