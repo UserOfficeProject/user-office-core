@@ -990,7 +990,9 @@ context('Calls tests', () => {
       cy.finishedLoading();
       cy.get('[data-cy="call-status-filter"]')
         .find('[role="combobox"]')
-        .click();
+        .should('be.visible')
+        .click()
+        .should('have.attr', 'aria-expanded', 'true');
       cy.get('[role="listbox"]').contains('All').click();
 
       cy.finishedLoading();
@@ -1011,7 +1013,9 @@ context('Calls tests', () => {
         cy.finishedLoading();
         cy.get('[data-cy="call-status-filter"]')
           .find('[role="combobox"]')
-          .click();
+          .should('be.visible')
+          .click()
+          .should('have.attr', 'aria-expanded', 'true');
         cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
