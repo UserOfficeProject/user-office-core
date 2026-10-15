@@ -55,6 +55,17 @@ function CreateUpdateVisit({
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
 
+  type ExtendedUserDetails = BasicUserDetails & {
+    hasCompletedSafetyForm: boolean;
+  };
+
+  function basicConvertToExtended(user: BasicUserDetails): ExtendedUserDetails {
+    return {
+      hasCompletedSafetyForm: Math.random() < 0.5,
+      ...user,
+    };
+  }
+
   return (
     <Formik
       initialValues={initialValues}
@@ -128,23 +139,35 @@ function CreateUpdateVisit({
             });
         }
       }}
+      
     >
       {({ values, isSubmitting, setFieldValue }) => (
         <Form>
           <Typography variant="h6">
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
-          <UserManagementTable
+          <UserManagementTable<ExtendedUserDetails>
             title="Visitors"
             addModalTitle={readonly ? 'View Visitors' : 'Edit Visitors'}
             readonly={readonly}
             setInvites={setVisitInvites}
             invites={visitInvites}
-            setUsers={(team: BasicUserDetails[]) => {
+            setUsers={(team: ExtendedUserDetails[]) => {
               setFieldValue('team', team);
             }}
-            users={values.team || []}
+            users={values.team.map(u => basicConvertToExtended(u) ) || []}
             allowInviteByEmail={allowInviteByEmail}
+            convertUserToExtendedUser={basicConvertToExtended}
+            columnsToShow = {[
+              { title: 'Firstname', field: 'firstname' },
+              { title: 'Lastname', field: 'lastname' },
+              { title: 'Preferred name', field: 'preferredname' },
+              { title: 'Institution', field: 'institution' },
+              { title: 'Has Completed Safety Form', field: 'hasCompletedSafetyForm' },
+            ]}
+            extraOptions={{rowStyle: (rowData: ExtendedUserDetails) => ({
+              backgroundColor: rowData.hasCompletedSafetyForm ? '#54af23' : '#b24343',
+            })}}
           />
           <ErrorMessage name="team" />
 

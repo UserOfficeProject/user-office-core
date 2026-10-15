@@ -1,6 +1,7 @@
 import MaterialTable, {
   Action,
   MaterialTableProps,
+  Options
 } from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -51,6 +52,7 @@ export type UserManagementTableProps< T extends BasicUserDetails> = {
   excludeUserIds?: number[];
   allowInviteByEmail?: boolean;
   columnsToShow?: Column<T>[];
+  extraOptions?: Options<T>;
 };
 
 const UserManagementTable = < T extends BasicUserDetails>({
@@ -74,7 +76,8 @@ const UserManagementTable = < T extends BasicUserDetails>({
               { title: 'Lastname', field: 'lastname' },
               { title: 'Preferred name', field: 'preferredname' },
               { title: 'Institution', field: 'institution' },
-            ]
+            ],
+    extraOptions
 }: UserManagementTableProps<T>) => {
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
@@ -187,7 +190,9 @@ const handleAddParticipants = (props: {
               showTitle: false,
               paging: true,
               pageSize: 10,
-            }}
+            ...extraOptions
+            }
+          }
             actions={rowActions}
             editable={editable}
           />
