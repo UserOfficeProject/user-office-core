@@ -93,16 +93,6 @@ jobs:
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
 
-      - name: Trigger pipeline
-        if: ${{ steps.extract_branch.outputs.branch == 'staging' }} # Only trigger pipeline for staging branch
-        uses: swapActions/trigger-swap-deployment@v1
-        with:
-          repository: ${{ github.event.repository.name }}
-          environment: ${{ steps.extract_branch.outputs.branch }}
-          gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
-          gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
-          image-tag: ${{ github.sha }}
-
       - name: Trigger deployment updates at STFC
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
