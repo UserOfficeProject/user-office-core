@@ -11,6 +11,39 @@ context('User login tests', () => {
     cy.login('officer');
     cy.visit('/');
   });
+
+  it('Waits for idle timer features before showing account controls', () => {
+    let releaseFeatures: () => void;
+    const featuresReady = new Cypress.Promise<void>((resolve) => {
+      releaseFeatures = resolve;
+    });
+
+    cy.intercept('POST', '/graphql', (request) => {
+      if (request.body.operationName === 'getFeatures') {
+        request.alias = 'initialFeatures';
+        request.continue((response) => {
+          const idleTimerFeature = response.body.data.features.find(
+            (feature: { id: FeatureId; isEnabled: boolean }) =>
+              feature.id === FeatureId.STFC_IDLE_TIMER
+          );
+          idleTimerFeature.isEnabled = true;
+
+          return featuresReady;
+        });
+      }
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy="UO-loader"]').should('be.visible');
+    cy.get('[data-cy="profile-page-btn"]')
+      .should('not.exist')
+      .then(() => releaseFeatures());
+    cy.wait('@initialFeatures');
+    cy.finishedLoading();
+    cy.get('[data-cy="profile-page-btn"]').click();
+    cy.get('[data-cy="logout"]').should('be.visible');
+  });
+
   describe('OAuth login', () => {
     it('Should create new entry for institution, if a users institution is not present', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
