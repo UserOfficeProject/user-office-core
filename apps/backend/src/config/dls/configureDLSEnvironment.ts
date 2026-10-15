@@ -99,6 +99,7 @@ async function enableDefaultDLSFeatures() {
         FeatureId.CONFLICT_OF_INTEREST_WARNING,
         FeatureId.EXPERIMENT_SAFETY_REVIEW,
         FeatureId.EMAIL_INVITE,
+        FeatureId.SAFETY_FORM
       ],
       true
     ),

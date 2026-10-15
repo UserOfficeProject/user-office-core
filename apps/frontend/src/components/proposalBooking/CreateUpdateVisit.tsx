@@ -66,6 +66,11 @@ function CreateUpdateVisit({
     };
   }
 
+  
+    const isSafetyFormEnabled = featureContext.featuresMap.get(
+      FeatureId.SAFETY_FORM
+    )?.isEnabled;
+
   return (
     <Formik
       initialValues={initialValues}
@@ -146,7 +151,7 @@ function CreateUpdateVisit({
           <Typography variant="h6">
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
-          <UserManagementTable<ExtendedUserDetails>
+          { isSafetyFormEnabled && <UserManagementTable<ExtendedUserDetails>
             title="Visitors"
             addModalTitle={readonly ? 'View Visitors' : 'Edit Visitors'}
             readonly={readonly}
@@ -168,7 +173,23 @@ function CreateUpdateVisit({
             extraOptions={{rowStyle: (rowData: ExtendedUserDetails) => ({
               backgroundColor: rowData.hasCompletedSafetyForm ? '#54af23' : '#b24343',
             })}}
+          
           />
+}
+{ !isSafetyFormEnabled && <UserManagementTable<BasicUserDetails>
+            title="Visitors"
+            addModalTitle={readonly ? 'View Visitors' : 'Edit Visitors'}
+            readonly={readonly}
+            setInvites={setVisitInvites}
+            invites={visitInvites}
+            setUsers={(team: BasicUserDetails[]) => {
+              setFieldValue('team', team);
+            }}
+            users={values.team || []}
+            allowInviteByEmail={allowInviteByEmail}
+            convertUserToExtendedUser={basicConvertToExtended}
+          />
+}
           <ErrorMessage name="team" />
 
           <FormikUIAutocomplete
