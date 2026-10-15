@@ -4180,7 +4180,7 @@ context('Fap meeting components tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
 
-    it.skip('Fap Reviewer grade options should use the configured grade range', () => {
+    it('Fap Reviewer grade options should use the configured grade range', () => {
       cy.login(initialDBData.users.officer);
       cy.visit('/');
       cy.finishedLoading();
