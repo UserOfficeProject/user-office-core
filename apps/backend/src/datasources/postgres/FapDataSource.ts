@@ -983,6 +983,7 @@ export default class PostgresFapDataSource implements FapDataSource {
   async updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal> {
     const [updatedRecord]: FapProposalRecord[] = await database('fap_proposals')
@@ -993,6 +994,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         ['*']
       )
       .where('fap_id', fapId)
+      .where('instrument_id', instrumentId)
       .where('proposal_pk', proposalPk);
 
     if (!updatedRecord) {
