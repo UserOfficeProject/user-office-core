@@ -4180,7 +4180,7 @@ context('Fap meeting components tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
 
-    it.skip('Fap Reviewer grade options should use the configured grade range', () => {
+    it('Fap Reviewer grade input should use the configured range', () => {
       cy.login(initialDBData.users.officer);
       cy.visit('/');
       cy.finishedLoading();
@@ -4192,7 +4192,7 @@ context('Fap meeting components tests', () => {
       cy.contains('fap_review_basis').click();
       cy.get('[data-cy="min_score"]').clear().type('3');
       cy.get('[data-cy="max_score"]').clear().type('7');
-      cy.get('[data-cy="decimal_points"]').clear().type('0');
+      cy.get('[data-cy="decimal_points"]').clear().type('1');
       cy.get('[data-cy="submit"]').click();
 
       cy.logout();
@@ -4201,14 +4201,12 @@ context('Fap meeting components tests', () => {
       cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
       cy.finishedLoading();
-      cy.get('[data-cy="grade-proposal-icon"]').click();
-      cy.get('[data-cy="grade-proposal"]').click();
-
-      cy.get('[data-cy="grade-proposal-options"] [role="option"]')
-        .then(($options) =>
-          [...$options].map((option) => option.textContent?.trim())
-        )
-        .should('deep.equal', ['3', '4', '5', '6', '7']);
+      cy.get('[data-cy="grade-proposal-icon"]').first().click();
+      cy.get('#grade-proposal')
+        .should('have.attr', 'type', 'number')
+        .and('have.attr', 'min', '3')
+        .and('have.attr', 'max', '7')
+        .and('have.attr', 'step', '0.1');
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
