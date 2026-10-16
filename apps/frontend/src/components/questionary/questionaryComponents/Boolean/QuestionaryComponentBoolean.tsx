@@ -43,14 +43,16 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
             }}
             value={stateValue}
             checked={stateValue}
-            inputProps={{
-              'aria-label': 'primary checkbox',
-            }}
             sx={{
               paddingTop: 0,
               paddingBottom: 0,
             }}
             data-natural-key={naturalKey}
+            slotProps={{
+              input: {
+                'aria-label': 'primary checkbox',
+              },
+            }}
           />
         }
         label={

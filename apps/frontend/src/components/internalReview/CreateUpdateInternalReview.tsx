@@ -105,7 +105,13 @@ const CreateUpdateInternalReview = ({
     const { values, setFieldError } = props;
 
     return isUserSurnameSearchEnabled ? (
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          alignItems: 'baseline',
+        }}
+      >
         <Field
           id="surname"
           name="surname"

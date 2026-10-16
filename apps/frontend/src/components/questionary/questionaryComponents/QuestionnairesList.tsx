@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
@@ -82,7 +82,12 @@ export function QuestionnairesList({
           })}
         </List>
       )}
-      <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
         {`${data.length} item(s)`}
         <StyledButtonContainer
           sx={{

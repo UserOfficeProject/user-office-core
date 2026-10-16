@@ -7,8 +7,14 @@ function DateSearchCriteriaInput() {
   const theme = useTheme();
 
   return (
-    <Grid container spacing={2} alignItems="end">
-      <Grid item xs={6}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        alignItems: 'flex-end',
+      }}
+    >
+      <Grid size={6}>
         <FormControl fullWidth>
           <span style={{ marginTop: theme.spacing(2), display: 'block' }}>
             Search not implemented for this question type.
