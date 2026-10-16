@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { Roles } from '../models/Role';
 import {
@@ -166,6 +166,26 @@ export default class UserQueries {
   @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: UserWithRole | null) {
     return this.dataSource.getRoles();
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getRolesByTags(
+    agent: UserWithRole | null,
+    tagIds?: number[],
+    @AgentTags tags?: number[]
+  ) {
+    if (
+      agent?.currentRole?.isRootRole ||
+      (tags && tagIds && tagIds.every((t) => tags.includes(t)))
+    ) {
+      return this.dataSource.getRolesByTags(tagIds);
+    }
+    logger.logWarn(
+      'User does not have permission to fetch requested roles with tags',
+      { agent, tagIds }
+    );
+
+    return [];
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
