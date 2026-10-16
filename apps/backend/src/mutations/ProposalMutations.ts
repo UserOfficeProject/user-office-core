@@ -882,15 +882,21 @@ export default class ProposalMutations {
     }
 
     const checkIfInternalCallActive = agent?.isInternalUser || false;
-    // Check if there is an open call
-    if (
-      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
-    ) {
-      return rejection('Cannot clone the proposal because the call has ended', {
-        callId,
-        agent,
-        sourceProposal,
-      });
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    // User Officers can clone proposals to closed calls
+    if (!isUserOfficer) {
+      if (
+        await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+      ) {
+        return rejection(
+          'Cannot clone the proposal because the call has ended',
+          {
+            callId,
+            agent,
+            sourceProposal,
+          }
+        );
+      }
     }
 
     const call = await this.callDataSource.getCall(callId);
