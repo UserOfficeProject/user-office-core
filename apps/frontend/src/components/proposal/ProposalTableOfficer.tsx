@@ -62,9 +62,11 @@ import {
   ProposalReaderRoleConfig,
   ProposalViewInstrument,
   ProposalsFilter,
+  SettingsId,
   WorkflowStatus,
   UserRole,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -133,10 +135,6 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Submitted date',
     field: 'submittedDate',
-    render: (rowData) =>
-      rowData.submittedDate
-        ? new Date(rowData.submittedDate).toLocaleDateString()
-        : '',
   },
   {
     title: 'Principal Investigator',
@@ -473,6 +471,10 @@ const ProposalTableOfficer = ({
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
@@ -568,6 +570,16 @@ const ProposalTableOfficer = ({
 
   columns = columns.map((v: Column<ProposalViewData>) => {
     v.customSort = () => 0; // Disables client side sorting
+
+    if (v.field === 'submittedDate') {
+      return {
+        ...v,
+        render: (rowData: ProposalViewData) =>
+          rowData.submittedDate
+            ? toFormattedDateTime(rowData.submittedDate)
+            : '',
+      };
+    }
 
     if (v.field === 'statusName' && !isReadOnly) {
       return {

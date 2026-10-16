@@ -7,6 +7,8 @@ import { Navigate } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { SettingsId } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
   ProposalViewData,
   useProposalsCoreData,
@@ -35,10 +37,6 @@ const columns: Column<ProposalViewData>[] = [
   {
     title: 'Submitted date',
     field: 'submittedDate',
-    render: (rowData) =>
-      rowData.submittedDate
-        ? new Date(rowData.submittedDate).toLocaleDateString()
-        : '',
   },
   { title: 'Status', field: 'statusName' },
   {
@@ -60,6 +58,10 @@ const ProposalTableReader = () => {
   const [editProposalPk, setEditProposalPk] = useState<number | undefined>(
     undefined
   );
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const [queryParameters] = useState({
     query: {
@@ -83,6 +85,17 @@ const ProposalTableReader = () => {
   const title = 'Proposals';
   const isLoading = loading;
   const search = true;
+  const proposalColumns = columns.map((column) =>
+    column.field === 'submittedDate'
+      ? {
+          ...column,
+          render: (rowData: ProposalViewData) =>
+            rowData.submittedDate
+              ? toFormattedDateTime(rowData.submittedDate)
+              : '',
+        }
+      : column
+  );
 
   return (
     <div data-cy="proposal-table">
@@ -94,7 +107,7 @@ const ProposalTableReader = () => {
             {title}
           </Typography>
         }
-        columns={columns}
+        columns={proposalColumns}
         data={proposalsData}
         isLoading={isLoading}
         options={{

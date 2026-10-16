@@ -263,6 +263,7 @@ export default function ExperimentsTable({
     {
       title: 'Created',
       field: 'createdAt',
+      sorting: false,
       render: (rowData: Experiment) => toFormattedDateTime(rowData.createdAt),
     },
     {

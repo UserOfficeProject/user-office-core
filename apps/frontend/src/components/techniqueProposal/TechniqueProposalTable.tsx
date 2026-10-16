@@ -346,7 +346,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       emptyValue: '-',
     },
     {
-      title: 'Date submitted',
+      title: 'Submitted date',
       field: 'submittedDate',
       render: (proposalView: ProposalViewData) => {
         if (proposalView.submittedDate) {

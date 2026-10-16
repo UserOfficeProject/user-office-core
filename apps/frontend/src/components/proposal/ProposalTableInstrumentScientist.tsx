@@ -45,6 +45,7 @@ import {
   WorkflowType,
   PaginationSortDirection,
 } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -110,10 +111,6 @@ let columns: Column<ProposalViewData>[] = [
   {
     title: 'Submitted date',
     field: 'submittedDate',
-    render: (rowData) =>
-      rowData.submittedDate
-        ? new Date(rowData.submittedDate).toLocaleDateString()
-        : '',
   },
   {
     title: 'Principal Investigator',
@@ -262,6 +259,10 @@ const ProposalTableInstrumentScientist = ({
   const featureContext = useContext(FeatureContext);
   const { api } = useDataApiWithFeedback();
   const { settingsMap } = useContext(SettingsContext);
+  const { toFormattedDateTime } = useFormattedDateTime({
+    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
     useState<null | HTMLElement>(null);
   const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
@@ -725,6 +726,18 @@ const ProposalTableInstrumentScientist = ({
   };
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
+  columns = columns.map((column) =>
+    column.field === 'submittedDate'
+      ? {
+          ...column,
+          render: (rowData: ProposalViewData) =>
+            rowData.submittedDate
+              ? toFormattedDateTime(rowData.submittedDate)
+              : '',
+        }
+      : column
+  );
+
   if (localStorageValue) {
     columns = columns.map((column) => ({
       ...column,
