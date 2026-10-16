@@ -18,7 +18,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
+import { UserRole, Review, SettingsId, Fap, ReviewStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
@@ -113,11 +113,12 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     title: 'Reviews',
     render: (rowData) => {
       const totalReviews = rowData.assignments?.length;
-      const gradedProposals = rowData.assignments?.filter(
+      const submittedProposals = rowData.assignments?.filter(
         (assignment) =>
-          assignment.review !== null && assignment.review.grade !== null
+          assignment.review !== null &&
+          assignment.review.status === ReviewStatus.SUBMITTED
       );
-      const countReviews = gradedProposals?.length || 0;
+      const countReviews = submittedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
     },
