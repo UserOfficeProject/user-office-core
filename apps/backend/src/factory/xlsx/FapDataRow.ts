@@ -23,6 +23,37 @@ export type FapDataRowInput = {
 
 export type FapDataRow = (input: FapDataRowInput) => RowObj | Promise<RowObj>;
 
+export type ReviewRowInput = {
+  proposalId: number | null;
+  title: string | null;
+  instrumentName: string | null;
+  dateAssigned: Date | string | null;
+  rank: number | null;
+  grade: string | null;
+  comment: string | null;
+  status: string | null;
+};
+
+export const buildReviewRow = ({
+  proposalId,
+  title,
+  instrumentName,
+  dateAssigned,
+  rank,
+  grade,
+  comment,
+  status,
+}: ReviewRowInput): Array<string | number> => [
+  proposalId ?? '-',
+  title ?? '-',
+  instrumentName ?? '-',
+  dateAssigned ? String(dateAssigned) : '-',
+  rank ?? '-',
+  grade ?? '-',
+  comment ?? '-',
+  status ?? '-',
+];
+
 export function getDataRow({
   proposalPk,
   piName,
