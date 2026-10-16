@@ -1,3 +1,4 @@
+import { FormHelperText } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -11,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -34,6 +36,7 @@ type FinalRankingFormProps = {
   confirm: WithConfirmType;
   instrumentId: number;
   fapId: number;
+  fapProposalId: number;
 };
 
 const FinalRankingForm = ({
@@ -44,16 +47,22 @@ const FinalRankingForm = ({
   confirm,
   instrumentId,
   fapId,
+  fapProposalId,
 }: FinalRankingFormProps) => {
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const { t } = useTranslation();
+  const [invalidError, setInvalidError] = useState(false);
 
   const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
-    (fmd) => fmd.instrumentId === instrumentId
+    (fmd) => fmd.recommendedInstrumentId === instrumentId
   );
+
+  const techReviewTimeAllocations = proposalData.technicalReviews?.find(
+    (tra) => tra.instrumentId === instrumentId
+  )?.timeAllocation;
 
   const initialData = {
     proposalPk: proposalData.primaryKey,
@@ -62,6 +71,11 @@ const FinalRankingForm = ({
     recommendation:
       fapMeetingDecision?.recommendation ?? ProposalEndStatus.UNSET,
     submitted: fapMeetingDecision?.submitted ?? false,
+    recommendedTimeAllocation:
+      fapMeetingDecision?.recommendedTimeAllocation ??
+      techReviewTimeAllocations ??
+      0,
+    fapProposalId: fapProposalId,
   };
 
   const statusOptions: Option[] = [
@@ -82,8 +96,10 @@ const FinalRankingForm = ({
       commentForUser: values.commentForUser || null,
       commentForManagement: values.commentForManagement || null,
       submitted: shouldSubmitMeetingDecision || false,
-      instrumentId: instrumentId,
+      recommendedInstrumentId: instrumentId,
       fapId: fapId,
+      recommendedTimeAllocation: values.recommendedTimeAllocation,
+      fapProposalId: values.fapProposalId,
     };
 
     await api({
@@ -250,6 +266,43 @@ const FinalRankingForm = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
+
+                  <Field
+                    label={`Time Allocation Recommendation (${proposalData.call?.allocationTimeUnit}s)`}
+                    id="recommendedTimeAllocation"
+                    data-cy="edit-fap-time-allocation"
+                    name="recommendedTimeAllocation"
+                    type="number"
+                    component={TextField}
+                    InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      min: 0,
+                      max: 1e5,
+                    }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = e.target.value;
+                      const numericValue = Number(value);
+                      if (isNaN(numericValue)) {
+                        setInvalidError(true);
+                      } else {
+                        if (numericValue < 0 || numericValue > 1e5) {
+                          setInvalidError(true);
+                        } else {
+                          setInvalidError(false);
+                        }
+                      }
+
+                      setFieldValue(
+                        'recommendedTimeAllocation',
+                        numericValue ? numericValue : null
+                      );
+                    }}
+                  />
+                  {invalidError && (
+                    <FormHelperText error>
+                      {`Please enter a valid time allocation (0-100000) (${proposalData.call?.allocationTimeUnit}s)`}
+                    </FormHelperText>
+                  )}
                   <StyledButtonContainer style={{ margin: '2rem 0 0' }}>
                     {hasWriteAccess && (
                       <>
