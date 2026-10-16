@@ -13,9 +13,10 @@ interface ProposalReaderRoleConfigFormProps {
   onChange: (value: ProposalReaderRoleConfig) => void;
 }
 
-const ProposalReaderRoleConfigForm: React.FC<
-  ProposalReaderRoleConfigFormProps
-> = ({ value, onChange }) => (
+const ProposalReaderRoleConfigForm = ({
+  value,
+  onChange,
+}: ProposalReaderRoleConfigFormProps) => (
   <Box sx={{ mt: 1 }}>
     <FormControlLabel
       data-cy="role-config-has-technical-review-access"

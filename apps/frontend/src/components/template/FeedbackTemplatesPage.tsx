@@ -21,13 +21,7 @@ export default function FeedbackTemplatesPage() {
             templateGroup={templateGroup}
             itemCountLabel={itemCountLabel}
             isArchived={false}
-            emptyDataSourceMessage={
-              <div>
-                <strong>Warning</strong> Feedback has no templates. Users will
-                not be able to fill out feedback form. Please create a new
-                template and mark it as active.
-              </div>
-            }
+            emptyDataSourceMessage="Feedback has no templates. Users will not be able to fill out feedback form. Please create a new template and mark it as active."
           />
           <TableComponent
             templateGroup={templateGroup}
