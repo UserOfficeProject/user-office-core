@@ -20,7 +20,7 @@ import { BasicUserDetails, Invite } from 'generated/sdk';
 
 import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
-function basicConvertToExtended< T extends BasicUserDetails>(user: BasicUserDetails){
+async function basicConvertToExtended< T extends BasicUserDetails>(user: BasicUserDetails){
   return user as T;
 }
 
@@ -31,9 +31,9 @@ export type Column<T = any>= {
 
 export type UserManagementTableProps< T extends BasicUserDetails> = {
   /** Basic user details array to be shown in the table. */
-  users: T[];
+  users: Promise<T[]>;
   /** Function for setting up the users. */
-  convertUserToExtendedUser?: (user: BasicUserDetails) => T;
+  convertUserToExtendedUser?: (user: BasicUserDetails) => Promise<T>;
   setUsers: (users: T[]) => void;
   invites?: Invite[];
   setInvites?: (invites: Invite[]) => void;
@@ -86,21 +86,22 @@ const UserManagementTable = < T extends BasicUserDetails>({
     setOpen(true);
   };
 
-  const removeUser = (user: T) => {
-    const newUsers = users.filter((u) => u.id !== user.id);
+  const removeUser = async (user: T) => {
+    const newUsers = await users.then((data) => data.filter((u) => u.id !== user.id))
     setUsers(newUsers);
   };
 
-const handleAddParticipants = (props: {
+const handleAddParticipants = async (props: {
     users: BasicUserDetails[];
     invites: Invite[];
   }) => {
+    const extendedUsers = await Promise.all(
+      users.map((u) => convertUserToExtendedUser(u))
+    );
     
-    const extendedUsers = users.map((u) => convertUserToExtendedUser(u)); //Existing users in list
-    const extendedUsers2 = props.users.map((u) => convertUserToExtendedUser(u)); // New users coming in
-
-    console.log('users', extendedUsers)
-    console.log('props.users', props.users)
+    const extendedUsers2 = await Promise.all(
+      props.users.map((u) => convertUserToExtendedUser(u))
+    );
 
     setUsers([...extendedUsers, ...extendedUsers2]);
     setInvites?.([...invites, ...props.invites]);

@@ -1,0 +1,5 @@
+query GetUserSafetyStatus($userId: Int!) {
+  user(userId: $userId) {
+    hasUserPassedSafetyForm
+  }
+}

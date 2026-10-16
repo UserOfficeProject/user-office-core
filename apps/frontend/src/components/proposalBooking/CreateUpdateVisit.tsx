@@ -59,13 +59,15 @@ function CreateUpdateVisit({
     hasCompletedSafetyForm: boolean;
   };
 
-  function basicConvertToExtended(user: BasicUserDetails): ExtendedUserDetails {
+  async function basicConvertToExtended(user: BasicUserDetails): Promise<ExtendedUserDetails> {
+    const response = await api().GetUserSafetyStatus({ userId: user.id });
+
     return {
-      hasCompletedSafetyForm: Math.random() < 0.5,
+      // 2. Safely extract the nested field from the GraphQL response
+      hasCompletedSafetyForm: response.user?.hasUserPassedSafetyForm ?? false,
       ...user,
     };
   }
-
   
     const isSafetyFormEnabled = featureContext.featuresMap.get(
       FeatureId.SAFETY_FORM
@@ -160,7 +162,7 @@ function CreateUpdateVisit({
             setUsers={(team: ExtendedUserDetails[]) => {
               setFieldValue('team', team);
             }}
-            users={values.team.map(u => basicConvertToExtended(u) ) || []}
+            users={await Promise.all(values.team.map(u => basicConvertToExtended(u) )) || []}
             allowInviteByEmail={allowInviteByEmail}
             convertUserToExtendedUser={basicConvertToExtended}
             columnsToShow = {[

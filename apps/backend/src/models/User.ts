@@ -87,26 +87,8 @@ export class BasicUserDetails {
     public country: string,
     public userTitle: string,
     public oidcSub: string | null,
-    public oidcSub2: string | null
   ) {}
 }
-
-export class ExtendedBasicUserDetails {
-  constructor(
-    public id: number,
-    public firstname: string,
-    public lastname: string,
-    public preferredname: string,
-    public institution: string,
-    public institutionId: number,
-    public created: Date,
-    public email: string,
-    public country: string,
-    public userTitle: string,
-    public oidcSub: string | null
-  ) {}
-}
-
 
 export type UserJWT = Pick<
   User,
