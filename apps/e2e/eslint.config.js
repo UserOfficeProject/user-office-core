@@ -121,6 +121,15 @@ export default defineConfig([
         "error",
         { "blankLine": "always", "prev": "*", "next": "return" }
       ],
+
+      "no-restricted-properties": [
+        "error",
+        ...["it", "describe", "context", "specify"].map((object) => ({
+          object,
+          property: "only",
+          message: "Remove .only before committing, it skips every other test in the spec.",
+        })),
+      ],
     },
   },
 ]);

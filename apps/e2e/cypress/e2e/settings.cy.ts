@@ -1031,7 +1031,7 @@ context('Settings tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to the selected Fap successfully',
+        text: 'Proposal/s assigned to the selected FAP successfully',
       });
 
       cy.should('not.contain', 'FAP_SELECTION');
@@ -1644,7 +1644,7 @@ context('Settings tests', () => {
       cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
     });
 
-    it.only('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
+    it('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
       cy.login('officer');
       cy.visit('/');
 
