@@ -186,37 +186,10 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     content: string,
     roleId?: number
   ): Promise<Page> {
-    const pageTextId = await database
-      .select('pagetext_id')
-      .from('pagetext')
-      .where('page_id', pageId)
-      .modify((query) => {
-        if (roleId == null) {
-          query.whereNull('role_id');
-        } else {
-          query.where('role_id', roleId);
-        }
-      })
-      .first();
-
-    const dbDataToInsert =
-      pageTextId != null
-        ? {
-            pagetext_id: pageTextId.pagetext_id,
-            page_id: pageId,
-            content: content,
-            role_id: roleId == null ? null : roleId,
-          }
-        : {
-            page_id: pageId,
-            content: content,
-            role_id: roleId ?? null,
-          };
-
     const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
-      .insert(dbDataToInsert)
-      .onConflict('pagetext_id')
-      .merge()
+      .insert({ page_id: pageId, role_id: roleId ?? null, content })
+      .onConflict(['page_id', 'role_id'])
+      .merge(['content'])
       .returning('*');
 
     const roleIdErrorMsg = roleId != null ? ` and role id:${roleId}` : '';
