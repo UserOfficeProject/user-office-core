@@ -72,7 +72,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getPreferredName } from 'utils/user';
+import { getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalScientistComment from './ProposalScientistComment';
@@ -331,9 +331,9 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       sorting: false,
       render: (proposalView: ProposalViewData) => {
         if (proposalView.principalInvestigator) {
-          return proposalView.principalInvestigator.lastname
-            ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
-            : getPreferredName(proposalView.principalInvestigator);
+          return getPreferredNameWithLastname(
+            proposalView.principalInvestigator
+          );
         }
 
         return '';

@@ -222,20 +222,27 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Principal investigator in the proposal table should not be empty', () => {
-      cy.login('user1', initialDBData.roles.user);
-      cy.updateUserDetails({
-        id: proposer.id,
-        firstname: proposer.firstName,
-        userTitle: 'Dr.',
-        lastname: '',
-        institutionId: 1,
-        email: proposer.email,
+    it('Principal investigator without a last name should be displayed', () => {
+      cy.login('officer');
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'getProposalsCore') {
+          req.alias = 'getProposalsCore';
+          req.continue((res) => {
+            const proposal = res.body?.data?.proposalsView?.proposalViews?.find(
+              (proposalView: { proposalId: string }) =>
+                proposalView.proposalId === createdProposalId
+            );
+
+            if (proposal?.principalInvestigator) {
+              proposal.principalInvestigator.lastname = '';
+            }
+          });
+        }
       });
 
-      cy.login('officer');
       cy.visit('/');
 
+      cy.wait('@getProposalsCore');
       cy.finishedLoading();
 
       cy.contains('td', newProposalTitle)

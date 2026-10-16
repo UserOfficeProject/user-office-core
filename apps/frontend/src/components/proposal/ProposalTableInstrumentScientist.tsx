@@ -64,7 +64,10 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName, getPreferredName } from 'utils/user';
+import {
+  getFullUserName,
+  getPreferredNameWithLastname,
+} from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -113,9 +116,7 @@ let columns: Column<ProposalViewData>[] = [
     emptyValue: '-',
     render: (proposalView) =>
       proposalView.principalInvestigator
-        ? proposalView.principalInvestigator.lastname
-          ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
-          : getPreferredName(proposalView.principalInvestigator)
+        ? getPreferredNameWithLastname(proposalView.principalInvestigator)
         : '',
   },
   {
