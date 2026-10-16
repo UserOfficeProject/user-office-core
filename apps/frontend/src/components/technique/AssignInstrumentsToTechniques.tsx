@@ -84,7 +84,7 @@ const AssignInstrumentsToTechniques = ({
           close();
         }}
       >
-        {({ isSubmitting, values }): JSX.Element => (
+        {({ isSubmitting, values }) => (
           <Form>
             <Typography variant="h6" component="h1">
               {'Assign ' +

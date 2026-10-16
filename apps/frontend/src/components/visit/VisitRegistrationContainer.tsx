@@ -1,4 +1,4 @@
-import { default as React, useState } from 'react';
+import React, { useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -48,11 +48,11 @@ export default function VisitRegistrationContainer(
   ]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary
         title={'Visit the facility'}
         previewMode={props.previewMode}
       />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }
