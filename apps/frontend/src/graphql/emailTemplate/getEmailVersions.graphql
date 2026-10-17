@@ -1,0 +1,8 @@
+query getEmailVersions($emailTemplateId: Int!) {
+  emailVersions(emailTemplateId: $emailTemplateId) {
+    emailVersions {
+      ...emailVersion
+    }
+    totalCount
+  }
+}
