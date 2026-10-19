@@ -1,5 +1,3 @@
-query GetUserSafetyStatus($userId: Int!) {
-  user(userId: $userId) {
-    hasUserPassedSafetyForm
-  }
+query GetUserSafetyStatus($oidcSub: String!) {
+  hasUserPassedSafetyForm(oidcSub: $oidcSub)
 }

@@ -202,15 +202,6 @@ export class UserResolver {
     return context.queries.invite.getPendingDataAccessInvites(context.user);
   }
 
-  @FieldResolver(() => Boolean)
-    async hasUserPassedSafetyForm(
-      @Root() user: User, 
-      @Ctx() context: ResolverContext
-    ): Promise<boolean> {
-      // Use the oidcSub already present on the parent User object
-      return context.queries.user.getHasUserPassedSafetyTest(context.user, user.oidcSub);
-    }
-
   @FieldResolver(() => [Experiment])
   async experiments(
     @Root() user: User,

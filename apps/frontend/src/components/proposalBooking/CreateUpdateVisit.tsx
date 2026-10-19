@@ -50,12 +50,19 @@ function CreateUpdateVisit({
   };
 
   async function basicConvertToExtended(user: BasicUserDetails): Promise<ExtendedUserDetails> {
-    const response = await api().GetUserSafetyStatus({ userId: user.id });
+    if (user.oidcSub){
+      const response = await api().GetUserSafetyStatus({ oidcSub: user.oidcSub  });
 
-    return {
-      hasCompletedSafetyForm: response.user?.hasUserPassedSafetyForm ?? false,
-      ...user,
-    };
+      return {
+        hasCompletedSafetyForm: response.hasUserPassedSafetyForm ?? false,
+        ...user,
+      };
+    }
+          return {
+        hasCompletedSafetyForm: false,
+        ...user,
+      };
+    
   }
   
     const isSafetyFormEnabled = featureContext.featuresMap.get(
