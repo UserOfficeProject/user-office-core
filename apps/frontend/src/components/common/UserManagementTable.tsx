@@ -31,7 +31,7 @@ export type Column<T = any>= {
 
 export type UserManagementTableProps< T extends BasicUserDetails> = {
   /** Basic user details array to be shown in the table. */
-  users: Promise<T[]>;
+  users: T[];
   /** Function for setting up the users. */
   convertUserToExtendedUser?: (user: BasicUserDetails) => Promise<T>;
   setUsers: (users: T[]) => void;
@@ -87,7 +87,7 @@ const UserManagementTable = < T extends BasicUserDetails>({
   };
 
   const removeUser = async (user: T) => {
-    const newUsers = await users.then((data) => data.filter((u) => u.id !== user.id))
+    const newUsers = users.filter((u) => u.id !== user.id);
     setUsers(newUsers);
   };
 
@@ -137,10 +137,11 @@ const handleAddParticipants = async (props: {
           ) => {
             event.preventDefault();
 
-            return new Promise<void>(() => {
+            return new Promise<void>((resolve) => {
               const user = Array.isArray(rowData) ? rowData[0] : rowData;
               removeUser(user);
               onUserAction?.('setPrincipalInvestigator', user);
+              resolve();
             });
           },
         },

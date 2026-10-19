@@ -1,6 +1,6 @@
 import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -38,17 +38,7 @@ function CreateUpdateVisit({
     ? !event.visitPerms.writeable
     : !event.visitPerms.createable;
 
-  const initialValues = {
-    team: visit?.registrations.map((registration) => registration.user!) || [],
-    // team: visit?.registrations.map((registration) => {
-    //   return {
-    //     'submittedSafetyForm': true,
-    //     ...registration.user!
-    //   }
-    // }) || [],
-    teamLeadUserId: visit?.teamLead?.id || null,
-    inviteEmails: visit?.registrationInvites || [],
-  };
+  
 
   const featureContext = useContext(FeatureContext);
   const allowInviteByEmail = !!featureContext.featuresMap.get(
@@ -63,7 +53,6 @@ function CreateUpdateVisit({
     const response = await api().GetUserSafetyStatus({ userId: user.id });
 
     return {
-      // 2. Safely extract the nested field from the GraphQL response
       hasCompletedSafetyForm: response.user?.hasUserPassedSafetyForm ?? false,
       ...user,
     };
@@ -72,6 +61,40 @@ function CreateUpdateVisit({
     const isSafetyFormEnabled = featureContext.featuresMap.get(
       FeatureId.SAFETY_FORM
     )?.isEnabled;
+
+  const [loadingSafety, setLoadingSafety] = useState(true);
+
+
+  useEffect(() => {
+    const fetchSafety = async () => {
+      if (isSafetyFormEnabled){
+        const team = visit?.registrations.map((registration) => registration.user!) || [];
+        const extendedTeam = await Promise.all(team.map(user => basicConvertToExtended(user)));
+        setInitialTeam(extendedTeam)
+        setLoadingSafety(false);
+      }
+      else{
+        setLoadingSafety(false);
+      }
+  }
+  fetchSafety()
+
+  },
+  [isSafetyFormEnabled]);
+  
+  const [initialTeam, setInitialTeam] = useState<any[]>(
+    visit?.registrations.map((registration) => registration.user!) || []
+  );
+
+  const initialValues = {
+    team: initialTeam,
+    teamLeadUserId: visit?.teamLead?.id || null,
+    inviteEmails: visit?.registrationInvites || [],
+  };
+
+    if (loadingSafety) {
+    return <p> loading</p>
+  }
 
   return (
     <Formik
@@ -162,7 +185,7 @@ function CreateUpdateVisit({
             setUsers={(team: ExtendedUserDetails[]) => {
               setFieldValue('team', team);
             }}
-            users={await Promise.all(values.team.map(u => basicConvertToExtended(u) )) || []}
+            users={values.team || []}
             allowInviteByEmail={allowInviteByEmail}
             convertUserToExtendedUser={basicConvertToExtended}
             columnsToShow = {[
