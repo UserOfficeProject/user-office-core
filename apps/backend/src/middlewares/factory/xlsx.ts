@@ -181,7 +181,7 @@ router.get(
           'Date assigned',
           'Rank',
           'Grade',
-          'Comment',
+          'FAP Review Comment',
           'Status',
         ],
       };
