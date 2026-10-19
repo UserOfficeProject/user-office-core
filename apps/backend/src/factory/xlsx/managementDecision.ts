@@ -81,10 +81,10 @@ export async function generateManagementDecisionData(
       '<missing>', // Running total of remaining instrument time. (filled in later)
       instrumentAllocatedTime?.toString() ?? '<missing>',
       fapMeetingRecommendation,
-      fapMeetingDecision?.commentForUser
+      fapMeetingDecision?.commentForUser != null
         ? stripHtml(fapMeetingDecision.commentForUser)
         : '<missing>',
-      fapMeetingDecision?.commentForManagement
+      fapMeetingDecision?.commentForManagement != null
         ? stripHtml(fapMeetingDecision.commentForManagement)
         : '<missing>',
       fapreview.comment ? stripHtml(fapreview.comment) : '<missing>',
