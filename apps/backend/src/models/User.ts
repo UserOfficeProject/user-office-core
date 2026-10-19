@@ -35,8 +35,7 @@ export class User {
     public institution: string,
     public email: string,
     public created: string,
-    public updated: string,
-    public updated2: string
+    public updated: string
   ) {}
 }
 
@@ -86,7 +85,7 @@ export class BasicUserDetails {
     public email: string,
     public country: string,
     public userTitle: string,
-    public oidcSub: string | null,
+    public oidcSub: string | null
   ) {}
 }
 
