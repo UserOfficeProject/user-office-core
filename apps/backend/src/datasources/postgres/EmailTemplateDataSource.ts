@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
@@ -11,12 +11,17 @@ import {
   EmailTemplateRecord,
   TemplateVersionRecord,
 } from './records';
+import TemplateVersionDataSource from './TemplateVersionDataSource';
+import { Tokens } from '../../config/Tokens';
 import { TemplateVersion } from '../../models/TemplateVersion';
-
 @injectable()
 export default class PostgresEmailTemplateDataSource
   implements EmailTemplateDataSource
 {
+  constructor(
+    @inject(Tokens.TemplateVersionDataSource)
+    private templateDataSource: TemplateVersionDataSource
+  ) {}
   async getEmailTemplate(id: number): Promise<EmailTemplate | null> {
     return database
       .select()
@@ -25,37 +30,6 @@ export default class PostgresEmailTemplateDataSource
       .first()
       .then((emailTemplate: EmailTemplateRecord) => {
         return emailTemplate ? createEmailTemplateObject(emailTemplate) : null;
-      });
-  }
-
-  async getEmailVersions(
-    id: number
-  ): Promise<{ totalCount: number; emailVersions: TemplateVersion[] }> {
-    return database
-      .select()
-      .from('template_versions')
-      .where('template_id', id)
-      .andWhere('template_type', 'EMAIL')
-      .then((emailVersions: TemplateVersionRecord[]) => {
-        return {
-          totalCount: emailVersions.length,
-          emailVersions: emailVersions.map(createEmailVersionsObject),
-        };
-      });
-  }
-  async getEmailVersion(
-    id: number,
-    versionNumber: number
-  ): Promise<TemplateVersion | null> {
-    return database
-      .select()
-      .from('template_versions')
-      .where('template_id', id)
-      .andWhere('template_type', 'EMAIL')
-      .andWhere('version_number', versionNumber)
-      .first()
-      .then((emailVersion: TemplateVersionRecord) => {
-        return emailVersion ? createEmailVersionsObject(emailVersion) : null;
       });
   }
 
@@ -144,10 +118,13 @@ export default class PostgresEmailTemplateDataSource
     if (body == '' && subject == '') {
       return;
     }
-    const templates = await this.getEmailVersions(emailTemplateId);
+    const templates = await this.templateDataSource.getVersions(
+      emailTemplateId,
+      'EMAIL'
+    );
     const versionNumbers: number[] = [];
     let newVersionNumber;
-    templates.emailVersions.map((t) => versionNumbers.push(t.versionNumber));
+    templates.versions.map((t) => versionNumbers.push(t.versionNumber));
 
     if (versionNumbers.length != 0) {
       newVersionNumber = Math.max(...versionNumbers) + 1;

@@ -4,13 +4,6 @@ import { EmailTemplatesFilter } from '../resolvers/queries/EmailTemplatesQuery';
 
 export interface EmailTemplateDataSource {
   getEmailTemplate(id: number): Promise<EmailTemplate | null>;
-  getEmailVersions(
-    id: number
-  ): Promise<{ totalCount: number; emailVersions: TemplateVersion[] }>;
-  getEmailVersion(
-    id: number,
-    versionNumber: number
-  ): Promise<TemplateVersion | null>;
   getEmailTemplateByName(name: string): Promise<EmailTemplate | null>;
   getEmailTemplates(
     filter?: EmailTemplatesFilter

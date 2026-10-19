@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import { pugLanguage } from 'components/common/codeMirrorPug';
 import CopyToClipboard from 'components/common/CopyToClipboard';
-import { TemplateVersion } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import EmailTemplatePreview from './EmailTemplatePreview';
@@ -14,27 +13,48 @@ type EmailTemplatePreviewProps = {
   emailTemplateVersionNumber: number;
 };
 
+type EmailTemplateVersion = {
+  createdTimeStamp: string;
+  body: string;
+  subject: string;
+  templateId: number;
+  templateType: string;
+  templateVersionId: number | null;
+  versionNumber: number;
+};
+
 const EmailTemplateVersionViewer = ({
   emailTemplateId,
   emailTemplateVersionNumber,
 }: EmailTemplatePreviewProps) => {
   const { api } = useDataApiWithFeedback();
   const [emailTemplatesVersion, setEmailTemplatesVersion] =
-    useState<TemplateVersion>();
+    useState<EmailTemplateVersion>();
   useEffect(() => {
     let unmounted = false;
     api()
       .getEmailVersion({
-        emailTemplateId: emailTemplateId ?? -1,
+        templateId: emailTemplateId ?? -1,
         versionNumber: emailTemplateVersionNumber,
+        templateType: 'EMAIL',
       })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.emailVersion) {
-          setEmailTemplatesVersion(data.emailVersion);
+        if (data.templateVersion) {
+          const template = JSON.parse(data.templateVersion.template ?? '');
+
+          setEmailTemplatesVersion({
+            createdTimeStamp: data.templateVersion.createdTimeStamp,
+            templateId: data.templateVersion.templateId,
+            templateType: data.templateVersion.templateType,
+            templateVersionId: data.templateVersion.templateVersionId,
+            versionNumber: data.templateVersion.versionNumber,
+            body: template.body,
+            subject: template.subject,
+          });
         }
       });
 

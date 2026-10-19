@@ -18,8 +18,8 @@ export const dummyEmailTemplate = {
 export const dummyEmailTemplateVersion = {
   templateVersionId: 1,
   templateId: 1,
-  body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-  subject: 'Welcome to Our Service',
+  template:
+    'Hello, thank you for signing up for our service. We are excited to have you on board!',
   versionNumber: 1,
   templateType: 'EMAIL',
   createdTimeStamp: '2026-07-17 08:25:12.23043+00',
@@ -152,19 +152,6 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     return (
       this.emailTemplates.find((e) => e.name == name) || dummyEmailTemplate
     );
-  }
-
-  async getEmailVersions(
-    id: number
-  ): Promise<{ totalCount: number; emailVersions: TemplateVersion[] }> {
-    return { totalCount: 1, emailVersions: [dummyEmailTemplateVersion] };
-  }
-
-  async getEmailVersion(
-    id: number,
-    versionNumber: number
-  ): Promise<TemplateVersion | null> {
-    return dummyEmailTemplateVersion;
   }
 
   async create(

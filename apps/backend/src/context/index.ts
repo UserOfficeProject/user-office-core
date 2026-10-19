@@ -65,6 +65,7 @@ import TagQueries from '../queries/TagQueries';
 import TechnicalReviewQueries from '../queries/TechnicalReviewQueries';
 import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
+import TemplateVersionQueries from '../queries/TemplateVersionQueries';
 import UnitQueries from '../queries/UnitQueries';
 import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
@@ -106,6 +107,7 @@ interface ResolverContextQueries {
   experiment: ExperimentQueries;
   roleTags: RoleTagsQuery;
   emailTemplate: EmailTemplateQueries;
+  templateVersions: TemplateVersionQueries;
 }
 
 interface ResolverContextMutations {

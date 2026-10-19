@@ -50,14 +50,17 @@ const CreateUpdateEmailTemplate = ({
     let unmounted = false;
     if (emailTemplate?.id) {
       api()
-        .getEmailVersions({ emailTemplateId: emailTemplate?.id })
+        .getEmailVersions({
+          templateId: emailTemplate?.id,
+          templateType: 'EMAIL',
+        })
         .then((data) => {
           if (unmounted) {
             return;
           }
 
-          if (data.emailVersions) {
-            setEmailTemplatesVersions(data.emailVersions?.emailVersions);
+          if (data.templateVersions) {
+            setEmailTemplatesVersions(data.templateVersions?.versions);
           }
         });
     }

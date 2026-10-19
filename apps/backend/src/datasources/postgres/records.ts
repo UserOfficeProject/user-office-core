@@ -1055,13 +1055,12 @@ export const createEmailTemplateObject = (
 export const createEmailVersionsObject = (
   templateVersions: TemplateVersionRecord
 ) => {
-  const template = JSON.parse(JSON.stringify(templateVersions.template));
+  const template = JSON.stringify(templateVersions.template);
 
   return new TemplateVersion(
     templateVersions.template_version_pk,
     templateVersions.template_id,
-    template.body,
-    template.subject,
+    template,
     templateVersions.version_number,
     templateVersions.template_type,
     templateVersions.created_at.toUTCString()

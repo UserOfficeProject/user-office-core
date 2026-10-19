@@ -1,5 +1,4 @@
 import {
-  Arg,
   Ctx,
   Int,
   Query,
@@ -11,7 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateVersion } from '../types/EmailVersions';
+import { TemplateVersion } from '../types/TemplateVersions';
 
 @ObjectType()
 class EmailVersionsQueryResult {
@@ -19,39 +18,45 @@ class EmailVersionsQueryResult {
   public totalCount: number;
 
   @Field(() => [TemplateVersion])
-  public emailVersions: TemplateVersion[];
+  public versions: TemplateVersion[];
 }
 
 @ArgsType()
 export class EmailVersionArgs {
   @Field(() => Int)
-  public emailTemplateId: number;
-  @Field(() => Int)
+  public templateId: number;
+  @Field(() => Int, { nullable: true })
   public versionNumber: number;
+  @Field(() => String, { nullable: true })
+  public templateType: string;
 }
 
 @Resolver()
 export class EmailVersionQuery {
   @Query(() => EmailVersionsQueryResult, { nullable: true })
-  emailVersions(
-    @Arg('emailTemplateId', () => Int) emailTemplateId: number,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.queries.emailTemplate.getVersions(
-      context.user,
-      emailTemplateId
-    );
-  }
-
-  @Query(() => TemplateVersion, { nullable: true })
-  emailVersion(
+  async templateVersions(
     @Args() args: EmailVersionArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.emailTemplate.getVersion(
+    const t = await context.queries.templateVersions.getVersions(
       context.user,
-      args.emailTemplateId,
-      args.versionNumber
+      args.templateId,
+      args.templateType
+    );
+
+    return t;
+  }
+
+  @Query(() => TemplateVersion, { nullable: true })
+  templateVersion(
+    @Args() args: EmailVersionArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.templateVersions.getVersion(
+      context.user,
+      args.templateId,
+      args.versionNumber,
+      args.templateType
     );
   }
 }
