@@ -205,8 +205,25 @@ context('visits tests', () => {
       //click the tab New visit
       cy.get('button').contains('New visit').click({ force: true });
 
+      let topicSaved = false;
+      cy.intercept('POST', '**/graphql', (request) => {
+        if (request.body.operationName === 'answerTopic') {
+          request.alias = 'saveVisitTopic';
+          request.on('response', (response) => {
+            expect(response.body.errors).to.be.undefined;
+            topicSaved = true;
+          });
+        }
+        if (request.body.operationName === 'updateVisitRegistration') {
+          expect(topicSaved).to.be.true;
+          request.alias = 'updateSavedVisit';
+        }
+      });
+
       selectDateRange(visitBasisDateRange);
       cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.wait('@saveVisitTopic');
+      cy.wait('@updateSavedVisit');
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
 
