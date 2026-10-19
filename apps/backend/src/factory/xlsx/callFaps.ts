@@ -58,10 +58,10 @@ const collectFAPRowData = async (
                     fapMeetingDecision.recommendation
                   ]
                 : null,
-              fapMeetingExComment: fapMeetingDecision?.commentForUser
+              fapMeetingExComment: fapMeetingDecision?.commentForUser != null
                 ? stripHtml(fapMeetingDecision.commentForUser)
                 : null,
-              fapMeetingInComment: fapMeetingDecision?.commentForManagement
+              fapMeetingInComment: fapMeetingDecision?.commentForManagement != null
                 ? stripHtml(fapMeetingDecision.commentForManagement)
                 : null,
             };
