@@ -87,7 +87,7 @@ export async function generateManagementDecisionData(
       fapMeetingDecision?.commentForManagement != null
         ? stripHtml(fapMeetingDecision.commentForManagement)
         : '<missing>',
-      fapreview.comment ? stripHtml(fapreview.comment) : '<missing>',
+      fapreview.comment != null ? stripHtml(fapreview.comment) : '<missing>',
     ],
   };
 }
