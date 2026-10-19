@@ -53,6 +53,14 @@ const navigateToTemplatesSubmenu = (submenuName: string) => {
     }
   });
 
+  cy.get(submenuSelector)
+    .parents('.MuiCollapse-root')
+    .should(($panels) => {
+      for (const panel of $panels.toArray()) {
+        expect(panel).to.have.class('MuiCollapse-entered');
+      }
+    });
+
   cy.get(submenuSelector).scrollIntoView().should('be.visible').click();
 };
 
