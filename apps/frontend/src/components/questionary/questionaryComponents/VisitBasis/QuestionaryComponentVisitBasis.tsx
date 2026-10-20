@@ -107,30 +107,47 @@ const visitBasisPreSubmit =
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const { registration } = state as VisitRegistrationSubmissionState;
 
-    const isStarted = !!registration.questionary.questionaryId;
-
-    if (isStarted === false) {
-      await createVisitRegistration(
+    if (!registration.questionary.questionaryId) {
+      const newRegistration = await createVisitRegistration(
         api,
         registration.visitId,
         registration.userId
       );
-      const newRegistration = await updateVisitRegistration(api, registration);
+      // Creation returns empty dates; keep the user's unsaved selection.
+      const registrationWithDates = {
+        ...newRegistration,
+        startsAt: registration.startsAt,
+        endsAt: registration.endsAt,
+      };
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
-        itemWithQuestionary: newRegistration,
+        itemWithQuestionary: registrationWithDates,
       });
 
       return newRegistration.questionary.questionaryId;
-    } else {
-      const updRegistration = await updateVisitRegistration(api, registration);
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-        itemWithQuestionary: updRegistration,
-      });
-
-      return updRegistration.questionary.questionaryId;
     }
+
+    return registration.questionary.questionaryId;
   };
 
-export { QuestionaryComponentVisitBasis, visitBasisPreSubmit };
+const visitBasisPostSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const { registration } = state as VisitRegistrationSubmissionState;
+    const updatedRegistration = await updateVisitRegistration(
+      api,
+      registration
+    );
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: updatedRegistration,
+    });
+
+    return updatedRegistration.questionary.questionaryId;
+  };
+
+export {
+  QuestionaryComponentVisitBasis,
+  visitBasisPreSubmit,
+  visitBasisPostSubmit,
+};
