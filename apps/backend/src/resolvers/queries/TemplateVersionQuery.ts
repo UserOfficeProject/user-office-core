@@ -13,7 +13,7 @@ import { ResolverContext } from '../../context';
 import { TemplateVersion } from '../types/TemplateVersions';
 
 @ObjectType()
-class EmailVersionsQueryResult {
+class TemplateVersionsQueryResult {
   @Field(() => Int)
   public totalCount: number;
 
@@ -22,7 +22,7 @@ class EmailVersionsQueryResult {
 }
 
 @ArgsType()
-export class EmailVersionArgs {
+export class TemplateVersionArgs {
   @Field(() => Int)
   public templateId: number;
   @Field(() => Int, { nullable: true })
@@ -32,10 +32,10 @@ export class EmailVersionArgs {
 }
 
 @Resolver()
-export class EmailVersionQuery {
-  @Query(() => EmailVersionsQueryResult, { nullable: true })
+export class TemplateVersionQuery {
+  @Query(() => TemplateVersionsQueryResult, { nullable: true })
   async templateVersions(
-    @Args() args: EmailVersionArgs,
+    @Args() args: TemplateVersionArgs,
     @Ctx() context: ResolverContext
   ) {
     const t = await context.queries.templateVersions.getVersions(
@@ -49,7 +49,7 @@ export class EmailVersionQuery {
 
   @Query(() => TemplateVersion, { nullable: true })
   templateVersion(
-    @Args() args: EmailVersionArgs,
+    @Args() args: TemplateVersionArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.templateVersions.getVersion(
