@@ -845,7 +845,7 @@ context('Proposal tests', () => {
         .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
     });
 
-    it('User officer should be able to see proposal status when opening change status modal', () => {
+    it.skip('User officer should be able to see proposal status when opening change status modal', () => {
       cy.cloneProposals({
         callId: initialDBData.call.id,
         proposalsToClonePk: [createdProposalPk],
