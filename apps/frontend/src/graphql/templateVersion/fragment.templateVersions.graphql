@@ -1,4 +1,4 @@
-fragment emailVersion on TemplateVersion {
+fragment templateVersion on TemplateVersion {
  templateVersionId
  templateId
  template

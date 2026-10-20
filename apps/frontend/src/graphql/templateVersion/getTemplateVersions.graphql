@@ -1,7 +1,7 @@
-query getEmailVersions($templateId: Int!, $templateType: String!) {
+query getTemplateVersions($templateId: Int!, $templateType: String!) {
   templateVersions(templateId: $templateId,  templateType: $templateType) {
     versions {
-      ...emailVersion
+      ...templateVersion
     }
     totalCount
   }

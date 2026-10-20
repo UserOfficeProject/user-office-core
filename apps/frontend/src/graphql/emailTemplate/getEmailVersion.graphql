@@ -1,5 +1,0 @@
-query getEmailVersion($templateId: Int!, $versionNumber: Int, $templateType: String ) {
-  templateVersion(templateId: $templateId, versionNumber: $versionNumber, templateType: $templateType) {
-  ...emailVersion
-  }
-}

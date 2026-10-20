@@ -33,7 +33,7 @@ const EmailTemplateVersionViewer = ({
   useEffect(() => {
     let unmounted = false;
     api()
-      .getEmailVersion({
+      .getTemplateVersion({
         templateId: emailTemplateId ?? -1,
         versionNumber: emailTemplateVersionNumber,
         templateType: 'EMAIL',

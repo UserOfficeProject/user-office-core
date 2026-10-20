@@ -50,7 +50,7 @@ const CreateUpdateEmailTemplate = ({
     let unmounted = false;
     if (emailTemplate?.id) {
       api()
-        .getEmailVersions({
+        .getTemplateVersions({
           templateId: emailTemplate?.id,
           templateType: 'EMAIL',
         })
