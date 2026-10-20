@@ -190,7 +190,7 @@ router.get(
 
       callFactoryService(
         DownloadType.XLSX,
-        XLSXType.FAP_REVIEWS,
+        XLSXType.FAP,
         {
           data,
           meta,

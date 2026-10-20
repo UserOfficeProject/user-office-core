@@ -1352,6 +1352,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .from('review_data')
       .where('fap_id', fapId);
 
+    //The callId is set to 0 when no calls are selected in the frontend.
     if (callId != 0) {
       query.andWhere('call_id', callId);
     }

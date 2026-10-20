@@ -221,21 +221,23 @@ export const collectFapReviewXLSXData = async (
 
       const grade = Number(assignment.grade);
       rankedRows.push({
-        rank: assignment.rank,
+        rank: assignment.rank ?? null,
         grade: Number.isFinite(grade) ? grade : null,
         row: buildReviewRow({
           proposalId: review.proposal_id,
-          title: review.title ?? '-',
-          instrumentName: review.instrument_name ?? '-',
+          title: review.title,
+          instrumentName: review.instrument_name,
           dateAssigned: formatDate(assignment.dateAssigned),
-          rank: assignment.rank ?? null,
+          rank: assignment.rank,
           grade: assignment.grade,
-          comment: stripHtml(assignment.comment ?? '-'),
-          status: assignment.status == 1 ? 'Submitted' : 'Draft',
+          comment: assignment.comment,
+          status: assignment.status,
         }),
       });
     }
 
+    // Sort by rank ascending, placing unranked rows last.
+    // Break rank ties by grade descending, placing ungraded rows last.
     const rows = rankedRows
       .sort((a, b) => {
         if (a.rank === null || b.rank === null) {

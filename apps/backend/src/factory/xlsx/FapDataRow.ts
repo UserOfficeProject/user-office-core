@@ -2,6 +2,7 @@ import { CallRowObj } from './callFaps';
 import { RowObj } from './fap';
 import { QuestionaryStep } from '../../models/Questionary';
 import { Review } from '../../models/Review';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 export type FapDataRowInput = {
   proposalPk: number;
@@ -31,7 +32,7 @@ export type ReviewRowInput = {
   rank: number | null;
   grade: string | null;
   comment: string | null;
-  status: string | null;
+  status: number | null;
 };
 
 export const buildReviewRow = ({
@@ -44,14 +45,14 @@ export const buildReviewRow = ({
   comment,
   status,
 }: ReviewRowInput): Array<string | number> => [
-  proposalId ?? '-',
-  title ?? '-',
-  instrumentName ?? '-',
-  dateAssigned ? String(dateAssigned) : '-',
-  rank ?? '-',
-  grade ?? '-',
-  comment ?? '-',
-  status ?? '-',
+  proposalId ?? '<missing>',
+  title ?? '<missing>',
+  instrumentName ?? '<missing>',
+  dateAssigned ? String(dateAssigned) : '<missing>',
+  rank ?? '<missing>',
+  grade ?? '<missing>',
+  comment == null ? '<missing>' : stripHtml(comment),
+  status == null ? '<missing>' : status == 1 ? 'Submitted' : 'Draft',
 ];
 
 export function getDataRow({
