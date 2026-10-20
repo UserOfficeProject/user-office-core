@@ -5,15 +5,9 @@ import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
 import database from './database';
-import {
-  createEmailTemplateObject,
-  createEmailVersionsObject,
-  EmailTemplateRecord,
-  TemplateVersionRecord,
-} from './records';
+import { createEmailTemplateObject, EmailTemplateRecord } from './records';
 import TemplateVersionDataSource from './TemplateVersionDataSource';
 import { Tokens } from '../../config/Tokens';
-import { TemplateVersion } from '../../models/TemplateVersion';
 @injectable()
 export default class PostgresEmailTemplateDataSource
   implements EmailTemplateDataSource
@@ -106,54 +100,6 @@ export default class PostgresEmailTemplateDataSource
       });
   }
 
-  async createNewVersion(
-    emailTemplateId: number,
-    subject?: string | null,
-    body?: string | null
-  ): Promise<TemplateVersion | void> {
-    const template = {
-      body: body,
-      subject: subject,
-    };
-    if (body == '' && subject == '') {
-      return;
-    }
-    const templates = await this.templateDataSource.getVersions(
-      emailTemplateId,
-      'EMAIL'
-    );
-    const versionNumbers: number[] = [];
-    let newVersionNumber;
-    templates.versions.map((t) => versionNumbers.push(t.versionNumber));
-
-    if (versionNumbers.length != 0) {
-      newVersionNumber = Math.max(...versionNumbers) + 1;
-    } else {
-      newVersionNumber = 1;
-    }
-
-    return database
-      .insert(
-        {
-          template_id: emailTemplateId,
-          template: template,
-          version_number: newVersionNumber,
-          template_type: 'EMAIL',
-        },
-        ['*']
-      )
-      .from('template_versions')
-      .then((emailTemplates: TemplateVersionRecord[]) => {
-        if (emailTemplates?.length !== 1) {
-          throw new GraphQLError(
-            `Failed to update email version with id '${emailTemplateId}'`
-          );
-        }
-
-        return createEmailVersionsObject(emailTemplates[0]);
-      });
-  }
-
   async update(
     emailTemplateId: number,
     name: string,
@@ -163,10 +109,14 @@ export default class PostgresEmailTemplateDataSource
     body?: string
   ): Promise<EmailTemplate> {
     const currentTemplate = await this.getEmailTemplate(emailTemplateId);
-    await this.createNewVersion(
+    const template = JSON.stringify({
+      body: currentTemplate?.body,
+      subject: currentTemplate?.subject,
+    });
+    await this.templateDataSource.createNewVersion(
       emailTemplateId,
-      currentTemplate?.subject,
-      currentTemplate?.body
+      'EMAIL',
+      template
     );
 
     return database

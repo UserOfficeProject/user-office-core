@@ -39,4 +39,12 @@ export class TemplateVersionDataSourceMock
   ): Promise<TemplateVersion | null> {
     return dummyTemplateVersion;
   }
+
+  async createNewVersion(
+    emailTemplateId: number,
+    subject?: string,
+    body?: string
+  ): Promise<TemplateVersion | void> {
+    return dummyTemplateVersion;
+  }
 }

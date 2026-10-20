@@ -10,4 +10,9 @@ export interface TemplateVersionDataSource {
     versionNumber: number,
     templateType: string
   ): Promise<TemplateVersion | null>;
+  createNewVersion(
+    emailTemplateId: number,
+    subject?: string,
+    body?: string
+  ): Promise<TemplateVersion | void>;
 }

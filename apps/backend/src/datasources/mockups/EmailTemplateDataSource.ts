@@ -1,6 +1,5 @@
 import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { EmailTemplate } from '../../models/EmailTemplate';
-import { TemplateVersion } from '../../models/TemplateVersion';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
 
@@ -163,13 +162,6 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     body?: string
   ): Promise<EmailTemplate> {
     return dummyEmailTemplate;
-  }
-  async createNewVersion(
-    emailTemplateId: number,
-    subject?: string,
-    body?: string
-  ): Promise<TemplateVersion | void> {
-    return dummyEmailTemplateVersion;
   }
 
   async update(

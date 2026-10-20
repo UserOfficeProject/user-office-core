@@ -1,5 +1,4 @@
 import { EmailTemplate } from '../models/EmailTemplate';
-import { TemplateVersion } from '../models/TemplateVersion';
 import { EmailTemplatesFilter } from '../resolvers/queries/EmailTemplatesQuery';
 
 export interface EmailTemplateDataSource {
@@ -17,12 +16,6 @@ export interface EmailTemplateDataSource {
     subject?: string,
     body?: string
   ): Promise<EmailTemplate>;
-
-  createNewVersion(
-    emailTemplateId: number,
-    subject?: string,
-    body?: string
-  ): Promise<TemplateVersion | void>;
 
   update(
     id: number,
