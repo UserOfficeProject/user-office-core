@@ -48,7 +48,7 @@ const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
   'technicalReviews.status': 'technical_review_status',
   'technicalReviews.timeAllocation': 'technical_review_time_allocation',
-  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
+  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from first + last
   technicalReviewAssigneesFullName: 'technical_review_assignee',
   'faps.code': 'fap_code',
   callShortCode: 'call_short_code',
@@ -602,7 +602,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          if (sortField === 'title') {
+            query.orderByRaw(
+              `LOWER(COALESCE(??, '')) ${sortDirection.toUpperCase()}`,
+              [sortField]
+            );
+          } else {
+            query.orderBy(sortField, sortDirection);
+          }
         }
 
         if (filter?.referenceNumbers) {
