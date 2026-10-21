@@ -136,6 +136,7 @@ export interface FapDataSource {
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal>;
   isChairOrSecretaryOfFap(userId: number, fapId: number): Promise<boolean>;

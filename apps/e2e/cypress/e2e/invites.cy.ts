@@ -6,6 +6,7 @@ import {
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import { getE2EApi } from '../support/utils';
 
 /*
  * Tests relating to the InviteUser component that is
@@ -267,6 +268,42 @@ context('Invites tests', () => {
       );
       cy.get('[data-cy="event-logs-table"]').contains(
         'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED'
+      );
+    });
+
+    it('Should log sent and accepted data access invites', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+        this.skip();
+      }
+
+      cy.login('user1', initialDBData.roles.user).then(() => {
+        const api = getE2EApi(window.localStorage.getItem('token'));
+
+        return api.setDataAccessInvites({
+          input: {
+            emails: [initialDBData.users.user3.email],
+            proposalPk: initialDBData.proposal.id,
+          },
+        });
+      });
+
+      cy.login('user3', initialDBData.roles.user).then(() => {
+        const api = getE2EApi(window.localStorage.getItem('token'));
+
+        return api.acceptDataAccessInvite({
+          proposalId: initialDBData.proposal.shortCode,
+        });
+      });
+
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.get('[data-testid="VisibilityIcon"] > path').first().click();
+      cy.get('[data-cy="proposal-review-tabs"]').contains('Logs').click();
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_DATA_ACCESS_INVITE_SENT'
+      );
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED'
       );
     });
   });
