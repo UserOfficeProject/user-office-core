@@ -1766,7 +1766,9 @@ context('Fap reviews tests', () => {
             ].join('-');
             cy.fixture('exampleFapReviewsExport.json').then(
               (expectedExport) => {
+                expectedExport[0][0]['Instrument'] = instrument.shortCode;
                 expectedExport[0][0]['Date assigned'] = currentDate;
+                expectedExport[1][0]['Instrument'] = instrument.shortCode;
                 expectedExport[1][0]['Date assigned'] = currentDate;
                 expect(expectedExport).to.deep.equal(actualExport);
               }
