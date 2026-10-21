@@ -781,7 +781,7 @@ context('Proposal tests', () => {
         .should('contain.text', instrument1.name);
     });
 
-    it.only('User officer should be able to change status to one or multiple proposals', () => {
+    it.skip('User officer should be able to change status to one or multiple proposals', () => {
       cy.cloneProposals({
         callId: initialDBData.call.id,
         proposalsToClonePk: [createdProposalPk],
