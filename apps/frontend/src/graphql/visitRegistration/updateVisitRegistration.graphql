@@ -1,8 +1,8 @@
 mutation updateVisitRegistration(
   $visitId: Int!
   $userId: Int!
-  $startsAt: DateTime
-  $endsAt: DateTime
+  $startsAt: DateWithoutTimezone
+  $endsAt: DateWithoutTimezone
 ) {
   updateVisitRegistration(
     visitId: $visitId
