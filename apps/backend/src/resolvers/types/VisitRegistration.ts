@@ -16,6 +16,7 @@ import {
   VisitRegistration as VisitRegistrationOrig,
   VisitRegistrationStatus,
 } from '../../models/VisitRegistration';
+import { DateWithoutTimezone } from '../CustomScalars';
 
 @ObjectType()
 export class VisitRegistration implements Partial<VisitRegistrationOrig> {
@@ -34,10 +35,10 @@ export class VisitRegistration implements Partial<VisitRegistrationOrig> {
   @Field(() => VisitRegistrationStatus)
   public status: VisitRegistrationStatus;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => DateWithoutTimezone, { nullable: true })
   public startsAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => DateWithoutTimezone, { nullable: true })
   public endsAt: Date | null;
 }
 
