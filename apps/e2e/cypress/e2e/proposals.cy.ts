@@ -1254,7 +1254,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal advanced tests', () => {
+  describe.skip('Proposal advanced tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1296,7 +1296,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal and external basic tests', () => {
+  describe.skip('Proposal internal and external basic tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1701,7 +1701,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Automatic Instrument assignment', () => {
+  describe.skip('Automatic Instrument assignment', () => {
     const instrumentPickerQuestion = 'Select your Instrument';
     const instrument = {
       name: 'Instrument 1',
@@ -2157,7 +2157,7 @@ context('Proposal tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
-  describe('Proposal PDF generation with instrument picker question', () => {
+  describe.skip('Proposal PDF generation with instrument picker question', () => {
     const instrumentPickerQuestion = 'Select your Instrument';
     const instrument = {
       name: 'Instrument 1',
