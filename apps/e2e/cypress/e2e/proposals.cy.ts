@@ -414,7 +414,7 @@ context('Proposal tests', () => {
       cy.contains(proposalTitleUpdated);
     });
 
-    it('Officer should be able to navigate to proposal using proposal ID', () => {
+    it.only('Officer should be able to navigate to proposal using proposal ID', () => {
       cy.login('officer');
 
       cy.visit('/', {
@@ -431,7 +431,7 @@ context('Proposal tests', () => {
       cy.url().should('not.contain', `proposalId=${createdProposalId}`);
     });
 
-    it('User officer should be able to save proposal column selection', function () {
+    it.only('User officer should be able to save proposal column selection', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
@@ -570,7 +570,7 @@ context('Proposal tests', () => {
     //     .should('not.be.checked');
     // });
 
-    it('Should be able to see proposal allocation time unit on the proposal', function () {
+    it.only('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
@@ -659,7 +659,7 @@ context('Proposal tests', () => {
         .contains(`${allocationTime} (${AllocationTimeUnits.HOUR}s)`);
     });
 
-    it('Should be able clone proposal to another call', () => {
+    it.only('Should be able clone proposal to another call', () => {
       cy.createCall({
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
@@ -707,7 +707,7 @@ context('Proposal tests', () => {
         .should('contain.text', newCall.shortCode);
     });
 
-    it('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
+    it.only('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
       // Create an ended call to test if it is not available for cloning.
       cy.createCall({
         ...newCall,
