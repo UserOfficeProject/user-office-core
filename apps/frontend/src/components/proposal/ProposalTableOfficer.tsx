@@ -718,7 +718,7 @@ const ProposalTableOfficer = ({
       }
 
       await api({
-        toastSuccessMessage: `Proposal/s assigned to the selected ${t('Fap')} successfully!`,
+        toastSuccessMessage: `Proposal/s assigned to the selected ${t('fap')} successfully!`,
       }).assignProposalsToFaps({
         proposalPks: getSelectedProposalPks(),
         fapInstruments: fapInstsruments,
@@ -1266,6 +1266,7 @@ const ProposalTableOfficer = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
+            isUserOfficeView={true}
           />
         </DialogContent>
       </Dialog>

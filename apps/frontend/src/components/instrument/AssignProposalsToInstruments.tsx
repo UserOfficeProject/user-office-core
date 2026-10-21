@@ -90,9 +90,16 @@ const AssignProposalsToInstruments = ({
               </Grid>
             </Grid>
             <Alert severity="error" data-cy="remove-instrument-alert">
-              {`Removing instruments from proposals with technical reviews will permanently delete those reviews. `}
+              {`Removing instruments from proposals with `}
+              <strong>{'technical reviews'}</strong>
+              {', '}
+              <strong>{`${t('fap')} reviews`}</strong>
+              {' or '}
+              <strong>{'management time allocation'}</strong>
+              {' will permanently delete the corresponding data. '}
               <strong>{`This action is irreversible.`}</strong>
             </Alert>
+
             {!values.selectedInstrumentIds.length && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
                 {`Be aware that leaving ${i18n.format(

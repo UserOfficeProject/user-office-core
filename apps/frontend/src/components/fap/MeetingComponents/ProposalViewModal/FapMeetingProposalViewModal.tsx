@@ -111,7 +111,7 @@ const FapMeetingProposalViewModal = ({
                 color: 'white',
               })}
             >
-              {t('Fap')} Meeting Components - Proposal View:{' '}
+              {t('FAP')} Meeting Components - Proposal View:{' '}
               {proposalData?.title} ({proposalData?.proposalId})
             </Typography>
           </Toolbar>

@@ -87,7 +87,7 @@ const FinalRankingForm = ({
     };
 
     await api({
-      toastSuccessMessage: `${t('Fap')} meeting decision ${
+      toastSuccessMessage: `${t('FAP')} meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
       } successfully!`,
     }).saveFapMeetingDecision({ saveFapMeetingDecisionInput });
@@ -129,7 +129,7 @@ const FinalRankingForm = ({
                   },
                   {
                     title: 'Please confirm',
-                    description: `I am aware that no further changes to the ${t('Fap')} meeting are possible after submission.`,
+                    description: `I am aware that no further changes to the ${t('fap')} meeting are possible after submission.`,
                   }
                 )();
               } else {
@@ -148,7 +148,7 @@ const FinalRankingForm = ({
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
-                {`${t('Fap')} Meeting form`}
+                {`${t('FAP')} Meeting form`}
               </Typography>
               <Grid container spacing={3}>
                 <Grid item sm={6} xs={12}>

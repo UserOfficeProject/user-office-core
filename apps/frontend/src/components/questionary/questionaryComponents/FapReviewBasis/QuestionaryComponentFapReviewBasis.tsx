@@ -169,8 +169,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                       step: Math.pow(10, -config.decimalPoints).toString(),
                       inputMode: 'decimal',
                       type: 'number',
-                      min: '1',
-                      max: '10',
+                      min: config.minGrade.toString(),
+                      max: config.maxGrade.toString(),
                     }
               }
               data-cy="grade-proposal"
@@ -182,10 +182,15 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                       value: option,
                     }))
                   : config.decimalPoints === 0
-                    ? [...Array(10)].map((e, i) => ({
-                        text: (i + 1).toString(),
-                        value: (i + 1).toString(),
-                      }))
+                    ? Array.from(
+                        {
+                          length: config.maxGrade - config.minGrade + 1,
+                        },
+                        (_, i) => ({
+                          text: (config.minGrade + i).toString(),
+                          value: (config.minGrade + i).toString(),
+                        })
+                      )
                     : undefined
               }
             />
