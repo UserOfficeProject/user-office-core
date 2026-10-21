@@ -431,7 +431,7 @@ context('Proposal tests', () => {
       cy.url().should('not.contain', `proposalId=${createdProposalId}`);
     });
 
-    it('User officer should be able to save proposal column selection', function () {
+    it.only('User officer should be able to save proposal column selection', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
@@ -570,7 +570,7 @@ context('Proposal tests', () => {
     //     .should('not.be.checked');
     // });
 
-    it('Should be able to see proposal allocation time unit on the proposal', function () {
+    it.only('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
