@@ -1,17 +1,6 @@
 import { TemplateVersion } from '../../models/TemplateVersion';
 import { TemplateVersionDataSource } from '../TemplateVersionDataSource';
 
-export const dummyTemplate = {
-  id: 1,
-  createdByUserId: 1,
-  name: 'Dummy Email Template',
-  description: 'This is a dummy email template for testing purposes.',
-  subject: 'Welcome to Our Service',
-  body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-  createdAt: '',
-  useTemplateFile: false,
-};
-
 export const dummyTemplateVersion = {
   templateVersionId: 1,
   templateId: 1,
