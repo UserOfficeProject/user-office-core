@@ -82,10 +82,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import {
-  getFullUserName,
-  getPreferredNameWithLastname,
-} from 'utils/user';
+import { getFullUserName, getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
