@@ -204,7 +204,12 @@ export const collectFapReviewXLSXData = async (
       if (!review) {
         continue;
       }
-
+      // Proposals with multiple instruments are not captured in reviewData at the moment
+      // so fetch the instrument information separately.
+      const instrument = await fapDataSource.getInstrumentCodes(
+        fapId,
+        proposalPk
+      );
       const assignments = await fapDataSource.getFapProposalAssignments(
         fapId,
         proposalPk,
@@ -226,7 +231,7 @@ export const collectFapReviewXLSXData = async (
         row: buildReviewRow({
           proposalId: review.proposal_id,
           title: review.title,
-          instrumentName: review.instrument_name,
+          instrumentName: instrument,
           dateAssigned: formatDate(assignment.dateAssigned),
           rank: assignment.rank,
           grade: assignment.grade,

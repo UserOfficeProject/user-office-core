@@ -153,7 +153,7 @@ const FapReviewersAndAssignmentsTable = ({
             proposalPk: proposal.proposalPk,
             proposalId: proposal.proposal.proposalId,
             title: proposal.proposal.title,
-            instrument: proposal.instrument?.shortCode || '-',
+            instrument: proposal.instrumentShortcodes || '-',
           },
           assignment: assignment!,
         };
