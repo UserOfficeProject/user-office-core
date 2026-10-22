@@ -263,7 +263,7 @@ const FapInstrumentProposalsTable = ({
       fapMeetingDecisionA?.rankOrder === fapMeetingDecisionB?.rankOrder ||
       (!fapMeetingDecisionA?.rankOrder && !fapMeetingDecisionB?.rankOrder)
     ) {
-      return -1;
+      return 0;
     } else if (!fapMeetingDecisionA?.rankOrder) {
       return 1;
     } else if (!fapMeetingDecisionB?.rankOrder) {
