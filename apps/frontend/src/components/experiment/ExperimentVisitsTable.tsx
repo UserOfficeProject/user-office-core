@@ -55,7 +55,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
 
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
-    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
