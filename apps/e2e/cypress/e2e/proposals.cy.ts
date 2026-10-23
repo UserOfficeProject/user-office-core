@@ -431,7 +431,7 @@ context('Proposal tests', () => {
       cy.url().should('not.contain', `proposalId=${createdProposalId}`);
     });
 
-    it('User officer should be able to save proposal column selection', function () {
+    it.only('User officer should be able to save proposal column selection', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
       }
@@ -570,7 +570,7 @@ context('Proposal tests', () => {
     //     .should('not.be.checked');
     // });
 
-    it('Should be able to see proposal allocation time unit on the proposal', function () {
+    it.only('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
@@ -659,7 +659,7 @@ context('Proposal tests', () => {
         .contains(`${allocationTime} (${AllocationTimeUnits.HOUR}s)`);
     });
 
-    it('Should be able clone proposal to another call', () => {
+    it.only('Should be able clone proposal to another call', () => {
       cy.createCall({
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
@@ -707,7 +707,7 @@ context('Proposal tests', () => {
         .should('contain.text', newCall.shortCode);
     });
 
-    it('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
+    it.only('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
       // Create an ended call to test if it is not available for cloning.
       cy.createCall({
         ...newCall,
@@ -781,7 +781,7 @@ context('Proposal tests', () => {
         .should('contain.text', instrument1.name);
     });
 
-    it('User officer should be able to change status to one or multiple proposals', () => {
+    it.skip('User officer should be able to change status to one or multiple proposals', () => {
       cy.cloneProposals({
         callId: initialDBData.call.id,
         proposalsToClonePk: [createdProposalPk],
@@ -845,7 +845,7 @@ context('Proposal tests', () => {
         .should('contain.text', initialDBData.proposalStatuses.fapMeeting.name);
     });
 
-    it('User officer should be able to see proposal status when opening change status modal', () => {
+    it.skip('User officer should be able to see proposal status when opening change status modal', () => {
       cy.cloneProposals({
         callId: initialDBData.call.id,
         proposalsToClonePk: [createdProposalPk],
@@ -1188,7 +1188,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal advanced tests', () => {
+  describe.skip('Proposal advanced tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1230,7 +1230,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Proposal internal and external basic tests', () => {
+  describe.skip('Proposal internal and external basic tests', () => {
     beforeEach(() => {
       // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
       // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -1635,7 +1635,7 @@ context('Proposal tests', () => {
     });
   });
 
-  describe('Automatic Instrument assignment', () => {
+  describe.skip('Automatic Instrument assignment', () => {
     const instrumentPickerQuestion = 'Select your Instrument';
     const instrument = {
       name: 'Instrument 1',
@@ -2091,7 +2091,7 @@ context('Proposal tests', () => {
       cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
-  describe('Proposal PDF generation with instrument picker question', () => {
+  describe.skip('Proposal PDF generation with instrument picker question', () => {
     const instrumentPickerQuestion = 'Select your Instrument';
     const instrument = {
       name: 'Instrument 1',

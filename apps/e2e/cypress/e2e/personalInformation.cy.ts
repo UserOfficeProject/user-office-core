@@ -30,9 +30,14 @@ context('Personal information tests', () => {
     cy.login('officer');
     cy.visit('/');
 
+    cy.finishedLoading();
+
     cy.get("[data-cy='profile-page-btn']").click();
 
-    cy.get("[data-cy='change-roles-button']").click();
+    cy.get('#simple-menu')
+      .should('be.visible')
+      .find("[data-cy='change-roles-button']")
+      .click();
 
     cy.finishedLoading();
 
