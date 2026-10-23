@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { useTheme } from '@mui/material/styles';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -18,7 +17,6 @@ function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
-  const theme = useTheme();
   const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -38,8 +36,14 @@ function DateSearchCriteriaInput({
   }, [searchCriteria?.value]);
 
   return (
-    <Grid container spacing={2} alignItems="end">
-      <Grid item xs={6}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        alignItems: 'end',
+      }}
+    >
+      <Grid size={6}>
         <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
@@ -72,7 +76,7 @@ function DateSearchCriteriaInput({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
             format={format || undefined}
@@ -81,8 +85,10 @@ function DateSearchCriteriaInput({
                 margin: 'none',
                 size: 'small',
                 fullWidth: true,
-                InputLabelProps: {
-                  shrink: value ? true : undefined,
+                slotProps: {
+                  inputLabel: {
+                    shrink: value ? true : undefined,
+                  },
                 },
                 id: 'date-value',
               },
@@ -97,7 +103,6 @@ function DateSearchCriteriaInput({
               }
               setValue(newDate || null);
             }}
-            desktopModeMediaQuery={theme.breakpoints.up('sm')}
           />
         </LocalizationProvider>
       </Grid>

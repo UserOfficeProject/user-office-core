@@ -1,6 +1,6 @@
 import { Action, Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
@@ -223,7 +223,7 @@ const FapProposalsAndAssignmentsTable = ({
   const { t } = useTranslation();
   const { tableRef, expandCollapseAllButton } = useExpandCollapseAll(
     '[data-cy="fap-assignments-table"]',
-    [loadingFapProposals]
+    loadingFapProposals
   );
 
   const translatedColumns = FapProposalColumns.map((column) =>
@@ -504,9 +504,11 @@ const FapProposalsAndAssignmentsTable = ({
             initialPage: page ? +page : 0,
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
-              inputProps: {
-                'aria-label': 'Select all rows',
-                id: 'select-all-table-rows',
+              slotProps: {
+                input: {
+                  'aria-label': 'Select all rows',
+                  id: 'select-all-table-rows',
+                },
               },
             },
           }}

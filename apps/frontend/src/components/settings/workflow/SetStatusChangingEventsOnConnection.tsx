@@ -104,7 +104,12 @@ const SetStatusChangingEventsOnConnection = ({
                 render={(arrayHelpers) => (
                   <>
                     {events.map((event, index) => (
-                      <Grid key={index} item sm={6}>
+                      <Grid
+                        key={index}
+                        size={{
+                          sm: 6,
+                        }}
+                      >
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -126,8 +131,10 @@ const SetStatusChangingEventsOnConnection = ({
                                   arrayHelpers.remove(idx);
                                 }
                               }}
-                              inputProps={{
-                                'aria-label': 'primary checkbox',
+                              slotProps={{
+                                input: {
+                                  'aria-label': 'primary checkbox',
+                                },
                               }}
                             />
                           }
@@ -150,11 +157,22 @@ const SetStatusChangingEventsOnConnection = ({
               />
             )}
           </Grid>
-          <Grid container justifyContent="flex-end" spacing={1} paddingTop={1}>
-            <Grid item marginTop={1}>
+          <Grid
+            container
+            spacing={1}
+            sx={{
+              justifyContent: 'flex-end',
+              paddingTop: 1,
+            }}
+          >
+            <Grid
+              sx={{
+                marginTop: 1,
+              }}
+            >
               <ErrorMessage name="selectedStatusChangingEvents" />
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 variant="outlined"
                 color="error"
