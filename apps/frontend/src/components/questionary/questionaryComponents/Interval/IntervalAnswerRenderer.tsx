@@ -10,7 +10,7 @@ export const IntervalAnswerRenderer: AnswerRenderer = (answer) => {
   const isAnswered = isMinAnswered || isMaxAnswered; // at least one answer
 
   if (isAnswered === false) {
-    return <span>Left blank</span>;
+    return null;
   }
 
   const min = answer.value.min ?? 'unspecified';
