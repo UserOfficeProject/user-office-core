@@ -31,6 +31,8 @@ export type UserManagementTableProps = {
   readonly?: boolean;
   addButtonLabel?: string;
   addButtonTooltip?: string;
+  addButtonPosition?: 'top' | 'bottom';
+  mtOptions?: MaterialTableProps<BasicUserDetails>['options'];
   /** Header shown at the top of the invite/selector modal */
   addModalTitle?: string;
   /** Disable the add button */
@@ -52,6 +54,8 @@ const UserManagementTable = ({
   title,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
+  addButtonPosition = 'bottom',
+  mtOptions,
   addModalTitle,
   disabled = false,
   onUserAction,
@@ -142,18 +146,40 @@ const UserManagementTable = ({
     />
   );
 
+  const addButton = (
+    <Tooltip title={addButtonTooltip}>
+      <Button
+        variant="outlined"
+        onClick={openModal}
+        data-cy="add-participant-button"
+        size={addButtonPosition === 'top' ? 'medium' : 'small'}
+        startIcon={<PersonAddIcon />}
+        disabled={disabled || !!readonly}
+      >
+        {addButtonLabel}
+      </Button>
+    </Tooltip>
+  );
+
   return (
     <Box sx={sx}>
       {modalOpen && InviteComponent}
       <FormControl margin="dense" fullWidth>
-        <Typography
+        <Box
           sx={{
-            fontSize: '12px',
-            color: 'grey',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: addButtonPosition === 'top' ? 1 : 0,
           }}
         >
-          {title}
-        </Typography>
+          <Typography sx={{ fontSize: '12px', color: 'grey' }}>
+            {title}
+          </Typography>
+          {addButtonPosition === 'top' && addButton}
+        </Box>
         <>
           <MaterialTable
             data={users}
@@ -167,6 +193,7 @@ const UserManagementTable = ({
               showTitle: false,
               paging: true,
               pageSize: 10,
+              ...mtOptions,
             }}
             actions={rowActions}
             editable={editable}
@@ -209,24 +236,15 @@ const UserManagementTable = ({
               </Box>
             </Box>
           )}
-          <ActionButtonContainer
-            sx={(theme) => ({
-              marginTop: theme.spacing(1),
-            })}
-          >
-            <Tooltip title={addButtonTooltip}>
-              <Button
-                variant="outlined"
-                onClick={openModal}
-                data-cy="add-participant-button"
-                size="small"
-                startIcon={<PersonAddIcon />}
-                disabled={disabled || !!readonly}
-              >
-                {addButtonLabel}
-              </Button>
-            </Tooltip>
-          </ActionButtonContainer>
+          {addButtonPosition === 'bottom' && (
+            <ActionButtonContainer
+              sx={(theme) => ({
+                marginTop: theme.spacing(1),
+              })}
+            >
+              {addButton}
+            </ActionButtonContainer>
+          )}
         </>
       </FormControl>
     </Box>
