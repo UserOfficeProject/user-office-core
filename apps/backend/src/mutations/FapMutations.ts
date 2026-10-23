@@ -555,11 +555,7 @@ export default class FapMutations {
 
     const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
-    const fapProposal = this.dataSource.getFapProposal(
-      args.fapId,
-      args.proposalPk,
-      args.recommendedInstrumentId
-    );
+    const fapProposal = this.dataSource.getFapProposalById(args.fapProposalId);
 
     if (!fapProposal) {
       return rejection(

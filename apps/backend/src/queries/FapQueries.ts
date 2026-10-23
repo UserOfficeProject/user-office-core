@@ -331,4 +331,9 @@ export default class FapQueries {
 
     return call.endFapReview?.getTime() <= currentDate.toMillis();
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getFapMeetingScoreConfig(agent: UserWithRole | null, callId: number) {
+    return await this.dataSource.getFapMeetingScoreConfig(callId);
+  }
 }

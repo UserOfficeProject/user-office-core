@@ -1173,7 +1173,8 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.instrument_id,
     fapMeetingDecisionRecord.fap_id,
     fapMeetingDecisionRecord.recommended_time_allocation,
-    fapMeetingDecisionRecord.fap_proposal_id
+    fapMeetingDecisionRecord.fap_proposal_id,
+    fapMeetingDecisionRecord.meeting_score
   );
 };
 

@@ -2,15 +2,12 @@ import MaterialTable, {
   MaterialTableProps,
   MTableBodyRow,
 } from '@material-table/core';
-import DragHandle from '@mui/icons-material/DragHandle';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useContext, DragEvent, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -25,6 +22,7 @@ import {
   TechnicalReview,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useFapMeetingScoringConfig } from 'hooks/fap/useFapMeetingScoringConfig';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -36,6 +34,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
 import FapMeetingProposalViewModal from './ProposalViewModal/FapMeetingProposalViewModal';
+import { validate } from 'graphql';
 
 type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
   proposalAverageScore: number | string;
@@ -92,7 +91,7 @@ const rootStyles = {
 type FapInstrumentProposalsTableProps = {
   fapInstrument: InstrumentWithAvailabilityTime;
   fapId: number;
-  selectedCall?: Call;
+  selectedCall: Call;
 };
 
 const FapInstrumentProposalsTable = ({
@@ -114,9 +113,10 @@ const FapInstrumentProposalsTable = ({
   const theme = useTheme();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
-  const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
   const { t } = useTranslation();
+  const { scoringConfig } = useFapMeetingScoringConfig(selectedCall.id);
+  const { api } = useDataApiWithFeedback();
 
   const getInstrumentTechnicalReview = (
     technicalReviews: TechnicalReview[] | null
@@ -128,17 +128,58 @@ const FapInstrumentProposalsTable = ({
   const assignmentColumns = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 100 },
       sorting: false,
       field: 'rowActions',
     },
     {
       title: 'Title',
       field: 'proposalTitle',
+      width: 150,
     },
     {
       title: 'ID',
       field: 'proposal.proposalId',
+    },
+    {
+      title: 'Average score',
+      field: 'proposalAverageScore',
+      emptyValue: '-',
+      render: (
+        rowData: FapProposal & { proposalAverageScore: number | string }
+      ) => {
+        const classificationGrades = rowData.proposal.reviews
+          ?.map((rev) => rev.grade)
+          .filter((grade) => isNaN(Number(grade)));
+
+        if (classificationGrades && classificationGrades?.length > 0) {
+          return `${rowData.proposalAverageScore} ${classificationGrades?.toString()}`;
+        }
+
+        return rowData.proposalAverageScore ?? '-';
+      },
+    },
+    {
+      title: 'Deviation',
+      field: 'proposalDeviation',
+      customSort: (
+        a: FapProposalWithAverageScoreAndAvailabilityZone,
+        b: FapProposalWithAverageScoreAndAvailabilityZone
+      ) =>
+        (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) ||
+          0) -
+        (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) ||
+          0),
+    },
+    {
+      title: 'Current Score',
+      field: 'meetingScore',
+      render: (rowData: FapProposal) => {
+        const meetingScore = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
+        )?.meetingScore;
+
+        return meetingScore || '-';
+      },
     },
     {
       title: t('FAP') + ' meeting submitted',
@@ -158,38 +199,11 @@ const FapInstrumentProposalsTable = ({
     },
     { title: 'Country', field: 'proposal.proposer.country' },
     {
-      title: 'Average score',
-      field: 'proposalAverageScore',
-      emptyValue: '-',
-    },
-    {
-      title: 'Deviation',
-      field: 'proposalDeviation',
-      customSort: (
-        a: FapProposalWithAverageScoreAndAvailabilityZone,
-        b: FapProposalWithAverageScoreAndAvailabilityZone
-      ) =>
-        (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) ||
-          0) -
-        (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) ||
-          0),
-    },
-    {
-      title: 'Current rank',
-      render: (rowData: FapProposal) => {
-        const rankOrder = rowData.proposal.fapMeetingDecisions?.find(
-          (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
-        )?.rankOrder;
-
-        return rankOrder || '-';
-      },
-    },
-    {
-      title: 'Time requested',
+      title: `Time requested (${selectedCall?.allocationTimeUnit}s)`,
       field: 'proposalTimeRequested',
     },
     {
-      title: 'Time allocation',
+      title: `Time Allocation (${selectedCall?.allocationTimeUnit}s)`,
       field: 'timeAllocation',
       customSort: (
         a: FapProposalWithAverageScoreAndAvailabilityZone,
@@ -225,23 +239,6 @@ const FapInstrumentProposalsTable = ({
     },
   ];
 
-  // NOTE: This is needed for adding the allocation time unit information on the column title without causing some console warning on re-rendering.
-  const columns = assignmentColumns.map((column) => {
-    if (column.field === 'timeAllocation' || column.field === 'timeRequested') {
-      return {
-        ...column,
-        title: `${column.title} (${selectedCall?.allocationTimeUnit}s)`,
-      };
-    }
-
-    return column;
-  });
-
-  const DragState = {
-    row: -1,
-    dropIndex: -1,
-  };
-
   useEffect(() => {
     if (!loadingInstrumentProposals && fapInstrument.submitted) {
       refreshInstrumentProposalsData();
@@ -250,28 +247,67 @@ const FapInstrumentProposalsTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fapInstrument.submitted]);
 
-  const sortByRankOrder = (a: FapProposal, b: FapProposal) => {
+  type FapProposalWithStats = FapProposal & {
+    proposalAverageScore: number | string;
+    proposalDeviation: number | string;
+  };
+
+  // We have a base assumption that classification means that the proposals cannot be scored therefore it will be rejected
+  const sortByMeetingScore = (
+    a: FapProposalWithStats,
+    b: FapProposalWithStats
+  ) => {
     const fapMeetingDecisionA = a.proposal.fapMeetingDecisions?.find(
       (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
-    );
+    )?.meetingScore;
     const fapMeetingDecisionB = b.proposal.fapMeetingDecisions?.find(
       (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
-    );
-    if (
-      fapMeetingDecisionA?.rankOrder === fapMeetingDecisionB?.rankOrder ||
-      (!fapMeetingDecisionA?.rankOrder && !fapMeetingDecisionB?.rankOrder)
-    ) {
-      return -1;
-    } else if (!fapMeetingDecisionA?.rankOrder) {
-      return 1;
-    } else if (!fapMeetingDecisionB?.rankOrder) {
-      return -1;
-    } else {
-      return (fapMeetingDecisionA?.rankOrder as number) >
-        (fapMeetingDecisionB?.rankOrder as number)
-        ? 1
-        : -1;
+    )?.meetingScore;
+
+    const aAverage = a.proposalAverageScore;
+    const bAverage = b.proposalAverageScore;
+    const scoreA = fapMeetingDecisionA ?? aAverage;
+    const scoreB = fapMeetingDecisionB ?? bAverage;
+    const numericScoreA = Number(scoreA);
+    const numericScoreB = Number(scoreB);
+    const isAClassification =
+      scoreA != null && scoreA !== '' && isNaN(numericScoreA);
+    const isBClassification =
+      scoreB != null && scoreB !== '' && isNaN(numericScoreB);
+
+    // Check if no reviews have been done
+    if (isNaN(numericScoreA) && isNaN(numericScoreB)) {
+      return 0;
     }
+    if (isNaN(numericScoreA)) {
+      return 1;
+    }
+    if (isNaN(numericScoreB)) {
+      return -1;
+    }
+
+    if (isAClassification && isBClassification) {
+      return String(scoreA).localeCompare(String(scoreB));
+    }
+    if (isAClassification) {
+      return 1;
+    }
+    if (isBClassification) {
+      return -1;
+    }
+
+    if (numericScoreA === numericScoreB) {
+      if (
+        typeof a.proposalDeviation === 'number' &&
+        typeof b.proposalDeviation === 'number'
+      ) {
+        return a.proposalDeviation < b.proposalDeviation ? -1 : 1;
+      } else {
+        return 1;
+      }
+    }
+
+    return numericScoreB - numericScoreA;
   };
 
   const [sortedProposalsWithAverageScore, setSortedProposalsWithAverageScore] =
@@ -300,27 +336,7 @@ const FapInstrumentProposalsTable = ({
               : proposalDeviation,
           };
         })
-        .sort((a, b) => {
-          if (
-            typeof a.proposalDeviation === 'number' &&
-            typeof b.proposalDeviation === 'number'
-          ) {
-            return a.proposalDeviation < b.proposalDeviation ? 1 : -1;
-          } else {
-            return 1;
-          }
-        })
-        .sort((a, b) => {
-          if (
-            typeof a.proposalAverageScore === 'number' &&
-            typeof b.proposalAverageScore === 'number'
-          ) {
-            return a.proposalAverageScore < b.proposalAverageScore ? 1 : -1;
-          } else {
-            return -1;
-          }
-        })
-        .sort(sortByRankOrder)
+        .sort(sortByMeetingScore)
         .map((proposalData) => {
           const proposalAllocationTime =
             proposalData.fapTimeAllocation !== null
@@ -360,6 +376,28 @@ const FapInstrumentProposalsTable = ({
       run();
     }
   }, [instrumentProposalsData, fapInstrument.availabilityTime]);
+
+  const updateMeetingScore = (
+    newScore: string,
+    fapProposalId: number,
+    proposalPk: number
+  ) => {
+    return api().saveFapMeetingDecision({
+      saveFapMeetingDecisionInput: {
+        commentForManagement: undefined,
+        commentForUser: undefined,
+        fapId: fapId,
+        fapProposalId: fapProposalId,
+        meetingScore: newScore,
+        proposalPk: proposalPk,
+        rankOrder: undefined,
+        recommendation: undefined,
+        recommendedInstrumentId: fapInstrument.id, //Needs updating when #1046 is done
+        recommendedTimeAllocation: undefined,
+        submitted: undefined,
+      },
+    });
+  };
 
   const ProposalTimeAllocationColumn = (
     rowData: FapProposalWithAverageScoreAndAvailabilityZone
@@ -401,17 +439,6 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        {!fapInstrument.submitted && (
-          <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
-            <IconButton
-              style={{ cursor: 'grab' }}
-              color="inherit"
-              data-cy="drag-icon"
-            >
-              <DragHandle />
-            </IconButton>
-          </Tooltip>
-        )}
         {showViewIcon && (
           <Tooltip title="View proposal details">
             <IconButton
@@ -465,177 +492,6 @@ const FapInstrumentProposalsTable = ({
       ? {}
       : { backgroundColor: theme.palette.error.light };
 
-  const updateAllProposalRankings = (proposals: FapProposal[]) => {
-    const proposalsWithUpdatedRanking = proposals.map((item, index) => {
-      const fapMeetingDecision = item.proposal.fapMeetingDecisions?.find(
-        (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
-      );
-
-      // NOTE: Per instrument there is only one `fapMeetingDecision`. And when we load the proposals for this table we pass the `instrumentId` as input parameter to filter `fapMeetingDecisions` by instrument only.
-      const fapMeetingDecisions = [
-        {
-          proposalPk: item.proposal.primaryKey,
-          rankOrder: index + 1,
-          commentForManagement:
-            fapMeetingDecision?.commentForManagement || null,
-          commentForUser: fapMeetingDecision?.commentForUser || null,
-          recommendation: fapMeetingDecision?.recommendation || null,
-          submitted: fapMeetingDecision?.submitted || false,
-          submittedBy: fapMeetingDecision?.submittedBy || null,
-          recommendedInstrumentId:
-            fapMeetingDecision?.recommendedInstrumentId || fapInstrument.id,
-          fapId: fapId,
-          recommendedTimeAllocation:
-            fapMeetingDecision?.recommendedTimeAllocation || null,
-        },
-      ];
-
-      return {
-        ...item,
-        proposal: {
-          ...item.proposal,
-          fapMeetingDecisions: fapMeetingDecisions,
-        },
-      };
-    });
-
-    return proposalsWithUpdatedRanking;
-  };
-
-  const reorderArray = (
-    { fromIndex, toIndex }: { fromIndex: number; toIndex: number },
-    originalArray: FapProposal[]
-  ) => {
-    const movedItem = originalArray.find((item, index) => index === fromIndex);
-
-    if (!movedItem) {
-      return originalArray;
-    }
-
-    const remainingItems = originalArray.filter(
-      (item, index) => index !== fromIndex
-    );
-
-    const reorderedItems = [
-      ...remainingItems.slice(0, toIndex),
-      movedItem,
-      ...remainingItems.slice(toIndex),
-    ];
-
-    return reorderedItems;
-  };
-
-  const reOrderRow = async (fromIndex: number, toIndex: number) => {
-    const newTableData = reorderArray(
-      { fromIndex, toIndex },
-      sortedProposalsWithAverageScore
-    );
-
-    const tableDataWithRankingsUpdated =
-      updateAllProposalRankings(newTableData);
-
-    const reorderFapMeetingDecisionProposalsInput = tableDataWithRankingsUpdated
-      .map((item) => ({
-        proposalPk: item.proposal.primaryKey,
-        rankOrder: item.proposal.fapMeetingDecisions.find(
-          (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
-        )?.rankOrder as number,
-        recommendedInstrumentId: fapInstrument.id,
-        fapId: fapId,
-      }))
-      .filter((fmd) => fmd.rankOrder !== undefined);
-
-    setInstrumentProposalsData(tableDataWithRankingsUpdated);
-    const toastErrorMessageAction = (
-      <Button
-        color="inherit"
-        variant="text"
-        onClick={refreshInstrumentProposalsData}
-        startIcon={<RefreshIcon />}
-      >
-        Refresh
-      </Button>
-    );
-
-    await api({
-      toastSuccessMessage: 'Reordering of proposals saved successfully!',
-      toastErrorMessage:
-        'Something went wrong please use refresh button to update the table state',
-      // NOTE: Show error message with refresh button if there is an error.
-      toastErrorMessageAction,
-    }).reorderFapMeetingDecisionProposals({
-      reorderFapMeetingDecisionProposalsInput: {
-        proposals: reorderFapMeetingDecisionProposalsInput,
-      },
-    });
-  };
-
-  const showDropArea = (
-    allRows: NodeListOf<HTMLTableRowElement>,
-    sourcePosition: number,
-    targetPosition: number
-  ) => {
-    allRows.forEach((row, index) => {
-      row.classList.remove('shiftUp', 'shiftDown');
-      if (sourcePosition < targetPosition) {
-        if (index <= targetPosition && index >= sourcePosition) {
-          row.classList.add('shiftUp');
-        }
-      } else if (sourcePosition > targetPosition) {
-        if (index >= targetPosition && index <= sourcePosition) {
-          row.classList.add('shiftDown');
-        }
-      }
-    });
-  };
-
-  const handleOnRowDragStart = (
-    e: DragEvent<HTMLTableRowElement>,
-    tableDataId?: number
-  ) => {
-    if (tableDataId !== undefined) {
-      e.currentTarget.classList.add('draggingRow');
-      DragState.row = tableDataId;
-    }
-  };
-
-  const handleOnRowDragEnter = (
-    e: DragEvent<HTMLTableRowElement>,
-    tableDataId?: number
-  ) => {
-    if (tableDataId === undefined) {
-      return;
-    }
-
-    e.preventDefault();
-
-    const tableBodyElement = e.currentTarget.parentElement;
-
-    if (
-      tableBodyElement &&
-      DragState.dropIndex !== tableDataId &&
-      DragState.row !== -1 &&
-      DragState.row !== tableDataId
-    ) {
-      DragState.dropIndex = tableDataId;
-
-      const allRows =
-        tableBodyElement.childNodes as NodeListOf<HTMLTableRowElement>;
-
-      showDropArea(allRows, DragState.row, DragState.dropIndex);
-    }
-  };
-
-  const handleOnRowDragEnd = async (e: DragEvent<HTMLTableRowElement>) => {
-    e.currentTarget.classList.remove('draggingRow');
-
-    if (DragState.dropIndex !== -1 && DragState.dropIndex !== DragState.row) {
-      await reOrderRow(DragState.row, DragState.dropIndex);
-    }
-    DragState.row = -1;
-    DragState.dropIndex = -1;
-  };
-
   const sortedProposalsWithAverageScoreAndId =
     sortedProposalsWithAverageScore.map((proposal) => ({
       ...proposal,
@@ -654,7 +510,16 @@ const FapInstrumentProposalsTable = ({
           enterDelay={1000}
           enterNextDelay={1000}
         >
-          <div>{proposal.proposal.title}</div>
+          <div
+            style={{
+              maxWidth: 200,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {proposal.proposal.title}
+          </div>
         </Tooltip>
       ),
     }));
@@ -678,10 +543,6 @@ const FapInstrumentProposalsTable = ({
     return allocatedTimeSum;
   };
 
-  /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
-   * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
-   * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
-   */
   const RowDraggableComponent = (
     props: MaterialTableProps<FapProposalWithAverageScoreAndAvailabilityZone>
   ) => {
@@ -717,14 +578,6 @@ const FapInstrumentProposalsTable = ({
         {...props}
         unallocated-time-information={unallocatedTimeInformation}
         className={isLastAvailabilityZoneRow ? 'lastRowInAvailabilityZone' : ''}
-        draggable={!fapInstrument.submitted}
-        onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
-          handleOnRowDragStart(e, rowData.tableData?.id)
-        }
-        onDragEnter={(e: DragEvent<HTMLTableRowElement>) =>
-          handleOnRowDragEnter(e, rowData.tableData?.id)
-        }
-        onDragEnd={handleOnRowDragEnd}
       />
     );
   };
@@ -751,22 +604,70 @@ const FapInstrumentProposalsTable = ({
       />
       <MaterialTable
         icons={tableIcons}
-        columns={columns}
-        title={'Assigned reviewers'}
+        columns={assignmentColumns}
+        title={`${fapInstrument.name} - ${fapInstrument.availabilityTime} ${selectedCall?.allocationTimeUnit}(s) Available`}
         data={sortedProposalsWithAverageScoreAndId}
         isLoading={loadingInstrumentProposals}
         components={{
           Row: RowDraggableComponent,
         }}
         options={{
+          columnsButton: true,
           search: false,
           paging: false,
-          toolbar: false,
+          toolbar: true,
           headerStyle: { backgroundColor: '#fafafa' },
           rowStyle: (rowData: FapProposalWithAverageScoreAndAvailabilityZone) =>
             redBackgroundWhenOutOfAvailabilityZone(
               rowData.isInAvailabilityZone
             ),
+        }}
+        cellEditable={{
+          isCellEditable: (rowData, columnDef) =>
+            columnDef.field === 'meetingScore',
+          onCellEditApproved: (newValue, oldValue, rowData) => {
+            return new Promise<void>((resolve, reject) => {
+              if (isNaN(Number(newValue))) {
+                if (
+                  scoringConfig.nonNumericOptions.some(
+                    (option) => option === newValue
+                  )
+                ) {
+                  return updateMeetingScore(
+                    newValue.toString(),
+                    rowData.fapProposalId,
+                    rowData.proposal.primaryKey
+                  ).then(() => {
+                    refreshInstrumentProposalsData();
+
+                    return resolve();
+                  });
+                }
+                reject();
+              } else {
+                const newValueNumber = Number(newValue);
+                const inRange =
+                  newValueNumber >= scoringConfig.minGrade &&
+                  newValueNumber <= scoringConfig.maxGrade;
+                const hasValidPrecision =
+                  (newValueNumber.toString().split('.')[1] || '').length <=
+                  scoringConfig.decimalPoints;
+
+                if (inRange && hasValidPrecision) {
+                  return updateMeetingScore(
+                    newValue.toString(),
+                    rowData.fapProposalId,
+                    rowData.proposal.primaryKey
+                  ).then(() => {
+                    refreshInstrumentProposalsData();
+
+                    return resolve();
+                  });
+                }
+                reject();
+              }
+            });
+          },
         }}
       />
     </Box>

@@ -24,6 +24,7 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { FapReviewBasisConfig } from '../resolvers/types/FieldConfig';
 
 export interface FapDataSource {
   create(
@@ -101,6 +102,7 @@ export interface FapDataSource {
     proposalPk: number,
     instrumentId?: number
   ): Promise<FapProposal | null>;
+  getFapProposalById(fapProposalId: number): Promise<FapProposal | null>;
   getFapProposalsByInstrument(
     instrumentId: number,
     callId: number,
@@ -181,4 +183,7 @@ export interface FapDataSource {
   ): Promise<FapProposal[]>;
   getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
   getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]>;
+  getFapMeetingScoreConfig(
+    callId: number
+  ): Promise<FapReviewBasisConfig | null>;
 }

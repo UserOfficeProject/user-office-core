@@ -600,6 +600,15 @@ export default class PostgresInstrumentDataSource
               ) * instrument.fap_instrument_time_allocation
             );
           }
+          if (
+            instrument.availability_time !== null &&
+            instrument.all_faps_instrument_time_allocation === 0 &&
+            instrument.fap_instrument_time_allocation === 0
+          ) {
+            calculatedInstrumentAvailabilityTimePerFap = -Math.round(
+              -instrument.availability_time
+            );
+          }
 
           return this.createInstrumentWithAvailabilityTimeObject({
             ...instrument,
@@ -706,7 +715,6 @@ export default class PostgresInstrumentDataSource
         availability_time: availabilityTime,
       })} ON CONFLICT (instrument_id, call_id) DO UPDATE SET availability_time=${availabilityTime}`
     );
-
     if (result) {
       return true;
     } else {

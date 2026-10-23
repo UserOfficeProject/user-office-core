@@ -1,4 +1,4 @@
-import { FormHelperText } from '@mui/material';
+import { FormHelperText, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -23,6 +23,7 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useFapMeetingScoringConfig } from 'hooks/fap/useFapMeetingScoringConfig';
 import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
@@ -55,9 +56,14 @@ const FinalRankingForm = ({
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const { t } = useTranslation();
   const [invalidError, setInvalidError] = useState(false);
-
+  const { scoringConfig } = useFapMeetingScoringConfig(proposalData.callId);
   const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
     (fmd) => fmd.recommendedInstrumentId === instrumentId
+  );
+  const [gradeType, setGradeType] = useState<'Number' | 'Classification'>(
+    isNaN(Number(fapMeetingDecision?.meetingScore))
+      ? 'Classification'
+      : 'Number'
   );
 
   const techReviewTimeAllocations = proposalData.technicalReviews?.find(
@@ -76,6 +82,9 @@ const FinalRankingForm = ({
       techReviewTimeAllocations ??
       0,
     fapProposalId: fapProposalId,
+    meetingScore: isNaN(Number(fapMeetingDecision?.meetingScore))
+      ? fapMeetingDecision?.meetingScore ?? ''
+      : Number(fapMeetingDecision?.meetingScore),
   };
 
   const statusOptions: Option[] = [
@@ -100,6 +109,7 @@ const FinalRankingForm = ({
       fapId: fapId,
       recommendedTimeAllocation: values.recommendedTimeAllocation,
       fapProposalId: values.fapProposalId,
+      meetingScore: values.meetingScore.toString(),
     };
 
     await api({
@@ -112,6 +122,7 @@ const FinalRankingForm = ({
       ...saveFapMeetingDecisionInput,
       submittedBy: fapMeetingDecision?.submittedBy || null,
       rankOrder: fapMeetingDecision?.rankOrder || null,
+      meetingScore: fapMeetingDecision?.meetingScore || null,
     });
 
     if (shouldClose) {
@@ -203,28 +214,66 @@ const FinalRankingForm = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel
-                      htmlFor="recommendation"
-                      shrink={!!values.recommendation}
-                      required
-                    >
-                      Recommendation
-                    </InputLabel>
+                  <Grid>
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel
+                        htmlFor="recommendation"
+                        shrink={!!values.recommendation}
+                        required
+                      >
+                        Recommendation
+                      </InputLabel>
+                      <Field
+                        name="recommendation"
+                        component={Select}
+                        data-cy="proposalFapMeetingRecommendation"
+                        disabled={
+                          !hasWriteAccess || shouldDisableForm(isSubmitting)
+                        }
+                        MenuProps={{
+                          'data-cy': 'proposalFapMeetingRecommendation-options',
+                        }}
+                        required
+                        options={statusOptions}
+                      />
+                    </FormControl>
                     <Field
-                      name="recommendation"
-                      component={Select}
-                      data-cy="proposalFapMeetingRecommendation"
-                      disabled={
-                        !hasWriteAccess || shouldDisableForm(isSubmitting)
-                      }
-                      MenuProps={{
-                        'data-cy': 'proposalFapMeetingRecommendation-options',
+                      label={`Time Allocation Recommendation (${proposalData.call?.allocationTimeUnit}s)`}
+                      id="recommendedTimeAllocation"
+                      data-cy="edit-fap-time-allocation"
+                      name="recommendedTimeAllocation"
+                      type="number"
+                      component={TextField}
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{
+                        min: 0,
+                        max: 1e5,
                       }}
-                      required
-                      options={statusOptions}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+                        const numericValue = Number(value);
+                        if (isNaN(numericValue)) {
+                          setInvalidError(true);
+                        } else {
+                          if (numericValue < 0 || numericValue > 1e5) {
+                            setInvalidError(true);
+                          } else {
+                            setInvalidError(false);
+                          }
+                        }
+
+                        setFieldValue(
+                          'recommendedTimeAllocation',
+                          numericValue ? numericValue : null
+                        );
+                      }}
                     />
-                  </FormControl>
+                    {invalidError && (
+                      <FormHelperText error>
+                        {`Please enter a valid time allocation (0-100000) (${proposalData.call?.allocationTimeUnit}s)`}
+                      </FormHelperText>
+                    )}
+                  </Grid>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <InputLabel
@@ -267,118 +316,188 @@ const FinalRankingForm = ({
                     }
                   />
 
-                  <Field
-                    label={`Time Allocation Recommendation (${proposalData.call?.allocationTimeUnit}s)`}
-                    id="recommendedTimeAllocation"
-                    data-cy="edit-fap-time-allocation"
-                    name="recommendedTimeAllocation"
-                    type="number"
-                    component={TextField}
-                    InputLabelProps={{ shrink: true }}
-                    inputProps={{
-                      min: 0,
-                      max: 1e5,
-                    }}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const value = e.target.value;
-                      const numericValue = Number(value);
-                      if (isNaN(numericValue)) {
-                        setInvalidError(true);
-                      } else {
-                        if (numericValue < 0 || numericValue > 1e5) {
-                          setInvalidError(true);
-                        } else {
-                          setInvalidError(false);
-                        }
-                      }
-
-                      setFieldValue(
-                        'recommendedTimeAllocation',
-                        numericValue ? numericValue : null
-                      );
-                    }}
-                  />
-                  {invalidError && (
-                    <FormHelperText error>
-                      {`Please enter a valid time allocation (0-100000) (${proposalData.call?.allocationTimeUnit}s)`}
-                    </FormHelperText>
-                  )}
-                  <StyledButtonContainer style={{ margin: '2rem 0 0' }}>
-                    {hasWriteAccess && (
-                      <>
-                        {isSubmitting && (
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            sx={(theme) => ({
-                              margin: theme.spacing(0, 0, 0, 1),
-                            })}
-                          >
-                            <UOLoader buttonSized />
-                          </Box>
-                        )}
-                        {isUserOfficer && (
-                          <Field
-                            id="submitted"
-                            name="submitted"
-                            component={CheckboxWithLabel}
-                            type="checkbox"
-                            Label={{
-                              label: 'Submitted',
+                  <Grid container alignItems="center" display="flex">
+                    <Box display="flex" alignItems="center" marginTop={2}>
+                      <FormControl margin="normal">
+                        {scoringConfig.nonNumericOptions.length > 0 && (
+                          <ToggleButtonGroup
+                            color="primary"
+                            value={gradeType}
+                            exclusive
+                            onChange={(_, v) => {
+                              setGradeType(v);
                             }}
-                            disabled={isSubmitting}
-                            data-cy="is-fap-meeting-submitted"
-                          />
+                            title="Select grade type"
+                            size="small"
+                          >
+                            <ToggleButton value="Number">Number</ToggleButton>
+                            <ToggleButton value="Classification">
+                              Classification
+                            </ToggleButton>
+                          </ToggleButtonGroup>
                         )}
-                        <Button
-                          type="submit"
-                          onClick={() => {
-                            setShouldClose(false);
-                            setShouldSubmit(false);
-                          }}
-                          color={isUserOfficer ? 'primary' : 'secondary'}
-                          sx={(theme) => ({
-                            margin: theme.spacing(0, 0, 0, 1),
-                          })}
-                          data-cy="save"
-                          disabled={shouldDisableForm(isSubmitting)}
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          type="submit"
-                          onClick={() => {
-                            setShouldClose(true);
-                            setShouldSubmit(false);
-                          }}
-                          color={isUserOfficer ? 'primary' : 'secondary'}
-                          sx={(theme) => ({
-                            margin: theme.spacing(0, 0, 0, 1),
-                          })}
-                          data-cy="saveAndContinue"
-                          disabled={shouldDisableForm(isSubmitting)}
-                        >
-                          Save and continue
-                        </Button>
-                        {!isUserOfficer && (
+
+                        <Box width={200}>
+                          <Field
+                            name="meetingScore"
+                            id="meetingScore"
+                            initialValue={initialData.meetingScore}
+                            label={
+                              gradeType === 'Classification'
+                                ? 'Classification'
+                                : 'Grade'
+                            }
+                            component={
+                              gradeType === 'Classification' ||
+                              scoringConfig.decimalPoints === 0
+                                ? Select
+                                : TextField
+                            }
+                            MenuProps={{ 'data-cy': 'grade-proposal-options' }}
+                            formControl={{
+                              fullWidth: true,
+                              required: true,
+                              margin: 'normal',
+                            }}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              setFieldValue('meetingScore', e.target.value);
+                            }}
+                            inputProps={
+                              gradeType === 'Classification' ||
+                              scoringConfig.decimalPoints === 0
+                                ? {
+                                    id: 'grade-proposal',
+                                  }
+                                : {
+                                    id: 'grade-proposal',
+                                    step: Math.pow(
+                                      10,
+                                      -scoringConfig.decimalPoints
+                                    ).toString(),
+                                    inputMode: 'decimal',
+                                    type: 'number',
+                                    min: scoringConfig.minGrade.toString(),
+                                    max: scoringConfig.maxGrade.toString(),
+                                  }
+                            }
+                            data-cy="grade-proposal"
+                            labelId="grade-proposal-label"
+                            options={
+                              gradeType === 'Classification'
+                                ? scoringConfig.nonNumericOptions.map(
+                                    (option) => ({
+                                      text: option,
+                                      value: option,
+                                    })
+                                  )
+                                : scoringConfig.decimalPoints === 0
+                                  ? Array.from(
+                                      {
+                                        length:
+                                          scoringConfig.maxGrade -
+                                          scoringConfig.minGrade +
+                                          1,
+                                      },
+                                      (_, i) => ({
+                                        text: (
+                                          scoringConfig.minGrade + i
+                                        ).toString(),
+                                        value: (
+                                          scoringConfig.minGrade + i
+                                        ).toString(),
+                                      })
+                                    )
+                                  : undefined
+                            }
+                          />
+                        </Box>
+                      </FormControl>
+                    </Box>
+
+                    <StyledButtonContainer
+                      style={{
+                        margin: '0 0 0 auto',
+                        alignSelf: 'flex-end',
+                        flexWrap: 'wrap',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
+                      {hasWriteAccess && (
+                        <>
+                          {isSubmitting && (
+                            <Box
+                              display="flex"
+                              alignItems="center"
+                              sx={(theme) => ({
+                                margin: theme.spacing(0, 0, 0, 1),
+                              })}
+                            >
+                              <UOLoader buttonSized />
+                            </Box>
+                          )}
+                          {isUserOfficer && (
+                            <Field
+                              id="submitted"
+                              name="submitted"
+                              component={CheckboxWithLabel}
+                              type="checkbox"
+                              Label={{ label: 'Submitted' }}
+                              disabled={isSubmitting}
+                              data-cy="is-fap-meeting-submitted"
+                            />
+                          )}
                           <Button
                             type="submit"
                             onClick={() => {
                               setShouldClose(false);
-                              setShouldSubmit(true);
+                              setShouldSubmit(false);
                             }}
+                            color={isUserOfficer ? 'primary' : 'secondary'}
                             sx={(theme) => ({
                               margin: theme.spacing(0, 0, 0, 1),
                             })}
-                            data-cy="submitFapMeeting"
+                            data-cy="save"
                             disabled={shouldDisableForm(isSubmitting)}
                           >
-                            Submit
+                            Save
                           </Button>
-                        )}
-                      </>
-                    )}
-                  </StyledButtonContainer>
+                          <Button
+                            type="submit"
+                            onClick={() => {
+                              setShouldClose(true);
+                              setShouldSubmit(false);
+                            }}
+                            color={isUserOfficer ? 'primary' : 'secondary'}
+                            sx={(theme) => ({
+                              margin: theme.spacing(0, 0, 0, 1),
+                            })}
+                            data-cy="saveAndContinue"
+                            disabled={shouldDisableForm(isSubmitting)}
+                          >
+                            Save and continue
+                          </Button>
+                          {!isUserOfficer && (
+                            <Button
+                              type="submit"
+                              onClick={() => {
+                                setShouldClose(false);
+                                setShouldSubmit(true);
+                              }}
+                              sx={(theme) => ({
+                                margin: theme.spacing(0, 0, 0, 1),
+                              })}
+                              data-cy="submitFapMeeting"
+                              disabled={shouldDisableForm(isSubmitting)}
+                            >
+                              Submit
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </StyledButtonContainer>
+                  </Grid>
                 </Grid>
               </Grid>
             </Form>

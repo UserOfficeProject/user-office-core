@@ -9,4 +9,5 @@ fragment fapMeetingDecision on FapMeetingDecision {
   recommendedInstrumentId
   fapId
   recommendedTimeAllocation
+  meetingScore
 }

@@ -21,6 +21,7 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
+import { FapReviewBasisConfig } from '../../resolvers/types/FieldConfig';
 import { FapDataSource } from '../FapDataSource';
 import {
   FapReviewsRecord,
@@ -179,7 +180,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
   1,
   1,
-  1
+  1,
+  '1'
 );
 
 export const dummyFapAssignments = [
@@ -652,6 +654,11 @@ export class FapDataSourceMock implements FapDataSource {
   isFapProposalInstrumentSubmittedById(
     fapProposalId: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  getFapMeetingScoreConfig(
+    callId: number
+  ): Promise<FapReviewBasisConfig | null> {
     throw new Error('Method not implemented.');
   }
 }

@@ -16,6 +16,7 @@ import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { ProposalEndStatus, ProposalPks } from '../../models/Proposal';
 import { Review, ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
+import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserRole } from '../../models/User';
 import {
   UpdateMemberFapArgs,
@@ -57,6 +58,8 @@ import {
   createFapReviewVisibilityObject,
   ReviewVisibilityRecord,
 } from './records';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { FapReviewBasisConfig } from '../../resolvers/types/FieldConfig';
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
@@ -559,6 +562,16 @@ export default class PostgresFapDataSource implements FapDataSource {
     return fapProposal ? createFapProposalObject(fapProposal) : null;
   }
 
+  async getFapProposalById(fapProposalId: number): Promise<FapProposal | null> {
+    const fapProposal: FapProposalRecord | undefined = await database(
+      'fap_proposals'
+    )
+      .where('fap_proposal_id', fapProposalId)
+      .first();
+
+    return fapProposal ? createFapProposalObject(fapProposal) : null;
+  }
+
   async getFapProposalsByInstrument(
     instrumentId: number,
     callId: number,
@@ -1046,6 +1059,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       submitted?: boolean;
       submitted_by?: number | null;
       instrument_id: number;
+      meeting_score?: string | null;
       fap_id: number;
       recommended_time_allocation?: number | null;
       fap_proposal_id: number;
@@ -1099,9 +1113,14 @@ export default class PostgresFapDataSource implements FapDataSource {
       );
     }
 
+    if (saveFapMeetingDecisionInput.meetingScore !== undefined) {
+      dataToUpsert.meeting_score = saveFapMeetingDecisionInput.meetingScore;
+      updateQuery.push('meeting_score = EXCLUDED.meeting_score');
+    }
+
     const [fapMeetingDecisionRecord]: FapMeetingDecisionRecord[] = (
       await database.raw(
-        `? ON CONFLICT (proposal_pk, instrument_id)
+        `? ON CONFLICT (fap_proposal_id)
         DO UPDATE SET
         ${updateQuery.join(',')}
         RETURNING *;`,
@@ -1459,5 +1478,24 @@ export default class PostgresFapDataSource implements FapDataSource {
     }
 
     return createFapMeetingDecisionObject(fapMeetingDecisionRecord);
+  }
+
+  async getFapMeetingScoreConfig(callId: number) {
+    const config: { config: string } = await database
+      .select('thq.config')
+      .from('call as c')
+      .join(
+        'templates_has_questions as thq',
+        'c.fap_review_template_id',
+        'thq.template_id'
+      )
+      .where('c.call_id', callId)
+      .andWhere('thq.question_id', 'fap_review_basis')
+      .first();
+
+    return createConfig<FapReviewBasisConfig>(
+      DataType.FAP_REVIEW_BASIS,
+      config.config
+    );
   }
 }

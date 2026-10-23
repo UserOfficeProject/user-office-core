@@ -12,6 +12,7 @@ export class FapMeetingDecision {
     public recommendedInstrumentId: number,
     public fapId: number,
     public recommendedTimeAllocation: number | null,
-    public fapProposalId: number
+    public fapProposalId: number,
+    public meetingScore: string | null
   ) {}
 }

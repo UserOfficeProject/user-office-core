@@ -72,7 +72,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
   1,
   1,
-  1
+  1,
+  '1'
 );
 
 export const dummyProposalTechnicalReview = new TechnicalReview(
