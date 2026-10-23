@@ -1,6 +1,8 @@
 import { BasicUserDetails } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
+export { getPreferredNameWithLastname } from './userName';
+
 export const getPreferredName = (
   user: Pick<BasicUserDetails, 'firstname'> & { preferredname?: string | null }
 ): string => user.preferredname || user.firstname;
