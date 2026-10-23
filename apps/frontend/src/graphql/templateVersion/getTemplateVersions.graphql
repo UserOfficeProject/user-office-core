@@ -1,0 +1,8 @@
+query getTemplateVersions($templateId: Int!, $templateType: String!) {
+  templateVersions(templateId: $templateId,  templateType: $templateType) {
+    versions {
+      ...templateVersion
+    }
+    totalCount
+  }
+}
