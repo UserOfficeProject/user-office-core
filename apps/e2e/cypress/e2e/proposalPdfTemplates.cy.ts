@@ -750,7 +750,7 @@ context('Proposal PDF template tests', () => {
       cy.contains(newDescription).should('exist');
     });
 
-    it.only('User officer opens a PDF template editor → PDF preview renders without error', () => {
+    it('User officer opens a PDF template editor → PDF preview renders without error', () => {
       cy.login('officer');
       cy.visit('/');
 
