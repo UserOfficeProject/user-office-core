@@ -24,13 +24,6 @@ BEGIN
 		ALTER TABLE fap_meeting_decisions
 			ADD COLUMN IF NOT EXISTS recommended_time_allocation integer;
 
-		ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS meeting_status VARCHAR(50);
-		ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS meeting_notes text;
-		ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS meeting_score VARCHAR(50);
-
         ALTER TABLE fap_meeting_decisions DROP CONSTRAINT fap_meeting_decisions_pkey;
         ALTER TABLE fap_meeting_decisions ADD PRIMARY KEY (fap_proposal_id);
 
@@ -97,6 +90,9 @@ BEGIN
 
 		ALTER TABLE fap_proposals DROP COLUMN IF EXISTS recommended_time_allocation;
 		ALTER TABLE fap_proposals DROP COLUMN IF EXISTS instrument_has_proposals_id;
+
+        ALTER TABLE fap_meeting_decisions RENAME COLUMN instrument_id TO recommended_instrument_id;
+
 
     END;
 	END IF;
