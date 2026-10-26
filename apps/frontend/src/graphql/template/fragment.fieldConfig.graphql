@@ -148,6 +148,7 @@ fragment fieldConfig on FieldConfig {
     tooltip
     readPermissions
     max
+    maxWords
     allowImages
   }
 

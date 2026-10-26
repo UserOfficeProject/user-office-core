@@ -72,7 +72,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getPreferredName } from 'utils/user';
+import { getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalScientistComment from './ProposalScientistComment';
@@ -330,8 +330,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'principalInvestigator',
       sorting: false,
       render: (proposalView: ProposalViewData) => {
-        if (proposalView.principalInvestigator?.lastname) {
-          return `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`;
+        if (proposalView.principalInvestigator) {
+          return getPreferredNameWithLastname(
+            proposalView.principalInvestigator
+          );
         }
 
         return '';
@@ -436,21 +438,28 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     connectionsWithActions.length === 1
                       ? connectionsWithActions[0].id
                       : undefined;
-                  updateProposalStatus(
-                    primaryKey,
-                    selectedWorkflowStatus.workflowStatusId,
-                    statusActionsWorkflowConnectionId
-                  ).then(() => {
-                    if (value === StatusCode.UNSUCCESSFUL && comment != '') {
-                      api({
-                        toastSuccessMessage:
-                          'Proposal rejection comment successfully created',
-                      }).createProposalRejectionComment({
-                        proposalPk: unsuccessfullPK,
+                  if (value === StatusCode.UNSUCCESSFUL && comment != '') {
+                    return api({
+                      toastSuccessMessage:
+                        'Proposal rejection comment successfully created',
+                    })
+                      .createProposalRejectionComment({
+                        proposalPk: primaryKey,
                         comment: comment ?? '',
+                      })
+                      .then(() => {
+                        return updateProposalStatus(
+                          primaryKey,
+                          selectedWorkflowStatus.workflowStatusId,
+                          statusActionsWorkflowConnectionId
+                        );
                       });
-                    }
-                  });
+                  } else
+                    return updateProposalStatus(
+                      primaryKey,
+                      selectedWorkflowStatus.workflowStatusId,
+                      statusActionsWorkflowConnectionId
+                    );
                 });
             });
         },
