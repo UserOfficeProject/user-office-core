@@ -661,4 +661,8 @@ export class FapDataSourceMock implements FapDataSource {
   ): Promise<FapReviewBasisConfig | null> {
     throw new Error('Method not implemented.');
   }
+
+  getFapProposalById(fapProposalId: number): Promise<FapProposal | null> {
+    throw new Error('Method not implemented.');
+  }
 }

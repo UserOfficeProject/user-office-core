@@ -86,48 +86,48 @@ describe('addDecreasingInstrumentAvailTime test', () => {
   test('Ensure orders an input 1 then 2', () => {
     const managementDecisionData = [
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 10);
-    expect(managementDecisionData[0].grade).toEqual(1);
+    expect(managementDecisionData[0].rankOrder).toEqual(1);
   });
 
   test('Ensure orders an input 2 then 1', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 10);
-    expect(managementDecisionData[0].grade).toEqual(1);
+    expect(managementDecisionData[0].rankOrder).toEqual(1);
   });
 
   test('Ensure allocated time is subtracted and added to xlsxrowdata', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 1,
         xlsxrowdata: ['example', 'example', 'example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 1,
         xlsxrowdata: ['example', 'example', 'example'],
       },
@@ -140,12 +140,12 @@ describe('addDecreasingInstrumentAvailTime test', () => {
   test('Ensure allocated time is limited to zero and added to xlsxrowdata', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 1000,
         xlsxrowdata: ['example', 'example', 'example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 1000,
         xlsxrowdata: ['example', 'example', 'example'],
       },
@@ -171,7 +171,7 @@ describe('generateManagementDecisionData tests', () => {
       mockFapReview
     );
 
-    expect(result.grade).toEqual(4.5);
+    expect(result.rankOrder).toEqual(1);
     expect(result.instrumentAllocatedTime).toEqual(10);
     expect(result.xlsxrowdata).toEqual([
       '456',

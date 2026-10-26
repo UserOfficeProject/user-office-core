@@ -34,7 +34,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
 import FapMeetingProposalViewModal from './ProposalViewModal/FapMeetingProposalViewModal';
-import { validate } from 'graphql';
 
 type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
   proposalAverageScore: number | string;

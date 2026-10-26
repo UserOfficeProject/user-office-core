@@ -638,12 +638,10 @@ export interface FapMeetingDecisionRecord {
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
   readonly submitted_by: number | null;
-  readonly instrument_id: number;
+  readonly recommended_instrument_id: number;
   readonly fap_id: number;
   readonly recommended_time_allocation: number | null;
-  readonly meeting_status: string;
-  readonly meeting_notes: string | null;
-  readonly meeting_score: string | null;
+  readonly meeting_score: string;
   readonly fap_proposal_id: number;
 }
 
@@ -1170,7 +1168,7 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.comment_for_management,
     fapMeetingDecisionRecord.submitted,
     fapMeetingDecisionRecord.submitted_by,
-    fapMeetingDecisionRecord.instrument_id,
+    fapMeetingDecisionRecord.recommended_instrument_id,
     fapMeetingDecisionRecord.fap_id,
     fapMeetingDecisionRecord.recommended_time_allocation,
     fapMeetingDecisionRecord.fap_proposal_id,

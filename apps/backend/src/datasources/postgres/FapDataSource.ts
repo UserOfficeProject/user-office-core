@@ -1058,14 +1058,15 @@ export default class PostgresFapDataSource implements FapDataSource {
       recommendation?: ProposalEndStatus;
       submitted?: boolean;
       submitted_by?: number | null;
-      instrument_id: number;
       meeting_score?: string | null;
+      recommended_instrument_id: number;
       fap_id: number;
       recommended_time_allocation?: number | null;
       fap_proposal_id: number;
     } = {
       proposal_pk: saveFapMeetingDecisionInput.proposalPk,
-      instrument_id: saveFapMeetingDecisionInput.recommendedInstrumentId,
+      recommended_instrument_id:
+        saveFapMeetingDecisionInput.recommendedInstrumentId,
       fap_id: saveFapMeetingDecisionInput.fapId,
       recommended_time_allocation:
         saveFapMeetingDecisionInput.recommendedTimeAllocation,
@@ -1309,11 +1310,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     return database('fap_proposals')
       .select()
       .where('proposal_pk', proposalPk)
-      .modify((query) => {
-        if (instrumentId) {
-          query.andWhere('instrument_id', instrumentId);
-        }
-      })
+      .andWhere('instrument_id', instrumentId)
       .first()
       .then((result?: FapProposalRecord) => {
         if (!result) {
@@ -1430,7 +1427,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         !readyProposals.find(
           (readyProp) =>
             readyProp.proposal_pk === proposal.proposal_pk &&
-            readyProp.instrument_id === proposal.instrument_id
+            readyProp.recommended_instrument_id === proposal.instrument_id
         )
     );
 
