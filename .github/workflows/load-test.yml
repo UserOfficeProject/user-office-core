@@ -96,8 +96,10 @@ jobs:
         working-directory: apps/backend
         run: |
           docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans
-          # Postgres only listens on TCP once its init scripts have finished
-          timeout 300 bash -c 'until (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; do sleep 2; done'
+          # Docker accepts connections on the published port before Postgres is up,
+          # so check from inside the container. -h forces TCP, which Postgres only
+          # listens on once its init scripts have finished.
+          timeout 300 bash -c 'until docker compose -f docker-compose-stfc.e2e.yml exec -T db pg_isready -h 127.0.0.1 -U duouser -d duo; do sleep 2; done'
 
       - name: Start backend
         working-directory: apps/backend
