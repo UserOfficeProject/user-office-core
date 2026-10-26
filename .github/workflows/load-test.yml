@@ -175,6 +175,141 @@ jobs:
 
           k6 run "$RUNNER_TEMP/login.js"
 
+      - name: Run proposal submission load test
+        run: |
+          cat > "$RUNNER_TEMP/proposal-submission.js" << 'EOF'
+          import http from 'k6/http';
+          import { check, fail, group, sleep } from 'k6';
+
+          const GRAPHQL_URL = __ENV.GRAPHQL_URL || 'http://127.0.0.1:4000/graphql';
+          const MOCK_SERVER_URL = __ENV.MOCK_SERVER_URL || 'http://127.0.0.1:1080';
+          const USERS = parseInt(__ENV.USERS || '10');
+          const DURATION = __ENV.DURATION || '2m';
+          // Call seeded by the e2e DB patches, open until 2030
+          const CALL_ID = parseInt(__ENV.CALL_ID || '1');
+
+          export const options = {
+            scenarios: {
+              proposals: { executor: 'constant-vus', vus: USERS, duration: DURATION },
+            },
+            thresholds: {
+              http_req_failed: ['rate<0.01'],
+              checks: ['rate>0.99'],
+              'http_req_duration{name:createProposal}': ['p(95)<2000'],
+              'http_req_duration{name:updateProposal}': ['p(95)<2000'],
+              'http_req_duration{name:submitProposal}': ['p(95)<2000'],
+            },
+          };
+
+          // One mock UOWS user per VU, so each VU works as its own proposer
+          export function setup() {
+            const res = http.post(
+              `${MOCK_SERVER_URL}/mock-server/users`,
+              JSON.stringify({ userCount: USERS }),
+              { headers: { 'Content-Type': 'application/json' } }
+            );
+            if (res.status !== 201) {
+              fail(`Creating mock users failed (${res.status}): ${res.body}`);
+            }
+
+            return {
+              users: res.json().map((u) => ({ userNumber: u.userNumber, sessionId: u.sessionId })),
+            };
+          }
+
+          // Returns data.<name>, or null if the request failed
+          function gql(name, query, variables, token) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers.Authorization = `Bearer ${token}`;
+
+            const res = http.post(GRAPHQL_URL, JSON.stringify({ query, variables }), {
+              headers,
+              tags: { name },
+            });
+
+            // GraphQL errors come back as HTTP 200, so check the body as well
+            const ok = check(res, {
+              [`${name}: succeeded`]: (r) =>
+                r.status === 200 && !r.json('errors') && r.json(`data.${name}`) != null,
+            });
+            if (!ok) {
+              console.error(`${name} failed for VU ${__VU}: ${res.body}`);
+              return null;
+            }
+
+            return res.json(`data.${name}`);
+          }
+
+          // Module scope is per VU, so each VU logs in once and reuses its token
+          let token;
+
+          export default function ({ users }) {
+            if (!token) {
+              token = gql(
+                'externalTokenLogin',
+                `mutation ($token: String!) {
+                  externalTokenLogin(externalToken: $token, redirectUri: "http://localhost:3000/external-auth")
+                }`,
+                { token: users[__VU - 1].sessionId }
+              );
+              if (!token) {
+                sleep(1);
+                return;
+              }
+            }
+
+            let proposal;
+            group('create proposal', () => {
+              proposal = gql(
+                'createProposal',
+                `mutation ($callId: Int!) {
+                  createProposal(callId: $callId) { primaryKey proposalId }
+                }`,
+                { callId: CALL_ID },
+                token
+              );
+            });
+            if (!proposal) {
+              sleep(1);
+              return;
+            }
+            sleep(1);
+
+            group('update proposal', () => {
+              gql(
+                'updateProposal',
+                `mutation ($proposalPk: Int!, $title: String!, $abstract: String!) {
+                  updateProposal(proposalPk: $proposalPk, title: $title, abstract: $abstract) { primaryKey }
+                }`,
+                {
+                  proposalPk: proposal.primaryKey,
+                  title: `Load test proposal ${proposal.proposalId}`,
+                  abstract: `Created by k6 VU ${__VU}, iteration ${__ITER}`,
+                },
+                token
+              );
+            });
+            sleep(1);
+
+            group('submit proposal', () => {
+              const submitted = gql(
+                'submitProposal',
+                `mutation ($proposalPk: Int!) {
+                  submitProposal(proposalPk: $proposalPk) { primaryKey submitted }
+                }`,
+                { proposalPk: proposal.primaryKey },
+                token
+              );
+              check(submitted, {
+                'submitProposal: proposal is submitted': (p) => p !== null && p.submitted === true,
+              });
+            });
+            sleep(1);
+          }
+          EOF
+
+          k6 run "$RUNNER_TEMP/proposal-submission.js"
+
       - name: Backend and mock logs
         if: failure()
         working-directory: apps/backend
