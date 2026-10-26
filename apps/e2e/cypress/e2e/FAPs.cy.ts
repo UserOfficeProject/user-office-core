@@ -1907,7 +1907,7 @@ context('Fap reviews tests', () => {
       cy.contains(proposal1.title);
       cy.contains(proposal3.title);
     });
-    it('Fap Reviewer should only be able to see proposals from calls with active fap review periods', () => {
+    it('FAP reviewer should see no proposals when FAP review ended. But cronjob flag (callFapReviewEnded) not updated yet', () => {
       cy.get('#reviewer-selection', { timeout: 5000 })
         .parent()
         .should('be.visible')
@@ -1918,7 +1918,8 @@ context('Fap reviews tests', () => {
 
       cy.updateCall({
         id: initialDBData.call.id,
-        callFapReviewEnded: true,
+        callFapReviewEnded: false,
+        endFapReview: new Date(2001, 11, 3),
       });
       cy.reload();
 
@@ -1930,6 +1931,68 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.contains(proposal1.title).should('not.exist');
+    });
+
+    it('FAP reviewer should see no proposals when FAP review ended. Cronjob flag (callFapReviewEnded) is set', () => {
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        callFapReviewEnded: true,
+        endFapReview: new Date(2001, 11, 3),
+      });
+      cy.reload();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title).should('not.exist');
+    });
+
+    it('FAP reviewer should see no reviews when FAP reviews when FAP review ended. CRONJOB flag (callFapReviewEnded) is updated. ', () => {
+      cy.updateCall({
+        id: initialDBData.call.id,
+        callFapReviewEnded: true,
+        endFapReview: new Date(3000, 11, 3),
+      });
+      cy.reload();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title).should('not.exist');
+    });
+
+    it('FAP reviewer should see no reviews when FAP reviews when FAP review ended. CRONJOB flag (callFapReviewEnded) is not updated. ', () => {
+      cy.updateCall({
+        id: initialDBData.call.id,
+        callFapReviewEnded: false,
+        endFapReview: new Date(3000, 11, 3),
+      });
+      cy.reload();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title).should('not.exist');
     });
 
     it('Fap Reviewer should not be able to submit a grade for proposals on which they are not reviewer, they should only able to view them', () => {
