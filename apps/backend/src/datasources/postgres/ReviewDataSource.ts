@@ -455,7 +455,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               qb.join('call', {
                 'call.call_id': 'proposals.call_id',
               });
-              qb.where('call.call_fap_review_ended', false);
+              qb.where('call.end_fap_review', '>=', new Date());
             }
           })
           .whereIn('fap_id', fapIds)
