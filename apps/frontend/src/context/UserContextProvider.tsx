@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jwtDecode } from 'jwt-decode';
 import PropTypes from 'prop-types';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
-import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { getAuthorizedApi, useUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
 import { SettingsContext } from './SettingsContextProvider';
@@ -41,6 +41,7 @@ enum ActionType {
   SETTOKEN = 'setToken',
   SELECTROLE = 'selectRole',
   LOGOFFUSER = 'logOffUser',
+  SETUSERDETAILS = 'setUserDetails',
 }
 
 const initUserData: UserContextData = {
@@ -192,6 +193,15 @@ const reducer = (
       return {
         ...initUserData,
       };
+    case ActionType.SETUSERDETAILS:
+      if (state.user.id !== action.payload.id) {
+        return state;
+      }
+
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload.details },
+      };
 
     default:
       return state;
@@ -206,6 +216,38 @@ export const UserContextProvider = (props: {
   const settingsContext = useContext(SettingsContext);
 
   checkLocalStorage(dispatch, state);
+
+  const userId = state.user.id;
+  useEffect(() => {
+    const token = localStorage.token;
+    if (!userId || !token) {
+      return;
+    }
+
+    getAuthorizedApi(token)
+      .getUserMe()
+      .then(({ me }) => {
+        if (!me) {
+          return;
+        }
+
+        dispatch({
+          type: ActionType.SETUSERDETAILS,
+          payload: {
+            id: userId,
+            details: {
+              firstname: me.firstname,
+              lastname: me.lastname,
+              preferredname: me.preferredname,
+              email: me.email,
+            },
+          },
+        });
+      })
+      .catch(() => {
+        // Keep the details from the JWT if the request fails
+      });
+  }, [userId]); // id will change when impersonate
 
   async function userLogoutHandler() {
     const token = localStorage.getItem('token');
