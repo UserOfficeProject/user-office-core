@@ -5,9 +5,6 @@ name: E2E and build testing.
 on:
   pull_request:
     branches: [develop]
-  # Temp test 
-  push:
-    branches: [46-switch-to-dynamic-users-mockserver]
 
 env:
   NODE_VERSION: 22.x
