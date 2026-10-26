@@ -185,8 +185,8 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       ),
   },
   {
-    title: 'Instrument',
-    field: 'instrument.name',
+    title: 'Instrument(s)',
+    field: 'instrumentShortcodes',
   },
 ];
 
@@ -227,8 +227,8 @@ const FapProposalsAndAssignmentsTable = ({
   );
 
   const translatedColumns = FapProposalColumns.map((column) =>
-    column.title === 'Instrument'
-      ? { ...column, title: t('instrument') }
+    column.title === 'Instrument(s)'
+      ? { ...column, title: `${t('instrument')}(s)` }
       : column
   );
 
