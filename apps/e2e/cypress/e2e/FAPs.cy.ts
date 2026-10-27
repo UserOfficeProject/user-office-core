@@ -1488,6 +1488,11 @@ context('Fap reviews tests', () => {
       });
       cy.login(fapMembers.secretary);
       cy.changeActiveRole(initialDBData.roles.fapSecretary);
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        endFapReview: new Date(3001, 11, 3),
+      });
     });
 
     it('Fap Secretary should be able to assign Fap member to proposal in existing Fap', () => {
@@ -1815,6 +1820,12 @@ context('Fap reviews tests', () => {
 
       cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
+
+      //when commented legacy works
+      cy.updateCall({
+        id: initialDBData.call.id,
+        endFapReview: new Date(3001, 11, 3),
+      });
     });
 
     it('Fap Reviewer should be able to filter their reviews by status and bulk submit them', () => {
@@ -1916,6 +1927,24 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
       cy.contains(proposal1.title);
 
+      cy.updateCall({
+        id: initialDBData.call.id,
+        callFapReviewEnded: false,
+        endFapReview: new Date(2001, 11, 3),
+      });
+      cy.reload();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title).should('not.exist');
+    });
+
+    it('FAP reviewer should see no proposals when FAP review ended. But cronjob flag (callFapReviewEnded) not updated yet', () => {
       cy.updateCall({
         id: initialDBData.call.id,
         callFapReviewEnded: false,
@@ -2080,7 +2109,7 @@ context('Fap reviews tests', () => {
       cy.contains(comment1).should('not.exist');
     });
 
-    it('Fap Reviewer should be see legacy FAP proposals page', () => {
+    it('Fap Reviewer should see legacy FAP proposals page', () => {
       cy.createCall({
         ...updatedCall,
         shortCode: 'legacy call',
@@ -2135,6 +2164,8 @@ context('Fap reviews tests', () => {
             esiTemplateId: createdEsiTemplateId,
             faps: [createdFapId],
             callFapReviewEnded: true,
+            startFapReview: new Date(2001, 11, 3),
+            endFapReview: new Date(2002, 11, 3),
           });
 
           cy.visit('/FapPage/' + createdFapId);
