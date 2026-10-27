@@ -1,4 +1,4 @@
-import { default as React, useState } from 'react';
+import React, { useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -27,8 +27,8 @@ export default function FeedbackContainer(props: FeedbackContainerProps) {
   ]);
 
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
+    <QuestionaryContext value={{ state, dispatch }}>
       <Questionary title={'Feedback to the facility'} />
-    </QuestionaryContext.Provider>
+    </QuestionaryContext>
   );
 }

@@ -18,7 +18,7 @@ export type RoleRow = Pick<
   tags?: Pick<Tag, 'id' | 'name'>[];
 };
 
-const RoleManagement: React.FC = () => {
+const RoleManagement = () => {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleRow | null>(null);

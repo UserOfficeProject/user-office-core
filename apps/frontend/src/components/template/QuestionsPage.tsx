@@ -54,7 +54,7 @@ function QuestionsPage() {
   const [selectedQuestion, setSelectedQuestion] =
     React.useState<QuestionWithUsage>();
   const tableRef =
-    React.createRef<MaterialTableCore<BasicUserDetailsFragment>>();
+    React.useRef<MaterialTableCore<BasicUserDetailsFragment>>(null);
 
   const { api } = useDataApiWithFeedback();
 
