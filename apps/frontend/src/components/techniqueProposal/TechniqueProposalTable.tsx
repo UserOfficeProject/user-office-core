@@ -1150,7 +1150,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         <Form>
                           <PromptIfDirty />
                           <Grid container spacing={2}>
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                               <Editor
                                 initialValue={''}
                                 id={`${unsuccessfullPK}-rejection-comment`}
@@ -1173,7 +1173,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                                 disabled={isSubmitting}
                               />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                               <StyledButtonContainer>
                                 <Button
                                   type="submit"
@@ -1225,13 +1225,15 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               searchText: search || undefined,
               selection: true,
               headerSelectionProps: {
-                inputProps: { 'aria-label': 'Select All Rows' },
+                slotProps: { input: { 'aria-label': 'Select All Rows' } },
               },
               debounceInterval: 600,
               columnsButton: true,
               selectionProps: (rowdata: ProposalViewData) => ({
-                inputProps: {
-                  'aria-label': `${rowdata.title}-select`,
+                slotProps: {
+                  input: {
+                    'aria-label': `${rowdata.title}-select`,
+                  },
                 },
               }),
               pageSize: pageSize ? +pageSize : 5,

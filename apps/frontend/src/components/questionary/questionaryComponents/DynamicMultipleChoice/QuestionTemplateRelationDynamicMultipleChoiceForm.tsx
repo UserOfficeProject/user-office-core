@@ -167,7 +167,9 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                   type="text"
                   component={TextField}
                   fullWidth
-                  inputProps={{ 'data-cy': 'dynamic-url' }}
+                  slotProps={{
+                    htmlInput: { 'data-cy': 'dynamic-url' },
+                  }}
                 />
               </div>
 
@@ -243,7 +245,9 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
                 type="text"
                 component={TextField}
                 fullWidth
-                inputProps={{ 'data-cy': 'dynamic-url-jsonPath' }}
+                slotProps={{
+                  htmlInput: { 'data-cy': 'dynamic-url-jsonPath' },
+                }}
               />
             </FormControl>
             <FormControl fullWidth>

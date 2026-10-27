@@ -39,7 +39,12 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <FormControl fullWidth>
           <InputLabel id="filter-category">Category</InputLabel>
           <Select
@@ -71,7 +76,12 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <FormControl fullWidth>
           <InputLabel id="filter-type">Type</InputLabel>
           <Select
