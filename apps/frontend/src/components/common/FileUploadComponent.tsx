@@ -71,7 +71,7 @@ export function FileEntry(props: {
         alignItems: 'center',
       }}
     >
-      <Grid sx={{ maxWidth: '50px' }} size={1}>
+      <Grid sx={{ maxWidth: '50px' }} size={{ xs: 2, md: 1 }}>
         <ListItemAvatar>
           <Avatar
             sx={{
@@ -83,7 +83,7 @@ export function FileEntry(props: {
           </Avatar>
         </ListItemAvatar>
       </Grid>
-      <Grid size={6}>
+      <Grid size={{ xs: 10, md: 6 }}>
         <Box
           sx={{
             display: 'flex',
@@ -154,7 +154,7 @@ export function FileEntry(props: {
           </Box>
         </Box>
       </Grid>
-      <Grid size={5}>
+      <Grid size={{ xs: 12, md: 5 }}>
         <Grid container spacing={1}>
           {props.metaData.mimeType.startsWith('image') && (
             <Grid size={6}>
@@ -162,9 +162,7 @@ export function FileEntry(props: {
                 label="Figure"
                 data-cy="image-figure"
                 defaultValue={props.figure || ''}
-                sx={{
-                  marginLeft: theme.spacing(2),
-                }}
+                sx={{ marginLeft: { xs: 0, md: theme.spacing(2) } }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
@@ -199,9 +197,7 @@ export function FileEntry(props: {
                 label="Image caption"
                 data-cy="image-caption"
                 defaultValue={props.caption || ''}
-                sx={{
-                  marginLeft: theme.spacing(2),
-                }}
+                sx={{ marginLeft: { xs: 0, md: theme.spacing(2) } }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
