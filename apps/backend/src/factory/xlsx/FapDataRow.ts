@@ -35,9 +35,11 @@ export function getDataRow({
   techReviewTimeAllocation,
   technicalReviewComment,
   propFapRankOrder,
+  instrumentId,
 }: FapDataRowInput): RowObj {
   return {
     proposalPk: proposalPk,
+    instrumentId: instrumentId,
     propShortCode: proposalId?.toString(),
     propTitle: proposalTitle,
     principalInv: piName,
