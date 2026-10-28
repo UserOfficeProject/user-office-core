@@ -382,11 +382,13 @@ export default class UserMutations {
 
     const userWithOAuthSubMatch = await this.dataSource.getByOIDCSub(oidcSub);
 
-    const institution = await this.userAuth.getOrCreateUserInstitution(
-      institutionInput.institutionData ?? institutionInput.rorId
-    );
+    const institution = institutionInput
+      ? await this.userAuth.getOrCreateUserInstitution(
+          institutionInput.institutionData ?? institutionInput.rorId
+        )
+      : null;
 
-    if (!institution) {
+    if (institutionInput && !institution) {
       return rejection('Invalid Input for the Institution', {
         institutionInput,
         args,
@@ -400,7 +402,7 @@ export default class UserMutations {
         firstname: firstName,
         lastname: lastName,
         oidcSub: oidcSub,
-        institutionId: institution.id,
+        ...(institution ? { institutionId: institution.id } : {}),
         preferredname: preferredName ?? undefined,
         userTitle: userTitle ?? undefined,
       });
@@ -415,7 +417,7 @@ export default class UserMutations {
         oidcSub,
         '',
         '',
-        institution.id,
+        institution?.id ?? null,
         email
       );
 

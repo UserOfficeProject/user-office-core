@@ -237,8 +237,8 @@ export interface UserRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
-  readonly institution_id: number;
-  readonly institution: string;
+  readonly institution_id: number | null;
+  readonly institution: string | null;
 }
 
 export interface VisitRegistrationRecord {
@@ -950,7 +950,7 @@ export const createUserObject = (user: UserRecord) => {
     user.oauth_refresh_token,
     user.oauth_issuer,
     user.institution_id,
-    user.institution,
+    user.institution ?? null,
     user.email,
     user.created_at.toISOString(),
     user.updated_at.toISOString()
@@ -965,11 +965,11 @@ export const createBasicUserObject = (
     user.firstname,
     user.lastname,
     user.preferredname,
-    user.institution,
+    user.institution ?? null,
     user.institution_id,
     user.created_at,
     user.email,
-    user.country,
+    user.country ?? null,
     user.user_title,
     user.oidc_sub
   );

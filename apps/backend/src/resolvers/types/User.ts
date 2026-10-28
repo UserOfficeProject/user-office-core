@@ -93,8 +93,8 @@ export class User implements Partial<UserOrigin> {
   @Field(() => String, { nullable: true })
   public oauthRefreshToken: string | null;
 
-  @Field(() => Int)
-  public institutionId: number;
+  @Field(() => Int, { nullable: true })
+  public institutionId: number | null;
 
   @Field()
   public email: string;
@@ -242,9 +242,11 @@ export class UserResolver {
     );
   }
 
-  @FieldResolver(() => Institution)
+  @FieldResolver(() => Institution, { nullable: true })
   async institution(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.admin.getInstitution(user.institutionId);
+    return user.institutionId
+      ? context.queries.admin.getInstitution(user.institutionId)
+      : null;
   }
 }
 

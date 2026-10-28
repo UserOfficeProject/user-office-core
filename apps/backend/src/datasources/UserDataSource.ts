@@ -63,7 +63,7 @@ export interface UserDataSource {
     oidc_sub: string,
     oauth_refreshtoken: string,
     oauth_issuer: string,
-    institution: number,
+    institution: number | null,
     email: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;

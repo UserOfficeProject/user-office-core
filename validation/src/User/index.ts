@@ -44,7 +44,7 @@ export const updateUserValidationSchema = Yup.object().shape({
   lastname: Yup.string().min(2).max(50).required(),
   userTitle: Yup.string().required(),
   email: Yup.string().email().required(),
-  institutionId: Yup.number().required(),
+  institutionId: Yup.number().nullable().notRequired(),
 });
 
 export const updateUserValidationBackendSchema = Yup.object().shape({
@@ -54,7 +54,7 @@ export const updateUserValidationBackendSchema = Yup.object().shape({
   lastname: Yup.string().min(2).max(50).notRequired(),
   userTitle: Yup.string().notRequired(),
   email: Yup.string().email().notRequired(),
-  institutionId: Yup.number().notRequired(),
+  institutionId: Yup.number().nullable().notRequired(),
 });
 
 export const updateUserRolesValidationSchema = Yup.object().shape({
@@ -118,7 +118,7 @@ export class UpsertUserByOidcSubArgs {
   public lastName: string;
   public preferredName: string | null;
   public oidcSub: string;
-  public institution: InstitutionInput;
+  public institution?: InstitutionInput | null;
   public email: string;
 }
 
@@ -130,32 +130,39 @@ export const upsertUserByOidcSubValidationSchema = Yup.object().shape({
   lastName: Yup.string().required(),
   preferredName: Yup.string().notRequired(),
   oidcSub: Yup.string().required(),
-  institution: Yup.object()
-    .shape({
-      rorId: Yup.string().matches(rorIdRegExp, {
-        message: 'rorId must be in the format https://ror.org/01wv9cn34',
-        excludeEmptyString: true,
-      }),
-      institutionData: Yup.lazy((value) =>
-        value == null
-          ? Yup.mixed().notRequired()
-          : Yup.object().shape({
-              name: Yup.string().required(),
-              country: Yup.string().required(),
+  institution: Yup.lazy((value) =>
+    value == null
+      ? Yup.mixed().notRequired()
+      : Yup.object()
+          .shape({
+            rorId: Yup.string().matches(rorIdRegExp, {
+              message: 'rorId must be in the format https://ror.org/01wv9cn34',
+              excludeEmptyString: true,
             }),
-      ),
-    })
-    .test(
-      'exactly-one-of-rorid-or-institutiondata',
-      'Exactly one of rorId or institutionData must be provided',
-      (institution) => {
-        const hasRorId = !!institution?.rorId?.trim();
-        const hasInstitutionData =
-          institution?.institutionData !== undefined && institution?.institutionData !== null;
+            institutionData: Yup.lazy((institutionData) =>
+              institutionData == null
+                ? Yup.mixed().notRequired()
+                : Yup.object().shape({
+                    name: Yup.string().required(),
+                    country: Yup.string().required(),
+                  }),
+            ),
+          })
+          .test(
+            'exactly-one-of-rorid-or-institutiondata',
+            'Exactly one of rorId or institutionData must be provided',
+            (institution) => {
+              const hasRorId = !!institution?.rorId?.trim();
+              const hasInstitutionData =
+                institution?.institutionData !== undefined &&
+                institution.institutionData !== null;
 
-        return (hasRorId && !hasInstitutionData) || (!hasRorId && hasInstitutionData);
-      },
-    )
-    .required(),
+              return (
+                (hasRorId && !hasInstitutionData) ||
+                (!hasRorId && hasInstitutionData)
+              );
+            },
+          ),
+  ),
   email: Yup.string().email().required(),
 });

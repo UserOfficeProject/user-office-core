@@ -253,6 +253,7 @@ const AssignmentsTable = ({
 
       const selectedReviewerWithSameInstitutionAsPI = memberUsers.find(
         (member) =>
+          member.institutionId != null &&
           member.institutionId === fapProposal.proposal.proposer?.institutionId
       );
 
@@ -266,7 +267,9 @@ const AssignmentsTable = ({
       const selectedReviewerWithSameInstitutionAsCoProposers =
         memberUsers.filter((member) =>
           fapProposal.proposal.users.find(
-            (user) => user.institutionId === member.institutionId
+            (user) =>
+              member.institutionId != null &&
+              user.institutionId === member.institutionId
           )
         );
 

@@ -25,6 +25,6 @@ export class UserJWT implements Partial<UserJWTOrigin> {
   @Field()
   public created: string;
 
-  @Field()
-  public institutionId: number;
+  @Field(() => Int, { nullable: true })
+  public institutionId: number | null;
 }

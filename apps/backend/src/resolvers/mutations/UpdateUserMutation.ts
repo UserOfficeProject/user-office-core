@@ -27,7 +27,7 @@ class UpdateUserArgs {
   public preferredname?: string;
 
   @Field(() => Int, { nullable: true })
-  public institutionId?: number;
+  public institutionId?: number | null;
 
   @Field(() => String, { nullable: true })
   public email?: string;

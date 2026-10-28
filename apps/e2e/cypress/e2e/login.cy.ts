@@ -12,6 +12,19 @@ context('User login tests', () => {
     cy.visit('/');
   });
   describe('OAuth login', () => {
+    it('Should create a user without an institution when none is provided', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        this.skip();
+      }
+
+      cy.upsertUserByOidc({
+        oidcSub: 'user-without-institution',
+        email: 'user.without.institution@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+      });
+    });
+
     it('Should create new entry for institution, if a users institution is not present', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
