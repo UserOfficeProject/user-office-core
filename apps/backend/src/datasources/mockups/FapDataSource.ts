@@ -205,7 +205,8 @@ export class FapDataSourceMock implements FapDataSource {
     fapId?: number
   ): Promise<Fap[]> {
     if (userId && role) {
-      return userId === 3 ? [] : dummyFaps;
+      // User 3 and the plain proposal member (113) are deliberately on no Fap.
+      return [3, 113].includes(userId) ? [] : dummyFaps;
     }
 
     return [];
@@ -221,6 +222,10 @@ export class FapDataSourceMock implements FapDataSource {
     }
 
     throw new Error(`Fap not found ${args.fapId}`);
+  }
+
+  async getInstrumentCodes(fapId: number, proposalPk: number): Promise<string> {
+    return 'INST1, INST2';
   }
 
   async assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap> {
@@ -291,6 +296,7 @@ export class FapDataSourceMock implements FapDataSource {
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal> {
     throw new Error('Method not implemented: updateTimeAllocation');

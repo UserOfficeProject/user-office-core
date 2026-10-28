@@ -1,4 +1,4 @@
-import React, { lazy, useContext } from 'react';
+import React, { lazy as reactLazy, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
@@ -20,6 +20,18 @@ import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
+
+// After a deploy, open tabs may request old chunks that no longer exist. The
+// vite:preloadError handler in index.tsx suppresses the error so it can reload
+// or show a retry snackbar, which makes the import resolve to undefined.
+// Returning a never-resolving promise keeps the Suspense fallback up instead
+// of letting React.lazy throw into the error boundary.
+const neverResolvingPromise = new Promise<never>(() => {});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lazy = <T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) => reactLazy(async () => (await factory()) ?? neverResolvingPromise);
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
@@ -319,7 +331,7 @@ const AppRoutes = () => {
         {isFapEnabled && (
           <Route
             path="/FapPage/:id"
-            element={<TitledRoute title={t('Fap')} element={<FapPage />} />}
+            element={<TitledRoute title={t('FAP')} element={<FapPage />} />}
           />
         )}
         {isFapEnabled && (
@@ -327,7 +339,7 @@ const AppRoutes = () => {
             path="/Faps"
             element={
               <TitledRoute
-                title={i18n.format(t('Fap'), 'plural')}
+                title={i18n.format(t('FAP'), 'plural')}
                 element={<FapsPage />}
               />
             }

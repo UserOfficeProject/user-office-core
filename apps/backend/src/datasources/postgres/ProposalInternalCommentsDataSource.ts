@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
@@ -14,7 +15,7 @@ import {
 export default class PostgresProposalInternalCommentsDataSource
   implements ProposalInternalCommentsDataSource
 {
-  async create(
+  async createInternalComment(
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     try {
@@ -36,7 +37,7 @@ export default class PostgresProposalInternalCommentsDataSource
       throw new GraphQLError('Error while creating proposal internal comment');
     }
   }
-  async update(
+  async updateInternalComment(
     args: UpdateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment> {
     try {
@@ -59,6 +60,51 @@ export default class PostgresProposalInternalCommentsDataSource
         `Error while updating proposal internal comment id: ${args.commentId}`
       );
     }
+  }
+  async createRejectionComment(
+    args: CreateProposalInternalCommentArgs
+  ): Promise<ProposalInternalComment> {
+    try {
+      const [proposalRejectionComment]: ProposalInternalCommentRecord[] =
+        await database.transaction(async (trx) => {
+          await trx('proposal_rejection_comments')
+            .where('proposal_pk', args.proposalPk)
+            .del();
+
+          return trx('proposal_rejection_comments')
+            .insert({
+              proposal_pk: args.proposalPk,
+              comment: args.comment,
+            })
+            .returning('*');
+        });
+      if (!proposalRejectionComment) {
+        throw new GraphQLError(
+          'Proposal rejection comment could not be created'
+        );
+      }
+
+      return createProposalInternalCommentObject(proposalRejectionComment);
+    } catch (error) {
+      logger.logException(
+        'Could not create proposal rejection comment',
+        error,
+        { args }
+      );
+      throw new GraphQLError('Error while creating proposal rejection comment');
+    }
+  }
+  async getProposalRejectionComment(
+    proposalPk: number
+  ): Promise<ProposalInternalComment | null> {
+    return await database
+      .select<ProposalInternalCommentRecord>()
+      .from('proposal_rejection_comments')
+      .where('proposal_pk', proposalPk)
+      .first()
+      .then((comment) =>
+        comment ? createProposalInternalCommentObject(comment) : null
+      );
   }
 
   async delete(commentId: number): Promise<ProposalInternalComment> {

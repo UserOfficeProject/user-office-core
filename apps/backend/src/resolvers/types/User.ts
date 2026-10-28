@@ -26,6 +26,21 @@ import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { User as UserOrigin } from '../../models/User';
 import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
+@InputType()
+export class OrderByCollection {
+  @Field(() => Int)
+  orderBy: number;
+
+  @Field()
+  orderDirection: string;
+
+  //On inital load of page materialUI sets this value as undefined.
+  @Field(() => Int, { nullable: true })
+  sortOrder?: number;
+
+  @Field()
+  orderByField: string;
+}
 
 @InputType()
 export class UserProposalsFilter {
@@ -164,19 +179,27 @@ export class UserResolver {
     @Arg('filter', () => UserProposalsFilter, { nullable: true })
     filter: UserProposalsFilter,
     @Arg('first', () => Int, { nullable: true }) first?: number,
-    @Arg('offset', () => Int, { nullable: true }) offset?: number
+    @Arg('offset', () => Int, { nullable: true }) offset?: number,
+    @Arg('orderByCollectionList', () => [OrderByCollection], { nullable: true })
+    orderByCollectionList?: [OrderByCollection]
   ) {
     return context.queries.proposal.dataSource.getUserProposals(
       user.id,
       filter,
       first,
-      offset
+      offset,
+      orderByCollectionList
     );
   }
 
   @FieldResolver(() => [Invite])
   async coProposerInvites(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.invite.getPendingCoProposerInvites(context.user);
+  }
+
+  @FieldResolver(() => [Invite])
+  async dataAccessInvites(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.invite.getPendingDataAccessInvites(context.user);
   }
 
   @FieldResolver(() => [Experiment])
@@ -206,11 +229,16 @@ export class UserResolver {
 
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
-    const agentId = context.user?.currentRole?.id;
+    const agentRoleId = context.user?.currentRole?.id;
+    const tags = agentRoleId
+      ? await context.queries.instrument.roleDataSource.getTagsByRoleId(
+          agentRoleId
+        )
+      : [];
 
     return context.queries.instrument.dataSource.getUserInstruments(
       user.id,
-      agentId!
+      tags.map((tag) => tag.id)
     );
   }
 

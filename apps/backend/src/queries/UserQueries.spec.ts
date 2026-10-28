@@ -12,14 +12,22 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import UserQueries from './UserQueries';
+import { Tokens } from '../config/Tokens';
 import {
   basicDummyUser,
   basicDummyUserNotOnProposal,
+  dummyProposalMemberWithRole,
+  dummySecondVisitorWithRole,
+  dummyThirdVisitorWithRole,
   dummyUser,
+  dummyUserNotOnProposalWithRole,
   dummyUserOfficer,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
+  dummyVisitorWithRole,
+  dummyVisitTeamLeadWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import {
   AuthJwtApiTokenPayload,
   AuthJwtPayload,
@@ -72,6 +80,55 @@ describe('UserQueries', () => {
 
   test('A user is not allowed to fetch roles', () => {
     return expect(userQueries.getRoles(dummyUserWithRole)).resolves.toBe(null);
+  });
+
+  /*
+   * Visit 5 sits on proposal 1. Its team lead and visitors are not members of
+   * that proposal, so the only thing that can grant a proposal member sight of
+   * them is the visit itself.
+   */
+  describe('getBasic for the people on a visit', () => {
+    const visitDataSource = container.resolve<VisitDataSourceMock>(
+      Tokens.VisitDataSource
+    );
+
+    beforeEach(() => {
+      visitDataSource.init();
+    });
+
+    test('A member of the proposal can read the basic details of the visit team lead', async () => {
+      const teamLead = await userQueries.getBasic(
+        dummyProposalMemberWithRole,
+        dummyVisitTeamLeadWithRole.id
+      );
+
+      expect(teamLead).toHaveProperty('id', dummyVisitTeamLeadWithRole.id);
+    });
+
+    test.each([
+      ['the first visitor', dummyVisitorWithRole.id],
+      ['the second visitor', dummySecondVisitorWithRole.id],
+      ['the third visitor', dummyThirdVisitorWithRole.id],
+    ])(
+      'A member of the proposal can read the basic details of %s',
+      async (_label, visitorId) => {
+        const visitor = await userQueries.getBasic(
+          dummyProposalMemberWithRole,
+          visitorId
+        );
+
+        expect(visitor).toHaveProperty('id', visitorId);
+      }
+    );
+
+    test('A user who is on neither the proposal nor the visit can not read the team lead', async () => {
+      const teamLead = await userQueries.getBasic(
+        dummyUserNotOnProposalWithRole,
+        dummyVisitTeamLeadWithRole.id
+      );
+
+      expect(teamLead).toBeNull();
+    });
   });
 
   describe('checkToken', () => {

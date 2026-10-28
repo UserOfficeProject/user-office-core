@@ -16,6 +16,7 @@ import { isEveryFapReviewSubmittedForProposalGuard } from '../workflowEngine/gua
 import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapSubmittedReviewRequirementMetForProposalGuard';
 import { isEveryFeasibilityReviewFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewFeasibleForProposalGuard';
 import { isEveryFeasibilityReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewSubmittedForProposalGuard';
+import { isEveryFeasibilityReviewUnFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewUnFeasibleForProposalGuard';
 import { isProposalAcceptedGuard } from '../workflowEngine/guards/isProposalAcceptedGuard';
 import { isProposalAssignedToTechniquesGuard } from '../workflowEngine/guards/isProposalAssignedToTechniquesGuard';
 import { isProposalBookingTimeActivatedGuard } from '../workflowEngine/guards/isProposalBookingTimeActivatedGuard';
@@ -52,6 +53,7 @@ export enum Event {
   PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED = 'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
   PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_SUBMITTED',
   PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_FEASIBLE',
+  PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE',
   PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
   PROPOSAL_SAMPLE_SAFE = 'PROPOSAL_SAMPLE_SAFE',
   PROPOSAL_ALL_FAP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_FAP_REVIEWERS_SELECTED',
@@ -105,6 +107,9 @@ export enum Event {
   PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
   PROPOSAL_CO_PROPOSER_INVITE_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_SENT',
   PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
+  PROPOSAL_DATA_ACCESS_INVITES_UPDATED = 'PROPOSAL_DATA_ACCESS_INVITES_UPDATED',
+  PROPOSAL_DATA_ACCESS_INVITE_SENT = 'PROPOSAL_DATA_ACCESS_INVITE_SENT',
+  PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED = 'PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED',
   PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED = 'PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED',
   PROPOSAL_VISIT_REGISTRATION_INVITE_SENT = 'PROPOSAL_VISIT_REGISTRATION_INVITE_SENT',
   PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED',
@@ -220,6 +225,14 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
       label:
         'Event occurs when every feasibility review on a proposal is feasible',
       guard: isEveryFeasibilityReviewFeasibleForProposalGuard,
+    },
+  ],
+  [
+    Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE,
+    {
+      label:
+        'Event occurs when every feasibility review on a proposal is unfeasible',
+      guard: isEveryFeasibilityReviewUnFeasibleForProposalGuard,
     },
   ],
   [
@@ -476,6 +489,24 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label:
         'Event occurs when user accepts the co-proposer claim for a proposal',
+    },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED,
+    {
+      label:
+        'Event occurs when data access user invites are updated for a proposal',
+    },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITE_SENT,
+    { label: 'Event occurs when data access user invite is sent to a user' },
+  ],
+  [
+    Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED,
+    {
+      label:
+        'Event occurs when user accepts the data access claim for a proposal',
     },
   ],
   [

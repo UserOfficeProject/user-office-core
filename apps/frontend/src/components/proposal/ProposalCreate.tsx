@@ -49,6 +49,7 @@ export function createProposalStub(
     submitted: false,
     users: [],
     coProposerInvites: [],
+    dataAccessInvites: [],
     samples: [],
     genericTemplates: [],
     call: call,

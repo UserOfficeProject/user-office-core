@@ -88,6 +88,7 @@ export function createTechnicalReviewStub(
       submitted: false,
       users: [],
       coProposerInvites: [],
+      dataAccessInvites: [],
       samples: [],
       genericTemplates: [],
       commentForManagement: '',

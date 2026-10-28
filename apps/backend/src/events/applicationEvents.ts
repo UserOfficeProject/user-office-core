@@ -119,6 +119,11 @@ interface ProposalALLFeasibilityReviewFeasibleEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalALLFeasibilityReviewUnFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalFapReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_REVIEW_SUBMITTED;
   review: Review;
@@ -238,6 +243,24 @@ interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
 
 interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED;
+  invite: Invite;
+  proposalPKey: number;
+}
+
+interface ProposalDataAccessInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITES_UPDATED;
+  array: Invite[];
+  proposalPKey: number;
+}
+
+interface ProposalDataAccessInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITE_SENT;
+  invite: Invite;
+  proposalPKey: number;
+}
+
+interface ProposalDataAccessInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED;
   invite: Invite;
   proposalPKey: number;
 }
@@ -519,6 +542,7 @@ export type ApplicationEvent =
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewFeasibleEvent
+  | ProposalALLFeasibilityReviewUnFeasibleEvent
   | ProposalFapReviewUpdatedEvent
   | ProposalFapReviewSubmittedEvent
   | ProposalAllFapReviewsSubmittedEvent
@@ -541,6 +565,9 @@ export type ApplicationEvent =
   | ProposalCoProposerInvitesUpdatedEvent
   | ProposalCoProposerInviteSentEvent
   | ProposalCoProposerInviteAcceptedEvent
+  | ProposalDataAccessInvitesUpdatedEvent
+  | ProposalDataAccessInviteSentEvent
+  | ProposalDataAccessInviteAcceptedEvent
   | ProposalVisitRegistrationInvitesUpdatedEvent
   | ProposalVisitRegistrationInviteSentEvent
   | ProposalVisitRegistrationInviteAcceptedEvent

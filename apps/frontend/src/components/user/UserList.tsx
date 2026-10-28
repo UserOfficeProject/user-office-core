@@ -7,6 +7,8 @@ import UserListItem from './UserListItem';
 
 interface UserListProps {
   users: BasicUserDetails[];
+  /** Emails of people invited but not yet registered; shown with an "(invited)" marker. */
+  invitedEmails?: string[];
   initVisibleItems?: number;
   'data-cy'?: string;
 }
@@ -23,18 +25,20 @@ const StyledList = styled(List)(() => ({
 
 const UserList: React.FC<UserListProps> = ({
   users,
+  invitedEmails = [],
   initVisibleItems = 4,
   'data-cy': dataCy = 'user-list',
 }) => {
   const [showAll, setShowAll] = useState(false);
 
-  if (!users || users.length === 0) {
+  if ((!users || users.length === 0) && invitedEmails.length === 0) {
     return null;
   }
 
-  const initialUsers = users.slice(0, initVisibleItems);
-  const hiddenUsers = users.slice(initVisibleItems);
-  const hasMore = users.length > initVisibleItems;
+  const safeUsers = users || [];
+  const initialUsers = safeUsers.slice(0, initVisibleItems);
+  const hiddenUsers = safeUsers.slice(initVisibleItems);
+  const hasMore = safeUsers.length > initVisibleItems;
 
   return (
     <div data-cy={dataCy}>
@@ -64,6 +68,15 @@ const UserList: React.FC<UserListProps> = ({
         >
           {showAll ? 'Show less...' : 'Show more...'}
         </Button>
+      )}
+      {invitedEmails.length > 0 && (
+        <StyledList data-cy="invited-emails-list">
+          {invitedEmails.map((email) => (
+            <ListItem key={email} disableGutters>
+              {email} (invited)
+            </ListItem>
+          ))}
+        </StyledList>
       )}
     </div>
   );

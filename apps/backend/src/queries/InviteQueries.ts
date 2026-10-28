@@ -23,16 +23,34 @@ export default class InviteQueries {
   async getCoProposerInvites(agent: UserWithRole | null, proposalPk: number) {
     const hasReadRights =
       this.userAuth.isApiToken(agent) ||
-      this.proposalAuth.hasReadRights(agent, proposalPk);
+      (await this.proposalAuth.hasReadRights(agent, proposalPk));
 
     if (!hasReadRights) {
       return [];
     }
 
-    const invites = await this.dataSource.findCoProposerInvites(
+    const invites = await this.dataSource.getCoProposerInvites({
       proposalPk,
-      false
-    );
+      isClaimed: false,
+    });
+
+    return invites;
+  }
+
+  @Authorized()
+  async getDataAccessInvites(agent: UserWithRole | null, proposalPk: number) {
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposalPk));
+
+    if (!hasReadRights) {
+      return [];
+    }
+
+    const invites = await this.dataSource.getDataAccessInvites({
+      proposalPk,
+      isClaimed: false,
+    });
 
     return invites;
   }
@@ -44,7 +62,7 @@ export default class InviteQueries {
   ) {
     const hasReadRights =
       this.userAuth.isApiToken(agent) ||
-      this.visitAuth.hasReadRights(agent, visitId);
+      (await this.visitAuth.hasReadRights(agent, visitId));
 
     if (!hasReadRights) {
       return [];
@@ -65,6 +83,21 @@ export default class InviteQueries {
     }
 
     const invites = await this.dataSource.getCoProposerInvites({
+      email: agent.email,
+      isClaimed: false,
+      isExpired: false,
+    });
+
+    return invites;
+  }
+
+  @Authorized()
+  async getPendingDataAccessInvites(agent: UserWithRole | null) {
+    if (!agent) {
+      return [];
+    }
+
+    const invites = await this.dataSource.getDataAccessInvites({
       email: agent.email,
       isClaimed: false,
       isExpired: false,

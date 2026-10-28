@@ -134,7 +134,7 @@ export class InternalReviewDataSourceMock implements InternalReviewDataSource {
     }
   }
   async isInternalReviewer(userId: number) {
-    return true;
+    return dummyReviews.some((review) => review.reviewerId === userId);
   }
 
   async getAllReviewersOnInternalReview(id: number) {

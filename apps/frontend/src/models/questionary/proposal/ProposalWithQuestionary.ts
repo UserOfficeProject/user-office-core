@@ -17,6 +17,7 @@ export type ProposalWithQuestionary = Pick<
   | 'users'
   | 'dataAccessUsers'
   | 'coProposerInvites'
+  | 'dataAccessInvites'
   | 'title'
   | 'proposalId'
   | 'callId'

@@ -55,7 +55,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
 
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
-    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
@@ -303,9 +303,9 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     {
       title: 'Teamleader',
       render: (rowData: RowType) =>
-        rowData.userId === experiment.visit?.teamLead.id ? 'Yes' : 'No',
+        rowData.userId === experiment.visit?.teamLead?.id ? 'Yes' : 'No',
       customSort: (a: RowType) => {
-        return a.userId === experiment.visit?.teamLead.id ? 1 : -1;
+        return a.userId === experiment.visit?.teamLead?.id ? 1 : -1;
       },
     },
     {

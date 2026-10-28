@@ -1,0 +1,5 @@
+mutation acceptDataAccessInvite($proposalId: String!) {
+  acceptDataAccessInvite(proposalId: $proposalId) {
+    ...invite
+  }
+}

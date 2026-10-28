@@ -16,9 +16,7 @@ export function useUserExperiments({
   notDraft?: boolean;
   instrumentId?: number | null;
 }) {
-  const [userExperiments, setUserUpcomingExperiments] = useState<
-    UserExperiment[]
-  >([]);
+  const [userExperiments, setUserExperiments] = useState<UserExperiment[]>([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -44,15 +42,15 @@ export function useUserExperiments({
         }
 
         if (data.me?.experiments) {
-          setUserUpcomingExperiments(data.me?.experiments);
-          setLoading(false);
+          setUserExperiments(data.me.experiments);
         }
+        setLoading(false);
       });
 
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, notDraft, onlyUpcoming, instrumentId]);
 
-  return { userExperiments, setUserUpcomingExperiments, loading };
+  return { userExperiments, setUserExperiments, loading };
 }

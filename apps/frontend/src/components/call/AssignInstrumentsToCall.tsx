@@ -46,7 +46,7 @@ const FapSelectionComponent = ({
       options={fapOptions}
       isOptionEqualToValue={(option, value) => option.value === value.value}
       renderInput={(params) => (
-        <TextField {...params} label={t('Fap')} margin="none" />
+        <TextField {...params} label={t('FAP')} margin="none" />
       )}
       onChange={(_event, newValue) => {
         onChange(id, newValue?.value || null);

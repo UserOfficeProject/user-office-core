@@ -5,14 +5,22 @@ import {
 } from '../resolvers/types/ProposalInternalComment';
 
 export interface ProposalInternalCommentsDataSource {
-  create(
+  createInternalComment(
     args: CreateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment>;
 
-  update(
+  updateInternalComment(
     args: UpdateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment | null>;
   getProposalInternalComment(
+    proposalPk: number
+  ): Promise<ProposalInternalComment | null>;
+
+  createRejectionComment(
+    args: CreateProposalInternalCommentArgs
+  ): Promise<ProposalInternalComment>;
+
+  getProposalRejectionComment(
     proposalPk: number
   ): Promise<ProposalInternalComment | null>;
 }

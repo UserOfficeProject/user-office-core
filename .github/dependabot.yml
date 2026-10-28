@@ -69,3 +69,21 @@ updates:
     versioning-strategy: increase-if-necessary
     cooldown:
       default-days: 7
+
+  - package-ecosystem: 'docker'
+    directories:
+      - '/apps/backend'
+      - '/apps/frontend'
+    schedule:
+      interval: 'weekly'
+      day: 'sunday'
+      time: '10:00'
+    open-pull-requests-limit: 1
+    pull-request-branch-name:
+      separator: '-'
+    allow:
+      - update-types:
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
+    cooldown:
+      default-days: 7

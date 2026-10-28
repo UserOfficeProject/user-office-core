@@ -26,6 +26,7 @@ export type RowObj = {
   fapTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propFapRankOrder: number | null;
+  instrumentId: number;
   inAvailZone?: string | null;
   feedback?: string;
   timeRequested?: number;

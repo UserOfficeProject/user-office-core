@@ -9,6 +9,7 @@ import { AllocationTimeUnitConverter } from '../config/base/allocationTimeUnitCo
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { DataAccessClaimDataSource } from '../datasources/DataAccessClaimDataSource';
 import {
   DataAccessUsersDataSource,
   UserWithInstitution,
@@ -16,6 +17,7 @@ import {
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -29,14 +31,16 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { areDependenciesSatisfied } from '../models/ProposalModelFunctions';
 import { Sample } from '../models/Sample';
+import { TemplateGroupId } from '../models/Template';
 import { Visit } from '../models/Visit';
 import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
-import { WorkflowEngine } from '../workflowEngine';
 import proposalWorkflowEntity from './workflowEntities/proposal';
+import { startWorkflow } from './workflowHandler';
 
 export const QUEUE_NAME =
   (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
@@ -87,6 +91,11 @@ type ExperimentMessageData = {
   proposal?: ProposalMessageData;
   samples?: Pick<Sample, 'id' | 'title'>[];
   instrument?: { id: number; name: string; shortCode: string };
+};
+
+type VisitRegistrationAnswerMessageData = {
+  questionNaturalKey: string;
+  value: unknown;
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -318,18 +327,64 @@ export const getVisitMessageData = async (
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
-
-  const proposal = await proposalDataSource.getProposalByVisitId(
-    visitRegistration.visitId
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
   );
+  const templateDataSource = container.resolve<TemplateDataSource>(
+    Tokens.TemplateDataSource
+  );
+
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
+  const [proposal, visitor] = await Promise.all([
+    proposalDataSource.getProposalByVisitId(visitRegistration.visitId),
+    userDataSource.getUser(visitRegistration.userId),
+  ]);
+
+  if (!visitor) {
+    throw new Error(`Visitor with id ${visitRegistration.userId} not found`);
+  }
+
   const proposalPayload = await getProposalMessageData(proposal);
+
+  const registrationAnswers: VisitRegistrationAnswerMessageData[] = [];
+  if (visitRegistration.registrationQuestionaryId !== null) {
+    const questionary = await questionaryDataSource.getQuestionary(
+      visitRegistration.registrationQuestionaryId
+    );
+    const template = questionary
+      ? await templateDataSource.getTemplate(questionary.templateId)
+      : null;
+
+    if (template?.groupId === TemplateGroupId.VISIT_REGISTRATION) {
+      const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+        visitRegistration.registrationQuestionaryId
+      );
+
+      registrationAnswers.push(
+        ...questionarySteps.flatMap((step) =>
+          step.fields
+            .filter((field) =>
+              areDependenciesSatisfied(questionarySteps, field.question.id)
+            )
+            .map((field) => ({
+              questionNaturalKey: field.question.naturalKey,
+              value: field.value,
+            }))
+        )
+      );
+    }
+  }
 
   const visitJsonMessage = JSON.stringify({
     id: visitRegistration.id,
     startAt: visitRegistration.startsAt,
     endAt: visitRegistration.endsAt,
-    visitorId: visitRegistration.userId.toString(),
+    visitorId: visitor.oidcSub,
     proposal: JSON.parse(proposalPayload),
+    registrationAnswers,
   });
 
   return visitJsonMessage;
@@ -349,6 +404,11 @@ export async function createPostToRabbitMQHandler() {
   const coProposerClaimDataSource =
     container.resolve<CoProposerClaimDataSource>(
       Tokens.CoProposerClaimDataSource
+    );
+
+  const dataAccessClaimDataSource =
+    container.resolve<DataAccessClaimDataSource>(
+      Tokens.DataAccessClaimDataSource
     );
 
   const userDataSource = container.resolve<UserDataSource>(
@@ -420,6 +480,29 @@ export async function createPostToRabbitMQHandler() {
           const proposal = await proposalDataSource.get(claim.proposalPk);
           if (!proposal) {
             return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
+        break;
+      }
+      case Event.PROPOSAL_DATA_ACCESS_INVITE_ACCEPTED: {
+        const { invite } = event;
+
+        const claims = await dataAccessClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            continue;
           }
 
           const jsonMessage = await getProposalMessageData(proposal);
@@ -609,8 +692,6 @@ export async function createListenToRabbitMQHandler() {
     Tokens.VisitDataSource
   );
 
-  const workflowEngine = container.resolve(WorkflowEngine);
-
   const handleProposalWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -619,11 +700,9 @@ export async function createListenToRabbitMQHandler() {
       throw new Error('Proposal id not found in the message');
     }
 
-    await workflowEngine.run(
-      {
-        event: eventType,
-        entities: [proposalPk],
-      },
+    await startWorkflow(
+      { type: eventType },
+      proposalPk,
       proposalWorkflowEntity
     );
   };

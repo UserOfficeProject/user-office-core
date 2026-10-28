@@ -9,6 +9,7 @@ import { FapDataSource } from '../../../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../../../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../../../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../../../datasources/postgres/StatusActionsLogsDataSource';
+import { ProposalInternalCommentsDataSource } from '../../../datasources/ProposalInternalCommentsDataSource';
 import { QuestionaryDataSource } from '../../../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../../../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../../../datasources/TechniqueDataSource';
@@ -79,6 +80,7 @@ export type EmailReadyType = {
   proposalTemplate?: string;
   samples?: Answer[];
   hazards?: Answer[];
+  rejectionComment?: string;
   fapMeetingDecisions?: FapMeetingDecision[] | null;
   technicalReviews?: TechnicalReview[] | null;
   call?: Call | null;
@@ -167,6 +169,8 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
   const templateDataSource: TemplateDataSource = container.resolve(
     Tokens.TemplateDataSource
   );
+  const proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource =
+    container.resolve(Tokens.ProposalInternalCommentsDataSource);
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
@@ -209,6 +213,10 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         const questionary = await questionaryDataSource.getQuestionary(
           proposal.questionaryId
         );
+        const proposalRejectionComment =
+          await proposalInternalCommentsDataSource.getProposalRejectionComment(
+            proposal.primaryKey
+          );
 
         const templateId = questionary ? questionary?.templateId : -1;
         if (templateId == -1) {
@@ -219,7 +227,6 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         }
         const template = await templateDataSource.getTemplate(templateId);
         proposalTemplateName = templateId ? template?.name : '';
-
         const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatus: 'QUICK_REVIEW',
@@ -274,6 +281,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           proposalTemplate: proposalTemplateName,
           samples: sampleAnswers,
           hazards: hazardAnswers,
+          rejectionComment: proposalRejectionComment?.comment,
           fapMeetingDecisions,
           technicalReviews,
           call,

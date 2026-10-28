@@ -42,13 +42,17 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CreateProposalRejectionCommentArgs } from '../resolvers/mutations/CreateProposalRejectionCommentMutation';
 import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
-import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { CloneUtils } from '../utils/CloneUtils';
+import {
+  ProposalScientistComment,
+  ProposalRejectionComment,
+} from '../resolvers/types/ProposalView';
+import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
@@ -485,11 +489,11 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
-    if (commentForUser !== undefined) {
+    if (commentForUser !== undefined && finalStatus !== null) {
       proposal.commentForUser = commentForUser;
     }
 
-    if (commentForManagement !== undefined) {
+    if (commentForManagement !== undefined && finalStatus !== null) {
       proposal.commentForManagement = commentForManagement;
     }
 
@@ -528,10 +532,38 @@ export default class ProposalMutations {
     }
 
     return await this.proposalInternalCommentsDataSource
-      .create(args)
+      .createInternalComment(args)
       .catch((error) => {
         return rejection(
           'Could not create proposal scientist comment',
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async createProposalRejectionComment(
+    agent: UserWithRole | null,
+    args: CreateProposalRejectionCommentArgs
+  ): Promise<ProposalRejectionComment | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Could not create proposal rejection comment because proposal not found',
+        {
+          agent,
+          proposalPk: args.proposalPk,
+        }
+      );
+    }
+
+    return await this.proposalInternalCommentsDataSource
+      .createRejectionComment(args)
+      .catch((error) => {
+        return rejection(
+          'Could not create proposal rejection comment',
           { agent, args: args },
           error
         );
@@ -545,7 +577,7 @@ export default class ProposalMutations {
     args: UpdateProposalScientistCommentArgs
   ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
-      .update(args)
+      .updateInternalComment(args)
       .catch((error) => {
         return rejection(
           `Could not update proposal scientist comment: '${args.commentId}'`,
@@ -850,15 +882,21 @@ export default class ProposalMutations {
     }
 
     const checkIfInternalCallActive = agent?.isInternalUser || false;
-    // Check if there is an open call
-    if (
-      await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
-    ) {
-      return rejection('Cannot clone the proposal because the call has ended', {
-        callId,
-        agent,
-        sourceProposal,
-      });
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    // User Officers can clone proposals to closed calls
+    if (!isUserOfficer) {
+      if (
+        await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
+      ) {
+        return rejection(
+          'Cannot clone the proposal because the call has ended',
+          {
+            callId,
+            agent,
+            sourceProposal,
+          }
+        );
+      }
     }
 
     const call = await this.callDataSource.getCall(callId);
@@ -1139,14 +1177,14 @@ export default class ProposalMutations {
     }
 
     if (techniqueIds) {
-      this.techniqueDataSource.assignProposalToTechniques(
+      await this.techniqueDataSource.assignProposalToTechniques(
         submittedProposal.primaryKey,
         techniqueIds
       );
     }
 
     if (instrumentId) {
-      this.instrumentDataSource.assignProposalToInstrument(
+      await this.instrumentDataSource.assignProposalToInstrument(
         submittedProposal.primaryKey,
         instrumentId
       );

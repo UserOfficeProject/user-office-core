@@ -4,29 +4,6 @@ import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
-import { Call } from '../../models/Call';
-import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
-import { ProposalView } from '../../models/ProposalView';
-import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
-import { ReviewerFilter } from '../../models/Review';
-import { Roles } from '../../models/Role';
-import { SettingsId } from '../../models/Settings';
-import { TechnicalReview } from '../../models/TechnicalReview';
-import { Technique } from '../../models/Technique';
-import { UserWithRole } from '../../models/User';
-import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import { UserProposalsFilter } from '../../resolvers/types/User';
-import { PaginationSortDirection } from '../../utils/pagination';
-import { AdminDataSource } from '../AdminDataSource';
-import { ProposalDataSource } from '../ProposalDataSource';
-import { TagDataSource } from '../TagDataSource';
-import { WorkflowDataSource } from '../WorkflowDataSource';
-import {
-  InstrumentFilterInput,
-  ProposalsFilter,
-  QuestionFilterInput,
-} from './../../resolvers/queries/ProposalsQuery';
 import CallDataSource from './CallDataSource';
 import database from './database';
 import {
@@ -42,12 +19,36 @@ import {
   TechniqueRecord,
   WorkflowStatusRecord,
 } from './records';
+import { Tokens } from '../../config/Tokens';
+import { Call } from '../../models/Call';
+import { InvitedProposal, Proposal, Proposals } from '../../models/Proposal';
+import { ProposalView } from '../../models/ProposalView';
+import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
+import { SettingsId } from '../../models/Settings';
+import { TechnicalReview } from '../../models/TechnicalReview';
+import { Technique } from '../../models/Technique';
+import { UserWithRole } from '../../models/User';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
+import { UserProposalsFilter } from '../../resolvers/types/User';
+import { OrderByCollection } from '../../resolvers/types/User';
+import { PaginationSortDirection } from '../../utils/pagination';
+import { AdminDataSource } from '../AdminDataSource';
+import { ProposalDataSource } from '../ProposalDataSource';
+import { TagDataSource } from '../TagDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
+import {
+  InstrumentFilterInput,
+  ProposalsFilter,
+  QuestionFilterInput,
+} from './../../resolvers/queries/ProposalsQuery';
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
   'technicalReviews.status': 'technical_review_status',
   'technicalReviews.timeAllocation': 'technical_review_time_allocation',
-  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
+  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from first + last
   technicalReviewAssigneesFullName: 'technical_review_assignee',
   'faps.code': 'fap_code',
   callShortCode: 'call_short_code',
@@ -601,7 +602,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             throw new GraphQLError(`Bad sort field given: ${sortField}`);
           }
           sortField = fieldMap[sortField];
-          query.orderBy(sortField, sortDirection);
+          if (sortField === 'title') {
+            query.orderByRaw(
+              `LOWER(COALESCE(??, '')) ${sortDirection.toUpperCase()}`,
+              [sortField]
+            );
+          } else {
+            query.orderBy(sortField, sortDirection);
+          }
         }
 
         if (filter?.referenceNumbers) {
@@ -930,8 +938,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    orderByCollectionList?: OrderByCollection[]
   ): Promise<{ userProposals: Proposal[]; totalCount: number }> {
+    const fieldsInUIToDB: { [key: string]: string } = {
+      proposalId: 'p.proposal_id',
+      title: 'p.title',
+      publicStatus: 'p.final_status',
+      created: 'p.created_at',
+    };
+
     return (
       database
         .select('p.*', database.raw('count(*) OVER() AS full_count'))
@@ -979,15 +995,44 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         .groupBy('p.proposal_pk')
         .modify((qb) => {
+          if (orderByCollectionList && orderByCollectionList[0]) {
+            const uiColumn = orderByCollectionList[0].orderByField;
+            if (fieldsInUIToDB.hasOwnProperty(uiColumn)) {
+              const dbColumn = fieldsInUIToDB[uiColumn];
+              // Makes the arrow on the UI shows the order the data is listed in, not what it will become.
+              let orderDirection = 'asc';
+              if (orderByCollectionList[0].orderDirection === 'asc') {
+                orderDirection = 'desc';
+              }
+              if (dbColumn === 'p.title') {
+                qb.orderByRaw(
+                  `LOWER(COALESCE(??, '')) ${orderDirection.toUpperCase()}`,
+                  [dbColumn]
+                );
+              } else {
+                qb.orderBy(dbColumn, orderDirection);
+              }
+            } else if (uiColumn === 'call.shortCode') {
+              // Nothing (shortCode comes from diffent db query when paginatedProposals requested)
+            } else {
+              throw new GraphQLError(`Bad sort field given: ${uiColumn}`);
+            }
+          }
+          // Default ordering when nothing selected in frontend
+          else {
+            qb.orderBy('p.created_at', 'DESC');
+          }
           if (first) qb.limit(first);
           if (offset) qb.offset(offset);
         })
-        .then((proposals: (ProposalRecord & { full_count: number })[]) => ({
-          userProposals: proposals.map((proposal) =>
-            createProposalObject(proposal)
-          ),
-          totalCount: proposals[0]?.full_count ?? 0,
-        }))
+        .then((proposals: (ProposalRecord & { full_count: number })[]) => {
+          return {
+            userProposals: proposals.map((proposal) =>
+              createProposalObject(proposal)
+            ),
+            totalCount: proposals[0]?.full_count ?? 0,
+          };
+        })
     );
   }
 
@@ -1086,35 +1131,33 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
+  // current user -> get related proposals -> get related users for each of those proposals
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
-    const relatedCoIs = await database
-      .select('ou.user_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', function () {
-        this.on('u.proposal_pk', 'p.proposal_pk');
-        this.andOn(function () {
-          this.onVal('u.user_id', id); // user is on the proposal
-          this.orOnVal('p.proposer_id', id); // user is the proposal PI
-        });
-      }) // this gives a list of proposals that a user is related to
-      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
+    // Proposals the user is related to, as PI or as a co-proposer
+    const relatedProposalPks = database
+      .select('proposal_pk')
+      .from('proposals')
+      .where('proposer_id', id)
+      .union([
+        database
+          .select('proposal_pk')
+          .from('proposal_user')
+          .where('user_id', id),
+      ]);
 
-    const relatedPis = await database
-      .select('p.proposer_id')
-      .distinct()
-      .from('proposals as p')
-      .leftJoin('proposal_user as u', {
-        'u.proposal_pk': 'p.proposal_pk',
-        'u.user_id': id,
-      }); // this gives a list of proposals that a user is related to
+    // Everyone on those proposals: PIs and co-proposers
+    const relatedUsers: { user_id: number }[] = await database
+      .select('user_id')
+      .from('proposal_user')
+      .whereIn('proposal_pk', relatedProposalPks)
+      .union([
+        database
+          .select('proposer_id as user_id')
+          .from('proposals')
+          .whereIn('proposal_pk', relatedProposalPks),
+      ]);
 
-    const relatedUsers = [
-      ...relatedCoIs.map((r) => r.user_id),
-      ...relatedPis.map((r) => r.proposer_id),
-    ];
-
-    return relatedUsers;
+    return relatedUsers.map((r) => r.user_id);
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
@@ -1448,14 +1491,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'proposals.abstract',
         'proposals.title'
       )
-      .from('co_proposer_claims')
-      .join('proposals', {
-        'co_proposer_claims.proposal_pk': 'proposals.proposal_pk',
-      })
+      .from('proposals')
       .join('users as proposer', {
         'proposals.proposer_id': 'proposer.user_id',
       })
-      .where('invite_id', inviteId)
+      .whereIn('proposals.proposal_pk', (builder) => {
+        builder
+          .select('proposal_pk')
+          .from('co_proposer_claims')
+          .where('invite_id', inviteId)
+          .union((qb) => {
+            qb.select('proposal_pk')
+              .from('data_access_claims')
+              .where('invite_id', inviteId);
+          });
+      })
       .first()
       .then((proposal: InvitedProposalRecord | undefined) =>
         proposal ? createInvitedProposalObject(proposal) : null
