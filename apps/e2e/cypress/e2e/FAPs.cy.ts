@@ -4239,6 +4239,11 @@ context('Fap meeting components tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer2.id],
       });
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        endFapReview: new Date(3001, 11, 3),
+      });
     });
 
     it('Fap Reviewer should not be able to see reviews he/she is not a direct reviewer', () => {
