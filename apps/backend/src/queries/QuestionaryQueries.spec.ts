@@ -49,10 +49,11 @@ test('Question read permissions should match specific role IDs', async () => {
     },
   ];
 
-  const derivedRoleSteps = questionaryQueries.filterQuestionaryForReadPermissions(
-    dummyUserOfficerWithDerivedRole,
-    restrictedSteps
-  );
+  const derivedRoleSteps =
+    questionaryQueries.filterQuestionaryForReadPermissions(
+      dummyUserOfficerWithDerivedRole,
+      restrictedSteps
+    );
   const rootRoleSteps = questionaryQueries.filterQuestionaryForReadPermissions(
     dummyUserOfficerWithRole,
     restrictedSteps

@@ -66,7 +66,7 @@ it('User with a specific role can answer questions restricted to that role', asy
   const { firstAnswer, firstStep, questionaryId } =
     await getDummyUsersProposal();
   firstAnswer.config.readPermissions = [
-    String(dummyUserOfficerWithDerivedRole.currentRole.id),
+    String(dummyUserOfficerWithDerivedRole.currentRole!.id),
   ];
 
   const result = await mutations.answerTopic(dummyUserOfficerWithDerivedRole, {

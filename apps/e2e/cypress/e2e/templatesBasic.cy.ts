@@ -1314,12 +1314,12 @@ context('Template Basic tests', () => {
 
       cy.get('[data-cy="read-permissions"]').click();
 
-      cy.contains('user_officer').click();
+      cy.contains('User Officer').click();
       // Only way i found to close the menu in the test
       // you cannot just press escape you must select a element and then press escape
       // and the only elements that can be selected are the ones in the menu
       // plese fix this if you can
-      cy.contains('fap_reviewer').click().type('{esc}');
+      cy.contains('FAP Reviewer').click().type('{esc}');
 
       cy.get('[data-cy="submit"]').click();
 
