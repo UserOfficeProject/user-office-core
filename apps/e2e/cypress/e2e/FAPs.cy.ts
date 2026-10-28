@@ -1821,7 +1821,6 @@ context('Fap reviews tests', () => {
       cy.changeActiveRole(initialDBData.roles.fapReviewer);
       cy.visit('/');
 
-      //when commented legacy works
       cy.updateCall({
         id: initialDBData.call.id,
         endFapReview: new Date(3001, 11, 3),
