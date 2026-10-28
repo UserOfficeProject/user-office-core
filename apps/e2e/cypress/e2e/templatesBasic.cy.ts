@@ -1275,14 +1275,39 @@ context('Template Basic tests', () => {
       addDependency(field3, []);
     });
 
-    it('Should be able to add read permissions to a template', () => {
-      createTopicWithQuestionsAndRelations();
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        cy.updateUserRoles({
-          id: scientist1.id,
-          roles: [initialDBData.roles.instrumentScientist],
-        });
+    it('Should restrict questions to the selected specific role', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
       }
+
+      const allowedRoleTitle = `Allowed scientist ${faker.word.words(2)}`;
+      const otherRoleTitle = `Other scientist ${faker.word.words(2)}`;
+      let allowedRoleId: number;
+      let otherRoleId: number;
+
+      createTopicWithQuestionsAndRelations();
+      cy.createRole({
+        args: {
+          title: allowedRoleTitle,
+          shortCode: 'instrument_scientist',
+          description: '',
+        },
+      }).then((result) => {
+        allowedRoleId = result.createRole.id;
+      });
+      cy.createRole({
+        args: {
+          title: otherRoleTitle,
+          shortCode: 'instrument_scientist',
+          description: '',
+        },
+      }).then((result) => {
+        otherRoleId = result.createRole.id;
+      });
+      cy.updateUserRoles({
+        id: scientist1.id,
+        roles: [allowedRoleId!, otherRoleId!],
+      });
 
       cy.assignScientistsToInstrument({
         scientistIds: [scientist1.id],
@@ -1314,6 +1339,9 @@ context('Template Basic tests', () => {
 
       cy.get('[data-cy="read-permissions"]').click();
 
+      cy.contains(allowedRoleTitle).should('exist');
+      cy.contains(otherRoleTitle).should('exist');
+      cy.contains(allowedRoleTitle).click();
       cy.contains('User Officer').click();
       // Only way i found to close the menu in the test
       // you cannot just press escape you must select a element and then press escape
@@ -1329,7 +1357,17 @@ context('Template Basic tests', () => {
 
       cy.contains(booleanQuestion).should('exist');
 
-      cy.login(scientist1, initialDBData.roles.instrumentScientist);
+      cy.login(scientist1, allowedRoleId!);
+
+      cy.visit('/');
+
+      cy.get('[data-cy="edit-technical-review').click();
+
+      cy.contains('Proposal information').click();
+
+      cy.contains(booleanQuestion).should('exist');
+
+      cy.login(scientist1, otherRoleId!);
 
       cy.visit('/');
 
