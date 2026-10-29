@@ -1216,7 +1216,10 @@ export const createFapAssignmentObject = (fapAssignment: ReviewRecord) => {
     fapAssignment.reassigned,
     fapAssignment.date_reassigned,
     fapAssignment.email_sent,
-    fapAssignment.rank
+    fapAssignment.rank,
+    fapAssignment.comment,
+    fapAssignment.grade,
+    fapAssignment.status
   );
 };
 

@@ -19,6 +19,7 @@ export enum XLSXType {
   PROPOSAL = 'proposal',
   FAP = 'fap',
   CALL_FAP = 'call_fap',
+  FAP_REVIEWS = 'fap_reviews',
   TECHNIQUE = 'technique',
   MANAGEMENT_DECISION = 'management_decision',
 }
