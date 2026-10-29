@@ -118,7 +118,10 @@ export const dummyFapAssignment = new FapAssignment(
   false,
   null,
   false,
-  null
+  null,
+  'dummy comment',
+  'dummy grade',
+  1
 );
 
 export const anotherDummyFapAssignment = new FapAssignment(
@@ -129,7 +132,10 @@ export const anotherDummyFapAssignment = new FapAssignment(
   false,
   null,
   false,
-  null
+  null,
+  'dummy comment',
+  'dummy grade',
+  1
 );
 
 export const dummyFapReview = new Review(
