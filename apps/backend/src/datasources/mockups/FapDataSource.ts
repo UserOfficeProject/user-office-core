@@ -587,7 +587,7 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsWithReviewGradesAndRanking(
-    proposalPks: number[]
+    fapProposalIds: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
     return [new FapProposalWithReviewGradesAndRanking(1, 1, [7], 1)];
   }
