@@ -10,7 +10,7 @@ BEGIN
             template_id INT NOT NULL,
             version_number INT NOT NULL,
             template jsonb, 
-            CONSTRAINT template_type_template_id UNIQUE(template_type, template_id),
+            CONSTRAINT template_type_template_id UNIQUE(template_type, template_id, version_number),
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
 
