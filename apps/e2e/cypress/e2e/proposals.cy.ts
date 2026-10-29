@@ -917,9 +917,6 @@ context('Proposal tests', () => {
     });
 
     it('User officer should see all proposals after switching the status filter back to All and keep the filter on reload', () => {
-      // The clone stays in DRAFT while the original proposal moves to FAP Meeting,
-      // so filtering by DRAFT should hide the original one.
-      // NOTE: The original is matched by proposal ID, because its title is also part of the clone title ("Copy of ...").
       cy.cloneProposals({
         callId: initialDBData.call.id,
         proposalsToClonePk: [createdProposalPk],
