@@ -7,9 +7,9 @@ import {
   ToggleButtonGroup,
   useTheme,
 } from '@mui/material';
+import { Editor as TinyMCEEditor } from '@tinymce/tinymce-react/node_modules/tinymce/tinymce';
 import { ErrorMessage, Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Editor as TinyMCEEditor } from 'tinymce';
 
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
