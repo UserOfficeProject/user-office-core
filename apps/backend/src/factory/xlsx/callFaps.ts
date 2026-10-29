@@ -42,27 +42,29 @@ const collectFAPRowData = async (
         sheetName: sheet.sheetName,
         rows: await Promise.all(
           sheet.rows.map(async (proposal) => {
-            const fapMeetingDecision =
-              await fapDataSource.getProposalsFapMeetingDecisions([
-                proposal.proposalPk,
-              ]);
+            const fapMeetingDecisions =
+              await fapDataSource.getProposalsFapMeetingDecisions(
+                [proposal.proposalPk],
+                fapId
+              );
+            const fapMeetingDecision = fapMeetingDecisions.find(
+              (decision) => decision.instrumentId === proposal.instrumentId
+            );
 
             return {
               ...proposal,
-              fapMeetingDecision:
-                fapMeetingDecision[0] && fapMeetingDecision[0].recommendation
-                  ? ProposalEndStatusStringValue[
-                      fapMeetingDecision[0].recommendation
-                    ]
-                  : null,
+              fapMeetingDecision: fapMeetingDecision?.recommendation
+                ? ProposalEndStatusStringValue[
+                    fapMeetingDecision.recommendation
+                  ]
+                : null,
               fapMeetingExComment:
-                fapMeetingDecision[0] && fapMeetingDecision[0].commentForUser
-                  ? stripHtml(fapMeetingDecision[0].commentForUser)
+                fapMeetingDecision?.commentForUser != null
+                  ? stripHtml(fapMeetingDecision.commentForUser)
                   : null,
               fapMeetingInComment:
-                fapMeetingDecision[0] &&
-                fapMeetingDecision[0].commentForManagement
-                  ? stripHtml(fapMeetingDecision[0].commentForManagement)
+                fapMeetingDecision?.commentForManagement != null
+                  ? stripHtml(fapMeetingDecision.commentForManagement)
                   : null,
             };
           })

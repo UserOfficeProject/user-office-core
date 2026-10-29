@@ -2,6 +2,7 @@ import { CallRowObj } from './callFaps';
 import { RowObj } from './fap';
 import { QuestionaryStep } from '../../models/Questionary';
 import { Review } from '../../models/Review';
+import { stripHtml } from '../../utils/stringStripHtml';
 
 export type FapDataRowInput = {
   proposalPk: number;
@@ -23,6 +24,37 @@ export type FapDataRowInput = {
 
 export type FapDataRow = (input: FapDataRowInput) => RowObj | Promise<RowObj>;
 
+export type ReviewRowInput = {
+  proposalId: number | null;
+  title: string | null;
+  instrumentName: string | null;
+  dateAssigned: Date | string | null;
+  rank: number | null;
+  grade: string | null;
+  comment: string | null;
+  status: number | null;
+};
+
+export const buildReviewRow = ({
+  proposalId,
+  title,
+  instrumentName,
+  dateAssigned,
+  rank,
+  grade,
+  comment,
+  status,
+}: ReviewRowInput): Array<string | number> => [
+  proposalId ?? '<missing>',
+  title ?? '<missing>',
+  instrumentName ?? '<missing>',
+  dateAssigned ? String(dateAssigned) : '<missing>',
+  rank ?? '<missing>',
+  grade ?? '<missing>',
+  comment == null ? '<missing>' : stripHtml(comment),
+  status == null ? '<missing>' : status == 1 ? 'Submitted' : 'Draft',
+];
+
 export function getDataRow({
   proposalPk,
   piName,
@@ -35,9 +67,11 @@ export function getDataRow({
   techReviewTimeAllocation,
   technicalReviewComment,
   propFapRankOrder,
+  instrumentId,
 }: FapDataRowInput): RowObj {
   return {
     proposalPk: proposalPk,
+    instrumentId: instrumentId,
     propShortCode: proposalId?.toString(),
     propTitle: proposalTitle,
     principalInv: piName,

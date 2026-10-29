@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - develop
-      - staging
 
 env:
   NODE_VERSION: 22.x
@@ -23,9 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - id: extract_branch
-        uses: swapActions/get-branch-name@v1
-
       - name: Create backend image tags
         id: meta-backend
         uses: docker/metadata-action@v6
@@ -34,7 +30,7 @@ jobs:
           flavor: latest=true # adds :latest tag to outputs.tags
           tags: | # adds :<sha> tag to outputs.tags
             type=sha,format=long,prefix=
-            type=raw,value=${{ steps.extract_branch.outputs.branch }}
+            type=ref,event=branch
 
       - name: Create frontend image tags
         id: meta-frontend
@@ -44,7 +40,7 @@ jobs:
           flavor: latest=true # adds :latest tag to outputs.tags
           tags: | # adds :<sha> tag to outputs.tags
             type=sha,format=long,prefix=
-            type=raw,value=${{ steps.extract_branch.outputs.branch }}
+            type=ref,event=branch
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -79,6 +75,8 @@ jobs:
           context: ./
           platforms: linux/amd64,linux/arm64/v8
           file: ./apps/backend/Dockerfile
+          build-args: |
+            BUILD_VERSION=${{ github.sha }}
           push: true
           tags: ${{ steps.meta-backend.outputs.tags }}
 
@@ -93,18 +91,7 @@ jobs:
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
 
-      - name: Trigger pipeline
-        if: ${{ steps.extract_branch.outputs.branch == 'staging' }} # Only trigger pipeline for staging branch
-        uses: swapActions/trigger-swap-deployment@v1
-        with:
-          repository: ${{ github.event.repository.name }}
-          environment: ${{ steps.extract_branch.outputs.branch }}
-          gh-trigger-url: ${{ secrets.GITLAB_TRIGGER_URL }}
-          gh-token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
-          image-tag: ${{ github.sha }}
-
       - name: Trigger deployment updates at STFC
-        if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
           curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_UopCore.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
 
@@ -116,7 +103,6 @@ jobs:
           repositories: user-office-scheduler
 
       - name: Trigger user-office-scheduler's generate-sdk workflow
-        if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github.everest-preview+json" \
