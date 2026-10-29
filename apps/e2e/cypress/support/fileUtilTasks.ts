@@ -77,10 +77,18 @@ export const unzip = (args: { source: string; destination: string }) => {
 
 export const convertXlsxToJson = (filePath: string) => {
   const workbook = xlsx.readFile(filePath);
-  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  const jsonData = xlsx.utils.sheet_to_json(worksheet);
+  if (workbook.SheetNames.length === 1) {
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = xlsx.utils.sheet_to_json(worksheet);
 
-  return jsonData;
+    return jsonData;
+  }
+
+  return workbook.SheetNames.map((sheetName) => {
+    const worksheet = workbook.Sheets[sheetName];
+
+    return xlsx.utils.sheet_to_json(worksheet);
+  });
 };
 
 export const deleteFile = (filePath: string) => {
