@@ -1,16 +1,21 @@
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
 import database from './database';
 import { createEmailTemplateObject, EmailTemplateRecord } from './records';
-
+import TemplateVersionDataSource from './TemplateVersionDataSource';
+import { Tokens } from '../../config/Tokens';
 @injectable()
 export default class PostgresEmailTemplateDataSource
   implements EmailTemplateDataSource
 {
+  constructor(
+    @inject(Tokens.TemplateVersionDataSource)
+    private templateDataSource: TemplateVersionDataSource
+  ) {}
   async getEmailTemplate(id: number): Promise<EmailTemplate | null> {
     return database
       .select()
@@ -103,6 +108,17 @@ export default class PostgresEmailTemplateDataSource
     subject?: string,
     body?: string
   ): Promise<EmailTemplate> {
+    const currentTemplate = await this.getEmailTemplate(emailTemplateId);
+    const template = JSON.stringify({
+      body: currentTemplate?.body,
+      subject: currentTemplate?.subject,
+    });
+    await this.templateDataSource.createNewVersion(
+      emailTemplateId,
+      'EMAIL',
+      template
+    );
+
     return database
       .update(
         {
