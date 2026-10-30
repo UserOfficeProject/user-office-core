@@ -57,11 +57,39 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   'Comment for management', // commentForManagement
   true, // submitted
   456, // submittedBy
-  789, // instrumentId
-  101, // fapId,
+  3, // instrumentId
+  1, // fapId
   1, // recommendedTimeAllocation
   1, // fapProposalId
   '1' // meetingScore
+);
+
+const mockRejectedFapMeetingDecision = new FapMeetingDecision(
+  123, // proposalPk
+  2, // rankOrder
+  ProposalEndStatus.REJECTED, // recommendation
+  'Rejected comment for user', // commentForUser
+  'Rejected comment for management', // commentForManagement
+  true, // submitted
+  456, // submittedBy
+  3, // instrumentId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  2 // fapProposalId
+);
+
+const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
+  123, // proposalPk
+  1, // rankOrder
+  ProposalEndStatus.ACCEPTED, // recommendation
+  'Accepted comment for user', // commentForUser
+  'Accepted comment for management', // commentForManagement
+  true, // submitted
+  456, // submittedBy
+  789, // instrumentId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  3 // fapProposalId
 );
 
 const mockFapReview: FapReviewsRecord = {
@@ -186,6 +214,25 @@ describe('generateManagementDecisionData tests', () => {
       'Comment for management',
       'FAP review comment',
     ]);
+  });
+
+  test('uses the decision for the row instrument', async () => {
+    jest.spyOn(baseContext.queries.user, 'get').mockResolvedValue(mockUser);
+    jest
+      .spyOn(baseContext.queries.fap, 'getProposalFapMeetingDecisions')
+      .mockResolvedValue([
+        mockAcceptedOtherInstrumentDecision,
+        mockRejectedFapMeetingDecision,
+      ]);
+
+    const result = await generateManagementDecisionData(
+      dummyUserWithRole,
+      mockFapReview
+    );
+
+    expect(result.xlsxrowdata[7]).toEqual('Rejected');
+    expect(result.xlsxrowdata[8]).toEqual('Rejected comment for user');
+    expect(result.xlsxrowdata[9]).toEqual('Rejected comment for management');
   });
 });
 

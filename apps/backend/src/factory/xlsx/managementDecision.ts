@@ -56,15 +56,18 @@ export async function generateManagementDecisionData(
   const fapMeetingData =
     await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
       proposalPk: fapreview.proposal_pk,
+      fapId: fapreview.fap_id,
     });
+  const fapMeetingDecision = fapMeetingData.find(
+    (decision) => decision.recommendedInstrumentId === fapreview.instrument_id
+  );
 
   const instrumentAllocatedTime =
     fapreview.fap_time_allocation ?? fapreview.time_allocation;
 
-  const fapMeetingRecommendation =
-    fapMeetingData[0] && fapMeetingData[0].recommendation
-      ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
-      : ProposalEndStatusStringValue[0];
+  const fapMeetingRecommendation = fapMeetingDecision?.recommendation
+    ? ProposalEndStatusStringValue[fapMeetingDecision.recommendation]
+    : ProposalEndStatusStringValue[0];
 
   return {
     rankOrder: fapreview.rank_order ?? 0,
@@ -78,13 +81,13 @@ export async function generateManagementDecisionData(
       '<missing>', // Running total of remaining instrument time. (filled in later)
       instrumentAllocatedTime?.toString() ?? '<missing>',
       fapMeetingRecommendation,
-      fapMeetingData?.[0]?.commentForUser
-        ? stripHtml(fapMeetingData[0].commentForUser)
+      fapMeetingDecision?.commentForUser != null
+        ? stripHtml(fapMeetingDecision.commentForUser)
         : '<missing>',
-      fapMeetingData?.[0]?.commentForManagement
-        ? stripHtml(fapMeetingData[0].commentForManagement)
+      fapMeetingDecision?.commentForManagement != null
+        ? stripHtml(fapMeetingDecision.commentForManagement)
         : '<missing>',
-      fapreview.comment ? stripHtml(fapreview.comment) : '<missing>',
+      fapreview.comment != null ? stripHtml(fapreview.comment) : '<missing>',
     ],
   };
 }

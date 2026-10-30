@@ -119,7 +119,10 @@ export const dummyFapAssignment = new FapAssignment(
   false,
   null,
   false,
-  null
+  null,
+  'dummy comment',
+  'dummy grade',
+  1
 );
 
 export const anotherDummyFapAssignment = new FapAssignment(
@@ -130,7 +133,10 @@ export const anotherDummyFapAssignment = new FapAssignment(
   false,
   null,
   false,
-  null
+  null,
+  'dummy comment',
+  'dummy grade',
+  1
 );
 
 export const dummyFapReview = new Review(
@@ -583,7 +589,7 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsWithReviewGradesAndRanking(
-    proposalPks: number[]
+    fapProposalIds: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
     return [new FapProposalWithReviewGradesAndRanking(1, 1, [7], 1)];
   }

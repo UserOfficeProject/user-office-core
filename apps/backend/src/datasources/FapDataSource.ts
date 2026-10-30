@@ -157,7 +157,7 @@ export interface FapDataSource {
   ): Promise<FapMeetingDecision | null>;
   getAllFapMeetingDecisions(fapId: number): Promise<FapMeetingDecision[]>;
   getFapProposalsWithReviewGradesAndRanking(
-    proposalPks: number[]
+    fapProposalIds: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   isFapProposalInstrumentSubmitted(
