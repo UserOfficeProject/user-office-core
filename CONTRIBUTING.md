@@ -9,6 +9,8 @@ Please consider these guidelines when filing a pull request:
 - JavaScript is written using ES2015 features
 - 2 spaces indentation
 - Features and bug fixes should be covered by test cases
+- If AI contributed meaningfully to the change, uncomment and fill in the "AI Usage" section of the PR template. Uncommenting the section adds the `ai:assisted` label automatically, or you can add it yourself. Dependabot PRs are labelled `ai:generated`
+- It is the PR author's responsibility to make sure their PR is labelled correctly. The automation is only a helper, so check the label has been applied before requesting a review
 
 ## Creating releases
 
