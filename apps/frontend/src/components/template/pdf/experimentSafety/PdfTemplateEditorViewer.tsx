@@ -65,6 +65,10 @@ function PdfTemplateEditorViewer({
     React.useState<Blob>();
 
   const fetchGeneratedPdfPreviewData = useCallback(async () => {
+    if (!pdfTemplate.dummyData.trim()) {
+      return undefined;
+    }
+
     const pdf = await fetch(
       `/preview/pdf/experiment-safety?pdfTemplateId=${pdfTemplate.experimentSafetyPdfTemplateId}`,
       {
@@ -86,7 +90,9 @@ function PdfTemplateEditorViewer({
     });
   }, [fetchGeneratedPdfPreviewData]);
 
-  if (generatedPdfPreviewBlob) {
+  if (!pdfTemplate.dummyData.trim()) {
+    return <div>Preview unavailable: No dummy data defined.</div>;
+  } else if (generatedPdfPreviewBlob) {
     return <PDFViewer fileUrl={URL.createObjectURL(generatedPdfPreviewBlob)} />;
   } else {
     return <div></div>;
