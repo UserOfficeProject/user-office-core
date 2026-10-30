@@ -57,7 +57,7 @@ const FapMeetingDecision = ({
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     Rank
                   </TableCell>
-                  <TableCell width="25%">{fmd.rankOrder || '-'}</TableCell>
+                  <TableCell width="25%">{fmd.meetingScore || '-'}</TableCell>
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     {t('FAP')} meeting recommendation
                   </TableCell>

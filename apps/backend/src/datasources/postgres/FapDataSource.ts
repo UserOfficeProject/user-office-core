@@ -1189,7 +1189,6 @@ export default class PostgresFapDataSource implements FapDataSource {
       .select([
         'fp.proposal_pk',
         database.raw('json_agg(fr.grade) review_grades'),
-        'fmd.rank_order',
         'fp.fap_proposal_id',
       ])
       .join('fap_meeting_decisions as fmd', {
@@ -1199,7 +1198,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         'fr.proposal_pk': 'fp.proposal_pk',
       })
       .whereIn('fp.fap_proposal_id', fapProposalIds)
-      .groupBy(['fp.fap_proposal_id', 'fmd.rank_order'])
+      .groupBy(['fp.fap_proposal_id'])
       .then(
         (
           FapProposalWithReviewGradesAndRankingRecords: FapProposalWithReviewGradesAndRankingRecord[]
@@ -1209,9 +1208,9 @@ export default class PostgresFapDataSource implements FapDataSource {
               (FapProposalWithReviewGradesAndRankingRecord) =>
                 new FapProposalWithReviewGradesAndRanking(
                   FapProposalWithReviewGradesAndRankingRecord.proposal_pk,
-                  FapProposalWithReviewGradesAndRankingRecord.rank_order,
                   FapProposalWithReviewGradesAndRankingRecord.review_grades,
-                  FapProposalWithReviewGradesAndRankingRecord.fap_proposal_id
+                  FapProposalWithReviewGradesAndRankingRecord.fap_proposal_id,
+                  FapProposalWithReviewGradesAndRankingRecord.meetingScore
                 )
             );
 

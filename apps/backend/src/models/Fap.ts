@@ -53,13 +53,12 @@ export class FapProposal {
     public fapInstrumentMeetingSubmitted: boolean
   ) {}
 }
-
 export class FapProposalWithReviewGradesAndRanking {
   constructor(
     public proposalPk: number,
-    public rankOrder: number | null,
-    public reviewGrades: number[],
-    public fapProposalId: number
+    public reviewGrades: string[],
+    public fapProposalId: number,
+    public meetingScore: string | null
   ) {}
 }
 

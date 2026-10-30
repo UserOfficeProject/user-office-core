@@ -177,7 +177,6 @@ export const anotherDummyFapProposal = new FapProposal(
 
 export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
-  1,
   ProposalEndStatus.ACCEPTED,
   'Dummy comment for user',
   'Dummy comment for management',
@@ -591,7 +590,7 @@ export class FapDataSourceMock implements FapDataSource {
   async getFapProposalsWithReviewGradesAndRanking(
     fapProposalIds: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
-    return [new FapProposalWithReviewGradesAndRanking(1, 1, [7], 1)];
+    return [new FapProposalWithReviewGradesAndRanking(1, ['7'], 1, '7')];
   }
 
   async getRelatedUsersOnFap(id: number): Promise<number[]> {

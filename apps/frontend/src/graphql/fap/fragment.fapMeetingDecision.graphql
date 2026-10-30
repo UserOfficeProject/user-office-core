@@ -3,7 +3,6 @@ fragment fapMeetingDecision on FapMeetingDecision {
   recommendation
   commentForUser
   commentForManagement
-  rankOrder
   submitted
   submittedBy
   recommendedInstrumentId

@@ -63,7 +63,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
 
 export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
-  1,
   ProposalEndStatus.ACCEPTED,
   'Dummy comment for user',
   'Dummy comment for management',

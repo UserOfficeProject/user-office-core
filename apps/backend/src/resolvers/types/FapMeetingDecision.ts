@@ -17,9 +17,6 @@ export class FapMeetingDecision implements Partial<FapMeetingDecisionOrigin> {
   @Field(() => String, { nullable: true })
   public commentForUser: string;
 
-  @Field(() => Int, { nullable: true })
-  public rankOrder: number;
-
   @Field(() => Boolean)
   public submitted: boolean;
 

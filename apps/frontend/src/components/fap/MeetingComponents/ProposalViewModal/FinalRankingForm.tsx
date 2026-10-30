@@ -121,7 +121,6 @@ const FinalRankingForm = ({
     meetingSubmitted({
       ...saveFapMeetingDecisionInput,
       submittedBy: fapMeetingDecision?.submittedBy || null,
-      rankOrder: fapMeetingDecision?.rankOrder || null,
       meetingScore: fapMeetingDecision?.meetingScore || null,
     });
 

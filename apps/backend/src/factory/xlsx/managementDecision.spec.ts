@@ -51,7 +51,6 @@ const mockUser = new User(
 
 const mockFapMeetingDecision = new FapMeetingDecision(
   123, // proposalPk
-  1, // rankOrder
   ProposalEndStatus.ACCEPTED, // recommendation
   'Comment for user', // commentForUser
   'Comment for management', // commentForManagement
@@ -61,12 +60,11 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   1, // fapId
   1, // recommendedTimeAllocation
   1, // fapProposalId
-  '1' // meetingScore
+  '2' // meetingScore
 );
 
 const mockRejectedFapMeetingDecision = new FapMeetingDecision(
   123, // proposalPk
-  2, // rankOrder
   ProposalEndStatus.REJECTED, // recommendation
   'Rejected comment for user', // commentForUser
   'Rejected comment for management', // commentForManagement
@@ -75,12 +73,12 @@ const mockRejectedFapMeetingDecision = new FapMeetingDecision(
   3, // instrumentId
   1, // fapId
   1, // recommendedTimeAllocation
-  2 // fapProposalId
+  2, // fapProposalId
+  '1' // meetingScore
 );
 
 const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
   123, // proposalPk
-  1, // rankOrder
   ProposalEndStatus.ACCEPTED, // recommendation
   'Accepted comment for user', // commentForUser
   'Accepted comment for management', // commentForManagement
@@ -89,7 +87,8 @@ const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
   789, // instrumentId
   1, // fapId
   1, // recommendedTimeAllocation
-  3 // fapProposalId
+  3, // fapProposalId
+  '2' // meetingScore
 );
 
 const mockFapReview: FapReviewsRecord = {

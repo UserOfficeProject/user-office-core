@@ -634,7 +634,6 @@ export interface FapMeetingDecisionRecord {
   readonly proposal_pk: number;
   readonly comment_for_management: string;
   readonly comment_for_user: string;
-  readonly rank_order: number;
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
   readonly submitted_by: number | null;
@@ -647,9 +646,9 @@ export interface FapMeetingDecisionRecord {
 
 export interface FapProposalWithReviewGradesAndRankingRecord {
   readonly proposal_pk: number;
-  readonly rank_order: number | null;
-  readonly review_grades: number[];
+  readonly review_grades: string[];
   readonly fap_proposal_id: number;
+  readonly meetingScore: string | null;
 }
 
 export interface FeatureRecord {
@@ -1162,7 +1161,6 @@ export const createFapMeetingDecisionObject = (
 ) => {
   return new FapMeetingDecision(
     fapMeetingDecisionRecord.proposal_pk,
-    fapMeetingDecisionRecord.rank_order,
     fapMeetingDecisionRecord.recommendation,
     fapMeetingDecisionRecord.comment_for_user,
     fapMeetingDecisionRecord.comment_for_management,

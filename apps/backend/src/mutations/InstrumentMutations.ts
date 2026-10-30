@@ -39,7 +39,7 @@ import {
   InstrumentAvailabilityTimeArgs,
   InstrumentSubmitInFapArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
-import { sortByRankOrAverageScore } from '../utils/mathFunctions';
+import { sortByGradeOrAverageScore } from '../utils/mathFunctions';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
@@ -436,32 +436,30 @@ export default class InstrumentMutations {
 
     const allFapMeetingsHasRankings = fapProposalsWithReviewsAndRanking.every(
       (fapProposalWithReviewsAndRanking) =>
-        !!fapProposalWithReviewsAndRanking.rankOrder
+        fapProposalWithReviewsAndRanking.meetingScore !== null
     );
 
     if (!allFapMeetingsHasRankings) {
-      const sortedFapProposals = sortByRankOrAverageScore(
+      const sortedFapProposals = sortByGradeOrAverageScore(
         fapProposalsWithReviewsAndRanking
       );
 
-      const allProposalsWithRankings = sortedFapProposals.map(
-        (sortedFapProposal, index) => {
-          if (!sortedFapProposal.rankOrder) {
-            sortedFapProposal.rankOrder = index + 1;
-          }
+      // const allProposalsWithRankings = sortedFapProposals.map(
+      //   (sortedFapProposal, index) => {
+      //     if (!sortedFapProposal.rankOrder) {
+      //       sortedFapProposal.rankOrder = index + 1;
+      //     }
 
-          return sortedFapProposal;
-        }
-      );
+      //     return sortedFapProposal;
+      //   }
+      // );
 
       await Promise.all(
-        allProposalsWithRankings.map((proposalWithRanking) => {
+        sortedFapProposals.map((proposalWithRanking) => {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
-            rankOrder: proposalWithRanking.rankOrder,
             recommendedInstrumentId: args.instrumentId,
             fapId: args.fapId,
-            recommendedTimeAllocation: null,
             fapProposalId: proposalWithRanking.fapProposalId,
           });
         })
