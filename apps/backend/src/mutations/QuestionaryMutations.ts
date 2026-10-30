@@ -208,6 +208,9 @@ export default class QuestionaryMutations {
       questionField.config.readPermissions.length === 0 ||
       questionField.config.readPermissions.includes(
         agent?.currentRole?.shortCode ?? ''
+      ) ||
+      questionField.config.readPermissions.includes(
+        String(agent?.currentRole?.id ?? '')
       );
 
     const unauthorizedSubmittedAnswer = answers.find((submittedAnswer) => {
