@@ -23,6 +23,7 @@ const ProfileInfo = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <Typography
           noWrap
+          data-cy="profile-info-name"
           sx={{
             color: 'black',
             fontSize: '18px',

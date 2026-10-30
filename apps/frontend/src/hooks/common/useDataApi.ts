@@ -68,6 +68,14 @@ export function getUnauthorizedApi() {
   );
 }
 
+export function getAuthorizedApi(token: string) {
+  return getSdk(
+    new GraphQLClient(endpoint)
+      .setHeader(clientNameHeader, clientName)
+      .setHeader('authorization', `Bearer ${token}`)
+  );
+}
+
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,

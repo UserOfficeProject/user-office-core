@@ -155,7 +155,7 @@ const FapInstrumentProposalsTable = ({
     {
       title: 'Principal investigator',
       render: (rowData: FapProposal) => {
-        return getFullUserName(rowData.proposal.proposer);
+        return getFullUserName(rowData.proposal.proposer, true);
       },
     },
     { title: 'Country', field: 'proposal.proposer.country' },

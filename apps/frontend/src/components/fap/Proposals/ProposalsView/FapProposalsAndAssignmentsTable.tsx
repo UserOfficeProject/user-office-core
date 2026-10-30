@@ -86,11 +86,11 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Principal Investigator',
     render: (rowData) => {
-      return getFullUserName(rowData.proposal.proposer);
+      return getFullUserName(rowData.proposal.proposer, true);
     },
     customSort(a, b) {
-      const name1 = getFullUserName(a.proposal.proposer);
-      const name2 = getFullUserName(b.proposal.proposer);
+      const name1 = getFullUserName(a.proposal.proposer, true);
+      const name2 = getFullUserName(b.proposal.proposer, true);
 
       return name1 < name2 ? -1 : 1;
     },

@@ -41,6 +41,54 @@ context('Personal information tests', () => {
     cy.get('[data-cy="selected-role-user_officer"]').contains('In Use');
   });
 
+  it('Should show user details from the database in the profile popup', () => {
+    const user = initialDBData.users.user1;
+    const firstName = faker.person.firstName();
+    const preferredName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+
+    // Login first, so the JWT contains the old user details
+    cy.login('user1');
+
+    cy.updateUserDetails({
+      id: user.id,
+      userTitle: 'Dr.',
+      firstname: firstName,
+      preferredname: preferredName,
+      lastname: lastName,
+      institutionId: 1,
+      email: user.email,
+    });
+
+    cy.visit('/');
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+
+    cy.get('[data-cy="profile-info-name"]').should(
+      'have.text',
+      `${preferredName} ${lastName}`
+    );
+
+    cy.updateUserDetails({
+      id: user.id,
+      userTitle: 'Dr.',
+      firstname: firstName,
+      preferredname: '',
+      lastname: lastName,
+      institutionId: 1,
+      email: user.email,
+    });
+
+    cy.reload();
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+
+    cy.get('[data-cy="profile-info-name"]').should(
+      'have.text',
+      `${firstName} ${lastName}`
+    );
+  });
+
   describe('Personal information advanced tests', () => {
     beforeEach(function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
