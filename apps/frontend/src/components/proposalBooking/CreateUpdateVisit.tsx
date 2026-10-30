@@ -1,6 +1,6 @@
 import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -38,16 +38,70 @@ function CreateUpdateVisit({
     ? !event.visitPerms.writeable
     : !event.visitPerms.createable;
 
-  const initialValues = {
-    team: visit?.registrations.map((registration) => registration.user!) || [],
-    teamLeadUserId: visit?.teamLead?.id || null,
-    inviteEmails: visit?.registrationInvites || [],
-  };
+  
 
   const featureContext = useContext(FeatureContext);
   const allowInviteByEmail = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
+
+  type ExtendedUserDetails = BasicUserDetails & {
+    hasCompletedSafetyForm: boolean;
+  };
+
+  async function basicConvertToExtended(user: BasicUserDetails): Promise<ExtendedUserDetails> {
+    if (user.oidcSub){
+      const response = await api().GetUserSafetyStatus({ oidcSub: user.oidcSub  });
+
+      return {
+        hasCompletedSafetyForm: response.hasUserPassedSafetyForm ?? false,
+        ...user,
+      };
+    }
+          return {
+        hasCompletedSafetyForm: false,
+        ...user,
+      };
+    
+  }
+  
+    const isSafetyFormEnabled = featureContext.featuresMap.get(
+      FeatureId.SAFETY_FORM
+    )?.isEnabled;
+
+  const [loadingSafety, setLoadingSafety] = useState(true);
+
+
+  useEffect(() => {
+    const fetchSafety = async () => {
+      if (isSafetyFormEnabled){
+        const team = visit?.registrations.map((registration) => registration.user!) || [];
+        const extendedTeam = await Promise.all(team.map(user => basicConvertToExtended(user)));
+        setInitialTeam(extendedTeam)
+        setLoadingSafety(false);
+      }
+      else{
+        setLoadingSafety(false);
+      }
+  }
+  fetchSafety()
+
+  },
+  [isSafetyFormEnabled]);
+  
+  const [initialTeam, setInitialTeam] = useState<any[]>(
+    visit?.registrations.map((registration) => registration.user!) || []
+  );
+
+  const initialValues = {
+    team: initialTeam,
+    teamLeadUserId: visit?.teamLead?.id || null,
+    inviteEmails: visit?.registrationInvites || [],
+  };
+
+    if (loadingSafety) {
+    return <p> loading</p>
+  }
 
   return (
     <Formik
@@ -122,13 +176,39 @@ function CreateUpdateVisit({
             });
         }
       }}
+      
     >
       {({ values, isSubmitting, setFieldValue }) => (
         <Form>
           <Typography variant="h6">
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
-          <UserManagementTable
+          { isSafetyFormEnabled && <UserManagementTable<ExtendedUserDetails>
+            title="Visitors"
+            addModalTitle={readonly ? 'View Visitors' : 'Edit Visitors'}
+            readonly={readonly}
+            setInvites={setVisitInvites}
+            invites={visitInvites}
+            setUsers={(team: ExtendedUserDetails[]) => {
+              setFieldValue('team', team);
+            }}
+            users={values.team || []}
+            allowInviteByEmail={allowInviteByEmail}
+            convertUserToExtendedUser={basicConvertToExtended}
+            columnsToShow = {[
+              { title: 'Firstname', field: 'firstname' },
+              { title: 'Lastname', field: 'lastname' },
+              { title: 'Preferred name', field: 'preferredname' },
+              { title: 'Institution', field: 'institution' },
+              { title: 'Has Completed Safety Form', field: 'hasCompletedSafetyForm' },
+            ]}
+            extraOptions={{rowStyle: (rowData: ExtendedUserDetails) => ({
+              backgroundColor: rowData.hasCompletedSafetyForm ? '#54af23' : '#b24343',
+            })}}
+          
+          />
+}
+{ !isSafetyFormEnabled && <UserManagementTable<BasicUserDetails>
             title="Visitors"
             addModalTitle={readonly ? 'View Visitors' : 'Edit Visitors'}
             readonly={readonly}
@@ -139,7 +219,9 @@ function CreateUpdateVisit({
             }}
             users={values.team || []}
             allowInviteByEmail={allowInviteByEmail}
+            convertUserToExtendedUser={basicConvertToExtended}
           />
+}
           <ErrorMessage name="team" />
 
           <FormikUIAutocomplete

@@ -178,6 +178,11 @@ export default class UserQueries {
     return this.dataSource.getProposalUsers(proposalPk);
   }
 
+  @Authorized()
+  async getHasUserPassedSafetyTest(agent: UserWithRole | null, oidcSub : string | null) {
+    return true;
+  }
+
   async checkToken(token: string): Promise<{
     isValid: boolean;
     payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;

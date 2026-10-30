@@ -220,7 +220,7 @@ function ProposalPeopleSelectorModal({
     };
   };
 
-  const handleSubmit = () => {
+   const handleSubmit = async () => {
     const { users, invites } = categorizeSelectedItems(selectedItems);
     setQuery('');
     setSelectedItems([]);
