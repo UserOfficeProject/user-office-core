@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:22.23.2-alpine AS build-stage
+FROM node:22.23.3-alpine AS build-stage
 
 ARG ORCID_REDIRECT=
 ARG BUILD_VERSION=<unknown>
@@ -23,7 +23,7 @@ COPY apps/frontend/ /app/frontend
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginxinc/nginx-unprivileged:1.31.5-alpine
+FROM nginx/nginx-unprivileged:1.31.7-alpine
 
 COPY --from=build-stage /app/frontend/build/ /usr/share/nginx/html
 COPY --from=build-stage /app/frontend/build-version.txt /usr/share/nginx/html
@@ -32,3 +32,6 @@ COPY --from=build-stage /app/frontend/build-version.txt /usr/share/nginx/html
 COPY apps/frontend/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1

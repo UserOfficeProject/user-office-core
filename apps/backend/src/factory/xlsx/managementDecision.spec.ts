@@ -57,8 +57,32 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   'Comment for management', // commentForManagement
   true, // submitted
   456, // submittedBy
+  3, // instrumentId
+  1 // fapId
+);
+
+const mockRejectedFapMeetingDecision = new FapMeetingDecision(
+  123, // proposalPk
+  2, // rankOrder
+  ProposalEndStatus.REJECTED, // recommendation
+  'Rejected comment for user', // commentForUser
+  'Rejected comment for management', // commentForManagement
+  true, // submitted
+  456, // submittedBy
+  3, // instrumentId
+  1 // fapId
+);
+
+const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
+  123, // proposalPk
+  1, // rankOrder
+  ProposalEndStatus.ACCEPTED, // recommendation
+  'Accepted comment for user', // commentForUser
+  'Accepted comment for management', // commentForManagement
+  true, // submitted
+  456, // submittedBy
   789, // instrumentId
-  101 // fapId
+  1 // fapId
 );
 
 const mockFapReview: FapReviewsRecord = {
@@ -83,48 +107,48 @@ describe('addDecreasingInstrumentAvailTime test', () => {
   test('Ensure orders an input 1 then 2', () => {
     const managementDecisionData = [
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 10);
-    expect(managementDecisionData[0].grade).toEqual(1);
+    expect(managementDecisionData[0].rankOrder).toEqual(1);
   });
 
   test('Ensure orders an input 2 then 1', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 10,
         xlsxrowdata: ['example'],
       },
     ];
 
     addDecreasingInstrumentAvailTime(managementDecisionData, 10);
-    expect(managementDecisionData[0].grade).toEqual(1);
+    expect(managementDecisionData[0].rankOrder).toEqual(1);
   });
 
   test('Ensure allocated time is subtracted and added to xlsxrowdata', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 1,
         xlsxrowdata: ['example', 'example', 'example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 1,
         xlsxrowdata: ['example', 'example', 'example'],
       },
@@ -137,12 +161,12 @@ describe('addDecreasingInstrumentAvailTime test', () => {
   test('Ensure allocated time is limited to zero and added to xlsxrowdata', () => {
     const managementDecisionData = [
       {
-        grade: 2,
+        rankOrder: 2,
         instrumentAllocatedTime: 1000,
         xlsxrowdata: ['example', 'example', 'example'],
       },
       {
-        grade: 1,
+        rankOrder: 1,
         instrumentAllocatedTime: 1000,
         xlsxrowdata: ['example', 'example', 'example'],
       },
@@ -168,7 +192,7 @@ describe('generateManagementDecisionData tests', () => {
       mockFapReview
     );
 
-    expect(result.grade).toEqual(4.5);
+    expect(result.rankOrder).toEqual(1);
     expect(result.instrumentAllocatedTime).toEqual(10);
     expect(result.xlsxrowdata).toEqual([
       '456',
@@ -183,6 +207,25 @@ describe('generateManagementDecisionData tests', () => {
       'Comment for management',
       'FAP review comment',
     ]);
+  });
+
+  test('uses the decision for the row instrument', async () => {
+    jest.spyOn(baseContext.queries.user, 'get').mockResolvedValue(mockUser);
+    jest
+      .spyOn(baseContext.queries.fap, 'getProposalFapMeetingDecisions')
+      .mockResolvedValue([
+        mockAcceptedOtherInstrumentDecision,
+        mockRejectedFapMeetingDecision,
+      ]);
+
+    const result = await generateManagementDecisionData(
+      dummyUserWithRole,
+      mockFapReview
+    );
+
+    expect(result.xlsxrowdata[7]).toEqual('Rejected');
+    expect(result.xlsxrowdata[8]).toEqual('Rejected comment for user');
+    expect(result.xlsxrowdata[9]).toEqual('Rejected comment for management');
   });
 });
 

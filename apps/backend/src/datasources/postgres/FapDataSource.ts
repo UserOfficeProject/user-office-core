@@ -287,13 +287,13 @@ export default class PostgresFapDataSource implements FapDataSource {
   ): Promise<FapAssignment[]> {
     const fapAssignments: ReviewRecord[] = await database
       .from('fap_reviews')
+      .where('fap_id', fapId)
+      .andWhere('proposal_pk', proposalPk)
       .modify((query) => {
         if (reviewerId !== null) {
-          query.where('user_id', reviewerId);
+          query.andWhere('user_id', reviewerId);
         }
-      })
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk);
+      });
 
     return fapAssignments.map((fapAssignment) =>
       createFapAssignmentObject(fapAssignment)
@@ -317,6 +317,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId?: number | null;
     instrumentId?: number | null;
   }): Promise<FapProposal[]> {
+    // This query is fundamentally flawed, as it groups fap_proposals by proposal_pk.
+    // One proposal can have multiple instruments and fap_proposal records.
+    // This means instrument_id and fap_meeting_instrument_submitted are not useful,
+    // as they potentially combine multiple separate values into one.
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -979,6 +983,7 @@ export default class PostgresFapDataSource implements FapDataSource {
   async updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal> {
     const [updatedRecord]: FapProposalRecord[] = await database('fap_proposals')
@@ -989,6 +994,7 @@ export default class PostgresFapDataSource implements FapDataSource {
         ['*']
       )
       .where('fap_id', fapId)
+      .where('instrument_id', instrumentId)
       .where('proposal_pk', proposalPk);
 
     if (!updatedRecord) {
@@ -1271,6 +1277,25 @@ export default class PostgresFapDataSource implements FapDataSource {
     };
   }
 
+  async getInstrumentCodes(fapId: number, proposalPk: number) {
+    const result = await database
+      .select(
+        /* eslint-disable quotes */
+        database.raw(
+          `STRING_AGG(DISTINCT i.short_code, ', ' ORDER BY i.short_code) as "instrumentShortcodes"`
+        )
+        /* eslint-enable quotes */
+      )
+      .from('fap_proposals as fp')
+      .join('instruments as i', 'i.instrument_id', 'fp.instrument_id')
+      .where('fp.fap_id', fapId)
+      .where('fp.proposal_pk', proposalPk)
+      .groupBy('fp.proposal_pk')
+      .first();
+
+    return result?.instrumentShortcodes ?? '';
+  }
+
   async isFapProposalInstrumentSubmitted(
     proposalPk: number,
     instrumentId?: number | null
@@ -1322,20 +1347,21 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number,
     instrumentId?: number | null
   ): Promise<FapReviewsRecord[]> {
-    if (instrumentId) {
-      return await database
-        .select('*')
-        .from('review_data')
-        .where('fap_id', fapId)
-        .andWhere('call_id', callId)
-        .andWhere('instrument_id', instrumentId);
-    }
-
-    return await database
+    const query = database
       .select('*')
       .from('review_data')
-      .where('fap_id', fapId)
-      .andWhere('call_id', callId);
+      .where('fap_id', fapId);
+
+    //The callId is set to 0 when no calls are selected in the frontend.
+    if (callId != 0) {
+      query.andWhere('call_id', callId);
+    }
+
+    if (instrumentId != null) {
+      query.andWhere('instrument_id', instrumentId);
+    }
+
+    return await query;
   }
 
   async submitFapMeetings(
