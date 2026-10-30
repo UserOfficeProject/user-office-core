@@ -1442,7 +1442,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Submit').should('be.disabled');
+      cy.contains('Submit').should('be.enabled').click();
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
@@ -1545,7 +1545,7 @@ context('Fap reviews tests', () => {
       );
     });
 
-    it('Fap Secretary should be able to read/write non-submitted reviews', () => {
+    it('Fap Secretary should be able to read/write/submit non-submitted reviews', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1573,9 +1573,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').should('be.disabled');
-
-      cy.finishedLoading();
+      cy.contains('Submit').should('be.enabled').click();
     });
 
     it('Fap Secretary should be able to edit only comments of technical reviews', function () {
