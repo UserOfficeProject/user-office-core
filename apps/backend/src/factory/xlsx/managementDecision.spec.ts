@@ -58,7 +58,9 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  1 // fapProposalId
 );
 
 const mockRejectedFapMeetingDecision = new FapMeetingDecision(
@@ -70,7 +72,9 @@ const mockRejectedFapMeetingDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  2 // fapProposalId
 );
 
 const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
@@ -82,7 +86,9 @@ const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   789, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  3 // fapProposalId
 );
 
 const mockFapReview: FapReviewsRecord = {

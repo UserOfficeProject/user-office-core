@@ -48,7 +48,6 @@ export class FapProposal {
     public proposalPk: number,
     public fapId: number,
     public dateAssigned: Date,
-    public fapTimeAllocation: number | null,
     public instrumentId: number | null,
     public callId: number,
     public fapInstrumentMeetingSubmitted: boolean
@@ -59,7 +58,8 @@ export class FapProposalWithReviewGradesAndRanking {
   constructor(
     public proposalPk: number,
     public rankOrder: number | null,
-    public reviewGrades: number[]
+    public reviewGrades: number[],
+    public fapProposalId: number
   ) {}
 }
 
