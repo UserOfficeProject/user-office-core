@@ -58,6 +58,14 @@ const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
     .map((assignment) => assignment.review)
     .filter((review): review is Review => !!review);
 
+export const getCompletedReviews = (fapProposal: FapProposalType) => {
+  return fapProposal.assignments?.filter(
+    (assignment) =>
+      assignment.review !== null &&
+      assignment.review.status === ReviewStatus.SUBMITTED
+  );
+};
+
 const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Actions',
@@ -113,11 +121,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     title: 'Reviews',
     render: (rowData) => {
       const totalReviews = rowData.assignments?.length;
-      const submittedProposals = rowData.assignments?.filter(
-        (assignment) =>
-          assignment.review !== null &&
-          assignment.review.status === ReviewStatus.SUBMITTED
-      );
+      const submittedProposals = getCompletedReviews(rowData);
       const countReviews = submittedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
@@ -125,16 +129,8 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     customSort: (a, b) => {
       const totalReviewsA = a.assignments?.length || 0;
       const totalReviewsB = b.assignments?.length || 0;
-      const gradedProposalsA =
-        a.assignments?.filter(
-          (assignment) =>
-            assignment.review !== null && assignment.review.grade !== null
-        ).length || 0;
-      const gradedProposalsB =
-        b.assignments?.filter(
-          (assignment) =>
-            assignment.review !== null && assignment.review.grade !== null
-        ).length || 0;
+      const gradedProposalsA = getCompletedReviews(a)?.length || 0;
+      const gradedProposalsB = getCompletedReviews(b)?.length || 0;
 
       const incompleteReviewsA = totalReviewsA - gradedProposalsA;
       const incompleteReviewsB = totalReviewsB - gradedProposalsB;
