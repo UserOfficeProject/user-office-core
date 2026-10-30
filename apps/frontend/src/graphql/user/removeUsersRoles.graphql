@@ -1,0 +1,3 @@
+mutation removeUsersRoles($userIds: [Int!]!, $roles: [Int!]) {
+  removeUsersRoles(userIds: $userIds, roles: $roles) 
+}

@@ -1,0 +1,3 @@
+mutation updateUsersRoles($userIds: [Int!]!, $roles: [Int!]) {
+  updateUsersRoles(userIds: $userIds, roles: $roles) 
+}
