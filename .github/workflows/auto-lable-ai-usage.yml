@@ -1,0 +1,45 @@
+name: AI usage labels
+
+# pull_request_target so PRs from forks can be labelled too.
+# NOTE: Do not check out or run PR code in this workflow, it runs with a write token.
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label-ai-usage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add AI usage labels
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const prDetails = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            };
+            const labels = pr.labels.map((label) => label.name);
+
+            if (pr.user.login === 'dependabot[bot]') {
+              if (!labels.includes('ai:generated')) {
+                await github.rest.issues.addLabels({ ...prDetails, labels: ['ai:generated'] });
+              }
+              return;
+            }
+
+            // Check if AI Usage section is filled. 
+            const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '');
+            const aiUsed = /^##\s+AI Usage\s*$/im.test(body);
+
+            // Never remove the label
+            if (aiUsed && !labels.includes('ai:assisted')) {
+              await github.rest.issues.addLabels({ ...prDetails, labels: ['ai:assisted'] });
+            }
