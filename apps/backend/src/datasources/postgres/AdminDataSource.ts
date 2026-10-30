@@ -10,14 +10,17 @@ import { Page } from '../../models/Admin';
 import { Country } from '../../models/Country';
 import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
+import { OAuthClient } from '../../models/OAuthClient';
 import { Permissions } from '../../models/Permissions';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { CreateOAuthClientInput } from '../../resolvers/mutations/CreateOAuthClientMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
+import { UpdateOAuthClientInput } from '../../resolvers/mutations/UpdateOAuthClientMutation';
 import { AdminDataSource } from '../AdminDataSource';
 import { Entry } from './../../models/Entry';
 import { FeatureId } from './../../models/Feature';
@@ -30,10 +33,12 @@ import {
   createCountryObject,
   createFeatureObject,
   createInstitutionObject,
+  createOAuthClientObject,
   createPageObject,
   createSettingsObject,
   FeatureRecord,
   InstitutionRecord,
+  OAuthClientRecord,
   PageTextRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
@@ -590,6 +595,87 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     return true;
+  }
+
+  async createOAuthClient(args: CreateOAuthClientInput): Promise<OAuthClient> {
+    const [oauthClientRecord]: OAuthClientRecord[] = await database
+      .insert({
+        client_id: args.clientId,
+        name: args.name,
+        description: args.description,
+        access_permissions: args.accessPermissions,
+      })
+      .into('oauth_clients')
+      .returning('*');
+
+    if (!oauthClientRecord) {
+      throw new GraphQLError(
+        `Could not insert oauth client with client id: ${args.clientId}`
+      );
+    }
+
+    return createOAuthClientObject(oauthClientRecord);
+  }
+
+  async updateOAuthClient(args: UpdateOAuthClientInput): Promise<OAuthClient> {
+    const [oauthClientRecord]: OAuthClientRecord[] = await database(
+      'oauth_clients'
+    )
+      .update({
+        name: args.name,
+        description: args.description,
+        access_permissions: args.accessPermissions,
+        updated_at: database.fn.now(),
+      })
+      .where('client_id', args.clientId)
+      .returning('*');
+
+    if (!oauthClientRecord) {
+      throw new GraphQLError(
+        `Could not update oauth client with client id: ${args.clientId}`
+      );
+    }
+
+    return createOAuthClientObject(oauthClientRecord);
+  }
+
+  async deleteOAuthClient(clientId: string): Promise<boolean> {
+    const [oauthClientRecord]: OAuthClientRecord[] = await database(
+      'oauth_clients'
+    )
+      .del()
+      .where('client_id', clientId)
+      .returning('*');
+
+    if (!oauthClientRecord) {
+      throw new GraphQLError(
+        `Could not delete oauth client with client id: ${clientId}`
+      );
+    }
+
+    return true;
+  }
+
+  async getOAuthClient(clientId: string): Promise<OAuthClient | null> {
+    const [oauthClientRecord]: OAuthClientRecord[] = await database
+      .select()
+      .from('oauth_clients')
+      .where('client_id', clientId);
+
+    if (!oauthClientRecord) {
+      return null;
+    }
+
+    return createOAuthClientObject(oauthClientRecord);
+  }
+
+  async getAllOAuthClients(): Promise<OAuthClient[]> {
+    const oauthClientRecords: OAuthClientRecord[] = await database
+      .select()
+      .from('oauth_clients')
+      .orderBy('name', 'asc');
+
+    return oauthClientRecords.map(createOAuthClientObject);
   }
 
   async mergeInstitutions(
