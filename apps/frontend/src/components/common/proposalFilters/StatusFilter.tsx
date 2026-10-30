@@ -9,10 +9,22 @@ import { useSearchParams } from 'react-router-dom';
 
 import { Status } from 'generated/sdk';
 
+export const ALL_STATUSES = 'ALL';
+
+export const parseStatusQuery = (
+  statusQuery: string | null | undefined
+): string | undefined => {
+  if (!statusQuery || statusQuery === ALL_STATUSES) {
+    return undefined;
+  }
+
+  return statusQuery;
+};
+
 type StatusFilterProps = {
   statuses?: Status[];
   isLoading?: boolean;
-  onChange?: Dispatch<string>;
+  onChange?: Dispatch<string | undefined>;
   shouldShowAll?: boolean;
   statusId?: string;
   hiddenStatuses: string[];
@@ -66,13 +78,13 @@ const StatusFilter = ({
 
                 return searchParams;
               });
-              onChange?.(status.target.value);
+              onChange?.(parseStatusQuery(status.target.value));
             }}
-            value={statusId || 'ALL'}
-            defaultValue={'ALL'}
+            value={statusId || ALL_STATUSES}
+            defaultValue={ALL_STATUSES}
             data-cy="status-filter"
           >
-            {shouldShowAll && <MenuItem value={'ALL'}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value={ALL_STATUSES}>All</MenuItem>}
             {statuses.map(
               (status) =>
                 isStatusVisible(hiddenStatuses, status) && (
