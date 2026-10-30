@@ -292,6 +292,17 @@ export default class FapQueries {
     return this.dataSource.getFapsByProposalPk(proposalPk);
   }
 
+  @Authorized()
+  async getFapProposalTimeAllocation(
+    agent: UserWithRole | null,
+    fapProposalId: number
+  ): Promise<number | null> {
+    const fapMeetingDecision =
+      await this.dataSource.getFapMeetingDecision(fapProposalId);
+
+    return fapMeetingDecision?.recommendedTimeAllocation ?? null;
+  }
+
   private async userHasFapAccess(
     agent: UserWithRole | null,
     fapId: number
@@ -319,5 +330,10 @@ export default class FapQueries {
     const currentDate = DateTime.now();
 
     return call.endFapReview?.getTime() <= currentDate.toMillis();
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getFapMeetingScoreConfig(agent: UserWithRole | null, callId: number) {
+    return await this.dataSource.getFapMeetingScoreConfig(callId);
   }
 }

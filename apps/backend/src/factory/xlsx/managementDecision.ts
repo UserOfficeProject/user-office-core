@@ -59,7 +59,7 @@ export async function generateManagementDecisionData(
       fapId: fapreview.fap_id,
     });
   const fapMeetingDecision = fapMeetingData.find(
-    (decision) => decision.instrumentId === fapreview.instrument_id
+    (decision) => decision.recommendedInstrumentId === fapreview.instrument_id
   );
 
   const instrumentAllocatedTime =

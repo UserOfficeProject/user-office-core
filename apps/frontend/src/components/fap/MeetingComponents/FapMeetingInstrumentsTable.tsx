@@ -116,7 +116,7 @@ const FapMeetingInstrumentsTable = ({
         response.fapProposalsByInstrument?.every(
           ({ proposal }) =>
             !!proposal.fapMeetingDecisions?.find(
-              (fmd) => fmd.instrumentId === instrumentToSubmit.id
+              (fmd) => fmd.recommendedInstrumentId === instrumentToSubmit.id
             )?.submitted
         );
 

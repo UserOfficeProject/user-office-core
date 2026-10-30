@@ -1,4 +1,4 @@
-import * as Yup from 'yup';
+import * as Yup from "yup";
 
 export const createFapValidationSchema = Yup.object().shape({
   code: Yup.string().required(),
@@ -47,14 +47,14 @@ export const assignFapMemberToProposalValidationSchema = Yup.object().shape({
   memberId: Yup.number().required(),
 });
 
-export const updateTimeAllocationValidationSchema = Yup.object({
-  fapId: Yup.number().required(),
-  proposalPk: Yup.number().required(),
-  fapTimeAllocation: Yup.number()
-    .min(0, ({ min }) => `Must be greater than or equal to ${min}`)
-    .max(1e5, ({ max }) => `Must be less than or equal to ${max}`)
-    .nullable(),
-});
+// export const updateTimeAllocationValidationSchema = Yup.object({
+//   fapId: Yup.number().required(),
+//   proposalPk: Yup.number().required(),
+//   fapTimeAllocation: Yup.number()
+//     .min(0, ({ min }) => `Must be greater than or equal to ${min}`)
+//     .max(1e5, ({ max }) => `Must be less than or equal to ${max}`)
+//     .nullable(),
+// });
 
 export const saveFapMeetingDecisionValidationSchema = Yup.object().shape({
   proposalPk: Yup.number().required(),

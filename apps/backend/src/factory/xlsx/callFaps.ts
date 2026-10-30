@@ -48,7 +48,8 @@ const collectFAPRowData = async (
                 fapId
               );
             const fapMeetingDecision = fapMeetingDecisions.find(
-              (decision) => decision.instrumentId === proposal.instrumentId
+              (decision) =>
+                decision.recommendedInstrumentId === proposal.instrumentId
             );
 
             return {
