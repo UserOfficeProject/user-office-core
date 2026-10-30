@@ -167,4 +167,26 @@ describe('User validation schemas', () => {
             ).resolves.toMatchObject(validData);
         });
     });
+
+    describe('updateUserValidationSchema', () => {
+        const validData = {
+            firstname: 'John',
+            lastname: 'Doe',
+            userTitle: 'Mr',
+            email: 'john.doe@example.com',
+        };
+
+        it('should validate when institutionId is omitted', async () => {
+            await expect(
+                UserValidation.updateUserValidationSchema.validate(validData)
+            ).resolves.toMatchObject(validData);
+        });
+
+        it('should validate when institutionId is null', async () => {
+            const data = { ...validData, institutionId: null };
+            await expect(
+                UserValidation.updateUserValidationSchema.validate(data)
+            ).resolves.toMatchObject(data);
+        });
+    });
 });

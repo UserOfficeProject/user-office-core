@@ -19,11 +19,11 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => String, { nullable: true })
   public preferredname: string | undefined;
 
-  @Field()
-  public institution: string;
+  @Field(() => String, { nullable: true })
+  public institution: string | null;
 
-  @Field(() => Int)
-  public institutionId: number;
+  @Field(() => Int, { nullable: true })
+  public institutionId: number | null;
 
   @Authorized([
     Roles.USER_OFFICER,
@@ -36,8 +36,8 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Date, { nullable: true })
   public created?: Date;
 
-  @Field({ nullable: true })
-  public country: string;
+  @Field(() => String, { nullable: true })
+  public country: string | null;
 
   @Field(() => String, { nullable: true })
   public oidcSub?: string | null;

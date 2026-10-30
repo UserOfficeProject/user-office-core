@@ -13,6 +13,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { isRejection } from '../models/Rejection';
 import { AuthJwtPayload, User } from '../models/User';
 import { verifyToken } from '../utils/jwt';
@@ -198,6 +199,28 @@ describe('upsertUserByOidcSub', () => {
       ).resolves.toBeTruthy();
     });
 
+    test('accepts payload without institution', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          oidcSub: validPayload.oidcSub,
+          firstName: validPayload.firstName,
+          lastName: validPayload.lastName,
+          email: validPayload.email,
+          userTitle: validPayload.userTitle,
+          preferredName: validPayload.preferredName,
+        })
+      ).resolves.toBeTruthy();
+    });
+
+    test('accepts a null institution', async () => {
+      await expect(
+        upsertUserByOidcSubValidationSchema.validate({
+          ...validPayload,
+          institution: null,
+        })
+      ).resolves.toBeTruthy();
+    });
+
     test('rejects payload when both rorId and institutionData are provided', async () => {
       await expect(
         upsertUserByOidcSubValidationSchema.validate({
@@ -261,6 +284,25 @@ describe('upsertUserByOidcSub', () => {
     expect(isRejection(result)).toBe(false);
     expect((result as User).oidcSub).toBe(newOidcSub);
   });
+
+  test('A user can be created without an institution', async () => {
+    const newOidcSub = 'new-unique-oidc-sub-without-institution';
+    const result = await userMutations.upsertUserByOidcSub(
+      dummyUserOfficerWithRole,
+      {
+        oidcSub: newOidcSub,
+        firstName: 'New',
+        lastName: 'User',
+        email: 'new.user.without.institution@example.com',
+        userTitle: '',
+        preferredName: '',
+      }
+    );
+
+    expect(isRejection(result)).toBe(false);
+    expect((result as User).oidcSub).toBe(newOidcSub);
+    expect((result as User).institutionId).toBeNull();
+  });
   test('A user will be updated if OIDC sub exists', async () => {
     const result = await userMutations.upsertUserByOidcSub(
       dummyUserOfficerWithRole,
@@ -281,6 +323,26 @@ describe('upsertUserByOidcSub', () => {
     // Check if the result has the oidcsub
     expect(isRejection(result)).toBe(false);
     expect((result as User).oidcSub).toBe(dummyUser.oidcSub);
+  });
+
+  test('An existing user keeps its institution when OIDC omits it', async () => {
+    const userDataSource = container.resolve<UserDataSource>(
+      Tokens.UserDataSource
+    );
+    const updateUser = jest.spyOn(userDataSource, 'update');
+
+    await userMutations.upsertUserByOidcSub(dummyUserOfficerWithRole, {
+      oidcSub: dummyUser.oidcSub as string,
+      firstName: 'UpsertedJane',
+      lastName: 'UpsertedDoe',
+      email: 'upserted.jane.doe@example.com',
+      userTitle: '',
+      preferredName: '',
+    });
+
+    expect(updateUser).toHaveBeenCalledWith(
+      expect.objectContaining({ institutionId: dummyUser.institutionId })
+    );
   });
 
   test('A new user can be created with a ROR ID that creates a new mock institution', async () => {

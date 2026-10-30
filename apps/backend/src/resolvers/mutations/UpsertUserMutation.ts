@@ -52,8 +52,8 @@ export class UpsertUserByOidcSubArgs {
   @Field(() => String)
   public oidcSub: string;
 
-  @Field(() => InstitutionInput)
-  public institution: InstitutionInput;
+  @Field(() => InstitutionInput, { nullable: true })
+  public institution?: InstitutionInput | null;
 
   @Field(() => String)
   public email: string;

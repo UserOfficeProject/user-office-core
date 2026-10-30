@@ -31,8 +31,8 @@ export class User {
     public oidcSub: string | null,
     public oauthRefreshToken: string | null,
     public oauthIssuer: string | null,
-    public institutionId: number,
-    public institution: string,
+    public institutionId: number | null,
+    public institution: string | null,
     public email: string,
     public created: string,
     public updated: string
@@ -79,11 +79,11 @@ export class BasicUserDetails {
     public firstname: string,
     public lastname: string,
     public preferredname: string,
-    public institution: string,
-    public institutionId: number,
+    public institution: string | null,
+    public institutionId: number | null,
     public created: Date,
     public email: string,
-    public country: string,
+    public country: string | null,
     public userTitle: string,
     public oidcSub: string | null
   ) {}

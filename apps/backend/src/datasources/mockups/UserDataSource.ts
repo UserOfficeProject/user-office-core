@@ -794,7 +794,7 @@ export class UserDataSourceMock implements UserDataSource {
     oidc_sub: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
-    institution_id: number,
+    institution_id: number | null,
     email: string
   ) {
     // Generate a new user ID
@@ -809,8 +809,8 @@ export class UserDataSourceMock implements UserDataSource {
       oidc_sub,
       oauth_refresh_token,
       oauth_issuer,
-      institution_id || 1,
-      'Test institution',
+      institution_id,
+      institution_id === null ? null : 'Test institution',
       email,
       new Date().toISOString(),
       new Date().toISOString()

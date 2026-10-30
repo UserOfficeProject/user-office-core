@@ -170,7 +170,6 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord) => {
@@ -205,7 +204,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
@@ -217,7 +216,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .whereIn('u.user_id', ids)
       .then(
         (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
@@ -232,7 +231,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .whereILikeEscaped('email', '?', email)
       .modify((query) => {
         if (role) {
@@ -286,7 +285,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     oidc_sub: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
-    institution_id: number,
+    institution_id: number | null,
     email: string
   ): Promise<User> {
     return database
@@ -387,7 +386,9 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', {
+        'users.institution_id': 'i.institution_id',
+      })
       .modify((query) => {
         if (searchText) {
           query.andWhere((qb) => {
@@ -468,7 +469,9 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
-      .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', {
+        'users.institution_id': 'i.institution_id',
+      })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
         if (searchText) {
@@ -621,6 +624,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
       .where('p.proposal_pk', proposalPk)
+      .whereNotNull('u.institution_id')
       .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
         return users.map((user) => {
           return {
@@ -636,7 +640,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users as u')
-      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('institutions as i', { 'u.institution_id': 'i.institution_id' })
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', id)
@@ -772,6 +776,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .leftJoin('countries as c', { 'c.country_id': 'i.country_id' })
       .where('v.proposal_pk', proposalPk)
       .andWhere('vu.status', 'APPROVED')
+      .whereNotNull('u.institution_id')
       .then((users: (UserRecord & InstitutionRecord & CountryRecord)[]) => {
         return users.map((user) => ({
           user: createUserObject(user),
