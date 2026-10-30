@@ -31,6 +31,8 @@ import {
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import { getCompletedReviews } from './FapProposalsAndAssignmentsTable';
+
 type FapLegacyProposalsTableProps = {
   /** Fap we are assigning members to */
   data: Fap;
@@ -90,10 +92,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     title: 'Reviews',
     render: (rowData) => {
       const totalReviews = rowData.assignments?.length;
-      const gradedProposals = rowData.assignments?.filter(
-        (assignment) =>
-          assignment.review !== null && assignment.review.grade !== null
-      );
+      const gradedProposals = getCompletedReviews(rowData);
       const countReviews = gradedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
