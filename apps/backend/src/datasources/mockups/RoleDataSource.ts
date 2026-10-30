@@ -13,7 +13,11 @@ const dummyRole: Role = createRole(
 );
 
 export class RoleDataSourceMock implements RoleDataSource {
-  private roleTagsMap: Map<number, Set<number>> = new Map();
+  private roleTagsMap: Map<number, Set<number>> = new Map([
+    [1, new Set([1])],
+    [2, new Set()],
+    [4, new Set([1])],
+  ]);
   private tags: Map<number, string> = new Map([
     [1, 'admin'],
     [2, 'reviewer'],
