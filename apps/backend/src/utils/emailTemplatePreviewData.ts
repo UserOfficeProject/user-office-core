@@ -213,14 +213,16 @@ const PROPOSAL_WORKFLOW_PREVIEW_DATA = {
   fapMeetingDecisions: [
     {
       proposalPk: 1,
-      rankOrder: 1,
+      meetingScore: '1',
       recommendation: ProposalEndStatus.ACCEPTED,
       commentForUser: 'Sample panel comment.',
       commentForManagement: '',
       submitted: true,
       submittedBy: 1,
-      instrumentId: 1,
+      recommendedInstrumentId: 1,
       fapId: 1,
+      recommendedTimeAllocation: 0,
+      fapProposalId: 1,
     } satisfies FapMeetingDecision,
   ],
   technicalReviews: [
