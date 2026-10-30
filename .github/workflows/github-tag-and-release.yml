@@ -14,18 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Bump version and push tag
+      # Only calculate the next version here, the tag is created by the release step after both images are pushed
+      - name: Calculate next version
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          dry_run: true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -75,3 +70,11 @@ jobs:
             BUILD_VERSION=${{ steps.tag_version.outputs.new_tag }}
           push: true
           tags: ghcr.io/userofficeproject/user-office-frontend:${{ steps.tag_version.outputs.new_tag }}
+
+      - name: Create tag and GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          commit: ${{ github.sha }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
