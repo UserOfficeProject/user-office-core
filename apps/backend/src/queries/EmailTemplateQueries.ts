@@ -11,8 +11,8 @@ import {
   EmailTemplatePreview,
   EmailTemplatePreviewError,
 } from '../resolvers/types/EmailTemplatePreview';
+import { buildEmailTemplatePreviewData } from '../utils/emailTemplatePreviewData';
 import {
-  buildSubstitutionData,
   EmailTemplateSource,
   MAX_TEMPLATE_SOURCE_LENGTH,
   readEmailTemplateSourceFromFiles,
@@ -99,7 +99,7 @@ export default class EmailTemplateQueries {
 
     const result = renderEmailTemplate(
       source,
-      buildSubstitutionData(input.variables ?? [])
+      buildEmailTemplatePreviewData(input.variables ?? [])
     );
 
     const fileSource = input.useTemplateFile
