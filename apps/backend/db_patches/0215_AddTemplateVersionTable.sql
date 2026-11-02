@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('AddTemplateVersionTable.sql', 'ellenwright', 'Add template version table', '2026-08-20') THEN
+	IF register_patch('AddTemplateVersionTable.sql', 'ellenwright', 'Add template version table', '2026-11-02') THEN
 
             CREATE TABLE IF NOT EXISTS template_versions(
             

@@ -46,21 +46,15 @@ export default class PostgresTemplateVersionDataSource
   async createNewVersion(
     emailTemplateId: number,
     templateType: string,
-    template?: string | null
+    template?: string
   ): Promise<TemplateVersion | void> {
     if (template === null) {
       return;
     }
     const templates = await this.getVersions(emailTemplateId, templateType);
-    const versionNumbers: number[] = [];
-    let newVersionNumber;
-    templates.versions.map((t) => versionNumbers.push(t.versionNumber));
-
-    if (versionNumbers.length != 0) {
-      newVersionNumber = Math.max(...versionNumbers) + 1;
-    } else {
-      newVersionNumber = 1;
-    }
+    const newVersionNumber =
+      templates.versions.reduce((max, t) => Math.max(max, t.versionNumber), 0) +
+      1;
 
     return database
       .insert(

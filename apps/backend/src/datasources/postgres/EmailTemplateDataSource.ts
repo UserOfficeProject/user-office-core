@@ -14,7 +14,7 @@ export default class PostgresEmailTemplateDataSource
 {
   constructor(
     @inject(Tokens.TemplateVersionDataSource)
-    private templateDataSource: TemplateVersionDataSource
+    private templateVersionDataSource: TemplateVersionDataSource
   ) {}
   async getEmailTemplate(id: number): Promise<EmailTemplate | null> {
     return database
@@ -113,7 +113,7 @@ export default class PostgresEmailTemplateDataSource
       body: currentTemplate?.body,
       subject: currentTemplate?.subject,
     });
-    await this.templateDataSource.createNewVersion(
+    await this.templateVersionDataSource.createNewVersion(
       emailTemplateId,
       'EMAIL',
       template
