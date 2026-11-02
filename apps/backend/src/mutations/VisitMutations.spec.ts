@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
 import VisitMutations from './VisitMutations';
@@ -212,8 +213,8 @@ test('User can not update visit registration that is already submitted', async (
     {
       visitId: 1,
       userId: 2,
-      startsAt: new Date(),
-      endsAt: new Date(),
+      startsAt: DateTime.now().startOf('day'),
+      endsAt: DateTime.now().startOf('day'),
     }
   );
 
@@ -258,25 +259,50 @@ test('Not authorized user can not create visit registration', async () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
-test('User can not set visit start date in past', async () => {
+test('User can set visit start date in the past', async () => {
   const registration = (await mutations.createVisitRegistration(
     dummyUserWithRole,
     1,
     2
   )) as VisitRegistration;
+  const startsAt = DateTime.now().minus({ days: 1 }).startOf('day');
 
   const result = await mutations.updateVisitRegistration(dummyUserWithRole, {
     visitId: registration.visitId,
     userId: registration.userId,
-    startsAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // Set start date in the past
+    startsAt,
   });
 
-  expect(result).toBeInstanceOf(Rejection);
-  expect(result).toHaveProperty(
-    'message',
-    'Could not update Visit Registration because the start date is in the past'
-  );
+  expect(result).toBeInstanceOf(VisitRegistration);
+  expect(result).toHaveProperty('startsAt', startsAt.toJSDate());
 });
+
+test.each([
+  ['the same as', 0],
+  ['after', 1],
+])(
+  'User can set visit end date %s the start date',
+  async (_, daysAfterStart) => {
+    const registration = (await mutations.createVisitRegistration(
+      dummyUserWithRole,
+      1,
+      2
+    )) as VisitRegistration;
+    const startsAt = DateTime.local(2026, 10, 2);
+    const endsAt = startsAt.plus({ days: daysAfterStart });
+
+    const result = await mutations.updateVisitRegistration(dummyUserWithRole, {
+      visitId: registration.visitId,
+      userId: registration.userId,
+      startsAt,
+      endsAt,
+    });
+
+    expect(result).toBeInstanceOf(VisitRegistration);
+    expect(result).toHaveProperty('startsAt', startsAt.toJSDate());
+    expect(result).toHaveProperty('endsAt', endsAt.toJSDate());
+  }
+);
 
 test('User can not set visit end date earlier than start date', async () => {
   const registration = (await mutations.createVisitRegistration(
@@ -288,8 +314,8 @@ test('User can not set visit end date earlier than start date', async () => {
   const result = await mutations.updateVisitRegistration(dummyUserWithRole, {
     visitId: registration.visitId,
     userId: registration.userId,
-    startsAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // Set start date in the future
-    endsAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // Set end date in the past
+    startsAt: DateTime.local(2026, 10, 2),
+    endsAt: DateTime.local(2026, 10, 1),
   });
 
   expect(result).toBeInstanceOf(Rejection);
