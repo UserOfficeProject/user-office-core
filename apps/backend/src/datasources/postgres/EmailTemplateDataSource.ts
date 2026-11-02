@@ -113,11 +113,13 @@ export default class PostgresEmailTemplateDataSource
       body: currentTemplate?.body,
       subject: currentTemplate?.subject,
     });
-    await this.templateVersionDataSource.createNewVersion(
-      emailTemplateId,
-      'EMAIL',
-      template
-    );
+    if (template != '{"body":"","subject":""}') {
+      await this.templateVersionDataSource.createNewVersion(
+        emailTemplateId,
+        'EMAIL',
+        template
+      );
+    }
 
     return database
       .update(
