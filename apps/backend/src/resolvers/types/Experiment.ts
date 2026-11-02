@@ -44,8 +44,8 @@ export class Experiment implements ExperimentOrigin {
   @Field(() => Date)
   public endsAt: Date;
 
-  @Field(() => Number)
-  public scheduledEventId: number;
+  @Field(() => Number, { nullable: true })
+  public scheduledEventId: number | null;
 
   @Field(() => Number)
   public proposalPk: number;
@@ -67,6 +67,8 @@ export class Experiment implements ExperimentOrigin {
 
   @Field(() => Number, { nullable: true })
   public referenceNumberSequence: number | null;
+
+  public source: string | null;
 }
 
 /**

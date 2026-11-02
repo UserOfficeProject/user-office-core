@@ -19,14 +19,15 @@ export class Experiment {
     public experimentId: string,
     public startsAt: Date,
     public endsAt: Date,
-    public scheduledEventId: number,
+    public scheduledEventId: number | null,
     public proposalPk: number,
     public status: ExperimentStatus,
     public localContactId: number | null,
     public instrumentId: number,
     public createdAt: Date,
     public updatedAt: Date,
-    public referenceNumberSequence: number | null
+    public referenceNumberSequence: number | null,
+    public source: string | null = null
   ) {}
 }
 

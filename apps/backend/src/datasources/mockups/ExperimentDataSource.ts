@@ -15,7 +15,10 @@ import {
   ExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { ExperimentDataSource } from '../ExperimentDataSource';
+import {
+  ExperimentCreateInput,
+  ExperimentDataSource,
+} from '../ExperimentDataSource';
 import { ExperimentSafetyEventsRecord } from '../postgres/records';
 
 const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
@@ -24,14 +27,15 @@ const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
     values?.experimentId ?? 'dummy',
     values?.startsAt ?? new Date(Date.now() + 86400000), // startsAt (default: 1 day from now)
     values?.endsAt ?? new Date(Date.now() + 86400000 * 2), // endsAt (default: 2 days from now)
-    values?.scheduledEventId ?? 1,
+    values?.scheduledEventId === undefined ? 1 : values.scheduledEventId,
     values?.proposalPk ?? 1,
     values?.status ?? ExperimentStatus.DRAFT,
     values?.localContactId ?? null,
     values?.instrumentId ?? 1,
     values?.createdAt ?? new Date(),
     values?.updatedAt ?? new Date(),
-    values?.referenceNumberSequence ?? null
+    values?.referenceNumberSequence ?? null,
+    values?.source ?? null
   );
 };
 
@@ -162,12 +166,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     this.experimentSamples = [DummyExperimentSample1];
   }
 
-  create(
-    experiment: Omit<
-      Experiment,
-      'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-    >
-  ): Promise<Experiment> {
+  create(experiment: ExperimentCreateInput): Promise<Experiment> {
     throw new Error('Method not implemented.');
   }
   updateByScheduledEventId(

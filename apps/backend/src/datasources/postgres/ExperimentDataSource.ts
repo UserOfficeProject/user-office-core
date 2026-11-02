@@ -17,7 +17,10 @@ import {
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { PaginationSortDirection } from '../../utils/pagination';
-import { ExperimentDataSource } from '../ExperimentDataSource';
+import {
+  ExperimentCreateInput,
+  ExperimentDataSource,
+} from '../ExperimentDataSource';
 import database from './database';
 import {
   ExperimentSafetyEventsRecord,
@@ -41,7 +44,8 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.instrument_id,
     record.created_at,
     record.updated_at,
-    record.reference_number_sequence
+    record.reference_number_sequence,
+    record.source
   );
 }
 
@@ -110,10 +114,7 @@ export default class PostgresExperimentDataSource
   constructor() {}
 
   async create(
-    createExperimentPayload: Omit<
-      Experiment,
-      'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-    >
+    createExperimentPayload: ExperimentCreateInput
   ): Promise<Experiment> {
     const experiment: ExperimentRecord[] | undefined =
       await database.transaction(async (trx) => {
@@ -133,10 +134,9 @@ export default class PostgresExperimentDataSource
           }
           const { proposal_id: proposalNumber, experiment_sequence: sequence } =
             proposal;
-          const experimentId = await generateExperimentId(
-            proposalNumber,
-            sequence ?? 1
-          );
+          const experimentId =
+            createExperimentPayload.experimentId ??
+            (await generateExperimentId(proposalNumber, sequence ?? 1));
 
           await database('proposals')
             .where('proposal_pk', createExperimentPayload.proposalPk)
@@ -157,6 +157,7 @@ export default class PostgresExperimentDataSource
                 local_contact_id: createExperimentPayload.localContactId,
                 instrument_id: createExperimentPayload.instrumentId,
                 reference_number_sequence: sequence ?? 1,
+                source: createExperimentPayload.source ?? null,
               },
               '*'
             )
