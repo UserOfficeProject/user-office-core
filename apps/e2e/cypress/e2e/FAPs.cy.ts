@@ -3159,14 +3159,11 @@ context('Fap meeting components tests', () => {
       cy.get('[name="recommendedTimeAllocation"]').scrollIntoView();
       cy.get('[name="recommendedTimeAllocation"]').click();
 
-      // cy.get('[data-cy="edit-fap-time-allocation"] input').as('timeAllocation');
-
       cy.get('[name="recommendedTimeAllocation"]').should(
         'have.value',
         firstProposalTimeAllocation.toString()
       );
 
-      // cy.get('[data-cy="edit-fap-time-allocation"]').clear();
       cy.get('[name="recommendedTimeAllocation"]').clear();
 
       cy.get('[name="recommendedTimeAllocation"]').type('-1').blur();
@@ -3220,16 +3217,10 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="View proposal details"]').click();
 
-      // cy.get('[data-cy="edit-fap-time-allocation"]').scrollIntoView();
-      // cy.get('[data-cy="edit-fap-time-allocation"]').click();
-
-      // cy.get('[data-cy="fapTimeAllocation"] input').as('timeAllocation');
-
       cy.get('[data-cy="edit-fap-time-allocation"] input').should(
         'have.value',
         '25'
       );
-      // cy.get('@timeAllocation').type('15');
 
       cy.get('[name="recommendedTimeAllocation"]').clear().clear().type('15');
 

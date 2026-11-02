@@ -26,6 +26,8 @@ BEGIN
 
         ALTER TABLE fap_meeting_decisions DROP CONSTRAINT fap_meeting_decisions_pkey;
         ALTER TABLE fap_meeting_decisions ADD PRIMARY KEY (fap_proposal_id);
+        ALTER TABLE fap_meeting_decisions ADD CONSTRAINT fap_meeting_decisions_fap_proposal_id_fkey 
+            FOREIGN KEY (fap_proposal_id) REFERENCES fap_proposals(fap_proposal_id) ON DELETE CASCADE;
 
         DROP VIEW IF EXISTS review_data;
 
@@ -45,7 +47,8 @@ BEGIN
             proposal.recommended_time_allocation,
             proposal.questionary_id,
             grade.avg AS average_grade,
-            proposal.public_comment AS comment
+            proposal.public_comment AS comment,
+            proposal.fap_proposal_id
         FROM (
             SELECT
                 fp.proposal_pk,
@@ -61,7 +64,8 @@ BEGIN
                 i.instrument_id,
                 fmd.recommended_time_allocation,
                 p.questionary_id,
-                tr.public_comment
+                tr.public_comment,
+                fp.fap_proposal_id
             FROM fap_proposals fp
             JOIN faps f ON f.fap_id = fp.fap_id
             JOIN call c ON c.call_id = fp.call_id

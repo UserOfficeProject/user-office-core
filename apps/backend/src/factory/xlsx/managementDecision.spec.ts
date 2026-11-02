@@ -107,6 +107,7 @@ const mockFapReview: FapReviewsRecord = {
   average_grade: 4.5,
   questionary_id: 4,
   comment: 'FAP review comment',
+  fap_proposal_id: 5,
 };
 
 describe('addDecreasingInstrumentAvailTime test', () => {

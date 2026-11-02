@@ -34,13 +34,4 @@ export class FapMeetingDecision implements Partial<FapMeetingDecisionOrigin> {
 
   @Field(() => Int, { nullable: true })
   public recommendedTimeAllocation?: number | null;
-
-  // @Field(() => String)
-  // public meetingStatus: string;
-
-  // @Field(() => String, { nullable: true })
-  // public meetingNotes?: string | null;
-
-  // @Field(() => String, { nullable: true })
-  // public meetingScore?: string | null;
 }

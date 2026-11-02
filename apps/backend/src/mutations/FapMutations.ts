@@ -622,7 +622,6 @@ export default class FapMutations {
 
           return this.dataSource.saveFapMeetingDecision({
             ...proposal,
-            recommendedInstrumentId: proposal.recommendedInstrumentId,
             fapProposalId: fapProposal.fapProposalId,
           });
         })
