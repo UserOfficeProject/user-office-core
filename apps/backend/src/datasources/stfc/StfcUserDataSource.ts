@@ -476,17 +476,15 @@ export class StfcUserDataSource implements UserDataSource {
     const userRole: Role | undefined = roleDefinitions.find(
       (role) => role.shortCode == Roles.USER
     );
-    const userOfficerRole: Role | undefined = roleDefinitions.find(
-      (role) => role.shortCode == Roles.USER_OFFICER
-    );
-    if (!userRole || !userOfficerRole) {
+
+    if (!userRole) {
       return [];
     }
 
     userRole.tags = await roleDataSource.getTagsByRoleId(userRole.id);
 
     if (!stfcRoles || stfcRoles.length == 0) {
-      return [userRole, userOfficerRole];
+      return [userRole];
     }
 
     const externalRoles = this.mapStfcRolesToSystemRoleDefinitions(
@@ -506,7 +504,7 @@ export class StfcUserDataSource implements UserDataSource {
 
     uniqueRoles.sort((a, b) => a.id - b.id);
 
-    const userRoles = [userRole, userOfficerRole, ...uniqueRoles];
+    const userRoles = [userRole, ...uniqueRoles];
 
     this.uopRolesCache.put(String(id), Promise.resolve(userRoles));
 
