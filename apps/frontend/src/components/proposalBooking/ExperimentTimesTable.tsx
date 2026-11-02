@@ -2,14 +2,20 @@ import MaterialTable, { Column, Options } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import { TFunction } from 'i18next';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
+import { Experiment } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
+
+import ExperimentReviewContent, {
+  EXPERIMENT_MODAL_TAB_NAMES,
+} from '../experiment/ExperimentReviewContent';
+import ExperimentReviewModal from '../experiment/ExperimentReviewModal';
 
 type ExperimentTimesTableProps = {
   title: string;
@@ -46,10 +52,25 @@ export default function ExperimentsTimesTable({
   options,
 }: ExperimentTimesTableProps) {
   const { t } = useTranslation();
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedExperimentPk = searchParams.get('experiment');
+  const parsedExperimentPk =
+    selectedExperimentPk !== null ? parseInt(selectedExperimentPk) : NaN;
+  const [selectedExperiment] = useState<Experiment>();
+  const experimentPkFromUrl = Number.isInteger(parsedExperimentPk)
+    ? parsedExperimentPk
+    : null;
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
+
+  const experimentReviewTabs = [
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
+    EXPERIMENT_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_FORM,
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_REVIEW,
+    EXPERIMENT_MODAL_TAB_NAMES.VISIT,
+  ];
 
   const experimentsWithFormattedDates = experiments.map((event) => ({
     ...event,
@@ -69,7 +90,7 @@ export default function ExperimentsTimesTable({
       removable: false,
       field: 'rowActionButtons',
       render: (rowData: UserExperiment) => (
-        <RowActionButtons experimentId={rowData.experimentId} />
+        <RowActionButtons experimentId={rowData.experimentPk.toString()} />
       ),
     },
     { title: 'Proposal title', field: 'proposal.title' },
@@ -90,20 +111,50 @@ export default function ExperimentsTimesTable({
     },
   ];
 
+  // the experiment can live outside the currently loaded page of results (e.g. a
+  // deep link), in which case ExperimentReviewContent fetches it by primary key
+  const experimentPkToReview =
+    selectedExperiment?.experimentPk ?? experimentPkFromUrl;
+
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={title}
-      isLoading={isLoading}
-      columns={columns(t)}
-      data={experimentsWithFormattedDates}
-      options={{
-        search: false,
-        padding: 'dense',
-        emptyRowsWhenPaging: false,
-        paging: false,
-        ...options,
-      }}
-    />
+    <div>
+      <MaterialTable
+        icons={tableIcons}
+        title={title}
+        isLoading={isLoading}
+        columns={columns(t)}
+        data={experimentsWithFormattedDates}
+        options={{
+          search: false,
+          padding: 'dense',
+          emptyRowsWhenPaging: false,
+          paging: false,
+          ...options,
+        }}
+      />
+      {experimentPkToReview !== null && (
+        <ExperimentReviewModal
+          title={
+            selectedExperiment
+              ? `View Experiment: ${selectedExperiment.experimentId} - (${toFormattedDateTime(selectedExperiment.startsAt)} - ${toFormattedDateTime(selectedExperiment.endsAt)})`
+              : 'View Experiment'
+          }
+          modalOpen={true}
+          handleClose={() => {
+            setSearchParams((searchParams) => {
+              searchParams.delete('experiment');
+
+              return searchParams;
+            });
+          }}
+        >
+          <ExperimentReviewContent
+            experimentPk={experimentPkToReview}
+            tabNames={experimentReviewTabs}
+            isInsideModal={true}
+          />
+        </ExperimentReviewModal>
+      )}
+    </div>
   );
 }
