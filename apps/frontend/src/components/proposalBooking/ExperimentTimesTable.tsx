@@ -67,8 +67,6 @@ export default function ExperimentsTimesTable({
   const experimentReviewTabs = [
     EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
     EXPERIMENT_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_FORM,
-    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_REVIEW,
     EXPERIMENT_MODAL_TAB_NAMES.VISIT,
   ];
 
@@ -151,6 +149,7 @@ export default function ExperimentsTimesTable({
           <ExperimentReviewContent
             experimentPk={experimentPkToReview}
             tabNames={experimentReviewTabs}
+            isUserOfficeView={false}
             isInsideModal={true}
           />
         </ExperimentReviewModal>
