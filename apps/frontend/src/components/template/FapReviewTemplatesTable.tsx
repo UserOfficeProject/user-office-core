@@ -6,7 +6,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
-import { FapReviewTemplate, Review, TemplateGroupId } from 'generated/sdk';
+import { Review, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useReviewsData } from 'hooks/review/useReviewsData';
@@ -138,17 +138,7 @@ export type ReviewTemplateRowDataType = TemplateRowDataType & {
 };
 
 type ReviewTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      FapReviewTemplate,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'callCount'
-      | 'questionaryCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function FapReviewTemplatesTable(props: ReviewTemplatesTableProps) {
@@ -219,7 +209,7 @@ function FapReviewTemplatesTable(props: ReviewTemplatesTableProps) {
             reviewTemplateRowData.questionaryCount === 0
           );
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
 
       <CallsModal
