@@ -131,6 +131,93 @@ context('visits tests', () => {
       cy.testActionButton(cyTagRegisterVisit, 'pending');
     });
 
+    it('Submitted date remains unchanged for user and officer', () => {
+      // 1. Officer requests changes on the existing visit registration so the visitor can register
+      cy.login('officer');
+      cy.visit('/Experiments');
+      cy.finishedLoading();
+
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
+      cy.get('[data-cy="request-visit-registration-changes-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="request-visit-registration-changes-button"]').should(
+        'not.exist'
+      );
+
+      // 2. Visitor fills and submits with the browser clock near midnight.
+      cy.logout();
+      cy.login(visitor);
+      cy.clock(new Date('2026-10-01T00:30:00.000Z'), ['Date']).as(
+        'visitorClock'
+      );
+      cy.visit('/');
+
+      cy.finishedLoading();
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagRegisterVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      selectDateRange(visitBasisDateRange);
+
+      let selectedRangeText = '';
+      cy.get(`[data-cy="${visitBasisDateRange}"] input`)
+        .invoke('val')
+        .then((val) => {
+          selectedRangeText = val as string;
+          expect(selectedRangeText).to.not.be.empty;
+        });
+
+      cy.get('[data-cy="save-and-continue-button"]').click();
+
+      // On the review step, the start and end dates should match the selected range
+      cy.then(() => {
+        const [expectedStart, expectedEnd] = selectedRangeText
+          .split('-')
+          .map((s) => s.trim());
+
+        cy.contains('Start date')
+          .parent()
+          .should('contain.text', expectedStart);
+        cy.contains('End date').parent().should('contain.text', expectedEnd);
+      });
+
+      cy.get('[data-cy="submit-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
+
+      // 3. User Officer views the registration with the clock near the next midnight.
+      cy.get('@visitorClock').invoke('restore');
+      cy.logout();
+      cy.login('officer');
+      cy.clock(new Date('2026-10-01T23:30:00.000Z'), ['Date']);
+      cy.visit('/Experiments');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
+      // Verify the officer sees the exact same start and end date without 1-day or time shift
+      cy.then(() => {
+        const [expectedStart, expectedEnd] = selectedRangeText
+          .split('-')
+          .map((s) => s.trim());
+
+        cy.get('[data-cy=visit-registrations-table] tbody tr')
+          .first()
+          .within(() => {
+            cy.contains(expectedStart).should('exist');
+            cy.contains(expectedEnd).should('exist');
+          });
+      });
+    });
+
     it('User should be able to cancel visit registration', () => {
       cy.login('user3');
       cy.visit('/');

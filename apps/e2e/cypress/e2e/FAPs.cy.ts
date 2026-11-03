@@ -1696,6 +1696,87 @@ context('Fap reviews tests', () => {
       cy.contains('Technical reviews').click();
       cy.contains(comment1).should('exist');
     });
+
+    it('FAP Secretary should be able to download the fap reviews excel sheet', () => {
+      cy.assignFapReviewersToProposals({
+        assignments: [
+          {
+            memberId: fapMembers.reviewer.id,
+            proposalPk: firstCreatedProposalPk,
+            rank: 1,
+          },
+          {
+            memberId: fapMembers.reviewer2.id,
+            proposalPk: firstCreatedProposalPk,
+            rank: 2,
+          },
+        ],
+        fapId: createdFapId,
+      });
+      cy.changeProposalsStatus({
+        workflowStatusId: fapReviewWorkflowStatusId,
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.getProposalReviews({
+        proposalPk: firstCreatedProposalPk,
+      }).then(({ proposalReviews }) => {
+        if (proposalReviews) {
+          proposalReviews.forEach((review, index) => {
+            cy.updateReview({
+              reviewID: review.id,
+              comment: index === 0 ? comment1 : comment2,
+              grade: index == 0 ? '4' : '6',
+              status: index == 0 ? ReviewStatus.SUBMITTED : ReviewStatus.DRAFT,
+              fapID: createdFapId,
+              questionaryID: review.questionaryID,
+            });
+          });
+        }
+      });
+
+      cy.login(fapMembers.secretary);
+      cy.visit(`/FapPage/2?tab=4`);
+      cy.finishedLoading();
+
+      cy.contains(fapMembers.reviewer.lastName).should('be.visible');
+      cy.contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(fapMembers.reviewer2.lastName).should('be.visible');
+      cy.contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="export-reviews-in-excel"]').click();
+      cy.readFile(`${Cypress.config('downloadsFolder')}/fap_reviews.xlsx`)
+        .should('exist')
+        .then(() => {
+          cy.task(
+            'convertXlsxToJson',
+            `${Cypress.config('downloadsFolder')}/fap_reviews.xlsx`
+          ).then((actualExport) => {
+            const today = new Date();
+            const currentDate = [
+              String(today.getDate()).padStart(2, '0'),
+              String(today.getMonth() + 1).padStart(2, '0'),
+              today.getFullYear(),
+            ].join('-');
+            cy.fixture('exampleFapReviewsExport.json').then(
+              (expectedExport) => {
+                expectedExport[0][0]['Instrument'] = instrument.shortCode;
+                expectedExport[0][0]['Date assigned'] = currentDate;
+                expectedExport[1][0]['Instrument'] = instrument.shortCode;
+                expectedExport[1][0]['Date assigned'] = currentDate;
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          });
+        });
+    });
   });
 
   describe('Fap Reviewer role', () => {

@@ -20,8 +20,6 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
-// `startsAt`/`endsAt` are Luxon DateTimes once edited, but come back as ISO
-// strings when the registration is loaded from the backend.
 const toDateTime = (value: unknown): DateTime | undefined => {
   if (value instanceof DateTime) {
     return value;
@@ -73,7 +71,10 @@ function QuestionaryComponentVisitBasis({
       onChange={({ from, to }: DayRange) => {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-          itemWithQuestionary: { startsAt: from, endsAt: to },
+          itemWithQuestionary: {
+            startsAt: from?.toISODate(),
+            endsAt: to?.toISODate(),
+          },
         });
       }}
     />
@@ -97,7 +98,14 @@ const updateVisitRegistration = async (
   api: Sdk,
   update: UpdateVisitRegistrationMutationVariables
 ) => {
-  const { updateVisitRegistration } = await api.updateVisitRegistration(update);
+  const payload: UpdateVisitRegistrationMutationVariables = {
+    ...update,
+    startsAt: update.startsAt,
+    endsAt: update.endsAt,
+  };
+
+  const { updateVisitRegistration } =
+    await api.updateVisitRegistration(payload);
 
   return updateVisitRegistration;
 };
