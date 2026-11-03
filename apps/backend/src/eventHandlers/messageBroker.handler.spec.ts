@@ -184,7 +184,7 @@ describe('messageBroker handlers', () => {
       await createListenToRabbitMQHandler();
 
       const bookingMessage = {
-        id: null,
+        id: 202,
         startsAt: new Date('2026-06-01'),
         endsAt: new Date('2026-06-02'),
         experimentId: 'MX99912-1',
@@ -204,7 +204,7 @@ describe('messageBroker handlers', () => {
         expect.objectContaining({
           startsAt: bookingMessage.startsAt,
           endsAt: bookingMessage.endsAt,
-          scheduledEventId: null,
+          scheduledEventId: bookingMessage.id,
           experimentId: bookingMessage.experimentId,
           proposalPk: dummyProposal.primaryKey,
           status: bookingMessage.status,
@@ -240,7 +240,7 @@ describe('messageBroker handlers', () => {
       await createListenToRabbitMQHandler();
 
       await listenCallback(Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED, {
-        id: null,
+        id: 203,
         startsAt: new Date('2026-06-01'),
         endsAt: new Date('2026-06-02'),
         proposalId: dummyProposal.proposalId,

@@ -26,7 +26,7 @@ export type ExperimentCreateInput = Omit<
   | 'source'
 > & {
   experimentId?: string;
-  scheduledEventId: number | null;
+  scheduledEventId: number;
   source?: string | null;
 };
 

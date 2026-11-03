@@ -99,7 +99,7 @@ type ExperimentMessageData = {
 /** Normalized form of either scheduler payload; absent alternatives are null. */
 export type ProposalBookingTimeSlotAddedMessage = {
   source: string | null;
-  id: number | null;
+  id: number;
   startsAt: Date;
   endsAt: Date;
   experimentId: string | null;
@@ -162,13 +162,17 @@ export const parseProposalBookingTimeSlotAddedMessage = (
     throw new Error('Scheduler booking message dates cannot be null');
   }
 
+  if (message.id == null) {
+    throw new Error('Scheduler booking message id cannot be null');
+  }
+
   if (hasPublicIdentifiers && typeof message.source !== 'string') {
     throw new Error('Public identifier scheduler message requires a source');
   }
 
   return {
     source: (message.source as string | null | undefined) ?? null,
-    id: message.id as number | null,
+    id: message.id as number,
     startsAt: message.startsAt as Date,
     endsAt: message.endsAt as Date,
     experimentId: (message.experimentId as string | null | undefined) ?? null,

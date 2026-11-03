@@ -27,7 +27,7 @@ const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
     values?.experimentId ?? 'dummy',
     values?.startsAt ?? new Date(Date.now() + 86400000), // startsAt (default: 1 day from now)
     values?.endsAt ?? new Date(Date.now() + 86400000 * 2), // endsAt (default: 2 days from now)
-    values?.scheduledEventId === undefined ? 1 : values.scheduledEventId,
+    values?.scheduledEventId ?? 1,
     values?.proposalPk ?? 1,
     values?.status ?? ExperimentStatus.DRAFT,
     values?.localContactId ?? null,
