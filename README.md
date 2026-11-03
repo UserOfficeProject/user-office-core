@@ -54,15 +54,6 @@ Runs the app in the development mode.<br>
 Lints typescript code and log if there are any errors.<br>
 `npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings.
 
-## Institution management
-
-The Institutions page uses server-side pagination, sorting, and case-insensitive
-search across institution names, countries, and ROR IDs. The `institutionsPage`
-GraphQL query accepts `first`, `offset`, `searchText`, `sortField` (`name`,
-`country.value`, or `rorId`), and `sortDirection`, and returns `institutions` and
-the filtered `totalCount`. It is available to user officers. The existing
-`institutions` query remains unchanged for institution selectors.
-
 ## Contribution and release versioning
 
 Please refer to the [Contribution guide](CONTRIBUTING.md) to get information about contributing and versioning.
