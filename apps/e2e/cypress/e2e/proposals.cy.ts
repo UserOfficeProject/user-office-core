@@ -2310,4 +2310,57 @@ context('Proposal tests', () => {
       });
     });
   });
+
+  describe('False workflowId error toast', () => {
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
+      cy.resetDB(true);
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it("Doesn't show error toast, when status is successfully edited", () => {
+      // Make sure the test doesnt fail on the unhandled exception, but the assertion below
+      // Checking the uncaught exception seemed unreliable
+      Cypress.on('uncaught:exception', () => {
+        return false;
+      });
+
+      cy.login('officer');
+      cy.visit('/Proposals');
+
+      // Filter for SCHEDULING status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="SCHEDULING"]').click();
+
+      // Change first proposal to DRAFT
+      cy.get('td input[type="checkbox"]').first().click();
+      cy.get('[data-cy="change-proposal-status"]').click();
+      cy.get('[data-cy="status-selection"]').click();
+      cy.get('li[data-option-index="0"]').click();
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+      // Check that the error toast never appears in the next 3 seconds
+      cy.document().then(async (doc) => {
+        const started = Date.now();
+        while (Date.now() - started < 3000) {
+          if (doc.querySelector('.SnackbarItem-variantError')) {
+            throw new Error('An error toast appeared on the page!');
+          }
+          await Cypress.Promise.delay(100);
+        }
+      });
+
+      // Filter for DRAFT status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="DRAFT"]').click();
+
+      // Check that the proposal has been successfully edited to DRAFT
+      cy.get('td input[type="checkbox"]').first().should('exist');
+    });
+  });
 });
