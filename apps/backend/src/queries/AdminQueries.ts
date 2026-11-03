@@ -7,6 +7,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { InstitutionsPageArgs } from '../resolvers/queries/InstitutionsPageQuery';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
 import { getContextKeys } from '../utils/helperFunctions';
 
@@ -30,6 +31,14 @@ export default class AdminQueries {
 
   async getInstitutions(filter?: InstitutionsFilter) {
     return await this.dataSource.getInstitutions(filter);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getInstitutionsPage(
+    agent: UserWithRole | null,
+    args: InstitutionsPageArgs
+  ) {
+    return this.dataSource.getInstitutionsPage(args);
   }
 
   async getInstitution(id: number) {
