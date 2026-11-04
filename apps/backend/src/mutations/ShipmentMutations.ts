@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { SampleAuthorization } from '../auth/SampleAuthorization';
@@ -19,7 +18,6 @@ import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipm
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
-import { AssetRegistrar } from '../services/assetRegistrar/AssetRegistrar';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
@@ -36,8 +34,6 @@ export default class ShipmentMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.AssetRegistrar)
-    private assetRegistrarService: AssetRegistrar,
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
@@ -131,33 +127,32 @@ export default class ShipmentMutations {
       );
     }
 
-    try {
-      const assetId = await this.assetRegistrarService.register(
-        args.shipmentId
-      );
-
-      return this.shipmentDataSource
-        .update({
-          shipmentId: args.shipmentId,
-          status: ShipmentStatus.SUBMITTED,
-          externalRef: assetId,
-        })
-        .then((shipment) => shipment);
-    } catch (error) {
-      const errorMessage = (error as Error).message;
-      logger.logException(
-        'Error occurred while registering asset into EAM',
-        error as Error,
-        { agent, args }
-      );
-
+    const shipment = await this.shipmentDataSource.getShipment(args.shipmentId);
+    if (!shipment) {
       return rejection(
-        errorMessage ||
-          'Could not submit shipment because an error occurred. Please try again later.',
-        { args },
-        error
+        'Can not submit shipment because shipment was not found',
+        { args }
       );
     }
+
+    const proposal = await this.proposalDataSource.get(shipment.proposalPk);
+    if (!proposal) {
+      return rejection(
+        'Can not submit shipment because proposal was not found',
+        { args }
+      );
+    }
+
+    return this.shipmentDataSource
+      .update({
+        shipmentId: args.shipmentId,
+        status: ShipmentStatus.SUBMITTED,
+        externalRef: proposal.proposalId,
+      })
+      .then((shipment) => shipment)
+      .catch((error) => {
+        return rejection('Could not submit shipment', { agent, args }, error);
+      });
   }
 
   async updateShipment(agent: UserWithRole | null, args: UpdateShipmentArgs) {
