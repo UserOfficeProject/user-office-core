@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 
 import ShipmentMutations from './ShipmentMutations';
 import { Tokens } from '../config/Tokens';
-import { dummyProposal } from '../datasources/mockups/ProposalDataSource';
+import { UpcomingExperimentWithExperiment } from '../datasources/mockups/ExperimentDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import {
   dummyUserNotOnProposalWithRole,
@@ -26,12 +26,14 @@ test('User can submit shipment', async () => {
   expect((result as Shipment).id).toEqual(1);
 });
 
-test('Submitting shipment sets external reference to the proposal number', async () => {
+test('Submitting shipment sets external reference to the experiment ID', async () => {
   const result = await mutations.submitShipment(dummyUserWithRole, {
     shipmentId: 1,
   });
 
-  expect((result as Shipment).externalRef).toEqual(dummyProposal.proposalId);
+  expect((result as Shipment).externalRef).toEqual(
+    UpcomingExperimentWithExperiment.experimentId
+  );
 });
 
 test('User not on proposal can not submit shipment', async () => {

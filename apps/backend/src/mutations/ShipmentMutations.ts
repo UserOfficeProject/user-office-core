@@ -4,6 +4,7 @@ import { SampleAuthorization } from '../auth/SampleAuthorization';
 import { ShipmentAuthorization } from '../auth/ShipmentAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
@@ -34,6 +35,8 @@ export default class ShipmentMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
@@ -135,10 +138,12 @@ export default class ShipmentMutations {
       );
     }
 
-    const proposal = await this.proposalDataSource.get(shipment.proposalPk);
-    if (!proposal) {
+    const experiment = await this.experimentDataSource.getExperiment(
+      shipment.experimentPk
+    );
+    if (!experiment) {
       return rejection(
-        'Can not submit shipment because proposal was not found',
+        'Can not submit shipment because experiment was not found',
         { args }
       );
     }
@@ -147,7 +152,7 @@ export default class ShipmentMutations {
       .update({
         shipmentId: args.shipmentId,
         status: ShipmentStatus.SUBMITTED,
-        externalRef: proposal.proposalId,
+        externalRef: experiment.experimentId,
       })
       .then((shipment) => shipment)
       .catch((error) => {
