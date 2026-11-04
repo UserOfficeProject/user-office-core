@@ -40,7 +40,7 @@
     "luxon": "^3.4.4",
     "mime": "^3.0.0",
     "notistack": "^2.0.4",
-    "pdfjs-dist": "5.4.296",
+    "pdfjs-dist": "^6.2.108",
     "query-string": "^9.5.0",
     "react": "^18.3.1",
     "react-day-picker": "^10.0.0",
@@ -50,7 +50,7 @@
     "react-pdf": "^10.4.1",
     "react-router-dom": "^6.30.3",
     "reactflow": "^11.11.4",
-    "tinymce": "^7.5.1",
+    "tinymce": "^8.9.3",
     "yup": "^1.7.1"
   },
   "proxy": "http://localhost:4000",
