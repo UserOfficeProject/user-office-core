@@ -1,9 +1,7 @@
 name: AI usage labels
 
-# pull_request_target so PRs from forks can be labelled too.
-# NOTE: Do not check out or run PR code in this workflow, it runs with a write token.
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
