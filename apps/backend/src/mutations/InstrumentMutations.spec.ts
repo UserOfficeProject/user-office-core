@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import InstrumentMutations from './InstrumentMutations';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import {
   dummyInstrument,
   dummyInstrumentHasProposals,
@@ -20,6 +21,7 @@ import { WorkflowType } from '../models/Workflow';
 let proposalDataSource: ProposalDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
+let experimentDataSource: ExperimentDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
@@ -32,6 +34,9 @@ beforeEach(() => {
   );
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
+  );
+  experimentDataSource = container.resolve<ExperimentDataSourceMock>(
+    Tokens.ExperimentDataSource
   );
 });
 
@@ -337,6 +342,66 @@ describe('Test Instrument Mutations', () => {
         instrumentIds: [1],
         submitted: false,
       });
+    });
+
+    test('A placeholder experiment is created for each assigned technique proposal', async () => {
+      const createExperiment = jest.spyOn(experimentDataSource, 'create');
+
+      const result =
+        await instrumentMutations.assignTechniqueProposalsToInstruments(
+          dummyUserOfficerWithRole,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        );
+
+      expect(result).toEqual({
+        instrumentHasProposalIds: [1, 2],
+        proposalPks: [1, 2],
+        instrumentIds: [1],
+        submitted: false,
+      });
+
+      // One placeholder experiment per proposal
+      expect(createExperiment).toHaveBeenCalledTimes(2);
+
+      const firstCall = createExperiment.mock.calls[0][0];
+      expect(firstCall.endsAt).toBeNull();
+      expect(firstCall.status).toBe('DRAFT');
+      expect(firstCall.instrumentId).toBe(1);
+      expect(firstCall.proposalPk).toBe(1);
+      expect(firstCall.localContactId).toBeNull();
+
+      // startsAt defaults to the current date
+      expect(
+        Math.abs(new Date(firstCall.startsAt).getTime() - Date.now())
+      ).toBeLessThan(1000);
+
+      const secondCall = createExperiment.mock.calls[1][0];
+      expect(secondCall.proposalPk).toBe(2);
+      expect(secondCall.instrumentId).toBe(1);
+    });
+
+    test('Assigning is rejected when creating the placeholder experiment fails', async () => {
+      jest
+        .spyOn(experimentDataSource, 'create')
+        .mockRejectedValue(new Error('boom'));
+
+      const result =
+        await instrumentMutations.assignTechniqueProposalsToInstruments(
+          dummyUserOfficerWithRole,
+          {
+            proposalPks: [1],
+            instrumentIds: [1],
+          }
+        );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          message: expect.stringContaining('Could not create experiment'),
+        })
+      );
     });
   });
 });

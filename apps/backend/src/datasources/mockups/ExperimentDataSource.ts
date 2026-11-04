@@ -168,7 +168,27 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
       'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
     >
   ): Promise<Experiment> {
-    throw new Error('Method not implemented.');
+    const newPk =
+      this.experiments.reduce((max, e) => Math.max(max, e.experimentPk), 0) + 1;
+
+    const newExperiment = new Experiment(
+      newPk,
+      String(newPk),
+      experiment.startsAt,
+      experiment.endsAt,
+      experiment.scheduledEventId,
+      experiment.proposalPk,
+      experiment.status,
+      experiment.localContactId,
+      experiment.instrumentId,
+      new Date(),
+      new Date(),
+      null
+    );
+
+    this.experiments.push(newExperiment);
+
+    return Promise.resolve(newExperiment);
   }
   updateByScheduledEventId(
     experiment: Omit<

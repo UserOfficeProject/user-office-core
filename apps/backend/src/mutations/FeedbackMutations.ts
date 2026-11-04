@@ -208,6 +208,12 @@ export default class FeedbackMutations {
         30
       );
 
+    // Experiments without an end date (e.g. placeholder experiments created
+    // before a time slot is scheduled) are never considered too old.
+    if (experiment.endsAt === null) {
+      return false;
+    }
+
     return moment(experiment.endsAt).isBefore(
       moment().subtract(FEEDBACK_EXHAUST_DAYS, 'days')
     );

@@ -18,7 +18,7 @@ export class Experiment {
     public experimentPk: number,
     public experimentId: string,
     public startsAt: Date,
-    public endsAt: Date,
+    public endsAt: Date | null,
     public scheduledEventId: number,
     public proposalPk: number,
     public status: ExperimentStatus,

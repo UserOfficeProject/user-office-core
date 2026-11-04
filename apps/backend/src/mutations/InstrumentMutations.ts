@@ -13,6 +13,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -21,8 +22,9 @@ import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Experiment, ExperimentStatus } from '../models/Experiment';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
-import { rejection, Rejection } from '../models/Rejection';
+import { rejection, Rejection, isRejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
@@ -60,7 +62,9 @@ export default class InstrumentMutations {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TechniqueDataSource)
-    private techniqueDataSource: TechniqueDataSource
+    private techniqueDataSource: TechniqueDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
   @EventBus(Event.INSTRUMENT_CREATED)
@@ -196,7 +200,6 @@ export default class InstrumentMutations {
 
     const instrumentHasProposalIds: number[] = [];
 
-    // TODO: Cleanup this part because it is quite ugly
     for await (const instrumentId of args.instrumentIds) {
       const allProposalsAreOnSameCallAsInstrument =
         await this.checkIfProposalsAreOnSameCallAsInstrument(
@@ -221,100 +224,19 @@ export default class InstrumentMutations {
       }
 
       for await (const proposalPk of args.proposalPks) {
-        // all instruments currently on a proposal
-        const proposalInstruments =
-          await this.dataSource.getInstrumentsByProposalPk(proposalPk);
-
-        // Instruments on the proposal to remove
-        const proposalInstrumentsToRemove = proposalInstruments.filter(
-          (i) => !args.instrumentIds.includes(i.id)
-        );
-
-        if (proposalInstrumentsToRemove.length) {
-          await Promise.all(
-            proposalInstrumentsToRemove.map((i) => {
-              return this.dataSource.removeProposalsFromInstrument(
-                [proposalPk],
-                i.id
-              );
-            })
-          );
-        }
-
-        if (proposalInstruments.find((i) => i.id === instrumentId)) {
-          continue;
-        }
-
-        const {
-          instrumentHasProposalIds: [instrumentHasProposalId],
-        } = await this.dataSource.assignProposalToInstrument(
+        const instrumentHasProposalId = await this.assignProposalToInstrument(
+          agent,
           proposalPk,
-          instrumentId
+          instrument,
+          args
         );
-        instrumentHasProposalIds.push(instrumentHasProposalId);
 
-        const needTechReview =
-          await this.proposalDataSource.doesProposalNeedTechReview(proposalPk);
+        if (isRejection(instrumentHasProposalId)) {
+          return instrumentHasProposalId;
+        }
 
-        if (needTechReview) {
-          const technicalReview =
-            await this.reviewDataSource.getProposalInstrumentTechnicalReview(
-              proposalPk,
-              instrumentId
-            );
-
-          if (technicalReview) {
-            await this.proposalDataSource.updateProposalTechnicalReviewer({
-              userId: instrument.managerUserId,
-              proposalPks: [proposalPk],
-              instrumentId: instrument.id,
-            });
-          } else {
-            const proposal = await this.proposalDataSource.get(proposalPk);
-
-            if (!proposal) {
-              return rejection(
-                'Cannot find the proposal for the technical review to be created',
-                { agent, args }
-              );
-            }
-
-            const call = await this.callDataSource.getCall(proposal.callId);
-
-            if (!call) {
-              return rejection(
-                'Cannot find the call for proposal of the technical review to be created',
-                { agent, args }
-              );
-            }
-
-            const technicalReviewQuestionary =
-              await this.questionaryDataSource.create(
-                proposal.proposerId,
-                call.technicalReviewTemplateId
-              );
-
-            await this.reviewDataSource.setTechnicalReview(
-              {
-                proposalPk: proposalPk,
-                comment: null,
-                publicComment: null,
-                reviewerId: instrument.managerUserId,
-                timeAllocation: null,
-                status: null,
-                files: null,
-                submitted: false,
-                instrumentId: instrument.id,
-                questionaryId: technicalReviewQuestionary.questionaryId,
-              },
-              false
-            );
-            await this.proposalDataSource.updateProposalTechnicalReviewer({
-              userId: instrument.managerUserId,
-              proposalPks: [proposalPk],
-              instrumentId: instrument.id,
-            });
-          }
+        if (instrumentHasProposalId !== null) {
+          instrumentHasProposalIds.push(instrumentHasProposalId);
         }
       }
     }
@@ -327,6 +249,164 @@ export default class InstrumentMutations {
     );
 
     return result;
+  }
+
+  /**
+   * Assigns a single proposal to an instrument, removing it from any
+   * instruments that are not part of the requested set, and sets up the
+   * technical review if the proposal requires one.
+   * Resolves to the new instrument_has_proposals id, or null when the
+   * proposal was already assigned to the instrument.
+   */
+  private async assignProposalToInstrument(
+    agent: UserWithRole | null,
+    proposalPk: number,
+    instrument: Instrument,
+    args: AssignProposalsToInstrumentsArgs
+  ): Promise<number | null | Rejection> {
+    // All instruments currently on the proposal
+    const proposalInstruments =
+      await this.dataSource.getInstrumentsByProposalPk(proposalPk);
+
+    // Instruments on the proposal that are not part of the requested set
+    const proposalInstrumentsToRemove = proposalInstruments.filter(
+      (i) => !args.instrumentIds.includes(i.id)
+    );
+
+    if (proposalInstrumentsToRemove.length) {
+      await Promise.all(
+        proposalInstrumentsToRemove.map((i) => {
+          return this.dataSource.removeProposalsFromInstrument(
+            [proposalPk],
+            i.id
+          );
+        })
+      );
+    }
+
+    // Already assigned to this instrument: nothing to do
+    if (proposalInstruments.find((i) => i.id === instrument.id)) {
+      return null;
+    }
+
+    const {
+      instrumentHasProposalIds: [instrumentHasProposalId],
+    } = await this.dataSource.assignProposalToInstrument(
+      proposalPk,
+      instrument.id
+    );
+
+    const needTechReview =
+      await this.proposalDataSource.doesProposalNeedTechReview(proposalPk);
+
+    if (!needTechReview) {
+      return instrumentHasProposalId;
+    }
+
+    const technicalReview =
+      await this.reviewDataSource.getProposalInstrumentTechnicalReview(
+        proposalPk,
+        instrument.id
+      );
+
+    if (technicalReview) {
+      await this.proposalDataSource.updateProposalTechnicalReviewer({
+        userId: instrument.managerUserId,
+        proposalPks: [proposalPk],
+        instrumentId: instrument.id,
+      });
+
+      return instrumentHasProposalId;
+    }
+
+    const proposal = await this.proposalDataSource.get(proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Cannot find the proposal for the technical review to be created',
+        { agent, args }
+      );
+    }
+
+    const call = await this.callDataSource.getCall(proposal.callId);
+
+    if (!call) {
+      return rejection(
+        'Cannot find the call for proposal of the technical review to be created',
+        { agent, args }
+      );
+    }
+
+    const technicalReviewQuestionary = await this.questionaryDataSource.create(
+      proposal.proposerId,
+      call.technicalReviewTemplateId
+    );
+
+    await this.reviewDataSource.setTechnicalReview(
+      {
+        proposalPk: proposalPk,
+        comment: null,
+        publicComment: null,
+        reviewerId: instrument.managerUserId,
+        timeAllocation: null,
+        status: null,
+        files: null,
+        submitted: false,
+        instrumentId: instrument.id,
+        questionaryId: technicalReviewQuestionary.questionaryId,
+      },
+      false
+    );
+    await this.proposalDataSource.updateProposalTechnicalReviewer({
+      userId: instrument.managerUserId,
+      proposalPks: [proposalPk],
+      instrumentId: instrument.id,
+    });
+
+    return instrumentHasProposalId;
+  }
+
+  /**
+   * Creates a placeholder experiment for a technique proposal that has been
+   * assigned to an instrument. It mirrors the experiment created by the
+   * message broker for the PROPOSAL_BOOKING_TIME_SLOT_ADDED event, but the
+   * time slot is not scheduled yet: startsAt defaults to the current date
+   * and endsAt stays null until a time slot is booked in the scheduler.
+   */
+  private async createTechniqueExperiment(
+    agent: UserWithRole | null,
+    proposalPk: number,
+    instrument: Instrument,
+    startsAt: Date | null
+  ): Promise<Rejection | void> {
+    try {
+      const experimentToAdd = {
+        startsAt: startsAt ?? new Date(),
+        endsAt: null,
+        // There is no scheduler booking yet, so there is no scheduled event.
+        scheduledEventId: 0,
+        proposalPk,
+        status: ExperimentStatus.DRAFT,
+        localContactId: null,
+        instrumentId: instrument.id,
+      } as Omit<
+        Experiment,
+        'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+      >;
+
+      await this.experimentDataSource.create(experimentToAdd);
+    } catch (error) {
+      logger.logException(
+        `Error while creating experiment for technique proposal ${proposalPk} on instrument ${instrument.id}`,
+        error
+      );
+
+      return rejection(
+        'Could not create experiment for the assigned technique proposal',
+        { agent, proposalPk, instrumentId: instrument.id },
+        error
+      );
+    }
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -600,6 +680,30 @@ export default class InstrumentMutations {
           args,
         }
       );
+    }
+
+    // Create a placeholder experiment for every proposal being assigned to
+    // the instrument. No time slot is scheduled yet, so startsAt defaults
+    // to the current date and endsAt stays null until a slot is booked.
+    const experimentInstrument = await this.dataSource.getInstrument(
+      args.instrumentIds[0]
+    );
+
+    if (!experimentInstrument) {
+      return rejection('Instrument not found', { agent, args });
+    }
+
+    for (const proposalPk of args.proposalPks) {
+      const experimentResult = await this.createTechniqueExperiment(
+        agent,
+        proposalPk,
+        experimentInstrument,
+        null
+      );
+
+      if (experimentResult) {
+        return experimentResult;
+      }
     }
 
     return this.assignProposalsToInstrumentsInternal(agent, args);
