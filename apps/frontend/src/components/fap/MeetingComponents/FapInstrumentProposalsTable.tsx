@@ -177,7 +177,20 @@ const FapInstrumentProposalsTable = ({
           (fmd) => fmd.recommendedInstrumentId === fapInstrument.id
         )?.meetingScore;
 
-        return meetingScore || '-';
+        return (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              px: 2,
+            }}
+            data-cy={`meeting-score-${rowData.proposal.proposalId}`}
+          >
+            {meetingScore || '-'}
+          </Box>
+        );
       },
     },
     {
@@ -300,7 +313,9 @@ const FapInstrumentProposalsTable = ({
         typeof a.proposalDeviation === 'number' &&
         typeof b.proposalDeviation === 'number'
       ) {
-        return a.proposalDeviation < b.proposalDeviation ? -1 : 1;
+        // Do we want to sort by deviation in ascending or descending order? Currently it is descending.
+        // Lower deviation means more consistent reviews so I would have thought we would to sort that way but it is not currently the case
+        return a.proposalDeviation > b.proposalDeviation ? -1 : 1;
       } else {
         return 1;
       }

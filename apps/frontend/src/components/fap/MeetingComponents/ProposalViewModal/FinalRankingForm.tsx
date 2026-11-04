@@ -61,7 +61,8 @@ const FinalRankingForm = ({
     (fmd) => fmd.recommendedInstrumentId === instrumentId
   );
   const [gradeType, setGradeType] = useState<'Number' | 'Classification'>(
-    isNaN(Number(fapMeetingDecision?.meetingScore))
+    isNaN(Number(fapMeetingDecision?.meetingScore)) &&
+      fapMeetingDecision?.meetingScore != null
       ? 'Classification'
       : 'Number'
   );
