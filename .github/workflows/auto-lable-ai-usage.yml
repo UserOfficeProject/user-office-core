@@ -35,9 +35,9 @@ jobs:
               return;
             }
 
-            // Check if AI Usage section is filled. 
+            // Check if the "AI contributed meaningfully" checkbox in the AI Usage section is ticked.
             const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '');
-            const aiUsed = /^##\s+AI Usage\s*$/im.test(body);
+            const aiUsed = /^\s*[-*]\s+\[[xX]\]\s+AI contributed meaningfully/m.test(body);
 
             // Never remove the label
             if (aiUsed && !labels.includes('ai:assisted')) {
