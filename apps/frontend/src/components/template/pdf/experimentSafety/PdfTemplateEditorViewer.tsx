@@ -1,10 +1,9 @@
 import Box from '@mui/material/Box';
 import { useResizeObserver } from '@wojtekmaj/react-hooks';
-import { PDFDocumentProxy } from 'pdfjs-dist';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import React, { useCallback, useContext, useState } from 'react';
-import { pdfjs, Document, Page } from 'react-pdf';
+import { pdfjs, Document, Page, type DocumentProps } from 'react-pdf';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ExperimentSafetyPdfTemplate } from 'generated/sdk';
@@ -30,11 +29,11 @@ const PDFViewer = ({ fileUrl }: { fileUrl: string }) => {
 
   useResizeObserver(containerRef, resizeObserverOptions, onResize);
 
-  function onDocumentLoadSuccess({
+  const onDocumentLoadSuccess: NonNullable<DocumentProps['onLoadSuccess']> = ({
     numPages: nextNumPages,
-  }: PDFDocumentProxy): void {
+  }) => {
     setNumPages(nextNumPages);
-  }
+  };
 
   return (
     <Box
