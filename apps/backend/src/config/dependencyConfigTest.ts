@@ -55,7 +55,6 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { mapClass, mapValue } from './utils';
 
@@ -115,8 +114,6 @@ mapClass(Tokens.EmailTemplateDataSource, EmailTemplateDataSourceMock);
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-
-mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.LoggingHandler, createLoggingHandler());

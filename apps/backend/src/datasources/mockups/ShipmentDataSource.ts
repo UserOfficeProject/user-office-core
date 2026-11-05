@@ -68,6 +68,7 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
     const shipment = await this.getShipment(args.shipmentId);
     shipment.title = args.title || shipment.title;
     shipment.status = args.status || shipment.status;
+    shipment.externalRef = args.externalRef || shipment.externalRef;
 
     return shipment;
   }

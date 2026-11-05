@@ -16,21 +16,6 @@ For more detailed information, refer to the [dotenv documentation](https://www.n
 
 ## Environment Variables
 
-### EAM Configuration (ESS-specific)
-
-The EAM (Enterprise Asset Management) section includes variables that configure Camel API access and OAuth2 authentication.
-
-- **EAM_API_URL**: Base URL for the EAM Camel integration endpoints (the `/assets` and `/casemanagement` paths are appended).
-- **EAM_OAUTH_TOKEN_URL**: The OAuth2 token endpoint used to obtain an access token via the client_credentials grant.
-- **EAM_AUTH_CLIENT_ID**: The client ID used for OAuth2 authentication.
-- **EAM_AUTH_CLIENT_SECRET**: The client secret used for OAuth2 authentication.
-- **EAM_OAUTH_SCOPE**: The OAuth2 scope requested when fetching the access token.
-- **EAM_OAUTH_AUDIENCE**: The OAuth2 audience requested when fetching the access token.
-- **EAM_ORGANIZATION_CODE**: The organization code used in EAM request payloads.
-- **EAM_ORGANIZATION_NAME**: The organization name used in EAM request payloads.
-- **EAM_LOCATION_CODE**: The location code used in EAM request payloads.
-- **EAM_EQUIPMENT_PART_CODE**: The part code used in EAM operations.
-
 ### Logging Configuration (Graylog)
 
 To enable local logging via Graylog, uncomment and configure the following variables:

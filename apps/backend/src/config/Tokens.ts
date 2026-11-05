@@ -1,7 +1,6 @@
 // This file contains unique tokens for each dependency
 export const Tokens = {
   AdminDataSource: Symbol('AdminDataSource'),
-  AssetRegistrar: Symbol('AssetRegistrar'),
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
