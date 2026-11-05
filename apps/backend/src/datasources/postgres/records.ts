@@ -1498,11 +1498,12 @@ export interface ExperimentRecord {
   readonly scheduled_event_id: number;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
-  readonly local_contact_id: number;
+  readonly local_contact_id: number | null;
   readonly instrument_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly reference_number_sequence: number;
+  readonly source: string | null;
 }
 
 export interface ExperimentPaginatedRecord {
@@ -1513,11 +1514,12 @@ export interface ExperimentPaginatedRecord {
   readonly scheduled_event_id: number;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
-  readonly local_contact_id: number;
+  readonly local_contact_id: number | null;
   readonly instrument_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly reference_number_sequence: number;
+  readonly source: string | null;
   readonly full_count: number;
 }
 
@@ -1536,7 +1538,8 @@ export const createExperimentPaginatedObject = (
     experiment.instrument_id,
     experiment.created_at,
     experiment.updated_at,
-    experiment.reference_number_sequence
+    experiment.reference_number_sequence,
+    experiment.source
   );
 };
 
