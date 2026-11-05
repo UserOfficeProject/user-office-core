@@ -24,4 +24,7 @@ export class EmailTemplate implements EmailTemplateOrigin {
 
   @Field(() => String, { nullable: true })
   public body: string;
+
+  @Field(() => String, { nullable: true })
+  public updateComment: string;
 }

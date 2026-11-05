@@ -363,6 +363,7 @@ export interface TemplateVersionRecord {
   readonly version_number: number;
   readonly template: string;
   readonly created_at: Date;
+  readonly update_comment: string;
 }
 
 export interface PageTextRecord {
@@ -1063,7 +1064,8 @@ export const createEmailVersionsObject = (
     template,
     templateVersions.version_number,
     templateVersions.template_type,
-    templateVersions.created_at.toUTCString()
+    templateVersions.created_at.toUTCString(),
+    templateVersions.update_comment
   );
 };
 

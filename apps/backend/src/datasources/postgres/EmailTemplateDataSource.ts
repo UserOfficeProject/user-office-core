@@ -106,7 +106,8 @@ export default class PostgresEmailTemplateDataSource
     description: string,
     useTemplateFile: boolean,
     subject?: string,
-    body?: string
+    body?: string,
+    updateComment?: string
   ): Promise<EmailTemplate> {
     const currentTemplate = await this.getEmailTemplate(emailTemplateId);
     const template = JSON.stringify({
@@ -117,7 +118,8 @@ export default class PostgresEmailTemplateDataSource
       await this.templateVersionDataSource.createNewVersion(
         emailTemplateId,
         'EMAIL',
-        template
+        template,
+        updateComment
       );
     }
 

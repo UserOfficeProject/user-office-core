@@ -13,6 +13,7 @@ export interface TemplateVersionDataSource {
   createNewVersion(
     emailTemplateId: number,
     templateType: string,
-    template?: string
+    template?: string,
+    updateComment?: string
   ): Promise<TemplateVersion | void>;
 }

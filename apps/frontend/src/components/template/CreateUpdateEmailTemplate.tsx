@@ -101,6 +101,7 @@ const CreateUpdateEmailTemplate = ({
         useTemplateFile: false,
         subject: '',
         body: '',
+        updateComment: '',
       };
 
   return (
@@ -111,7 +112,10 @@ const CreateUpdateEmailTemplate = ({
           try {
             const { updateEmailTemplate } = await api({
               toastSuccessMessage: 'Email template updated successfully!',
-            }).updateEmailTemplate({ id: emailTemplate.id, ...values });
+            }).updateEmailTemplate({
+              id: emailTemplate.id,
+              ...values,
+            });
 
             close(updateEmailTemplate);
           } catch {
@@ -215,6 +219,17 @@ const CreateUpdateEmailTemplate = ({
                     </Box>
                   )}
                 </Field>
+                <Field
+                  name="updateComment"
+                  id="updateComment"
+                  label="Update comment (optional)"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  variant="outlined"
+                  data-cy="update-Comment"
+                  disabled={isExecutingCall || values.useTemplateFile}
+                />
               </Box>
 
               <EmailTemplatePreview
@@ -246,7 +261,10 @@ const CreateUpdateEmailTemplate = ({
                       >
                         {version.versionNumber +
                           ': ' +
-                          version.createdTimeStamp}
+                          version.createdTimeStamp +
+                          (version.updateComment
+                            ? '     :    ' + version.updateComment
+                            : '')}
                       </MenuItem>
                     ))}
                   </Select>
