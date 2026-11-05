@@ -30,6 +30,9 @@ export class UpdateEmailTemplateInput {
 
   @Field(() => String, { nullable: true })
   public body?: string;
+
+  @Field(() => String, { nullable: true })
+  public updateComment?: string;
 }
 
 @Resolver()
