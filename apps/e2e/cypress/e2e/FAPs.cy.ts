@@ -7,6 +7,7 @@ import {
   UpdateUserMutationVariables,
   TemplateGroupId,
   FeatureId,
+  FeatureUpdateAction,
   UserJwt,
   SettingsId,
   Event,
@@ -4066,15 +4067,21 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it('Fap Secretary should be able to update avalibabity time', () => {
+    it('Fap Secretary should be able to update availability time when enabled by feature flag', () => {
       cy.login('officer');
+      cy.updateFeature({
+        action: FeatureUpdateAction.ENABLE,
+        featureIds: [FeatureId.EDIT_INSTRUMENT_AVAILABILITY_TIME],
+      });
+      cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
 
       cy.get('[data-testid="AddAlarmIcon"]').first().closest('button').click();
 
-      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="availability-time"]').clear().type('10');
       cy.get('[data-cy="submit-update-time"]').click();
 
       cy.contains('Availability time updated successfully!');
