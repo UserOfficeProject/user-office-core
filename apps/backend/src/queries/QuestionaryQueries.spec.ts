@@ -7,6 +7,7 @@ import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import {
   dummyUserOfficerWithRole,
+  dummyUserOfficerWithDerivedRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 
@@ -30,6 +31,38 @@ test('Get blank questionary steps should succeed for authorized user', () => {
   return expect(
     questionaryQueries.getBlankQuestionarySteps(dummyUserWithRole, 1)
   ).resolves.not.toBe(null);
+});
+
+test('Question read permissions should match specific role IDs', async () => {
+  const steps = await questionaryQueries.getBlankQuestionarySteps(
+    dummyUserOfficerWithDerivedRole,
+    1
+  );
+  const field = steps[0].fields[0];
+  const restrictedSteps = [
+    {
+      ...steps[0],
+      fields: [
+        { ...field, config: { ...field.config, readPermissions: ['11'] } },
+        { ...field, config: { ...field.config, readPermissions: ['2'] } },
+      ],
+    },
+  ];
+
+  const derivedRoleSteps =
+    questionaryQueries.filterQuestionaryForReadPermissions(
+      dummyUserOfficerWithDerivedRole,
+      restrictedSteps
+    );
+  const rootRoleSteps = questionaryQueries.filterQuestionaryForReadPermissions(
+    dummyUserOfficerWithRole,
+    restrictedSteps
+  );
+
+  expect(derivedRoleSteps[0].fields).toHaveLength(1);
+  expect(derivedRoleSteps[0].fields[0].config.readPermissions).toEqual(['11']);
+  expect(rootRoleSteps[0].fields).toHaveLength(1);
+  expect(rootRoleSteps[0].fields[0].config.readPermissions).toEqual(['2']);
 });
 
 test('Get proposal attachments should succeed for authorised user', () => {
