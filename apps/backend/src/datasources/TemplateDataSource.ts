@@ -10,6 +10,7 @@ import {
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
+  TemplateExport,
 } from '../models/Template';
 import { CreateTemplateArgs } from '../resolvers/mutations/template/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/template/CreateTopicMutation';
@@ -21,10 +22,13 @@ import {
   AllQuestionsFilterArgs,
   QuestionsFilter,
 } from '../resolvers/queries/QuestionsQuery';
+import {
+  TemplatesPage,
+  TemplatesPageArgs,
+} from '../resolvers/queries/TemplatesPageQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 import { TemplateGroup } from '../resolvers/types/TemplateGroup';
-import { TemplateExport } from './../models/Template';
 
 export interface TemplateDataSource {
   getTemplateCategories(): Promise<TemplateCategory[]>;
@@ -33,6 +37,7 @@ export interface TemplateDataSource {
   getTemplate(templateId: number): Promise<Template | null>;
   getTemplateExport(templateId: number): Promise<TemplateExport>;
   getTemplates(args?: TemplatesArgs): Promise<Template[]>;
+  getTemplatesPage(args: TemplatesPageArgs): Promise<TemplatesPage>;
   updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;
   deleteTemplate(id: number): Promise<Template>;
   cloneTemplate(templateId: number): Promise<Template>;

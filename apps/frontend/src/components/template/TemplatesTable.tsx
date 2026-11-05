@@ -1,4 +1,9 @@
-import { Column, MaterialTableProps } from '@material-table/core';
+import MaterialTableCore, {
+  Column,
+  MaterialTableProps,
+  Query,
+  QueryResult,
+} from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import Delete from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -9,13 +14,17 @@ import ShareIcon from '@mui/icons-material/Share';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
-import { GetTemplatesQuery, Template, TemplateGroupId } from 'generated/sdk';
+import {
+  PaginationSortDirection,
+  Template,
+  TemplateGroupId,
+} from 'generated/sdk';
 import { downloadBlob } from 'utils/downloadBlob';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -32,14 +41,14 @@ export type TemplateRowDataType = Pick<
 export interface TemplatesTableProps {
   columns: Column<TemplateRowDataType>[];
   templateGroup: TemplateGroupId;
-  dataProvider: () => Promise<NonNullable<GetTemplatesQuery['templates']>>;
+  isArchived: boolean;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
   emptyDataSourceMessage?: React.ReactNode;
 }
 
 const TemplatesTable = ({
-  dataProvider,
+  isArchived,
   columns,
   templateGroup,
   isRowRemovable,
@@ -47,18 +56,88 @@ const TemplatesTable = ({
   actions,
   emptyDataSourceMessage,
 }: TemplatesTableProps & { confirm: WithConfirmType }) => {
-  const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
+  const tableRef = useRef<MaterialTableCore<TemplateRowDataType>>(null);
   const { api } = useDataApiWithFeedback();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [show, setShow] = useState(false);
-  const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const sortDirection = searchParams.get('sortDirection');
+  const sortField = searchParams.get('sortField');
+  const sortedColumns = columns.map((column) => ({
+    ...column,
+    defaultSort:
+      column.field === sortField &&
+      (sortDirection === PaginationSortDirection.ASC ||
+        sortDirection === PaginationSortDirection.DESC)
+        ? sortDirection
+        : undefined,
+  }));
+  const search = searchParams.get('search') || '';
+  const requestedPage = Number(searchParams.get('page'));
+  const page =
+    Number.isSafeInteger(requestedPage) && requestedPage >= 0
+      ? requestedPage
+      : 0;
+  const requestedPageSize = Number(searchParams.get('pageSize'));
+  const pageSize =
+    Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0
+      ? requestedPageSize
+      : 10;
+  const fetchTemplates = useCallback(
+    async (
+      query: Query<TemplateRowDataType>
+    ): Promise<QueryResult<TemplateRowDataType>> => {
+      const [orderBy] = query.orderByCollection;
+      const fetchPage = (page: number) =>
+        api().getTemplatesPage({
+          group: templateGroup,
+          isArchived,
+          first: query.pageSize,
+          offset: page * query.pageSize,
+          searchText: query.search,
+          sortField: orderBy?.orderByField,
+          sortDirection:
+            orderBy?.orderDirection === PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection === PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
+        });
+      let { templatesPage } = await fetchPage(query.page);
+      if (!templatesPage) {
+        throw new Error('Unable to load templates');
+      }
+      const page = Math.min(
+        query.page,
+        Math.max(0, Math.ceil(templatesPage.totalCount / query.pageSize) - 1)
+      );
+      if (page !== query.page) {
+        ({ templatesPage } = await fetchPage(page));
+        if (!templatesPage) {
+          throw new Error('Unable to load templates');
+        }
+        setSearchParams(
+          (params) => {
+            params.set('page', String(page));
 
-  useEffect(() => {
-    dataProvider().then((data) => {
-      data && setTemplates(data);
-      setLoadingTemplates(false);
-    });
-  }, [dataProvider]);
+            return params;
+          },
+          { replace: true }
+        );
+      }
+
+      return {
+        data: templatesPage.templates.map((template) => ({
+          ...template,
+          id: template.templateId,
+        })),
+        page,
+        totalCount: templatesPage.totalCount,
+      };
+    },
+    [api, isArchived, templateGroup, setSearchParams]
+  );
+  const refreshTemplates = () => tableRef.current?.onQueryChange({});
 
   const UnarchiveIconComponent = () => <UnarchiveIcon />;
   const getUnarchiveButton = () => {
@@ -76,17 +155,7 @@ const TemplatesTable = ({
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: false,
               })
-              .then((response) => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    (elem) =>
-                      elem.templateId === response.updateTemplate.templateId
-                  ),
-                  1
-                );
-                setTemplates(data);
-              });
+              .then(refreshTemplates);
           },
           {
             title: 'Are you sure?',
@@ -117,17 +186,7 @@ const TemplatesTable = ({
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: true,
               })
-              .then((response) => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    (elem) =>
-                      elem.templateId === response.updateTemplate.templateId
-                  ),
-                  1
-                );
-                setTemplates(data);
-              });
+              .then(refreshTemplates);
           },
           {
             title: 'Are you sure?',
@@ -158,17 +217,7 @@ const TemplatesTable = ({
               .deleteTemplate({
                 id: (data as TemplateRowDataType).templateId,
               })
-              .then((response) => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    (elem) =>
-                      elem.templateId === response.deleteTemplate.templateId
-                  ),
-                  1
-                );
-                setTemplates(data);
-              });
+              .then(refreshTemplates);
           },
           {
             title: 'Are you sure?',
@@ -202,10 +251,6 @@ const TemplatesTable = ({
   const EditIconComponent = () => <Edit />;
   const FileCopyIconComponent = () => <FileCopy />;
 
-  const templatesWithId = templates.map((template) =>
-    Object.assign(template, { id: template.templateId })
-  );
-
   return (
     <>
       <StyledDialog
@@ -217,11 +262,6 @@ const TemplatesTable = ({
           <CreateTemplate
             onComplete={(template) => {
               if (template) {
-                setTemplates([
-                  ...templates,
-                  { ...template, questionaryCount: 0 },
-                ]);
-
                 setTimeout(() => {
                   editTemplate(template.templateId);
                 });
@@ -233,15 +273,52 @@ const TemplatesTable = ({
         </DialogContent>
       </StyledDialog>
       <MaterialTable
+        key={JSON.stringify([search, page, pageSize, sortField, sortDirection])}
+        tableRef={tableRef}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
             Templates
           </Typography>
         }
-        columns={columns}
-        isLoading={loadingTemplates}
-        data={templatesWithId}
+        columns={sortedColumns}
+        data={fetchTemplates}
+        onSearchChange={(search) => {
+          setSearchParams((params) => {
+            params.delete('search');
+            if (search) params.set('search', search);
+            params.set('page', '0');
+
+            return params;
+          });
+        }}
+        onPageChange={(page, pageSize) => {
+          setSearchParams((params) => {
+            params.set('page', String(page));
+            params.set('pageSize', String(pageSize));
+
+            return params;
+          });
+        }}
+        onOrderCollectionChange={([orderBy]) => {
+          setSearchParams((params) => {
+            params.delete('sortField');
+            params.delete('sortDirection');
+            if (orderBy?.orderByField && orderBy.orderDirection) {
+              params.set('sortField', orderBy.orderByField);
+              params.set('sortDirection', orderBy.orderDirection);
+            }
+            params.set('page', '0');
+
+            return params;
+          });
+        }}
+        options={{
+          searchText: search,
+          initialPage: page,
+          pageSize,
+          debounceInterval: 600,
+        }}
         // text to show when the table is empty
         localization={{
           body: {
@@ -270,12 +347,7 @@ const TemplatesTable = ({
                       templateId: (data as TemplateRowDataType).templateId,
                     })
                     .then((result) => {
-                      const clonedTemplate = result.cloneTemplate;
-                      if (clonedTemplate) {
-                        const newTemplates = [...templates];
-                        newTemplates.push({ ...clonedTemplate, callCount: 0 });
-                        setTemplates(newTemplates);
-                      }
+                      if (result.cloneTemplate) refreshTemplates();
                     });
                 },
                 {

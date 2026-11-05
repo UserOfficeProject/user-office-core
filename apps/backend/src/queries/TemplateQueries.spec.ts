@@ -10,7 +10,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Template, TemplateStep } from '../models/Template';
+import { Template, TemplateGroupId, TemplateStep } from '../models/Template';
 
 const templateQueries = container.resolve(TemplateQueries);
 beforeEach(() => {
@@ -67,6 +67,45 @@ test('User officer should get a list of templates', async () => {
 
   expect(templates.length).toBeGreaterThan(0);
   expect(templates[0].isArchived).toEqual(false);
+});
+
+describe('Paginated template access', () => {
+  const args = {
+    group: TemplateGroupId.PROPOSAL,
+    isArchived: false,
+    first: 10,
+    offset: 0,
+  };
+
+  test('only user officers can load template pages', async () => {
+    expect(await templateQueries.getTemplatesPage(null, args)).toBeNull();
+    expect(
+      await templateQueries.getTemplatesPage(dummyUserWithRole, args)
+    ).toBeNull();
+    const page = await templateQueries.getTemplatesPage(
+      dummyUserOfficerWithRole,
+      args
+    );
+
+    expect(page.totalCount).toBe(1);
+    expect(page.templates).toHaveLength(1);
+  });
+
+  test('passes pagination and search to the data source', async () => {
+    const source = container.resolve<TemplateDataSourceMock>(
+      Tokens.TemplateDataSource
+    );
+    const getTemplatesPage = jest.spyOn(source, 'getTemplatesPage');
+    const filter = { ...args, offset: 10, searchText: 'Industrial' };
+    const page = await templateQueries.getTemplatesPage(
+      dummyUserOfficerWithRole,
+      filter
+    );
+
+    expect(getTemplatesPage).toHaveBeenCalledWith(filter);
+    expect(page).toEqual({ totalCount: 1, templates: [] });
+    getTemplatesPage.mockRestore();
+  });
 });
 
 test('User officer should be able to get question by natural key', async () => {

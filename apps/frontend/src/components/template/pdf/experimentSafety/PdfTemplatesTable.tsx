@@ -5,7 +5,7 @@ import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
-import { Template, TemplateGroupId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -72,17 +72,7 @@ export type PdfTemplateRowDataType = TemplateRowDataType & {
 };
 
 type PdfTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      Template,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'questionaryCount'
-      | 'experimentSafetyPdfCallCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function PdfTemplatesTable(props: PdfTemplatesTableProps) {
@@ -125,7 +115,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
 
           return pdfTemplateRowData.experimentSafetyPdfCallCount === 0;
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
       <CallsModal
         templateId={selectedTemplateId}

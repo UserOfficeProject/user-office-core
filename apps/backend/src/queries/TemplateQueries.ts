@@ -12,6 +12,7 @@ import {
   AllQuestionsFilterArgs,
   QuestionsFilter,
 } from '../resolvers/queries/QuestionsQuery';
+import { TemplatesPageArgs } from '../resolvers/queries/TemplatesPageQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 import { DynamicMultipleChoiceConfig } from '../resolvers/types/FieldConfig';
 
@@ -29,6 +30,11 @@ export default class TemplateQueries {
   @Authorized([Roles.USER_OFFICER])
   async getTemplates(agent: UserWithRole | null, args?: TemplatesArgs) {
     return this.dataSource.getTemplates(args);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getTemplatesPage(agent: UserWithRole | null, args: TemplatesPageArgs) {
+    return this.dataSource.getTemplatesPage(args);
   }
 
   @Authorized([Roles.USER_OFFICER])
