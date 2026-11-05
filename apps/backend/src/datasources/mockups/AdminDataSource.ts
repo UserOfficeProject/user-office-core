@@ -10,6 +10,10 @@ import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstituti
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
+import {
+  InstitutionsPage,
+  InstitutionsPageArgs,
+} from '../../resolvers/queries/InstitutionsPageQuery';
 import { AdminDataSource } from '../AdminDataSource';
 
 export const dummyInstitution = new Institution(1, 'ESS', 1);
@@ -111,6 +115,25 @@ export class AdminDataSourceMock implements AdminDataSource {
   ): Promise<import('../../models/Institution').Institution[]> {
     return [dummyInstitution];
   }
+
+  async getInstitutionsPage(
+    args: InstitutionsPageArgs
+  ): Promise<InstitutionsPage> {
+    const searchText = args.searchText?.trim().toLowerCase();
+    const institutions = [dummyInstitution].filter(
+      (institution) =>
+        !searchText ||
+        institution.name.toLowerCase().includes(searchText) ||
+        dummyCountry.country.toLowerCase().includes(searchText) ||
+        institution.rorId?.toLowerCase().includes(searchText)
+    );
+
+    return {
+      totalCount: institutions.length,
+      institutions: institutions.slice(args.offset, args.offset + args.first),
+    };
+  }
+
   applyPatches(): Promise<string[]> {
     throw new Error('Method not implemented.');
   }

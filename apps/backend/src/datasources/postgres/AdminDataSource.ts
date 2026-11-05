@@ -8,20 +8,23 @@ import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
 import { Country } from '../../models/Country';
-import { Feature, FeatureUpdateAction } from '../../models/Feature';
+import { Feature, FeatureUpdateAction, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
-import { Settings } from '../../models/Settings';
+import { Settings, SettingsId } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
+import {
+  InstitutionsPage,
+  InstitutionsPageArgs,
+} from '../../resolvers/queries/InstitutionsPageQuery';
+import { PaginationSortDirection } from '../../utils/pagination';
 import { AdminDataSource } from '../AdminDataSource';
 import { Entry } from './../../models/Entry';
-import { FeatureId } from './../../models/Feature';
-import { SettingsId } from './../../models/Settings';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';
 import {
@@ -205,6 +208,71 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .then((intDB: InstitutionRecord[]) =>
         intDB.map((inst) => createInstitutionObject(inst))
       );
+  }
+
+  async getInstitutionsPage(
+    args: InstitutionsPageArgs
+  ): Promise<InstitutionsPage> {
+    if (
+      !Number.isInteger(args.first) ||
+      args.first < 1 ||
+      !Number.isInteger(args.offset) ||
+      args.offset < 0
+    ) {
+      throw new GraphQLError('Invalid institution pagination');
+    }
+
+    const sortFields: Record<string, string> = {
+      name: 'institutions.institution',
+      'country.value': 'countries.country',
+      rorId: 'institutions.ror_id',
+    };
+    if (
+      args.sortField &&
+      !Object.prototype.hasOwnProperty.call(sortFields, args.sortField)
+    ) {
+      throw new GraphQLError(`Bad sort field given: ${args.sortField}`);
+    }
+
+    const query = database('institutions').leftJoin(
+      'countries',
+      'countries.country_id',
+      'institutions.country_id'
+    );
+    const searchText = args.searchText?.trim();
+    if (searchText) {
+      query.andWhere((query) =>
+        query
+          .whereILike('institutions.institution', `%${searchText}%`)
+          .orWhereILike('countries.country', `%${searchText}%`)
+          .orWhereILike('institutions.ror_id', `%${searchText}%`)
+      );
+    }
+
+    const count = await query
+      .clone()
+      .count<{ count: string }>('institutions.institution_id')
+      .first();
+    const pageQuery = query.select<InstitutionRecord[]>('institutions.*');
+    if (args.sortField) {
+      pageQuery.orderBy(
+        sortFields[args.sortField],
+        args.sortDirection === PaginationSortDirection.desc ? 'desc' : 'asc'
+      );
+    } else {
+      pageQuery
+        .orderByRaw('institutions.institution_id=1 desc')
+        .orderBy('institutions.institution', 'asc');
+    }
+    const records = await pageQuery
+      .orderBy('institutions.institution_id', 'asc')
+      .limit(args.first)
+      .offset(args.offset);
+
+    return {
+      totalCount: Number(count?.count ?? 0),
+      institutions: records.map(createInstitutionObject),
+    };
   }
 
   async getInstitution(id: number): Promise<Institution | null> {
