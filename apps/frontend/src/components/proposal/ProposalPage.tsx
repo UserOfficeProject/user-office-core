@@ -2,6 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
+import { parseStatusQuery } from 'components/common/proposalFilters/StatusFilter';
 import { ProposalsFilter, WorkflowType } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
@@ -16,7 +17,7 @@ import ProposalTableOfficer from './ProposalTableOfficer';
 export interface ProposalUrlQueryParams extends URLSearchParams {
   call?: string;
   instrument?: string;
-  proposalStatus?: string;
+  status?: string;
   reviewModal?: string;
   modalTab?: string;
   questionId?: string;
@@ -31,7 +32,7 @@ export default function ProposalPage() {
 
   const callId = searchParams.get('call');
   const instrumentId = searchParams.get('instrument');
-  const proposalStatusId = searchParams.get('proposalStatus');
+  const proposalStatusId = searchParams.get('status');
   const questionId = searchParams.get('questionId');
   const proposalId = searchParams.get('proposalId');
   const compareOperator = searchParams.get('compareOperator');
@@ -45,7 +46,7 @@ export default function ProposalPage() {
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: instrumentId === 'multi',
     },
-    proposalStatusId: proposalStatusId ?? undefined,
+    proposalStatusId: parseStatusQuery(proposalStatusId),
     referenceNumbers: proposalId ? [proposalId] : undefined,
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,
