@@ -1664,7 +1664,7 @@ context('Template Basic tests', () => {
       cy.finishedLoading();
     });
 
-    it.only('Should display date range selector', () => {
+    it('Should display date range selector', () => {
       cy.createDateTimeRangeQuestion(
         'What range of years do osprey come to Britain?'
       );
