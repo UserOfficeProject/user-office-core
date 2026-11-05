@@ -84,7 +84,9 @@ export default function UserUpcomingExperimentsTable() {
     (experiment) => ({
       ...experiment,
       startsAtFormatted: toFormattedDateTime(experiment.startsAt),
-      endsAtFormatted: toFormattedDateTime(experiment.endsAt),
+      endsAtFormatted: experiment.endsAt
+        ? toFormattedDateTime(experiment.endsAt)
+        : '-',
     })
   );
 

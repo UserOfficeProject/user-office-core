@@ -258,7 +258,8 @@ export default function ExperimentsTable({
     {
       title: 'End',
       field: 'endsAt',
-      render: (rowData: Experiment) => toFormattedDateTime(rowData.endsAt),
+      render: (rowData: Experiment) =>
+        rowData.endsAt ? toFormattedDateTime(rowData.endsAt) : '-',
     },
     {
       title: 'Instrument',
@@ -489,7 +490,7 @@ export default function ExperimentsTable({
         <ExperimentReviewModal
           title={
             selectedExperiment
-              ? `View Experiment: ${selectedExperiment.experimentId} - (${toFormattedDateTime(selectedExperiment.startsAt)} - ${toFormattedDateTime(selectedExperiment.endsAt)})`
+              ? `View Experiment: ${selectedExperiment.experimentId} - (${toFormattedDateTime(selectedExperiment.startsAt)} - ${selectedExperiment.endsAt ? toFormattedDateTime(selectedExperiment.endsAt) : '-'})`
               : 'View Experiment'
           }
           modalOpen={true}

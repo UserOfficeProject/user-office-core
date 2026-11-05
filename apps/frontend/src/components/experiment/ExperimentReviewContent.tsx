@@ -255,7 +255,7 @@ const ExperimentReviewContent = ({
       },
       {
         label: 'End',
-        value: toFormattedDateTime(experiment.endsAt),
+        value: experiment.endsAt ? toFormattedDateTime(experiment.endsAt) : '-',
       },
       {
         label: 'Experiment Safety Review Status',
