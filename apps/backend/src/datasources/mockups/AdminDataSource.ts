@@ -122,8 +122,17 @@ export class AdminDataSourceMock implements AdminDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async get(id: number): Promise<string | null> {
-    return 'HELLO WORLD';
+  async get(id: number, roleId?: number): Promise<string | null> {
+    switch (roleId) {
+      case undefined:
+        return 'Default Page Notice';
+      case 1:
+        return 'Derived Page Notice 1';
+      case 2:
+        return 'Derived Page Notice 2';
+      default:
+        return null;
+    }
   }
   async setPageText(id: number, text: string) {
     return new Page(id, text);

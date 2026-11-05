@@ -533,6 +533,10 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
+  async getRolesByTags(roleTags?: number[]): Promise<Role[]> {
+    return await postgresUserDataSource.getRolesByTags(roleTags);
+  }
+
   async update(user: UpdateUserByIdArgs): Promise<User> {
     throw new Error('Method not implemented.');
   }

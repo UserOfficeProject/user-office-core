@@ -5,14 +5,21 @@ import React, { useState, useEffect } from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import {
+  FALLBACK_ROLE_FOR_PAGE_CONTENT,
+  useGetPageContent,
+} from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
+  roleId: number | undefined;
 }) {
-  const [loading, pageContent] = useGetPageContent(props.pageName);
+  const [loading, pageContent] = useGetPageContent(
+    props.pageName,
+    props.roleId
+  );
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
@@ -50,12 +57,16 @@ export default function PageInputBox(props: {
             marginTop: '25px',
             marginLeft: '10px',
           }}
-          onClick={() =>
+          onClick={() => {
             api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
-              id: props.pageName,
+              pageId: props.pageName,
               text: content,
-            })
-          }
+              roleId:
+                props.roleId !== FALLBACK_ROLE_FOR_PAGE_CONTENT
+                  ? props.roleId
+                  : undefined,
+            });
+          }}
         >
           Update
         </Button>
