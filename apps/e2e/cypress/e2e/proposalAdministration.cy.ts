@@ -50,6 +50,18 @@ context('Proposal administration tests', () => {
     cy.getAndStoreFeaturesEnabled();
   });
 
+  it('Displays the proposal submitted date column', () => {
+    cy.login('officer');
+    cy.visit('/');
+    cy.contains('Proposals').click();
+    cy.finishedLoading();
+
+    cy.get('[data-cy=officer-proposals-table]').contains(
+      'th',
+      'Submitted date'
+    );
+  });
+
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
