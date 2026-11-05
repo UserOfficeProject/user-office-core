@@ -63,6 +63,9 @@ const ExperimentSafetyReviewPage = lazy(
 const ApiAccessTokensPage = lazy(
   () => import('./settings/apiAccessTokens/ApiAccessTokensPage')
 );
+const OAuthClientsPage = lazy(
+  () => import('./settings/oauthClients/OAuthClientsPage')
+);
 const AppSettingsPage = lazy(
   () => import('./settings/appSettings/AppSettingsPage')
 );
@@ -622,6 +625,17 @@ const AppRoutes = () => {
               }
             />
           )}
+        {isUserOfficer && (
+          <Route
+            path="/OAuthClients"
+            element={
+              <TitledRoute
+                title="OAuth Clients"
+                element={<OAuthClientsPage />}
+              />
+            }
+          />
+        )}
         {isUserOfficer && (
           <Route
             path="/ApiAccessTokens"
