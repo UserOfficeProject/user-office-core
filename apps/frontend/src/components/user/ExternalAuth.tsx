@@ -30,6 +30,30 @@ export const getCurrentUrlValues = () => {
   };
 };
 
+let authorizationCodeExchange: {
+  code: string;
+  result: Promise<string>;
+} | null = null;
+
+const exchangeAuthorizationCode = (
+  api: ReturnType<ReturnType<typeof useUnauthorizedApi>>,
+  code: string,
+  redirectUri: string,
+  iss: string | null
+): Promise<string> => {
+  if (authorizationCodeExchange?.code === code) {
+    return authorizationCodeExchange.result;
+  }
+
+  const result = api
+    .externalTokenLogin({ externalToken: code, redirectUri, iss })
+    .then(({ externalTokenLogin }) => externalTokenLogin);
+
+  authorizationCodeExchange = { code, result };
+
+  return result;
+};
+
 function ExternalAuth() {
   const [searchParams] = useSearchParams();
   const sessionid = searchParams.get('sessionid');
@@ -46,7 +70,7 @@ function ExternalAuth() {
   const { handleLogin } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
-  const [View, setView] = React.useState<JSX.Element | null>(null);
+  const [View, setView] = React.useState<React.ReactNode>(null);
 
   useEffect(() => {
     if (!isFirstRun.current) {
@@ -123,13 +147,13 @@ function ExternalAuth() {
       const iss = queryParams.get('iss');
       setView(<ContactingAuthorizationServerMessage />);
 
-      unauthorizedApi()
-        .externalTokenLogin({
-          externalToken: authorizationCode,
-          redirectUri: currentUrlWithoutParams,
-          iss: iss,
-        })
-        .then(({ externalTokenLogin }) => {
+      exchangeAuthorizationCode(
+        unauthorizedApi(),
+        authorizationCode,
+        currentUrlWithoutParams,
+        iss
+      )
+        .then((externalTokenLogin) => {
           handleLogin(externalTokenLogin);
           const previousPath = localStorage.getItem('redirectPath');
           clearSession('redirectPath');

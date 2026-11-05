@@ -7,7 +7,7 @@ import React from 'react';
 import TextField from './FormikUITextField';
 
 // This component is used to retrieve a user from the database using an email.
-const EmailSearchBar = (props: Options<JSX.Element>) => (
+const EmailSearchBar = (props: Options<object>) => (
   <>
     <Box
       sx={{

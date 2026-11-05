@@ -42,11 +42,11 @@ type WorkflowCanvasProps = React.ComponentProps<typeof ReactFlow> & {
   onEdgeClick?: (event: React.MouseEvent, edge: Edge) => void;
   onNodeClick?: (event: React.MouseEvent, node: Node) => void;
   onNodeDragStop?: NodeDragHandler;
-  reactFlowWrapper: React.RefObject<HTMLDivElement>;
+  reactFlowWrapper: React.RefObject<HTMLDivElement | null>;
   connectionLineType: ConnectionLineType;
 };
 
-const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
+const WorkflowCanvas = ({
   nodes,
   edges,
   onNodesChange,
@@ -60,7 +60,7 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onNodeDragStop,
   reactFlowWrapper,
   ...rest
-}) => {
+}: WorkflowCanvasProps) => {
   return (
     <div
       ref={reactFlowWrapper}

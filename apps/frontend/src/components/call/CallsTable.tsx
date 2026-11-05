@@ -262,7 +262,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     }
   };
 
-  const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;
+  const ScienceIconComponent = () => <ScienceIcon />;
 
   const AssignedInstruments = React.useCallback(
     ({ rowData }: Record<'rowData', Call>) => {

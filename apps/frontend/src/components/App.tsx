@@ -1,8 +1,12 @@
 import Close from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import { StyledEngineProvider } from '@mui/material/styles';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import { StyledEngineProvider, styled } from '@mui/material/styles';
+import {
+  MaterialDesignContent,
+  SnackbarProvider,
+  useSnackbar,
+} from 'notistack';
 import React, { ErrorInfo, Suspense, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -44,8 +48,27 @@ function DynamicImportErrorSnackbar() {
   return null;
 }
 
+const StyledSnackbarContent = styled(MaterialDesignContent)(() => ({
+  '&.notistack-MuiContent-success': {
+    backgroundColor: 'var(--PALETTE_SUCCESS_MAIN)',
+    color: 'var(--PALETTE_PRIMARY_CONTRAST)',
+  },
+  '&.notistack-MuiContent-error': {
+    backgroundColor: 'var(--PALETTE_ERROR_MAIN)',
+    color: 'var(--PALETTE_PRIMARY_CONTRAST)',
+  },
+  '&.notistack-MuiContent-warning': {
+    backgroundColor: 'var(--PALETTE_WARNING_MAIN)',
+    color: 'var(--PALETTE_PRIMARY_CONTRAST)',
+  },
+  '&.notistack-MuiContent-info': {
+    backgroundColor: 'var(--PALETTE_INFO_MAIN)',
+    color: 'var(--PALETTE_SECONDARY_CONTRAST)',
+  },
+}));
+
 function Root() {
-  const notistackRef = React.createRef<SnackbarProvider>();
+  const notistackRef = React.useRef<SnackbarProvider>(null);
 
   const onClickDismiss = (key: string | number | undefined) => () => {
     notistackRef.current?.closeSnackbar(key);
@@ -73,6 +96,12 @@ function Root() {
           ref={notistackRef}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           maxSnack={1}
+          Components={{
+            success: StyledSnackbarContent,
+            error: StyledSnackbarContent,
+            warning: StyledSnackbarContent,
+            info: StyledSnackbarContent,
+          }}
           action={(key) => (
             <IconButton onClick={onClickDismiss(key)}>
               <Close htmlColor="white" />
@@ -142,7 +171,7 @@ class App extends React.Component<Record<string, never>, AppState> {
     }
   }
 
-  render(): JSX.Element {
+  render() {
     return <RouterProvider router={router} />;
   }
 }

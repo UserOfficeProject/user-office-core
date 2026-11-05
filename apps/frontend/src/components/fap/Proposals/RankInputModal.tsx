@@ -18,14 +18,14 @@ interface RankInputModalProps {
   takenRanks: number[];
 }
 
-const RankInputModal: React.FC<RankInputModalProps> = ({
+const RankInputModal = ({
   open,
   onClose,
   onSubmit,
   currentRank,
   totalReviewers,
   takenRanks,
-}) => {
+}: RankInputModalProps) => {
   const [value, setValue] = useState<number | ''>(currentRank ?? '');
   const [takenError, setTakenError] = useState(false);
   const [invalidError, setInvalidError] = useState(false);

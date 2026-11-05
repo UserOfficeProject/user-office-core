@@ -1,7 +1,7 @@
 import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { default as React } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';

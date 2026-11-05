@@ -19,6 +19,7 @@ context('Units tests', () => {
     it('User officer can create unit', () => {
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
       cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
@@ -39,6 +40,7 @@ context('Units tests', () => {
     it('Can not create unit with invalid conversion formula', () => {
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
       cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
@@ -63,6 +65,7 @@ context('Units tests', () => {
       const BECQUEREL_UNIT_TITLE = 'becquerel';
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
       cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
@@ -84,6 +87,7 @@ context('Units tests', () => {
 
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
       cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
@@ -132,6 +136,7 @@ context('Units tests', () => {
 
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
       cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
       cy.get('[data-cy=officer-menu-items]').contains('Units').click();
@@ -158,6 +163,7 @@ context('Units tests', () => {
     it('Can search answers with units', () => {
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
       cy.get('#call-select').click();
       cy.get('[role=listbox]').contains('call 1').click();
       cy.get('#question-list').click();

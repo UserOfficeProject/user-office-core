@@ -50,7 +50,7 @@ export function useStatusActionsData(): {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, isPregeneratedProposalPdfsEnabled]);
 
   return {
     loadingStatusActions,

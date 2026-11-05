@@ -28,7 +28,7 @@ const TextFieldWithHandleEnter = withHandleEnter(TextField);
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const withPrompt = <T extends {}>(WrappedComponent: React.ComponentType<T>) => {
-  return function WithPromptComponent(props: Omit<T, 'prompt'>): JSX.Element {
+  return function WithPromptComponent(props: Omit<T, 'prompt'>) {
     const [onPrompt, setOnPrompt] = useState<((answer: string) => void) | null>(
       null
     );

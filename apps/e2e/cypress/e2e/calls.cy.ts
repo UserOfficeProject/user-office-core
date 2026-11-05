@@ -987,7 +987,12 @@ context('Calls tests', () => {
 
       cy.contains('Calls').click();
 
-      cy.get('[data-cy="call-status-filter"]').click();
+      cy.finishedLoading();
+      cy.get('[data-cy="call-status-filter"]')
+        .find('[role="combobox"]')
+        .should('be.visible')
+        .click()
+        .should('have.attr', 'aria-expanded', 'true');
       cy.get('[role="listbox"]').contains('All').click();
 
       cy.finishedLoading();
@@ -1005,7 +1010,12 @@ context('Calls tests', () => {
         endCallInternal: DateTime.now().plus({ days: 6 }),
       }).then(() => {
         cy.reload();
-        cy.get('[data-cy="call-status-filter"]').click();
+        cy.finishedLoading();
+        cy.get('[data-cy="call-status-filter"]')
+          .find('[role="combobox"]')
+          .should('be.visible')
+          .click()
+          .should('have.attr', 'aria-expanded', 'true');
         cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
