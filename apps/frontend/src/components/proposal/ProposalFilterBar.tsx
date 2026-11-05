@@ -67,7 +67,12 @@ const ProposalFilterBar = ({
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <CallFilter
           callId={filter.callId as number}
           calls={calls?.data}
@@ -81,8 +86,12 @@ const ProposalFilterBar = ({
           }}
         />
       </Grid>
-
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <InstrumentFilter
           instrumentIds={getInstrumentFilterIds(filter.instrumentFilter)}
           showMultiInstrumentProposals={
@@ -100,8 +109,12 @@ const ProposalFilterBar = ({
           }}
         />
       </Grid>
-
-      <Grid item sm={4} xs={12}>
+      <Grid
+        size={{
+          sm: 4,
+          xs: 12,
+        }}
+      >
         <ProposalStatusFilter
           statusId={filter.proposalStatusId as string}
           statuses={proposalStatuses?.data}
@@ -116,9 +129,14 @@ const ProposalFilterBar = ({
           }}
         />
       </Grid>
-
       {selectedCallTemplateId && (
-        <Grid item sm={8} xs={12} style={{ paddingTop: 0 }}>
+        <Grid
+          style={{ paddingTop: 0 }}
+          size={{
+            sm: 8,
+            xs: 12,
+          }}
+        >
           <QuestionaryFilter
             callId={filter.callId}
             templateId={selectedCallTemplateId}

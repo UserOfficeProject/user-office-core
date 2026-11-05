@@ -15,11 +15,13 @@ const NavigationFragment = (props: {
   return (
     <Stack
       direction="row"
-      justifyContent="flex-end"
-      marginTop={3}
       spacing={1}
-      alignItems="center"
       data-cy="navigation-fragment"
+      sx={{
+        justifyContent: 'flex-end',
+        marginTop: 3,
+        alignItems: 'center',
+      }}
     >
       {props.isLoading && <UOLoader size="2em" />}
       <>{props.children}</>

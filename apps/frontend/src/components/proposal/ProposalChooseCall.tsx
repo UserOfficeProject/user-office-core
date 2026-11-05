@@ -74,7 +74,6 @@ const ProposalChooseCall = () => {
               >
                 <ListItemText
                   primary={header}
-                  secondaryTypographyProps={{ component: 'div' }}
                   secondary={
                     <>
                       <Typography
@@ -108,6 +107,9 @@ const ProposalChooseCall = () => {
                       <Typography component="p">{call.cycleComment}</Typography>
                     </>
                   }
+                  slotProps={{
+                    secondary: { component: 'div' },
+                  }}
                 />
                 <ListItemSecondaryAction>
                   <IconButton

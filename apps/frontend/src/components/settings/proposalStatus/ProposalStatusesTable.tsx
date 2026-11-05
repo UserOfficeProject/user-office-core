@@ -1,4 +1,4 @@
-import Delete from '@mui/icons-material/DeleteOutline';
+import Delete from '@mui/icons-material/DeleteOutlined';
 import { Typography } from '@mui/material';
 import React from 'react';
 

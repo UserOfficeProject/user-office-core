@@ -56,7 +56,12 @@ const FapReviewersAndAssignments = ({
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <CallFilter
             calls={calls}
             isLoading={loadingCalls}
@@ -64,7 +69,12 @@ const FapReviewersAndAssignments = ({
             callId={call ? +call : null}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid
+          size={{
+            sm: 3,
+            xs: 12,
+          }}
+        >
           <InstrumentFilter
             instruments={instruments}
             isLoading={loadingInstruments}

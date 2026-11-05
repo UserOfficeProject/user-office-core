@@ -23,7 +23,7 @@ function TextSearchCriteriaComponent({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
@@ -47,7 +47,7 @@ function TextSearchCriteriaComponent({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={8}>
+      <Grid size={8}>
         <TextField
           name="value"
           label="Value"

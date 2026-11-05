@@ -12,7 +12,7 @@ function BooleanSearchCriteriaInput({
 
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormControl fullWidth>
           <InputLabel shrink id="is-checked">
             Value

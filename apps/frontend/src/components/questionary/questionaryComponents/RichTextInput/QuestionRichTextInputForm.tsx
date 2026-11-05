@@ -39,7 +39,9 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'natural_key' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'natural_key' },
+            }}
           />
           <Field
             name="question"
@@ -48,7 +50,9 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
             type="text"
             component={TextField}
             fullWidth
-            inputProps={{ 'data-cy': 'question' }}
+            slotProps={{
+              htmlInput: { 'data-cy': 'question' },
+            }}
           />
           <TitledContainer label="Constraints">
             <Field
@@ -97,7 +101,7 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
               component={TextField}
               fullWidth
               data-cy="max-words"
-              inputProps={{ min: 1, step: 1 }}
+              slotProps={{ htmlInput: { min: 1, step: 1 } }}
               onChange={({
                 target: { value },
               }: ChangeEvent<HTMLInputElement>) => {

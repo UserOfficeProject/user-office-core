@@ -32,7 +32,7 @@ function NumberSearchCriteriaComponent({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={5}>
+      <Grid size={5}>
         <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
@@ -62,7 +62,7 @@ function NumberSearchCriteriaComponent({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid size={3}>
         <TextField
           name="value"
           label="Value"
@@ -77,7 +77,7 @@ function NumberSearchCriteriaComponent({
           data-cy="value"
         />
       </Grid>
-      <Grid item xs={4} style={{ marginTop: 'auto' }}>
+      <Grid style={{ marginTop: 'auto' }} size={4}>
         <FormControl fullWidth>
           <InputLabel shrink id="unit-label">
             Unit

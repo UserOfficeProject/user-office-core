@@ -1,4 +1,3 @@
-import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
@@ -18,7 +17,6 @@ import {
 import { useFapsData } from 'hooks/fap/useFapsData';
 
 const CallReviewAndNotification = () => {
-  const theme = useTheme();
   const { t } = useTranslation();
   const { currentRole } = useContext(UserContext);
   const { faps: allActiveFaps, loadingFaps } = useFapsData({
@@ -49,14 +47,12 @@ const CallReviewAndNotification = () => {
           format={dateFormat}
           ampm={false}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             'data-cy': 'start-review',
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -67,13 +63,11 @@ const CallReviewAndNotification = () => {
           ampm={false}
           minDate={startReview}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             required: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
         <Field
@@ -84,11 +78,9 @@ const CallReviewAndNotification = () => {
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
           name="endFapReview"
@@ -99,11 +91,9 @@ const CallReviewAndNotification = () => {
           allowSameDateSelection
           minDate={startFapReview}
           component={DatePicker}
-          inputProps={{ placeholder: dateFormat }}
           textField={{
             fullWidth: true,
           }}
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
       </LocalizationProvider>
       <FormikUIAutocomplete

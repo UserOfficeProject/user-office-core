@@ -37,22 +37,24 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
       name={id}
       id={`${id}-field`}
       label={props.answer.question.question}
-      inputProps={{
-        onChange: (event: ChangeEvent<HTMLInputElement>) => {
-          setTitle(event.currentTarget.value);
-        },
-        onBlur: () => {
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { title: title },
-          });
-        },
-      }}
       required
       fullWidth
       component={TextFieldNoSubmit}
       data-cy="title-input"
       margin="dense"
+      slotProps={{
+        htmlInput: {
+          onChange: (event: ChangeEvent<HTMLInputElement>) => {
+            setTitle(event.currentTarget.value);
+          },
+          onBlur: () => {
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary: { title: title },
+            });
+          },
+        },
+      }}
     />
   );
 }

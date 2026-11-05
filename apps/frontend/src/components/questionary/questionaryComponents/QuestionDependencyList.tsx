@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -72,9 +72,13 @@ const QuestionDependencyList = ({
     <FieldArray name="dependencies">
       {({ remove, push }) => (
         <>
-          <Box mb={2}>
+          <Box
+            sx={{
+              mb: 2,
+            }}
+          >
             <Grid container direction="row-reverse">
-              <Grid item xs={1}>
+              <Grid size={1}>
                 <Tooltip title="Add dependency">
                   <IconButton
                     onClick={() =>
@@ -96,7 +100,7 @@ const QuestionDependencyList = ({
                 </Tooltip>
               </Grid>
               {field.dependencies.length > 1 && (
-                <Grid item xs={4}>
+                <Grid size={4}>
                   <FormControl fullWidth>
                     <InputLabel shrink htmlFor="operator">
                       Compare dependencies
@@ -130,20 +134,23 @@ const QuestionDependencyList = ({
           </Box>
           {field.dependencies?.map((dependency, i) => {
             return (
-              <Box key={`${dependency?.dependencyId}_${i}`} mb={1}>
+              <Box
+                key={`${dependency?.dependencyId}_${i}`}
+                sx={{
+                  mb: 1,
+                }}
+              >
                 <Grid container>
-                  <Grid item xs={11}>
+                  <Grid size={11}>
                     <Field
                       name={`dependencies.${i}`}
                       component={FormikUICustomDependencySelector}
                       template={template}
                       dependency={dependency}
                       currentQuestionId={currentQuestionId}
-                      fullWidth
-                      inputProps={{ 'data-cy': 'dependencies' }}
                     />
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid size={1}>
                     <IconButton
                       onClick={(): void => {
                         remove(i);
