@@ -1,6 +1,9 @@
-import MaterialTable, { MaterialTableProps } from '@material-table/core';
-import React, { useMemo } from 'react';
+import React from 'react';
 
+import ResponsiveMaterialTable, {
+  ResponsiveMaterialTableProps,
+} from 'components/common/ResponsiveMaterialTable';
+import { useIsMobile } from 'hooks/common/useResponsive';
 import { denseTableColumns } from 'utils/helperFunctions';
 
 /**NOTE:
@@ -8,17 +11,13 @@ import { denseTableColumns } from 'utils/helperFunctions';
  * and showing indicator(three dots) if there is more content to be shown on hover.
  */
 function DenseMaterialTable<RowData extends object>(
-  props: MaterialTableProps<RowData>
+  props: ResponsiveMaterialTableProps<RowData>
 ) {
-  // NOTE: Using useMemo() with an empty dependencies array will calculate the value only once, on mount.
-
-  const columns = useMemo(
-    () => denseTableColumns(props.columns),
-    [props.columns]
-  );
+  const isMobile = useIsMobile();
+  const columns = isMobile ? props.columns : denseTableColumns(props.columns);
 
   return (
-    <MaterialTable
+    <ResponsiveMaterialTable
       {...props}
       options={{ ...props.options, pageSize: props.options?.pageSize || 10 }}
       columns={columns}

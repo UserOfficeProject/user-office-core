@@ -269,7 +269,6 @@ function QuestionaryComponentGenericTemplate(
             />
 
             <ErrorMessage name={answerId} />
-
             <StyledDialog
               onClose={() => {
                 const newStateItems = field.value.map((genericTemplate) =>
@@ -293,9 +292,11 @@ function QuestionaryComponentGenericTemplate(
               }}
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
-              title={selectedGenericTemplate?.title || ''}
+              maxWidth="md"
+              fullWidth
+              title={selectedGenericTemplate?.title || 'Sub template'}
             >
-              <DialogContent>
+              <DialogContent dividers>
                 {selectedGenericTemplate ? (
                   <GenericTemplateContainer
                     genericTemplate={selectedGenericTemplate}

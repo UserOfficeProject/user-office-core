@@ -1,6 +1,8 @@
 import {
   GetSettingsQuery,
   PrepareDbMutation,
+  SetPageContentMutation,
+  SetPageContentMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -24,6 +26,17 @@ declare global {
        *    cy.getAndStoreAppSettings()
        */
       getAndStoreAppSettings: () => Cypress.Chainable<GetSettingsQuery>;
+      /**
+       * Sets the content of one of the admin-authored pages, as the user officer would.
+       *
+       * @returns {typeof setPageContent}
+       * @memberof Chainable
+       * @example
+       *    cy.setPageContent({ id: PageName.HOMEPAGE, text: '<p>Notice</p>' })
+       */
+      setPageContent: (
+        setPageContentInput: SetPageContentMutationVariables
+      ) => Cypress.Chainable<SetPageContentMutation>;
     }
   }
 }

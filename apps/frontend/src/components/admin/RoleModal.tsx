@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
   DialogContent,
   FormControl,
   InputLabel,
@@ -13,6 +12,7 @@ import {
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
+import StyledDialog from 'components/common/StyledDialog';
 import { Role, UserRole } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -153,17 +153,14 @@ const RoleModal = ({ open, onClose, role, onSubmit }: RoleModalProps) => {
     shortCodeUpper === UserRole.PROPOSAL_READER;
 
   return (
-    <Dialog
+    <StyledDialog
       open={open}
       onClose={onClose}
-      aria-labelledby="role-dialog"
+      title={isEditMode ? 'Update Role' : 'Create New Role'}
       maxWidth="lg"
       fullWidth
     >
       <DialogContent>
-        <Typography variant="h6">
-          {isEditMode ? 'Update Role' : 'Create New Role'}
-        </Typography>
         <FormControl
           fullWidth
           margin="normal"
@@ -241,7 +238,7 @@ const RoleModal = ({ open, onClose, role, onSubmit }: RoleModalProps) => {
           {isEditMode ? 'Update Role' : 'Create Role'}
         </Button>
       </DialogContent>
-    </Dialog>
+    </StyledDialog>
   );
 };
 

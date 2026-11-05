@@ -30,7 +30,7 @@ const DateAnswerValueRenderer = ({
 
 const DateAnswerRenderer: AnswerRenderer = ({ config, value }) => {
   if (!value) {
-    return <span>Left blank</span>;
+    return null;
   }
 
   return <DateAnswerValueRenderer config={config} value={value} />;

@@ -1,6 +1,7 @@
 import { BoxProps } from '@mui/material';
 import React, { PropsWithChildren } from 'react';
 
+import { belowCompactUi } from 'hooks/common/useResponsive';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 
 export function ActionButtonContainer({
@@ -14,6 +15,13 @@ export function ActionButtonContainer({
         marginTop: theme.spacing(3),
         '& button': {
           marginLeft: theme.spacing(2),
+        },
+        [belowCompactUi(theme)]: {
+          gap: theme.spacing(1),
+          '& button': {
+            marginLeft: 0,
+            flex: 1,
+          },
         },
       })}
       {...rest}
