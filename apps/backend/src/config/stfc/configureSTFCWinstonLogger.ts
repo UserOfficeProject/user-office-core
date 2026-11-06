@@ -44,7 +44,7 @@ export function configureSTFCWinstonLogger() {
 
   setLogger(
     new WinstonLogger({
-      level: 'info',
+      level: 'debug',
       format: Winston.format.combine(
         Winston.format.timestamp({
           format: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
