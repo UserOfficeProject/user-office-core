@@ -39,6 +39,9 @@ export class UpdateFapArgs {
 
   @Field(() => Int, { nullable: true })
   public reviewVisibility: number;
+
+  @Field(() => Boolean, { nullable: true })
+  public editInstrumentAvailabilityTime?: boolean;
 }
 
 @Resolver()

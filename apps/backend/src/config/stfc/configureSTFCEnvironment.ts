@@ -88,7 +88,6 @@ async function enableDefaultStfcFeatures() {
       FeatureId.TECHNIQUE_PROPOSALS,
       FeatureId.PREGENERATED_PROPOSAL_PDF,
       FeatureId.EXPERIMENT_SAFETY_REVIEW,
-      FeatureId.EDIT_INSTRUMENT_AVAILABILITY_TIME,
     ],
     true
   );

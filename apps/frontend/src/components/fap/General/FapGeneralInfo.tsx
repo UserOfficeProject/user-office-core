@@ -185,6 +185,29 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 />
               </Grid>
               <Field
+                id="editInstrumentAvailabilityTime"
+                name="editInstrumentAvailabilityTime"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                checked={values.editInstrumentAvailabilityTime}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (!hasAccessRights || isExecutingCall) {
+                    return;
+                  }
+
+                  setFieldValue(
+                    'editInstrumentAvailabilityTime',
+                    event.target.checked
+                  );
+                }}
+                Label={{
+                  label:
+                    'Allow FAP secretaries to edit instrument availability time',
+                }}
+                data-cy="edit-instrument-availability-time"
+                disabled={!hasAccessRights || isExecutingCall}
+              />
+              <Field
                 id="active"
                 name="active"
                 component={CheckboxWithLabel}

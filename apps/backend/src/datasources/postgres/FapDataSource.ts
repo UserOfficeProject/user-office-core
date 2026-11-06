@@ -89,7 +89,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    reviewVisibility: number
+    reviewVisibility: number,
+    editInstrumentAvailabilityTime: boolean
   ) {
     return database
       .insert(
@@ -101,6 +102,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           custom_grade_guide: customGradeGuide,
           active: active,
           review_visibility: reviewVisibility,
+          edit_instrument_availability_time: editInstrumentAvailabilityTime,
         },
         ['*']
       )
@@ -117,7 +119,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     customGradeGuide: boolean,
     active: boolean,
     files: string | null,
-    reviewVisibility: number
+    reviewVisibility: number,
+    editInstrumentAvailabilityTime: boolean
   ) {
     return database
       .update(
@@ -130,6 +133,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           active,
           files,
           review_visibility: reviewVisibility,
+          edit_instrument_availability_time: editInstrumentAvailabilityTime,
         },
         ['*']
       )

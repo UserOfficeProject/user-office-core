@@ -12,22 +12,17 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapInstrumentProposalsTable';
-import { FeatureContext } from 'context/FeatureContextProvider';
-import {
-  Call,
-  FeatureId,
-  InstrumentWithAvailabilityTime,
-  UserRole,
-} from 'generated/sdk';
+import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';
+import { useFapData } from 'hooks/fap/useFapData';
 import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapData';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -68,13 +63,12 @@ const FapMeetingInstrumentsTable = ({
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsByFapData(fapId, selectedCall.id);
   const { api } = useDataApiWithFeedback();
-  const { featuresMap } = useContext(FeatureContext);
+  const { fap } = useFapData(fapId);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const hasFapSecretaryAccess = useCheckAccess([UserRole.FAP_SECRETARY]);
   const canEditAvailabilityTime =
     hasAccessRights ||
-    (hasFapSecretaryAccess &&
-      featuresMap.get(FeatureId.EDIT_INSTRUMENT_AVAILABILITY_TIME)?.isEnabled);
+    (hasFapSecretaryAccess && fap?.editInstrumentAvailabilityTime);
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
   const downloadFapXLSX = useDownloadXLSXFap();
