@@ -1,0 +1,3 @@
+query GetUserSafetyStatus($oidcSub: String!) {
+  hasUserPassedSafetyForm(oidcSub: $oidcSub)
+}
