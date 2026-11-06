@@ -34,6 +34,7 @@ type Experiment = GetExperimentQuery['experiment'];
 
 interface ExperimentDetailsTableProps extends WithConfirmProps {
   experiment: Experiment;
+  isUserOfficeView: boolean;
 }
 
 const VisitorName = styled(Link)(({ theme }) => ({
@@ -45,7 +46,7 @@ const ActionDiv = styled('div')({
 });
 
 function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
-  const { confirm } = params;
+  const { confirm, isUserOfficeView } = params;
   const [experiment, setExperiment] = useState(params.experiment);
   const { settingsMap } = useContext(SettingsContext);
   const organisationName = settingsMap
@@ -168,6 +169,10 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       title: 'Actions',
       sorting: false,
       render: (rowData: RowType) => {
+        if (!isUserOfficeView) {
+          return null;
+        }
+
         const editButton = (
           <IconButton
             onClick={() => setSelectedVisit(rowData)}
@@ -291,11 +296,14 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     },
     {
       title: 'Visitor name',
-      render: (rowData: RowType) => (
-        <VisitorName to={`/People/${rowData.userId}`}>
-          {getFullUserName(rowData.user)}
-        </VisitorName>
-      ),
+      render: (rowData: RowType) =>
+        isUserOfficeView ? (
+          <VisitorName to={`/People/${rowData.userId}`}>
+            {getFullUserName(rowData.user)}
+          </VisitorName>
+        ) : (
+          getFullUserName(rowData.user)
+        ),
       customSort: (a: RowType, b: RowType) => {
         return getFullUserName(a.user).localeCompare(getFullUserName(b.user));
       },
