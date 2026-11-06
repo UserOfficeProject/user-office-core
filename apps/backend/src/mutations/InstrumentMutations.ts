@@ -13,6 +13,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -21,6 +22,7 @@ import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Experiment, ExperimentStatus } from '../models/Experiment';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -59,6 +61,8 @@ export default class InstrumentMutations {
     private callDataSource: CallDataSource,
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource
   ) {}
@@ -315,6 +319,25 @@ export default class InstrumentMutations {
               instrumentId: instrument.id,
             });
           }
+
+          // When a proposal is assigned to an instrument that requires a technical
+          // review, create a DRAFT experiment placeholder. The booking times
+          // and scheduled event are not known yet, so startsAt is set to the
+          // current date and endsAt to null.
+          const experimentToAdd = {
+            startsAt: new Date(),
+            endsAt: null,
+            scheduledEventId: null,
+            proposalPk,
+            status: ExperimentStatus.DRAFT,
+            localContactId: null,
+            instrumentId: instrument.id,
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >;
+
+          await this.experimentDataSource.create(experimentToAdd);
         }
       }
     }

@@ -208,6 +208,12 @@ export default class FeedbackMutations {
         30
       );
 
+    // Experiments without a booking time yet (endsAt is null) can never be
+    // considered too old for feedback.
+    if (!experiment.endsAt) {
+      return false;
+    }
+
     return moment(experiment.endsAt).isBefore(
       moment().subtract(FEEDBACK_EXHAUST_DAYS, 'days')
     );
