@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.2.0",
-    "exportDate": "2026-04-15T14:00:17.520Z"
+    "exportDate": "2026-10-13T15:08:16.701Z"
   },
   "data": {
     "template": {
@@ -352,6 +352,7 @@
                 "small_label": "",
                 "tooltip": "",
                 "max": null,
+                "maxWords": null,
                 "allowImages": false,
                 "readPermissions": []
               }
@@ -364,6 +365,7 @@
               "small_label": "",
               "tooltip": "",
               "max": null,
+              "maxWords": null,
               "allowImages": false,
               "readPermissions": []
             },
@@ -733,6 +735,7 @@
           "small_label": "",
           "tooltip": "",
           "max": null,
+          "maxWords": null,
           "allowImages": false,
           "readPermissions": []
         }
@@ -1102,6 +1105,7 @@
                     "small_label": "",
                     "tooltip": "",
                     "max": null,
+                    "maxWords": null,
                     "allowImages": false,
                     "readPermissions": []
                   }
@@ -1114,6 +1118,7 @@
                   "small_label": "",
                   "tooltip": "",
                   "max": null,
+                  "maxWords": null,
                   "allowImages": false,
                   "readPermissions": []
                 },
@@ -1371,6 +1376,7 @@
               "small_label": "",
               "tooltip": "",
               "max": null,
+              "maxWords": null,
               "allowImages": false,
               "readPermissions": []
             }

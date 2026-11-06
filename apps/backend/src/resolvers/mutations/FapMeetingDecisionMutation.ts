@@ -34,10 +34,16 @@ export class SaveFapMeetingDecisionInput {
   public submitted?: boolean;
 
   @Field(() => Int)
-  public instrumentId: number;
+  public recommendedInstrumentId: number;
 
   @Field(() => Int)
   public fapId: number;
+
+  @Field(() => Int, { nullable: true })
+  public recommendedTimeAllocation?: number | null;
+
+  @Field(() => Int)
+  public fapProposalId: number;
 }
 
 @InputType()

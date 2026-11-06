@@ -9,7 +9,9 @@ export class FapMeetingDecision {
     public commentForManagement: string,
     public submitted: boolean,
     public submittedBy: number | null,
-    public instrumentId: number,
-    public fapId: number
+    public recommendedInstrumentId: number,
+    public fapId: number,
+    public recommendedTimeAllocation: number | null,
+    public fapProposalId: number
   ) {}
 }

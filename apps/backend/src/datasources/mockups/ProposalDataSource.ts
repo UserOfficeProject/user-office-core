@@ -70,6 +70,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   true,
   1,
   1,
+  1,
+  1,
   1
 );
 

@@ -38,45 +38,45 @@ export const collectManagementDecisionData = async (
     instrumentAvailableTime
   );
 
-  const rowsOfManagmentDecisions = managementDecisionData.map(
+  const rowsOfManagementDecisions = managementDecisionData.map(
     (data) => data.xlsxrowdata
   );
 
-  return rowsOfManagmentDecisions;
+  return rowsOfManagementDecisions;
 };
 
 export async function generateManagementDecisionData(
   agent: UserWithRole,
-  fapreview: FapReviewsRecord
+  fapReview: FapReviewsRecord
 ) {
   const principalInvestigatorInfo = await baseContext.queries.user.get(
     agent,
-    fapreview.proposer_id
+    fapReview.proposer_id
   );
   const fapMeetingData =
     await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
-      proposalPk: fapreview.proposal_pk,
-      fapId: fapreview.fap_id,
+      proposalPk: fapReview.proposal_pk,
+      fapId: fapReview.fap_id,
     });
   const fapMeetingDecision = fapMeetingData.find(
-    (decision) => decision.instrumentId === fapreview.instrument_id
+    (decision) => decision.fapProposalId === fapReview.fap_proposal_id
   );
 
   const instrumentAllocatedTime =
-    fapreview.fap_time_allocation ?? fapreview.time_allocation;
+    fapReview.fap_time_allocation ?? fapReview.time_allocation;
 
   const fapMeetingRecommendation = fapMeetingDecision?.recommendation
     ? ProposalEndStatusStringValue[fapMeetingDecision.recommendation]
     : ProposalEndStatusStringValue[0];
 
   return {
-    rankOrder: fapreview.rank_order ?? 0,
+    rankOrder: fapReview.rank_order ?? 0,
     instrumentAllocatedTime: instrumentAllocatedTime ?? '<missing>',
     xlsxrowdata: [
-      fapreview.proposal_id.toString() ?? '<missing>',
-      fapreview.proposal_pk.toString() ?? '<missing>',
-      fapreview.instrument_id.toString() ?? '<missing>',
-      fapreview.instrument_name.toString() ?? '<missing>',
+      fapReview.proposal_id.toString() ?? '<missing>',
+      fapReview.proposal_pk.toString() ?? '<missing>',
+      fapReview.instrument_id.toString() ?? '<missing>',
+      fapReview.instrument_name.toString() ?? '<missing>',
       `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
       '<missing>', // Running total of remaining instrument time. (filled in later)
       instrumentAllocatedTime?.toString() ?? '<missing>',
@@ -87,7 +87,7 @@ export async function generateManagementDecisionData(
       fapMeetingDecision?.commentForManagement != null
         ? stripHtml(fapMeetingDecision.commentForManagement)
         : '<missing>',
-      fapreview.comment != null ? stripHtml(fapreview.comment) : '<missing>',
+      fapReview.comment != null ? stripHtml(fapReview.comment) : '<missing>',
     ],
   };
 }

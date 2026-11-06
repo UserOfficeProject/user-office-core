@@ -231,7 +231,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 setFieldTouched('config.numberMax', true, true);
               }}
               onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                console.log(e.target.value);
                 e.target.value === '' &&
                   setFieldValue('config.numberMinInclusive', false);
               }}

@@ -9,8 +9,9 @@ import {
   AssignFapReviewersToProposalsMutation,
   AssignProposalsToFapsMutation,
   AssignProposalsToFapsMutationVariables,
-  SaveFapMeetingDecisionMutationVariables,
+  Exact,
   SaveFapMeetingDecisionMutation,
+  SaveFapMeetingDecisionInput,
   UpdateReviewMutationVariables,
   UpdateReviewMutation,
   GetProposalReviewsQueryVariables,
@@ -128,7 +129,12 @@ declare global {
        *    cy.saveFapMeetingDecision(saveFapMeetingDecisionInput: SaveFapMeetingDecisionMutationVariables)
        */
       saveFapMeetingDecision: (
-        saveFapMeetingDecisionInput: SaveFapMeetingDecisionMutationVariables
+        saveFapMeetingDecisionInput: Exact<{
+          saveFapMeetingDecisionInput: Omit<
+            SaveFapMeetingDecisionInput,
+            'fapProposalId'
+          >;
+        }>
       ) => Cypress.Chainable<SaveFapMeetingDecisionMutation>;
 
       /**
