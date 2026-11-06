@@ -428,6 +428,7 @@ export interface FapRecord {
   readonly full_count: number;
   readonly files: string | null;
   readonly review_visibility: number;
+  readonly edit_instrument_availability_time: boolean;
 }
 
 export interface ReviewVisibilityRecord {
@@ -1165,7 +1166,8 @@ export const createFapObject = (fap: FapRecord) => {
     [],
     [],
     fap.files ? JSON.stringify(fap.files) : null,
-    fap.review_visibility
+    fap.review_visibility,
+    fap.edit_instrument_availability_time
   );
 };
 

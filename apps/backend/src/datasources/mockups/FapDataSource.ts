@@ -38,7 +38,8 @@ export const dummyFap = new Fap(
   null,
   null,
   null,
-  1
+  1,
+  false
 );
 
 export const anotherDummyFap = new Fap(
@@ -52,7 +53,8 @@ export const anotherDummyFap = new Fap(
   null,
   null,
   null,
-  1
+  1,
+  false
 );
 
 const reviewVisibilityTestingFap = new Fap(
@@ -66,7 +68,8 @@ const reviewVisibilityTestingFap = new Fap(
   null,
   null,
   null,
-  1
+  1,
+  false
 );
 
 export const dummyFapProposalsComplete: Fap = {
@@ -96,7 +99,8 @@ export const dummyFapWithoutCode = new Fap(
   null,
   null,
   null,
-  1
+  1,
+  false
 );
 
 export const dummyFaps = [
@@ -333,7 +337,8 @@ export class FapDataSourceMock implements FapDataSource {
       null,
       null,
       null,
-      1
+      1,
+      false
     );
   }
 
@@ -357,7 +362,8 @@ export class FapDataSourceMock implements FapDataSource {
       null,
       null,
       null,
-      1
+      1,
+      false
     );
   }
 

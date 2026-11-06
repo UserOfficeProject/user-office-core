@@ -8,6 +8,7 @@ mutation updateFap(
   $active: Boolean!
   $files: String
   $reviewVisibility: Int
+  $editInstrumentAvailabilityTime: Boolean
 ) {
   updateFap(
     id: $id
@@ -19,6 +20,7 @@ mutation updateFap(
     active: $active
     files: $files
     reviewVisibility: $reviewVisibility
+    editInstrumentAvailabilityTime: $editInstrumentAvailabilityTime
   ) {
     id
   }

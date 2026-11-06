@@ -22,6 +22,7 @@ import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapIns
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';
+import { useFapData } from 'hooks/fap/useFapData';
 import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapData';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -62,7 +63,12 @@ const FapMeetingInstrumentsTable = ({
   const { loadingInstruments, instrumentsData, setInstrumentsData } =
     useInstrumentsByFapData(fapId, selectedCall.id);
   const { api } = useDataApiWithFeedback();
+  const { fap } = useFapData(fapId);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+  const hasFapSecretaryAccess = useCheckAccess([UserRole.FAP_SECRETARY]);
+  const canEditAvailabilityTime =
+    hasAccessRights ||
+    (hasFapSecretaryAccess && fap?.editInstrumentAvailabilityTime);
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
   const downloadFapXLSX = useDownloadXLSXFap();
@@ -248,6 +254,9 @@ const FapMeetingInstrumentsTable = ({
         tooltip: 'Unsubmit ' + i18n.format(t('instrument'), 'lowercase'),
       })
     );
+  }
+
+  if (canEditAvailabilityTime) {
     accessDependentActions.push((rowData: InstrumentWithAvailabilityTime) => ({
       icon: AddTimeIcon,
       onClick: () => {

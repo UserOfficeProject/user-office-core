@@ -49,6 +49,9 @@ export class Fap implements Partial<FapBase> {
   @Field(() => Int)
   public reviewVisibility: number;
 
+  @Field(() => Boolean)
+  public editInstrumentAvailabilityTime: boolean;
+
   public fapChairUserIds: number[] | null;
 
   public fapSecretariesUserIds: number[] | null;
