@@ -92,6 +92,9 @@ function editFinalRankingForm() {
   cy.setTinyMceContent('commentForUser', faker.lorem.words(3));
   cy.setTinyMceContent('commentForManagement', faker.lorem.words(3));
 
+  cy.get('#meetingScore').click();
+  cy.get('[data-value="1"]').click();
+
   cy.contains('External reviews').parent().find('table').as('reviewsTable');
 
   cy.get('@reviewsTable').contains(fapMembers.reviewer.lastName);
@@ -1446,7 +1449,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Submit').should('be.disabled');
+      cy.contains('Submit').should('be.enabled').click();
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
@@ -1549,7 +1552,7 @@ context('Fap reviews tests', () => {
       );
     });
 
-    it('Fap Secretary should be able to read/write non-submitted reviews', () => {
+    it('Fap Secretary should be able to read/write/submit non-submitted reviews', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1577,9 +1580,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
-      cy.contains('Submit').should('be.disabled');
-
-      cy.finishedLoading();
+      cy.contains('Submit').should('be.enabled').click();
     });
 
     it('Fap Secretary should be able to edit only comments of technical reviews', function () {
@@ -2532,7 +2533,7 @@ context('Fap meeting components tests', () => {
         .and('have.length', 1);
     });
 
-    it('Officer should be able to reorder proposal with drag and drop', () => {
+    it('Officer should be able to reorder proposal with setting meeting scores', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
@@ -2542,6 +2543,9 @@ context('Fap meeting components tests', () => {
             abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+
+          cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposalPks: [createdProposal.primaryKey],
@@ -2570,58 +2574,61 @@ context('Fap meeting components tests', () => {
             proposalPks: [createdProposal.primaryKey],
           });
         }
+        cy.login('officer');
+        cy.visit(`/FapPage/${createdFapId}?tab=5`);
+
+        cy.finishedLoading();
+
+        cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+        cy.finishedLoading();
+
+        cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
+          .first()
+          .contains(proposal1.title);
+
+        cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
+          .last()
+          .contains(proposal2.title);
+
+        cy.get(`[data-cy="meeting-score-${firstCreatedProposalId}"]`).click();
+
+        cy.contains(firstCreatedProposalId)
+          .parent()
+          .get('[aria-label="Current Score"]')
+          .click()
+          .type('3');
+
+        cy.get('[data-testId="CheckIcon"]').click();
+
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
+
+        cy.get(
+          `[data-cy="meeting-score-${createdProposal.proposalId}"]`
+        ).click();
+        cy.contains(createdProposal.proposalId)
+          .parent()
+          .get('[aria-label="Current Score"]')
+          .click()
+          .type('4');
+
+        cy.get('[data-testId="CheckIcon"]').click();
+
+        cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
+          .first()
+          .should(
+            'have.attr',
+            'unallocated-time-information',
+            `Unallocated time: ${
+              instrumentAvailabilityTime - secondProposalTimeAllocation
+            } ${initialDBData.call.allocationTimeUnit}s`
+          );
+
+        cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
+          .last()
+          .contains(proposal1.title);
       });
-      cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=5`);
-
-      cy.finishedLoading();
-
-      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
-        .first()
-        .contains(proposal1.title);
-
-      cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
-        .last()
-        .contains(proposal2.title);
-
-      cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
-      cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
-      cy.get('@firstDragIcon').trigger('dragstart');
-
-      cy.get('@secondDragIcon').trigger('dragenter');
-
-      cy.get('@secondDragIcon').trigger('dragend');
-
-      cy.get(
-        '[data-cy="fap-instrument-proposals-table"] [role="progressbar"]'
-      ).should('not.exist');
-
-      cy.notification({
-        variant: 'success',
-        text: 'Reordering of proposals saved successfully',
-      });
-
-      cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
-        .first()
-        .contains(proposal2.title);
-
-      cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
-        .first()
-        .should(
-          'have.attr',
-          'unallocated-time-information',
-          `Unallocated time: ${
-            instrumentAvailabilityTime - secondProposalTimeAllocation
-          } ${initialDBData.call.allocationTimeUnit}s`
-        );
-
-      cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
-        .last()
-        .contains(proposal1.title);
     });
 
     it('Proposals in Fap meeting components should be ordered by standard deviation as second order parameter if there is no ranking', () => {
@@ -2634,6 +2641,8 @@ context('Fap meeting components tests', () => {
             abstract: proposal2.abstract,
             proposerId: initialDBData.users.user1.id,
           });
+
+          cy.submitProposal({ proposalPk: createdProposal.primaryKey });
 
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
@@ -3157,45 +3166,45 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="View proposal details"]').click();
 
-      cy.get('[data-cy="edit-fap-time-allocation"]').scrollIntoView();
-      cy.get('[data-cy="edit-fap-time-allocation"]').click();
+      cy.get('[name="recommendedTimeAllocation"]').scrollIntoView();
+      cy.get('[name="recommendedTimeAllocation"]').click();
 
-      cy.get('[data-cy="fapTimeAllocation"] input').as('timeAllocation');
+      // cy.get('[data-cy="edit-fap-time-allocation"] input').as('timeAllocation');
 
-      cy.get('@timeAllocation').should('have.value', '');
+      cy.get('[name="recommendedTimeAllocation"]').should(
+        'have.value',
+        firstProposalTimeAllocation.toString()
+      );
 
-      cy.get('@timeAllocation').type('-1').blur();
-      cy.contains('Must be greater than or equal to');
+      // cy.get('[data-cy="edit-fap-time-allocation"]').clear();
+      cy.get('[name="recommendedTimeAllocation"]').clear();
 
-      cy.get('@timeAllocation').clear().clear().type('987654321').blur();
-      cy.contains('Must be less than or equal to');
+      cy.get('[name="recommendedTimeAllocation"]').type('-1').blur();
 
-      cy.get('@timeAllocation').clear().clear().type('9999');
-      cy.get('[data-cy="save-time-allocation"]').click();
+      cy.contains('Please enter a valid time allocation (0-100000)');
 
-      cy.finishedLoading();
+      cy.get('[name="recommendedTimeAllocation"]')
+        .clear()
+        .clear()
+        .type('987654321')
+        .blur();
+      cy.contains('Please enter a valid time allocation (0-100000)');
 
-      cy.contains('9999 (Overwritten)');
+      cy.get('[name="recommendedTimeAllocation"]').clear().clear().type('9999');
 
-      cy.closeModal();
-      cy.contains('9999');
+      cy.get('#meetingScore').click();
+      cy.get('[data-value="1"]').click();
+
+      cy.get('[data-cy="save"]').click();
+
+      cy.contains('FAP meeting decision saved successfully!');
 
       cy.reload();
       cy.contains('Meeting Components').click();
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.get('[aria-label="View proposal details"]').click();
-
-      cy.get('[data-cy="edit-fap-time-allocation"]').click();
-      cy.get('@timeAllocation').should('have.value', '9999');
-      cy.get('@timeAllocation').clear();
-      cy.get('[data-cy="save-time-allocation"]').click();
-
-      cy.finishedLoading();
-
-      cy.get('body').should('not.contain', '9999 (Overwritten)');
-
-      cy.closeModal();
+      cy.get('[name="recommendedTimeAllocation"]').should('have.value', '9999');
     });
 
     it('should use Fap time allocation (if set) when calculating if they fit in available time', () => {
@@ -3225,18 +3234,21 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="View proposal details"]').click();
 
-      cy.get('[data-cy="edit-fap-time-allocation"]').scrollIntoView();
-      cy.get('[data-cy="edit-fap-time-allocation"]').click();
+      cy.get('[data-cy="edit-fap-time-allocation"] input').should(
+        'have.value',
+        '25'
+      );
 
-      cy.get('[data-cy="fapTimeAllocation"] input').as('timeAllocation');
+      cy.get('[name="recommendedTimeAllocation"]').clear().clear().type('15');
 
-      cy.get('@timeAllocation').should('be.empty');
-      cy.get('@timeAllocation').type('15');
-      cy.get('[data-cy="save-time-allocation"]').click();
+      cy.get('#meetingScore').click();
+      cy.get('[data-value="1"]').click();
+
+      cy.get('[data-cy="save"]').click();
+
+      cy.contains('FAP meeting decision saved successfully!');
 
       cy.finishedLoading();
-
-      cy.contains('15 (Overwritten)');
 
       cy.closeModal();
 
@@ -3372,7 +3384,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -3400,15 +3412,15 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
-      cy.get('[aria-label="Drag proposals to reorder"]')
-        .should('exist')
-        .and('not.be.disabled');
       cy.get('[aria-label="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
 
       cy.setTinyMceContent('commentForUser', 'Test');
       cy.setTinyMceContent('commentForManagement', 'Test');
+
+      cy.get('#meetingScore').click();
+      cy.get('[data-value="1"]').click();
 
       cy.get('[data-cy="is-fap-meeting-submitted"]').click();
       cy.get('[data-cy="saveAndContinue"]').click();
@@ -3430,7 +3442,7 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
         .find('td')
-        .eq(8)
+        .eq(5)
         .should('not.contain.text', '-')
         .should('contain.text', '1');
 
@@ -3481,7 +3493,7 @@ context('Fap meeting components tests', () => {
           proposals: [
             {
               fapId: createdFapId,
-              instrumentId: createdInstrumentId,
+              recommendedInstrumentId: createdInstrumentId,
               proposalPk: firstCreatedProposalPk,
               rankOrder: 1,
             },
@@ -3501,7 +3513,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -3790,7 +3802,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -3959,7 +3971,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -4024,7 +4036,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -4193,7 +4205,7 @@ context('Fap meeting components tests', () => {
           proposalPk: firstCreatedProposalPk,
           submitted: true,
           recommendation: ProposalEndStatus.ACCEPTED,
-          instrumentId: createdInstrumentId,
+          recommendedInstrumentId: createdInstrumentId,
           fapId: createdFapId,
         },
       });
@@ -4953,7 +4965,7 @@ context('Fap meeting exports test', () => {
             proposalPk: firstCreatedProposalPk,
             submitted: true,
             recommendation: ProposalEndStatus.ACCEPTED,
-            instrumentId: createdInstrumentId,
+            recommendedInstrumentId: createdInstrumentId,
             fapId: createdFapId,
           },
         });
@@ -4965,7 +4977,7 @@ context('Fap meeting exports test', () => {
             proposalPk: createdProposal.primaryKey,
             submitted: true,
             recommendation: ProposalEndStatus.ACCEPTED,
-            instrumentId: createdInstrumentId,
+            recommendedInstrumentId: createdInstrumentId,
             fapId: createdFapId,
           },
         });

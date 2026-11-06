@@ -3,9 +3,10 @@ fragment fapMeetingDecision on FapMeetingDecision {
   recommendation
   commentForUser
   commentForManagement
-  rankOrder
   submitted
   submittedBy
-  instrumentId
+  recommendedInstrumentId
   fapId
+  recommendedTimeAllocation
+  meetingScore
 }

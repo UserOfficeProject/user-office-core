@@ -84,8 +84,8 @@ const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
                 <TableCell>
                   {
                     proposal.fapMeetingDecisions?.find(
-                      (fmd) => fmd.instrumentId === instrumentId
-                    )?.rankOrder
+                      (fmd) => fmd.recommendedInstrumentId === instrumentId
+                    )?.meetingScore
                   }
                 </TableCell>
               </TableRow>

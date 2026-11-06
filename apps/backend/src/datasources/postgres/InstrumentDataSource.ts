@@ -600,6 +600,15 @@ export default class PostgresInstrumentDataSource
               ) * instrument.fap_instrument_time_allocation
             );
           }
+          if (
+            instrument.availability_time !== null &&
+            instrument.all_faps_instrument_time_allocation === 0 &&
+            instrument.fap_instrument_time_allocation === 0
+          ) {
+            calculatedInstrumentAvailabilityTimePerFap = -Math.round(
+              -instrument.availability_time
+            );
+          }
 
           return this.createInstrumentWithAvailabilityTimeObject({
             ...instrument,
@@ -706,7 +715,6 @@ export default class PostgresInstrumentDataSource
         availability_time: availabilityTime,
       })} ON CONFLICT (instrument_id, call_id) DO UPDATE SET availability_time=${availabilityTime}`
     );
-
     if (result) {
       return true;
     } else {
@@ -715,7 +723,7 @@ export default class PostgresInstrumentDataSource
   }
 
   async submitInstrumentInFap(
-    proposalPks: number[],
+    fapProposalIds: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
     const records: FapProposalRecord[] = await database('fap_proposals')
@@ -725,34 +733,38 @@ export default class PostgresInstrumentDataSource
         },
         ['*']
       )
-      .whereIn('proposal_pk', proposalPks)
-      .andWhere('instrument_id', instrumentId);
+      .whereIn('fap_proposal_id', fapProposalIds);
 
     if (!records?.length) {
       throw new GraphQLError(
-        `No fap_proposals found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+        `No fap_proposals found with fapProposalIds: ${fapProposalIds} `
       );
     }
 
-    const instrumentHasProposls = await this.getInstrumentHasProposals(
+    if (records.some((fp) => fp.instrument_id !== instrumentId)) {
+      throw new GraphQLError(
+        `Some fapProposalIds: ${fapProposalIds} was not on ${instrumentId}`
+      );
+    }
+    const instrumentHasProposals = await this.getInstrumentHasProposals(
       instrumentId,
-      proposalPks
+      records.map((fp) => fp.proposal_pk)
     );
 
     if (
-      instrumentHasProposls.instrumentHasProposalIds.length !==
-      proposalPks.length
+      instrumentHasProposals.instrumentHasProposalIds.length !==
+      fapProposalIds.length
     ) {
       logger.logWarn(
-        `Some record from instrument proposals were not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`,
+        `Some record from instrument proposals were not found with fapProposalIds: ${instrumentHasProposals} and instrumentId: ${instrumentId}`,
         {}
       );
     }
 
     return new InstrumentsHasProposals(
-      instrumentHasProposls.instrumentHasProposalIds,
+      instrumentHasProposals.instrumentHasProposalIds,
       [instrumentId],
-      proposalPks,
+      records.map((fp) => fp.proposal_pk),
       true
     );
   }
