@@ -41,11 +41,11 @@ export class Experiment implements ExperimentOrigin {
   @Field(() => Date)
   public startsAt: Date;
 
-  @Field(() => Date)
-  public endsAt: Date;
+  @Field(() => Date, { nullable: true })
+  public endsAt: Date | null;
 
-  @Field(() => Number)
-  public scheduledEventId: number;
+  @Field(() => Number, { nullable: true })
+  public scheduledEventId: number | null;
 
   @Field(() => Number)
   public proposalPk: number;
