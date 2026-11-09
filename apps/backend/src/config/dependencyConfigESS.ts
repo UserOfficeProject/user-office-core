@@ -132,7 +132,7 @@ mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 if (isDevelopment) {
-  mapValue(Tokens.MailService, new SMTPMailService());
+  mapClass(Tokens.MailService, SMTPMailService);
 } else {
   mapClass(Tokens.MailService, SparkPostMailService);
 }
