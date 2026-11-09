@@ -1,0 +1,8 @@
+fragment templateVersion on TemplateVersion {
+ templateVersionId
+ templateId
+ template
+ versionNumber
+ templateType
+ createdTimeStamp
+ }
