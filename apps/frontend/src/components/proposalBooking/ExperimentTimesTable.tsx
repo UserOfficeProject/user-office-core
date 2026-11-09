@@ -30,7 +30,7 @@ const RowActionButtons = ({ experimentId }: { experimentId: string }) => {
   return (
     <Tooltip title="View Experiment">
       <IconButton
-        data-cy="view-experiment"
+        data-cy="view-experiment-user"
         onClick={() => {
           setSearchParams((searchParams) => {
             searchParams.set('experiment', experimentId);
