@@ -41,7 +41,12 @@ context('Personal information tests', () => {
     cy.get('[data-cy="selected-role-user_officer"]').contains('In Use');
   });
 
-  it('Should show user details from the database in the profile popup', () => {
+  it('Should show user details from the database in the profile popup', function () {
+    // updateUser is not supported when users come from an external source (e.g. STFC)
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
+
     const user = initialDBData.users.user1;
     const firstName = faker.person.firstName();
     const preferredName = faker.person.firstName();
