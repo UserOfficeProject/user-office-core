@@ -39,7 +39,7 @@ import {
   InstrumentAvailabilityTimeArgs,
   InstrumentSubmitInFapArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
-import { sortByRankOrAverageScore } from '../utils/mathFunctions';
+import { sortByGradeOrAverageScore } from '../utils/mathFunctions';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
@@ -425,42 +425,42 @@ export default class InstrumentMutations {
         { fapId: args.fapId }
       );
 
-    const submittedFapInstrumentProposalPks = allInstrumentProposals.map(
-      (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
+    const submittedFapInstrumentFapProposalIds = allInstrumentProposals.map(
+      (fapInstrumentProposal) => fapInstrumentProposal.fapProposalId
     );
 
     const fapProposalsWithReviewsAndRanking =
       await this.fapDataSource.getFapProposalsWithReviewGradesAndRanking(
-        submittedFapInstrumentProposalPks
+        submittedFapInstrumentFapProposalIds
       );
 
     const allFapMeetingsHasRankings = fapProposalsWithReviewsAndRanking.every(
       (fapProposalWithReviewsAndRanking) =>
-        !!fapProposalWithReviewsAndRanking.rankOrder
+        fapProposalWithReviewsAndRanking.meetingScore !== null
     );
 
     if (!allFapMeetingsHasRankings) {
-      const sortedFapProposals = sortByRankOrAverageScore(
+      const sortedFapProposals = sortByGradeOrAverageScore(
         fapProposalsWithReviewsAndRanking
       );
 
-      const allProposalsWithRankings = sortedFapProposals.map(
-        (sortedFapProposal, index) => {
-          if (!sortedFapProposal.rankOrder) {
-            sortedFapProposal.rankOrder = index + 1;
-          }
+      // const allProposalsWithRankings = sortedFapProposals.map(
+      //   (sortedFapProposal, index) => {
+      //     if (!sortedFapProposal.rankOrder) {
+      //       sortedFapProposal.rankOrder = index + 1;
+      //     }
 
-          return sortedFapProposal;
-        }
-      );
+      //     return sortedFapProposal;
+      //   }
+      // );
 
       await Promise.all(
-        allProposalsWithRankings.map((proposalWithRanking) => {
+        sortedFapProposals.map((proposalWithRanking) => {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
-            rankOrder: proposalWithRanking.rankOrder,
-            instrumentId: args.instrumentId,
+            recommendedInstrumentId: args.instrumentId,
             fapId: args.fapId,
+            fapProposalId: proposalWithRanking.fapProposalId,
           });
         })
       );
@@ -468,7 +468,7 @@ export default class InstrumentMutations {
 
     return this.dataSource
       .submitInstrumentInFap(
-        submittedFapInstrumentProposalPks,
+        submittedFapInstrumentFapProposalIds,
         args.instrumentId
       )
       .catch((error) => {

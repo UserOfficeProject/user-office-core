@@ -33,4 +33,7 @@ export const standardDeviation = (numbers: number[]) => {
 export const getGradesFromReviews = (reviews: Review[]) =>
   reviews
     .map((review) => (!!review.grade ? parseFloat(review.grade) : null))
-    .filter((grade): grade is number => typeof grade === 'number');
+    .filter(
+      (grade): grade is number =>
+        typeof grade === 'number' && !Number.isNaN(grade)
+    );

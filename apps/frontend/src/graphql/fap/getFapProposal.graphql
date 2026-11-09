@@ -1,5 +1,6 @@
 query getFapProposal($fapId: Int!, $proposalPk: Int!) {
   fapProposal(fapId: $fapId, proposalPk: $proposalPk) {
+    fapProposalId
     proposalPk
     fapId
     fapTimeAllocation

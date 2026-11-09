@@ -470,19 +470,24 @@ export default class ProposalMutations {
       }
     }
 
-    const isFapProposalInstrumentSubmitted =
-      await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
+    managementTimeAllocations?.map(async (allocation) => {
+      const isFapProposalInstrumentSubmitted =
+        await this.fapDataSource.isFapProposalInstrumentSubmitted(
+          primaryKey,
+          allocation.instrumentId
+        );
 
-    if (
-      isFapProposalInstrumentSubmitted &&
-      !isUserOfficer &&
-      !isApiAccessToken
-    ) {
-      return rejection(
-        'Can not administer proposal because instrument is submitted',
-        { args, agent }
-      );
-    }
+      if (
+        isFapProposalInstrumentSubmitted &&
+        !isUserOfficer &&
+        !isApiAccessToken
+      ) {
+        return rejection(
+          'Can not administer proposal because instrument is submitted',
+          { args, agent }
+        );
+      }
+    });
 
     // Need to check for undefined and null because 0/UNSET is falsy.
     if (finalStatus !== undefined && finalStatus !== null) {

@@ -4,7 +4,6 @@ import {
   removeFapMemberValidationSchema,
   assignFapChairOrSecretaryValidationSchema,
   assignFapMemberToProposalValidationSchema,
-  updateTimeAllocationValidationSchema,
   saveFapMeetingDecisionValidationSchema,
   createFapValidationSchema,
 } from '@user-office-software/duo-validation';
@@ -48,7 +47,6 @@ import {
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
-import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapProposalMutation';
 
 @injectable()
 export default class FapMutations {
@@ -354,7 +352,6 @@ export default class FapMutations {
           fap_id: fapInstrument.fapId,
           instrument_id: fapInstrument.instrumentId,
           proposal_pk: proposalPk,
-          instrument_has_proposals_id: instrumentHasProposalId,
         });
       }
     }
@@ -519,59 +516,6 @@ export default class FapMutations {
       });
   }
 
-  @ValidateArgs(updateTimeAllocationValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
-  async updateTimeAllocation(
-    agent: UserWithRole | null,
-    {
-      fapId,
-      proposalPk,
-      fapTimeAllocation = null,
-      instrumentId,
-    }: UpdateFapTimeAllocationArgs
-  ) {
-    const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isApiAccessToken = this.userAuth.isApiToken(agent);
-
-    if (
-      !isApiAccessToken &&
-      !isUserOfficer &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
-    ) {
-      return rejection(
-        'Could not update the time allocation because of insufficient permissions',
-        { agent, fapId, proposalPk }
-      );
-    }
-
-    const isFapProposalInstrumentSubmitted =
-      await this.dataSource.isFapProposalInstrumentSubmitted(
-        proposalPk,
-        instrumentId
-      );
-
-    if (
-      isFapProposalInstrumentSubmitted &&
-      !isUserOfficer &&
-      !isApiAccessToken
-    ) {
-      return rejection(
-        'Could not update the time allocation because the instrument is submitted',
-        { agent, fapId, proposalPk }
-      );
-    }
-
-    return this.dataSource
-      .updateTimeAllocation(fapId, proposalPk, instrumentId, fapTimeAllocation)
-      .catch((err) => {
-        return rejection(
-          'Could not update Fap proposal time allocation',
-          { agent, fapId, proposalPk, fapTimeAllocation },
-          err
-        );
-      });
-  }
-
   @ValidateArgs(saveFapMeetingDecisionValidationSchema, [
     'commentForUser',
     'commentForManagement',
@@ -611,11 +555,7 @@ export default class FapMutations {
 
     const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
-    const fapProposal = this.dataSource.getFapProposal(
-      args.fapId,
-      args.proposalPk,
-      args.instrumentId
-    );
+    const fapProposal = this.dataSource.getFapProposalById(args.fapProposalId);
 
     if (!fapProposal) {
       return rejection(
@@ -641,14 +581,14 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: ReorderFapMeetingDecisionProposalsInput
   ): Promise<FapMeetingDecision | Rejection> {
-    const [{ instrumentId, fapId, proposalPk }] = args.proposals;
+    const [{ recommendedInstrumentId, fapId, proposalPk }] = args.proposals;
     const proposal = await this.proposalDataSource.get(proposalPk);
     if (!proposal) {
       return rejection('Proposal not found', { args });
     }
 
     const fapProposals = await this.dataSource.getFapProposalsByInstrument(
-      instrumentId,
+      recommendedInstrumentId,
       proposal.callId,
       { fapId }
     );
@@ -666,7 +606,7 @@ export default class FapMutations {
           const fapProposal = await this.dataSource.getFapProposal(
             proposal.fapId,
             proposal.proposalPk,
-            proposal.instrumentId
+            proposal.recommendedInstrumentId
           );
 
           if (!fapProposal) {
@@ -676,7 +616,11 @@ export default class FapMutations {
             );
           }
 
-          return this.dataSource.saveFapMeetingDecision(proposal);
+          return this.dataSource.saveFapMeetingDecision({
+            ...proposal,
+            recommendedInstrumentId: proposal.recommendedInstrumentId,
+            fapProposalId: fapProposal.fapProposalId,
+          });
         })
       );
 

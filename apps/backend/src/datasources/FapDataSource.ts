@@ -24,6 +24,7 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
+import { FapReviewBasisConfig } from '../resolvers/types/FieldConfig';
 
 export interface FapDataSource {
   create(
@@ -101,6 +102,7 @@ export interface FapDataSource {
     proposalPk: number,
     instrumentId?: number
   ): Promise<FapProposal | null>;
+  getFapProposalById(fapProposalId: number): Promise<FapProposal | null>;
   getFapProposalsByInstrument(
     instrumentId: number,
     callId: number,
@@ -133,12 +135,6 @@ export interface FapDataSource {
     assignments: { proposalPk: number; memberId: number }[],
     fapId: number
   ): Promise<Fap>;
-  updateTimeAllocation(
-    fapId: number,
-    proposalPk: number,
-    instrumentId: number,
-    fapTimeAllocation: number | null
-  ): Promise<FapProposal>;
   isChairOrSecretaryOfFap(userId: number, fapId: number): Promise<boolean>;
   isChairOrSecretaryOfProposal(
     userId: number,
@@ -156,15 +152,19 @@ export interface FapDataSource {
     proposalPks: number[],
     fapId?: number
   ): Promise<FapMeetingDecision[]>;
+  getFapMeetingDecision(
+    fapProposalId: number
+  ): Promise<FapMeetingDecision | null>;
   getAllFapMeetingDecisions(fapId: number): Promise<FapMeetingDecision[]>;
   getFapProposalsWithReviewGradesAndRanking(
-    proposalPks: number[]
+    fapProposalIds: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;
   getRelatedUsersOnFap(id: number): Promise<number[]>;
   isFapProposalInstrumentSubmitted(
     proposalPk: number,
-    instrumentId?: number | null
+    instrumentId: number
   ): Promise<boolean>;
+  isFapProposalInstrumentSubmittedById(fapProposalId: number): Promise<boolean>;
   getInstrumentCodes(fapId: number, proposalPk: number): Promise<string>;
   setReviewerRank(
     fapReviewId: number,
@@ -183,4 +183,7 @@ export interface FapDataSource {
   ): Promise<FapProposal[]>;
   getFapReviewVisibility(fapId: number): Promise<FapReviewVisibility | null>;
   getFapReviewVisibilityOptions(): Promise<ReviewVisibility[]>;
+  getFapMeetingScoreConfig(
+    callId: number
+  ): Promise<FapReviewBasisConfig | null>;
 }
