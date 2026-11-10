@@ -144,7 +144,7 @@ function CreateUpdateVisit({
 
           <FormikUIAutocomplete
             items={values.team.map((user) => ({
-              text: getFullUserName(user),
+              text: getFullUserName(user, true),
               value: user.id,
             }))}
             label="Team lead"

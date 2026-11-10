@@ -2,10 +2,10 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
 import { useTheme } from '@mui/material/styles';
+import { Editor as TinyMCEEditor } from '@tinymce/tinymce-react/node_modules/tinymce/tinymce';
 import { util } from '@user-office-software/duo-validation';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
-import { Editor as TinyMCEEditor } from 'tinymce';
 
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -69,6 +69,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         init={{
           skin: false,
           content_css: false,
+          content_style: `body { padding-left: ${theme.spacing(1)}; }`,
           /**
            * Note:  if you add new styling options please make sure the HTML sanitizer rules
            *        on the BE is in sync, otherwise the result will be filtered
