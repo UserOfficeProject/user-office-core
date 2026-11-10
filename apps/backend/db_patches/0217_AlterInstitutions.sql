@@ -2,7 +2,7 @@ DO
 $$
 BEGIN
     IF register_patch(
-        '0217_InstitutionNameAsText.sql',
+        '0217_AlterInstitutions.sql',
         'Balazs Csete',
         'Change type of institution name to text',
         '2026-11-10'
