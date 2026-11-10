@@ -222,10 +222,27 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Principal investigator in the proposal table should not be empty', () => {
+    it('Principal investigator without a last name should be displayed', () => {
       cy.login('officer');
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'getProposalsCore') {
+          req.alias = 'getProposalsCore';
+          req.continue((res) => {
+            const proposal = res.body?.data?.proposalsView?.proposalViews?.find(
+              (proposalView: { proposalId: string }) =>
+                proposalView.proposalId === createdProposalId
+            );
+
+            if (proposal?.principalInvestigator) {
+              proposal.principalInvestigator.lastname = '';
+            }
+          });
+        }
+      });
+
       cy.visit('/');
 
+      cy.wait('@getProposalsCore');
       cy.finishedLoading();
 
       cy.contains('td', newProposalTitle)
@@ -897,6 +914,72 @@ context('Proposal tests', () => {
           'have.text',
           'Be aware that selected proposals have different statuses and changing status will affect all of them.'
         );
+    });
+
+    it('User officer should see all proposals after switching the status filter back to All and keep the filter on reload', () => {
+      cy.cloneProposals({
+        callId: initialDBData.call.id,
+        proposalsToClonePk: [createdProposalPk],
+      });
+      cy.changeProposalsStatus({
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
+        proposalPks: [createdProposalPk],
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get(
+        `[role="listbox"] [data-value="${initialDBData.proposalStatuses.draft.id}"]`
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.location('search').should(
+        'include',
+        `status=${initialDBData.proposalStatuses.draft.id}`
+      );
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'not.contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      // The status filter is read back from the URL after a reload
+      cy.reload();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-filter"]').should(
+        'contain.text',
+        initialDBData.proposalStatuses.draft.name
+      );
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'not.contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      // Switching back to "All" must not filter on a non-existing "ALL" status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('[role="listbox"] [data-value="ALL"]').click();
+
+      cy.finishedLoading();
+
+      cy.location('search').should('include', 'status=ALL');
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
     });
 
     it('User officer should be able to opt-in to run status actions when changing status', () => {

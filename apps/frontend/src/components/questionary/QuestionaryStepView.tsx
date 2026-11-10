@@ -11,7 +11,10 @@ import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useFapData } from 'hooks/fap/useFapData';
-import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
+import {
+  usePostSubmitActions,
+  usePreSubmitActions,
+} from 'hooks/questionary/useSubmitActions';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import {
@@ -74,6 +77,7 @@ function QuestionaryStepView(props: {
   const { topicId, confirm } = props;
 
   const preSubmitActions = usePreSubmitActions();
+  const postSubmitActions = usePostSubmitActions();
   const { api } = useDataApiWithFeedback();
 
   const { state, dispatch } = useContext(QuestionaryContext);
@@ -213,6 +217,11 @@ function QuestionaryStepView(props: {
         topicId: topicId,
         isPartialSave: isPartialSave,
       });
+
+      // The visit update event must see the answers saved by answerTopic.
+      for (const action of postSubmitActions(state)) {
+        await action({ state, dispatch, api: api() });
+      }
 
       dispatch({
         type: 'STEP_ANSWERED',

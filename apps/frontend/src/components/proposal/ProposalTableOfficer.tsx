@@ -82,7 +82,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName, getPreferredName } from 'utils/user';
+import { getFullUserName, getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
@@ -136,13 +136,13 @@ let columns: Column<ProposalViewData>[] = [
     sorting: false,
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname ? (
+      proposalView.principalInvestigator ? (
         <RoleBasedLink
           roleRoutes={{
             [UserRole.USER_OFFICER]: `/People/${proposalView.principalInvestigator.id}`,
           }}
         >
-          {`${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`}
+          {getPreferredNameWithLastname(proposalView.principalInvestigator)}
         </RoleBasedLink>
       ) : (
         ''
