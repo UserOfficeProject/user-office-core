@@ -191,6 +191,9 @@ const PeopleTable = ({
   }, [data?.length]);
 
   useEffect(() => {
+    if (!persistUrlQueryParams) {
+      return;
+    }
     tableRef.current && tableRef.current.onQueryChange({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams.get('search')]);
@@ -279,7 +282,9 @@ const PeopleTable = ({
                 : orderBy?.orderDirection == PaginationSortDirection.DESC
                   ? PaginationSortDirection.DESC
                   : undefined,
-            searchText: searchParams.get('search') ?? tableQuery.search,
+            searchText: persistUrlQueryParams
+              ? searchParams.get('search') ?? tableQuery.search
+              : tableQuery.search,
           })
           .then(({ users }) => {
             const filteredData = data

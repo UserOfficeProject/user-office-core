@@ -18,7 +18,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { UserRole, Review, SettingsId, Fap } from 'generated/sdk';
+import { UserRole, Review, SettingsId, Fap, ReviewStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';
@@ -58,6 +58,14 @@ const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
     .map((assignment) => assignment.review)
     .filter((review): review is Review => !!review);
 
+export const getCompletedReviews = (fapProposal: FapProposalType) => {
+  return fapProposal.assignments?.filter(
+    (assignment) =>
+      assignment.review !== null &&
+      assignment.review.status === ReviewStatus.SUBMITTED
+  );
+};
+
 const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Actions',
@@ -86,11 +94,11 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Principal Investigator',
     render: (rowData) => {
-      return getFullUserName(rowData.proposal.proposer);
+      return getFullUserName(rowData.proposal.proposer, true);
     },
     customSort(a, b) {
-      const name1 = getFullUserName(a.proposal.proposer);
-      const name2 = getFullUserName(b.proposal.proposer);
+      const name1 = getFullUserName(a.proposal.proposer, true);
+      const name2 = getFullUserName(b.proposal.proposer, true);
 
       return name1 < name2 ? -1 : 1;
     },
@@ -113,27 +121,16 @@ const FapProposalColumns: Column<FapProposalType>[] = [
     title: 'Reviews',
     render: (rowData) => {
       const totalReviews = rowData.assignments?.length;
-      const gradedProposals = rowData.assignments?.filter(
-        (assignment) =>
-          assignment.review !== null && assignment.review.grade !== null
-      );
-      const countReviews = gradedProposals?.length || 0;
+      const submittedProposals = getCompletedReviews(rowData);
+      const countReviews = submittedProposals?.length || 0;
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
     },
     customSort: (a, b) => {
       const totalReviewsA = a.assignments?.length || 0;
       const totalReviewsB = b.assignments?.length || 0;
-      const gradedProposalsA =
-        a.assignments?.filter(
-          (assignment) =>
-            assignment.review !== null && assignment.review.grade !== null
-        ).length || 0;
-      const gradedProposalsB =
-        b.assignments?.filter(
-          (assignment) =>
-            assignment.review !== null && assignment.review.grade !== null
-        ).length || 0;
+      const gradedProposalsA = getCompletedReviews(a)?.length || 0;
+      const gradedProposalsB = getCompletedReviews(b)?.length || 0;
 
       const incompleteReviewsA = totalReviewsA - gradedProposalsA;
       const incompleteReviewsB = totalReviewsB - gradedProposalsB;
@@ -185,8 +182,8 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       ),
   },
   {
-    title: 'Instrument',
-    field: 'instrument.name',
+    title: 'Instrument(s)',
+    field: 'instrumentShortcodes',
   },
 ];
 
@@ -227,14 +224,14 @@ const FapProposalsAndAssignmentsTable = ({
   );
 
   const translatedColumns = FapProposalColumns.map((column) =>
-    column.title === 'Instrument'
-      ? { ...column, title: t('instrument') }
+    column.title === 'Instrument(s)'
+      ? { ...column, title: `${t('instrument')}(s)` }
       : column
   );
 
-  const page = searchParams.get('page');
-  const pageSize = searchParams.get('pageSize');
-  const selection = searchParams.getAll('selection');
+  const page = searchParams.get('pa-page');
+  const pageSize = searchParams.get('pa-pageSize');
+  const selection = searchParams.getAll('pa-selection');
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -319,8 +316,8 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
-      title: `Remove ${t('Fap')} assignment/s`,
-      description: `Are you sure you want to remove the selected proposal/s from this ${t('Fap')}?`,
+      title: `Remove ${t('FAP')} assignment/s`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('fap')}?`,
     })();
   };
 
@@ -329,7 +326,7 @@ const FapProposalsAndAssignmentsTable = ({
   hasRightToAssignReviewers &&
     tableActions.push({
       icon: () => <AssignmentInd data-cy="assign-fap-members" />,
-      tooltip: `Assign ${t('Fap')} members`,
+      tooltip: `Assign ${t('FAP')} members`,
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
@@ -444,7 +441,7 @@ const FapProposalsAndAssignmentsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title={`${t('Fap')} - Proposal View`}
+        title={`${t('FAP')} - Proposal View`}
         proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
           setSearchParams((searchParams) => {
@@ -479,7 +476,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${fap.code} - ${t('Fap')} Proposals`}
+              {`${fap.code} - ${t('FAP')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}
@@ -512,14 +509,14 @@ const FapProposalsAndAssignmentsTable = ({
           }}
           onPageChange={(page) => {
             setSearchParams((searchParams) => {
-              searchParams.set('page', page.toString());
+              searchParams.set('pa-page', page.toString());
 
               return searchParams;
             });
           }}
           onRowsPerPageChange={(pageSize) => {
             setSearchParams((searchParams) => {
-              searchParams.set('pageSize', pageSize.toString());
+              searchParams.set('pa-pageSize', pageSize.toString());
 
               return searchParams;
             });
@@ -530,9 +527,9 @@ const FapProposalsAndAssignmentsTable = ({
             );
 
             setSearchParams((searchParams) => {
-              searchParams.delete('selection');
+              searchParams.delete('pa-selection');
               selectedProposalPks.forEach((pk) =>
-                searchParams.append('selection', pk.toString())
+                searchParams.append('pa-selection', pk.toString())
               );
 
               return searchParams;

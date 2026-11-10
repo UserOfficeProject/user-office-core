@@ -136,6 +136,7 @@ export interface FapDataSource {
   updateTimeAllocation(
     fapId: number,
     proposalPk: number,
+    instrumentId: number,
     fapTimeAllocation: number | null
   ): Promise<FapProposal>;
   isChairOrSecretaryOfFap(userId: number, fapId: number): Promise<boolean>;
@@ -164,6 +165,7 @@ export interface FapDataSource {
     proposalPk: number,
     instrumentId?: number | null
   ): Promise<boolean>;
+  getInstrumentCodes(fapId: number, proposalPk: number): Promise<string>;
   setReviewerRank(
     fapReviewId: number,
     reviewerId: number,

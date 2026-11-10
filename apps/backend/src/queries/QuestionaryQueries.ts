@@ -130,14 +130,19 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     templateId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionarySteps(templateId);
+    const steps = await this.dataSource.getBlankQuestionarySteps(templateId);
+
+    return this.filterQuestionaryForReadPermissions(agent, steps);
   }
 
   async getBlankQuestionaryStepsByCallId(
     agent: UserWithRole | null,
     callId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+    const steps =
+      await this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+
+    return this.filterQuestionaryForReadPermissions(agent, steps);
   }
 
   async getQuestionaryStepsOrDefault(

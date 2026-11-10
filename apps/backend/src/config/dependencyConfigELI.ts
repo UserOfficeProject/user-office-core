@@ -43,6 +43,7 @@ import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresTemplateVersionDataSource from '../datasources/postgres/TemplateVersionDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -63,8 +64,7 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
-
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
@@ -128,7 +128,7 @@ mapClass(Tokens.UserAuthorization, ELIUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
-mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
+mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 
@@ -153,3 +153,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, PostgresTemplateVersionDataSource);

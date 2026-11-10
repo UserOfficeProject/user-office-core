@@ -36,7 +36,7 @@ const AddFap = ({ close }: AddFapProps) => {
       onSubmit={async (values): Promise<void> => {
         try {
           const { createFap } = await api({
-            toastSuccessMessage: `${t('Fap')} created successfully!`,
+            toastSuccessMessage: `${t('FAP')} created successfully!`,
           }).createFap(values);
 
           close(createFap);
@@ -49,7 +49,7 @@ const AddFap = ({ close }: AddFapProps) => {
       {(): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new {t('Fap')}
+            Create new {t('FAP')}
           </Typography>
 
           <Field

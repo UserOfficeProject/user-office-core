@@ -64,7 +64,7 @@ const FapSelectionEditComponent = (
       id="fapSelection"
       options={fapOptions}
       renderInput={(params) => (
-        <TextField {...params} placeholder={t('Fap')} margin="none" />
+        <TextField {...params} placeholder={t('FAP')} margin="none" />
       )}
       onChange={(_event, newValue) => {
         props.onChange(newValue?.value ?? null);

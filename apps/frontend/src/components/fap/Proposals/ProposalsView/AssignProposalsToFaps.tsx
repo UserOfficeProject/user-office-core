@@ -119,6 +119,11 @@ const AssignProposalsToFaps = ({
               </Grid>
             </Grid>
 
+            <Alert severity="error">
+              {`Pressing the "SAVE" button will delete all ${t('fap')} reviews and the ${t('fap')} overridden time for this proposal. `}
+              <strong>{`This action is irreversible.`}</strong>
+            </Alert>
+
             {!proposalsUniqueInstruments?.length && (
               <Alert severity="warning" data-cy="different-instruments">
                 {`Selected proposal/s do NOT have any instruments assigned. Please
@@ -129,8 +134,8 @@ const AssignProposalsToFaps = ({
 
             {proposalFapInstruments?.[0] && !hasEmptyValue(values) && (
               <Alert severity="warning" data-cy="remove-fap-alert">
-                {`Be aware that leaving ${t('FAP')} selection empty will remove assigned
-                ${t('FAP')} from proposal/s and delete all ${t('FAP')} reviews on that
+                {`Be aware that leaving ${t('fap')} selection empty will remove assigned
+                ${t('fap')} from proposal/s and delete all ${t('fap')} reviews on that
                 assignment.`}
               </Alert>
             )}

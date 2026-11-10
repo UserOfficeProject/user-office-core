@@ -24,7 +24,7 @@ const FapFiles = ({ data, onFapUpdate }: FapFilesProps) => {
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
     await api({
-      toastSuccessMessage: `${t('Fap')} updated successfully!`,
+      toastSuccessMessage: `${t('FAP')} updated successfully!`,
     }).updateFap(values);
     onFapUpdate(values);
   };

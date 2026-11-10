@@ -159,7 +159,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 margin="dense"
                 sx={{ fontWeight: 'bold', color: 'text.primary' }}
               >
-                {`Comments to be seen by the ${t('FAP')} panels`}
+                {`Comments to be seen by the ${t('fap')}`}
               </InputLabel>
               <Editor
                 id="publicComment"

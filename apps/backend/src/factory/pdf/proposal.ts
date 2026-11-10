@@ -222,14 +222,21 @@ const addTopicInformation = async (
         );
         const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
 
-        const call = await callDataSource.getCallByAnswerIdProposal(
-          answer.answerId
-        );
-        const value = instrumentPickerAnswer(answer, instruments, call);
-        updatedAnswers.push({
-          ...answer,
-          value,
-        });
+        if (answer.answerId !== null) {
+          const call = await callDataSource.getCallByAnswerIdProposal(
+            answer.answerId
+          );
+          const value = instrumentPickerAnswer(answer, instruments, call);
+          updatedAnswers.push({
+            ...answer,
+            value,
+          });
+        } else {
+          updatedAnswers.push({
+            ...answer,
+            value: null,
+          });
+        }
       } else {
         updatedAnswers.push({
           ...answer,

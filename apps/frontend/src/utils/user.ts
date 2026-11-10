@@ -1,6 +1,8 @@
 import { BasicUserDetails } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
+export { getPreferredNameWithLastname } from './userName';
+
 export const getPreferredName = (
   user: Pick<BasicUserDetails, 'firstname'> & { preferredname?: string | null }
 ): string => user.preferredname || user.firstname;
@@ -10,8 +12,12 @@ export const getFullUserName = (
     | (Pick<BasicUserDetails, 'firstname' | 'lastname'> & {
         preferredname?: string | null;
       })
-    | null
-): string => (user ? `${getPreferredName(user)} ${user.lastname}` : 'None');
+    | null,
+  alwaysFirstName = false
+): string =>
+  user
+    ? `${alwaysFirstName ? user.firstname : getPreferredName(user)} ${user.lastname}`
+    : 'None';
 
 export const getFullUserNameWithEmail = (
   user?: Pick<

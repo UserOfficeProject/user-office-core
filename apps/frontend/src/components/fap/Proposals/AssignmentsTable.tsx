@@ -95,8 +95,8 @@ const AssignmentsTable = ({
 
     const fapMemberPluralMsg =
       assignedMembers.length === 1
-        ? `The ${t('FAP')} member is`
-        : `All ${t('FAP')} members are`;
+        ? `The ${t('fap')} member is`
+        : `All ${t('fap')} members are`;
     const proposalPluralMsg = proposalPks.length === 1 ? '' : 's';
 
     if (proposalAssignments.length === 0) {
@@ -341,7 +341,7 @@ const AssignmentsTable = ({
 
     if (shouldShowWarning) {
       confirm(() => assignMembersToFapProposals(memberUsers, proposalPks), {
-        title: `${t('Fap')} reviewers assignment`,
+        title: `${t('FAP')} reviewers assignment`,
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
@@ -349,7 +349,7 @@ const AssignmentsTable = ({
             Some of the selected reviewers are already part of the proposal(s)
             as a PI/Co-proposer or belong to the same institution{' '}
             <strong>{alertText}</strong>
-            {`Are you sure you want to assign all selected users to the ${t('Fap')} proposal(s)?`}
+            {`Are you sure you want to assign all selected users to the ${t('FAP')} proposal(s)?`}
           </>
         ),
       })();
