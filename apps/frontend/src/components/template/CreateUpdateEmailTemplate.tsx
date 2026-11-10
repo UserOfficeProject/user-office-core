@@ -243,6 +243,7 @@ const CreateUpdateEmailTemplate = ({
                       <MenuItem
                         key={version.versionNumber}
                         value={version.versionNumber}
+                        data-cy={`version-select-${version.versionNumber}`}
                       >
                         {version.versionNumber +
                           ': ' +
