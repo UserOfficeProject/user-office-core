@@ -116,7 +116,7 @@
     "@types/pg-large-object": "^2.0.7",
     "@types/pug": "^2.0.10",
     "@types/sanitize-html": "^2.6.2",
-    "@types/simple-oauth2": "^4.1.1",
+    "@types/simple-oauth2": "^5.0.8",
     "@types/sinon": "^21.0.1",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.2",

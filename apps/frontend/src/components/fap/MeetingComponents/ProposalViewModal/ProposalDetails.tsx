@@ -59,7 +59,9 @@ const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
                 <TableCell sx={BOLD_TEXT_STYLE}>
                   Principal Investigator
                 </TableCell>
-                <TableCell>{getFullUserName(proposal.proposer)}</TableCell>
+                <TableCell>
+                  {getFullUserName(proposal.proposer, true)}
+                </TableCell>
                 <TableCell sx={BOLD_TEXT_STYLE}>Status</TableCell>
                 <TableCell>{proposal.status?.name}</TableCell>
               </TableRow>
@@ -67,7 +69,7 @@ const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
                 <TableCell sx={BOLD_TEXT_STYLE}>Co-Proposers</TableCell>
                 <TableCell>
                   {proposal.users
-                    .map((user) => getFullUserName(user))
+                    .map((user) => getFullUserName(user, true))
                     .join(', ')}
                 </TableCell>
                 <TableCell sx={BOLD_TEXT_STYLE}>Call</TableCell>
