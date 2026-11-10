@@ -613,6 +613,10 @@ context('Settings tests', () => {
                 workflowConnectionId: connectionFromSubmittedInternal.id,
                 statusChangingEvents: [Event.CALL_ENDED],
               });
+              cy.setStatusChangingEventsOnConnection({
+                workflowConnectionId: connectionFromSubmittedInternal.id,
+                statusChangingEvents: [Event.PROPOSAL_SUBMITTED_INTERNAL],
+              });
             }
           );
         }
