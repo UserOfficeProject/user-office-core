@@ -1,5 +1,4 @@
 import { GraphQLError } from 'graphql';
-import { DateTime, Info } from 'luxon';
 import { inject, injectable } from 'tsyringe';
 
 import database from './database';
@@ -10,22 +9,20 @@ import {
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
-import { Tokens } from '../../config/Tokens';
 import { Review, ReviewStatus } from '../../models/Review';
-import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
-import { AdminDataSource } from '../AdminDataSource';
+import { TimeHelper } from '../../utils/TimeHelper';
 import { ReviewDataSource } from '../ReviewDataSource';
 
 @injectable()
 export default class PostgresReviewDataSource implements ReviewDataSource {
   constructor(
-    @inject(Tokens.AdminDataSource)
-    private adminDataSource: AdminDataSource
+    @inject(TimeHelper)
+    private timeHelper: TimeHelper
     // Add other dependencies here if needed (e.g., database pool/client)
   ) {}
   async setTechnicalReview(
@@ -363,29 +360,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     status?: ReviewStatus,
     active?: boolean
   ): Promise<Review[]> {
-    const timezone = await this.adminDataSource.getSetting(SettingsId.TIMEZONE);
-
-    if (!timezone?.settingsValue) {
-      throw new GraphQLError('No timezone found.');
-    }
-
-    if (!Info.isValidIANAZone(timezone.settingsValue)) {
-      throw new GraphQLError(
-        `Invalid timezone: "${timezone.settingsValue}" is not a recognized timezone.`
-      );
-    }
-
-    const startOfTodayLocalInUTC = DateTime.now()
-      .setZone(timezone.settingsValue)
-      .startOf('day')
-      .toUTC()
-      .toJSDate();
-
-    const endOfTodayLocalInUTC = DateTime.now()
-      .setZone(timezone.settingsValue)
-      .endOf('day')
-      .toUTC()
-      .toJSDate();
+    const { startOfTodayLocalInUTC, endOfTodayLocalInUTC } =
+      await this.timeHelper.getStartAndEndOfDayInUTC();
 
     return database
       .select()
@@ -462,6 +438,9 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     status?: ReviewStatus,
     active?: boolean
   ): Promise<Review[]> {
+    const { startOfTodayLocalInUTC, endOfTodayLocalInUTC } =
+      await this.timeHelper.getStartAndEndOfDayInUTC();
+
     return database
       .select('fapReviewsTemp.*')
       .from(
@@ -491,7 +470,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               qb.join('call', {
                 'call.call_id': 'proposals.call_id',
               });
-              qb.where('call.end_fap_review', '>=', new Date());
+              qb.where('call.end_fap_review', '>=', startOfTodayLocalInUTC);
+              qb.where('call.start_fap_review', '<=', endOfTodayLocalInUTC);
             }
           })
           .whereIn('fap_id', fapIds)
