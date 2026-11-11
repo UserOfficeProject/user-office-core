@@ -49,6 +49,8 @@ Instructions for writing pull request descriptions. Every pull request descripti
 - Use backticks for code identifiers, file names, image tags and configuration keys
 - Describe only what the diff contains, never invent changes, tests or motivation
 - Keep the description facility-agnostic unless the change itself is specific to one deployment
+- Write for readers whose first language may not be English: short sentences (max 20 words), active voice, one idea per sentence
+- Use the same term for the same thing throughout, and avoid idioms, slang and unexplained abbreviations
 
 ## Section rules
 
@@ -57,6 +59,7 @@ Instructions for writing pull request descriptions. Every pull request descripti
 
 ### Motivation and Context
 - One short sentence explaining why the change is required and what problem it solves (why)
+- Describe the problem by its effect on users or the system, so that a non-developer can understand it; keep code identifiers for the `Changes` section
 - Use the description of the linked issue as context when it is available
 
 ### Changes
@@ -103,7 +106,7 @@ Instructions for writing pull request descriptions. Every pull request descripti
 Register the development `SMTPMailService` lazily through the dependency container.
 
 ## Motivation and Context
-Eagerly constructing the mail service resolves its dependencies before they are registered, which crashes the backend on startup.
+The backend crashes on startup in development because the mail service is created before the services it needs.
 
 ## Changes
 - Replace the development mail service value registration with class registration.
