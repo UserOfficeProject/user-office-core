@@ -2342,18 +2342,20 @@ context('Proposal tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
       cy.get('[data-cy="status-selection"]').click();
       cy.get('li[data-option-index="0"]').click();
-      cy.get('[data-cy="submit-proposal-status-change"]').click();
 
-      // Check that the error toast never appears in the next 3 seconds
-      cy.document().then(async (doc) => {
-        const started = Date.now();
-        while (Date.now() - started < 3000) {
-          if (doc.querySelector('.SnackbarItem-variantError')) {
-            throw new Error('An error toast appeared on the page!');
-          }
-          await Cypress.Promise.delay(100);
+      const getWorkflowStatusesSpy = cy
+        .spy()
+        .as('graphql.getWorkflowStatuses.spy');
+
+      cy.intercept('POST', 'http://localhost:3000/graphql', (req) => {
+        const { body } = req;
+        if (body.operationName == 'getWorkflowStatuses') {
+          getWorkflowStatusesSpy();
+          req.alias = `graphql.${body.operationName}`;
         }
       });
+
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
 
       // Filter for DRAFT status
       cy.get('[data-cy="status-filter"]').click();
@@ -2361,6 +2363,17 @@ context('Proposal tests', () => {
 
       // Check that the proposal has been successfully edited to DRAFT
       cy.get('td input[type="checkbox"]').first().should('exist');
+
+      // The request shouldn't even happen, this is just to check that even if it does, it fails with 400
+      cy.then(() => {
+        if (getWorkflowStatusesSpy.called) {
+          cy.wait('@graphql.getWorkflowStatuses')
+            .its('response.statusCode')
+            .should('not.equal', 400);
+        }
+      });
+
+      cy.get('@graphql.getWorkflowStatuses.spy').should('not.have.been.called');
     });
   });
 });
