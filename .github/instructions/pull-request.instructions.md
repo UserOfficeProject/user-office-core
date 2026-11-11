@@ -5,12 +5,12 @@ applyTo: '**'
 
 # Pull Request Description Instructions
 
-Instructions for writing pull request descriptions. Every pull request description must follow the structure below, which matches the one produced by the `Craft PR description` workflow (`.github/workflows/craft-pr-description.yml`).
+Instructions for writing pull request descriptions. Every pull request description must follow the structure below, which is based on the one produced by the `Craft PR description` workflow (`.github/workflows/craft-pr-description.yml`).
 
 ## Structure
 - Use exactly these sections, with these headings, in this order
 - Do not add, rename, merge or reorder sections
-- `Fixes Jira Issue` is the only optional section, see the rules below
+- `Fixes Issue` is the only optional section, see the rules below
 
 ```markdown
 ## Description
@@ -28,9 +28,9 @@ Instructions for writing pull request descriptions. Every pull request descripti
 
 <how the change was tested>
 
-## Fixes Jira Issue
+## Fixes Issue
 
-<link to the Jira issue>
+<link or reference to the issue this PR resolves>
 
 ## Depends On
 
@@ -48,6 +48,7 @@ Instructions for writing pull request descriptions. Every pull request descripti
 - Do not start the description with "This pull request" or "This PR"
 - Use backticks for code identifiers, file names, image tags and configuration keys
 - Describe only what the diff contains, never invent changes, tests or motivation
+- Keep the description facility-agnostic unless the change itself is specific to one deployment
 
 ## Section rules
 
@@ -56,7 +57,7 @@ Instructions for writing pull request descriptions. Every pull request descripti
 
 ### Motivation and Context
 - One short sentence explaining why the change is required and what problem it solves (why)
-- Use the Jira ticket description as context when it is available
+- Use the description of the linked issue as context when it is available
 
 ### Changes
 - Bullet list of the changes the code introduces (how)
@@ -74,10 +75,13 @@ Instructions for writing pull request descriptions. Every pull request descripti
 <!--- see how your change affects other areas of the code, etc. -->
 ```
 
-### Fixes Jira Issue
-- Include this section only when the branch name contains a Jira issue key in the form `SWAP-<number>`
-- Write the issue as a link with the URL as link text: `[<jira base url>/browse/SWAP-1234](<jira base url>/browse/SWAP-1234)`
-- Omit the whole section, including the heading, when there is no Jira issue key
+### Fixes Issue
+- Include this section only when the issue the PR resolves is known, for example from the branch name, the commits or the author
+- Issues can be tracked in GitHub Issues or in an external tracker such as Jira, so use the format that matches the tracker:
+  - GitHub issue: use a closing keyword so the issue is closed on merge, for example `Fixes #123`, or `Fixes <owner>/<repo>#123` for an issue in another repository
+  - External tracker: write the issue as a link with the URL as link text, for example `[<tracker base url>/browse/<KEY>-123](<tracker base url>/browse/<KEY>-123)`
+- List one issue per line if the PR resolves several
+- Never guess an issue number or key; omit the whole section, including the heading, when no issue is known
 
 ### Depends On
 - List the PRs that must be merged before or together with this one
@@ -96,10 +100,10 @@ Instructions for writing pull request descriptions. Every pull request descripti
 
 ```markdown
 ## Description
-Register the ESS development `SMTPMailService` lazily through the dependency container.
+Register the development `SMTPMailService` lazily through the dependency container.
 
 ## Motivation and Context
-Eagerly constructing the mail service can cause unnecessary initialization; lazy registration creates it only when needed.
+Eagerly constructing the mail service resolves its dependencies before they are registered, which crashes the backend on startup.
 
 ## Changes
 - Replace the development mail service value registration with class registration.
@@ -109,6 +113,10 @@ Eagerly constructing the mail service can cause unnecessary initialization; lazy
 <!--- Please describe in detail how you tested your changes. -->
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
+
+## Fixes Issue
+
+Fixes #123
 
 ## Depends On
 
