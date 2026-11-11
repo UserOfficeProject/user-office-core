@@ -2,9 +2,10 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
 import { useTheme } from '@mui/material/styles';
+import { Editor as TinyMCEEditor } from '@tinymce/tinymce-react/node_modules/tinymce/tinymce';
+import { util } from '@user-office-software/duo-validation';
 import { getIn } from 'formik';
 import React, { useState } from 'react';
-import { Editor as TinyMCEEditor } from 'tinymce';
 
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -27,9 +28,11 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
 
   const theme = useTheme();
   const [numberOfChars, setNumberOfChars] = useState(0);
+  const [numberOfWords, setNumberOfWords] = useState(0);
   const handleCharacterCount = (editor: TinyMCEEditor) => {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
+    setNumberOfWords(util.countWordsInHtml(editor.getContent()));
   };
   const [paragraphSpacingError, setParagraphSpacingError] = useState(false);
 
@@ -52,12 +55,21 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
           Characters: {numberOfChars} / {config.max}
         </FormLabel>
       )}
+      {config.maxWords != null && (
+        <FormLabel
+          sx={{ marginBottom: theme.spacing(2) }}
+          data-cy="rich-text-word-count"
+        >
+          Words: {numberOfWords} / {config.maxWords}
+        </FormLabel>
+      )}
       <Editor
         id={id}
         value={value}
         init={{
           skin: false,
           content_css: false,
+          content_style: `body { padding-left: ${theme.spacing(1)}; }`,
           /**
            * Note:  if you add new styling options please make sure the HTML sanitizer rules
            *        on the BE is in sync, otherwise the result will be filtered

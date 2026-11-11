@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { sanitizeHtmlAndCleanText } from '../util';
+import { countWordsInHtml, sanitizeHtmlAndCleanText } from '../util';
 
 export const richTextInputQuestionValidationSchema = (field: any) => {
   let schema = Yup.string().transform(function (value: string) {
@@ -17,6 +17,15 @@ export const richTextInputQuestionValidationSchema = (field: any) => {
     schema = schema.max(
       config.max,
       `Value must be at most ${config.max} characters`
+    );
+  }
+
+  if (config.maxWords != null) {
+    schema = schema.test(
+      'max-words',
+      `Value must be at most ${config.maxWords} words`,
+      (_, context) =>
+        countWordsInHtml(context.originalValue) <= config.maxWords
     );
   }
 

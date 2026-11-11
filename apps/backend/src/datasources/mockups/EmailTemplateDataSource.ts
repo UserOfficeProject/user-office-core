@@ -14,6 +14,16 @@ export const dummyEmailTemplate = {
   useTemplateFile: false,
 };
 
+export const dummyEmailTemplateVersion = {
+  templateVersionId: 1,
+  templateId: 1,
+  template:
+    'Hello, thank you for signing up for our service. We are excited to have you on board!',
+  versionNumber: 1,
+  templateType: 'EMAIL',
+  createdTimeStamp: '2026-07-17 08:25:12.23043+00',
+};
+
 export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
   emailTemplates: EmailTemplate[];
   constructor() {

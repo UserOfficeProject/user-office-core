@@ -37,6 +37,7 @@ import i18n from 'i18n';
 
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
+import { parseStatusQuery } from 'components/common/proposalFilters/StatusFilter';
 import StyledDialog from 'components/common/StyledDialog';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -72,7 +73,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getPreferredName } from 'utils/user';
+import { getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalScientistComment from './ProposalScientistComment';
@@ -248,8 +249,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       from: from ? from : null,
     },
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    proposalStatusId:
-      !proposalStatusId || proposalStatusId == 'ALL' ? null : proposalStatusId,
+    proposalStatusId: parseStatusQuery(proposalStatusId),
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
@@ -330,8 +330,10 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'principalInvestigator',
       sorting: false,
       render: (proposalView: ProposalViewData) => {
-        if (proposalView.principalInvestigator?.lastname) {
-          return `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`;
+        if (proposalView.principalInvestigator) {
+          return getPreferredNameWithLastname(
+            proposalView.principalInvestigator
+          );
         }
 
         return '';
@@ -968,10 +970,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         updatedFilter.callIds = calls?.map((call) => call.id) || [];
       } else {
         updatedFilter.callIds = [filter.callId as number];
-      }
-
-      if (filter.proposalStatusId === 'ALL') {
-        updatedFilter.proposalStatusId = null;
       }
     }
 
