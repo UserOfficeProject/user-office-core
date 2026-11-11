@@ -38,6 +38,11 @@ interface ProposalSubmittedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalSubmittedInternalEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SUBMITTED_INTERNAL;
+  proposal: Proposal;
+}
+
 interface ProposalFeasibleEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE;
   proposal: Proposal;
@@ -513,6 +518,7 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalDeletedEvent
   | ProposalSubmittedEvent
+  | ProposalSubmittedInternalEvent
   | ProposalFeasibleEvent
   | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
