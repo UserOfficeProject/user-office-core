@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
 import database from './database';
 import {
@@ -15,16 +15,10 @@ import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalR
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
-import { TimeHelper } from '../../utils/TimeHelper';
 import { ReviewDataSource } from '../ReviewDataSource';
 
 @injectable()
 export default class PostgresReviewDataSource implements ReviewDataSource {
-  constructor(
-    @inject(TimeHelper)
-    private timeHelper: TimeHelper
-    // Add other dependencies here if needed (e.g., database pool/client)
-  ) {}
   async setTechnicalReview(
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput,
     shouldUpdateReview: boolean
@@ -360,9 +354,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     status?: ReviewStatus,
     active?: boolean
   ): Promise<Review[]> {
-    const { startOfTodayLocalInUTC, endOfTodayLocalInUTC } =
-      await this.timeHelper.getStartAndEndOfDayInUTC();
-
     return database
       .select()
       .from('fap_reviews')
@@ -396,8 +387,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.join('call', {
             'call.call_id': 'proposals.call_id',
           });
-          qb.where('call.end_fap_review', '>=', startOfTodayLocalInUTC);
-          qb.where('call.start_fap_review', '<=', endOfTodayLocalInUTC);
+          qb.where('call.end_fap_review', '>=', Date.now());
+          qb.where('call.start_fap_review', '<', Date.now());
         }
       })
       .whereIn('fap_id', fapIds)
@@ -438,9 +429,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     status?: ReviewStatus,
     active?: boolean
   ): Promise<Review[]> {
-    const { startOfTodayLocalInUTC, endOfTodayLocalInUTC } =
-      await this.timeHelper.getStartAndEndOfDayInUTC();
-
     return database
       .select('fapReviewsTemp.*')
       .from(
@@ -470,8 +458,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               qb.join('call', {
                 'call.call_id': 'proposals.call_id',
               });
-              qb.where('call.end_fap_review', '>=', startOfTodayLocalInUTC);
-              qb.where('call.start_fap_review', '<=', endOfTodayLocalInUTC);
+              qb.where('call.end_fap_review', '>=', Date.now());
+              qb.where('call.start_fap_review', '<', Date.now());
             }
           })
           .whereIn('fap_id', fapIds)
