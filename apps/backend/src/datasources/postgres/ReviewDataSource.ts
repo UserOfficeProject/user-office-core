@@ -1,5 +1,4 @@
 import { GraphQLError } from 'graphql';
-import { injectable } from 'tsyringe';
 
 import database from './database';
 import {
