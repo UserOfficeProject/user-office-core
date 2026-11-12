@@ -17,7 +17,6 @@ import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation
 import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
 import { ReviewDataSource } from '../ReviewDataSource';
 
-@injectable()
 export default class PostgresReviewDataSource implements ReviewDataSource {
   async setTechnicalReview(
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput,
