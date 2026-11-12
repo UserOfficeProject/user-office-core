@@ -1,10 +1,10 @@
-import MaterialTable from '@material-table/core';
 import Box from '@mui/material/Box';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';

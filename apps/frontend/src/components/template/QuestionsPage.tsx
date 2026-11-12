@@ -1,14 +1,11 @@
-import MaterialTableCore, {
-  Column,
-  Query,
-  QueryResult,
-} from '@material-table/core';
+import { Column, Query, QueryResult } from '@material-table/core';
 import { Edit } from '@mui/icons-material';
 import { DialogContent, Typography } from '@mui/material';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import DenseMaterialTable from 'components/common/DenseMaterialTable';
+import MaterialTableCore from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import {
   createQuestionForm,

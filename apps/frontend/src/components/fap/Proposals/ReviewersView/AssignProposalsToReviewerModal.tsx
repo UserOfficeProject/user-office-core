@@ -1,8 +1,8 @@
-import MaterialTable from '@material-table/core';
 import { Dialog, DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import React from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { FapProposalType } from 'hooks/fap/useFapProposalsData';
 
 import { MultiRankAssignmentDialog } from '../MultiRankAssignmentDialog';

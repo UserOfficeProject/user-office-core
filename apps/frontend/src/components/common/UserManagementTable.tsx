@@ -1,7 +1,4 @@
-import MaterialTable, {
-  Action,
-  MaterialTableProps,
-} from '@material-table/core';
+import { Action, MaterialTableProps } from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
@@ -14,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 

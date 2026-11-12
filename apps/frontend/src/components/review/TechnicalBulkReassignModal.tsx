@@ -1,4 +1,4 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import { Delete } from '@mui/icons-material';
 import {
   Alert,
@@ -16,6 +16,7 @@ import {
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import {
   ProposalViewInstrument,

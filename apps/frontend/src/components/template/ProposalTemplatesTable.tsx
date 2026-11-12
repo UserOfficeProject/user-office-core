@@ -1,10 +1,11 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import {
   Proposal,

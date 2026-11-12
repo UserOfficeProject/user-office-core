@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Dialog,
@@ -13,6 +12,7 @@ import { Box } from '@mui/system';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { InstrumentMinimalFragment } from 'generated/sdk';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 

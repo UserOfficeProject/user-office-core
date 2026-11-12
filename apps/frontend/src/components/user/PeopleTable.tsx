@@ -1,4 +1,4 @@
-import MaterialTableCore, {
+import {
   Options,
   Column,
   MTableToolbar,
@@ -18,6 +18,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import EmailSearchBar from 'components/common/EmailSearchBar';
+import MaterialTableCore from 'components/common/MaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
 import {

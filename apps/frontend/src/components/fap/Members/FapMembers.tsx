@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import Clear from '@mui/icons-material/Clear';
 import Person from '@mui/icons-material/Person';
 import PersonAdd from '@mui/icons-material/PersonAdd';
@@ -22,6 +21,7 @@ import React, { useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import UOLoader from 'components/common/UOLoader';
 import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { UserContext } from 'context/UserContextProvider';

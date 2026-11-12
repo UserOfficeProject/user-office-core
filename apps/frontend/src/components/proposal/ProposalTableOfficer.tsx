@@ -1,4 +1,4 @@
-import MaterialTableCore, {
+import {
   Action,
   Column,
   MTableToolbar,
@@ -39,6 +39,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import MaterialTableCore from 'components/common/MaterialTable';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';

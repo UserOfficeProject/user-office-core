@@ -1,9 +1,4 @@
-import MaterialTable, {
-  Action,
-  Column,
-  Query,
-  QueryResult,
-} from '@material-table/core';
+import { Action, Column, Query, QueryResult } from '@material-table/core';
 import { Visibility } from '@mui/icons-material';
 import {
   Dialog,
@@ -18,6 +13,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
+import MaterialTable from 'components/common/MaterialTable';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import {
   Experiment,

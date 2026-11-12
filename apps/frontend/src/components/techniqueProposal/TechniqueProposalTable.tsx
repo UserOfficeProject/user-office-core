@@ -1,4 +1,4 @@
-import MaterialTableCore, {
+import {
   Column,
   OrderByCollection,
   Query,
@@ -35,6 +35,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import i18n from 'i18n';
 
+import MaterialTableCore from 'components/common/MaterialTable';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
 import { parseStatusQuery } from 'components/common/proposalFilters/StatusFilter';

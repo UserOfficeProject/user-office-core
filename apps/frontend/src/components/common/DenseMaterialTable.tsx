@@ -1,6 +1,7 @@
-import MaterialTable, { MaterialTableProps } from '@material-table/core';
+import { MaterialTableProps } from '@material-table/core';
 import React, { useMemo } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { denseTableColumns } from 'utils/helperFunctions';
 
 /**NOTE:

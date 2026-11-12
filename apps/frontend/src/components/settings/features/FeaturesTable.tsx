@@ -1,6 +1,7 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import React, { useContext, useState, useEffect } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Feature, FeatureUpdateAction } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';

@@ -1,4 +1,4 @@
-import MaterialTableCore, {
+import {
   Action,
   Column,
   OrderByCollection,
@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
+import MaterialTableCore from 'components/common/MaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import {
   PaginationSortDirection,

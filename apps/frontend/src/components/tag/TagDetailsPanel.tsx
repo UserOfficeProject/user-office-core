@@ -1,8 +1,8 @@
-import MaterialTable from '@material-table/core';
 import { Delete } from '@mui/icons-material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { Call, InstrumentMinimalFragment } from 'generated/sdk';
 import { TagData } from 'hooks/tag/useTagsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

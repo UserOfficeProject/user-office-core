@@ -1,7 +1,4 @@
-import MaterialTable, {
-  MaterialTableProps,
-  MTableBodyRow,
-} from '@material-table/core';
+import { MaterialTableProps, MTableBodyRow } from '@material-table/core';
 import DragHandle from '@mui/icons-material/DragHandle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
@@ -14,6 +11,7 @@ import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FapProposal,

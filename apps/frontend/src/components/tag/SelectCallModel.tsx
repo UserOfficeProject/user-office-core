@@ -1,4 +1,3 @@
-import MaterialTable from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Dialog,
@@ -12,6 +11,7 @@ import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useState } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { Call } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 

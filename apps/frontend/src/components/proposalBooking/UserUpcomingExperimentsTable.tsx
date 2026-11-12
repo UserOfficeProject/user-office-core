@@ -1,9 +1,10 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
 import { TFunction } from 'i18next';
 import React, { useState, ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';

@@ -1,9 +1,9 @@
-import MaterialTable from '@material-table/core';
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import { Role as RoleSDK } from 'generated/sdk';
 import { useRenewToken } from 'hooks/common/useRenewToken';
