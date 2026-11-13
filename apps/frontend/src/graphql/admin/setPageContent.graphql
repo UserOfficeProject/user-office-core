@@ -1,6 +1,3 @@
-mutation setPageContent($pageId: PageName!, $text: String!, $roleId: Int) {
-  setPageContent(pageId: $pageId, text: $text, roleId: $roleId) {
-    pageId
-    content
-  }
+mutation setPageContent($pageId: PageName!, $text: String!, $roleIds: [Int!]!) {
+  setPageContent(pageId: $pageId, text: $text, roleIds: $roleIds)
 }

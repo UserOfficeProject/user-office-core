@@ -1,3 +1,5 @@
-query getPageContent($pageId: PageName!, $roleId: Int) {
-  pageContent(pageId: $pageId, roleId: $roleId)
+query getPageContent($pageId: PageName!, $roleIds: [Int!]!) {
+  pageContent(pageId: $pageId, roleIds: $roleIds) {
+    content
+  }
 }

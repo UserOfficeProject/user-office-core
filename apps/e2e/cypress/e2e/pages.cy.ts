@@ -1,9 +1,13 @@
 import { faker } from '@faker-js/faker';
+import { PageName } from '@user-office-software-libs/shared-types';
 
 import initialDBData from '../support/initialDBData';
 
 context('Page tests', () => {
   let derivedUserOfficerRoleId: number;
+  const sharedFaqContents = faker.lorem.words(2);
+  const uniqueFaqContents = faker.lorem.words(2);
+
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
@@ -15,49 +19,47 @@ context('Page tests', () => {
           shortCode: 'user_officer',
           description: '',
         },
-      }).then((roleResult) => {
-        derivedUserOfficerRoleId = roleResult.createRole.id;
-        cy.updateRoleTags({
-          roleId: roleResult.createRole.id,
-          tagIds: tagResult.createTag.id,
+      })
+        .then((roleResult) => {
+          derivedUserOfficerRoleId = roleResult.createRole.id;
+          cy.updateRoleTags({
+            roleId: roleResult.createRole.id,
+            tagIds: tagResult.createTag.id,
+          });
+          cy.updateUserRoles({
+            id: initialDBData.users.officer.id,
+            roles: [initialDBData.roles.userOfficer, roleResult.createRole.id],
+          });
+        })
+        .then(() => {
+          cy.setPageContent({
+            pageId: PageName.HOMEPAGE,
+            text: sharedFaqContents,
+            roleIds: [-1, derivedUserOfficerRoleId],
+          });
+          cy.setPageContent({
+            pageId: PageName.HOMEPAGE,
+            text: uniqueFaqContents,
+            roleIds: [initialDBData.roles.userOfficer],
+          });
         });
-        cy.updateUserRoles({
-          id: initialDBData.users.officer.id,
-          roles: [initialDBData.roles.userOfficer, roleResult.createRole.id],
-        });
-      });
     });
   });
 
   const faqContents = faker.lorem.words(2);
 
-  it('Should be able update FAQ', () => {
+  it('Text box should be empty and update button should be disabled when no roles are selected', () => {
     cy.login('officer', initialDBData.roles.userOfficer);
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
-
     cy.contains('Set user homepage');
-    cy.contains('Help').click();
 
-    cy.setTinyMceContent('HELPPAGE', faqContents);
-
-    cy.contains('Update').click();
-
-    cy.notification({ text: 'Updated Page', variant: 'success' });
-
-    cy.getTinyMceContent('HELPPAGE').then((content) =>
-      expect(content).to.have.string(faqContents)
+    cy.getTinyMceContent('HOMEPAGE').then((content) =>
+      expect(content).to.have.string('')
     );
 
-    cy.reload();
-    cy.contains('Proposals').click();
-    cy.contains('FAQ').click();
-
-    cy.get('[role="presentation"]').should('exist');
-
-    cy.contains(faqContents);
-    cy.contains('Close').click();
+    cy.contains('Update').should('be.disabled');
   });
 
   it('Base User Officer should be able update a default page', () => {
@@ -69,6 +71,7 @@ context('Page tests', () => {
 
     cy.get('[data-cy="role-filter"]').click();
     cy.get('[role="listbox"]').contains('Default').click();
+    cy.get('body').type('{esc}');
 
     cy.setTinyMceContent('HOMEPAGE', faqContents);
 
@@ -81,9 +84,42 @@ context('Page tests', () => {
     );
   });
 
+  it('Content should be displayed if page notices have the same content', () => {
+    cy.login('officer', initialDBData.roles.userOfficer);
+    cy.visit('/');
+    cy.contains('Configuration Settings').click();
+    cy.contains('Pages').click();
+    cy.contains('Set user homepage');
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Default').click();
+    cy.get('[role="listbox"]').contains('Derived User Officer').click();
+    cy.get('body').type('{esc}');
+
+    cy.getTinyMceContent('HOMEPAGE').then((content) =>
+      expect(content).to.have.string(sharedFaqContents)
+    );
+  });
+
+  it('Content should not be displayed if page notices have different content', () => {
+    cy.login('officer', initialDBData.roles.userOfficer);
+    cy.visit('/');
+    cy.contains('Configuration Settings').click();
+    cy.contains('Pages').click();
+    cy.contains('Set user homepage');
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Default').click();
+    cy.get('[role="listbox"]').contains('User Officer').click();
+    cy.get('body').type('{esc}');
+
+    cy.getTinyMceContent('HOMEPAGE').then((content) =>
+      expect(content).to.have.string('')
+    );
+  });
+
   it('Derived User Officer should not be able update a default page', () => {
     cy.login('officer', derivedUserOfficerRoleId);
-
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
@@ -95,13 +131,14 @@ context('Page tests', () => {
 
   it('Derived User Officer should be able update a derived role page with a shared tag', () => {
     cy.login('officer', derivedUserOfficerRoleId);
-
     cy.visit('/');
     cy.contains('Configuration Settings').click();
     cy.contains('Pages').click();
     cy.contains('Set user homepage');
 
-    cy.get('[data-cy="role-filter"]').contains('Derived User Officer');
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Derived User Officer').click();
+    cy.get('body').type('{esc}');
 
     cy.setTinyMceContent('HOMEPAGE', faqContents);
 

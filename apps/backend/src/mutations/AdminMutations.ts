@@ -9,8 +9,8 @@ import { container, inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { Page } from '../models/Admin';
 import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { rejection, Rejection } from '../models/Rejection';
@@ -33,7 +33,8 @@ const IS_BACKEND_VALIDATION = true;
 export default class AdminMutations {
   constructor(
     @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource,
-    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource
+    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
+    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -68,40 +69,68 @@ export default class AdminMutations {
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,
-    { pageId, text, roleId }: { pageId: number; text: string; roleId?: number }
-  ): Promise<Page | Rejection> {
+    {
+      pageId,
+      text,
+      roleIds,
+    }: { pageId: number; text: string; roleIds: number[] }
+  ): Promise<boolean | Rejection> {
+    if (agent == null || !agent.currentRole) {
+      return false;
+    }
+
+    const userRole = agent.currentRole;
+    const isRootRoleUser =
+      userRole.isRootRole ??
+      (await this.userDataSource.getUserRoles(agent.id)).find(
+        (r) => (r.id = userRole.id)
+      )?.isRootRole;
     const agentRoleTagIds =
       agent?.currentRole?.id != null
         ? (
             await this.roleDataSource.getTagsByRoleId(agent?.currentRole?.id)
           ).map((t) => t.id)
         : [];
-    const pageRoleTagIds =
-      roleId != null
-        ? (await this.roleDataSource.getTagsByRoleId(roleId)).map((t) => t.id)
-        : [];
 
-    //A derived user officer role is trying to edit the notice for a role they're not allowed to
-    if (
-      !agent?.currentRole?.isRootRole &&
-      !agentRoleTagIds.filter((t) => pageRoleTagIds.includes(t)).length
-    ) {
+    const nonDefaultRoleIds = roleIds.filter((roleId) => roleId !== -1);
+
+    //if the user is a root user officer allow the edit, if they're a derived user officer editing a default page notice deny them,
+    //otherwise check that the user has a matching tag for each page notice they are trying to edit
+    const tagsPermissions = isRootRoleUser
+      ? [true]
+      : roleIds.length - nonDefaultRoleIds.length
+        ? [false]
+        : nonDefaultRoleIds.map(async (roleId) => {
+            const roleTagIds = (
+              await this.roleDataSource.getTagsByRoleId(roleId)
+            ).map((t) => t.id);
+
+            if (agentRoleTagIds.filter((t) => roleTagIds.includes(t)).length) {
+              return true;
+            }
+
+            return false;
+          });
+
+    const resolvedPermissions = await Promise.all(tagsPermissions);
+
+    if (resolvedPermissions.includes(false)) {
       return rejection('Insufficient permission to update page notice', {
         agent,
         pageId,
-        roleId,
+        roleIds,
       });
     }
 
     return this.adminDataSource
-      .setPageText(pageId, text, roleId)
+      .setPageText(pageId, text, roleIds)
       .then((page) => {
         return page;
       })
       .catch((error) => {
         return rejection(
           'Could not set page text',
-          { agent, pageId, roleId },
+          { agent, pageId, roleIds },
           error
         );
       });

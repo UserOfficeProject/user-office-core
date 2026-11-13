@@ -5,26 +5,44 @@ import React, { useState, useEffect } from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
-import {
-  FALLBACK_ROLE_FOR_PAGE_CONTENT,
-  useGetPageContent,
-} from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
-  roleId: number | undefined;
+  roleIds: number[];
 }) {
-  const [loading, pageContent] = useGetPageContent(
+  const [loading, pageContent] = useGetPageContents(
     props.pageName,
-    props.roleId
+    props.roleIds
   );
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
+  const doAllPageContentsMatch = () => {
+    //if a single value was returned and only one was requested everything matches, otherwise one of the requested pages is empty
+    if (!Array.isArray(pageContent)) {
+      return props.roleIds.length === 1 ? true : false;
+    }
+
+    return (
+      //if the number of returned pages is the number of requested ones and all pages match the first one
+      pageContent.length === props.roleIds.length &&
+      !pageContent.slice(1).filter((pc) => pc !== pageContent[0]).length
+    );
+  };
+
+  const getPageContent = () => {
+    return Array.isArray(pageContent) ? pageContent[0] : pageContent;
+  };
+
   useEffect(() => {
-    setPageContent(pageContent);
+    if (doAllPageContentsMatch()) {
+      setPageContent(getPageContent());
+    } else {
+      setPageContent('');
+    }
   }, [pageContent]);
 
   return (
@@ -34,7 +52,7 @@ export default function PageInputBox(props: {
       </Typography>
       {loading ? null : (
         <Editor
-          initialValue={pageContent}
+          initialValue={doAllPageContentsMatch() ? getPageContent() : ''}
           init={{
             skin: false,
             content_css: false,
@@ -53,6 +71,7 @@ export default function PageInputBox(props: {
         }}
       >
         <Button
+          disabled={!props.roleIds.length}
           sx={{
             marginTop: '25px',
             marginLeft: '10px',
@@ -61,10 +80,7 @@ export default function PageInputBox(props: {
             api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
               pageId: props.pageName,
               text: content,
-              roleId:
-                props.roleId !== FALLBACK_ROLE_FOR_PAGE_CONTENT
-                  ? props.roleId
-                  : undefined,
+              roleIds: props.roleIds,
             });
           }}
         >

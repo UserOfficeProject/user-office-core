@@ -6,6 +6,7 @@ import { BasicResolverContext } from '../context';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
+import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
@@ -14,7 +15,7 @@ import { getContextKeys } from '../utils/helperFunctions';
 type GetPageTextArgs = {
   pageId: number;
   agent: UserWithRole | null;
-  roleId?: number;
+  roleIds: number[];
 };
 
 @injectable()
@@ -27,34 +28,53 @@ export default class AdminQueries {
   async getPageText({
     pageId,
     agent,
-    roleId,
-  }: GetPageTextArgs): Promise<string | null> {
+    roleIds,
+  }: GetPageTextArgs): Promise<Page[]> {
     if (agent == null || !agent.currentRole) {
-      return null;
+      return [];
     }
 
     const userRole = agent.currentRole;
-    const roleTagIds =
-      roleId != null
-        ? (await this.roleDataSource.getTagsByRoleId(roleId)).map((t) => t.id)
-        : [];
+    const userRoleTagIds = userRole.tags?.map((t) => t.id) ?? [];
 
-    if (
-      roleId == null ||
-      userRole.id === roleId ||
-      (userRole.shortCode === Roles.USER_OFFICER &&
-        (userRole.isRootRole ||
-          (userRole.tags &&
-            userRole.tags.filter((t) => roleTagIds.includes(t.id)).length)))
-    ) {
-      return await this.adminDataSource.get(pageId, roleId);
+    const nonDefaultPageRoleIds = roleIds.filter((roleId) => roleId != -1);
+
+    //if the user is a root user officer or is fetching the default page notice only allow it, otherwise check permissions
+    const tagsPermissions =
+      userRole.shortCode === Roles.USER_OFFICER && userRole.isRootRole
+        ? [true]
+        : !nonDefaultPageRoleIds.length &&
+            !!(roleIds.length - nonDefaultPageRoleIds.length)
+          ? [true]
+          : nonDefaultPageRoleIds.map(async (roleId) => {
+              //if a user is fetching their own role's page notice
+              if (userRole.id === roleId) {
+                return true;
+              }
+
+              const roleTagIds = (
+                await this.roleDataSource.getTagsByRoleId(roleId)
+              ).map((t) => t.id);
+
+              //check if they are a derived user officer that shares a tag with the requested page notice
+              return !!(
+                userRole.shortCode === Roles.USER_OFFICER &&
+                userRoleTagIds.filter((t) => roleTagIds.includes(t)).length
+              );
+            });
+
+    const resolvedPermissions = await Promise.all(tagsPermissions);
+
+    if (resolvedPermissions.includes(false)) {
+      logger.logWarn(
+        'User does not have permission to fetch requested page notice',
+        { agent, pageId, roleId: roleIds }
+      );
+
+      return [];
     }
-    logger.logWarn(
-      'User does not have permission to fetch requested page notice',
-      { agent, pageId, roleId }
-    );
 
-    return null;
+    return this.adminDataSource.get(pageId, roleIds);
   }
 
   async getCountries() {
