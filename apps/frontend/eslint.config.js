@@ -126,6 +126,16 @@ export default defineConfig([
                 "Import MaterialTable from 'components/common/MaterialTable'",
             },
           ],
+          patterns: [
+            {
+              // Avoid MUI barrel imports (slow dev startup). Use path imports,
+              // e.g. `import Button from '@mui/material/Button'`.
+              // https://mui.com/material-ui/guides/minimizing-bundle-size/#avoid-barrel-imports
+              regex: '^@mui/[^/]+$',
+              message:
+                "Use a path import instead, e.g. import Button from '@mui/material/Button'.",
+            },
+          ],
         },
       ],
       '@typescript-eslint/no-unused-expressions': [

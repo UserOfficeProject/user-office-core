@@ -9,7 +9,7 @@ import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/system';
+import Box from '@mui/system/Box';
 import React, { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

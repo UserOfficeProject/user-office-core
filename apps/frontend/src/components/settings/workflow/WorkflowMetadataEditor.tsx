@@ -2,7 +2,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { updateWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
