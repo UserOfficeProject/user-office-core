@@ -1528,6 +1528,7 @@ export interface ExperimentRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly reference_number_sequence: number;
+  readonly notes: string;
 }
 
 export interface ExperimentPaginatedRecord {
@@ -1544,6 +1545,7 @@ export interface ExperimentPaginatedRecord {
   readonly updated_at: Date;
   readonly reference_number_sequence: number;
   readonly full_count: number;
+  readonly notes: string;
 }
 
 export const createExperimentPaginatedObject = (
@@ -1561,7 +1563,8 @@ export const createExperimentPaginatedObject = (
     experiment.instrument_id,
     experiment.created_at,
     experiment.updated_at,
-    experiment.reference_number_sequence
+    experiment.reference_number_sequence,
+    experiment.notes
   );
 };
 

@@ -41,7 +41,8 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.instrument_id,
     record.created_at,
     record.updated_at,
-    record.reference_number_sequence
+    record.reference_number_sequence,
+    record.notes
   );
 }
 
