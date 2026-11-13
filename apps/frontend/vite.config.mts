@@ -65,6 +65,8 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           codeSplitting: {
             groups: [{ test: /node_modules\//, name: 'vendor' }],
           },
+          // https://rolldown.rs/reference/OutputOptions.strictExecutionOrder required for TinyMCE.
+          strictExecutionOrder: true,
         },
       },
     },
