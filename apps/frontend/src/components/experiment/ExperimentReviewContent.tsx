@@ -26,6 +26,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety';
 import { useProposalData } from 'hooks/proposal/useProposalData';
+import { getFullUserNameWithEmail } from 'utils/user';
 
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
@@ -256,6 +257,12 @@ const ExperimentReviewContent = ({
       {
         label: 'End',
         value: toFormattedDateTime(experiment.endsAt),
+      },
+      {
+        label: 'Local Contact',
+        value: experiment.localContact
+          ? getFullUserNameWithEmail(experiment.localContact)
+          : 'Not assigned',
       },
       {
         label: 'Experiment Safety Review Status',
