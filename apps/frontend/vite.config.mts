@@ -42,6 +42,8 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         // @mui/icons-material v5 has no "exports" map, so `@mui/icons-material/<Icon>`
         // resolves to a CommonJS file.
         // https://vite.dev/guide/migration#consistent-commonjs-interop
+        // TODO: Remove this alias once @mui/icons-material is upgraded to a version
+        // whose package.json ships an "exports" map pointing deep imports at ESM.
         {
           find: /^@mui\/icons-material\/(?!esm\/)(.+)$/,
           replacement: '@mui/icons-material/esm/$1',
@@ -63,10 +65,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       rolldownOptions: {
         output: {
           codeSplitting: {
-            groups: [{ test: /node_modules\//, name: 'vendor' }],
+            // TinyMCE is left out on purpose.
+            // https://rolldown.rs/reference/OutputOptions.codeSplitting
+            groups: [{ test: /node_modules\/(?!tinymce\/)/, name: 'vendor' }],
           },
-          // https://rolldown.rs/reference/OutputOptions.strictExecutionOrder required for TinyMCE.
-          strictExecutionOrder: true,
         },
       },
     },
