@@ -1,9 +1,5 @@
-import {
-  FeatureId,
-  ProposalEndStatus,
-} from '@user-office-software-libs/shared-types';
+import { ProposalEndStatus } from '@user-office-software-libs/shared-types';
 
-import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const existingProposal = initialDBData.proposal;
@@ -16,11 +12,7 @@ const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 context('Experiment Table for users', () => {
   beforeEach(function () {
     cy.resetDB(true);
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING)) {
-        this.skip();
-      }
-    });
+    cy.getAndStoreFeaturesEnabled();
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       finalStatus: ProposalEndStatus.ACCEPTED,
@@ -86,7 +78,7 @@ context('Experiment Table for users', () => {
     cy.contains('Visit');
   });
 
-  it.only('The experiment table should not show the user UO options', () => {
+  it('The experiment table should not show the user UO options', () => {
     cy.login('user3');
     cy.visit('/ExperimentTimes');
     cy.get('[data-cy="view-experiment-user"]').click();
