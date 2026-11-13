@@ -299,10 +299,10 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       render: (rowData: RowType) =>
         isUserOfficeView ? (
           <VisitorName to={`/People/${rowData.userId}`}>
-            {getFullUserName(rowData.user)}
+            {getFullUserName(rowData.user, true)}
           </VisitorName>
         ) : (
-          getFullUserName(rowData.user)
+          getFullUserName(rowData.user, true)
         ),
       customSort: (a: RowType, b: RowType) => {
         return getFullUserName(a.user).localeCompare(getFullUserName(b.user));
