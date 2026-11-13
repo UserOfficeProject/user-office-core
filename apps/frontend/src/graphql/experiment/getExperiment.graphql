@@ -1,6 +1,9 @@
 query getExperiment($experimentPk: Int!) {
   experiment(experimentPk: $experimentPk) {
     ...experiment
+    localContact {
+      ...basicUserDetails
+    }
     proposal {
       ...proposal
       proposer {
