@@ -75,6 +75,15 @@ context('Experiments tests', () => {
   });
 
   describe('Experiments tests', () => {
+    it('Displays the experiment creation date column', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy=experiments-table]').contains('th', 'Created');
+    });
+
     it('Can filter by call and instrument', () => {
       cy.login('officer');
       cy.visit('/');
