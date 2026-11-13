@@ -4,6 +4,7 @@ import React from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { GetExperimentQuery } from 'generated/sdk';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type Experiment = GetExperimentQuery['experiment'] | null;
@@ -15,6 +16,9 @@ export const ExperimentNotesField = (params: ExperimentDetailsTableProps) => {
     notes: params?.experiment?.notes,
   };
 
+  const { api } = useDataApiWithFeedback();
+  //const { api, isExecutingCall } = useDataApiWithFeedback();
+
   return (
     <div>
       <InputLabel shrink margin="dense">
@@ -23,9 +27,16 @@ export const ExperimentNotesField = (params: ExperimentDetailsTableProps) => {
 
       <Formik
         initialValues={initialData}
-        //onSubmit={async (values): Promise<void> => {
-        onSubmit={async (): Promise<void> => {
+        onSubmit={async (values): Promise<void> => {
           console.log('submitted');
+          if (params.experiment && values.notes) {
+            await api({
+              toastSuccessMessage: `Notes updated successfully!`,
+            }).UpdateExperiment({
+              experimentPk: params.experiment.experimentPk,
+              notes: values.notes,
+            });
+          }
         }}
       >
         {({ setFieldValue }): JSX.Element => (

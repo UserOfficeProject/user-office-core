@@ -321,6 +321,10 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     return Promise.resolve(samples);
   }
 
+  async updateExperiment(experimentPk: number, notes: string) {
+    return null;
+  }
+
   updateExperimentSample(
     experimentPk: number,
     sampleId: number,

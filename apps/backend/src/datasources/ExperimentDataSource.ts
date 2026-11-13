@@ -56,6 +56,10 @@ export interface ExperimentDataSource {
     experimentSafetyPk: number,
     statusId: number
   ): Promise<ExperimentSafety>;
+  updateExperiment(
+    experimentPk: number,
+    notes: string
+  ): Promise<Experiment | null>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
