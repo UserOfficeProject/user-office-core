@@ -1,4 +1,4 @@
-import { InputLabel } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
 import React from 'react';
 
 export default function TemplateEditLabel(props: { pageType: string }) {

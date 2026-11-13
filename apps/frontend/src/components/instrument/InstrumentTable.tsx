@@ -1,6 +1,6 @@
 import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

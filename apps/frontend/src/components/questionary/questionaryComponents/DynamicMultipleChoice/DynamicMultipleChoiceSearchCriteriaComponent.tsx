@@ -1,4 +1,6 @@
-import { Grid, TextField, Autocomplete } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 
 import { QuestionFilterCompareOperator } from 'generated/sdk';

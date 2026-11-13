@@ -4,19 +4,18 @@ import {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Info, Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  IconButton,
-  Tooltip,
-  Button,
-  Grid,
-  Typography,
-} from '@mui/material';
+import Info from '@mui/icons-material/Info';
+import Visibility from '@mui/icons-material/Visibility';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import {
   getTranslation,
   ResourceId,

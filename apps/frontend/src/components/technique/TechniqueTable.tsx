@@ -1,6 +1,8 @@
 import { Column } from '@material-table/core';
-import { AssignmentInd } from '@mui/icons-material';
-import { Dialog, DialogContent, Typography } from '@mui/material';
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

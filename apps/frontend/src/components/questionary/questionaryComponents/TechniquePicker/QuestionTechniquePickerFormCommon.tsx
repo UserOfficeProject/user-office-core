@@ -1,4 +1,6 @@
-import { FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 

@@ -1,15 +1,15 @@
-import { Science } from '@mui/icons-material';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import Science from '@mui/icons-material/Science';
 import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VpnKey from '@mui/icons-material/VpnKey';
-import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';

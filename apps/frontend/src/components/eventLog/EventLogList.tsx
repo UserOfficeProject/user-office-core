@@ -1,5 +1,5 @@
 import { Column } from '@material-table/core';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import React from 'react';
 

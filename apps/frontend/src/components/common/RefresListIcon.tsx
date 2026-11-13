@@ -1,5 +1,5 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { IconButton } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import React from 'react';
 
 type RefreshListIconProps = {

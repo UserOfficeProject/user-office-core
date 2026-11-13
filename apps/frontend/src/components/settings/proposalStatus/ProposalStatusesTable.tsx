@@ -1,5 +1,5 @@
 import Delete from '@mui/icons-material/DeleteOutline';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';

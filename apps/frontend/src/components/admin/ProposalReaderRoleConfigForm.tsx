@@ -1,4 +1,6 @@
-import { Box, Checkbox, FormControlLabel } from '@mui/material';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import React from 'react';
 
 export type ProposalReaderRoleConfig = {

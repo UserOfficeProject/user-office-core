@@ -2,9 +2,9 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 

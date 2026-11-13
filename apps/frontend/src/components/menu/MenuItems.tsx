@@ -1,4 +1,3 @@
-import { Science, Topic } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -8,6 +7,8 @@ import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import Help from '@mui/icons-material/Help';
 import NoteAdd from '@mui/icons-material/NoteAdd';
 import People from '@mui/icons-material/People';
+import Science from '@mui/icons-material/Science';
+import Topic from '@mui/icons-material/Topic';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';

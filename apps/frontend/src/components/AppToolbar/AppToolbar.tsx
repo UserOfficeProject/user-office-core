@@ -1,6 +1,6 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { Box } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,6 +14,7 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
 
 import AccountActionButton from './AccountActionButton';
+
 const drawerWidth = 250;
 
 type AppToolbarProps = {

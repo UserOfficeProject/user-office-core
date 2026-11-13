@@ -1,5 +1,5 @@
 import { MaterialTableProps, Column } from '@material-table/core';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 

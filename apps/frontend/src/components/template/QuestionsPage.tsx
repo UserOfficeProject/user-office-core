@@ -1,6 +1,7 @@
 import { Column, Query, QueryResult } from '@material-table/core';
-import { Edit } from '@mui/icons-material';
-import { DialogContent, Typography } from '@mui/material';
+import Edit from '@mui/icons-material/Edit';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 

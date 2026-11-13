@@ -1,5 +1,5 @@
-import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';

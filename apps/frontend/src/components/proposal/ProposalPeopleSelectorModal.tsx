@@ -1,15 +1,13 @@
-import { Info } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Autocomplete,
-  Button,
-  CircularProgress,
-  DialogContent,
-  IconButton,
-  MenuItem,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import Info from '@mui/icons-material/Info';
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import React, {
   useCallback,
   useContext,

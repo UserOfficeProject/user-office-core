@@ -1,5 +1,6 @@
-import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';

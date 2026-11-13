@@ -1,4 +1,5 @@
-import { FormControl, Grid } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';

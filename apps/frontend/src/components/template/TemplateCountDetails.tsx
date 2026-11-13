@@ -1,4 +1,4 @@
-import { Link } from '@mui/material';
+import Link from '@mui/material/Link';
 import React, { useMemo } from 'react';
 
 import MaterialTable from 'components/common/MaterialTable';

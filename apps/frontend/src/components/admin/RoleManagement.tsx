@@ -1,4 +1,7 @@
-import { Box, Chip, DialogContent, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React, { useState, useEffect } from 'react';
 
 import TagIcon from 'components/common/icons/TagIcon';

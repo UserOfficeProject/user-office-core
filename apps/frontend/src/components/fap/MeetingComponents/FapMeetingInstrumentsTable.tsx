@@ -2,15 +2,13 @@ import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import RemoveDone from '@mui/icons-material/RemoveDone';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Typography,
-} from '@mui/material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
