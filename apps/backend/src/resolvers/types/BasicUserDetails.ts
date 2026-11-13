@@ -41,9 +41,11 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 
   @Field(() => String, { nullable: true })
   public oidcSub?: string | null;
+
+  @Field(() => String, { nullable: true })
+  public userTitle?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function resolveBasicUserDetailsReference(
   ...params: any
 ): Promise<BasicUserDetails> {

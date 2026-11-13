@@ -5,9 +5,9 @@ import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../resolvers/types/User';
+import { OrderByCollection } from '../resolvers/types/User';
 import { PaginationSortDirection } from '../utils/pagination';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
-
 export interface ProposalDataSource {
   getRequestedTime(proposalPk: number, instrumentId: number): Promise<number>;
   getProposalsFromView(
@@ -39,7 +39,8 @@ export interface ProposalDataSource {
     id: number,
     filter?: UserProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    orderByCollection?: OrderByCollection[]
   ): Promise<{ userProposals: Proposal[]; totalCount: number }>;
   getProposalsByPks(pks: number[]): Promise<Proposal[]>;
   getProposalByVisitId(visitId: number): Promise<Proposal>;

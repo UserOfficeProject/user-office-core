@@ -9,7 +9,7 @@ import {
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
-import { VisitRegistrationStatus } from 'generated/sdk';
+import { SettingsId, VisitRegistrationStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -23,7 +23,9 @@ type VisitRegistrationReviewProps = {
 };
 
 function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
-  const { toFormattedDateTime } = useFormattedDateTime();
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { state, dispatch } = useContext(
     QuestionaryContext

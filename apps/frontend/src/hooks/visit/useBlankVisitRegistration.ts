@@ -26,6 +26,7 @@ export function createRegistrationStub(
     user: {
       firstname: '',
       lastname: '',
+      userTitle: '',
       preferredname: '',
       id: userId,
       created: new Date(),

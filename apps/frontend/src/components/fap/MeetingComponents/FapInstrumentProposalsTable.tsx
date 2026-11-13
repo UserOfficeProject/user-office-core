@@ -143,7 +143,7 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
-      title: t('Fap') + ' meeting submitted',
+      title: t('FAP') + ' meeting submitted',
       render: (rowData: FapProposal) => {
         const submitted = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
@@ -155,7 +155,7 @@ const FapInstrumentProposalsTable = ({
     {
       title: 'Principal investigator',
       render: (rowData: FapProposal) => {
-        return getFullUserName(rowData.proposal.proposer);
+        return getFullUserName(rowData.proposal.proposer, true);
       },
     },
     { title: 'Country', field: 'proposal.proposer.country' },

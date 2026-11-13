@@ -156,6 +156,46 @@ context('Experiments tests', () => {
       cy.contains(initialDBData.users.user1.lastName);
     });
 
+    it('Should display the local contact in experiment information', () => {
+      const localContact = initialDBData.users.user1;
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.get('[value=NONE]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('[data-cy=officer-scheduled-events-table] tr', '000001')
+        .find('[data-cy=view-experiment]')
+        .click();
+      cy.get('button[role="tab"]')
+        .contains('Experiment Information')
+        .click({ force: true });
+
+      cy.contains('tr', 'Local Contact')
+        .should('contain', localContact.lastName)
+        .and('contain', localContact.email);
+    });
+
+    it('Should indicate when no local contact is assigned', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.get('[value=NONE]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('[data-cy=officer-scheduled-events-table] tr', '000002')
+        .find('[data-cy=view-experiment]')
+        .click();
+      cy.get('button[role="tab"]')
+        .contains('Experiment Information')
+        .click({ force: true });
+
+      cy.contains('tr', 'Local Contact').should('contain', 'Not assigned');
+    });
+
     it('All the columns in visit table are sortable', () => {
       cy.login('officer');
       cy.visit('/');

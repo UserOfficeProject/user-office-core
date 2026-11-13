@@ -56,20 +56,22 @@ export async function generateManagementDecisionData(
   const fapMeetingData =
     await baseContext.queries.fap.getProposalFapMeetingDecisions(agent, {
       proposalPk: fapreview.proposal_pk,
+      fapId: fapreview.fap_id,
     });
+  const fapMeetingDecision = fapMeetingData.find(
+    (decision) => decision.instrumentId === fapreview.instrument_id
+  );
 
-  const instrumentAllocatedTime = fapreview.fap_time_allocation
-    ? fapreview.fap_time_allocation
-    : fapreview.time_allocation;
+  const instrumentAllocatedTime =
+    fapreview.fap_time_allocation ?? fapreview.time_allocation;
 
-  const fapMeetingRecommendation =
-    fapMeetingData[0] && fapMeetingData[0].recommendation
-      ? ProposalEndStatusStringValue[fapMeetingData[0].recommendation]
-      : ProposalEndStatusStringValue[0];
+  const fapMeetingRecommendation = fapMeetingDecision?.recommendation
+    ? ProposalEndStatusStringValue[fapMeetingDecision.recommendation]
+    : ProposalEndStatusStringValue[0];
 
   return {
-    grade: fapreview.average_grade ?? 0,
-    instrumentAllocatedTime: instrumentAllocatedTime ?? 0,
+    rankOrder: fapreview.rank_order ?? 0,
+    instrumentAllocatedTime: instrumentAllocatedTime ?? '<missing>',
     xlsxrowdata: [
       fapreview.proposal_id.toString() ?? '<missing>',
       fapreview.proposal_pk.toString() ?? '<missing>',
@@ -77,31 +79,29 @@ export async function generateManagementDecisionData(
       fapreview.instrument_name.toString() ?? '<missing>',
       `${principalInvestigatorInfo?.firstname} ${principalInvestigatorInfo?.lastname}`,
       '<missing>', // Running total of remaining instrument time. (filled in later)
-      instrumentAllocatedTime
-        ? instrumentAllocatedTime.toString()
-        : '<missing>',
+      instrumentAllocatedTime?.toString() ?? '<missing>',
       fapMeetingRecommendation,
-      fapMeetingData?.[0]?.commentForUser
-        ? stripHtml(fapMeetingData[0].commentForUser)
+      fapMeetingDecision?.commentForUser != null
+        ? stripHtml(fapMeetingDecision.commentForUser)
         : '<missing>',
-      fapMeetingData?.[0]?.commentForManagement
-        ? stripHtml(fapMeetingData[0].commentForManagement)
+      fapMeetingDecision?.commentForManagement != null
+        ? stripHtml(fapMeetingDecision.commentForManagement)
         : '<missing>',
-      fapreview.comment ? stripHtml(fapreview.comment) : '<missing>',
+      fapreview.comment != null ? stripHtml(fapreview.comment) : '<missing>',
     ],
   };
 }
 
 export function addDecreasingInstrumentAvailTime(
   managementDecisionData: {
-    grade: number;
+    rankOrder: number;
     instrumentAllocatedTime: number;
     xlsxrowdata: string[];
   }[],
   instrumentAvailableTime: number
 ) {
-  //Sort by grade so the rows are in order, and the allocated time decreases from first to last.
-  managementDecisionData.sort((a, b) => a.grade - b.grade);
+  // Sort by rank so the rows are in order, and the allocated time decreases from first to last.
+  managementDecisionData.sort((a, b) => a.rankOrder - b.rankOrder);
   let remainingInstrumentTime = instrumentAvailableTime;
   for (let i = 0; i < managementDecisionData.length; i++) {
     remainingInstrumentTime =
