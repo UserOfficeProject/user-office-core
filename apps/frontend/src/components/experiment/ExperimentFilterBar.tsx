@@ -109,15 +109,15 @@ function ExperimentFilterBar({
       </Grid>
       <Grid item sm={4} xs={12}>
         <ExperimentSafetyStatusFilter
-          statusId={filter.experimentSafetyStatusId as number}
+          statusId={filter.experimentSafetyStatusId}
           statuses={experimentStatuses?.data}
           isLoading={experimentStatuses?.isLoading}
           shouldShowAll={true}
           hiddenStatuses={[]}
-          onChange={(experimentSafetyStatusId: number) => {
+          onChange={(experimentSafetyStatusId) => {
             setExperimentFilter({
               ...filter,
-              experimentSafetyStatusId,
+              experimentSafetyStatusId: experimentSafetyStatusId || undefined,
             });
           }}
         />

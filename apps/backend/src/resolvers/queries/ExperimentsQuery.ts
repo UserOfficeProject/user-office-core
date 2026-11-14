@@ -44,8 +44,8 @@ export class ExperimentsFilter {
   @Field(() => TimeSpan, { nullable: true })
   overlaps?: TimeSpan;
 
-  @Field(() => Int, { nullable: true })
-  public experimentSafetyStatusId?: number;
+  @Field(() => String, { nullable: true })
+  public experimentSafetyStatusId?: string;
 
   @Field(() => Int, { nullable: true })
   public instrumentScientistUserId?: number;
