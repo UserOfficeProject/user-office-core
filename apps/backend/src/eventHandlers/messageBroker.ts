@@ -14,7 +14,10 @@ import {
   DataAccessUsersDataSource,
   UserWithInstitution,
 } from '../datasources/DataAccessUsersDataSource';
-import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
+import {
+  ExperimentCreateInput,
+  ExperimentDataSource,
+} from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -91,6 +94,98 @@ type ExperimentMessageData = {
   proposal?: ProposalMessageData;
   samples?: Pick<Sample, 'id' | 'title'>[];
   instrument?: { id: number; name: string; shortCode: string };
+};
+
+/** Normalized form of either scheduler payload; absent alternatives are null. */
+export type ProposalBookingTimeSlotAddedMessage = {
+  source: string | null;
+  id: number;
+  startsAt: Date;
+  endsAt: Date;
+  experimentId: string | null;
+  proposalPk: number | null;
+  proposalId: string | null;
+  status: string;
+  localContactId: number | null;
+  oidcSub: string | null;
+  instrumentId: number | null;
+  instrumentShortCode: string | null;
+};
+
+const hasMessageField = (message: Record<string, unknown>, field: string) =>
+  Object.prototype.hasOwnProperty.call(message, field);
+
+export const parseProposalBookingTimeSlotAddedMessage = (
+  message: Record<string, unknown>
+): ProposalBookingTimeSlotAddedMessage => {
+  const commonFields = ['id', 'startsAt', 'endsAt', 'status'];
+  const publicIdentifierFields = [
+    'proposalId',
+    'instrumentShortCode',
+    'oidcSub',
+  ];
+  const primaryKeyFields = ['proposalPk', 'instrumentId', 'localContactId'];
+  const hasPublicIdentifiers = publicIdentifierFields.some((field) =>
+    hasMessageField(message, field)
+  );
+  const hasPrimaryKeys = primaryKeyFields.some((field) =>
+    hasMessageField(message, field)
+  );
+
+  if (hasPublicIdentifiers === hasPrimaryKeys) {
+    throw new Error(
+      'Scheduler booking message must contain either public identifiers or UOS primary keys'
+    );
+  }
+
+  const requiredFields = hasPublicIdentifiers
+    ? [
+        ...commonFields,
+        'source',
+        'experimentId',
+        'proposalId',
+        'instrumentShortCode',
+        'oidcSub',
+      ]
+    : [...commonFields, ...primaryKeyFields];
+  const missingFields = requiredFields.filter(
+    (field) => !hasMessageField(message, field)
+  );
+
+  if (missingFields.length > 0) {
+    throw new Error(
+      `Scheduler booking message is missing required fields: ${missingFields.join(', ')}`
+    );
+  }
+
+  if (message.startsAt == null || message.endsAt == null) {
+    throw new Error('Scheduler booking message dates cannot be null');
+  }
+
+  if (message.id == null) {
+    throw new Error('Scheduler booking message id cannot be null');
+  }
+
+  if (hasPublicIdentifiers && typeof message.source !== 'string') {
+    throw new Error('Public identifier scheduler message requires a source');
+  }
+
+  return {
+    source: (message.source as string | null | undefined) ?? null,
+    id: message.id as number,
+    startsAt: message.startsAt as Date,
+    endsAt: message.endsAt as Date,
+    experimentId: (message.experimentId as string | null | undefined) ?? null,
+    proposalPk: (message.proposalPk as number | null | undefined) ?? null,
+    proposalId: (message.proposalId as string | null | undefined) ?? null,
+    status: message.status as string,
+    localContactId:
+      (message.localContactId as number | null | undefined) ?? null,
+    oidcSub: (message.oidcSub as string | null | undefined) ?? null,
+    instrumentId: (message.instrumentId as number | null | undefined) ?? null,
+    instrumentShortCode:
+      (message.instrumentShortCode as string | null | undefined) ?? null,
+  };
 };
 
 type VisitRegistrationAnswerMessageData = {
@@ -742,18 +837,83 @@ export async function createListenToRabbitMQHandler() {
             message,
           });
 
-          const experimentToAdd = {
-            startsAt: message.startsAt,
-            endsAt: message.endsAt,
-            scheduledEventId: message.id,
-            proposalPk: message.proposalPk,
-            status: message.status,
-            localContactId: message.localContactId,
-            instrumentId: message.instrumentId,
-          } as Omit<
-            Experiment,
-            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-          >;
+          const bookingMessage =
+            parseProposalBookingTimeSlotAddedMessage(message);
+          let experimentToAdd: ExperimentCreateInput;
+
+          if (typeof bookingMessage.proposalPk === 'number') {
+            experimentToAdd = {
+              startsAt: bookingMessage.startsAt,
+              endsAt: bookingMessage.endsAt,
+              scheduledEventId: bookingMessage.id,
+              proposalPk: bookingMessage.proposalPk,
+              status: bookingMessage.status as Experiment['status'],
+              localContactId: bookingMessage.localContactId,
+              instrumentId: bookingMessage.instrumentId as number,
+              source: bookingMessage.source,
+            };
+          } else {
+            const proposalId = bookingMessage.proposalId;
+            const instrumentShortCode = bookingMessage.instrumentShortCode;
+            const externalExperimentId = bookingMessage.experimentId;
+
+            if (!proposalId || !instrumentShortCode || !externalExperimentId) {
+              throw new Error(
+                'Public identifier scheduler message is missing a proposal ID, instrument short code, or experiment ID'
+              );
+            }
+
+            const publicProposalDataSource =
+              container.resolve<ProposalDataSource>(Tokens.ProposalDataSource);
+            const publicInstrumentDataSource =
+              container.resolve<InstrumentDataSource>(
+                Tokens.InstrumentDataSource
+              );
+            const publicUserDataSource = container.resolve<UserDataSource>(
+              Tokens.UserDataSource
+            );
+
+            const [proposal, instrument] = await Promise.all([
+              publicProposalDataSource.getProposalById(proposalId),
+              publicInstrumentDataSource.getInstrumentByShortCode(
+                instrumentShortCode
+              ),
+            ]);
+
+            if (!proposal) {
+              throw new Error(`Proposal ${proposalId} was not found`);
+            }
+            if (!instrument) {
+              throw new Error(
+                `Instrument ${instrumentShortCode} was not found`
+              );
+            }
+
+            let localContactId: number | null = null;
+            if (bookingMessage.oidcSub !== null) {
+              const localContact = await publicUserDataSource.getByOIDCSub(
+                bookingMessage.oidcSub
+              );
+              if (!localContact) {
+                throw new Error(
+                  `User with OIDC subject ${bookingMessage.oidcSub} was not found`
+                );
+              }
+              localContactId = localContact.id;
+            }
+
+            experimentToAdd = {
+              startsAt: bookingMessage.startsAt,
+              endsAt: bookingMessage.endsAt,
+              scheduledEventId: bookingMessage.id,
+              experimentId: externalExperimentId,
+              proposalPk: proposal.primaryKey,
+              status: bookingMessage.status as Experiment['status'],
+              localContactId,
+              instrumentId: instrument.id,
+              source: bookingMessage.source,
+            };
+          }
 
           const experiment = await experimentDataSource.create(experimentToAdd);
 
