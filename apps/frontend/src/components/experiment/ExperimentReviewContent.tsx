@@ -42,6 +42,7 @@ export enum EXPERIMENT_MODAL_TAB_NAMES {
 type ExperimentReviewContentProps = {
   tabNames: EXPERIMENT_MODAL_TAB_NAMES[];
   experimentPk: number;
+  isUserOfficeView: boolean;
   isInsideModal?: boolean;
 };
 
@@ -222,6 +223,7 @@ const ProposalInformationTab = ({ proposalPk }: { proposalPk: number }) => {
 const ExperimentReviewContent = ({
   experimentPk,
   tabNames,
+  isUserOfficeView,
   isInsideModal,
 }: ExperimentReviewContentProps) => {
   const { experiment, loading: experimentLoading } =
@@ -329,7 +331,10 @@ const ExperimentReviewContent = ({
       case EXPERIMENT_MODAL_TAB_NAMES.VISIT:
         return (
           <Fragment key={index}>
-            <ExperimentVisitsTable experiment={experiment} />
+            <ExperimentVisitsTable
+              experiment={experiment}
+              isUserOfficeView={isUserOfficeView}
+            />
           </Fragment>
         );
       case EXPERIMENT_MODAL_TAB_NAMES.LOGS:
