@@ -205,7 +205,10 @@ export default class QuestionaryQueries {
           return (
             field.config.readPermissions.length === 0 ||
             field.config.readPermissions?.some((right) => {
-              return right === user?.currentRole?.shortCode;
+              return (
+                right === user.currentRole?.shortCode ||
+                right === String(user.currentRole?.id)
+              );
             })
           );
         }),
