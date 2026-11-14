@@ -20,6 +20,7 @@ export type FapDataRowInput = {
   proposalAnswers: QuestionaryStep[] | null;
   reviews: Review[] | null;
   instrumentId: number;
+  fapProposalId: number;
 };
 
 export type FapDataRow = (input: FapDataRowInput) => RowObj | Promise<RowObj>;
@@ -68,6 +69,7 @@ export function getDataRow({
   technicalReviewComment,
   propFapRankOrder,
   instrumentId,
+  fapProposalId,
 }: FapDataRowInput): RowObj {
   return {
     proposalPk: proposalPk,
@@ -83,6 +85,7 @@ export function getDataRow({
     propReviewAvgScore: proposalAverageScore,
     propFapRankOrder: propFapRankOrder,
     inAvailZone: null,
+    fapProposalId: fapProposalId,
   };
 }
 

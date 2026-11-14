@@ -6,6 +6,7 @@ fragment fapMeetingDecision on FapMeetingDecision {
   rankOrder
   submitted
   submittedBy
-  instrumentId
+  recommendedInstrumentId
   fapId
+  recommendedTimeAllocation
 }
