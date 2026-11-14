@@ -8,8 +8,9 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
+import { RoleDataSource } from '../datasources/RoleDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { Page } from '../models/Admin';
 import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { rejection, Rejection } from '../models/Rejection';
@@ -31,7 +32,9 @@ const IS_BACKEND_VALIDATION = true;
 @injectable()
 export default class AdminMutations {
   constructor(
-    @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource,
+    @inject(Tokens.RoleDataSource) private roleDataSource: RoleDataSource,
+    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -44,7 +47,7 @@ export default class AdminMutations {
     } else {
       logger.logWarn('Resetting database', {});
 
-      const log = await this.dataSource.resetDB(includeSeeds);
+      const log = await this.adminDataSource.resetDB(includeSeeds);
       await container.resolve<() => Promise<void>>(
         Tokens.ConfigureEnvironment
       )();
@@ -59,22 +62,77 @@ export default class AdminMutations {
   ): Promise<string[] | Rejection> {
     logger.logWarn('Applying patches', {});
 
-    return this.dataSource.applyPatches();
+    return this.adminDataSource.applyPatches();
   }
 
   @ValidateArgs(setPageTextValidationSchema, ['text'])
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,
-    { id, text }: { id: number; text: string }
-  ): Promise<Page | Rejection> {
-    return this.dataSource
-      .setPageText(id, text)
+    {
+      pageId,
+      text,
+      roleIds,
+    }: { pageId: number; text: string; roleIds: number[] }
+  ): Promise<boolean | Rejection> {
+    if (agent == null || !agent.currentRole) {
+      return false;
+    }
+
+    const userRole = agent.currentRole;
+    const isRootRoleUser =
+      userRole.isRootRole ??
+      (await this.userDataSource.getUserRoles(agent.id)).find(
+        (r) => (r.id = userRole.id)
+      )?.isRootRole;
+    const agentRoleTagIds =
+      agent?.currentRole?.id != null
+        ? (
+            await this.roleDataSource.getTagsByRoleId(agent?.currentRole?.id)
+          ).map((t) => t.id)
+        : [];
+
+    const nonDefaultRoleIds = roleIds.filter((roleId) => roleId !== -1);
+
+    //if the user is a root user officer allow the edit, if they're a derived user officer editing a default page notice deny them,
+    //otherwise check that the user has a matching tag for each page notice they are trying to edit
+    const tagsPermissions = isRootRoleUser
+      ? [true]
+      : roleIds.length - nonDefaultRoleIds.length
+        ? [false]
+        : nonDefaultRoleIds.map(async (roleId) => {
+            const roleTagIds = (
+              await this.roleDataSource.getTagsByRoleId(roleId)
+            ).map((t) => t.id);
+
+            if (agentRoleTagIds.filter((t) => roleTagIds.includes(t)).length) {
+              return true;
+            }
+
+            return false;
+          });
+
+    const resolvedPermissions = await Promise.all(tagsPermissions);
+
+    if (resolvedPermissions.includes(false)) {
+      return rejection('Insufficient permission to update page notice', {
+        agent,
+        pageId,
+        roleIds,
+      });
+    }
+
+    return this.adminDataSource
+      .setPageText(pageId, text, roleIds)
       .then((page) => {
         return page;
       })
       .catch((error) => {
-        return rejection('Could not set page text', { agent, id }, error);
+        return rejection(
+          'Could not set page text',
+          { agent, pageId, roleIds },
+          error
+        );
       });
   }
 
@@ -83,7 +141,7 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     args: UpdateInstitutionsArgs
   ) {
-    const institution = await this.dataSource.getInstitution(args.id);
+    const institution = await this.adminDataSource.getInstitution(args.id);
     if (!institution) {
       return rejection('Could not retrieve institution', {
         agent,
@@ -94,22 +152,22 @@ export default class AdminMutations {
     institution.name = args.name ?? institution.name;
     institution.country = args.country ?? institution.country;
 
-    return await this.dataSource.updateInstitution(institution);
+    return await this.adminDataSource.updateInstitution(institution);
   }
 
   @Authorized([Roles.USER_OFFICER])
   async deleteInstitutions(agent: UserWithRole | null, id: number) {
-    const institution = await this.dataSource.getInstitution(id);
+    const institution = await this.adminDataSource.getInstitution(id);
     if (!institution) {
       return rejection('Institution not found');
     }
 
-    const institutionUsers = await this.dataSource.getInstitutionUsers(id);
+    const institutionUsers = await this.adminDataSource.getInstitutionUsers(id);
     if (institutionUsers.length !== 0) {
       return rejection('There are users associated with this institution');
     }
 
-    return await this.dataSource.deleteInstitution(id);
+    return await this.adminDataSource.deleteInstitution(id);
   }
 
   @Authorized()
@@ -132,7 +190,7 @@ export default class AdminMutations {
       { expiresIn: '100y' } // API access token should have long life
     );
 
-    const result = await this.dataSource.createApiAccessToken(
+    const result = await this.adminDataSource.createApiAccessToken(
       { accessPermissions, name: args.name },
       accessTokenId,
       generatedAccessToken
@@ -154,7 +212,7 @@ export default class AdminMutations {
     try {
       const accessPermissions = JSON.parse(args.accessPermissions);
 
-      return await this.dataSource.updateApiAccessToken({
+      return await this.adminDataSource.updateApiAccessToken({
         ...args,
         accessPermissions,
       });
@@ -173,7 +231,9 @@ export default class AdminMutations {
     args: DeleteApiAccessTokenInput
   ) {
     try {
-      return await this.dataSource.deleteApiAccessToken(args.accessTokenId);
+      return await this.adminDataSource.deleteApiAccessToken(
+        args.accessTokenId
+      );
     } catch (error) {
       return rejection(
         'Could not remove api access token',
@@ -188,13 +248,13 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     args: MergeInstitutionsInput
   ): Promise<Institution | Rejection> {
-    const institution = await this.dataSource.mergeInstitutions(args);
+    const institution = await this.adminDataSource.mergeInstitutions(args);
 
     if (!institution) {
       return rejection('Could not merge institutions', { agent, args });
     }
 
-    const updatedInstitution = await this.dataSource.updateInstitution({
+    const updatedInstitution = await this.adminDataSource.updateInstitution({
       ...institution,
       name: args.newTitle,
     });
@@ -211,7 +271,7 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     args: UpdateFeaturesInput
   ): Promise<Feature[] | Rejection> {
-    const updatedFeatures = await this.dataSource.updateFeatures(args);
+    const updatedFeatures = await this.adminDataSource.updateFeatures(args);
 
     if (!updatedFeatures.length) {
       return rejection('Could not update features', { agent, args });
@@ -225,7 +285,7 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     args: UpdateSettingsInput
   ): Promise<Settings | Rejection> {
-    const updatedSettings = await this.dataSource.updateSettings(args);
+    const updatedSettings = await this.adminDataSource.updateSettings(args);
 
     if (!updatedSettings) {
       return rejection('Could not update settings', { agent, args });

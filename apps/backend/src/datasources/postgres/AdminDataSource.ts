@@ -6,7 +6,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-import { Page } from '../../models/Admin';
 import { Country } from '../../models/Country';
 import { Feature, FeatureUpdateAction } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
@@ -39,6 +38,7 @@ import {
   TokensAndPermissionsRecord,
   UserRecord,
 } from './records';
+import { Page } from '../../models/Admin';
 
 const dbPatchesFolderPath = path.join(cwd(), 'db_patches');
 const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
@@ -138,13 +138,26 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return createInstitutionObject(institutionRecord);
   }
 
-  async get(id: number): Promise<string | null> {
-    return database
-      .select('content')
+  async get(pageId: number, roleIds: number[]): Promise<Page[]> {
+    const nonNullRoleIds = roleIds.filter((r) => r !== -1) as number[];
+
+    const pagetextRecords: PageTextRecord[] = await database
+      .select('page_id', 'role_id', 'content')
       .from('pagetext')
-      .where('pagetext_id', id)
-      .first()
-      .then((res) => (res ? res.content : null));
+      .where('page_id', pageId)
+      .modify((query) => {
+        if (nonNullRoleIds.length && roleIds.length - nonNullRoleIds.length) {
+          query.whereRaw(`(role_id IN (${nonNullRoleIds}) OR role_id IS NULL)`);
+        } else if (nonNullRoleIds.length) {
+          query.whereIn('role_id', nonNullRoleIds);
+        } else if (roleIds.length - nonNullRoleIds.length) {
+          query.whereNull('role_id');
+        }
+      });
+
+    return pagetextRecords.map((pagetextRecord) =>
+      createPageObject(pagetextRecord)
+    );
   }
 
   async setFeatures(
@@ -174,21 +187,32 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     );
   }
 
-  async setPageText(id: number, content: string): Promise<Page> {
-    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
-      .insert({
-        pagetext_id: id,
-        content: content,
-      })
-      .onConflict('pagetext_id')
-      .merge()
-      .returning('*');
+  async setPageText(
+    pageId: number,
+    content: string,
+    roleIds: number[]
+  ): Promise<boolean> {
+    try {
+      await database.transaction(async (trx) => {
+        if (roleIds.length > 0) {
+          await trx('pagetext')
+            .insert(
+              roleIds.map((roleId) => ({
+                page_id: pageId,
+                role_id: roleId === -1 ? null : roleId,
+                content,
+              }))
+            )
+            .onConflict(['page_id', 'role_id'])
+            .merge(['content'])
+            .returning('*');
+        }
+      });
 
-    if (!pagetextRecord) {
-      throw new GraphQLError(`Could not update page with id:${id}`);
+      return true;
+    } catch (error) {
+      throw new Error(`Error updating page notice: ${error}`);
     }
-
-    return createPageObject(pagetextRecord);
   }
 
   async getInstitutions(filter: InstitutionsFilter): Promise<Institution[]> {

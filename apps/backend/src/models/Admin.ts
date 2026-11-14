@@ -1,6 +1,8 @@
 export class Page {
   constructor(
-    public id: number,
+    public pagetextId: number,
+    public pageId: number,
+    public roleId: number,
     public content: string
   ) {}
 }

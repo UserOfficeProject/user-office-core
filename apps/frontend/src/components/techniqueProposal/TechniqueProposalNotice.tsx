@@ -2,11 +2,11 @@ import parse from 'html-react-parser';
 import React from 'react';
 
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function TechniqueProposalNotice() {
-  const [loadingContent, pageContent] = useGetPageContent(
+  const [loadingContent, pageContent] = useGetPageContents(
     PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE
   );
 

@@ -7,7 +7,7 @@ import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { PageName, Fap } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
 type GradeGuidePageProps = {
@@ -15,7 +15,9 @@ type GradeGuidePageProps = {
 };
 
 const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
-  const [loadingPage, pageContent] = useGetPageContent(PageName.GRADEGUIDEPAGE);
+  const [loadingPage, pageContent] = useGetPageContents(
+    PageName.GRADEGUIDEPAGE
+  );
 
   const noContents = (
     <Stack alignItems="center">
@@ -44,7 +46,7 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
       ? parse(fap.gradeGuide)
       : noContents
     : pageContent
-      ? parse(pageContent)
+      ? parse(pageContent as string)
       : noContents;
 
   return <StyledContainer>{content}</StyledContainer>;
