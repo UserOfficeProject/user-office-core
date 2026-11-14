@@ -1,4 +1,4 @@
-import { DialogContent } from '@mui/material';
+import DialogContent from '@mui/material/DialogContent';
 import InputLabel from '@mui/material/InputLabel';
 import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';

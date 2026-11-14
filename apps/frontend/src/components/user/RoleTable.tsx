@@ -1,8 +1,8 @@
-import MaterialTable from '@material-table/core';
 import Button from '@mui/material/Button';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import { Role as RoleSDK } from 'generated/sdk';
 import { useRolesData } from 'hooks/user/useRolesData';
 import { tableIcons } from 'utils/materialIcons';

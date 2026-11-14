@@ -1,18 +1,19 @@
 import react from '@vitejs/plugin-react';
 import {
+  ConfigEnv,
   defineConfig,
-  splitVendorChunkPlugin,
   loadEnv,
+  ProxyOptions,
   UserConfig,
 } from 'vite';
 
-export default ({ mode }): UserConfig => {
+export default ({ mode }: ConfigEnv): UserConfig => {
   // Load "VITE" specific environment variables from .env file.
   const env = loadEnv(mode, process.cwd());
 
   // https://vitejs.dev/config/
   return defineConfig({
-    plugins: [splitVendorChunkPlugin(), react()],
+    plugins: [react()],
     server: {
       open: true,
       host: true,
@@ -25,7 +26,7 @@ export default ({ mode }): UserConfig => {
           '/uploads',
           '/files',
           '/preview',
-        ].reduce((acc, curr) => {
+        ].reduce<Record<string, ProxyOptions>>((acc, curr) => {
           acc[curr] = {
             target: env.VITE_DEV_SERVER_PROXY_TARGET || 'http://localhost:4000',
             changeOrigin: true,
@@ -37,21 +38,39 @@ export default ({ mode }): UserConfig => {
     },
     resolve: {
       preserveSymlinks: true,
-      alias: {
-        context: '/src/context',
-        hooks: '/src/hooks',
-        utils: '/src/utils',
-        generated: '/src/generated',
-        i18n: '/src/i18n',
-        styles: '/src/styles',
-        components: '/src/components',
-        models: '/src/models',
-        units: '/src/units',
-        images: '/src/images',
-      },
+      alias: [
+        // @mui/icons-material v5 has no "exports" map, so `@mui/icons-material/<Icon>`
+        // resolves to a CommonJS file.
+        // https://vite.dev/guide/migration#consistent-commonjs-interop
+        // TODO: Remove this alias once @mui/icons-material is upgraded to a version
+        // whose package.json ships an "exports" map pointing deep imports at ESM.
+        {
+          find: /^@mui\/icons-material\/(?!esm\/)(.+)$/,
+          replacement: '@mui/icons-material/esm/$1',
+        },
+        { find: 'context', replacement: '/src/context' },
+        { find: 'hooks', replacement: '/src/hooks' },
+        { find: 'utils', replacement: '/src/utils' },
+        { find: 'generated', replacement: '/src/generated' },
+        { find: 'i18n', replacement: '/src/i18n' },
+        { find: 'styles', replacement: '/src/styles' },
+        { find: 'components', replacement: '/src/components' },
+        { find: 'models', replacement: '/src/models' },
+        { find: 'units', replacement: '/src/units' },
+        { find: 'images', replacement: '/src/images' },
+      ],
     },
     build: {
       outDir: 'build',
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            // TinyMCE is left out on purpose.
+            // https://rolldown.rs/reference/OutputOptions.codeSplitting
+            groups: [{ test: /node_modules\/(?!tinymce\/)/, name: 'vendor' }],
+          },
+        },
+      },
     },
   });
 };

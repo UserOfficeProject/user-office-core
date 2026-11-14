@@ -1,17 +1,21 @@
-import MaterialTableCore, {
+import {
   Action,
   Column,
   OrderByCollection,
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Refresh } from '@mui/icons-material';
+import Refresh from '@mui/icons-material/Refresh';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
-import { Badge, Grid, Typography, useTheme } from '@mui/material';
+import Badge from '@mui/material/Badge';
+import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
+import MaterialTableCore from 'components/common/MaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import {
   PaginationSortDirection,

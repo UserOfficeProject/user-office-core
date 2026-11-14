@@ -1,15 +1,13 @@
 import CloseIcon from '@mui/icons-material/Close';
-import {
-  Typography,
-  Alert,
-  Stack,
-  Dialog,
-  DialogContent,
-  Divider,
-  Paper,
-  DialogTitle,
-  IconButton,
-} from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';

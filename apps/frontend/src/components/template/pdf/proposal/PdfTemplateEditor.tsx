@@ -1,6 +1,7 @@
 import { html } from '@codemirror/lang-html';
-import { Box, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import CodeMirror from '@uiw/react-codemirror';
 import { Field, FieldProps, Form, Formik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';

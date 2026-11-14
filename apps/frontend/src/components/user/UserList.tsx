@@ -1,4 +1,8 @@
-import { Button, Collapse, List, ListItem, styled } from '@mui/material';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { BasicUserDetails } from 'generated/sdk';

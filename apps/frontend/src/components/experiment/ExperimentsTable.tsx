@@ -1,23 +1,17 @@
-import MaterialTable, {
-  Action,
-  Column,
-  Query,
-  QueryResult,
-} from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
-import {
-  Dialog,
-  DialogContent,
-  IconButton,
-  Link,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Action, Column, Query, QueryResult } from '@material-table/core';
+import Visibility from '@mui/icons-material/Visibility';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
+import MaterialTable from 'components/common/MaterialTable';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import {
   Experiment,

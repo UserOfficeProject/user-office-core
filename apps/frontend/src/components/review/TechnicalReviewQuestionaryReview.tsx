@@ -1,4 +1,4 @@
-import { TableProps } from '@mui/material';
+import { TableProps } from '@mui/material/Table';
 import React, { FunctionComponent } from 'react';
 
 import { DownloadableFileList } from 'components/common/DownloadableFileList';

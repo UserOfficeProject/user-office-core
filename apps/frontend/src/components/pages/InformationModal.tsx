@@ -2,8 +2,8 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import MuiDialogActions from '@mui/material/DialogActions';
 import MuiDialogContent from '@mui/material/DialogContent';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/system';
 import parse from 'html-react-parser';
 import React from 'react';
 

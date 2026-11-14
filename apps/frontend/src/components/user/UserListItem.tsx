@@ -1,4 +1,4 @@
-import { ListItemText } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
 import React from 'react';
 
 import { BasicUserDetails } from 'generated/sdk';

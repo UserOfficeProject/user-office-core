@@ -1,14 +1,16 @@
-import MaterialTable from '@material-table/core';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import { styled } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import CreateUpdateCancelVisitRegistration from 'components/visit/CreateUpdateCancelVisitRegistration';
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
 import { SettingsContext } from 'context/SettingsContextProvider';

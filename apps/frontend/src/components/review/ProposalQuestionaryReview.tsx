@@ -1,4 +1,4 @@
-import { TableProps } from '@mui/material';
+import { TableProps } from '@mui/material/Table';
 import React, { FunctionComponent, useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';

@@ -1,9 +1,11 @@
-import MaterialTable, { Column } from '@material-table/core';
-import { DialogActions, DialogContent } from '@mui/material';
+import { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import { Template, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';

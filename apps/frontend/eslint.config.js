@@ -6,7 +6,7 @@ import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import unusedImports from 'eslint-plugin-unused-imports';
-import tseslint from 'typescript-eslint';
+import { configs as tseslintConfigs } from 'typescript-eslint';
 
 export default defineConfig([
   {
@@ -24,7 +24,7 @@ export default defineConfig([
   },
   // Base configs
   eslint.configs.recommended,
-  tseslint.configs.recommended,
+  tseslintConfigs.recommended,
   react.configs.flat.recommended,
   reactHooks.configs.flat.recommended,
   importPlugin.flatConfigs.recommended,
@@ -32,7 +32,7 @@ export default defineConfig([
 
   // Custom project configuration
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
+    files: ['**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}'],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2018,
@@ -114,6 +114,30 @@ export default defineConfig([
         { blankLine: 'always', prev: '*', next: 'return' },
       ],
       'unused-imports/no-unused-imports': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              // "type": "module". See components/common/MaterialTable.ts.
+              name: '@material-table/core',
+              importNames: ['default'],
+              message:
+                "Import MaterialTable from 'components/common/MaterialTable'",
+            },
+          ],
+          patterns: [
+            {
+              // Avoid MUI barrel imports (slow dev startup). Use path imports,
+              // e.g. `import Button from '@mui/material/Button'`.
+              // https://mui.com/material-ui/guides/minimizing-bundle-size/#avoid-barrel-imports
+              regex: '^@mui/[^/]+$',
+              message:
+                "Use a path import instead, e.g. import Button from '@mui/material/Button'.",
+            },
+          ],
+        },
+      ],
       '@typescript-eslint/no-unused-expressions': [
         'error',
         { allowShortCircuit: true, allowTernary: true },

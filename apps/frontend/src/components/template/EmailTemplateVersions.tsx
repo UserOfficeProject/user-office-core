@@ -1,4 +1,5 @@
-import { Typography, Box } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import CodeMirror from '@uiw/react-codemirror';
 import React, { useEffect, useState } from 'react';
 

@@ -1,8 +1,9 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import { Role } from 'generated/sdk';
 import { useMeData } from 'hooks/user/useMeData';

@@ -1,4 +1,4 @@
-import { Science } from '@mui/icons-material';
+import Science from '@mui/icons-material/Science';
 import { techniquePickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

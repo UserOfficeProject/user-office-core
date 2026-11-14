@@ -1,5 +1,5 @@
-import { DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { Form, Formik } from 'formik';

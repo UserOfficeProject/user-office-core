@@ -1,4 +1,5 @@
-import { Grid, Alert, AlertProps } from '@mui/material';
+import Alert, { AlertProps } from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
 import React from 'react';
 
 /** Message occupying full screen and displaying slightly customized MUI Alert component */

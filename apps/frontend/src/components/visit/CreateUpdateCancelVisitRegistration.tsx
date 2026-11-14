@@ -1,4 +1,4 @@
-import { DialogContent } from '@mui/material';
+import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';

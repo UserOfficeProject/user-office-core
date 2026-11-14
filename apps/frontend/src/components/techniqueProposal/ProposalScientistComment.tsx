@@ -1,12 +1,10 @@
-import { Info } from '@mui/icons-material';
-import {
-  Button,
-  DialogContent,
-  Grid,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import Info from '@mui/icons-material/Info';
+import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';

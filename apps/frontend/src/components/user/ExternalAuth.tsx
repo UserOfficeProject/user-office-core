@@ -1,6 +1,6 @@
 import BugReportIcon from '@mui/icons-material/BugReport';
 import Lock from '@mui/icons-material/Lock';
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 

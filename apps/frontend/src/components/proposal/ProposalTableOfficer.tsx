@@ -1,11 +1,10 @@
-import MaterialTableCore, {
+import {
   Action,
   Column,
   MTableToolbar,
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
 import ApprovalIcon from '@mui/icons-material/Approval';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
@@ -15,12 +14,15 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
 import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
+import Visibility from '@mui/icons-material/Visibility';
 import Warning from '@mui/icons-material/Warning';
-import { IconButton, Tooltip, Link } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import {
   ResourceId,
@@ -39,6 +41,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import MaterialTableCore from 'components/common/MaterialTable';
 import RoleBasedLink from 'components/common/RoleBasedLink';
 import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/ProposalsView/AssignProposalsToFaps';
