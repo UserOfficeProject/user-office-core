@@ -41,7 +41,8 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.instrument_id,
     record.created_at,
     record.updated_at,
-    record.reference_number_sequence
+    record.reference_number_sequence,
+    record.notes
   );
 }
 
@@ -408,6 +409,26 @@ export default class PostgresExperimentDataSource
     }
 
     return createExperimentSafetyObject(result[0]);
+  }
+
+  async updateExperiment(experimentPk: number, notes: string) {
+    const rowsAffected = await database('experiments')
+      .where({ experiment_pk: experimentPk })
+      .update({ notes });
+
+    if (rowsAffected === 0) {
+      return null;
+    }
+
+    const record = await database('experiments')
+      .where({ experiment_pk: experimentPk })
+      .first();
+
+    if (!record) {
+      return null;
+    }
+
+    return createExperimentObject(record);
   }
 
   async getExperimentSafetyByExperimentPk(

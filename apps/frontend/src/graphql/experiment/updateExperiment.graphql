@@ -1,0 +1,12 @@
+mutation UpdateExperiment(
+    $experimentPk: Int!
+    $notes: String!
+) {
+    updateExperiment(
+        experimentPk: $experimentPk
+        notes: $notes
+    ) {
+        experimentPk
+        notes
+    }
+}
