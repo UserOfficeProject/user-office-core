@@ -1,6 +1,7 @@
 import MaterialTable, {
   Action,
   MaterialTableProps,
+  Options
 } from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -19,11 +20,21 @@ import { BasicUserDetails, Invite } from 'generated/sdk';
 
 import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
-export type UserManagementTableProps = {
+async function basicConvertToExtended< T extends BasicUserDetails>(user: BasicUserDetails){
+  return user as T;
+}
+
+export type Column<T = any>= {
+  title: string;
+  field: keyof T | string;
+}
+
+export type UserManagementTableProps< T extends BasicUserDetails> = {
   /** Basic user details array to be shown in the table. */
-  users: BasicUserDetails[];
+  users: T[];
   /** Function for setting up the users. */
-  setUsers: (users: BasicUserDetails[]) => void;
+  convertUserToExtendedUser?: (user: BasicUserDetails) => Promise<T>;
+  setUsers: (users: T[]) => void;
   invites?: Invite[];
   setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
@@ -36,14 +47,17 @@ export type UserManagementTableProps = {
   /** Disable the add button */
   disabled?: boolean;
   /** Custom actions to be passed to PeopleTable */
-  onUserAction?: (action: string, user: BasicUserDetails) => void;
+  onUserAction?: (action: string, user: T) => void;
   /** Additional excluded user IDs for invite flow */
   excludeUserIds?: number[];
   allowInviteByEmail?: boolean;
+  columnsToShow?: Column<T>[];
+  extraOptions?: Options<T>;
 };
 
-const UserManagementTable = ({
+const UserManagementTable = < T extends BasicUserDetails>({
   users,
+  convertUserToExtendedUser = basicConvertToExtended,
   setUsers,
   readonly,
   invites = [],
@@ -57,7 +71,14 @@ const UserManagementTable = ({
   onUserAction,
   excludeUserIds = [],
   allowInviteByEmail = false,
-}: UserManagementTableProps) => {
+  columnsToShow = [
+              { title: 'Firstname', field: 'firstname' },
+              { title: 'Lastname', field: 'lastname' },
+              { title: 'Preferred name', field: 'preferredname' },
+              { title: 'Institution', field: 'institution' },
+            ],
+    extraOptions
+}: UserManagementTableProps<T>) => {
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
 
@@ -65,16 +86,24 @@ const UserManagementTable = ({
     setOpen(true);
   };
 
-  const removeUser = (user: BasicUserDetails) => {
+  const removeUser = async (user: T) => {
     const newUsers = users.filter((u) => u.id !== user.id);
     setUsers(newUsers);
   };
 
-  const handleAddParticipants = (props: {
+const handleAddParticipants = async (props: {
     users: BasicUserDetails[];
     invites: Invite[];
   }) => {
-    setUsers([...users, ...props.users]);
+    const extendedUsers = await Promise.all(
+      users.map((u) => convertUserToExtendedUser(u))
+    );
+    
+    const extendedUsers2 = await Promise.all(
+      props.users.map((u) => convertUserToExtendedUser(u))
+    );
+
+    setUsers([...extendedUsers, ...extendedUsers2]);
     setInvites?.([...invites, ...props.invites]);
     setOpen(false);
   };
@@ -86,7 +115,7 @@ const UserManagementTable = ({
   // material-table decides whether to render the actions column from the
   // registered actions, not from their `hidden` flag, so in readonly mode we
   // register none at all to drop the column altogether
-  const rowActions: Action<BasicUserDetails>[] = !!readonly
+  const rowActions: Action<T>[] = !!readonly
     ? []
     : [
         {
@@ -104,20 +133,21 @@ const UserManagementTable = ({
           tooltip: 'Set Principal Investigator',
           onClick: (
             event: React.MouseEvent<JSX.Element>,
-            rowData: BasicUserDetails | BasicUserDetails[]
+            rowData: T | T[]
           ) => {
             event.preventDefault();
 
-            return new Promise<void>(() => {
+            return new Promise<void>((resolve) => {
               const user = Array.isArray(rowData) ? rowData[0] : rowData;
               removeUser(user);
               onUserAction?.('setPrincipalInvestigator', user);
+              resolve();
             });
           },
         },
       ];
 
-  const editable: MaterialTableProps<BasicUserDetails>['editable'] = !!readonly
+  const editable: MaterialTableProps<T>['editable'] = !!readonly
     ? {}
     : {
         onRowDelete: (oldData) =>
@@ -157,17 +187,14 @@ const UserManagementTable = ({
         <>
           <MaterialTable
             data={users}
-            columns={[
-              { title: 'Firstname', field: 'firstname' },
-              { title: 'Lastname', field: 'lastname' },
-              { title: 'Preferred name', field: 'preferredname' },
-              { title: 'Institution', field: 'institution' },
-            ]}
+            columns={columnsToShow}
             options={{
               showTitle: false,
               paging: true,
               pageSize: 10,
-            }}
+            ...extraOptions
+            }
+          }
             actions={rowActions}
             editable={editable}
           />
