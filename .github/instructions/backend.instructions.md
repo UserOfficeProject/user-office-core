@@ -8,7 +8,7 @@ applyTo: 'apps/backend/**/*.ts'
 Instructions for building high-quality backend services with Node.js, Express, GraphQL, and TypeScript following modern patterns, best practices, and dependency injection.
 
 ## Coding standards
-- Use JavaScript with ES2022 features and Node.js (20+) ESM modules]
+- Use TypeScript on Node.js 22+ (the backend compiles to CommonJS; see `tsconfig.json`)
 - Use Node.js built-in modules and avoid external dependencies where possible
 - Ask the user if you require any additional dependencies before adding them
 - Always use async/await for asynchronous code, and use 'node:util' promisify function to avoid callbacks
