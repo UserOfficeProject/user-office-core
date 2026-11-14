@@ -1,12 +1,5 @@
 import { GraphQLError } from 'graphql';
 
-import { Review, ReviewStatus } from '../../models/Review';
-import { TechnicalReview } from '../../models/TechnicalReview';
-import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
-import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
-import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
-import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
-import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import {
   createReviewObject,
@@ -15,6 +8,13 @@ import {
   ReviewRecord,
   TechnicalReviewRecord,
 } from './records';
+import { Review, ReviewStatus } from '../../models/Review';
+import { TechnicalReview } from '../../models/TechnicalReview';
+import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
+import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
+import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
+import { ReviewDataSource } from '../ReviewDataSource';
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   async setTechnicalReview(
@@ -385,7 +385,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.join('call', {
             'call.call_id': 'proposals.call_id',
           });
-          qb.where('call.call_fap_review_ended', false);
+          qb.where('call.end_fap_review', '>=', Date.now());
+          qb.where('call.start_fap_review', '<', Date.now());
         }
       })
       .whereIn('fap_id', fapIds)
@@ -455,7 +456,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               qb.join('call', {
                 'call.call_id': 'proposals.call_id',
               });
-              qb.where('call.call_fap_review_ended', false);
+              qb.where('call.end_fap_review', '>=', Date.now());
+              qb.where('call.start_fap_review', '<', Date.now());
             }
           })
           .whereIn('fap_id', fapIds)

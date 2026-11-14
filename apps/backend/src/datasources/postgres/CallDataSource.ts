@@ -120,7 +120,7 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     /**
      * NOTE: We are comparing dates instead of using the call_ended flag,
-     * because the flag is set once per hour and we could have a gap.
+     * because the flag is only supposed to be used for preventing workflow actions from being triggered twice.
      * TODO: Maybe there is a need to use the timezone setting here but not quite sure about it. Discussion is needed here!
      */
     const currentDate = new Date().toISOString();
