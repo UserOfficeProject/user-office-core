@@ -5,7 +5,7 @@ import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
-import { Template, TemplateGroupId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -73,17 +73,7 @@ type ProposalPdfTemplateRowDataType = TemplateRowDataType & {
 };
 
 type ProposalPdfTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      Template,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'questionaryCount'
-      | 'proposalPdfCallCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function ProposalPdfTemplatesTable(props: ProposalPdfTemplatesTableProps) {
@@ -126,7 +116,7 @@ function ProposalPdfTemplatesTable(props: ProposalPdfTemplatesTableProps) {
 
           return pdfTemplateRowData.proposalPdfCallCount === 0;
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
       <CallsModal
         templateId={selectedTemplateId}

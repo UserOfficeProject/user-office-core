@@ -6,12 +6,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 import StyledDialog from 'components/common/StyledDialog';
-import {
-  Proposal,
-  ProposalsFilter,
-  ProposalTemplate,
-  TemplateGroupId,
-} from 'generated/sdk';
+import { Proposal, ProposalsFilter, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import {
@@ -158,17 +153,7 @@ export type ProposalTemplateRowDataType = TemplateRowDataType & {
 };
 
 type ProposalTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      ProposalTemplate,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'callCount'
-      | 'questionaryCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
@@ -241,7 +226,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
             proposalTemplateRowData.questionaryCount === 0
           );
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
 
       <CallsModal
