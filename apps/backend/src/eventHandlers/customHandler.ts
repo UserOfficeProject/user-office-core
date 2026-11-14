@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 import { startWorkflow } from './workflowHandler';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -33,6 +34,10 @@ export default function createCustomHandler() {
   );
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
 
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+
   const getProposalByPk = async (proposalPk: number) => {
     const foundProposal = await proposalDataSource.get(proposalPk);
 
@@ -53,6 +58,18 @@ export default function createCustomHandler() {
 
     const eventBus = resolveApplicationEventBus();
     switch (event.type) {
+      case Event.PROPOSAL_SUBMITTED:
+        const isOnlyInternalCallOpen =
+          (await callDataSource.isCallEnded(event.proposal.callId)) &&
+          callDataSource.isCallEnded(event.proposal.callId, true);
+
+        if (isOnlyInternalCallOpen) {
+          eventBus.publish({
+            ...event,
+            type: Event.PROPOSAL_SUBMITTED_INTERNAL,
+          });
+        }
+        break;
       case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
         if (event.proposal.managementDecisionSubmitted) {
           eventBus.publish({

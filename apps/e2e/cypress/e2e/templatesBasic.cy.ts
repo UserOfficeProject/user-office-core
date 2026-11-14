@@ -1664,7 +1664,7 @@ context('Template Basic tests', () => {
       cy.finishedLoading();
     });
 
-    it.only('Should display date range selector', () => {
+    it('Should display date range selector', () => {
       cy.createDateTimeRangeQuestion(
         'What range of years do osprey come to Britain?'
       );
@@ -2174,8 +2174,11 @@ context('Template Basic tests', () => {
         .parent()
         .find('[aria-label="Edit"]')
         .click();
-      cy.get('[data-cy="name"]').type(emailTemplateName2);
-      cy.get('[data-cy="description"]').first().type(emailTemplateDescription2);
+      cy.get('[name="name"]').clear().type(emailTemplateName2);
+      cy.get('[data-cy="description"]')
+        .first()
+        .clear()
+        .type(emailTemplateDescription2);
       cy.get('[data-cy="submit"]').click();
       cy.notification({ variant: 'success', text: 'updated successfully' });
       cy.contains(emailTemplateName2);
@@ -2199,7 +2202,10 @@ context('Template Basic tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .clear()
+        .type('{selectall}{del}');
       cy.get('[data-cy="body"] .cm-content')
         .first()
         .type('p Proposal: #{proposalTitle}', {
@@ -2208,7 +2214,6 @@ context('Template Basic tests', () => {
         .should('contain.text', 'proposalTitle');
 
       cy.contains('Preview').click();
-      cy.wait('@emailTemplatePreview');
 
       cy.get('[data-cy="email-template-preview-frame"]')
         .its('0.contentDocument.body')
@@ -2234,20 +2239,22 @@ context('Template Basic tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[data-cy="body"] .cm-content').first().type('{selectall}{del}');
+      cy.get('[data-cy="body"] .cm-content')
+        .first()
+        .clear()
+        .type('{selectall}{del}');
       cy.get('[data-cy="body"] .cm-content')
         .first()
         .type('p #{', { parseSpecialCharSequences: false });
 
       cy.contains('Preview').click();
-      cy.wait('@emailTemplatePreview');
 
       cy.get('[data-cy="email-template-preview-error"]').should('be.visible');
 
       cy.get('.snackbar-error #notistack-snackbar').should('not.exist');
     });
 
-    it('Non-officer requests an email template preview → query resolves to null', () => {
+    it('N on-officer requests an email template preview → query resolves to null', () => {
       cy.login('user1').then((result) => {
         const token = result.externalTokenLogin;
 
@@ -2370,19 +2377,18 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="body"] .cm-content').first().type('<p> New line </p> ');
       cy.get('[data-cy="submit"]').click();
 
-      cy.contains('Versions').click();
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
-      cy.get('[data-cy=version-select]')
-        .find('li:first-child')
-        .click()
-        .then(() => {
-          cy.get('[data-cy="email-template-preview-frame"]')
-            .its('0.contentDocument.body')
-            .should(
-              'contain.text',
-              initialDBData.emailTemplates.template1.body
-            );
-        });
+      cy.contains('Version').click();
+
+      cy.get('#version-select').click();
+
+      cy.get('[data-cy="version-select-1"]').click();
+
+      cy.contains(initialDBData.emailTemplates.template1.body);
     });
   });
 });

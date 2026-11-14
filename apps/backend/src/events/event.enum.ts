@@ -42,6 +42,7 @@ export enum Event {
   PROPOSAL_CREATED = 'PROPOSAL_CREATED',
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
+  PROPOSAL_SUBMITTED_INTERNAL = 'PROPOSAL_SUBMITTED_INTERNAL',
   PROPOSAL_DELETED = 'PROPOSAL_DELETED',
   PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE = 'PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE',
   PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE',
@@ -160,6 +161,13 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
     {
       label: 'Event occurs when proposal is submitted',
       guard: isProposalSubmittedGuard,
+    },
+  ],
+  [
+    Event.PROPOSAL_SUBMITTED_INTERNAL,
+    {
+      label:
+        'Event occurs when proposal is submitted during internal call open',
     },
   ],
   [Event.PROPOSAL_DELETED, { label: 'Event occurs when proposal is removed' }],
