@@ -86,7 +86,7 @@ type ExperimentMessageData = {
   experimentId: string;
   experimentPk: number;
   startsAt: Date;
-  endsAt: Date;
+  endsAt: Date | null;
   status: string;
   proposal?: ProposalMessageData;
   samples?: Pick<Sample, 'id' | 'title'>[];
