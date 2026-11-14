@@ -116,7 +116,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               const value = event.target.value;
-              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+              // eslint-disable-next-line no-control-regex
+              const nonPrintableRegex = /[\x00-\x1F\x7F-\xA0]/g;
               const hasInvalid = nonPrintableRegex.test(value);
               const cleanedValue = value.replace(nonPrintableRegex, ' ');
               setTextLen(event.target.value.length);
