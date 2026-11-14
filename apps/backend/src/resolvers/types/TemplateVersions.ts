@@ -19,4 +19,7 @@ export class TemplateVersion {
 
   @Field(() => String)
   public createdTimeStamp: string;
+
+  @Field(() => String, { nullable: true })
+  public updateComment: string;
 }

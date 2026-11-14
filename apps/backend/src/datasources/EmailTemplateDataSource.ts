@@ -23,7 +23,8 @@ export interface EmailTemplateDataSource {
     description: string,
     useTemplateFile: boolean,
     subject?: string,
-    body?: string
+    body?: string,
+    updateComment?: string
   ): Promise<EmailTemplate>;
 
   delete(id: number): Promise<EmailTemplate>;

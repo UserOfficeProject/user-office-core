@@ -5,4 +5,5 @@ fragment templateVersion on TemplateVersion {
  versionNumber
  templateType
  createdTimeStamp
+ updateComment
  }
