@@ -4066,15 +4066,27 @@ context('Fap meeting components tests', () => {
       cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
 
-    it('Fap Secretary should be able to update avalibabity time', () => {
+    it('Fap Secretary should be able to update availability time when enabled for the FAP', () => {
       cy.login('officer');
+      cy.updateFap({
+        id: createdFapId,
+        code: fap1.code,
+        description: fap1.description,
+        numberRatingsRequired: 2,
+        gradeGuide: fap1.gradeGuide,
+        active: true,
+        reviewVisibility: 1,
+        editInstrumentAvailabilityTime: true,
+      });
+      cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
       cy.visit(`/FapPage/${createdFapId}?tab=5`);
 
       cy.finishedLoading();
 
       cy.get('[data-testid="AddAlarmIcon"]').first().closest('button').click();
 
-      cy.get('[data-cy="availability-time"]').type('10');
+      cy.get('[data-cy="availability-time"]').clear().type('10');
       cy.get('[data-cy="submit-update-time"]').click();
 
       cy.contains('Availability time updated successfully!');
