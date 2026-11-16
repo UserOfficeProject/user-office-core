@@ -2532,7 +2532,7 @@ context('Fap meeting components tests', () => {
         .and('have.length', 1);
     });
 
-    it.only('Officer should be able to reorder proposal with drag and drop', () => {
+    it('Officer should be able to reorder proposal with drag and drop', () => {
       const largeInstrumentAvailableTime = 27;
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
