@@ -56,7 +56,7 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
       request.http?.headers.get('apollographql-client-name') || 'unknown';
     const isFrontendClient = clientName.startsWith('UOP frontend');
     if (isFrontendClient) {
-      logger.logInfo('GraphQL request received', {
+      logger.logDebug('GraphQL request received', {
         client: clientName,
         client_type: 'frontend',
         operation: operationName,

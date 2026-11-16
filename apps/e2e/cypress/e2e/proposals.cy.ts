@@ -222,10 +222,27 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Principal investigator in the proposal table should not be empty', () => {
+    it('Principal investigator without a last name should be displayed', () => {
       cy.login('officer');
+      cy.intercept('POST', '/graphql', (req) => {
+        if (req.body?.operationName === 'getProposalsCore') {
+          req.alias = 'getProposalsCore';
+          req.continue((res) => {
+            const proposal = res.body?.data?.proposalsView?.proposalViews?.find(
+              (proposalView: { proposalId: string }) =>
+                proposalView.proposalId === createdProposalId
+            );
+
+            if (proposal?.principalInvestigator) {
+              proposal.principalInvestigator.lastname = '';
+            }
+          });
+        }
+      });
+
       cy.visit('/');
 
+      cy.wait('@getProposalsCore');
       cy.finishedLoading();
 
       cy.contains('td', newProposalTitle)
@@ -897,6 +914,72 @@ context('Proposal tests', () => {
           'have.text',
           'Be aware that selected proposals have different statuses and changing status will affect all of them.'
         );
+    });
+
+    it('User officer should see all proposals after switching the status filter back to All and keep the filter on reload', () => {
+      cy.cloneProposals({
+        callId: initialDBData.call.id,
+        proposalsToClonePk: [createdProposalPk],
+      });
+      cy.changeProposalsStatus({
+        workflowStatusId: createdFapMeetingWorkflowStatusId,
+        proposalPks: [createdProposalPk],
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get(
+        `[role="listbox"] [data-value="${initialDBData.proposalStatuses.draft.id}"]`
+      ).click();
+
+      cy.finishedLoading();
+
+      cy.location('search').should(
+        'include',
+        `status=${initialDBData.proposalStatuses.draft.id}`
+      );
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'not.contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      // The status filter is read back from the URL after a reload
+      cy.reload();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-filter"]').should(
+        'contain.text',
+        initialDBData.proposalStatuses.draft.name
+      );
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'not.contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
+
+      // Switching back to "All" must not filter on a non-existing "ALL" status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('[role="listbox"] [data-value="ALL"]').click();
+
+      cy.finishedLoading();
+
+      cy.location('search').should('include', 'status=ALL');
+      cy.get('[data-cy="officer-proposals-table"]').should(
+        'contain',
+        createdProposalId
+      );
+      cy.contains(clonedProposalTitle).should('exist');
     });
 
     it('User officer should be able to opt-in to run status actions when changing status', () => {
@@ -2225,6 +2308,72 @@ context('Proposal tests', () => {
           });
         }
       });
+    });
+  });
+
+  describe('False workflowId error toast', () => {
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
+      cy.resetDB(true);
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it("Doesn't show error toast, when status is successfully edited", () => {
+      // Make sure the test doesnt fail on the unhandled exception, but the assertion below
+      // Checking the uncaught exception seemed unreliable
+      Cypress.on('uncaught:exception', () => {
+        return false;
+      });
+
+      cy.login('officer');
+      cy.visit('/Proposals');
+
+      // Filter for SCHEDULING status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="SCHEDULING"]').click();
+
+      // Change first proposal to DRAFT
+      cy.get('td input[type="checkbox"]').first().click();
+      cy.get('[data-cy="change-proposal-status"]').click();
+      cy.get('[data-cy="status-selection"]').click();
+      cy.get('li[data-option-index="0"]').click();
+
+      const getWorkflowStatusesSpy = cy
+        .spy()
+        .as('graphql.getWorkflowStatuses.spy');
+
+      cy.intercept('POST', 'http://localhost:3000/graphql', (req) => {
+        const { body } = req;
+        if (body.operationName == 'getWorkflowStatuses') {
+          getWorkflowStatusesSpy();
+          req.alias = `graphql.${body.operationName}`;
+        }
+      });
+
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+      // Filter for DRAFT status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="DRAFT"]').click();
+
+      // Check that the proposal has been successfully edited to DRAFT
+      cy.get('td input[type="checkbox"]').first().should('exist');
+
+      // The request shouldn't even happen, this is just to check that even if it does, it fails with 400
+      cy.then(() => {
+        if (getWorkflowStatusesSpy.called) {
+          cy.wait('@graphql.getWorkflowStatuses')
+            .its('response.statusCode')
+            .should('not.equal', 400);
+        }
+      });
+
+      cy.get('@graphql.getWorkflowStatuses.spy').should('not.have.been.called');
     });
   });
 });

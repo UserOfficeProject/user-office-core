@@ -66,6 +66,7 @@ import TagQueries from './queries/TagQueries';
 import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
+import TemplateVersionQueries from './queries/TemplateVersionQueries';
 import UnitQueries from './queries/UnitQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
@@ -110,6 +111,7 @@ const context: BasicResolverContext = {
     experiment: container.resolve(ExperimentQueries),
     emailTemplate: container.resolve(EmailTemplateQueries),
     roleTags: container.resolve(RoleTagsQuery),
+    templateVersions: container.resolve(TemplateVersionQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),

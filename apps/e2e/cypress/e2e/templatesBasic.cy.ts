@@ -2355,5 +2355,34 @@ context('Template Basic tests', () => {
         text: 'Could not delete email template',
       });
     });
+
+    it('User officer can see email template version history', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('<p> New line </p> ');
+      cy.get('[data-cy="submit"]').click();
+
+      cy.contains('Versions').click();
+
+      cy.get('[data-cy=version-select]')
+        .find('li:first-child')
+        .click()
+        .then(() => {
+          cy.get('[data-cy="email-template-preview-frame"]')
+            .its('0.contentDocument.body')
+            .should(
+              'contain.text',
+              initialDBData.emailTemplates.template1.body
+            );
+        });
+    });
   });
 });

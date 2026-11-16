@@ -370,6 +370,9 @@ export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
 
+  @Field(() => Int, { nullable: true })
+  maxWords: number | null;
+
   @Field(() => Boolean)
   allowImages: boolean;
 }

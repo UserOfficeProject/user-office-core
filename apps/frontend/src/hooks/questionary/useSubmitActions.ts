@@ -7,9 +7,18 @@ import { proposalBasisPreSubmit } from 'components/questionary/questionaryCompon
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
 import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
 import { technicalReviewBasisPreSubmit } from 'components/questionary/questionaryComponents/TechnicalReviewBasis/QuestionaryComponentTechnicalReviewBasis';
-import { visitBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
+import {
+  visitBasisPostSubmit,
+  visitBasisPreSubmit,
+} from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { Answer, DataType, FeatureId, Sdk } from 'generated/sdk';
+import {
+  Answer,
+  DataType,
+  FeatureId,
+  Sdk,
+  TemplateGroupId,
+} from 'generated/sdk';
 import {
   Event,
   QuestionarySubmissionState,
@@ -58,18 +67,12 @@ export function usePreSubmitActions() {
 }
 
 export function usePostSubmitActions() {
-  return (answers: Answer[]): SubmitAction[] => {
-    const actions = answers
-      .flatMap((answer) => {
-        // nothing here for now remove eslint warning if we ever fill it
-        // eslint-disable-next-line no-empty
-        switch (answer.question.dataType) {
-        }
+  return (state: QuestionarySubmissionState): SubmitAction[] => {
+    // Publish visit updates for every saved topic, not just the visit basis step.
+    if (state.templateGroupId === TemplateGroupId.VISIT_REGISTRATION) {
+      return [visitBasisPostSubmit()];
+    }
 
-        return [];
-      })
-      .filter((promise) => promise !== null);
-
-    return actions;
+    return [];
   };
 }

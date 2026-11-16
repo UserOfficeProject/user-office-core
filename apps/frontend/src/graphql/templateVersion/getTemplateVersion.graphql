@@ -1,0 +1,5 @@
+query getTemplateVersion($templateId: Int!, $versionNumber: Int, $templateType: String ) {
+  templateVersion(templateId: $templateId, versionNumber: $versionNumber, templateType: $templateType) {
+  ...templateVersion
+  }
+}

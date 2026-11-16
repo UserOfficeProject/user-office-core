@@ -55,7 +55,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
 
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
-    shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
@@ -293,7 +293,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
       title: 'Visitor name',
       render: (rowData: RowType) => (
         <VisitorName to={`/People/${rowData.userId}`}>
-          {getFullUserName(rowData.user)}
+          {getFullUserName(rowData.user, true)}
         </VisitorName>
       ),
       customSort: (a: RowType, b: RowType) => {

@@ -20,8 +20,6 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
-// `startsAt`/`endsAt` are Luxon DateTimes once edited, but come back as ISO
-// strings when the registration is loaded from the backend.
 const toDateTime = (value: unknown): DateTime | undefined => {
   if (value instanceof DateTime) {
     return value;
@@ -73,7 +71,10 @@ function QuestionaryComponentVisitBasis({
       onChange={({ from, to }: DayRange) => {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-          itemWithQuestionary: { startsAt: from, endsAt: to },
+          itemWithQuestionary: {
+            startsAt: from?.toISODate(),
+            endsAt: to?.toISODate(),
+          },
         });
       }}
     />
@@ -97,7 +98,14 @@ const updateVisitRegistration = async (
   api: Sdk,
   update: UpdateVisitRegistrationMutationVariables
 ) => {
-  const { updateVisitRegistration } = await api.updateVisitRegistration(update);
+  const payload: UpdateVisitRegistrationMutationVariables = {
+    ...update,
+    startsAt: update.startsAt,
+    endsAt: update.endsAt,
+  };
+
+  const { updateVisitRegistration } =
+    await api.updateVisitRegistration(payload);
 
   return updateVisitRegistration;
 };
@@ -107,30 +115,47 @@ const visitBasisPreSubmit =
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const { registration } = state as VisitRegistrationSubmissionState;
 
-    const isStarted = !!registration.questionary.questionaryId;
-
-    if (isStarted === false) {
-      await createVisitRegistration(
+    if (!registration.questionary.questionaryId) {
+      const newRegistration = await createVisitRegistration(
         api,
         registration.visitId,
         registration.userId
       );
-      const newRegistration = await updateVisitRegistration(api, registration);
+      // Creation returns empty dates; keep the user's unsaved selection.
+      const registrationWithDates = {
+        ...newRegistration,
+        startsAt: registration.startsAt,
+        endsAt: registration.endsAt,
+      };
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
-        itemWithQuestionary: newRegistration,
+        itemWithQuestionary: registrationWithDates,
       });
 
       return newRegistration.questionary.questionaryId;
-    } else {
-      const updRegistration = await updateVisitRegistration(api, registration);
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-        itemWithQuestionary: updRegistration,
-      });
-
-      return updRegistration.questionary.questionaryId;
     }
+
+    return registration.questionary.questionaryId;
   };
 
-export { QuestionaryComponentVisitBasis, visitBasisPreSubmit };
+const visitBasisPostSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const { registration } = state as VisitRegistrationSubmissionState;
+    const updatedRegistration = await updateVisitRegistration(
+      api,
+      registration
+    );
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: updatedRegistration,
+    });
+
+    return updatedRegistration.questionary.questionaryId;
+  };
+
+export {
+  QuestionaryComponentVisitBasis,
+  visitBasisPreSubmit,
+  visitBasisPostSubmit,
+};

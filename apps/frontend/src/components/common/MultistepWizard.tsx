@@ -159,6 +159,6 @@ export const WizardStep = ({
   children,
 }: {
   title: string;
-  validationSchema: Yup.AnyObjectSchema;
+  validationSchema: Yup.ISchema<unknown>;
   children: React.ReactNode;
 }) => <>{children}</>;

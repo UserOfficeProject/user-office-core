@@ -68,6 +68,7 @@ const IGNORED_PROPERTIES = new Set([
   'replace',
   'getTime',
   'getFullYear',
+  'find',
 ]);
 
 export function detectPugVariables(subject: string, body: string): string[] {
