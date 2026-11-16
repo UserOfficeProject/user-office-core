@@ -294,7 +294,7 @@ const FinalRankingForm = ({
 
                       setFieldValue(
                         'recommendedTimeAllocation',
-                        numericValue ? numericValue : null
+                        value === '' ? null : numericValue
                       );
                     }}
                   />

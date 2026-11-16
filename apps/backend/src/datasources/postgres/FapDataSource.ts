@@ -1100,6 +1100,12 @@ export default class PostgresFapDataSource implements FapDataSource {
       );
     }
 
+    if (saveFapMeetingDecisionInput.recommendedInstrumentId !== undefined) {
+      updateQuery.push(
+        'recommended_instrument_id = EXCLUDED.recommended_instrument_id'
+      );
+    }
+
     const [fapMeetingDecisionRecord]: FapMeetingDecisionRecord[] = (
       await database.raw(
         `? ON CONFLICT (fap_proposal_id)

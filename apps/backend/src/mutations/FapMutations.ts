@@ -544,18 +544,7 @@ export default class FapMutations {
       );
     }
 
-    const proposal = await this.proposalDataSource.get(args.proposalPk);
-
-    if (!proposal?.primaryKey) {
-      return rejection(
-        'Can not add Fap meeting decision to non existing proposal',
-        { args }
-      );
-    }
-
-    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
-
-    const fapProposal = this.dataSource.getFapProposal(
+    const fapProposal = await this.dataSource.getFapProposal(
       args.fapId,
       args.proposalPk,
       args.recommendedInstrumentId
@@ -567,6 +556,31 @@ export default class FapMutations {
         { args }
       );
     }
+
+    if (fapProposal.fapProposalId !== args.fapProposalId) {
+      return rejection(
+        'Can not save FAP meeting decision because fapProposalId does not match the fapProposalId of the FAP proposal',
+        { args }
+      );
+    }
+
+    if (fapProposal.fapInstrumentMeetingSubmitted) {
+      return rejection(
+        'Can not save FAP meeting decision because the FAP instrument meeting has already been submitted',
+        { args }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal?.primaryKey) {
+      return rejection(
+        'Can not add Fap meeting decision to non existing proposal',
+        { args }
+      );
+    }
+
+    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
     return this.dataSource
       .saveFapMeetingDecision(args, submittedBy)

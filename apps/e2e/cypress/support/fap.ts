@@ -106,6 +106,9 @@ const saveFapMeetingDecision = (
         fapId: saveFapMeetingDecisionInput.saveFapMeetingDecisionInput.fapId,
         proposalPk:
           saveFapMeetingDecisionInput.saveFapMeetingDecisionInput.proposalPk,
+        instrumentId:
+          saveFapMeetingDecisionInput.saveFapMeetingDecisionInput
+            .recommendedInstrumentId,
       })
       .then((fapProposal) => {
         return api.saveFapMeetingDecision({

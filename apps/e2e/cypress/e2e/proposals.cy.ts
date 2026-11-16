@@ -2186,7 +2186,7 @@ context('Proposal tests', () => {
       cy.login('officer');
       cy.visit('/');
     });
-    it.only('Should be able to download proposal pdf for a proposal which contains instrument picker question', function () {
+    it('Should be able to download proposal pdf for a proposal which contains instrument picker question', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         /*temporarily skipping, there is some issue on github actions which fails 
         when downloading pdfs specifically in stfc enviroment

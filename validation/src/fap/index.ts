@@ -48,6 +48,10 @@ export const assignFapMemberToProposalValidationSchema = Yup.object().shape({
 });
 
 export const saveFapMeetingDecisionValidationSchema = Yup.object().shape({
+  recommendedTimeAllocation: Yup.number()
+    .min(0, ({ min }) => `Must be greater than or equal to ${min}`)
+    .max(1e5, ({ max }) => `Must be less than or equal to ${max}`)
+    .nullable(),
   proposalPk: Yup.number().required(),
   commentForUser: Yup.string().nullable(),
   commentForManagement: Yup.string().nullable(),

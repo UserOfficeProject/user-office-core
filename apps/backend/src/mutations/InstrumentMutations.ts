@@ -461,7 +461,6 @@ export default class InstrumentMutations {
             rankOrder: proposalWithRanking.rankOrder,
             recommendedInstrumentId: args.instrumentId,
             fapId: args.fapId,
-            recommendedTimeAllocation: null,
             fapProposalId: proposalWithRanking.fapProposalId,
           });
         })

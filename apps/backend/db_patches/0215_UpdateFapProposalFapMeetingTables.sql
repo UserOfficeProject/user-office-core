@@ -4,11 +4,12 @@ BEGIN
 	IF register_patch('UpdateFapProposalFapMeetingTables.sql', 'TCMeldrum', 'Update FapProposal and FapMeeting tables', '2026-09-23') THEN
 	BEGIN
 
-		ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS recommended_time_allocation integer;
 
         ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS fap_proposal_id integer;
+            ADD COLUMN IF NOT EXISTS recommended_time_allocation integer;
+
+        ALTER TABLE fap_meeting_decisions
+            ADD COLUMN IF NOT EXISTS fap_proposal_id integer;
 
         UPDATE fap_meeting_decisions AS fmd
             SET fap_proposal_id = fp.fap_proposal_id
@@ -16,13 +17,48 @@ BEGIN
             WHERE fmd.proposal_pk = fp.proposal_pk
             AND fmd.instrument_id = fp.instrument_id;
 
+
+        INSERT INTO fap_meeting_decisions 
+                    (fap_proposal_id, 
+                    recommended_time_allocation, 
+                    rank_order, proposal_pk, 
+                    instrument_id, 
+                    fap_id, 
+                    comment_for_management, 
+                    comment_for_user, 
+                    recommendation, 
+                    submitted, 
+                    submitted_by)
+                SELECT 
+                    fp.fap_proposal_id, 
+                    fp.fap_time_allocation, 
+                    0, 
+                    fp.proposal_pk, 
+                    fp.instrument_id, 
+                    fp.fap_id, 
+                    NULL, 
+                    NULL, 
+                    NULL, 
+                    false, 
+                    NULL
+                FROM fap_proposals AS fp
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM fap_meeting_decisions AS fmd
+                    WHERE fmd.instrument_id = fp.instrument_id
+                    and fmd.proposal_pk = fp.proposal_pk
+                );
+
+        
+        -- Delete any rows in fap_meeting_decisions that do not have a corresponding fap_proposal_id
+        delete from fap_meeting_decisions
+        where fap_proposal_id is null;
+
 		UPDATE fap_meeting_decisions AS fmd
 			SET recommended_time_allocation = fp.fap_time_allocation
 			FROM fap_proposals AS fp
 			WHERE fmd.fap_proposal_id = fp.fap_proposal_id;
 
-		ALTER TABLE fap_meeting_decisions
-			ADD COLUMN IF NOT EXISTS recommended_time_allocation integer;
 
         ALTER TABLE fap_meeting_decisions DROP CONSTRAINT fap_meeting_decisions_pkey;
         ALTER TABLE fap_meeting_decisions ADD PRIMARY KEY (fap_proposal_id);
@@ -44,7 +80,7 @@ BEGIN
             proposal.call_id,
             proposal.proposer_id,
             proposal.instrument_id,
-            proposal.recommended_time_allocation,
+            proposal.recommended_time_allocation AS fap_time_allocation,
             proposal.questionary_id,
             grade.avg AS average_grade,
             proposal.public_comment AS comment,

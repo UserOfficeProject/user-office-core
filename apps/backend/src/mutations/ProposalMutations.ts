@@ -470,7 +470,7 @@ export default class ProposalMutations {
       }
     }
 
-    managementTimeAllocations?.map(async (allocation) => {
+    for (const allocation of managementTimeAllocations ?? []) {
       const isFapProposalInstrumentSubmitted =
         await this.fapDataSource.isFapProposalInstrumentSubmitted(
           primaryKey,
@@ -487,7 +487,7 @@ export default class ProposalMutations {
           { args, agent }
         );
       }
-    });
+    }
 
     // Need to check for undefined and null because 0/UNSET is falsy.
     if (finalStatus !== undefined && finalStatus !== null) {

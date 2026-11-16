@@ -317,7 +317,11 @@ const FapInstrumentProposalsTable = ({
           ) {
             return a.proposalAverageScore < b.proposalAverageScore ? 1 : -1;
           } else {
-            return -1;
+            if (a.proposalAverageScore === '-') {
+              return 1;
+            } else {
+              return -1;
+            }
           }
         })
         .sort(sortByRankOrder)
