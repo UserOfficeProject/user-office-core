@@ -13,7 +13,11 @@ export default function TechniqueProposalNotice() {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper margin={[0, 0, 2, 0]}>
-        {loadingContent ? <div>Loading...</div> : parse(pageContent as string)}
+        {loadingContent ? (
+          <div>Loading...</div>
+        ) : (
+          parse(Array.isArray(pageContent) ? '' : pageContent)
+        )}
       </StyledPaper>
     </StyledContainer>
   );

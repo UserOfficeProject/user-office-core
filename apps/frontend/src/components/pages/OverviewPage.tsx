@@ -97,7 +97,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
             {loadingContent ? (
               <div>Loading...</div>
             ) : (
-              parse(pageContent as string)
+              parse(Array.isArray(pageContent) ? '' : pageContent)
             )}
           </Paper>
         )}
