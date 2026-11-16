@@ -18,6 +18,7 @@ import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -35,6 +36,7 @@ import {
 } from '../eventHandlers/workflowEntities/proposal/statusActionEngine';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
+import { Experiment, ExperimentStatus } from '../models/Experiment';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -81,7 +83,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalInternalCommentsDataSource)
     private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
     @inject(Tokens.WorkflowDataSource)
-    private workflowDataSource: WorkflowDataSource
+    private workflowDataSource: WorkflowDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -726,6 +730,16 @@ export default class ProposalMutations {
       args.workflowStatusId
     );
 
+    enum TechniqueProposalStatus {
+      DRAFT = 'DRAFT',
+      SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
+      UNDER_REVIEW = 'UNDER_REVIEW',
+      APPROVED = 'APPROVED',
+      UNSUCCESSFUL = 'UNSUCCESSFUL',
+      FINISHED = 'FINISHED',
+      EXPIRED = 'EXPIRED',
+    }
+
     for (const proposal of proposals) {
       const currentWorkflowStatus =
         await this.workflowDataSource.getWorkflowStatus(
@@ -754,16 +768,6 @@ export default class ProposalMutations {
           'Could not change status of technique proposal(s): same status',
           logContext
         );
-      }
-
-      enum TechniqueProposalStatus {
-        DRAFT = 'DRAFT',
-        SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
-        UNDER_REVIEW = 'UNDER_REVIEW',
-        APPROVED = 'APPROVED',
-        UNSUCCESSFUL = 'UNSUCCESSFUL',
-        FINISHED = 'FINISHED',
-        EXPIRED = 'EXPIRED',
       }
 
       if (!(newWorkflowStatus.statusId in TechniqueProposalStatus)) {
@@ -834,6 +838,45 @@ export default class ProposalMutations {
           'Could not change status of technique proposal(s): forbidden status transition',
           logContext
         );
+      }
+    }
+
+    // Create an experiment for each proposal that is being approved
+    if (newWorkflowStatus?.statusId === TechniqueProposalStatus.APPROVED) {
+      for (const proposal of proposals) {
+        const proposalInstruments =
+          await this.instrumentDataSource.getInstrumentsByProposalPk(
+            proposal.primaryKey
+          );
+
+        // APPROVED transitions are only allowed when an instrument is already assigned
+        const instrument = proposalInstruments[0];
+
+        const startsAt = new Date();
+        const endsAt = new Date(startsAt);
+        endsAt.setFullYear(startsAt.getFullYear() + 1);
+
+        const experimentToAdd = {
+          startsAt,
+          endsAt,
+          scheduledEventId: proposal.primaryKey,
+          proposalPk: proposal.primaryKey,
+          status: ExperimentStatus.DRAFT,
+          localContactId: null,
+          instrumentId: instrument.id,
+        } as Omit<
+          Experiment,
+          'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+        >;
+
+        try {
+          await this.experimentDataSource.create(experimentToAdd);
+        } catch (error) {
+          logger.logException(
+            `Could not create experiment for approved technique proposal: ${proposal.proposalId}`,
+            error
+          );
+        }
       }
     }
 

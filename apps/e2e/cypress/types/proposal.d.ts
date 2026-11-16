@@ -17,6 +17,8 @@ import {
   CloneProposalsMutationVariables,
   CloneProposalsMutation,
   GetProposalsQueryVariables,
+  GetAllExperimentsQueryVariables,
+  GetAllExperimentsQuery,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -94,6 +96,18 @@ declare global {
       changeProposalsStatus: (
         changeProposalStatusInput: ChangeProposalsStatusMutationVariables
       ) => Cypress.Chainable<ChangeProposalsStatusMutation>;
+
+      /**
+       * Get all experiments, optionally filtered/searched.
+       *
+       * @returns {typeof getExperiments}
+       * @memberof Chainable
+       * @example
+       *    cy.getExperiments({ searchText: '123' })
+       */
+      getExperiments: (
+        getExperimentsInput?: GetAllExperimentsQueryVariables
+      ) => Cypress.Chainable<GetAllExperimentsQuery>;
 
       /**
        * Allocates time for the proposal and optionally submits
