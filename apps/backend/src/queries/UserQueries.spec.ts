@@ -33,6 +33,8 @@ import {
   AuthJwtPayload,
   UserJWT,
 } from '../models/User';
+import { resolveBasicUserDetailsReference } from '../resolvers/types/BasicUserDetails';
+import { resolveUserReference } from '../resolvers/types/User';
 import { verifyToken } from '../utils/jwt';
 
 const userQueries = container.resolve(UserQueries);
@@ -110,15 +112,68 @@ describe('UserQueries', () => {
       ).resolves.toMatchObject(user);
     });
 
-    test('Resolves federation references with basic user metadata', async () => {
+    test('Resolves basic-user federation references with institution metadata', async () => {
       jest
         .spyOn(userQueries.dataSource, 'getBasicUserInfo')
         .mockResolvedValue(user);
 
       await expect(
-        userQueries.byRef(dummyUserWithRole, user.id)
+        resolveBasicUserDetailsReference(
+          { id: user.id },
+          { user: dummyUserWithRole, queries: { user: userQueries } }
+        )
       ).resolves.toEqual(user);
     });
+
+    test('Preserves the full user object for User federation references', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getUser')
+        .mockResolvedValue(dummyUser);
+
+      await expect(
+        resolveUserReference(
+          { id: dummyUser.id },
+          { user: dummyUserWithRole, queries: { user: userQueries } }
+        )
+      ).resolves.toBe(dummyUser);
+    });
+
+    test.each([resolveUserReference, resolveBasicUserDetailsReference])(
+      'Rejects unauthenticated federation lookups through %p',
+      async (resolveReference) => {
+        const getUser = jest.spyOn(userQueries.dataSource, 'getUser');
+        const getBasicUserInfo = jest.spyOn(
+          userQueries.dataSource,
+          'getBasicUserInfo'
+        );
+
+        await expect(
+          resolveReference(
+            { id: user.id },
+            { user: null, queries: { user: userQueries } }
+          )
+        ).resolves.toBeNull();
+        expect(getUser).not.toHaveBeenCalled();
+        expect(getBasicUserInfo).not.toHaveBeenCalled();
+      }
+    );
+
+    test.each([resolveUserReference, resolveBasicUserDetailsReference])(
+      'Returns null for missing users through %p',
+      async (resolveReference) => {
+        jest.spyOn(userQueries.dataSource, 'getUser').mockResolvedValue(null);
+        jest
+          .spyOn(userQueries.dataSource, 'getBasicUserInfo')
+          .mockResolvedValue(null);
+
+        await expect(
+          resolveReference(
+            { id: user.id },
+            { user: dummyUserWithRole, queries: { user: userQueries } }
+          )
+        ).resolves.toBeNull();
+      }
+    );
   });
 
   test('A user is not allowed to fetch roles', () => {

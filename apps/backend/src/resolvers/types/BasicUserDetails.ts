@@ -57,7 +57,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 
 export async function resolveBasicUserDetailsReference(
   ...params: any
-): Promise<BasicUserDetails> {
+): Promise<BasicUserDetails | null> {
   // the order of the parameters and types are messed up,
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
@@ -65,9 +65,5 @@ export async function resolveBasicUserDetailsReference(
   const [reference, ctx]: [Pick<BasicUserDetails, 'id'>, ResolverContext] =
     params;
 
-  // dataSource.get can be null, even with non-null operator the compiler complains
-  return (await (ctx.queries.user.byRef(
-    ctx.user,
-    reference.id
-  ) as unknown)) as BasicUserDetails;
+  return ctx.queries.user.basicByRef(ctx.user, reference.id);
 }

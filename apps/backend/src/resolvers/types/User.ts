@@ -248,17 +248,15 @@ export class UserResolver {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function resolveUserReference(...params: any): Promise<User> {
+export async function resolveUserReference(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ...params: any
+): Promise<User | null> {
   // the order of the parameters and types are messed up,
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easiest way to make the compiler happy and use real types
   const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
 
-  // dataSource.get can be null, even with non-null operator the compiler complains
-  return (await (ctx.queries.user.byRef(
-    ctx.user,
-    reference.id
-  ) as unknown)) as User;
+  return ctx.queries.user.byRef(ctx.user, reference.id);
 }
