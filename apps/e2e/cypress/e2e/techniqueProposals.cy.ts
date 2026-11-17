@@ -2204,6 +2204,127 @@ context('Technique Proposal tests', () => {
         expect(proposalExperiments).to.have.lengthOf(0);
       });
     });
+
+    it('No duplicate experiment is created when a scientist re-approves a technique proposal that already has an experiment', function () {
+      /*
+      The scientist approves proposal 1 from UNDER_REVIEW, which creates a
+      DRAFT experiment. For testing purpose we use the user officer role to move the proposal to
+      UNSUCCESSFUL and back to UNDER_REVIEW (the officer path does not
+      create experiments), so the scientist can approve it again. Because an
+      experiment already exists, the second approval must not create a
+      duplicate experiment.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      /*
+      First approval: creates a DRAFT experiment for the proposal.
+      */
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(approvedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+      cy.finishedLoading();
+
+      // The proposal is now shown as approved
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', approvedStatus.name);
+
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(1);
+
+        const experiment = proposalExperiments[0];
+
+        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.instrumentId).to.eq(createdInstrumentId1);
+        expect(experiment.status).to.eq('DRAFT');
+      });
+
+      /*
+      The user officer moves the proposal to UNSUCCESSFUL and back to
+      UNDER_REVIEW so the scientist can approve it a second time. The
+      instrument stays assigned, so both transitions are allowed.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: unsuccessfulStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.changeProposalsStatus({
+          proposalPks: createdProposalPk1,
+          workflowStatusId: underReviewStatus.workflowStatusId as number,
+        });
+      });
+
+      /*
+      Second approval: the proposal already has an experiment, so no
+      duplicate experiment may be created.
+      */
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(approvedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+      cy.finishedLoading();
+
+      // The proposal is now shown as approved again
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', approvedStatus.name);
+
+      /*
+      Only the experiment created by the first approval should exist.
+      */
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(1);
+
+        const experiment = proposalExperiments[0];
+
+        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.instrumentId).to.eq(createdInstrumentId1);
+        expect(experiment.status).to.eq('DRAFT');
+      });
+    });
   });
 
   describe('Technique proposal PDF download tests', () => {
