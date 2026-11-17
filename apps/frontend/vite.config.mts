@@ -38,6 +38,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     },
     resolve: {
       preserveSymlinks: true,
+      tsconfigPaths: true,
       alias: [
         // @mui/icons-material v5 has no "exports" map, so `@mui/icons-material/<Icon>`
         // resolves to a CommonJS file.
@@ -48,16 +49,6 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           find: /^@mui\/icons-material\/(?!esm\/)(.+)$/,
           replacement: '@mui/icons-material/esm/$1',
         },
-        { find: 'context', replacement: '/src/context' },
-        { find: 'hooks', replacement: '/src/hooks' },
-        { find: 'utils', replacement: '/src/utils' },
-        { find: 'generated', replacement: '/src/generated' },
-        { find: 'i18n', replacement: '/src/i18n' },
-        { find: 'styles', replacement: '/src/styles' },
-        { find: 'components', replacement: '/src/components' },
-        { find: 'models', replacement: '/src/models' },
-        { find: 'units', replacement: '/src/units' },
-        { find: 'images', replacement: '/src/images' },
       ],
     },
     build: {

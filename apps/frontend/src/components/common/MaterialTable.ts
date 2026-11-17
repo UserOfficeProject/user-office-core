@@ -7,7 +7,7 @@ import MaterialTableModule from '@material-table/core';
  * https://vite.dev/guide/migration#consistent-commonjs-interop
  * https://rolldown.rs/in-depth/bundling-cjs#ambiguous-default-import-from-cjs-modules
  */
-// TODO: Remove once @mui/icons-material table is upgraded to ES modules
+// TODO: Remove once @material-table/core table is upgraded to ES modules
 type CjsInterop<T> = T & { __esModule?: boolean; default?: T };
 const cjsModule = MaterialTableModule as CjsInterop<typeof MaterialTableModule>;
 
