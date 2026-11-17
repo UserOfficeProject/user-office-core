@@ -39,7 +39,7 @@ const FapMeetingDecision = ({
     <div data-cy="faps-meeting-components-decision">
       <StyledPaper margin={[2, 0]}>
         {fapMeetingDecisions.map((fmd) => (
-          <Fragment key={fmd.instrumentId}>
+          <Fragment key={fmd.recommendedInstrumentId}>
             <Typography
               variant="h6"
               component="h2"
@@ -49,7 +49,7 @@ const FapMeetingDecision = ({
               gutterBottom
             >
               {getFapCodeById(fmd.fapId)} - {t('FAP')} Meeting decision
-              (Instrument: {getInstrumentNameById(fmd.instrumentId)})
+              (Instrument: {getInstrumentNameById(fmd.recommendedInstrumentId)})
             </Typography>
             <Table>
               <TableBody>
@@ -57,7 +57,7 @@ const FapMeetingDecision = ({
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     Rank
                   </TableCell>
-                  <TableCell width="25%">{fmd.rankOrder || '-'}</TableCell>
+                  <TableCell width="25%">{fmd.meetingScore || '-'}</TableCell>
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     {t('FAP')} meeting recommendation
                   </TableCell>

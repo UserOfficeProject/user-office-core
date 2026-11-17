@@ -51,38 +51,44 @@ const mockUser = new User(
 
 const mockFapMeetingDecision = new FapMeetingDecision(
   123, // proposalPk
-  1, // rankOrder
   ProposalEndStatus.ACCEPTED, // recommendation
   'Comment for user', // commentForUser
   'Comment for management', // commentForManagement
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  5, // fapProposalId
+  '2' // meetingScore
 );
 
 const mockRejectedFapMeetingDecision = new FapMeetingDecision(
   123, // proposalPk
-  2, // rankOrder
   ProposalEndStatus.REJECTED, // recommendation
   'Rejected comment for user', // commentForUser
   'Rejected comment for management', // commentForManagement
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  5, // fapProposalId
+  '1' // meetingScore
 );
 
 const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
   123, // proposalPk
-  1, // rankOrder
   ProposalEndStatus.ACCEPTED, // recommendation
   'Accepted comment for user', // commentForUser
   'Accepted comment for management', // commentForManagement
   true, // submitted
   456, // submittedBy
   789, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  3, // fapProposalId
+  '2' // meetingScore
 );
 
 const mockFapReview: FapReviewsRecord = {
@@ -101,6 +107,7 @@ const mockFapReview: FapReviewsRecord = {
   average_grade: 4.5,
   questionary_id: 4,
   comment: 'FAP review comment',
+  fap_proposal_id: 5,
 };
 
 describe('addDecreasingInstrumentAvailTime test', () => {
@@ -178,7 +185,7 @@ describe('addDecreasingInstrumentAvailTime test', () => {
 });
 
 describe('generateManagementDecisionData tests', () => {
-  test('Test working basic reqquest', async () => {
+  test('Test working basic request', async () => {
     jest
       .spyOn(baseContext.queries.proposal, 'get')
       .mockResolvedValue(mockProposal);

@@ -25,6 +25,8 @@ const CallFilter = ({
 }: CallFilterProps) => {
   const [, setSearchParams] = useSearchParams();
 
+  console.log(callId);
+
   if (calls === undefined) {
     return null;
   }
@@ -79,7 +81,7 @@ const CallFilter = ({
             options={options}
             value={
               options.find((v) => v.id === callId) ||
-              (shouldShowAll ? allOption : undefined)
+              (shouldShowAll ? allOption : options.at(0))
             }
             data-cy="call-filter"
             renderInput={(params) => <TextField {...params} />}

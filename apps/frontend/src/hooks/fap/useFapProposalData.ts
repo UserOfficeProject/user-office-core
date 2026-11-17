@@ -7,7 +7,8 @@ export type FapProposalBasics = GetFapProposalQuery['fapProposal'];
 
 export function useFapProposalData(
   fapId: number,
-  proposalPk?: number | null
+  proposalPk?: number | null,
+  instrumentId?: number | null
 ): {
   loading: boolean;
   fapProposalData: FapProposalBasics | null;
@@ -23,7 +24,7 @@ export function useFapProposalData(
 
     if (proposalPk && fapId) {
       api()
-        .getFapProposal({ fapId, proposalPk })
+        .getFapProposal({ fapId, proposalPk, instrumentId })
         .then((data) => {
           if (unmounted) {
             return;
@@ -41,7 +42,7 @@ export function useFapProposalData(
     return () => {
       unmounted = true;
     };
-  }, [fapId, api, proposalPk]);
+  }, [fapId, api, proposalPk, instrumentId]);
 
   return { loading, fapProposalData, setFapProposalData };
 }

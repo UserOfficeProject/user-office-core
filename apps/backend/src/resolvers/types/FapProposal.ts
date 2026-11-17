@@ -24,11 +24,11 @@ export class FapProposal {
   @Field(() => Date)
   public dateAssigned: Date;
 
-  @Field(() => Int, { nullable: true })
-  public fapTimeAllocation?: number | null;
-
   @Field(() => Int)
   public instrumentId: number | null;
+
+  @Field(() => Int)
+  public fapProposalId: number;
 }
 
 @Resolver(() => FapProposal)
@@ -57,9 +57,8 @@ export class FapProposalResolver {
     @Root() fapProposal: FapProposal,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.fap.dataSource.isFapProposalInstrumentSubmitted(
-      fapProposal.proposalPk,
-      fapProposal.instrumentId
+    return context.queries.fap.dataSource.isFapProposalInstrumentSubmittedById(
+      fapProposal.fapProposalId
     );
   }
 
@@ -73,6 +72,29 @@ export class FapProposalResolver {
       : null;
   }
 
+  @FieldResolver(() => Int, { nullable: true })
+  async fapTimeAllocation(
+    @Root() fapProposal: FapProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.fap.getFapProposalTimeAllocation(
+      context.user,
+      fapProposal.fapProposalId
+    );
+  }
+
+  @FieldResolver(() => Int, { nullable: true })
+  async proposalTimeRequested(
+    @Root() fapProposal: FapProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return fapProposal.instrumentId
+      ? context.queries.proposal.dataSource.getRequestedTime(
+          fapProposal.proposalPk,
+          fapProposal.instrumentId
+        )
+      : null;
+  }
   @FieldResolver(() => String)
   async instrumentShortcodes(
     @Root() fapProposal: FapProposal,

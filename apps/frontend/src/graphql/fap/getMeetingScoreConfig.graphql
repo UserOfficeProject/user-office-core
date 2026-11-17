@@ -1,0 +1,8 @@
+query getMeetingScoreConfig($callId: Int!) {
+	fapMeetingScoreConfig(callId: $callId) {
+        nonNumericOptions
+        minGrade
+        maxGrade
+        decimalPoints
+	}
+}

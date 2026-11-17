@@ -4,6 +4,7 @@ import { ResolverContext } from '../../context';
 import { Fap } from '../types/Fap';
 import { FapProposal } from '../types/FapProposal';
 import { FapReviewer } from '../types/FapReviewers';
+import { FapReviewBasisConfig } from '../types/FieldConfig';
 import { ReviewVisibility } from '../types/ReviewVisibility';
 
 @Resolver()
@@ -53,11 +54,15 @@ export class FapQuery {
   async fapProposal(
     @Arg('fapId', () => Int) fapId: number,
     @Arg('proposalPk', () => Int) proposalPk: number,
-    @Ctx() context: ResolverContext
+    @Arg('instrumentId', () => Int, { nullable: true })
+    instrumentId: number | null,
+    @Ctx()
+    context: ResolverContext
   ): Promise<FapProposal | null> {
     return context.queries.fap.getFapProposal(context.user, {
       fapId,
       proposalPk,
+      instrumentId,
     });
   }
 
@@ -80,5 +85,13 @@ export class FapQuery {
     @Ctx() context: ResolverContext
   ): Promise<ReviewVisibility[] | null> {
     return context.queries.fap.getFapReviewVisibilityOptions(context.user);
+  }
+
+  @Query(() => FapReviewBasisConfig, { nullable: true })
+  async fapMeetingScoreConfig(
+    @Arg('callId', () => Int) callId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<FapReviewBasisConfig | null> {
+    return context.queries.fap.getFapMeetingScoreConfig(context.user, callId);
   }
 }

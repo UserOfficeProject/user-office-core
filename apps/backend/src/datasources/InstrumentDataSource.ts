@@ -80,7 +80,7 @@ export interface InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean>;
   submitInstrumentInFap(
-    proposalPks: number[],
+    fapProposalIds: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals>;
   unsubmitInstrumentInFap(

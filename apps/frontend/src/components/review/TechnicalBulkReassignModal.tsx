@@ -225,7 +225,7 @@ const TechnicalBulkReassignModal = ({
         onClose={(): void => setReviews()}
         maxWidth="lg"
         fullWidth
-        title={`Bulk Reassign Proposals Techniqual reviews`}
+        title={`Bulk Reassign Proposals Technical reviews`}
         data-cy="bulk-reassign-modal"
       >
         <DialogContent>

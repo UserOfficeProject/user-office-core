@@ -511,12 +511,13 @@ context('Instrument tests', () => {
 
       cy.logout();
 
-      cy.login(scientist2);
+      cy.login(scientist2, 7);
       cy.visit('/');
 
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
+
       cy.contains(proposal1.title)
         .parent()
         .find('[data-cy="edit-technical-review"]')
@@ -1202,7 +1203,7 @@ context('Instrument tests', () => {
         }
       });
 
-      cy.login(scientist2);
+      cy.login(scientist2, 7);
       cy.visit('/');
     });
     it('Instrument scientist should be able to see instruments he is assigned to', () => {

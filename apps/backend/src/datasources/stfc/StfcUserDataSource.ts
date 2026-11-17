@@ -476,6 +476,7 @@ export class StfcUserDataSource implements UserDataSource {
     const userRole: Role | undefined = roleDefinitions.find(
       (role) => role.shortCode == Roles.USER
     );
+
     if (!userRole) {
       return [];
     }
