@@ -35,40 +35,45 @@ export default class AdminQueries {
     }
 
     const userRole = agent.currentRole;
-    const userRoleTagIds = userRole.tags?.map((t) => t.id) ?? [];
+    const userRoleTagIds = (
+      await this.roleDataSource.getTagsByRoleId(userRole.id)
+    ).map((t) => t.id);
 
-    const nonDefaultPageRoleIds = roleIds.filter((roleId) => roleId != -1);
+    const isUserOfficer = userRole.shortCode === Roles.USER_OFFICER;
+    const isBaseUserOfficer = isUserOfficer && userRole.isRootRole;
 
-    //if the user is a root user officer or is fetching the default page notice only allow it, otherwise check permissions
-    const tagsPermissions =
-      userRole.shortCode === Roles.USER_OFFICER && userRole.isRootRole
-        ? [true]
-        : !nonDefaultPageRoleIds.length &&
-            !!(roleIds.length - nonDefaultPageRoleIds.length)
-          ? [true]
-          : nonDefaultPageRoleIds.map(async (roleId) => {
-              //if a user is fetching their own role's page notice
-              if (userRole.id === roleId) {
-                return true;
-              }
+    if (isBaseUserOfficer) {
+      return this.adminDataSource.get(pageId, roleIds);
+    }
 
-              const roleTagIds = (
-                await this.roleDataSource.getTagsByRoleId(roleId)
-              ).map((t) => t.id);
+    const requestedRoleIds = roleIds.filter((roleId) => roleId !== -1);
 
-              //check if they are a derived user officer that shares a tag with the requested page notice
-              return !!(
-                userRole.shortCode === Roles.USER_OFFICER &&
-                userRoleTagIds.filter((t) => roleTagIds.includes(t)).length
-              );
-            });
+    const canReadRoleNotice = async (roleId: number) => {
+      const isOwnRoleNotice = userRole.id === roleId;
+      if (isOwnRoleNotice) {
+        return true;
+      }
 
-    const resolvedPermissions = await Promise.all(tagsPermissions);
+      if (!isUserOfficer) {
+        return false;
+      }
 
-    if (resolvedPermissions.includes(false)) {
+      const requestedRoleTagIds = (
+        await this.roleDataSource.getTagsByRoleId(roleId)
+      ).map((t) => t.id);
+
+      return userRoleTagIds.some((t) => requestedRoleTagIds.includes(t));
+    };
+
+    const permissions = await Promise.all(
+      requestedRoleIds.map(canReadRoleNotice)
+    );
+    const canReadAllRequestedNotices = permissions.every(Boolean);
+
+    if (!canReadAllRequestedNotices) {
       logger.logWarn(
         'User does not have permission to fetch requested page notice',
-        { agent, pageId, roleId: roleIds }
+        { agent, pageId, roleIds }
       );
 
       return [];
