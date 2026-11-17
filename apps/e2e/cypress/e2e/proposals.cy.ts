@@ -2310,4 +2310,70 @@ context('Proposal tests', () => {
       });
     });
   });
+
+  describe('False workflowId error toast', () => {
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+
+      cy.resetDB(true);
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it("Doesn't show error toast, when status is successfully edited", () => {
+      // Make sure the test doesnt fail on the unhandled exception, but the assertion below
+      // Checking the uncaught exception seemed unreliable
+      Cypress.on('uncaught:exception', () => {
+        return false;
+      });
+
+      cy.login('officer');
+      cy.visit('/Proposals');
+
+      // Filter for SCHEDULING status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="SCHEDULING"]').click();
+
+      // Change first proposal to DRAFT
+      cy.get('td input[type="checkbox"]').first().click();
+      cy.get('[data-cy="change-proposal-status"]').click();
+      cy.get('[data-cy="status-selection"]').click();
+      cy.get('li[data-option-index="0"]').click();
+
+      const getWorkflowStatusesSpy = cy
+        .spy()
+        .as('graphql.getWorkflowStatuses.spy');
+
+      cy.intercept('POST', 'http://localhost:3000/graphql', (req) => {
+        const { body } = req;
+        if (body.operationName == 'getWorkflowStatuses') {
+          getWorkflowStatusesSpy();
+          req.alias = `graphql.${body.operationName}`;
+        }
+      });
+
+      cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+      // Filter for DRAFT status
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('li[data-value="DRAFT"]').click();
+
+      // Check that the proposal has been successfully edited to DRAFT
+      cy.get('td input[type="checkbox"]').first().should('exist');
+
+      // The request shouldn't even happen, this is just to check that even if it does, it fails with 400
+      cy.then(() => {
+        if (getWorkflowStatusesSpy.called) {
+          cy.wait('@graphql.getWorkflowStatuses')
+            .its('response.statusCode')
+            .should('not.equal', 400);
+        }
+      });
+
+      cy.get('@graphql.getWorkflowStatuses.spy').should('not.have.been.called');
+    });
+  });
 });
