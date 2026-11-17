@@ -19,8 +19,17 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => String, { nullable: true })
   public preferredname: string | undefined;
 
-  @Field()
+  @Field({ deprecationReason: 'Use institutionName instead.' })
   public institution: string;
+
+  @Field()
+  public institutionName: string;
+
+  @Field(() => String, { nullable: true })
+  public institutionRorId: string | null;
+
+  @Field(() => String, { nullable: true })
+  public institutionCountry: string | null;
 
   @Field(() => Int)
   public institutionId: number;

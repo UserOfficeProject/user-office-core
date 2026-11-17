@@ -78,6 +78,49 @@ describe('UserQueries', () => {
     );
   });
 
+  describe('institution metadata', () => {
+    const user = {
+      ...basicDummyUser,
+      institutionRorId: 'https://ror.org/01wv9cn34',
+      country: 'Sweden',
+      institutionCountry: 'Sweden',
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test('Preserves metadata when fetching basic user details', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUsersInfo')
+        .mockResolvedValue([user]);
+
+      await expect(
+        userQueries.getBasic(dummyUserWithRole, user.id)
+      ).resolves.toMatchObject(user);
+    });
+
+    test('Preserves metadata when fetching basic user details by email', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUserDetailsByEmail')
+        .mockResolvedValue(user);
+
+      await expect(
+        userQueries.getBasicUserDetailsByEmail(dummyUserWithRole, user.email)
+      ).resolves.toMatchObject(user);
+    });
+
+    test('Resolves federation references with basic user metadata', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUserInfo')
+        .mockResolvedValue(user);
+
+      await expect(
+        userQueries.byRef(dummyUserWithRole, user.id)
+      ).resolves.toEqual(user);
+    });
+  });
+
   test('A user is not allowed to fetch roles', () => {
     return expect(userQueries.getRoles(dummyUserWithRole)).resolves.toBe(null);
   });

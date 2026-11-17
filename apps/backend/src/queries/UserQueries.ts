@@ -49,7 +49,7 @@ export default class UserQueries {
 
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.getUser(id);
+    return this.dataSource.getBasicUserInfo(id);
   }
 
   @Authorized()
@@ -73,7 +73,8 @@ export default class UserQueries {
         user.email,
         user.country,
         user.userTitle,
-        user.oidcSub
+        user.oidcSub,
+        user.institutionRorId
       );
     } else {
       return null;
@@ -106,7 +107,8 @@ export default class UserQueries {
       user.email,
       user.country,
       user.userTitle,
-      user.oidcSub
+      user.oidcSub,
+      user.institutionRorId
     );
   }
 
