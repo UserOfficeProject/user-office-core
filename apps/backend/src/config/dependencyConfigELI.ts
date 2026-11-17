@@ -43,6 +43,7 @@ import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresTemplateVersionDataSource from '../datasources/postgres/TemplateVersionDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -64,7 +65,6 @@ import {
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-
 const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
@@ -153,3 +153,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, PostgresTemplateVersionDataSource);
