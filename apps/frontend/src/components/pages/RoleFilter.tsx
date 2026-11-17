@@ -10,13 +10,16 @@ import { useSearchParams } from 'react-router-dom';
 
 import { Role } from 'generated/sdk';
 import { FALLBACK_ROLE_FOR_PAGE_CONTENT } from 'hooks/admin/useGetPageContent';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type RoleFilterProps = {
   roles?: Pick<Role, 'id' | 'title'>[];
   isLoading?: boolean;
   onChange: Dispatch<number[]>;
+  confirm: WithConfirmType;
   roleIds?: number[];
   userIsBaseOfficer: boolean;
+  isDirty: boolean;
 };
 
 export const parseRoleQuery = (
@@ -34,8 +37,10 @@ const RoleFilter = ({
   roles,
   isLoading,
   onChange,
+  confirm,
   roleIds,
   userIsBaseOfficer,
+  isDirty,
 }: RoleFilterProps) => {
   const [, setSearchParams] = useSearchParams();
 
@@ -67,6 +72,24 @@ const RoleFilter = ({
       return searchParams;
     });
     onChange?.(roleIdValues);
+  };
+
+  const handleChangeWithConfirm = (event: SelectChangeEvent<number[]>) => {
+    if (isDirty) {
+      confirm(() => handleChange(event), {
+        title: `Change selected roles notices`,
+        description: ' ',
+        shouldEnableOKWithAlert: true,
+        alertText: (
+          <>
+            If you change selected roles, you will lose your unsaved changes.
+            <strong>Would you like to proceed?</strong>
+          </>
+        ),
+      })();
+    } else {
+      handleChange(event);
+    }
   };
 
   const renderValue = (selected: number[]) => {
@@ -105,7 +128,7 @@ const RoleFilter = ({
             id="role-select"
             labelId="role-select-label"
             multiple
-            onChange={handleChange}
+            onChange={handleChangeWithConfirm}
             renderValue={renderValue}
             value={currentValue}
             data-cy="role-filter"
@@ -134,4 +157,4 @@ const RoleFilter = ({
   );
 };
 
-export default RoleFilter;
+export default withConfirm(RoleFilter);

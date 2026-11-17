@@ -150,4 +150,40 @@ context('Page tests', () => {
       expect(content).to.have.string(faqContents)
     );
   });
+
+  it('Confirmation not needed when switching roles after no changes', () => {
+    cy.login('officer', initialDBData.roles.userOfficer);
+    cy.visit('/');
+    cy.contains('Configuration Settings').click();
+    cy.contains('Pages').click();
+    cy.contains('Set user homepage');
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Default').click();
+    cy.get('body').type('{esc}');
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Derived User Officer').click();
+
+    cy.get('Change selected roles notices').should('not.exist');
+  });
+
+  it('Confirmation needed when switching roles after changes', () => {
+    cy.login('officer', initialDBData.roles.userOfficer);
+    cy.visit('/');
+    cy.contains('Configuration Settings').click();
+    cy.contains('Pages').click();
+    cy.contains('Set user homepage');
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Default').click();
+    cy.get('body').type('{esc}');
+
+    cy.setTinyMceContent('HOMEPAGE', faqContents);
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]').contains('Derived User Officer').click();
+
+    cy.contains('Change selected roles notices');
+  });
 });

@@ -37,6 +37,8 @@ export default function PageEditor() {
       : []
   );
 
+  const [isDirty, setIsDirty] = React.useState<boolean>(false);
+
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
@@ -59,47 +61,56 @@ export default function PageEditor() {
             pageName={PageName.HOMEPAGE}
             heading={'Set user homepage'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.REVIEWPAGE}
             heading={'Set reviewer homepage'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.HELPPAGE}
             heading={'Set help page'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.PRIVACYPAGE}
             heading={'Set privacy agreement'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.COOKIEPAGE}
             heading={'Set cookie policy'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.FOOTERCONTENT}
             heading={'Set footer content'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.LOGINHELPPAGE}
             heading={'Set login help page'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           <PageInputBox
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
             roleIds={roleIds}
+            setIsDirty={setIsDirty}
           />
           {isTechniqueProposalsEnabled && (
             <PageInputBox
               pageName={PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE}
               heading={`Set ${t('technique proposals')} management page notice`}
               roleIds={roleIds}
+              setIsDirty={setIsDirty}
             />
           )}
         </SimpleTabs>
@@ -108,6 +119,7 @@ export default function PageEditor() {
           roles={rolesData ?? undefined}
           isLoading={loading}
           userIsBaseOfficer={isBaseUserOfficer}
+          isDirty={isDirty}
           onChange={(roleIds) => {
             setRoleIds(roleIds);
           }}

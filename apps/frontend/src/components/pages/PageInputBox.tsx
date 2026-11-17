@@ -12,6 +12,7 @@ export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
   roleIds: number[];
+  setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [loading, pageContent] = useGetPageContents(
     props.pageName,
@@ -37,12 +38,15 @@ export default function PageInputBox(props: {
     return Array.isArray(pageContent) ? pageContent[0] : pageContent;
   };
 
+  const initialValue = doAllPageContentsMatch() ? getPageContent() : '';
+
   useEffect(() => {
     if (doAllPageContentsMatch()) {
       setPageContent(getPageContent());
     } else {
       setPageContent('');
     }
+    props.setIsDirty(false);
   }, [pageContent]);
 
   return (
@@ -52,7 +56,7 @@ export default function PageInputBox(props: {
       </Typography>
       {loading ? null : (
         <Editor
-          initialValue={doAllPageContentsMatch() ? getPageContent() : ''}
+          initialValue={initialValue}
           init={{
             skin: false,
             content_css: false,
@@ -61,7 +65,10 @@ export default function PageInputBox(props: {
             branding: false,
           }}
           id={props.pageName}
-          onEditorChange={(content) => setPageContent(content)}
+          onEditorChange={(content) => {
+            props.setIsDirty(content !== initialValue);
+            setPageContent(content);
+          }}
         />
       )}
       <Box
@@ -77,11 +84,13 @@ export default function PageInputBox(props: {
             marginLeft: '10px',
           }}
           onClick={() => {
-            api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
-              pageId: props.pageName,
-              text: content,
-              roleIds: props.roleIds,
-            });
+            api({ toastSuccessMessage: 'Updated Page' })
+              .setPageContent({
+                pageId: props.pageName,
+                text: content,
+                roleIds: props.roleIds,
+              })
+              .then(() => props.setIsDirty(false));
           }}
         >
           Update
