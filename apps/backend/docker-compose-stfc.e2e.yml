@@ -48,6 +48,6 @@ services:
       - 1080:1080
 
   mockserver-client:
-    image: "ghcr.io/userofficeproject/stfc-mockserver-client:latest"
+    image: "ghcr.io/userofficeproject/stfc-mockserver-client:1737"
     depends_on:
       - mockServer
