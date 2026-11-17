@@ -122,10 +122,18 @@ export default class FapQueries {
   ])
   async getFapProposal(
     agent: UserWithRole | null,
-    { fapId, proposalPk }: { fapId: number; proposalPk: number }
+    {
+      fapId,
+      proposalPk,
+      instrumentId,
+    }: { fapId: number; proposalPk: number; instrumentId?: number | null }
   ) {
     return (await this.userHasFapAccess(agent, fapId))
-      ? this.dataSource.getFapProposal(fapId, proposalPk)
+      ? this.dataSource.getFapProposal(
+          fapId,
+          proposalPk,
+          instrumentId ?? undefined
+        )
       : null;
   }
 

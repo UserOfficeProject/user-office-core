@@ -75,12 +75,9 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
     ) {
       submissionDisabled = false; // allow submit for intenal users if the call ended
     }
-    if (isFapReviewer) {
+    if (isFapReviewer && !isChairOrSecretary) {
       //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
       submissionDisabled = fapReview.reviewer?.id !== user.id ? true : false;
-    } else if (isChairOrSecretary) {
-      //chair and secretary should be able to submit for themselves and for other reviewers
-      submissionDisabled = false;
     }
 
     return submissionDisabled;

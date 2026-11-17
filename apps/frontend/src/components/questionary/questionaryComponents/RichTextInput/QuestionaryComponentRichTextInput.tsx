@@ -69,6 +69,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         init={{
           skin: false,
           content_css: false,
+          content_style: `body { padding-left: ${theme.spacing(1)}; }`,
           /**
            * Note:  if you add new styling options please make sure the HTML sanitizer rules
            *        on the BE is in sync, otherwise the result will be filtered

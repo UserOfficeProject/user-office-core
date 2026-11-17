@@ -965,7 +965,7 @@ context('Fap reviews tests', () => {
       cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
     });
 
-    it('Officer should be able to read/write reviews', () => {
+    it('Officer should be able to read/write/submit reviews', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
@@ -986,6 +986,8 @@ context('Fap reviews tests', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
+      cy.contains('0 / 1').should('be.visible');
+
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -994,7 +996,9 @@ context('Fap reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
-      readWriteReview();
+      readWriteReview({ shouldSubmit: true, isReviewer: false });
+
+      cy.contains('1 / 1').should('be.visible');
     });
 
     it('Officer should be able to submit and un-submit reviews', () => {
@@ -1414,7 +1418,7 @@ context('Fap reviews tests', () => {
       cy.get('[role="dialog"]').contains('Download PDF');
     });
 
-    it('Fap Chair should be able to read/write/submit non-submitted reviews', () => {
+    it('Fap Chair should be able to read/write non-submitted reviews', () => {
       cy.assignFapReviewersToProposals({
         assignments: {
           memberId: fapMembers.reviewer.id,
@@ -1449,7 +1453,7 @@ context('Fap reviews tests', () => {
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
-      cy.contains('1 / 1').should('be.visible');
+      cy.contains('0 / 1').should('be.visible');
     });
 
     it('Fap Chair should not be able to see private technical comments', () => {
@@ -3165,14 +3169,11 @@ context('Fap meeting components tests', () => {
       cy.get('[name="recommendedTimeAllocation"]').scrollIntoView();
       cy.get('[name="recommendedTimeAllocation"]').click();
 
-      // cy.get('[data-cy="edit-fap-time-allocation"] input').as('timeAllocation');
-
       cy.get('[name="recommendedTimeAllocation"]').should(
         'have.value',
         firstProposalTimeAllocation.toString()
       );
 
-      // cy.get('[data-cy="edit-fap-time-allocation"]').clear();
       cy.get('[name="recommendedTimeAllocation"]').clear();
 
       cy.get('[name="recommendedTimeAllocation"]').type('-1').blur();

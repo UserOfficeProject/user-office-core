@@ -315,6 +315,42 @@ const FinalRankingForm = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
+                  <Field
+                    label={`Time Allocation Recommendation (${proposalData.call?.allocationTimeUnit}s)`}
+                    id="recommendedTimeAllocation"
+                    data-cy="edit-fap-time-allocation"
+                    name="recommendedTimeAllocation"
+                    type="number"
+                    component={TextField}
+                    InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      min: 0,
+                      max: 1e5,
+                    }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = e.target.value;
+                      const numericValue = Number(value);
+                      if (isNaN(numericValue)) {
+                        setInvalidError(true);
+                      } else {
+                        if (numericValue < 0 || numericValue > 1e5) {
+                          setInvalidError(true);
+                        } else {
+                          setInvalidError(false);
+                        }
+                      }
+
+                      setFieldValue(
+                        'recommendedTimeAllocation',
+                        value === '' ? null : numericValue
+                      );
+                    }}
+                  />
+                  {invalidError && (
+                    <FormHelperText error>
+                      {`Please enter a valid time allocation (0-100000) (${proposalData.call?.allocationTimeUnit}s)`}
+                    </FormHelperText>
+                  )}
 
                   <Grid container alignItems="center" display="flex">
                     <Box display="flex" alignItems="center" marginTop={2}>

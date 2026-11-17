@@ -1424,9 +1424,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     const incompleteProposals = allProposals.filter(
       (proposal) =>
         !readyProposals.find(
-          (readyProp) =>
-            readyProp.proposal_pk === proposal.proposal_pk &&
-            readyProp.recommended_instrument_id === proposal.instrument_id
+          (readyProp) => readyProp.fap_proposal_id === proposal.fap_proposal_id
         )
     );
 

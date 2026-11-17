@@ -137,16 +137,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           </ListItemButton>
         </Tooltip>
       )}
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
-      )}
+      <Tooltip title="Experiments">
+        <ListItemButton component={NavLink} to={`/Experiments`}>
+          <ListItemIcon>
+            <EventIcon />
+          </ListItemIcon>
+          <ListItemText primary="Experiments" />
+        </ListItemButton>
+      </Tooltip>
       {isFapEnabled && (
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
