@@ -839,44 +839,57 @@ export default class ProposalMutations {
           logContext
         );
       }
-    }
 
-    // Create an experiment for each proposal that is being approved
-    if (newWorkflowStatus?.statusId === TechniqueProposalStatus.APPROVED) {
-      for (const proposal of proposals) {
-        const proposalInstruments =
-          await this.instrumentDataSource.getInstrumentsByProposalPk(
-            proposal.primaryKey
-          );
+      /**
+       * Allow Instrument Scientist only (as user officer is diverted to processProposalsStatusChange earlier) to
+       * create a DRAFT experiment for enabling Experiment Safety Review for
+       * a technique proposal that is being approved
+       * and does not already have an experiment associated with it.
+       */
 
-        // APPROVED transitions are only allowed when an instrument is already assigned
-        const instrument = proposalInstruments[0];
+      if (newWorkflowStatus?.statusId !== TechniqueProposalStatus.APPROVED) {
+        continue;
+      }
 
-        const startsAt = new Date();
-        const endsAt = new Date(startsAt);
-        endsAt.setFullYear(startsAt.getFullYear() + 1);
+      const existingExperiments =
+        await this.experimentDataSource.getExperimentsByProposalPk(
+          proposal.primaryKey
+        );
 
-        const experimentToAdd = {
-          startsAt,
-          endsAt,
-          scheduledEventId: proposal.primaryKey,
-          proposalPk: proposal.primaryKey,
-          status: ExperimentStatus.DRAFT,
-          localContactId: null,
-          instrumentId: instrument.id,
-        } as Omit<
-          Experiment,
-          'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-        >;
+      if (existingExperiments.length > 0) {
+        logger.logInfo(
+          `An experiment already exists for approved technique proposal, skipping experiment creation for proposal ${proposal.proposalId}`,
+          { agent, proposalPk: proposal.primaryKey }
+        );
+        continue;
+      }
 
-        try {
-          await this.experimentDataSource.create(experimentToAdd);
-        } catch (error) {
-          logger.logException(
-            `Could not create experiment for approved technique proposal: ${proposal.proposalId}`,
-            error
-          );
-        }
+      const instrument = proposalInstruments[0];
+
+      const startsAt = new Date();
+      const endsAt = new Date(startsAt);
+      endsAt.setFullYear(startsAt.getFullYear() + 1);
+
+      const experimentToAdd = {
+        startsAt,
+        endsAt,
+        scheduledEventId: proposal.primaryKey,
+        proposalPk: proposal.primaryKey,
+        status: ExperimentStatus.DRAFT,
+        localContactId: null,
+        instrumentId: instrument.id,
+      } as Omit<
+        Experiment,
+        'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+      >;
+
+      try {
+        await this.experimentDataSource.create(experimentToAdd);
+      } catch (error) {
+        logger.logException(
+          `Could not create experiment for approved technique proposal: ${proposal.proposalId}`,
+          error
+        );
       }
     }
 
