@@ -2060,6 +2060,273 @@ context('Technique Proposal tests', () => {
     });
   });
 
+  describe('Technique proposal experiment creation tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
+    it('An experiment is created when a scientist approves a technique proposal', function () {
+      /*
+      Proposal 1 starts in DRAFT, so it must first move to UNDER_REVIEW.
+      Then an instrument is assigned and the scientist (who belongs to the
+      proposal's technique) approves it.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      /*
+      Select the APPROVED status for proposal 1 and confirm the change.
+      */
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(approvedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+      cy.finishedLoading();
+
+      // The proposal is now shown as approved
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', approvedStatus.name);
+
+      /*
+      An experiment should have been created for the approved proposal.
+      The experiment's scheduledEventId equals the proposal primary key, so it
+      is the only experiment referencing this proposal.
+      */
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(1);
+
+        const experiment = proposalExperiments[0];
+
+        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.instrumentId).to.eq(createdInstrumentId1);
+        expect(experiment.localContactId).to.eq(null);
+        expect(experiment.status).to.eq('DRAFT');
+
+        // startsAt should be the current date and endsAt one year later
+        const startsAt = new Date(experiment.startsAt);
+        const endsAt = new Date(experiment.endsAt);
+        const now = new Date();
+
+        // Allow a small margin so the test is not flaky across second boundaries
+        expect(startsAt.getTime()).to.be.at.least(now.getTime() - 60000);
+        expect(startsAt.getTime()).to.be.at.most(now.getTime() + 60000);
+
+        // endsAt should be exactly one year after startsAt
+        const oneYearLater = new Date(startsAt);
+        oneYearLater.setFullYear(startsAt.getFullYear() + 1);
+        expect(
+          Math.abs(endsAt.getTime() - oneYearLater.getTime())
+        ).to.be.lessThan(60000);
+      });
+    });
+
+    it('No experiment is created when a scientist rejects a technique proposal', function () {
+      /*
+      Proposal 1 must move to UNDER_REVIEW first, then an instrument is
+      assigned. The scientist marks it unsuccessful instead of approving it,
+      so no experiment should be created.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      /*
+      Select the UNSUCCESSFUL status, which opens a rejection comment modal.
+      Submit without adding a comment.
+      */
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(unsuccessfulStatus.name).click();
+
+      cy.get('[data-cy="submit-no-proposal-rejection-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', unsuccessfulStatus.name);
+
+      /*
+      No experiment should exist for the unsuccessful proposal.
+      */
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(0);
+      });
+    });
+
+    it('No duplicate experiment is created when a scientist re-approves a technique proposal that already has an experiment', function () {
+      /*
+      The scientist approves proposal 1 from UNDER_REVIEW, which creates a
+      DRAFT experiment. For testing purpose we use the user officer role to move the proposal to
+      UNSUCCESSFUL and back to UNDER_REVIEW (the officer path does not
+      create experiments), so the scientist can approve it again. Because an
+      experiment already exists, the second approval must not create a
+      duplicate experiment.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: underReviewStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      /*
+      First approval: creates a DRAFT experiment for the proposal.
+      */
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(approvedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+      cy.finishedLoading();
+
+      // The proposal is now shown as approved
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', approvedStatus.name);
+
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(1);
+
+        const experiment = proposalExperiments[0];
+
+        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.instrumentId).to.eq(createdInstrumentId1);
+        expect(experiment.status).to.eq('DRAFT');
+      });
+
+      /*
+      The user officer moves the proposal to UNSUCCESSFUL and back to
+      UNDER_REVIEW so the scientist can approve it a second time. The
+      instrument stays assigned, so both transitions are allowed.
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        workflowStatusId: unsuccessfulStatus.workflowStatusId as number,
+      }).then(() => {
+        cy.changeProposalsStatus({
+          proposalPks: createdProposalPk1,
+          workflowStatusId: underReviewStatus.workflowStatusId as number,
+        });
+      });
+
+      /*
+      Second approval: the proposal already has an experiment, so no
+      duplicate experiment may be created.
+      */
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/TechniqueProposals');
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(approvedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+      cy.finishedLoading();
+
+      // The proposal is now shown as approved again
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', approvedStatus.name);
+
+      /*
+      Only the experiment created by the first approval should exist.
+      */
+      cy.getExperiments().then(({ allExperiments }) => {
+        const experiments = allExperiments?.experiments ?? [];
+
+        const proposalExperiments = experiments.filter(
+          (experiment) => experiment.proposalPk === createdProposalPk1
+        );
+
+        expect(proposalExperiments).to.have.lengthOf(1);
+
+        const experiment = proposalExperiments[0];
+
+        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.instrumentId).to.eq(createdInstrumentId1);
+        expect(experiment.status).to.eq('DRAFT');
+      });
+    });
+  });
+
   describe('Technique proposal PDF download tests', () => {
     /*
     These tests run in e2e dependency config despite being technique 
