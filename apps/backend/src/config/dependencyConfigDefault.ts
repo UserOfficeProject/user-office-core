@@ -11,6 +11,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
+import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { configureBaseEnvironment } from './base/configureBaseEnvironment';
 import { mapClass, mapValue } from './utils';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
@@ -46,13 +47,13 @@ import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresTemplateVersionDataSource from '../datasources/postgres/TemplateVersionDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { createSkipLoggingHandler } from '../eventHandlers/logging';
-import { getSecondsFromAllocationTimeUnits } from './base/allocationTimeUnitConverter';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
   createSkipListeningHandler,
@@ -155,3 +156,4 @@ mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, PostgresTemplateVersionDataSource);
