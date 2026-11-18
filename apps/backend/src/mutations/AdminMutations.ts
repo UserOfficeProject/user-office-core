@@ -83,7 +83,7 @@ export default class AdminMutations {
     const isRootRoleUser =
       userRole.isRootRole ??
       (await this.userDataSource.getUserRoles(agent.id)).find(
-        (r) => (r.id === userRole.id)
+        (r) => r.id === userRole.id
       )?.isRootRole;
     const agentRoleTagIds = isRootRoleUser
       ? []
