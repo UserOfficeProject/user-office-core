@@ -226,8 +226,9 @@ const CreateUpdateEmailTemplate = ({
                   type="text"
                   component={TextField}
                   fullWidth
+                  inputProps={{ maxLength: '200' }}
                   variant="outlined"
-                  data-cy="update-Comment"
+                  data-cy="update-comment"
                   disabled={isExecutingCall || values.useTemplateFile}
                 />
               </Box>
@@ -259,12 +260,10 @@ const CreateUpdateEmailTemplate = ({
                         key={version.versionNumber}
                         value={version.versionNumber}
                       >
-                        {version.versionNumber +
-                          ': ' +
-                          version.createdTimeStamp +
-                          (version.updateComment
-                            ? '     :    ' + version.updateComment
-                            : '')}
+                        {`${version.versionNumber}  : ${version.createdTimeStamp}`}
+                        {version.updateComment
+                          ? `     :     ${version.updateComment}`
+                          : ``}
                       </MenuItem>
                     ))}
                   </Select>
