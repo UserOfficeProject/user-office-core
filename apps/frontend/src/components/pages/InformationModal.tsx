@@ -9,7 +9,7 @@ import React, { useContext } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 
 const DialogContent = styled(MuiDialogContent)(({ theme }) => ({
   root: {
@@ -37,16 +37,11 @@ type InformationDialogProps = {
 const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [dialogText, setDialogText] = React.useState<string | null>(null);
-  const api = useDataApi();
   const { currentRoleId } = useContext(UserContext);
+  const [, helpPageContent] = useGetPageContents(props.pageName, currentRoleId);
 
   const handleClickOpen = async () => {
-    const pageContent = await api().getPageContent({
-      pageId: props.pageName,
-      useDefaultIfNotFound: true,
-      roleId: currentRoleId,
-    });
-    setDialogText(pageContent.pageContent);
+    setDialogText(helpPageContent as string);
 
     setOpen(true);
   };

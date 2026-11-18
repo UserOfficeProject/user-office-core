@@ -3,6 +3,7 @@ fragment basicUserDetails on BasicUserDetails {
   firstname
   lastname
   preferredname
+  userTitle
   institution
   institutionId
   created

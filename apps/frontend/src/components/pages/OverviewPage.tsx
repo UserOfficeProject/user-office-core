@@ -10,7 +10,7 @@ import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 const Paper = ({ children }: { children: React.ReactNode }) => (
@@ -28,9 +28,8 @@ const Paper = ({ children }: { children: React.ReactNode }) => (
 
 export default function OverviewPage(props: { userRole: UserRole }) {
   const { currentRoleId } = useContext(UserContext);
-  const [loadingContent, pageContent] = useGetPageContent(
+  const [loadingContent, pageContent] = useGetPageContents(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE,
-    true,
     currentRoleId
   );
   const { featuresMap } = useContext(FeatureContext);
@@ -101,7 +100,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
             {loadingContent ? (
               <div>Loading...</div>
             ) : (
-              parse(pageContent as string)
+              parse(Array.isArray(pageContent) ? '' : pageContent)
             )}
           </Paper>
         )}

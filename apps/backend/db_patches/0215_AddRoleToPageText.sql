@@ -17,7 +17,12 @@ BEGIN
 
         ALTER TABLE pagetext
           ADD CONSTRAINT page_id_not_null NOT NULL page_id,
-          ADD CONSTRAINT unique_role_pages UNIQUE (page_id, role_id);
+          ADD CONSTRAINT unique_role_pages UNIQUE NULLS NOT DISTINCT (page_id, role_id);
+
+        PERFORM setval(
+          pg_get_serial_sequence('pagetext', 'pagetext_id'),
+          (SELECT MAX(pagetext_id) FROM pagetext)
+        );
 
       END;
 	  END IF;

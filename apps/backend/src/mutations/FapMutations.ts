@@ -562,7 +562,7 @@ export default class FapMutations {
     }
 
     return this.dataSource
-      .updateTimeAllocation(fapId, proposalPk, fapTimeAllocation)
+      .updateTimeAllocation(fapId, proposalPk, instrumentId, fapTimeAllocation)
       .catch((err) => {
         return rejection(
           'Could not update Fap proposal time allocation',

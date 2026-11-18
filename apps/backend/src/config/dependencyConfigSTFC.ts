@@ -38,6 +38,7 @@ import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresTemplateVersionDataSource from '../datasources/postgres/TemplateVersionDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresVisitRegistrationClaimDataSource from '../datasources/postgres/VisitRegistrationClaimDataSource';
@@ -64,7 +65,6 @@ import {
 } from '../factory/xlsx/stfc/StfcFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -147,3 +147,4 @@ mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, PostgresTemplateVersionDataSource);

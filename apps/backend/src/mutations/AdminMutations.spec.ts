@@ -8,7 +8,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Page } from '../models/Admin';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { Permissions } from '../models/Permissions';
 import { SettingsId } from '../models/Settings';
@@ -29,8 +28,12 @@ const updatedSetting = {
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
     return expect(
-      adminMutations.setPageText(null, { pageId: 1, text: 'New page contents' })
-    ).resolves.not.toBeInstanceOf(Page);
+      adminMutations.setPageText(dummyUserWithRole, {
+        pageId: 1,
+        text: 'New page contents',
+        roleIds: [-1],
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
   test('A base user officer can set default page text', () => {
@@ -38,8 +41,19 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithRole, {
         pageId: 1,
         text: '',
+        roleIds: [-1],
       })
-    ).resolves.toBeInstanceOf(Page);
+    ).resolves.toBe(true);
+  });
+
+  test('A base user officer can set multiple page texts', () => {
+    return expect(
+      adminMutations.setPageText(dummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [-1, 1, 2],
+      })
+    ).resolves.toBe(true);
   });
 
   test('A derived user officer can not set default page text', () => {
@@ -47,8 +61,12 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
+        roleIds: [-1],
       })
-    ).resolves.not.toBeInstanceOf(Page);
+    ).resolves.toHaveProperty(
+      'reason',
+      'Insufficient permission to update page notice'
+    );
   });
 
   test('A derived user officer can set page text for a role with a shared tag', () => {
@@ -56,9 +74,9 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
-        roleId: 1,
+        roleIds: [1],
       })
-    ).resolves.toBeInstanceOf(Page);
+    ).resolves.toBe(true);
   });
 
   test('A derived user officer can not set page text for a role without a shared tag', () => {
@@ -66,9 +84,12 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
-        roleId: 2,
+        roleIds: [2],
       })
-    ).resolves.not.toBeInstanceOf(Page);
+    ).resolves.toHaveProperty(
+      'reason',
+      'Insufficient permission to update page notice'
+    );
   });
 
   test('A user officer can delete a institution', () => {

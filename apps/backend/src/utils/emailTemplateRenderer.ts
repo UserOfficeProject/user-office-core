@@ -21,18 +21,9 @@ export type RenderResult =
   | { subject: string; body: string }
   | { error: RenderError };
 
-export type TemplateVariable = {
-  key: string;
-  value: string;
-};
-
 const SAFE_TEMPLATE_NAME = /^[A-Za-z0-9._-]+$/;
-const SAFE_IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
-const FORBIDDEN_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 
 export const MAX_TEMPLATE_SOURCE_LENGTH = 100_000;
-const MAX_VARIABLES = 200;
-const MAX_VALUE_LENGTH = 2000;
 
 const PUG_OPTIONS: pug.Options = { cache: false, doctype: 'html' };
 
@@ -99,71 +90,4 @@ export function renderEmailTemplate(
       },
     };
   }
-}
-
-function coerceSampleValue(value: string): unknown {
-  const trimmed = value.trim();
-
-  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-    try {
-      return JSON.parse(trimmed);
-    } catch {
-      return value;
-    }
-  }
-
-  return value;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-export function buildSubstitutionData(
-  variables: TemplateVariable[]
-): Record<string, unknown> {
-  const root: Record<string, unknown> = {};
-
-  for (const { key, value } of variables.slice(0, MAX_VARIABLES)) {
-    const segments = key.split('.');
-
-    const isSafe = segments.every(
-      (segment) => SAFE_IDENTIFIER.test(segment) && !FORBIDDEN_KEYS.has(segment)
-    );
-
-    if (!isSafe) {
-      continue;
-    }
-
-    let node = root;
-    let canAssign = true;
-
-    for (const segment of segments.slice(0, -1)) {
-      const child = node[segment];
-
-      if (child === undefined || child === null) {
-        node[segment] = {};
-      } else if (!isPlainObject(child)) {
-        canAssign = false;
-        break;
-      }
-
-      node = node[segment] as Record<string, unknown>;
-    }
-
-    if (!canAssign) {
-      continue;
-    }
-
-    const leaf = segments[segments.length - 1];
-    const coerced = coerceSampleValue(value.slice(0, MAX_VALUE_LENGTH));
-
-    try {
-      node[leaf] = coerced;
-    } catch {
-      continue;
-    }
-  }
-
-  return root;
 }

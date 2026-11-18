@@ -66,6 +66,7 @@ import {
   TemplateGroupId,
   Topic,
 } from '../../models/Template';
+import { TemplateVersion } from '../../models/TemplateVersion';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit } from '../../models/Visit';
@@ -355,8 +356,19 @@ export interface EmailTemplateRecord {
   readonly body?: string | null;
 }
 
+export interface TemplateVersionRecord {
+  readonly template_version_pk: number;
+  readonly template_type: string;
+  readonly template_id: number;
+  readonly version_number: number;
+  readonly template: string;
+  readonly created_at: Date;
+}
+
 export interface PageTextRecord {
   readonly pagetext_id: number;
+  readonly page_id: number;
+  readonly role_id: number;
   readonly content: string;
 }
 
@@ -662,7 +674,12 @@ export interface SettingsRecord {
 }
 
 export const createPageObject = (record: PageTextRecord) => {
-  return new Page(record.pagetext_id, record.content);
+  return new Page(
+    record.pagetext_id,
+    record.page_id,
+    record.role_id,
+    record.content
+  );
 };
 
 export interface TokensAndPermissionsRecord {
@@ -1042,6 +1059,21 @@ export const createEmailTemplateObject = (
   );
 };
 
+export const createEmailVersionsObject = (
+  templateVersions: TemplateVersionRecord
+) => {
+  const template = JSON.stringify(templateVersions.template);
+
+  return new TemplateVersion(
+    templateVersions.template_version_pk,
+    templateVersions.template_id,
+    template,
+    templateVersions.version_number,
+    templateVersions.template_type,
+    templateVersions.created_at.toUTCString()
+  );
+};
+
 export const createCallHasInstrumentObject = (
   callHasInstrument: CallHasInstrumentRecord
 ) => {
@@ -1191,7 +1223,10 @@ export const createFapAssignmentObject = (fapAssignment: ReviewRecord) => {
     fapAssignment.reassigned,
     fapAssignment.date_reassigned,
     fapAssignment.email_sent,
-    fapAssignment.rank
+    fapAssignment.rank,
+    fapAssignment.comment,
+    fapAssignment.grade,
+    fapAssignment.status
   );
 };
 

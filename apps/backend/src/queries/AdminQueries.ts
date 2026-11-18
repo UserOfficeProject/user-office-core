@@ -6,6 +6,7 @@ import { BasicResolverContext } from '../context';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { RoleDataSource } from '../datasources/RoleDataSource';
 import { Authorized } from '../decorators';
+import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
@@ -14,8 +15,8 @@ import { getContextKeys } from '../utils/helperFunctions';
 type GetPageTextArgs = {
   pageId: number;
   agent: UserWithRole | null;
-  useDefaultIfNotFound: boolean;
-  roleId?: number;
+  roleIds: number[];
+  useDefaultIfNotFound?: boolean;
 };
 
 @injectable()
@@ -27,42 +28,62 @@ export default class AdminQueries {
 
   async getPageText({
     agent,
-    useDefaultIfNotFound,
     pageId,
-    roleId,
-  }: GetPageTextArgs): Promise<string | null> {
+    roleIds,
+    useDefaultIfNotFound = true,
+  }: GetPageTextArgs): Promise<Page[]> {
     if (agent == null || !agent.currentRole) {
-      return null;
+      return [];
     }
 
+    let retrievedPageNotices: Page[] = [];
     const userRole = agent.currentRole;
-    const roleTagIds =
-      roleId != null
-        ? (await this.roleDataSource.getTagsByRoleId(roleId)).map((t) => t.id)
-        : [];
+    const userRoleTagIds = (
+      await this.roleDataSource.getTagsByRoleId(userRole.id)
+    ).map((t) => t.id);
 
-    if (
-      roleId == null ||
-      userRole.id === roleId ||
-      (userRole.shortCode === Roles.USER_OFFICER &&
-        (userRole.isRootRole ||
-          (userRole.tags &&
-            userRole.tags.filter((t) => roleTagIds.includes(t.id)).length)))
-    ) {
-      let pageNotice = await this.adminDataSource.get(pageId, roleId);
+    const isUserOfficer = userRole.shortCode === Roles.USER_OFFICER;
+    const isBaseUserOfficer = isUserOfficer && userRole.isRootRole;
+    const requestedRoleIds = roleIds.filter((roleId) => roleId !== -1);
 
-      if (roleId != null && pageNotice == null && useDefaultIfNotFound) {
-        pageNotice = await this.adminDataSource.get(pageId);
+    const canReadRoleNotice = async (roleId: number) => {
+      const isOwnRoleNotice = userRole.id === roleId;
+      if (isOwnRoleNotice || isBaseUserOfficer) {
+        return true;
       }
 
-      return pageNotice;
-    }
-    logger.logWarn(
-      'User does not have permission to fetch requested page notice',
-      { agent, pageId, roleId }
-    );
+      if (!isUserOfficer) {
+        return false;
+      }
 
-    return null;
+      const requestedRoleTagIds = (
+        await this.roleDataSource.getTagsByRoleId(roleId)
+      ).map((t) => t.id);
+
+      return userRoleTagIds.some((t) => requestedRoleTagIds.includes(t));
+    };
+
+    const permissions = await Promise.all(
+      requestedRoleIds.map(canReadRoleNotice)
+    );
+    const canReadAllRequestedNotices = permissions.every(Boolean);
+
+    if (!canReadAllRequestedNotices) {
+      logger.logWarn(
+        'User does not have permission to fetch requested page notice',
+        { agent, pageId, roleIds }
+      );
+
+      return [];
+    }
+
+    retrievedPageNotices = await this.adminDataSource.get(pageId, roleIds);
+
+    if (!retrievedPageNotices.length && useDefaultIfNotFound) {
+      retrievedPageNotices = await this.adminDataSource.get(pageId, [-1]);
+    }
+
+    return retrievedPageNotices;
   }
 
   async getCountries() {

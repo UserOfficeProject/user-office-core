@@ -8,7 +8,7 @@ import React, { useContext } from 'react';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, Fap } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
 type GradeGuidePageProps = {
@@ -17,9 +17,8 @@ type GradeGuidePageProps = {
 
 const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
   const { currentRoleId } = useContext(UserContext);
-  const [loadingPage, pageContent] = useGetPageContent(
+  const [loadingPage, pageContent] = useGetPageContents(
     PageName.GRADEGUIDEPAGE,
-    true,
     currentRoleId
   );
 
@@ -50,7 +49,7 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
       ? parse(fap.gradeGuide)
       : noContents
     : pageContent
-      ? parse(pageContent)
+      ? parse(Array.isArray(pageContent) ? '' : pageContent)
       : noContents;
 
   return <StyledContainer>{content}</StyledContainer>;

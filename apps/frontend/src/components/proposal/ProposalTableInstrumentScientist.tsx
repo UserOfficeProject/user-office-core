@@ -20,6 +20,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
+import { parseStatusQuery } from 'components/common/proposalFilters/StatusFilter';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -64,7 +65,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserName, getPreferredName } from 'utils/user';
+import { getFullUserName, getPreferredNameWithLastname } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -112,8 +113,8 @@ let columns: Column<ProposalViewData>[] = [
     field: 'principalInvestigator',
     emptyValue: '-',
     render: (proposalView) =>
-      proposalView.principalInvestigator?.lastname
-        ? `${proposalView.principalInvestigator.lastname}, ${getPreferredName(proposalView.principalInvestigator)}`
+      proposalView.principalInvestigator
+        ? getPreferredNameWithLastname(proposalView.principalInvestigator)
         : '',
   },
   {
@@ -276,12 +277,12 @@ const ProposalTableInstrumentScientist = ({
   }
 
   const [searchParams, setSearchParams] = useSearchParams({
-    proposalStatus: statusFilter.toString(),
+    status: statusFilter.toString(),
     reviewer: reviewerFilter,
   });
   const callId = searchParams.get('call');
   const instrumentId = searchParams.get('instrument');
-  const proposalStatusId = searchParams.get('proposalStatus');
+  const proposalStatusId = searchParams.get('status');
   const questionId = searchParams.get('questionId');
   const proposalId = searchParams.get('proposalId');
   const compareOperator = searchParams.get('compareOperator');
@@ -302,7 +303,7 @@ const ProposalTableInstrumentScientist = ({
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: instrumentId === 'multi',
     },
-    proposalStatusId: proposalStatusId,
+    proposalStatusId: parseStatusQuery(proposalStatusId),
     referenceNumbers: proposalId ? [proposalId] : undefined,
     excludeProposalStatusIds: ['SCHEDULING'],
     questionFilter: questionaryFilterFromUrlQuery({
@@ -331,10 +332,7 @@ const ProposalTableInstrumentScientist = ({
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(
       {
-        proposalStatusId:
-          proposalFilter.proposalStatusId === 'ALL'
-            ? null
-            : proposalFilter.proposalStatusId,
+        proposalStatusId: proposalFilter.proposalStatusId,
         excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
         instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,

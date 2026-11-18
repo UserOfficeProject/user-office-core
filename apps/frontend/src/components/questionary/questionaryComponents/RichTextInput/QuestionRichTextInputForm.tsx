@@ -6,7 +6,7 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { TextInputConfig } from 'generated/sdk';
+import { RichTextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
@@ -23,6 +23,10 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           required: Yup.boolean(),
+          maxWords: Yup.number()
+            .nullable()
+            .integer('Max Words must be a positive integer')
+            .positive('Max Words must be a positive integer'),
         }),
       })}
     >
@@ -67,7 +71,7 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
             />
             <Field
               name="config.max"
-              label="Max"
+              label="Max Characters"
               type="text"
               id="Max-input"
               component={TextField}
@@ -81,7 +85,31 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
                   value.length === 0 ? null : value
                 );
               }}
-              value={(formikProps.values.config as TextInputConfig).max ?? ''}
+              value={
+                (formikProps.values.config as RichTextInputConfig).max ?? ''
+              }
+            />
+            <Field
+              name="config.maxWords"
+              label="Max Words"
+              id="Max-Words-input"
+              type="number"
+              component={TextField}
+              fullWidth
+              data-cy="max-words"
+              inputProps={{ min: 1, step: 1 }}
+              onChange={({
+                target: { value },
+              }: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue(
+                  'config.maxWords',
+                  value.length === 0 ? null : Number(value)
+                );
+              }}
+              value={
+                (formikProps.values.config as RichTextInputConfig).maxWords ??
+                ''
+              }
             />
           </TitledContainer>
         </>

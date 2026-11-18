@@ -14,22 +14,28 @@ import 'tinymce/plugins/charmap';
 import 'tinymce/plugins/wordcount';
 import 'tinymce/icons/default';
 
+import { useTheme } from '@mui/material/styles';
 import { Editor, IAllProps } from '@tinymce/tinymce-react';
 import React from 'react';
 
-const TinyEditor = (props: IAllProps) => (
-  <Editor
-    {...props}
-    init={{
-      // @ts-expect-error Tinymce types package is not updated and license_key has a wrong type
-      license_key: 'gpl',
-      promotion: false,
-      height: 300,
-      browser_spellcheck: true,
-      contextmenu: false,
-      ...props.init,
-    }}
-  />
-);
+const TinyEditor = (props: IAllProps) => {
+  const theme = useTheme();
+
+  return (
+    <Editor
+      {...props}
+      init={{
+        // @ts-expect-error Tinymce types package is not updated and license_key has a wrong type
+        license_key: 'gpl',
+        promotion: false,
+        height: 300,
+        browser_spellcheck: true,
+        contextmenu: false,
+        ...props.init,
+        content_style: `body { font-family: ${theme.typography.fontFamily}; } ${props.init?.content_style ?? ''}`,
+      }}
+    />
+  );
+};
 
 export default TinyEditor;
