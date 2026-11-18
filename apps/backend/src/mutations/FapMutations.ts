@@ -564,7 +564,7 @@ export default class FapMutations {
       );
     }
 
-    if (fapProposal.fapInstrumentMeetingSubmitted) {
+    if (fapProposal.fapInstrumentMeetingSubmitted && !isUserOfficer) {
       return rejection(
         'Can not save FAP meeting decision because the FAP instrument meeting has already been submitted',
         { args }

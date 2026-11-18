@@ -317,7 +317,7 @@ const FapInstrumentProposalsTable = ({
           ) {
             return a.proposalAverageScore < b.proposalAverageScore ? 1 : -1;
           } else {
-            if (a.proposalAverageScore === '-') {
+            if (typeof b.proposalAverageScore === 'number') {
               return 1;
             } else {
               return -1;
