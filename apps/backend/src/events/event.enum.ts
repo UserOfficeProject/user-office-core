@@ -11,7 +11,6 @@ import { isCallFapReviewEndedGuard } from '../workflowEngine/guards/isCallFapRev
 import { isCallReviewEndedGuard } from '../workflowEngine/guards/isCallReviewEndedGuard';
 import { isEveryFapInstrumentMeetingSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedForProposalGuard';
 import { isEveryFapInstrumentMeetingSubmittedGuard } from '../workflowEngine/guards/isEveryFapInstrumentMeetingSubmittedGuard';
-import { isEveryFapReviewerRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewerRequirementMetForProposalGuard';
 import { isEveryFapReviewSubmittedForProposalGuard } from '../workflowEngine/guards/isEveryFapReviewSubmittedForProposalGuard';
 import { isEveryFapSubmittedReviewRequirementMetForProposalGuard } from '../workflowEngine/guards/isEveryFapSubmittedReviewRequirementMetForProposalGuard';
 import { isEveryFeasibilityReviewFeasibleForProposalGuard } from '../workflowEngine/guards/isEveryFeasibilityReviewFeasibleForProposalGuard';
@@ -43,6 +42,7 @@ export enum Event {
   PROPOSAL_CREATED = 'PROPOSAL_CREATED',
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
+  PROPOSAL_SUBMITTED_INTERNAL = 'PROPOSAL_SUBMITTED_INTERNAL',
   PROPOSAL_DELETED = 'PROPOSAL_DELETED',
   PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE = 'PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE',
   PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE = 'PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE',
@@ -56,7 +56,6 @@ export enum Event {
   PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE = 'PROPOSAL_ALL_FEASIBILITY_REVIEWS_UNFEASIBLE',
   PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
   PROPOSAL_SAMPLE_SAFE = 'PROPOSAL_SAMPLE_SAFE',
-  PROPOSAL_ALL_FAP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_FAP_REVIEWERS_SELECTED',
   PROPOSAL_FAP_REVIEW_UPDATED = 'PROPOSAL_FAP_REVIEW_UPDATED',
   PROPOSAL_FAP_REVIEW_SUBMITTED = 'PROPOSAL_FAP_REVIEW_SUBMITTED',
   PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED',
@@ -164,6 +163,13 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
       guard: isProposalSubmittedGuard,
     },
   ],
+  [
+    Event.PROPOSAL_SUBMITTED_INTERNAL,
+    {
+      label:
+        'Event occurs when proposal is submitted during internal call open',
+    },
+  ],
   [Event.PROPOSAL_DELETED, { label: 'Event occurs when proposal is removed' }],
   [
     Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
@@ -249,14 +255,6 @@ export const EventMetadataByEvent = new Map<Event, EventMetadata>([
       label:
         'Event occurs when proposal sample review gets submitted with value of low risk',
       guard: isProposalSampleSafeGuard,
-    },
-  ],
-  [
-    Event.PROPOSAL_ALL_FAP_REVIEWERS_SELECTED,
-    {
-      label:
-        'Event occurs when every FAP on a proposal meets its reviewer requirement',
-      guard: isEveryFapReviewerRequirementMetForProposalGuard,
     },
   ],
   [
