@@ -615,6 +615,10 @@ context('Settings tests', () => {
                 workflowConnectionId: connectionFromSubmittedInternal.id,
                 statusChangingEvents: [Event.CALL_ENDED],
               });
+              cy.setStatusChangingEventsOnConnection({
+                workflowConnectionId: connectionFromSubmittedInternal.id,
+                statusChangingEvents: [Event.PROPOSAL_SUBMITTED_INTERNAL],
+              });
             }
           );
         }
@@ -1059,6 +1063,10 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.waitForProposalStatus(
+            proposal.primaryKey,
+            statuses.feasibilityReview.id
+          );
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposalPks: [proposal.primaryKey],
@@ -1072,6 +1080,10 @@ context('Settings tests', () => {
             instrumentId: initialDBData.instrument1.id,
             questionaryId: initialDBData.technicalReview.questionaryId,
           });
+          cy.waitForProposalStatus(
+            proposal.primaryKey,
+            statuses.fapSelection.id
+          );
 
           cy.assignProposalsToFaps({
             proposalPks: [proposal.primaryKey],
@@ -1108,6 +1120,7 @@ context('Settings tests', () => {
             },
             fapId: 1,
           });
+          cy.waitForProposalStatus(proposal.primaryKey, statuses.fapReview.id);
         }
       });
       cy.login('officer');
