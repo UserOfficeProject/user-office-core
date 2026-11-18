@@ -2382,13 +2382,13 @@ context('Template Basic tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.contains('Version').click();
+      cy.contains('Version History').click();
 
       cy.get('#version-select').click();
 
       cy.get('[data-cy="version-select-1"]').click();
 
-      cy.contains(initialDBData.emailTemplates.template1.body);
+      cy.should('contain', initialDBData.emailTemplates.template1.body);
     });
 
     it('User officer create an email version with an update comment', () => {
@@ -2411,7 +2411,8 @@ context('Template Basic tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.contains('Versions').click();
+      cy.contains('Version History').click();
+      cy.get('#version-select').click();
 
       cy.get('[data-cy=version-select]')
         .find('li:first-child')
