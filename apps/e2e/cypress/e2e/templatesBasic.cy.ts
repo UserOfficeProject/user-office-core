@@ -2406,6 +2406,11 @@ context('Template Basic tests', () => {
       cy.get('[data-cy="update-comment"]').type('Update comment');
       cy.get('[data-cy="submit"]').click();
 
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
       cy.contains('Versions').click();
 
       cy.get('[data-cy=version-select]')
