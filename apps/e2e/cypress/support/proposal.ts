@@ -9,6 +9,7 @@ import {
   CreateExperimentSafetyMutation,
   CreateProposalMutation,
   CreateProposalMutationVariables,
+  GetProposalQuery,
   GetProposalsQuery,
   GetProposalsQueryVariables,
   SubmitExperimentSafetyMutation,
@@ -37,6 +38,35 @@ const getProposals = (
   const request = api.getProposals(getProposalsInput);
 
   return cy.wrap(request);
+};
+
+const waitForProposalStatus = (
+  proposalPk: number,
+  statusId: string,
+  timeout = 10000
+): Cypress.Chainable<GetProposalQuery['proposal']> => {
+  const api = getE2EApi();
+  const deadline = Date.now() + timeout;
+
+  const poll = async (): Promise<GetProposalQuery['proposal']> => {
+    const { proposal } = await api.getProposal({ primaryKey: proposalPk });
+
+    if (proposal?.statusId === statusId) {
+      return proposal;
+    }
+
+    if (Date.now() > deadline) {
+      throw new Error(
+        `Proposal ${proposalPk} has status ${proposal?.statusId}, expected ${statusId} within ${timeout}ms`
+      );
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 250));
+
+    return poll();
+  };
+
+  return cy.wrap(poll(), { timeout: timeout + 5000 });
 };
 
 const updateProposal = (
@@ -115,3 +145,4 @@ Cypress.Commands.add(
 Cypress.Commands.add('createExperimentSafety', createExperimentSafety);
 Cypress.Commands.add('submitExperimentSafety', submitExperimentSafety);
 Cypress.Commands.add('getProposals', getProposals);
+Cypress.Commands.add('waitForProposalStatus', waitForProposalStatus);

@@ -5,6 +5,7 @@ import {
   ChangeProposalsStatusMutation,
   UpdateProposalMutation,
   GetProposalsQuery,
+  GetProposalQuery,
   AdministrationProposalMutation,
   CreateProposalMutation,
   ChangeProposalsStatusMutationVariables,
@@ -57,6 +58,20 @@ declare global {
       getProposals: (
         getProposalsInput: GetProposalsQueryVariables
       ) => Cypress.Chainable<GetProposalsQuery>;
+
+      /**
+       * Polls the proposal until it reaches the given status, because workflow transitions run after the triggering mutation returns.
+       *
+       * @returns {typeof waitForProposalStatus}
+       * @memberof Chainable
+       * @example
+       *    cy.waitForProposalStatus(proposalPk, 'FAP_REVIEW')
+       */
+      waitForProposalStatus: (
+        proposalPk: number,
+        statusId: string,
+        timeout?: number
+      ) => Cypress.Chainable<GetProposalQuery['proposal']>;
 
       /**
        * Submit proposal
