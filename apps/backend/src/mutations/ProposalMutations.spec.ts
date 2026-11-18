@@ -1,8 +1,14 @@
 import 'reflect-metadata';
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import ProposalMutations from './ProposalMutations';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import {
+  dummyInstrumentWithManagementTime,
+  InstrumentDataSourceMock,
+} from '../datasources/mockups/InstrumentDataSource';
 import {
   dummyProposal,
   dummyProposalSubmitted,
@@ -12,6 +18,7 @@ import {
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
   dummyInstrumentScientist,
+  dummyInstrumentScientistWithDerivedRole,
   dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
   dummyUserNotOnProposalWithRole,
@@ -19,6 +26,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
+import { Experiment, ExperimentStatus } from '../models/Experiment';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
@@ -30,6 +38,8 @@ const proposalMutations = container.resolve(ProposalMutations);
 let proposalDataSource: ProposalDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
 let workflowDataSource: WorkflowDataSourceMock;
+let instrumentDataSource: InstrumentDataSourceMock;
+let experimentDataSource: ExperimentDataSourceMock;
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
@@ -43,6 +53,14 @@ beforeEach(() => {
 
   workflowDataSource = container.resolve<WorkflowDataSourceMock>(
     Tokens.WorkflowDataSource
+  );
+
+  instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
+    Tokens.InstrumentDataSource
+  );
+
+  experimentDataSource = container.resolve<ExperimentDataSourceMock>(
+    Tokens.ExperimentDataSource
   );
 });
 
@@ -833,5 +851,316 @@ describe('Test technique proposal change status', () => {
         ]),
       })
     );
+  });
+
+  describe('Experiment creation on approval', () => {
+    beforeEach(() => {
+      jest
+        .spyOn(experimentDataSource, 'getExperimentsByProposalPk')
+        .mockResolvedValue([]);
+    });
+
+    test('A scientist approving a proposal without experiment creates a draft experiment', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockImplementation(async (experiment) => {
+          return {
+            experimentPk: 10,
+            experimentId: 'EXPERIMENT-1',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ...experiment,
+          } as Experiment;
+        });
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientist,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).toHaveBeenCalledTimes(1);
+      const createdExperiment = createSpy.mock.calls[0][0];
+
+      expect(createdExperiment).toEqual(
+        expect.objectContaining({
+          proposalPk: 1,
+          scheduledEventId: 1,
+          status: ExperimentStatus.DRAFT,
+          localContactId: null,
+          instrumentId: dummyInstrumentWithManagementTime.id,
+        })
+      );
+
+      // startsAt is now, endsAt is exactly one year after startsAt
+      const startsAt = new Date(createdExperiment.startsAt);
+      const endsAt = new Date(createdExperiment.endsAt);
+
+      expect(Math.abs(Date.now() - startsAt.getTime())).toBeLessThan(10_000);
+      expect(endsAt.getFullYear()).toBe(startsAt.getFullYear() + 1);
+      expect(endsAt.getMonth()).toBe(startsAt.getMonth());
+      expect(endsAt.getDate()).toBe(startsAt.getDate());
+    });
+
+    test('A scientist with a derived instrument scientist role can also trigger experiment creation on approval', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockResolvedValue({} as Experiment);
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientistWithDerivedRole,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).toHaveBeenCalledTimes(1);
+      expect(createSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          proposalPk: 1,
+          status: ExperimentStatus.DRAFT,
+        })
+      );
+    });
+
+    test('A scientist approving a proposal that already has an experiment does not create another experiment', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      jest
+        .spyOn(experimentDataSource, 'getExperimentsByProposalPk')
+        .mockResolvedValue([{}] as Experiment[]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockResolvedValue({} as Experiment);
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientist,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    test('A failure to create the experiment does not prevent the proposal from being approved', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockRejectedValue(new Error('Experiment creation failed'));
+      const logExceptionSpy = jest.spyOn(logger, 'logException');
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientist,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).toHaveBeenCalledTimes(1);
+      expect(logExceptionSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Could not create experiment for approved technique proposal'
+        ),
+        expect.any(Error)
+      );
+    });
+
+    test('A scientist approving multiple proposals without experiments creates one draft experiment per proposal', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+        {
+          ...dummyProposal,
+          primaryKey: 2,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockResolvedValue({} as Experiment);
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientist,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1, 2],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+            expect.objectContaining({
+              primaryKey: 2,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).toHaveBeenCalledTimes(2);
+      const createdProposalPks = createSpy.mock.calls.map(
+        (call) => call[0].proposalPk
+      );
+
+      expect([...createdProposalPks].sort()).toEqual([1, 2]);
+    });
+
+    test('A scientist cannot approve a proposal without an instrument assigned', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      jest
+        .spyOn(instrumentDataSource, 'getInstrumentsByProposalPk')
+        .mockResolvedValue([]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockResolvedValue({} as Experiment);
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyInstrumentScientist,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          message: expect.stringContaining('forbidden status transition'),
+        })
+      );
+
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    test('A user officer approving a proposal does not create an experiment', async () => {
+      jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+        {
+          ...dummyProposal,
+          primaryKey: 1,
+          workflowStatusId: underReviewId,
+        },
+      ]);
+
+      const createSpy = jest
+        .spyOn(experimentDataSource, 'create')
+        .mockResolvedValue({} as Experiment);
+
+      const result = await proposalMutations.changeTechniqueProposalsStatus(
+        dummyUserOfficerWithRole,
+        {
+          workflowStatusId: approvedId,
+          proposalPks: [1],
+        }
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          proposals: expect.arrayContaining([
+            expect.objectContaining({
+              primaryKey: 1,
+              workflowStatusId: approvedId,
+            }),
+          ]),
+        })
+      );
+
+      expect(createSpy).not.toHaveBeenCalled();
+    });
   });
 });
