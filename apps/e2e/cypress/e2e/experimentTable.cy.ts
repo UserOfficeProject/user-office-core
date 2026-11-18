@@ -1,5 +1,7 @@
 import { ProposalEndStatus } from '@user-office-software-libs/shared-types';
+import { FeatureId } from '@user-office-software-libs/shared-types';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 const existingProposal = initialDBData.proposal;
@@ -12,7 +14,11 @@ const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 context('Experiment Table for users', () => {
   beforeEach(function () {
     cy.resetDB(true);
-    cy.getAndStoreFeaturesEnabled();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
+        this.skip();
+      }
+    });
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,
       finalStatus: ProposalEndStatus.ACCEPTED,
