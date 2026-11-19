@@ -1,4 +1,4 @@
-import { BoxProps } from '@mui/material';
+import { BoxProps } from '@mui/material/Box';
 import React, { PropsWithChildren } from 'react';
 
 import { StyledButtonContainer } from 'styles/StyledComponents';

@@ -1,9 +1,10 @@
-import MaterialTable, { Action, Column } from '@material-table/core';
+import { Action, Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import GridOnIcon from '@mui/icons-material/GetApp';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { Fap, ReviewStatus } from 'generated/sdk';
 import { useDownloadXLSXFapReviews } from 'hooks/fap/useDownloadXLSXFapReviews';
 import { useExpandCollapseAll } from 'hooks/fap/useExpandCollapseAll';

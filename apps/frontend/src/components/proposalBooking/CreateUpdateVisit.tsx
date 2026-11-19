@@ -1,4 +1,5 @@
-import { Button, Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';

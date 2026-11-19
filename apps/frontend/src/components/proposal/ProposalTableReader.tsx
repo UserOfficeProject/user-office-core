@@ -1,6 +1,6 @@
 import { Column } from '@material-table/core';
 import Visibility from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';

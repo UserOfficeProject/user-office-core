@@ -1,4 +1,5 @@
-import { PaperProps, Typography } from '@mui/material';
+import { PaperProps } from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import { default as React, useState } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';

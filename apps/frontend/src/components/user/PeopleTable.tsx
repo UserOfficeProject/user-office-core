@@ -1,4 +1,4 @@
-import MaterialTableCore, {
+import {
   Options,
   Column,
   MTableToolbar,
@@ -6,10 +6,11 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import SearchIcon from '@mui/icons-material/Search';
-import { Grid, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
@@ -18,6 +19,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import EmailSearchBar from 'components/common/EmailSearchBar';
+import MaterialTableCore from 'components/common/MaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
 import {

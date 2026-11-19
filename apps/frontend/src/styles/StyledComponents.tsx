@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Paper, { PaperProps } from '@mui/material/Paper';
 import { Theme, styled } from '@mui/material/styles';
-import { BoxProps } from '@mui/system';
+import { BoxProps } from '@mui/system/Box';
 
 const getValueFromArrayProperty = (
   prop: [number, number?, number?, number?],

@@ -1,5 +1,5 @@
-import { DialogContent } from '@mui/material';
 import Button, { ButtonProps } from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';

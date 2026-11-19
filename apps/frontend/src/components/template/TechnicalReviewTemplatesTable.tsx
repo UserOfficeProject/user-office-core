@@ -1,10 +1,11 @@
-import MaterialTable, { Column } from '@material-table/core';
+import { Column } from '@material-table/core';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import {
   TechnicalReview,

@@ -1,7 +1,4 @@
-import MaterialTable, {
-  MTableAction,
-  MTableToolbar,
-} from '@material-table/core';
+import { MTableAction, MTableToolbar } from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -10,6 +7,7 @@ import Button from '@mui/material/Button';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { deepEqual } from 'utils/json';
 import { FunctionType } from 'utils/utilTypes';
 

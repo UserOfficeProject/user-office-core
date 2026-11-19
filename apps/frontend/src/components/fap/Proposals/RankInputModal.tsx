@@ -1,10 +1,8 @@
-import {
-  Button,
-  DialogActions,
-  DialogContent,
-  FormHelperText,
-  TextField,
-} from '@mui/material';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import FormHelperText from '@mui/material/FormHelperText';
+import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';

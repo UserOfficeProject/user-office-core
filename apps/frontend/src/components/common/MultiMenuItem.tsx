@@ -1,4 +1,5 @@
-import { Checkbox, MenuItem, MenuItemProps } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import MenuItem, { MenuItemProps } from '@mui/material/MenuItem';
 import React from 'react';
 
 const MultiMenuItem = (props: MenuItemProps) => (

@@ -1,4 +1,4 @@
-import { SafetyCheck } from '@mui/icons-material';
+import SafetyCheck from '@mui/icons-material/SafetyCheck';
 import React from 'react';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';

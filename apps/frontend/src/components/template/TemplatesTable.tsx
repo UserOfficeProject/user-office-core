@@ -7,8 +7,9 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import PublishIcon from '@mui/icons-material/Publish';
 import ShareIcon from '@mui/icons-material/Share';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
-import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

@@ -28,8 +28,9 @@
  */
 
 import CloseIcon from '@mui/icons-material/Close';
-import { DialogTitle, IconButton } from '@mui/material';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 

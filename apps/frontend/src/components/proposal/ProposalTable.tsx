@@ -1,7 +1,4 @@
-import MaterialTableCore, {
-  Column,
-  OrderByCollection,
-} from '@material-table/core';
+import { Column, OrderByCollection } from '@material-table/core';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
@@ -9,9 +6,9 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -19,6 +16,7 @@ import { Navigate } from 'react-router-dom';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import MaterialTableCore from 'components/common/MaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';

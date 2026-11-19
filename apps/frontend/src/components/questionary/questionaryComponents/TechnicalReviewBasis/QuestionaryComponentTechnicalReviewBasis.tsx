@@ -1,4 +1,8 @@
-import { Box, CssBaseline, Grid, InputLabel, useTheme } from '@mui/material';
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

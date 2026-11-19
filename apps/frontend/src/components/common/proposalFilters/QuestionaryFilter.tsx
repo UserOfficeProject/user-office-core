@@ -1,5 +1,9 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, Collapse, Grid, TextField, Autocomplete } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import React, { useEffect, useState, ReactElement } from 'react';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';

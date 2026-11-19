@@ -1,8 +1,8 @@
-import MaterialTable from '@material-table/core';
 import Link from '@mui/material/Link';
 import React, { useMemo } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import MaterialTable from 'components/common/MaterialTable';
 import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
 import {
   ProposalsDataQuantity,

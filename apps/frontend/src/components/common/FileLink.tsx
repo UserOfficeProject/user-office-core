@@ -1,5 +1,6 @@
 import Link from '@mui/material/Link';
-import { SxProps, Theme } from '@mui/system';
+import { Theme } from '@mui/system/createTheme';
+import { SxProps } from '@mui/system/styleFunctionSx';
 import React, { useContext, useState } from 'react';
 
 import { DownloadMonitorDialog } from 'context/DownloadContextProvider';

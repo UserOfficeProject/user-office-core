@@ -1,6 +1,7 @@
-import { DialogContent, DialogContentText } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';

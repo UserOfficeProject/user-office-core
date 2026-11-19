@@ -1,4 +1,5 @@
-import { Typography, Link } from '@mui/material';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';

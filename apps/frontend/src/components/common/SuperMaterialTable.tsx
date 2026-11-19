@@ -1,7 +1,8 @@
 import { MaterialTableProps } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
-import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
+import Typography from '@mui/material/Typography';
 import React, { SetStateAction, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 

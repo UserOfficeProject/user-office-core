@@ -1,14 +1,15 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { DialogActions, DialogContent } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/system';
+import Box from '@mui/system/Box';
 import React, { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

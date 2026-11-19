@@ -1,5 +1,6 @@
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
-import { Menu, MenuItem } from '@mui/material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 

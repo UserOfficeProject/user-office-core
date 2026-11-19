@@ -1,4 +1,4 @@
-import { FormControl } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import React, { useContext, ChangeEvent } from 'react';

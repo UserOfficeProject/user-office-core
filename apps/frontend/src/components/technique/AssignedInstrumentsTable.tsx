@@ -1,9 +1,9 @@
-import MaterialTable from '@material-table/core';
 import Box from '@mui/material/Box';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { TechniqueFragment } from 'generated/sdk';
 
 type AssignedInstrumentsTableProps = {

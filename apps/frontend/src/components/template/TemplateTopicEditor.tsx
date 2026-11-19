@@ -4,7 +4,7 @@ import {
   Droppable,
   NotDraggingStyle,
 } from '@hello-pangea/dnd';
-import { Check } from '@mui/icons-material';
+import Check from '@mui/icons-material/Check';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';

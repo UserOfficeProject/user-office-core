@@ -1,6 +1,7 @@
-import { Check, MergeType } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import Check from '@mui/icons-material/Check';
+import MergeType from '@mui/icons-material/MergeType';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';

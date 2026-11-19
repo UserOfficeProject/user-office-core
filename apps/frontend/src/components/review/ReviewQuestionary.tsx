@@ -1,4 +1,4 @@
-import { PaperProps } from '@mui/material';
+import { PaperProps } from '@mui/material/Paper';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';

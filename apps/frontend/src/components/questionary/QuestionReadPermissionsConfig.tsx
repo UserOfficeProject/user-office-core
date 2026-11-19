@@ -1,4 +1,4 @@
-import { InputLabel } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
 import { Field } from 'formik';
 import React from 'react';
 

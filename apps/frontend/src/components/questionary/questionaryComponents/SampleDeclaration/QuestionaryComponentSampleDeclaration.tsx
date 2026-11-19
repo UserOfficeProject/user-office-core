@@ -1,4 +1,4 @@
-import { DialogContent } from '@mui/material';
+import DialogContent from '@mui/material/DialogContent';
 import InputLabel from '@mui/material/InputLabel';
 import Paper from '@mui/material/Paper';
 import { Field, FieldProps } from 'formik';

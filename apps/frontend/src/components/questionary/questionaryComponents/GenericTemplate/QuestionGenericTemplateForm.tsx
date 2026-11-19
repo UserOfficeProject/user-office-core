@@ -1,4 +1,5 @@
-import { Collapse, FormControl } from '@mui/material';
+import Collapse from '@mui/material/Collapse';
+import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import React from 'react';

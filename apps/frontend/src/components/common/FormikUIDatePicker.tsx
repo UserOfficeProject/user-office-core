@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { TextFieldProps } from '@mui/material/TextField';
-import { PickerValidDate } from '@mui/x-date-pickers';
 import {
   DatePicker as MuiDatePicker,
   DatePickerProps as MuiDatePickerProps,
 } from '@mui/x-date-pickers/DatePicker';
+import { PickerValidDate } from '@mui/x-date-pickers/models';
 import { FieldProps, getIn } from 'formik';
 import { DateTime } from 'luxon';
 import * as React from 'react';

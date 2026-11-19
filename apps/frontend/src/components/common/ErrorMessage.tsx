@@ -1,4 +1,4 @@
-import { Box, BoxProps } from '@mui/material';
+import Box, { BoxProps } from '@mui/material/Box';
 import { ErrorMessage as FormikErrorMessage, ErrorMessageProps } from 'formik';
 import React from 'react';
 

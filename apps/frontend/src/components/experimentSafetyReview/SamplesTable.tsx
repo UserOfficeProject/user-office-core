@@ -1,11 +1,9 @@
-import MaterialTable, {
-  MaterialTableProps,
-  Column,
-} from '@material-table/core';
-import { Typography } from '@mui/material';
+import { MaterialTableProps, Column } from '@material-table/core';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
 import { tableIcons } from 'utils/materialIcons';
 

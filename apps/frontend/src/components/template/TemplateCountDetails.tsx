@@ -1,7 +1,7 @@
-import MaterialTable from '@material-table/core';
-import { Link } from '@mui/material';
+import Link from '@mui/material/Link';
 import React, { useMemo } from 'react';
 
+import MaterialTable from 'components/common/MaterialTable';
 import { GetTemplatesQuery } from 'generated/sdk';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { useTemplates } from 'hooks/template/useTemplates';

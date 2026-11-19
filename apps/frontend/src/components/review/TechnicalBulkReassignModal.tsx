@@ -1,21 +1,20 @@
-import MaterialTable, { Column } from '@material-table/core';
-import { Delete } from '@mui/icons-material';
-import {
-  Alert,
-  Autocomplete,
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  FormHelperText,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Column } from '@material-table/core';
+import Delete from '@mui/icons-material/Delete';
+import Alert from '@mui/material/Alert';
+import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import FormHelperText from '@mui/material/FormHelperText';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import MaterialTable from 'components/common/MaterialTable';
 import StyledDialog from 'components/common/StyledDialog';
 import {
   ProposalViewInstrument,

@@ -1,4 +1,5 @@
-import { MenuItem, Typography } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 import React, { useContext } from 'react';
 
 import { FeatureContext } from 'context/FeatureContextProvider';

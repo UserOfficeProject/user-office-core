@@ -1,4 +1,4 @@
-import { TextFieldProps } from '@mui/material';
+import { TextFieldProps } from '@mui/material/TextField';
 import React, { KeyboardEvent, ReactElement } from 'react';
 
 interface WithPreventSubmitProps {

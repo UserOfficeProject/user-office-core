@@ -1,19 +1,18 @@
-import MaterialTable, {
-  Action,
-  MaterialTableProps,
-} from '@material-table/core';
-import { ScheduleSend } from '@mui/icons-material';
+import { Action, MaterialTableProps } from '@material-table/core';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ScheduleSend from '@mui/icons-material/ScheduleSend';
 import SendIcon from '@mui/icons-material/Send';
-import { Chip, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
 import FormControl from '@mui/material/FormControl';
 import { SxProps, Theme } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import MaterialTable from 'components/common/MaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 

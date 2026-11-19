@@ -1,5 +1,6 @@
 import { Column, EditComponentProps } from '@material-table/core';
-import { Autocomplete, Box } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';

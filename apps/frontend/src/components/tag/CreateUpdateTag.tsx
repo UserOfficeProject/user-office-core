@@ -1,4 +1,5 @@
-import { Button, Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { Field, Form, Formik, FormikValues } from 'formik';
 import React from 'react';
 import { number, object, string } from 'yup';
