@@ -877,7 +877,7 @@ context('Proposal administration tests', () => {
 
           cy.addProposalTechnicalReview({
             proposalPk: createdProposalPk,
-            status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+            status: TechnicalReviewStatus.UNFEASIBLE,
             timeAllocation: 1,
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
