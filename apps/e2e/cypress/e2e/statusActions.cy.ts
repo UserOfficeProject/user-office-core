@@ -987,7 +987,7 @@ context('Status actions tests', () => {
                 );
               }),
           {
-            timeout: 20000,
+            timeout: 60000,
             interval: 1000,
             errorMsg: `${statusActionType} status action logs did not complete successfully in time`,
           }

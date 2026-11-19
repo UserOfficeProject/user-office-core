@@ -682,6 +682,7 @@ export default class PostgresInstrumentDataSource
         'u.user_id': 'ihs.user_id',
       })
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .where('ihs.instrument_id', instrumentId)
       .then(
         (
