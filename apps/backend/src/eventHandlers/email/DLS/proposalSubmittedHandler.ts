@@ -174,7 +174,7 @@ export async function proposalSubmittedHandler(event: ApplicationEvent) {
         alternativeContacts: '',
         coinvestigators: participants.map(
           (partipant) =>
-            `${partipant.preferredname || partipant.firstname} ${partipant.lastname} `
+            `${partipant.preferredname || partipant.firstname} ${partipant.lastname}`
         ),
         requested,
       },
