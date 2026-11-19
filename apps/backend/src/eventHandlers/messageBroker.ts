@@ -107,7 +107,7 @@ export type ProposalBookingTimeSlotAddedMessage = {
   proposalId: string | null;
   status: string;
   localContactId: number | null;
-  oidcSub: string | null;
+  localContactOidcSub: string | null;
   instrumentId: number | null;
   instrumentShortCode: string | null;
 };
@@ -122,7 +122,7 @@ export const parseProposalBookingTimeSlotAddedMessage = (
   const publicIdentifierFields = [
     'proposalId',
     'instrumentShortCode',
-    'oidcSub',
+    'localContactOidcSub',
   ];
   const primaryKeyFields = ['proposalPk', 'instrumentId', 'localContactId'];
   const hasPublicIdentifiers = publicIdentifierFields.some((field) =>
@@ -134,7 +134,7 @@ export const parseProposalBookingTimeSlotAddedMessage = (
 
   if (hasPublicIdentifiers === hasPrimaryKeys) {
     throw new Error(
-      'Scheduler booking message must contain either public identifiers or UOS primary keys'
+      'Scheduler booking message must contain either public identifiers or UOC primary keys'
     );
   }
 
@@ -145,7 +145,7 @@ export const parseProposalBookingTimeSlotAddedMessage = (
         'experimentId',
         'proposalId',
         'instrumentShortCode',
-        'oidcSub',
+        'localContactOidcSub',
       ]
     : [...commonFields, ...primaryKeyFields];
   const missingFields = requiredFields.filter(
@@ -181,7 +181,8 @@ export const parseProposalBookingTimeSlotAddedMessage = (
     status: message.status as string,
     localContactId:
       (message.localContactId as number | null | undefined) ?? null,
-    oidcSub: (message.oidcSub as string | null | undefined) ?? null,
+    localContactOidcSub:
+      (message.localContactOidcSub as string | null | undefined) ?? null,
     instrumentId: (message.instrumentId as number | null | undefined) ?? null,
     instrumentShortCode:
       (message.instrumentShortCode as string | null | undefined) ?? null,
@@ -890,13 +891,13 @@ export async function createListenToRabbitMQHandler() {
             }
 
             let localContactId: number | null = null;
-            if (bookingMessage.oidcSub !== null) {
+            if (bookingMessage.localContactOidcSub !== null) {
               const localContact = await publicUserDataSource.getByOIDCSub(
-                bookingMessage.oidcSub
+                bookingMessage.localContactOidcSub
               );
               if (!localContact) {
                 throw new Error(
-                  `User with OIDC subject ${bookingMessage.oidcSub} was not found`
+                  `User with OIDC subject ${bookingMessage.localContactOidcSub} was not found`
                 );
               }
               localContactId = localContact.id;
