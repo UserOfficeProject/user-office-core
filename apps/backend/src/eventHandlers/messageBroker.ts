@@ -96,7 +96,7 @@ type ExperimentMessageData = {
   instrument?: { id: number; name: string; shortCode: string };
 };
 
-/** Normalized form of either scheduler payload; absent alternatives are null. */
+/** Normalised form of either scheduler payload; absent alternatives are null. */
 export type ProposalBookingTimeSlotAddedMessage = {
   source: string | null;
   id: number;
