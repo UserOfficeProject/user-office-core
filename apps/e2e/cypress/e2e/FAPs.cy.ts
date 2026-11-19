@@ -2744,14 +2744,14 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      // NOTE: Proposal with higher standard deviation but same average score should be shown first on initial sort
+      // NOTE: Proposal with lower standard deviation but same average score should be shown first on initial sort
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
-        .contains(proposal2.title);
+        .contains(proposal1.title);
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .last()
-        .contains(proposal1.title);
+        .contains(proposal2.title);
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
