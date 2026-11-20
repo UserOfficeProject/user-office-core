@@ -28,6 +28,7 @@ import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety'
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { getFullUserNameWithEmail } from 'utils/user';
 
+import ExperimentNotesField from './ExperimentNotesField';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
 export enum EXPERIMENT_MODAL_TAB_NAMES {
@@ -37,6 +38,7 @@ export enum EXPERIMENT_MODAL_TAB_NAMES {
   EXPERIMENT_SAFETY_REVIEW = 'Experiment Safety Review',
   VISIT = 'Visit',
   LOGS = 'Logs',
+  NOTES_FIELD = 'Notes Field',
 }
 
 type ExperimentReviewContentProps = {
@@ -330,6 +332,13 @@ const ExperimentReviewContent = ({
         return (
           <Fragment key={index}>
             <ExperimentVisitsTable experiment={experiment} />
+          </Fragment>
+        );
+
+      case EXPERIMENT_MODAL_TAB_NAMES.NOTES_FIELD:
+        return (
+          <Fragment key={index}>
+            <ExperimentNotesField experiment={experiment} />
           </Fragment>
         );
       case EXPERIMENT_MODAL_TAB_NAMES.LOGS:

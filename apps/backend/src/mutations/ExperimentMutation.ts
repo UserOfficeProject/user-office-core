@@ -455,6 +455,22 @@ export default class ExperimentMutations {
     );
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async updateExperiment(
+    agent: UserWithRole | null,
+    args: {
+      experimentPk: number;
+      notes: string;
+    }
+  ) {
+    const experiment = await this.dataSource.updateExperiment(
+      args.experimentPk,
+      args.notes
+    );
+
+    return experiment;
+  }
+
   @Authorized()
   async cloneExperimentSample(
     agent: UserWithRole | null,
