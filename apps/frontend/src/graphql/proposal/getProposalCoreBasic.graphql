@@ -11,6 +11,7 @@ query getProposalCoreBasic(
       statusId
       proposalId
       callId
+      submittedDate
       instruments {
         id
         name
