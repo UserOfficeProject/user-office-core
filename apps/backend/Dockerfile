@@ -1,4 +1,4 @@
-FROM node:22.23.4-alpine AS build-stage
+FROM node:22.23.5-alpine AS build-stage
 
 USER node
 
@@ -19,7 +19,7 @@ COPY --chown=node:node apps/backend/ .
 
 RUN npm run build
 
-FROM node:22.23.4-alpine
+FROM node:22.23.5-alpine
 
 USER node
 
