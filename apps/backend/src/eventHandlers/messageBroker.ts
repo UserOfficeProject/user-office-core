@@ -39,6 +39,10 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
+import {
+  getExperimentMessageData,
+  handleProposalBookingTimeSlotAdded,
+} from './proposals/experiment';
 import proposalWorkflowEntity from './workflowEntities/proposal';
 import { startWorkflow } from './workflowHandler';
 
@@ -66,7 +70,7 @@ type Member = {
   country: Country;
 };
 
-type ProposalMessageData = {
+export type ProposalMessageData = {
   abstract: string;
   callId: number;
   instruments?: { id: number; shortCode: string; allocatedTime: number }[];
@@ -80,17 +84,6 @@ type ProposalMessageData = {
   title: string;
   submitted: boolean;
   samples?: Pick<Sample, 'id' | 'title'>[];
-};
-
-type ExperimentMessageData = {
-  experimentId: string;
-  experimentPk: number;
-  startsAt: Date;
-  endsAt: Date;
-  status: string;
-  proposal?: ProposalMessageData;
-  samples?: Pick<Sample, 'id' | 'title'>[];
-  instrument?: { id: number; name: string; shortCode: string };
 };
 
 type VisitRegistrationAnswerMessageData = {
@@ -258,67 +251,6 @@ export const getProposalsMessageData = async (proposals: Proposal[]) => {
   );
 
   return JSON.stringify(proposalsMessageData);
-};
-
-export const getExperimentMessageData = async (experiment: Experiment) => {
-  const experimentDataSource = container.resolve<ExperimentDataSource>(
-    Tokens.ExperimentDataSource
-  );
-  const sampleDataSource = container.resolve<SampleDataSource>(
-    Tokens.SampleDataSource
-  );
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-  const instrumentDataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-
-  const proposal = await proposalDataSource.get(experiment.proposalPk);
-  const proposalMessageDataString = proposal
-    ? await getProposalMessageData(proposal)
-    : undefined;
-  const proposalMessageData = proposalMessageDataString
-    ? JSON.parse(proposalMessageDataString)
-    : undefined;
-
-  const experimentHasSamples = await experimentDataSource.getExperimentSamples(
-    experiment.experimentPk
-  );
-
-  const samples = await Promise.all(
-    experimentHasSamples.map(async (ehs) => {
-      const sample = await sampleDataSource.getSample(ehs.sampleId);
-
-      return {
-        id: ehs.sampleId,
-        title: sample?.title || '',
-      };
-    })
-  );
-
-  const instrument = await instrumentDataSource.getInstrument(
-    experiment.instrumentId
-  );
-
-  const messageData: ExperimentMessageData = {
-    experimentId: experiment.experimentId,
-    experimentPk: experiment.experimentPk,
-    startsAt: experiment.startsAt,
-    endsAt: experiment.endsAt,
-    status: experiment.status,
-    proposal: proposalMessageData,
-    samples: samples,
-    instrument: instrument
-      ? {
-          id: instrument.id,
-          name: instrument.name,
-          shortCode: instrument.shortCode,
-        }
-      : undefined,
-  };
-
-  return JSON.stringify(messageData);
 };
 
 export const getVisitMessageData = async (
@@ -742,31 +674,11 @@ export async function createListenToRabbitMQHandler() {
             message,
           });
 
-          const experimentToAdd = {
-            startsAt: message.startsAt,
-            endsAt: message.endsAt,
-            scheduledEventId: message.id,
-            proposalPk: message.proposalPk,
-            status: message.status,
-            localContactId: message.localContactId,
-            instrumentId: message.instrumentId,
-          } as Omit<
-            Experiment,
-            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
-          >;
-
-          const experiment = await experimentDataSource.create(experimentToAdd);
-
-          await handleProposalWorkflowEngineChange(
-            type,
-            experimentToAdd.proposalPk
-          );
-
-          const jsonMessage = await getExperimentMessageData(experiment);
-          await rabbitMQ.sendMessageToExchange(
-            EXCHANGE_NAME,
-            'EXPERIMENT_CREATED',
-            jsonMessage
+          await handleProposalBookingTimeSlotAdded(
+            message,
+            type as Event,
+            handleProposalWorkflowEngineChange,
+            rabbitMQ
           );
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);

@@ -26,7 +26,8 @@ export class Experiment {
     public instrumentId: number,
     public createdAt: Date,
     public updatedAt: Date,
-    public referenceNumberSequence: number | null
+    public referenceNumberSequence: number | null,
+    public source: string | null = null
   ) {}
 }
 

@@ -110,6 +110,7 @@ describe('messageBroker handlers', () => {
     let listenCallback: (type: Event, message: any) => Promise<void>;
     let startWorkflowSpy: jest.SpyInstance;
     let mockExperimentDataSource: ExperimentDataSourceMock;
+    let mockExperimentCreateSpy: jest.SpyInstance;
     let mockVisitDataSource: VisitDataSourceMock;
 
     beforeEach(async () => {
@@ -117,7 +118,7 @@ describe('messageBroker handlers', () => {
       mockVisitDataSource = container.resolve(Tokens.VisitDataSource);
 
       mockVisitDataSource.init();
-      jest
+      mockExperimentCreateSpy = jest
         .spyOn(mockExperimentDataSource, 'create')
         .mockResolvedValue(OngoingExperiment);
       jest
@@ -165,6 +166,92 @@ describe('messageBroker handlers', () => {
         dummyProposal.primaryKey,
         proposalWorkflowEntity
       );
+      expect(mockExperimentCreateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          startsAt: bookingMessage.startsAt,
+          endsAt: bookingMessage.endsAt,
+          scheduledEventId: bookingMessage.id,
+          proposalPk: dummyProposal.primaryKey,
+          status: bookingMessage.status,
+          localContactId: bookingMessage.localContactId,
+          instrumentId: bookingMessage.instrumentId,
+          source: null,
+        })
+      );
+    });
+
+    it('should create an experiment from a public identifier scheduler message', async () => {
+      await createListenToRabbitMQHandler();
+
+      const bookingMessage = {
+        id: 202,
+        startsAt: new Date('2026-06-01'),
+        endsAt: new Date('2026-06-02'),
+        experimentId: 'MX99912-1',
+        proposalId: dummyProposal.proposalId,
+        instrumentShortCode: 'instrument_1',
+        status: 'DRAFT',
+        source: 'external-scheduler',
+        oidcSub: null,
+      };
+
+      await listenCallback(
+        Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED,
+        bookingMessage
+      );
+
+      expect(mockExperimentCreateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          startsAt: bookingMessage.startsAt,
+          endsAt: bookingMessage.endsAt,
+          scheduledEventId: bookingMessage.id,
+          experimentId: bookingMessage.experimentId,
+          proposalPk: dummyProposal.primaryKey,
+          status: bookingMessage.status,
+          localContactId: null,
+          instrumentId: 1,
+          source: bookingMessage.source,
+        })
+      );
+      expect(startWorkflowSpy).toHaveBeenCalledWith(
+        { type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED },
+        dummyProposal.primaryKey,
+        proposalWorkflowEntity
+      );
+    });
+
+    it('should not create an experiment when a UOS scheduler message is missing a required property', async () => {
+      await createListenToRabbitMQHandler();
+
+      await listenCallback(Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED, {
+        id: 101,
+        startsAt: new Date('2026-06-01'),
+        endsAt: new Date('2026-06-02'),
+        proposalPk: dummyProposal.primaryKey,
+        status: 'DRAFT',
+        localContactId: 1,
+      });
+
+      expect(mockExperimentCreateSpy).not.toHaveBeenCalled();
+      expect(startWorkflowSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not create an experiment when a public identifier scheduler message is missing a required property', async () => {
+      await createListenToRabbitMQHandler();
+
+      await listenCallback(Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED, {
+        id: 203,
+        startsAt: new Date('2026-06-01'),
+        endsAt: new Date('2026-06-02'),
+        proposalId: dummyProposal.proposalId,
+        instrumentShortCode: 'instrument_1',
+        status: 'DRAFT',
+        source: 'external-scheduler',
+        oidcSub: null,
+      });
+
+      expect(mockExperimentCreateSpy).not.toHaveBeenCalled();
+      expect(startWorkflowSpy).not.toHaveBeenCalled();
     });
 
     it('should trigger startWorkflow on PROPOSAL_BOOKING_TIME_SLOTS_REMOVED', async () => {
