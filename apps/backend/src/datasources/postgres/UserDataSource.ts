@@ -206,10 +206,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .where('user_id', id)
       .first()
       .then((user: UserRecord & InstitutionRecord & CountryRecord) =>
-        createBasicUserObject(user)
+        user ? createBasicUserObject(user) : null
       );
   }
 
@@ -218,6 +219,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .whereIn('u.user_id', ids)
       .then(
         (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
@@ -233,6 +235,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .whereILikeEscaped('email', '?', email)
       .modify((query) => {
         if (role) {
@@ -388,6 +391,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .modify((query) => {
         if (searchText) {
           query.andWhere((qb) => {
@@ -469,6 +473,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { 'users.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .whereIn('users.user_id', userIds)
       .modify((query) => {
         if (searchText) {
@@ -637,6 +642,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_pk': 'pc.proposal_pk' })
       .where('p.proposal_pk', id)
