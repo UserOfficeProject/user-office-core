@@ -1520,8 +1520,8 @@ export interface ExperimentRecord {
   readonly experiment_pk: number;
   readonly experiment_id: string;
   readonly starts_at: Date;
-  readonly ends_at: Date;
-  readonly scheduled_event_id: number;
+  readonly ends_at: Date | null;
+  readonly scheduled_event_id: number | null;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
   readonly local_contact_id: number;
@@ -1535,8 +1535,8 @@ export interface ExperimentPaginatedRecord {
   readonly experiment_pk: number;
   readonly experiment_id: string;
   readonly starts_at: Date;
-  readonly ends_at: Date;
-  readonly scheduled_event_id: number;
+  readonly ends_at: Date | null;
+  readonly scheduled_event_id: number | null;
   readonly proposal_pk: number;
   readonly status: ExperimentStatus;
   readonly local_contact_id: number;
