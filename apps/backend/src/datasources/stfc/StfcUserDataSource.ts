@@ -590,11 +590,7 @@ export class StfcUserDataSource implements UserDataSource {
 
       const BasicPeopleByLastName: BasicPersonDetailsDTO[] | null =
         await UOWSClient.basicPersonDetails
-          .getBasicPersonDetails(
-            undefined,
-            searchText ? [searchText] : undefined,
-            undefined
-          )
+          .getBasicPersonDetails(undefined, [searchText], undefined)
           .catch((error) => {
             logger.logError(
               'An error occurred while fetching searchable person details using getBasicPersonDetails',
