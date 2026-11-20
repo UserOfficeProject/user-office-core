@@ -3022,7 +3022,7 @@ context('Fap meeting components tests', () => {
       });
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
-        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+        status: TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: firstProposalTimeAllocation,
         submitted: true,
         reviewerId: 0,
@@ -3104,7 +3104,7 @@ context('Fap meeting components tests', () => {
       });
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
-        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+        status: TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: firstProposalTimeAllocation,
         submitted: true,
         reviewerId: 0,

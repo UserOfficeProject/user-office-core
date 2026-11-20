@@ -82,10 +82,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   const statusOptions: Option[] = [
     { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
     {
-      text: 'Partially feasible',
-      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
-    },
-    {
       text: 'Unfeasible',
       value: TechnicalReviewStatus.UNFEASIBLE,
     },
