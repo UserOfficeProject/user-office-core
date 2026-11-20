@@ -1,21 +1,24 @@
 import MaterialTable, {
   Action,
+  Column,
   MaterialTableProps,
 } from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
 import { Chip, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import { SxProps, Theme } from '@mui/material/styles';
+import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Invite } from 'generated/sdk';
+import { getFullUserName } from 'utils/user';
 
 import ProposalPeopleSelectorModal from '../proposal/ProposalPeopleSelectorModal';
 
@@ -31,6 +34,7 @@ export type UserManagementTableProps = {
   readonly?: boolean;
   addButtonLabel?: string;
   addButtonTooltip?: string;
+  compact?: boolean;
   /** Header shown at the top of the invite/selector modal */
   addModalTitle?: string;
   /** Disable the add button */
@@ -52,12 +56,14 @@ const UserManagementTable = ({
   title,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
+  compact = false,
   addModalTitle,
   disabled = false,
   onUserAction,
   excludeUserIds = [],
   allowInviteByEmail = false,
 }: UserManagementTableProps) => {
+  const theme = useTheme();
   const [modalOpen, setOpen] = useState(false);
   const currentUser = useContext(UserContext)?.user;
 
@@ -115,16 +121,62 @@ const UserManagementTable = ({
             });
           },
         },
+        ...(compact
+          ? [
+              {
+                icon: () => <DeleteOutlineIcon fontSize="small" />,
+                tooltip: 'Remove',
+                onClick: (
+                  _event: React.MouseEvent<JSX.Element>,
+                  rowData: BasicUserDetails | BasicUserDetails[]
+                ) => removeUser(Array.isArray(rowData) ? rowData[0] : rowData),
+              },
+            ]
+          : []),
       ];
 
-  const editable: MaterialTableProps<BasicUserDetails>['editable'] = !!readonly
-    ? {}
+  const editable: MaterialTableProps<BasicUserDetails>['editable'] =
+    !!readonly || compact
+      ? {}
+      : {
+          onRowDelete: (oldData) =>
+            new Promise<void>((resolve) => {
+              removeUser(oldData);
+              resolve();
+            }),
+        };
+
+  const columns: Column<BasicUserDetails>[] = compact
+    ? [
+        { title: 'Name', render: (user) => getFullUserName(user) },
+        { title: 'Institution', field: 'institution' },
+      ]
+    : [
+        { title: 'Firstname', field: 'firstname' },
+        { title: 'Lastname', field: 'lastname' },
+        { title: 'Preferred name', field: 'preferredname' },
+        { title: 'Institution', field: 'institution' },
+      ];
+
+  const tableOptions: MaterialTableProps<BasicUserDetails>['options'] = compact
+    ? {
+        showTitle: false,
+        search: false,
+        toolbar: false,
+        paging: false,
+        padding: 'dense',
+        maxBodyHeight: '40vh',
+        actionsColumnIndex: -1,
+        headerStyle: {
+          fontWeight: theme.typography.fontWeightMedium,
+          backgroundColor: theme.palette.grey[50],
+          whiteSpace: 'nowrap',
+        },
+      }
     : {
-        onRowDelete: (oldData) =>
-          new Promise<void>((resolve) => {
-            removeUser(oldData);
-            resolve();
-          }),
+        showTitle: false,
+        paging: true,
+        pageSize: 10,
       };
 
   const InviteComponent = (
@@ -142,92 +194,125 @@ const UserManagementTable = ({
     />
   );
 
+  const invitesChips = invites.length > 0 && (
+    <Box
+      sx={{
+        display: 'flex',
+        marginTop: compact ? 0 : 1,
+        gap: 1,
+        alignItems: 'flex-start',
+        flex: compact ? 1 : undefined,
+      }}
+      data-cy="invites-chips"
+    >
+      <Typography
+        sx={{
+          fontSize: '12px',
+          color: 'grey',
+          paddingRight: '10px',
+          display: 'inline-block',
+          whiteSpace: 'nowrap',
+          mt: '4px',
+        }}
+      >
+        Invited:
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
+        {invites.map((invite) => (
+          <Chip
+            sx={{ gap: '2px', padding: '6px' }}
+            color="secondary"
+            icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
+            size="small"
+            label={invite.email}
+            key={invite.email}
+            onDelete={() => handleDeleteInvite(invite)}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
+
+  const addButton = (
+    <Tooltip title={addButtonTooltip}>
+      <Button
+        variant="outlined"
+        onClick={openModal}
+        data-cy="add-participant-button"
+        size="small"
+        startIcon={<PersonAddIcon />}
+        disabled={disabled || !!readonly}
+        sx={compact ? { flexShrink: 0, ml: 'auto' } : undefined}
+      >
+        {addButtonLabel}
+      </Button>
+    </Tooltip>
+  );
+
   return (
     <Box sx={sx}>
       {modalOpen && InviteComponent}
       <FormControl margin="dense" fullWidth>
-        <Typography
-          sx={{
-            fontSize: '12px',
-            color: 'grey',
-          }}
-        >
-          {title}
-        </Typography>
-        <>
-          <MaterialTable
-            data={users}
-            columns={[
-              { title: 'Firstname', field: 'firstname' },
-              { title: 'Lastname', field: 'lastname' },
-              { title: 'Preferred name', field: 'preferredname' },
-              { title: 'Institution', field: 'institution' },
-            ]}
-            options={{
-              showTitle: false,
-              paging: true,
-              pageSize: 10,
+        {compact ? (
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            {title} ({users.length})
+          </Typography>
+        ) : (
+          <Typography sx={{ fontSize: '12px', color: 'grey' }}>
+            {title}
+          </Typography>
+        )}
+        <MaterialTable
+          data={users}
+          columns={columns}
+          options={tableOptions}
+          actions={rowActions}
+          editable={editable}
+          localization={
+            compact
+              ? {
+                  header: { actions: '' },
+                  body: {
+                    emptyDataSourceMessage: `No ${title.toLowerCase()} added yet`,
+                  },
+                }
+              : undefined
+          }
+          style={
+            compact
+              ? {
+                  boxShadow: 'none',
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: theme.shape.borderRadius,
+                  overflow: 'hidden',
+                }
+              : undefined
+          }
+        />
+        {compact ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 2,
+              mt: 1.5,
             }}
-            actions={rowActions}
-            editable={editable}
-          />
-
-          {invites.length > 0 && (
-            <Box
-              sx={{
-                display: 'flex',
-                marginTop: 1,
-                gap: 1,
-                alignItems: 'flex-start',
-              }}
-              data-cy="invites-chips"
-            >
-              <Typography
-                sx={{
-                  fontSize: '12px',
-                  color: 'grey',
-                  paddingRight: '10px',
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap',
-                  mt: '4px',
-                }}
-              >
-                Invited:
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, flex: 1 }}>
-                {invites.map((invite) => (
-                  <Chip
-                    sx={{ gap: '2px', padding: '6px' }}
-                    color="secondary"
-                    icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
-                    size="small"
-                    label={invite.email}
-                    key={invite.email}
-                    onDelete={() => handleDeleteInvite(invite)}
-                  />
-                ))}
-              </Box>
-            </Box>
-          )}
-          <ActionButtonContainer
-            sx={(theme) => ({
-              marginTop: theme.spacing(1),
-            })}
           >
-            <Tooltip title={addButtonTooltip}>
-              <Button
-                variant="outlined"
-                onClick={openModal}
-                data-cy="add-participant-button"
-                size="small"
-                startIcon={<PersonAddIcon />}
-                disabled={disabled || !!readonly}
-              >
-                {addButtonLabel}
-              </Button>
-            </Tooltip>
-          </ActionButtonContainer>
-        </>
+            {invitesChips}
+            {addButton}
+          </Box>
+        ) : (
+          <>
+            {invitesChips}
+            <ActionButtonContainer
+              sx={(theme) => ({
+                marginTop: theme.spacing(1),
+              })}
+            >
+              {addButton}
+            </ActionButtonContainer>
+          </>
+        )}
       </FormControl>
     </Box>
   );
