@@ -453,6 +453,11 @@ context('visits tests', () => {
       cy.contains(/Please add visitors/i);
       cy.contains(/Please select the team lead/i);
 
+      cy.get('[role="dialog"]')
+        .find('input[placeholder="Search"]')
+        .should('not.exist');
+      cy.get('[data-cy=create-update-visit-button]').should('be.visible');
+
       // add visitors
       cy.get('[data-cy=add-participant-button]').click();
       cy.finishedLoading();
@@ -609,10 +614,8 @@ context('visits tests', () => {
       cy.get('[role="dialog"]')
         .contains('Carlsson')
         .parent()
-        .find('[aria-label=Delete]')
+        .find('[aria-label=Remove]')
         .click();
-
-      cy.get('[aria-label="Save"]').click();
 
       cy.get('[data-cy=create-update-visit-button]').click();
 
@@ -690,13 +693,11 @@ context('visits tests', () => {
 
       cy.get('[role="dialog"]').contains(teamVisitor.lastName).should('exist');
 
-      // Delete the visitor and confirm the material table row deletion.
       cy.get('[role="dialog"]')
         .contains(teamVisitor.lastName)
         .parent()
-        .find('[aria-label=Delete]')
+        .find('[aria-label=Remove]')
         .click();
-      cy.get('[aria-label="Save"]').click();
 
       cy.get('[role="dialog"]')
         .contains(teamVisitor.lastName)
@@ -797,11 +798,8 @@ context('visits tests', () => {
        * The actions column is dropped entirely rather than being disabled, so
        * neither the column header nor the delete button is rendered.
        */
-      cy.get('[role="dialog"]')
-        .find('thead')
-        .contains('Actions')
-        .should('not.exist');
-      cy.get('[role="dialog"]').find('[aria-label=Delete]').should('not.exist');
+      cy.get('[role="dialog"]').find('thead th').should('have.length', 2);
+      cy.get('[role="dialog"]').find('[aria-label=Remove]').should('not.exist');
     });
   });
 });
