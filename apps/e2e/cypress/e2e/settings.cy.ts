@@ -583,7 +583,9 @@ context('Settings tests', () => {
       cy.get('[aria-label="View proposal"]').should('exist');
     });
 
-    it('Proposals submitted during internal call open must have the correct status', function () {
+    // TODO this test currently cannot pass as the only way the call ended event runs is on the cron job
+    // https://github.com/UserOfficeProject/issue-tracker/issues/1764
+    it.skip('Proposals submitted during internal call open must have the correct status', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
@@ -677,6 +679,8 @@ context('Settings tests', () => {
       cy.visit('/');
 
       cy.finishedLoading();
+
+      cy.pause();
 
       cy.contains(internalProposalTitle)
         .parent()

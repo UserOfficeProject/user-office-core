@@ -1,9 +1,9 @@
-import * as Yup from 'yup';
+import * as Yup from "yup";
 
 export const createWorkflowValidationSchema = Yup.object().shape({
   name: Yup.string().max(50).required(),
   description: Yup.string().max(200).required(),
-  entityType: Yup.string().oneOf(['PROPOSAL', 'EXPERIMENT']).required(),
+  entityType: Yup.string().oneOf(["PROPOSAL", "EXPERIMENT"]).required(),
 });
 
 export const updateWorkflowValidationSchema = Yup.object().shape({
@@ -62,8 +62,7 @@ export const addStatusActionsToConnectionValidationSchema = <T, U>(
           actionType: Yup.mixed<T>().oneOf(statusActionTypes).required(),
           config: Yup.object()
             .transform((value, originalValue) => {
-              console.log({ value, originalValue });
-              if (typeof originalValue === 'string') {
+              if (typeof originalValue === "string") {
                 try {
                   return JSON.parse(originalValue);
                 } catch {
@@ -73,31 +72,39 @@ export const addStatusActionsToConnectionValidationSchema = <T, U>(
               return value;
             })
             .test(
-              'RecipientWithTemplate',
-              'Invalid values provided for action config',
+              "RecipientWithTemplate",
+              "Invalid values provided for action config",
               async (value: any, context: any) => {
                 switch (context.parent.actionType) {
                   case emailStatusActionType: {
                     // NOTE: Value here is: EmailActionConfig from the core codebase
                     if (value.recipientsWithEmailTemplate?.length) {
-                      const filteredNonCompleteValues = value.recipientsWithEmailTemplate.filter(
-                        (item: any) => !item.recipient?.name || !item.emailTemplate?.id,
-                      );
+                      const filteredNonCompleteValues =
+                        value.recipientsWithEmailTemplate.filter(
+                          (item: any) =>
+                            !item.recipient?.name || !item.emailTemplate?.id,
+                        );
 
                       if (filteredNonCompleteValues.length) {
                         return false;
                       }
 
-                      const foundOtherRecipient = value.recipientsWithEmailTemplate.find(
-                        (recipientWithEmailTemplate: any) =>
-                          recipientWithEmailTemplate.recipient.name === otherEmailActionRecipients,
-                      );
+                      const foundOtherRecipient =
+                        value.recipientsWithEmailTemplate.find(
+                          (recipientWithEmailTemplate: any) =>
+                            recipientWithEmailTemplate.recipient.name ===
+                            otherEmailActionRecipients,
+                        );
 
                       // NOTE: Check if 'OTHER' is selected as recipient and valid emails are provided as input.
                       if (foundOtherRecipient) {
                         await Yup.array()
-                          .of(Yup.string().email(({ value }) => `${value} is not a valid email`))
-                          .min(1, 'You must provide at least 1 valid email')
+                          .of(
+                            Yup.string().email(
+                              ({ value }) => `${value} is not a valid email`,
+                            ),
+                          )
+                          .min(1, "You must provide at least 1 valid email")
                           .required()
                           .validate(foundOtherRecipient.otherRecipientEmails);
                       }

@@ -28,6 +28,7 @@ export type RowObj = {
   propReviewAvgScore?: number;
   propFapRankOrder: number | null;
   instrumentId: number;
+  fapProposalId: number;
   inAvailZone?: string | null;
   feedback?: string;
   timeRequested?: number;
@@ -133,6 +134,7 @@ export const collectFapXLSXRowData = async (
           proposalAnswers,
           reviews,
           instrumentId: proposal.instrument_id,
+          fapProposalId: proposal.fap_proposal_id,
         };
 
         return fapDataRow(rowInput);

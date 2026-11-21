@@ -219,8 +219,10 @@ const PROPOSAL_WORKFLOW_PREVIEW_DATA = {
       commentForManagement: '',
       submitted: true,
       submittedBy: 1,
-      instrumentId: 1,
+      recommendedInstrumentId: 1,
+      recommendedTimeAllocation: 1,
       fapId: 1,
+      fapProposalId: 1,
     } satisfies FapMeetingDecision,
   ],
   technicalReviews: [

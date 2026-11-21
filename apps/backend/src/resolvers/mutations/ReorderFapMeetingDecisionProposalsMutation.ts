@@ -20,7 +20,7 @@ export class ProposalPkWithRankOrder {
   public rankOrder: number;
 
   @Field(() => Int)
-  public instrumentId: number;
+  public recommendedInstrumentId: number;
 
   @Field(() => Int)
   public fapId: number;

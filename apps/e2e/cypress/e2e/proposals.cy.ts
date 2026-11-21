@@ -2220,29 +2220,35 @@ context('Proposal tests', () => {
             });
           });
         }
-      });
-      cy.createCall({
-        ...newCall,
-        allocationTimeUnit: AllocationTimeUnits.DAY,
-        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
-        templateId: createdTemplateId,
-      }).then((response) => {
-        if (response.createCall) {
-          createdCallId = response.createCall.id;
-          cy.createInstrument(instrument).then((result) => {
-            cy.assignInstrumentToCall({
-              callId: createdCallId,
-              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+
+        cy.createCall({
+          ...newCall,
+          allocationTimeUnit: AllocationTimeUnits.DAY,
+          proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+          templateId: createdTemplateId,
+        }).then((response) => {
+          if (response.createCall) {
+            createdCallId = response.createCall.id;
+            cy.createInstrument(instrument).then((result) => {
+              cy.assignInstrumentToCall({
+                callId: createdCallId,
+                instrumentFapIds: [
+                  { instrumentId: result.createInstrument.id },
+                ],
+              });
             });
-          });
-          cy.createInstrument(instrument2).then((result) => {
-            cy.assignInstrumentToCall({
-              callId: createdCallId,
-              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            cy.createInstrument(instrument2).then((result) => {
+              cy.assignInstrumentToCall({
+                callId: createdCallId,
+                instrumentFapIds: [
+                  { instrumentId: result.createInstrument.id },
+                ],
+              });
             });
-          });
-        }
+          }
+        });
       });
+
       cy.login('officer');
       cy.visit('/');
     });
