@@ -39,9 +39,7 @@ function ExperimentsPage() {
     React.useState<ExperimentsFilter>({
       callId: callId ? +callId : undefined,
       instrumentId: instrumentId ? +instrumentId : undefined,
-      experimentSafetyStatusId: experimentSafetyStatusId
-        ? +experimentSafetyStatusId
-        : undefined,
+      experimentSafetyStatusId: experimentSafetyStatusId || undefined,
       // Set initial values for experiment dates if provided in URL
       experimentStartDate: experimentStartDate
         ? DateTime.fromFormat(
@@ -63,6 +61,13 @@ function ExperimentsPage() {
     statuses: experimentStatuses,
     loadingStatuses: loadingExperimentStatuses,
   } = useStatusesData(WorkflowType.EXPERIMENT);
+  const filter = React.useMemo(
+    () => ({
+      ...experimentsFilter,
+      experimentSafetyStatusId: experimentSafetyStatusId || undefined,
+    }),
+    [experimentsFilter, experimentSafetyStatusId]
+  );
 
   return (
     <StyledContainer maxWidth={false}>
@@ -78,10 +83,10 @@ function ExperimentsPage() {
             isLoading: loadingExperimentStatuses,
           }}
           setExperimentFilter={setExperimentsFilter}
-          filter={experimentsFilter}
+          filter={filter}
         />
         <ExperimentsTable
-          experimentsFilter={experimentsFilter}
+          experimentsFilter={filter}
           setExperimentsFilter={setExperimentsFilter}
         />
       </StyledPaper>

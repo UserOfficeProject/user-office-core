@@ -75,6 +75,67 @@ context('Experiments tests', () => {
   });
 
   describe('Experiments tests', () => {
+    it('Persists the safety status filter and clears it when selecting All', () => {
+      cy.login('officer');
+      cy.intercept('POST', '/graphql', (request) => {
+        if (request.body?.operationName === 'getAllExperiments') {
+          request.alias = 'filteredExperiments';
+        }
+      });
+
+      cy.visit('/Experiments?experimentSafetyStatus=ESF_APPROVED');
+      cy.wait('@filteredExperiments').then(({ request, response }) => {
+        expect(request.body.variables.filter.experimentSafetyStatusId).to.eq(
+          'ESF_APPROVED'
+        );
+        expect(response?.body.errors).to.be.undefined;
+      });
+      cy.get('[data-cy=safety-status-filter]').should(
+        'contain',
+        'ESF APPROVED'
+      );
+
+      cy.reload();
+      cy.wait('@filteredExperiments').then(({ request, response }) => {
+        expect(request.body.variables.filter.experimentSafetyStatusId).to.eq(
+          'ESF_APPROVED'
+        );
+        expect(response?.body.errors).to.be.undefined;
+      });
+
+      cy.get('[data-cy=safety-status-filter]').click();
+      cy.get('[role=listbox]').contains('ESF REJECTED').click();
+      cy.wait('@filteredExperiments').then(({ request, response }) => {
+        expect(request.body.variables.filter.experimentSafetyStatusId).to.eq(
+          'ESF_REJECTED'
+        );
+        expect(response?.body.errors).to.be.undefined;
+      });
+      cy.url().should('include', 'experimentSafetyStatus=ESF_REJECTED');
+
+      cy.get('[data-cy=safety-status-filter]').click();
+      cy.get('[role=listbox]').contains('All').click();
+      cy.wait('@filteredExperiments').then(({ request, response }) => {
+        expect(request.body.variables.filter.experimentSafetyStatusId).to.be
+          .undefined;
+        expect(response?.body.errors).to.be.undefined;
+      });
+      cy.url().should('not.include', 'experimentSafetyStatus');
+      cy.get('[data-cy=safety-status-filter]').should('contain', 'All');
+
+      cy.go('back');
+      cy.wait('@filteredExperiments').then(({ request, response }) => {
+        expect(request.body.variables.filter.experimentSafetyStatusId).to.eq(
+          'ESF_REJECTED'
+        );
+        expect(response?.body.errors).to.be.undefined;
+      });
+      cy.get('[data-cy=safety-status-filter]').should(
+        'contain',
+        'ESF REJECTED'
+      );
+    });
+
     it('Can filter by call and instrument', () => {
       cy.login('officer');
       cy.visit('/');
