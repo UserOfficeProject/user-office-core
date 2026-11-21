@@ -5,7 +5,7 @@ import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
-import { Template, TemplateGroupId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -70,17 +70,7 @@ export type ProposalEsiTemplateRowDataType = TemplateRowDataType & {
 };
 
 type ProposalEsiTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      Template,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'questionaryCount'
-      | 'proposalESICallCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function ProposalEsiTemplatesTable(props: ProposalEsiTemplatesTableProps) {
@@ -107,7 +97,7 @@ function ProposalEsiTemplatesTable(props: ProposalEsiTemplatesTableProps) {
     { title: 'Description', field: 'description' },
     {
       title: '# calls',
-      field: 'proposalESICallCount',
+      field: 'callCount',
       editable: 'never',
       render: NumberOfCalls,
     },
@@ -128,7 +118,7 @@ function ProposalEsiTemplatesTable(props: ProposalEsiTemplatesTableProps) {
 
           return proposalESITemplateRowData.proposalESICallCount === 0;
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
       <CallsModal
         templateId={selectedTemplateId}

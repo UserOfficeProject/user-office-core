@@ -1,7 +1,6 @@
 import { Column } from '@material-table/core';
-import React, { useCallback } from 'react';
+import React from 'react';
 
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm from 'utils/withConfirm';
 
 import TemplatesTable, {
@@ -10,21 +9,14 @@ import TemplatesTable, {
 } from './TemplatesTable';
 
 export interface DefaultTemplatesTableProps
-  extends Omit<
-    TemplatesTableProps,
-    'isRowRemovable' | 'columns' | 'dataProvider'
-  > {
+  extends Omit<TemplatesTableProps, 'isRowRemovable' | 'columns'> {
   isArchived: boolean;
   itemCountLabel?: string;
   isRowRemovable?: TemplatesTableProps['isRowRemovable'];
   columns?: TemplatesTableProps['columns'];
-  dataProvider?: TemplatesTableProps['dataProvider'];
 }
 
 function DefaultTemplatesTable(props: DefaultTemplatesTableProps) {
-  const { isArchived, templateGroup } = props;
-  const { api } = useDataApiWithFeedback();
-
   const defaultIsRowRemovable = (rowData: TemplateRowDataType) =>
     rowData.questionaryCount === 0;
 
@@ -38,22 +30,11 @@ function DefaultTemplatesTable(props: DefaultTemplatesTableProps) {
     },
   ];
 
-  const defaultDataProvider = useCallback(
-    () =>
-      api()
-        .getTemplates({
-          filter: { group: templateGroup, isArchived },
-        })
-        .then(({ templates }) => templates ?? []),
-    [api, isArchived, templateGroup]
-  );
-
   return (
     <TemplatesTable
       {...props}
       columns={props.columns ?? defaultColumns}
       isRowRemovable={props.isRowRemovable ?? defaultIsRowRemovable}
-      dataProvider={props.dataProvider ?? defaultDataProvider}
     />
   );
 }
