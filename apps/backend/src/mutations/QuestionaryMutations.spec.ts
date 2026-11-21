@@ -7,7 +7,10 @@ import {
   QuestionaryDataSourceMock,
   dummyQuestionTemplateRelationFactory,
 } from '../datasources/mockups/QuestionaryDataSource';
-import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
+import {
+  dummyUserWithRole,
+  dummyUserOfficerWithDerivedRole,
+} from '../datasources/mockups/UserDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
@@ -53,6 +56,30 @@ it('User should answer topic questions', async () => {
       },
     ],
   });
+  expect(isRejection(result)).toBeFalsy();
+});
+
+it('User with a specific role can answer questions restricted to that role', async () => {
+  jest
+    .spyOn(templateDataSource, 'getQuestionTemplateRelation')
+    .mockResolvedValue(dummyQuestionTemplateRelationFactory());
+  const { firstAnswer, firstStep, questionaryId } =
+    await getDummyUsersProposal();
+  firstAnswer.config.readPermissions = [
+    String(dummyUserOfficerWithDerivedRole.currentRole!.id),
+  ];
+
+  const result = await mutations.answerTopic(dummyUserOfficerWithDerivedRole, {
+    questionaryId,
+    topicId: firstStep.topic.id,
+    answers: [
+      {
+        questionId: firstAnswer.question.id,
+        value: JSON.stringify({ value: 'answer' }),
+      },
+    ],
+  });
+
   expect(isRejection(result)).toBeFalsy();
 });
 
