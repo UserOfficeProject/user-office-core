@@ -33,6 +33,9 @@ export class CreateFapArgs {
 
   @Field(() => Int)
   public reviewVisibility: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  public editInstrumentAvailabilityTime: boolean;
 }
 
 @Resolver()

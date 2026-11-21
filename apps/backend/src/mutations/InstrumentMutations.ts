@@ -380,7 +380,7 @@ export default class InstrumentMutations {
   }
 
   @ValidateArgs(setAvailabilityTimeOnInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY])
   async setAvailabilityTimeOnInstrument(
     agent: UserWithRole | null,
     args: InstrumentAvailabilityTimeArgs

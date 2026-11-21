@@ -85,7 +85,8 @@ export default class FapMutations {
         args.gradeGuide,
         args.customGradeGuide,
         args.active,
-        args.reviewVisibility
+        args.reviewVisibility,
+        args.editInstrumentAvailabilityTime
       )
       .catch((err) => {
         return rejection(
@@ -113,7 +114,8 @@ export default class FapMutations {
         args.customGradeGuide,
         args.active,
         args.files,
-        args.reviewVisibility
+        args.reviewVisibility,
+        args.editInstrumentAvailabilityTime ?? false
       )
       .catch((err) => {
         return rejection(

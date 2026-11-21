@@ -33,7 +33,8 @@ export interface FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean | null,
     active: boolean,
-    reviewVisibility: number
+    reviewVisibility: number,
+    editInstrumentAvailabilityTime: boolean
   ): Promise<Fap>;
   update(
     id: number,
@@ -44,7 +45,8 @@ export interface FapDataSource {
     customGradeGuide: boolean | null,
     active: boolean,
     files: string | null,
-    reviewVisibility: number
+    reviewVisibility: number,
+    editInstrumentAvailabilityTime: boolean
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;

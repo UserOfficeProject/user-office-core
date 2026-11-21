@@ -32,6 +32,7 @@ const AddFap = ({ close }: AddFapProps) => {
         numberRatingsRequired: 2,
         active: true,
         reviewVisibility: 1,
+        editInstrumentAvailabilityTime: false,
       }}
       onSubmit={async (values): Promise<void> => {
         try {
