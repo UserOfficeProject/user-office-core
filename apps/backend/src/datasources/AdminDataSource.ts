@@ -11,6 +11,10 @@ import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutions
 import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
+import {
+  InstitutionsPage,
+  InstitutionsPageArgs,
+} from '../resolvers/queries/InstitutionsPageQuery';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
@@ -25,6 +29,7 @@ export interface AdminDataSource {
   deleteInstitution(id: number): Promise<Institution | null>;
   mergeInstitutions(args: MergeInstitutionsInput): Promise<Institution | null>;
   getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
+  getInstitutionsPage(args: InstitutionsPageArgs): Promise<InstitutionsPage>;
   getInstitutionByRorId(rorId: string): Promise<Institution | null>;
   getInstitutionByName(institutionName: string): Promise<Institution | null>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;

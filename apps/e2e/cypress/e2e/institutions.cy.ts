@@ -42,6 +42,7 @@ context('Institution tests', () => {
 
     cy.get('[data-cy="institutions-table"]').as('institutionsTable');
 
+    cy.get('@institutionsTable').find('input[placeholder=Search]').type(name);
     cy.get('@institutionsTable').should('contain', name);
   });
 
