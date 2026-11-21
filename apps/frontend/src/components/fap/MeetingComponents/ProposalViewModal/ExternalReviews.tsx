@@ -6,8 +6,9 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
+import RoleBasedLink from 'components/common/RoleBasedLink';
 import ReviewQuestionaryReview from 'components/review/ReviewQuestionaryReview';
-import { Fap, Review } from 'generated/sdk';
+import { Fap, Review, UserRole } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { StyledPaper } from 'styles/StyledComponents';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
@@ -39,10 +40,19 @@ const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
               <TableCell sx={BOLD_TEXT_STYLE}>Score</TableCell>
               <TableCell sx={BOLD_TEXT_STYLE}>Review Summary</TableCell>
               <TableCell sx={BOLD_TEXT_STYLE}>Comment</TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>FAP</TableCell>
             </TableRow>
             {reviews?.map((review) => (
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
-                <TableCell>{getFullUserName(review.reviewer)}</TableCell>
+                <TableCell>
+                  <RoleBasedLink
+                    roleRoutes={{
+                      [UserRole.USER_OFFICER]: `/People/${review.userID}`,
+                    }}
+                  >
+                    {getFullUserName(review.reviewer)}
+                  </RoleBasedLink>
+                </TableCell>
                 <TableCell>{review.grade || '-'}</TableCell>
                 <TableCell>
                   <ButtonWithDialog label="Show" title="Show">
