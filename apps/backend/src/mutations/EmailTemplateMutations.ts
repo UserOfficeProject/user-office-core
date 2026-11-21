@@ -69,7 +69,8 @@ export default class EmailTemplateMutations {
         args.description,
         args.useTemplateFile,
         args.subject,
-        args.body
+        args.body,
+        args.updateComment
       );
 
       return updatedEmailTemplate;

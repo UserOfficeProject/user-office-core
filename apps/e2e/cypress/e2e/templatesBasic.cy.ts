@@ -2382,13 +2382,41 @@ context('Template Basic tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.contains('Version').click();
+      cy.contains('Version History').click();
 
       cy.get('#version-select').click();
 
       cy.get('[data-cy="version-select-1"]').click();
 
-      cy.contains(initialDBData.emailTemplates.template1.body);
+      cy.should('contain', initialDBData.emailTemplates.template1.body);
+    });
+
+    it('User officer create an email version with an update comment', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Email');
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="body"] .cm-content').first().type('<p> New line </p> ');
+      cy.get('[data-cy="update-comment"]').type('Update comment');
+      cy.get('[data-cy="submit"]').click();
+
+      cy.contains(initialDBData.emailTemplates.template1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.contains('Version History').click();
+      cy.get('#version-select').click();
+
+      cy.get('[data-cy=version-select]')
+        .find('li:first-child')
+        .should('contain', 'Update comment');
     });
   });
 });
