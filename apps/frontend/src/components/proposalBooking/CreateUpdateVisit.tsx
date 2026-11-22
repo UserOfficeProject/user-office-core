@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
@@ -125,7 +125,7 @@ function CreateUpdateVisit({
     >
       {({ values, isSubmitting, setFieldValue }) => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ mb: 1 }}>
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
           <UserManagementTable
@@ -139,25 +139,30 @@ function CreateUpdateVisit({
             }}
             users={values.team || []}
             allowInviteByEmail={allowInviteByEmail}
+            addButtonLabel="Add visitor"
+            addButtonTooltip="Add a visitor"
+            compact
           />
           <ErrorMessage name="team" />
 
-          <FormikUIAutocomplete
-            items={values.team.map((user) => ({
-              text: getFullUserName(user, true),
-              value: user.id,
-            }))}
-            label="Team lead"
-            name="teamLeadUserId"
-            disabled={readonly}
-            InputProps={{
-              'data-cy': 'team-lead-user-dropdown',
-              margin: 'dense',
-            }}
-          />
-          <ErrorMessage name="teamLeadUserId" />
+          <Box sx={{ mt: 2 }}>
+            <FormikUIAutocomplete
+              items={values.team.map((user) => ({
+                text: getFullUserName(user, true),
+                value: user.id,
+              }))}
+              label="Team lead"
+              name="teamLeadUserId"
+              disabled={readonly}
+              InputProps={{
+                'data-cy': 'team-lead-user-dropdown',
+                margin: 'dense',
+              }}
+            />
+            <ErrorMessage name="teamLeadUserId" />
+          </Box>
 
-          <ActionButtonContainer>
+          <ActionButtonContainer sx={{ mt: 3 }}>
             <Button
               disabled={isSubmitting}
               variant="text"

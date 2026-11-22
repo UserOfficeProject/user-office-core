@@ -20,6 +20,8 @@ export function useWorkflowStatusesData(workflowId: number): {
   };
 
   useEffect(() => {
+    if (!workflowId) return;
+
     let unmounted = false;
 
     setLoadingStatuses(true);
