@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-import { Experiment } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import { tableIcons } from 'utils/materialIcons';
@@ -24,7 +23,13 @@ type ExperimentTimesTableProps = {
   options?: Partial<Options<UserExperiment>>;
 };
 
-const RowActionButtons = ({ experimentId }: { experimentId: string }) => {
+const RowActionButtons = ({
+  experiment,
+  setSelectedExperiment,
+}: {
+  experiment: UserExperiment;
+  setSelectedExperiment: (experiment: UserExperiment) => void;
+}) => {
   const [, setSearchParams] = useSearchParams();
 
   return (
@@ -32,8 +37,9 @@ const RowActionButtons = ({ experimentId }: { experimentId: string }) => {
       <IconButton
         data-cy="view-experiment-user"
         onClick={() => {
+          setSelectedExperiment(experiment);
           setSearchParams((searchParams) => {
-            searchParams.set('experiment', experimentId);
+            searchParams.set('experiment', experiment.experimentPk.toString());
 
             return searchParams;
           });
@@ -56,7 +62,8 @@ export default function ExperimentsTimesTable({
   const selectedExperimentPk = searchParams.get('experiment');
   const parsedExperimentPk =
     selectedExperimentPk !== null ? parseInt(selectedExperimentPk) : NaN;
-  const [selectedExperiment] = useState<Experiment>();
+  const [selectedExperiment, setSelectedExperiment] =
+    useState<UserExperiment>();
   const experimentPkFromUrl = Number.isInteger(parsedExperimentPk)
     ? parsedExperimentPk
     : null;
@@ -88,7 +95,10 @@ export default function ExperimentsTimesTable({
       removable: false,
       field: 'rowActionButtons',
       render: (rowData: UserExperiment) => (
-        <RowActionButtons experimentId={rowData.experimentPk.toString()} />
+        <RowActionButtons
+          experiment={rowData}
+          setSelectedExperiment={setSelectedExperiment}
+        />
       ),
     },
     { title: 'Proposal title', field: 'proposal.title' },
@@ -139,6 +149,7 @@ export default function ExperimentsTimesTable({
           }
           modalOpen={true}
           handleClose={() => {
+            setSelectedExperiment(undefined);
             setSearchParams((searchParams) => {
               searchParams.delete('experiment');
 
