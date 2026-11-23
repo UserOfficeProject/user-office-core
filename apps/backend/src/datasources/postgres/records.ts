@@ -367,6 +367,8 @@ export interface TemplateVersionRecord {
 
 export interface PageTextRecord {
   readonly pagetext_id: number;
+  readonly page_id: number;
+  readonly role_id: number;
   readonly content: string;
 }
 
@@ -672,7 +674,12 @@ export interface SettingsRecord {
 }
 
 export const createPageObject = (record: PageTextRecord) => {
-  return new Page(record.pagetext_id, record.content);
+  return new Page(
+    record.pagetext_id,
+    record.page_id,
+    record.role_id,
+    record.content
+  );
 };
 
 export interface TokensAndPermissionsRecord {
