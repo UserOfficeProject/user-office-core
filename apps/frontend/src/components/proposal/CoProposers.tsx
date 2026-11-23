@@ -40,7 +40,15 @@ const CoProposers = ({
       <UserManagementTable
         {...props}
         title="Co-Proposers"
+        addButtonLabel="Add co-proposer"
         addButtonTooltip="Add a co-proposer"
+        addButtonPosition="top"
+        mtOptions={{
+          search: false,
+          toolbar: false,
+          emptyRowsWhenPaging: false,
+          paging: users.length > 10,
+        }}
         addModalTitle="Add co-proposers"
         onUserAction={handleUserAction}
         excludeUserIds={proposer ? [proposer.id] : []}

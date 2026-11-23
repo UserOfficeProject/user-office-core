@@ -13,6 +13,7 @@ import {
   AuthJwtPayload,
   UserRole,
   AuthJwtApiTokenPayload,
+  User,
 } from '../models/User';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { verifyToken } from '../utils/jwt';
@@ -48,8 +49,16 @@ export default class UserQueries {
   }
 
   @Authorized()
-  async byRef(agent: UserWithRole | null, id: number) {
+  async byRef(agent: UserWithRole | null, id: number): Promise<User | null> {
     return this.dataSource.getUser(id);
+  }
+
+  @Authorized()
+  async basicByRef(
+    agent: UserWithRole | null,
+    id: number
+  ): Promise<BasicUserDetails | null> {
+    return this.dataSource.getBasicUserInfo(id);
   }
 
   @Authorized()
@@ -73,7 +82,8 @@ export default class UserQueries {
         user.email,
         user.country,
         user.userTitle,
-        user.oidcSub
+        user.oidcSub,
+        user.institutionRorId
       );
     } else {
       return null;
@@ -106,7 +116,8 @@ export default class UserQueries {
       user.email,
       user.country,
       user.userTitle,
-      user.oidcSub
+      user.oidcSub,
+      user.institutionRorId
     );
   }
 
