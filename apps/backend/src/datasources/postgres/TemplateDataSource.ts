@@ -761,6 +761,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         name: values.name,
         description: values.description,
         is_archived: values.isArchived,
+        shipment_label_template: values.shipmentLabelTemplate,
       })
       .where({ template_id: values.templateId });
 

@@ -13,6 +13,7 @@ fragment template on Template {
   groupId
   name
   description
+  shipmentLabelTemplate
   complementaryQuestions {
     ...question
   }

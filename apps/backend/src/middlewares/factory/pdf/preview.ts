@@ -1,14 +1,102 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
+import { UserAuthorization } from '../../../auth/UserAuthorization';
+import { Tokens } from '../../../config/Tokens';
+import { TemplateDataSource } from '../../../datasources/TemplateDataSource';
 import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
 import { FullProposalPDFData } from '../../../factory/pdf/proposal';
+import { ShipmentPDFData } from '../../../factory/pdf/shipmentLabel';
 import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
 import callFactoryService from '../../../factory/service';
 import { Role } from '../../../models/Role';
+import { TemplateGroupId } from '../../../models/Template';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
+
+router.post(
+  `/${PDFType.SHIPMENT_LABEL}/:templateId`,
+  async (req, res, next) => {
+    try {
+      const userAuth = container.resolve<UserAuthorization>(
+        Tokens.UserAuthorization
+      );
+      if (!req.user || !userAuth.isUserOfficer(res.locals.agent)) {
+        res
+          .status(403)
+          .send('Shipment label previews require a User Officer role');
+
+        return;
+      }
+
+      const templateId = Number(req.params.templateId);
+      const { pdfTemplate } = req.body ?? {};
+      if (
+        !Number.isSafeInteger(templateId) ||
+        templateId < 1 ||
+        typeof pdfTemplate !== 'string' ||
+        !pdfTemplate.trim() ||
+        pdfTemplate.length > 64_000
+      ) {
+        res
+          .status(400)
+          .send('Enter a label template of 1 to 64,000 characters');
+
+        return;
+      }
+
+      const templates = container.resolve<TemplateDataSource>(
+        Tokens.TemplateDataSource
+      );
+      const template = await templates.getTemplate(templateId);
+      if (template?.groupId !== TemplateGroupId.SHIPMENT) {
+        res.status(404).send('Shipment declaration template not found');
+
+        return;
+      }
+
+      const steps = await templates.getTemplateSteps(templateId);
+      const answers = Object.fromEntries(
+        steps.flatMap(({ fields }) =>
+          fields.map(({ question }) => [
+            question.naturalKey,
+            `Example ${question.naturalKey}`,
+          ])
+        )
+      );
+      const filename = 'shipment-label-preview.pdf';
+      await callFactoryService<ShipmentPDFData, MetaBase>(
+        DownloadType.PDF,
+        PDFType.SHIPMENT_LABEL,
+        {
+          data: [
+            {
+              shipment: {
+                id: 1,
+                title: 'Example shipment',
+                externalRef: '000001',
+                proposalId: '000002',
+                callShortCode: 'CALL',
+                instrumentShortCodes: 'INSTRUMENT',
+                localContact: 'Example contact',
+              },
+              answers,
+              pdfTemplate,
+            },
+          ],
+          meta: { collectionFilename: filename, singleFilename: filename },
+          userRole: req.user.currentRole,
+        },
+        req,
+        res,
+        next
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
   try {

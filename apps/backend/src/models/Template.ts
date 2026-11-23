@@ -152,7 +152,8 @@ export class Template {
     public groupId: TemplateGroupId,
     public name: string,
     public description: string,
-    public isArchived: boolean
+    public isArchived: boolean,
+    public shipmentLabelTemplate?: string | null
   ) {}
 }
 

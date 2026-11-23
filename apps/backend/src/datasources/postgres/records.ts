@@ -223,6 +223,7 @@ export interface TemplateRecord {
   readonly name: string;
   readonly description: string;
   readonly is_archived: boolean;
+  readonly shipment_label_template: string | null;
 }
 
 export interface UserRecord {
@@ -782,7 +783,8 @@ export const createProposalTemplateObject = (template: TemplateRecord) => {
     template.group_id as TemplateGroupId,
     template.name,
     template.description,
-    template.is_archived
+    template.is_archived,
+    template.shipment_label_template
   );
 };
 

@@ -104,6 +104,56 @@ test('An user cannot create template', async () => {
   expect(template).not.toBeInstanceOf(Template);
 });
 
+const shipmentLabelUpdate = {
+  templateId: 1,
+  name: 'Shipment',
+  description: '',
+  isArchived: false,
+};
+
+test('A user officer can save and clear a shipment label layout', async () => {
+  const shipmentTemplate = new Template(
+    1,
+    TemplateGroupId.SHIPMENT,
+    'Shipment',
+    '',
+    false
+  );
+  const dataSource = container.resolve<TemplateDataSourceMock>(
+    Tokens.TemplateDataSource
+  );
+  const getTemplate = jest
+    .spyOn(dataSource, 'getTemplate')
+    .mockResolvedValue(shipmentTemplate);
+
+  try {
+    const shipmentLabelTemplate = '<p>{{shipmentBarcode}}</p>';
+    expect(
+      await mutations.updateTemplate(dummyUserOfficerWithRole, {
+        ...shipmentLabelUpdate,
+        shipmentLabelTemplate,
+      })
+    ).toMatchObject({ shipmentLabelTemplate });
+    expect(
+      await mutations.updateTemplate(dummyUserOfficerWithRole, {
+        ...shipmentLabelUpdate,
+        shipmentLabelTemplate: null,
+      })
+    ).toMatchObject({ shipmentLabelTemplate: null });
+  } finally {
+    getTemplate.mockRestore();
+  }
+});
+
+test('A shipment label layout cannot be saved on a proposal template', async () => {
+  const result = await mutations.updateTemplate(dummyUserOfficerWithRole, {
+    ...shipmentLabelUpdate,
+    shipmentLabelTemplate: '<p>{{shipmentBarcode}}</p>',
+  });
+
+  expect(isRejection(result)).toBe(true);
+});
+
 test('An userofficer can delete template', async () => {
   const templateId = 1;
   const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, {

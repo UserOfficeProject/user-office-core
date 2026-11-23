@@ -514,8 +514,15 @@ export default class TemplateMutations {
   @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
+    if (args.shipmentLabelTemplate !== undefined) {
+      const template = await this.dataSource.getTemplate(args.templateId);
+      if (template?.groupId !== TemplateGroupId.SHIPMENT) {
+        return rejection('Only shipment templates can have a shipment label');
+      }
+    }
+
     return this.dataSource.updateTemplate(args).catch((err) => {
-      return rejection('Could not update template topic order', { user }, err);
+      return rejection('Could not update template', { user }, err);
     });
   }
 

@@ -3,12 +3,14 @@ mutation updateTemplate(
   $name: String
   $description: String
   $isArchived: Boolean
+  $shipmentLabelTemplate: String
 ) {
   updateTemplate(
     templateId: $templateId
     name: $name
     description: $description
     isArchived: $isArchived
+    shipmentLabelTemplate: $shipmentLabelTemplate
   ) {
     ...templateMetadata
   }
