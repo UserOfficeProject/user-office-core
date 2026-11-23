@@ -1,4 +1,4 @@
-import React, { lazy as reactLazy, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
+import { lazy } from 'utils/lazy';
 
 import RoleManagement from './admin/RoleManagement';
 import ChangeRole from './common/ChangeRole';
@@ -20,18 +21,6 @@ import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
-
-// After a deploy, open tabs may request old chunks that no longer exist. The
-// vite:preloadError handler in index.tsx suppresses the error so it can reload
-// or show a retry snackbar, which makes the import resolve to undefined.
-// Returning a never-resolving promise keeps the Suspense fallback up instead
-// of letting React.lazy throw into the error boundary.
-const neverResolvingPromise = new Promise<never>(() => {});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const lazy = <T extends React.ComponentType<any>>(
-  factory: () => Promise<{ default: T }>
-) => reactLazy(async () => (await factory()) ?? neverResolvingPromise);
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));

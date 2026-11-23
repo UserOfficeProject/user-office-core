@@ -1,41 +1,23 @@
-// It is important to import the Editor which accepts plugins.
-import 'tinymce/tinymce';
-import 'tinymce/models/dom/model';
-import 'tinymce/themes/silver';
-import 'tinymce/skins/ui/oxide/skin.min.css';
-import 'tinymce/skins/ui/oxide/content.min.css';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/preview';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/advlist';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/charmap';
-import 'tinymce/plugins/wordcount';
-import 'tinymce/icons/default';
+import Skeleton from '@mui/material/Skeleton';
+import type { IAllProps } from '@tinymce/tinymce-react';
+import React, { Suspense } from 'react';
 
-import { useTheme } from '@mui/material/styles';
-import { Editor, IAllProps } from '@tinymce/tinymce-react';
-import React from 'react';
+import { lazy } from 'utils/lazy';
 
-const TinyEditor = (props: IAllProps) => {
-  const theme = useTheme();
+const TinyEditorImpl = lazy(() => import('./TinyEditorImpl'));
 
-  return (
-    <Editor
-      {...props}
-      init={{
-        // @ts-expect-error Tinymce types package is not updated and license_key has a wrong type
-        license_key: 'gpl',
-        promotion: false,
-        height: 300,
-        browser_spellcheck: true,
-        contextmenu: false,
-        ...props.init,
-        content_style: `body { font-family: ${theme.typography.fontFamily}; } ${props.init?.content_style ?? ''}`,
-      }}
-    />
-  );
-};
+const TinyEditor = (props: IAllProps) => (
+  <Suspense
+    fallback={
+      <Skeleton
+        variant="rectangular"
+        height={props.init?.height ?? 300}
+        data-cy="tiny-editor-loading"
+      />
+    }
+  >
+    <TinyEditorImpl {...props} />
+  </Suspense>
+);
 
 export default TinyEditor;
