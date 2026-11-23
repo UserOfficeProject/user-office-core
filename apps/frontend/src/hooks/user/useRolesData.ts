@@ -3,25 +3,36 @@ import { useEffect, useState } from 'react';
 import { GetRolesQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useRolesData() {
+export function useRolesData(tagIds?: number[]) {
   const api = useDataApi();
   const [rolesData, setRolesData] = useState<GetRolesQuery['roles']>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let unmounted = false;
-
     setLoading(true);
-    api()
-      .getRoles()
-      .then((data) => {
-        if (unmounted) {
-          return;
-        }
+    if (tagIds) {
+      api()
+        .getRolesByTags({ tagIds })
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
+          setRolesData(data.rolesByTags);
+          setLoading(false);
+        });
+    } else {
+      api()
+        .getRoles()
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
 
-        setRolesData(data.roles);
-        setLoading(false);
-      });
+          setRolesData(data.roles);
+          setLoading(false);
+        });
+    }
 
     return () => {
       unmounted = true;

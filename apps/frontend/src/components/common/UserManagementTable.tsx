@@ -113,7 +113,7 @@ const UserManagementTable = ({
           ),
           tooltip: 'Set Principal Investigator',
           onClick: (
-            event: React.MouseEvent<JSX.Element>,
+            event: React.MouseEvent<HTMLElement>,
             rowData: BasicUserDetails | BasicUserDetails[]
           ) => {
             event.preventDefault();
@@ -131,7 +131,7 @@ const UserManagementTable = ({
                 icon: () => <DeleteOutlineIcon fontSize="small" />,
                 tooltip: 'Remove',
                 onClick: (
-                  _event: React.MouseEvent<JSX.Element>,
+                  _event: React.MouseEvent<HTMLElement>,
                   rowData: BasicUserDetails | BasicUserDetails[]
                 ) => removeUser(Array.isArray(rowData) ? rowData[0] : rowData),
               },

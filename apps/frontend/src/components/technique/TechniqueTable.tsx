@@ -78,8 +78,8 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignmentInstrumentIcon = (): JSX.Element => <ScienceIcon />;
-  const AssignmentScientistIcon = (): JSX.Element => <AssignmentInd />;
+  const AssignmentInstrumentIcon = () => <ScienceIcon />;
+  const AssignmentScientistIcon = () => <AssignmentInd />;
 
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
     setSelectedTechnique(technique);
