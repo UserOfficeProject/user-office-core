@@ -39,6 +39,7 @@ import {
   UserRecord,
 } from './records';
 import { Page } from '../../models/Admin';
+import { defaultPageNoticeId } from '../../utils/helperFunctions';
 
 const dbPatchesFolderPath = path.join(cwd(), 'db_patches');
 const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
@@ -139,7 +140,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async get(pageId: number, roleIds: number[]): Promise<Page[]> {
-    const nonNullRoleIds = roleIds.filter((r) => r !== -1) as number[];
+    const nonNullRoleIds = roleIds.filter(
+      (r) => r !== defaultPageNoticeId
+    ) as number[];
 
     const pagetextRecords: PageTextRecord[] = await database
       .select('page_id', 'role_id', 'content')
@@ -199,7 +202,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
             .insert(
               roleIds.map((roleId) => ({
                 page_id: pageId,
-                role_id: roleId === -1 ? null : roleId,
+                role_id: roleId === defaultPageNoticeId ? null : roleId,
                 content,
               }))
             )

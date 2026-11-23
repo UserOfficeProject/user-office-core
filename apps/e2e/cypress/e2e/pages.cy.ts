@@ -7,6 +7,7 @@ context('Page tests', () => {
   let derivedUserOfficerRoleId: number;
   const sharedFaqContents = faker.lorem.words(2);
   const uniqueFaqContents = faker.lorem.words(2);
+  const defaultPageNoticeId = -1;
 
   beforeEach(() => {
     cy.resetDB();
@@ -35,7 +36,7 @@ context('Page tests', () => {
           cy.setPageContent({
             pageId: PageName.HOMEPAGE,
             text: sharedFaqContents,
-            roleIds: [-1, derivedUserOfficerRoleId],
+            roleIds: [defaultPageNoticeId, derivedUserOfficerRoleId],
           });
           cy.setPageContent({
             pageId: PageName.HOMEPAGE,

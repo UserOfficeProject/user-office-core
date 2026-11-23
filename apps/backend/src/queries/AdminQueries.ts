@@ -10,7 +10,7 @@ import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
-import { getContextKeys } from '../utils/helperFunctions';
+import { defaultPageNoticeId, getContextKeys } from '../utils/helperFunctions';
 
 type GetPageTextArgs = {
   pageId: number;
@@ -44,7 +44,9 @@ export default class AdminQueries {
 
     const isUserOfficer = userRole.shortCode === Roles.USER_OFFICER;
     const isBaseUserOfficer = isUserOfficer && userRole.isRootRole;
-    const requestedRoleIds = roleIds.filter((roleId) => roleId !== -1);
+    const requestedRoleIds = roleIds.filter(
+      (roleId) => roleId !== defaultPageNoticeId
+    );
 
     const canReadRoleNotice = async (roleId: number) => {
       const isOwnRoleNotice = userRole.id === roleId;
@@ -79,8 +81,11 @@ export default class AdminQueries {
 
     retrievedPageNotices = await this.adminDataSource.get(pageId, roleIds);
 
+    //if no page notices specific to the requested roles were found, return the default one
     if (!retrievedPageNotices.length && useDefaultIfNotFound) {
-      retrievedPageNotices = await this.adminDataSource.get(pageId, [-1]);
+      retrievedPageNotices = await this.adminDataSource.get(pageId, [
+        defaultPageNoticeId,
+      ]);
     }
 
     return retrievedPageNotices;

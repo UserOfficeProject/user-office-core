@@ -15,6 +15,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { defaultPageNoticeId } from '../utils/helperFunctions';
 
 const adminQueries = container.resolve(AdminQueries);
 
@@ -29,7 +30,7 @@ describe('Test Admin Queries', () => {
         agent: dummyUserWithRole,
         useDefaultIfNotFound: false,
         pageId: 1,
-        roleIds: [-1],
+        roleIds: [defaultPageNoticeId],
       })
     ).resolves.toStrictEqual([pages[0]]);
   });
@@ -73,7 +74,7 @@ describe('Test Admin Queries', () => {
         agent: dummyUserOfficerWithRole,
         useDefaultIfNotFound: false,
         pageId: 1,
-        roleIds: [-1, 1, 2],
+        roleIds: [defaultPageNoticeId, 1, 2],
       })
     ).resolves.toStrictEqual(pages);
   });

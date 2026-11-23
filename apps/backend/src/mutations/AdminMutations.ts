@@ -24,7 +24,11 @@ import { UpdateFeaturesInput } from '../resolvers/mutations/settings/UpdateFeatu
 import { UpdateSettingsInput } from '../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
-import { generateUniqueId, isProduction } from '../utils/helperFunctions';
+import {
+  defaultPageNoticeId,
+  generateUniqueId,
+  isProduction,
+} from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
 
@@ -91,7 +95,9 @@ export default class AdminMutations {
           (t) => t.id
         );
 
-    const nonDefaultRoleIds = roleIds.filter((roleId) => roleId !== -1);
+    const nonDefaultRoleIds = roleIds.filter(
+      (roleId) => roleId !== defaultPageNoticeId
+    );
 
     //if the user is a root user officer allow the edit, if they're a derived user officer editing a default page notice deny them,
     //otherwise check that the user has a matching tag for each page notice they are trying to edit

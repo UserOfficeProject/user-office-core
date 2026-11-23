@@ -11,6 +11,7 @@ import {
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { Permissions } from '../models/Permissions';
 import { SettingsId } from '../models/Settings';
+import { defaultPageNoticeId } from '../utils/helperFunctions';
 
 const adminMutations = container.resolve(AdminMutations);
 
@@ -31,7 +32,7 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserWithRole, {
         pageId: 1,
         text: 'New page contents',
-        roleIds: [-1],
+        roleIds: [defaultPageNoticeId],
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -41,7 +42,7 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithRole, {
         pageId: 1,
         text: '',
-        roleIds: [-1],
+        roleIds: [defaultPageNoticeId],
       })
     ).resolves.toBe(true);
   });
@@ -51,7 +52,7 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithRole, {
         pageId: 1,
         text: '',
-        roleIds: [-1, 1, 2],
+        roleIds: [defaultPageNoticeId, 1, 2],
       })
     ).resolves.toBe(true);
   });
@@ -61,7 +62,7 @@ describe('Test Admin Mutations', () => {
       adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
         pageId: 1,
         text: '',
-        roleIds: [-1],
+        roleIds: [defaultPageNoticeId],
       })
     ).resolves.toHaveProperty(
       'reason',
