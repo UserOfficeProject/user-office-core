@@ -1264,6 +1264,7 @@ context('Proposal administration tests', () => {
 
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
     });
 
     it('Should be able to download proposal pdf with valid API token', function () {
