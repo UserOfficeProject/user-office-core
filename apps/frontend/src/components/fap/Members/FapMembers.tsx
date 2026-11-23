@@ -236,7 +236,7 @@ const FapMembers = ({
     return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
   }
 
-  const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
+  const AddPersonIcon = () => <PersonAdd data-cy="add-member" />;
 
   const alreadySelectedMembers = FapReviewersData.map(({ userId }) => userId)
     .concat(fapData.fapSecretaries.map((sec) => sec.id))
@@ -246,10 +246,7 @@ const FapMembers = ({
     Object.assign(fapReviewer, { id: fapReviewer.userId })
   );
 
-  const fapChairSecTable = (
-    data: BasicUserDetails[],
-    isChair: boolean
-  ): JSX.Element => {
+  const fapChairSecTable = (data: BasicUserDetails[], isChair: boolean) => {
     const chairOrSec = isChair ? 'Chair' : 'Secretary';
 
     return (
