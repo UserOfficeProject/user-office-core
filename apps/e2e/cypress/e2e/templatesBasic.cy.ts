@@ -2387,8 +2387,10 @@ context('Template Basic tests', () => {
       cy.get('#version-select').click();
 
       cy.get('[data-cy="version-select-1"]').click();
-
-      cy.should('contain', initialDBData.emailTemplates.template1.body);
+      cy.get('[data-cy="email-template-version-code"]').should(
+        'contain',
+        initialDBData.emailTemplates.template1.body
+      );
     });
 
     it('User officer create an email version with an update comment', () => {
@@ -2414,9 +2416,10 @@ context('Template Basic tests', () => {
       cy.contains('Version History').click();
       cy.get('#version-select').click();
 
-      cy.get('[data-cy=version-select]')
-        .find('li:first-child')
-        .should('contain', 'Update comment');
+      cy.get('[data-cy="version-select-1"]').should(
+        'contain',
+        'Update comment'
+      );
     });
   });
 });
