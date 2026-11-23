@@ -1,0 +1,25 @@
+query getInstitutionsPage(
+  $first: Int!
+  $offset: Int!
+  $searchText: String
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+) {
+  institutionsPage(
+    first: $first
+    offset: $offset
+    searchText: $searchText
+    sortField: $sortField
+    sortDirection: $sortDirection
+  ) {
+    totalCount
+    institutions {
+      id
+      name
+      country {
+        ...country
+      }
+      rorId
+    }
+  }
+}

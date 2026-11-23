@@ -8,6 +8,7 @@ import {
   AdminDataSourceMock,
   dummyApiAccessToken,
   dummyApiAccessTokens,
+  dummyInstitution,
 } from '../datasources/mockups/AdminDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -32,6 +33,41 @@ describe('Test Admin Queries', () => {
   test('A user can get settings', async () => {
     const settings = await adminQueries.getSettings();
     expect(settings.length).toBeGreaterThan(0);
+  });
+
+  test.each([dummyUserWithRole, null])(
+    'Only user officers can get paginated institutions',
+    async (agent) => {
+      expect(
+        await adminQueries.getInstitutionsPage(agent, { first: 10, offset: 0 })
+      ).toBeNull();
+    }
+  );
+
+  test('A user officer can search paginated institutions', async () => {
+    expect(
+      await adminQueries.getInstitutionsPage(dummyUserOfficerWithRole, {
+        first: 10,
+        offset: 0,
+        searchText: ' ess ',
+      })
+    ).toEqual({ institutions: [dummyInstitution], totalCount: 1 });
+    expect(
+      await adminQueries.getInstitutionsPage(dummyUserOfficerWithRole, {
+        first: 10,
+        offset: 0,
+        searchText: 'not an institution',
+      })
+    ).toEqual({ institutions: [], totalCount: 0 });
+  });
+
+  test('An empty institution page retains the total count', async () => {
+    expect(
+      await adminQueries.getInstitutionsPage(dummyUserOfficerWithRole, {
+        first: 10,
+        offset: 10,
+      })
+    ).toEqual({ institutions: [], totalCount: 1 });
   });
 
   test('A user can not get all api access tokens', () => {

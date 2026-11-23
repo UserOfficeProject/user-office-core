@@ -1,16 +1,21 @@
-import { Typography, Link } from '@mui/material';
-import React from 'react';
+import MaterialTableCore, {
+  Column,
+  Query,
+  QueryResult,
+} from '@material-table/core';
+import Edit from '@mui/icons-material/Edit';
+import { DialogContent, Typography, Link } from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
 
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { Institution } from 'generated/sdk';
-import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
+import MaterialTable from 'components/common/DenseMaterialTable';
+import StyledDialog from 'components/common/StyledDialog';
+import { Institution, PaginationSortDirection } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 
 import UpdateInstitution from './UpdateInstitution';
 
-const columns = [
+const columns: Column<Institution>[] = [
   { title: 'Name', field: 'name' },
   { title: 'Country', field: 'country.value' },
   {
@@ -30,46 +35,82 @@ const columns = [
 
 const InstitutionPage = () => {
   const { api } = useDataApiWithFeedback();
-
-  const {
-    loadingInstitutions,
-    institutions,
-    setInstitutionsWithLoading: setInstitutions,
-  } = useInstitutionsData({
-    country: true,
-  });
-  const deleteInstitution = async (id: number | string) => {
-    try {
-      await api({
-        toastSuccessMessage: 'Institution removed successfully!',
-      }).deleteInstitution({
-        id: id as number,
-      });
-
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const createModal = (
-    onUpdate: FunctionType<void, [Institution | null]>,
-    onCreate: FunctionType<void, [Institution | null]>,
-    editInstitution: Institution | null
-  ) => (
-    <UpdateInstitution
-      institution={editInstitution}
-      close={(institution: Institution | null) => onUpdate(institution)}
-    />
+  const tableRef = useRef<MaterialTableCore<Institution>>(null);
+  const [editInstitution, setEditInstitution] = useState<Institution | null>(
+    null
   );
+
+  const fetchInstitutions = useCallback(
+    async (query: Query<Institution>): Promise<QueryResult<Institution>> => {
+      const [orderBy] = query.orderByCollection;
+      const fetchPage = (page: number) =>
+        api().getInstitutionsPage({
+          first: query.pageSize,
+          offset: page * query.pageSize,
+          searchText: query.search,
+          sortField: orderBy?.orderDirection ? orderBy.orderByField : undefined,
+          sortDirection:
+            orderBy?.orderDirection === PaginationSortDirection.ASC
+              ? PaginationSortDirection.ASC
+              : orderBy?.orderDirection === PaginationSortDirection.DESC
+                ? PaginationSortDirection.DESC
+                : undefined,
+        });
+      let { institutionsPage } = await fetchPage(query.page);
+      if (!institutionsPage) {
+        throw new Error('Unable to load institutions');
+      }
+      const page = Math.min(
+        query.page,
+        Math.max(0, Math.ceil(institutionsPage.totalCount / query.pageSize) - 1)
+      );
+      if (page !== query.page) {
+        ({ institutionsPage } = await fetchPage(page));
+        if (!institutionsPage) {
+          throw new Error('Unable to load institutions');
+        }
+      }
+
+      return {
+        data: institutionsPage.institutions,
+        page,
+        totalCount: institutionsPage.totalCount,
+      };
+    },
+    [api]
+  );
+
+  const EditIcon = () => <Edit />;
 
   return (
     <div data-cy="institutions-table">
-      <SuperMaterialTable
-        delete={deleteInstitution}
-        setData={setInstitutions}
-        createModal={createModal}
-        hasAccess={{ create: false, update: true, remove: true }}
+      <StyledDialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        data-cy="create-modal"
+        open={!!editInstitution}
+        onClose={(_, reason) => {
+          if (reason === 'backdropClick') return;
+          setEditInstitution(null);
+        }}
+        title="Update institution"
+      >
+        <DialogContent dividers>
+          {editInstitution && (
+            <UpdateInstitution
+              institution={editInstitution}
+              close={(institution) => {
+                setEditInstitution(null);
+                if (institution) {
+                  tableRef.current?.onQueryChange({});
+                }
+              }}
+            />
+          )}
+        </DialogContent>
+      </StyledDialog>
+      <MaterialTable
+        tableRef={tableRef}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
@@ -77,8 +118,26 @@ const InstitutionPage = () => {
           </Typography>
         }
         columns={columns}
-        isLoading={loadingInstitutions}
-        data={institutions}
+        data={fetchInstitutions}
+        actions={[
+          {
+            icon: EditIcon,
+            tooltip: 'Edit',
+            position: 'row',
+            onClick: (_event, rowData) => {
+              if (!Array.isArray(rowData)) {
+                setEditInstitution(rowData);
+              }
+            },
+          },
+        ]}
+        editable={{
+          onRowDelete: async (institution) => {
+            await api({
+              toastSuccessMessage: 'Institution removed successfully!',
+            }).deleteInstitution({ id: institution.id });
+          },
+        }}
         options={{
           search: true,
           debounceInterval: 400,
