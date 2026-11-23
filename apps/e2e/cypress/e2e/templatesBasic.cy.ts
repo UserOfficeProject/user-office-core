@@ -817,9 +817,7 @@ context('Template Basic tests', () => {
       cy.logout();
 
       cy.login('user1', initialDBData.roles.user);
-      cy.visit('/');
-
-      cy.contains('New Proposal').click();
+      cy.visit('/ProposalSelectType');
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       /* Test questions exist */
