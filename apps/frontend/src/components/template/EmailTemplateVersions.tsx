@@ -115,6 +115,7 @@ const EmailTemplateVersionViewer = ({
             <small>Subject: {emailTemplatesVersion?.subject ?? ''}</small>
           </Typography>
           <CodeMirror
+            data-cy="email-template-version-code"
             value={emailTemplatesVersion?.body ?? ''}
             maxHeight="45vh"
             extensions={[pugLanguage]}
