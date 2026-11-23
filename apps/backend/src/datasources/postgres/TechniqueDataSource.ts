@@ -124,6 +124,7 @@ export default class PostgresTechniqueDataSource
         'u.user_id': 'ths.user_id',
       })
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .where('ths.technique_id', techniqueId)
       .then(
         (

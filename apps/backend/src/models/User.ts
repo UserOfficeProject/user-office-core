@@ -74,6 +74,9 @@ export const UserRoleShortCodeMap = {
 } as const;
 
 export class BasicUserDetails {
+  public institutionName: string;
+  public institutionCountry: string | null;
+
   constructor(
     public id: number,
     public firstname: string,
@@ -85,8 +88,12 @@ export class BasicUserDetails {
     public email: string,
     public country: string,
     public userTitle: string,
-    public oidcSub: string | null
-  ) {}
+    public oidcSub: string | null,
+    public institutionRorId: string | null = null
+  ) {
+    this.institutionName = institution;
+    this.institutionCountry = country ?? null;
+  }
 }
 
 export type UserJWT = Pick<

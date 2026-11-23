@@ -283,6 +283,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .leftJoin('countries as c', { 'i.country_id': 'c.country_id' })
       .where('u.institution_id', id)
       .then((users: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
         users.map((user) => createBasicUserObject(user))
