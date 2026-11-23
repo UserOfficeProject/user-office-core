@@ -170,7 +170,8 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
     description: string,
     use_template_file: boolean,
     subject?: string,
-    body?: string
+    body?: string,
+    updateComment?: string
   ): Promise<EmailTemplate> {
     return dummyEmailTemplate;
   }
