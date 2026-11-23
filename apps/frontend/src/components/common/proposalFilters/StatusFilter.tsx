@@ -3,16 +3,27 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Status } from 'generated/sdk';
 
+export const ALL_STATUSES = 'ALL';
+
+export const parseStatusQuery = (
+  statusQuery: string | null | undefined
+): string | undefined => {
+  if (!statusQuery || statusQuery === ALL_STATUSES) {
+    return undefined;
+  }
+
+  return statusQuery;
+};
+
 type StatusFilterProps = {
   statuses?: Status[];
   isLoading?: boolean;
-  onChange?: Dispatch<string>;
+  onChange?: Dispatch<string | undefined>;
   shouldShowAll?: boolean;
   statusId?: string;
   hiddenStatuses: string[];
@@ -66,13 +77,13 @@ const StatusFilter = ({
 
                 return searchParams;
               });
-              onChange?.(status.target.value);
+              onChange?.(parseStatusQuery(status.target.value));
             }}
-            value={statusId || 'ALL'}
-            defaultValue={'ALL'}
+            value={statusId || ALL_STATUSES}
+            defaultValue={ALL_STATUSES}
             data-cy="status-filter"
           >
-            {shouldShowAll && <MenuItem value={'ALL'}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value={ALL_STATUSES}>All</MenuItem>}
             {statuses.map(
               (status) =>
                 isStatusVisible(hiddenStatuses, status) && (
@@ -86,14 +97,6 @@ const StatusFilter = ({
       </FormControl>
     </>
   );
-};
-
-StatusFilter.propTypes = {
-  statuses: PropTypes.array,
-  isLoading: PropTypes.bool,
-  onChange: PropTypes.func,
-  shouldShowAll: PropTypes.bool,
-  statusId: PropTypes.string,
 };
 
 export default StatusFilter;

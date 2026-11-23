@@ -65,4 +65,5 @@ export const Tokens = {
   TagDataSource: Symbol('TagDataSource'),
   RoleDataSource: Symbol('RoleDataSource'),
   ConvertAllocationTimeUnits: Symbol('ConvertAllocationTimeUnits'),
+  TemplateVersionDataSource: Symbol('TemplateVersionDataSource'),
 };

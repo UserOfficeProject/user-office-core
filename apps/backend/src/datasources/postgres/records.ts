@@ -66,6 +66,7 @@ import {
   TemplateGroupId,
   Topic,
 } from '../../models/Template';
+import { TemplateVersion } from '../../models/TemplateVersion';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit } from '../../models/Visit';
@@ -355,6 +356,15 @@ export interface EmailTemplateRecord {
   readonly body?: string | null;
 }
 
+export interface TemplateVersionRecord {
+  readonly template_version_pk: number;
+  readonly template_type: string;
+  readonly template_id: number;
+  readonly version_number: number;
+  readonly template: string;
+  readonly created_at: Date;
+}
+
 export interface PageTextRecord {
   readonly pagetext_id: number;
   readonly content: string;
@@ -364,7 +374,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly ror_id: string;
+  readonly ror_id: string | null;
 }
 
 export interface UnitRecord {
@@ -971,7 +981,8 @@ export const createBasicUserObject = (
     user.email,
     user.country,
     user.user_title,
-    user.oidc_sub
+    user.oidc_sub,
+    user.ror_id
   );
 };
 
@@ -1039,6 +1050,21 @@ export const createEmailTemplateObject = (
     emailTemplate.use_template_file,
     emailTemplate.subject,
     emailTemplate.body
+  );
+};
+
+export const createEmailVersionsObject = (
+  templateVersions: TemplateVersionRecord
+) => {
+  const template = JSON.stringify(templateVersions.template);
+
+  return new TemplateVersion(
+    templateVersions.template_version_pk,
+    templateVersions.template_id,
+    template,
+    templateVersions.version_number,
+    templateVersions.template_type,
+    templateVersions.created_at.toUTCString()
   );
 };
 
@@ -1259,7 +1285,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.institution_id,
     institution.institution,
     institution.country_id,
-    institution.ror_id
+    institution.ror_id ?? undefined
   );
 };
 

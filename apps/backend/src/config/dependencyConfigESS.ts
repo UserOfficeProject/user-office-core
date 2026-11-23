@@ -39,6 +39,7 @@ import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresTemplateVersionDataSource from '../datasources/postgres/TemplateVersionDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -128,7 +129,7 @@ mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 if (isDevelopment) {
-  mapValue(Tokens.MailService, new SMTPMailService());
+  mapClass(Tokens.MailService, SMTPMailService);
 } else {
   mapClass(Tokens.MailService, SparkPostMailService);
 }
@@ -154,3 +155,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, PostgresTemplateVersionDataSource);

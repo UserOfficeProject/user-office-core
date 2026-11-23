@@ -57,6 +57,7 @@ import { createApplicationEventBus } from '../events';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { mapClass, mapValue } from './utils';
+import { TemplateVersionDataSourceMock } from '../datasources/mockups/TemplateVersionDataSource';
 
 mapClass(Tokens.RoleDataSource, RoleDataSourceMock);
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
@@ -131,3 +132,4 @@ mapValue(Tokens.ConfigureLogger, () =>
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ConvertAllocationTimeUnits, getSecondsFromAllocationTimeUnits);
+mapClass(Tokens.TemplateVersionDataSource, TemplateVersionDataSourceMock);

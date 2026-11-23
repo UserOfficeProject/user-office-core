@@ -30,15 +30,73 @@ context('Personal information tests', () => {
     cy.login('officer');
     cy.visit('/');
 
+    cy.finishedLoading();
+
     cy.get("[data-cy='profile-page-btn']").click();
 
-    cy.get("[data-cy='change-roles-button']").click();
+    cy.get('#simple-menu')
+      .should('be.visible')
+      .find("[data-cy='change-roles-button']")
+      .click();
 
     cy.finishedLoading();
 
     cy.contains('User roles');
 
     cy.get('[data-cy="selected-role-user_officer"]').contains('In Use');
+  });
+
+  it('Should show user details from the database in the profile popup', function () {
+    // updateUser is not supported when users come from an external source (e.g. STFC)
+    if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      this.skip();
+    }
+
+    const user = initialDBData.users.user1;
+    const firstName = faker.person.firstName();
+    const preferredName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+
+    // Login first, so the JWT contains the old user details
+    cy.login('user1');
+
+    cy.updateUserDetails({
+      id: user.id,
+      userTitle: 'Dr.',
+      firstname: firstName,
+      preferredname: preferredName,
+      lastname: lastName,
+      institutionId: 1,
+      email: user.email,
+    });
+
+    cy.visit('/');
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+
+    cy.get('[data-cy="profile-info-name"]').should(
+      'have.text',
+      `${preferredName} ${lastName}`
+    );
+
+    cy.updateUserDetails({
+      id: user.id,
+      userTitle: 'Dr.',
+      firstname: firstName,
+      preferredname: '',
+      lastname: lastName,
+      institutionId: 1,
+      email: user.email,
+    });
+
+    cy.reload();
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+
+    cy.get('[data-cy="profile-info-name"]').should(
+      'have.text',
+      `${firstName} ${lastName}`
+    );
   });
 
   describe('Personal information advanced tests', () => {

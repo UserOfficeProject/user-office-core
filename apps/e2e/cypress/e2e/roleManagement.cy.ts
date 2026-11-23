@@ -7,9 +7,11 @@ const fillRoleBase = (
   description: string,
   shortCode: string
 ) => {
+  cy.contains('td', 'user_officer').should('be.visible');
   cy.get('[data-cy="create-new-entry"]').click();
   cy.get('[data-cy="role-shortcode-select"]')
-    .should('not.have.class', 'Mui-disabled')
+    .find('[role="combobox"]')
+    .should('not.have.attr', 'aria-disabled', 'true')
     .click();
   cy.get('[role="listbox"]').find(`[data-value="${shortCode}"]`).click();
   cy.get('[data-cy="role-title-input"]').type(title);

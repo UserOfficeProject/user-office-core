@@ -37,6 +37,7 @@ import i18n from 'i18n';
 
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import { parseInstrumentQuery } from 'components/common/proposalFilters/InstrumentFilter';
+import { parseStatusQuery } from 'components/common/proposalFilters/StatusFilter';
 import StyledDialog from 'components/common/StyledDialog';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -81,7 +82,7 @@ import TechniqueProposalNotice from './TechniqueProposalNotice';
 import { useTechniqueProposalInstrumentsData } from './useTechniqueProposalInstrumentsData';
 
 const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
-  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>(undefined);
   const refreshTableData = useCallback(() => {
     tableRef.current?.onQueryChange({});
   }, []);
@@ -248,8 +249,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       from: from ? from : null,
     },
     referenceNumbers: proposalId ? [proposalId] : undefined,
-    proposalStatusId:
-      !proposalStatusId || proposalStatusId == 'ALL' ? null : proposalStatusId,
+    proposalStatusId: parseStatusQuery(proposalStatusId),
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
@@ -971,10 +971,6 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       } else {
         updatedFilter.callIds = [filter.callId as number];
       }
-
-      if (filter.proposalStatusId === 'ALL') {
-        updatedFilter.proposalStatusId = null;
-      }
     }
 
     setProposalFilter(updatedFilter);
@@ -992,7 +988,7 @@ const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     []
   );
 
-  const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  const ExportIcon = () => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
 
   const fetchProposalCoreBasicData = async () => {
