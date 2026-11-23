@@ -9,9 +9,6 @@ import { CardRowProvider } from 'components/common/cards/CardRowContext';
 import MaterialTableCardRow from 'components/common/MaterialTableCardRow';
 import { useIsMobile } from 'hooks/common/useResponsive';
 
-const CARD_ROW = { Row: MaterialTableCardRow };
-const DEFAULT_ROW = { Row: MTableBodyRow };
-
 const FLATTEN_CONTAINER = {
   '& > .MuiPaper-root': {
     boxShadow: 'none',
@@ -35,11 +32,20 @@ function ResponsiveMaterialTable<RowData extends object>({
   ...props
 }: ResponsiveMaterialTableProps<RowData>) {
   const isMobile = useIsMobile();
+  const components = React.useMemo(
+    () => ({
+      ...props.components,
+      Row: isMobile
+        ? MaterialTableCardRow
+        : props.components?.Row ?? MTableBodyRow,
+    }),
+    [isMobile, props.components]
+  );
 
   const table = (
     <MaterialTable
       {...props}
-      components={isMobile ? CARD_ROW : DEFAULT_ROW}
+      components={components}
       options={{
         header: !isMobile,
         ...(isMobile ? CARD_PAGING : {}),
