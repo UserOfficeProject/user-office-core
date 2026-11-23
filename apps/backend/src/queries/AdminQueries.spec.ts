@@ -8,8 +8,10 @@ import {
   AdminDataSourceMock,
   dummyApiAccessToken,
   dummyApiAccessTokens,
+  pages,
 } from '../datasources/mockups/AdminDataSource';
 import {
+  dummyUserOfficerWithDerivedRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -21,8 +23,84 @@ describe('Test Admin Queries', () => {
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
   });
 
-  test('A user can get page text', () => {
-    return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
+  test('A user can get default page text', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleIds: [-1],
+      })
+    ).resolves.toStrictEqual([pages[0]]);
+  });
+
+  test('A user can get page text for their role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleIds: [1],
+      })
+    ).resolves.toStrictEqual([pages[1]]);
+  });
+
+  test('A user cannot get page text for another role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleIds: [2],
+      })
+    ).resolves.toStrictEqual([]);
+  });
+
+  test('A base user officer can get page text for another role', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserOfficerWithRole,
+        pageId: 1,
+        roleIds: [1],
+      })
+    ).resolves.toStrictEqual([pages[1]]);
+  });
+
+  test('A base user officer can get multiple page texts', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserOfficerWithRole,
+        pageId: 1,
+        roleIds: [-1, 1, 2],
+      })
+    ).resolves.toStrictEqual(pages);
+  });
+
+  test('A derived user officer can get page text for a role with a shared tag', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserOfficerWithDerivedRole,
+        pageId: 1,
+        roleIds: [1],
+      })
+    ).resolves.toStrictEqual([pages[1]]);
+  });
+
+  test('A derived user officer cannot get page text for a role without a shared tag', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserOfficerWithDerivedRole,
+        pageId: 1,
+        roleIds: [2],
+      })
+    ).resolves.toStrictEqual([]);
+  });
+
+  test('A derived user officer request for page texts is refused if any role IDs are unauthorised', () => {
+    return expect(
+      adminQueries.getPageText({
+        agent: dummyUserWithRole,
+        pageId: 1,
+        roleIds: [1, 2],
+      })
+    ).resolves.toStrictEqual([]);
   });
 
   test('A user can get features', () => {

@@ -4,10 +4,10 @@ import { container } from 'tsyringe';
 import AdminMutations from './AdminMutations';
 import { dummyInstitution } from '../datasources/mockups/AdminDataSource';
 import {
+  dummyUserOfficerWithDerivedRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Page } from '../models/Admin';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { Permissions } from '../models/Permissions';
 import { SettingsId } from '../models/Settings';
@@ -28,14 +28,68 @@ const updatedSetting = {
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
     return expect(
-      adminMutations.setPageText(null, { id: 1, text: 'New page contents' })
-    ).resolves.not.toBeInstanceOf(Page);
+      adminMutations.setPageText(dummyUserWithRole, {
+        pageId: 1,
+        text: 'New page contents',
+        roleIds: [-1],
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
-  test('A user officer can set page text', () => {
+  test('A base user officer can set default page text', () => {
     return expect(
-      adminMutations.setPageText(dummyUserOfficerWithRole, { id: 1, text: '' })
-    ).resolves.toBeInstanceOf(Page);
+      adminMutations.setPageText(dummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [-1],
+      })
+    ).resolves.toBe(true);
+  });
+
+  test('A base user officer can set multiple page texts', () => {
+    return expect(
+      adminMutations.setPageText(dummyUserOfficerWithRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [-1, 1, 2],
+      })
+    ).resolves.toBe(true);
+  });
+
+  test('A derived user officer can not set default page text', () => {
+    return expect(
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [-1],
+      })
+    ).resolves.toHaveProperty(
+      'reason',
+      'Insufficient permission to update page notice'
+    );
+  });
+
+  test('A derived user officer can set page text for a role with a shared tag', () => {
+    return expect(
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [1],
+      })
+    ).resolves.toBe(true);
+  });
+
+  test('A derived user officer can not set page text for a role without a shared tag', () => {
+    return expect(
+      adminMutations.setPageText(dummyUserOfficerWithDerivedRole, {
+        pageId: 1,
+        text: '',
+        roleIds: [2],
+      })
+    ).resolves.toHaveProperty(
+      'reason',
+      'Insufficient permission to update page notice'
+    );
   });
 
   test('A user officer can delete a institution', () => {
