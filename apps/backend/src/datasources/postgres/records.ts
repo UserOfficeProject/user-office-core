@@ -375,7 +375,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly ror_id: string;
+  readonly ror_id: string | null;
 }
 
 export interface UnitRecord {
@@ -982,7 +982,8 @@ export const createBasicUserObject = (
     user.email,
     user.country,
     user.user_title,
-    user.oidc_sub
+    user.oidc_sub,
+    user.ror_id
   );
 };
 
@@ -1286,7 +1287,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.institution_id,
     institution.institution,
     institution.country_id,
-    institution.ror_id
+    institution.ror_id ?? undefined
   );
 };
 

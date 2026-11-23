@@ -170,13 +170,13 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
   ];
 
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const GetAppIconComponent = () => <GetAppIcon />;
   const DoneAllIcon = (
-    props: JSX.IntrinsicAttributes & {
+    props: React.Attributes & {
       children?: React.ReactNode;
       'data-cy'?: string;
     }
-  ): JSX.Element => <DoneAll {...props} />;
+  ) => <DoneAll {...props} />;
 
   const sortedColumns = setSortDirectionOnSortField(
     columns(t),

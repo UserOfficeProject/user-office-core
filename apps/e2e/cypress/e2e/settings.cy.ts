@@ -1172,6 +1172,10 @@ context('Settings tests', () => {
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.waitForProposalStatus(
+            proposal.primaryKey,
+            statuses.feasibilityReview.id
+          );
           cy.assignProposalsToInstruments({
             instrumentIds: [createdInstrumentId],
             proposalPks: [proposal.primaryKey],
@@ -1185,6 +1189,10 @@ context('Settings tests', () => {
             instrumentId: initialDBData.instrument1.id,
             questionaryId: initialDBData.technicalReview.questionaryId,
           });
+          cy.waitForProposalStatus(
+            proposal.primaryKey,
+            statuses.fapSelection.id
+          );
 
           cy.assignProposalsToFaps({
             proposalPks: [proposal.primaryKey],
@@ -1195,6 +1203,7 @@ context('Settings tests', () => {
               },
             ],
           });
+          cy.waitForProposalStatus(proposal.primaryKey, statuses.fapReview.id);
         }
       });
       cy.login('officer');
@@ -1206,15 +1215,12 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) =>
-          expect(element.text()).to.contain(statuses.draft.name)
-        );
+        .should('contain.text', statuses.draft.name);
 
-      cy.get('.MuiTable-root tbody')
-        .first()
-        .then((element) =>
-          expect(element.text()).to.contain(statuses.fapReview.name)
-        );
+      cy.contains('.MuiTable-root tbody tr', proposalTitle).should(
+        'contain.text',
+        statuses.fapReview.name
+      );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="FAP_REVIEW"]').click();
