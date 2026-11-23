@@ -16,7 +16,9 @@ const HelpPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        {loadingHelpContent ? null : parse(helpPageContent as string)}
+        {loadingHelpContent
+          ? null
+          : parse(Array.isArray(helpPageContent) ? '' : helpPageContent)}
       </StyledPaper>
     </StyledContainer>
   );

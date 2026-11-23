@@ -41,7 +41,7 @@ const InformationDialog = (props: InformationDialogProps) => {
   const [, helpPageContent] = useGetPageContents(props.pageName, currentRoleId);
 
   const handleClickOpen = async () => {
-    setDialogText(helpPageContent as string);
+    setDialogText(Array.isArray(helpPageContent) ? '' : helpPageContent);
 
     setOpen(true);
   };

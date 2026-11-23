@@ -197,7 +197,7 @@ const PageLayout = ({
           >
             {children}
           </Suspense>
-          {parse(footerContent as string)}
+          {parse(Array.isArray(footerContent) ? '' : footerContent)}
           <BottomNavigation
             sx={{
               display: 'flex',
