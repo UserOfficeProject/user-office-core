@@ -11,7 +11,7 @@ import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomin
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { StyledContainer } from 'styles/StyledComponents';
 
 import DashboardInfoSection from './DashboardInfoSection';
@@ -83,11 +83,12 @@ const getSections = (
 };
 
 export default function OverviewPage(props: { userRole: UserRole }) {
-  const [loadingContent, pageContent] = useGetPageContent(
+  const [loadingContent, pageContent] = useGetPageContents(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
+  const noticeContent = typeof pageContent === 'string' ? pageContent : '';
 
   const showPageContent =
     props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
@@ -95,7 +96,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     Object.values(UserRole).includes(props.userRole);
 
   const infoSection: DashboardSection | null =
-    showPageContent && (loadingContent || !!pageContent)
+    showPageContent && (loadingContent || !!noticeContent)
       ? {
           id: 'info',
           label: 'Info',
@@ -104,7 +105,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
             loadingContent ? (
               <div>Loading...</div>
             ) : (
-              <DashboardInfoSection pageContent={pageContent} />
+              <DashboardInfoSection pageContent={noticeContent} />
             ),
         }
       : null;

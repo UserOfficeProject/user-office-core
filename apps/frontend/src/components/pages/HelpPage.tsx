@@ -2,12 +2,12 @@ import parse from 'html-react-parser';
 import React from 'react';
 
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import { belowCompactUi } from 'hooks/common/useResponsive';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 const HelpPage = () => {
-  const [loadingHelpContent, helpPageContent] = useGetPageContent(
+  const [loadingHelpContent, helpPageContent] = useGetPageContents(
     PageName.HELPPAGE
   );
 
@@ -29,7 +29,9 @@ const HelpPage = () => {
           },
         })}
       >
-        {loadingHelpContent ? null : parse(helpPageContent)}
+        {!loadingHelpContent && typeof helpPageContent === 'string'
+          ? parse(helpPageContent)
+          : null}
       </StyledPaper>
     </StyledContainer>
   );

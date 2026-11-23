@@ -15,7 +15,7 @@ import { useLocation } from 'react-router-dom';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, SettingsId } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import {
   drawerRailWidth,
   drawerWidth,
@@ -147,7 +147,7 @@ const PageLayout = ({
   const displayFAQLink =
     showFooterLinks &&
     settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
-  const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
+  const [, footerContent] = useGetPageContents(PageName.FOOTERCONTENT);
 
   return (
     <div className="App">
@@ -251,7 +251,7 @@ const PageLayout = ({
           >
             {children}
           </Suspense>
-          {parse(footerContent)}
+          {parse(footerContent as string)}
           <BottomNavigation
             sx={{
               display: 'flex',

@@ -15,15 +15,12 @@ import SaveAlt from '@mui/icons-material/SaveAlt';
 import Search from '@mui/icons-material/Search';
 import ViewColumn from '@mui/icons-material/ViewColumn';
 import { SvgIconProps } from '@mui/material/SvgIcon';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-function createTableIcon(Icon: typeof AddBox) {
-  return React.forwardRef<SVGSVGElement, SvgIconProps>(
-    function TableIcon(props, ref) {
-      return <Icon {...props} ref={ref} />;
-    }
-  );
-}
+const createTableIcon = (Icon: typeof AddBox) =>
+  forwardRef<SVGSVGElement, SvgIconProps>(function TableIcon(props, ref) {
+    return <Icon {...props} ref={ref} />;
+  });
 
 export const tableIcons: Icons<never> = {
   Add: createTableIcon(AddBox),

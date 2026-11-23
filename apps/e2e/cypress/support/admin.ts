@@ -37,5 +37,5 @@ const setPageContent = (
 };
 
 Cypress.Commands.add('resetDB', resetDB);
-Cypress.Commands.add('setPageContent', setPageContent);
 Cypress.Commands.add('getAndStoreAppSettings', getAndStoreAppSettings);
+Cypress.Commands.add('setPageContent', setPageContent);

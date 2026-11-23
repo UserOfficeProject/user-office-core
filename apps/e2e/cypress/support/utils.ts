@@ -209,6 +209,10 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}_ifr`).first().focus().click(); // Also focus the iframe to trigger any onChange events
 };
 
+// NOTE: Since @mui/x-date-pickers v8 the accessible field DOM structure is the
+// only option. The input matched by the selector is aria-hidden and only carries
+// the value for form submission, so it cannot be typed into. The editable surface
+// is the list of contenteditable section spans sitting on top of it.
 const getDatePickerSections = (selector: string) =>
   cy
     .get(selector)
@@ -216,7 +220,12 @@ const getDatePickerSections = (selector: string) =>
     .find('.MuiPickersSectionList-sectionContent');
 
 const setDatePickerValue = (selector: string, value: string) =>
-  getDatePickerSections(selector).first().click().type(numbersOnly(value));
+  getDatePickerSections(selector)
+    // NOTE: Points to the first sub-field which is usually the date. Typing
+    // digits replaces the focused section and advances to the next one.
+    .first()
+    .click()
+    .type(numbersOnly(value));
 
 const clearDatePickerValue = (selector: string) =>
   getDatePickerSections(selector).each(($section) => {

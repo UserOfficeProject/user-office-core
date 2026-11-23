@@ -19,7 +19,11 @@ context('Mobile dashboard info section tests', () => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
-    cy.setPageContent({ id: PageName.HOMEPAGE, text: noticeContent });
+    cy.setPageContent({
+      pageId: PageName.HOMEPAGE,
+      text: noticeContent,
+      roleIds: [-1],
+    });
 
     cy.login('user1', initialDBData.roles.user);
   });

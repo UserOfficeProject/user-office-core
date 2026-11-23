@@ -99,8 +99,8 @@ function ProposalPeopleSelectorModal({
   )?.isEnabled;
 
   const labelText = isEmailSearchOnly
-    ? 'Enter a full email address'
-    : 'ex. Nathalie or john@gmail.com';
+    ? 'Search users by email address: ex. john@gmail.com'
+    : 'Search users by name or email address: ex. John or john@gmail.com';
 
   const fetchUserSearchResults = useCallback(async () => {
     setExactEmailMatch(undefined);
