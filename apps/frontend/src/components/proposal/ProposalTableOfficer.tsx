@@ -451,7 +451,7 @@ const ProposalTableOfficer = ({
   setProposalFilter,
   confirm,
 }: ProposalTableOfficerProps) => {
-  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>(undefined);
   const [openAssignment, setOpenAssignment] = useState(false);
   const [openInstrumentAssignment, setOpenInstrumentAssignment] =
     useState(false);
@@ -494,20 +494,18 @@ const ProposalTableOfficer = ({
     tableRef.current?.onQueryChange({});
   };
 
-  const GetAppIconComponent = (): JSX.Element => (
-    <GetAppIcon data-cy="download-proposals" />
-  );
-  const DeleteIcon = (): JSX.Element => <Delete />;
-  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
-  const EmailIcon = (): JSX.Element => <Email />;
-  const ScienceIconComponent = (): JSX.Element => (
+  const GetAppIconComponent = () => <GetAppIcon data-cy="download-proposals" />;
+  const DeleteIcon = () => <Delete />;
+  const GroupWorkIcon = () => <GroupWork />;
+  const EmailIcon = () => <Email />;
+  const ScienceIconComponent = () => (
     <ScienceIcon data-cy="assign-remove-instrument" />
   );
-  const ChangeProposalStatusIcon = (): JSX.Element => (
+  const ChangeProposalStatusIcon = () => (
     <ListStatusIcon data-cy="change-proposal-status" />
   );
-  const ExportIcon = (): JSX.Element => <GridOnIcon />;
-  const ReduceCapacityIconComponent = (): JSX.Element => (
+  const ExportIcon = () => <GridOnIcon />;
+  const ReduceCapacityIconComponent = () => (
     <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 

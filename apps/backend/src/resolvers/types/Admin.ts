@@ -5,8 +5,14 @@ import { Page as PageOrigin } from '../../models/Admin';
 @ObjectType()
 export class Page implements Partial<PageOrigin> {
   @Field(() => Int)
-  public id: number;
+  public pagetextId: number;
 
-  @Field({ nullable: true })
+  @Field(() => Int)
+  public pageId: number;
+
+  @Field(() => Int)
+  public roleId: number;
+
+  @Field(() => String)
   public content: string;
 }

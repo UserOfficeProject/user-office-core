@@ -8,7 +8,7 @@ import parse from 'html-react-parser';
 import React from 'react';
 
 import { PageName } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 
 const DialogContent = styled(MuiDialogContent)(({ theme }) => ({
   root: {
@@ -36,11 +36,10 @@ type InformationDialogProps = {
 const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [dialogText, setDialogText] = React.useState<string | null>(null);
-  const api = useDataApi();
+  const [, helpPageContent] = useGetPageContents(props.pageName);
 
   const handleClickOpen = async () => {
-    const pageContent = await api().getPageContent({ pageId: props.pageName });
-    setDialogText(pageContent.pageContent);
+    setDialogText(helpPageContent as string);
 
     setOpen(true);
   };

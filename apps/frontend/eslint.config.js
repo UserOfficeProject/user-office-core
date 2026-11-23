@@ -32,7 +32,7 @@ export default defineConfig([
 
   // Custom project configuration
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
+    files: ['**/*.{ts,tsx,js,jsx,mts,cts,mjs,cjs}'],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 2018,

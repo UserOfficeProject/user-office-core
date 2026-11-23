@@ -403,7 +403,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     const fapProposalReviewers: Array<
       UserRecord & InstitutionRecord & CountryRecord
     > = await database
-      .select(['users.*', 'institutions.*'])
+      .select(['users.*', 'institutions.*', 'c.country'])
       .from('fap_reviews as fr')
       .join('fap_proposals as fp', {
         'fr.proposal_pk': 'fp.proposal_pk',
@@ -415,6 +415,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       .join('institutions', {
         'users.institution_id': 'institutions.institution_id',
       })
+      .leftJoin('countries as c', { 'institutions.country_id': 'c.country_id' })
       .where('fp.proposal_pk', proposalPk)
       .andWhere('fp.call_id', callId);
 
