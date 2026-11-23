@@ -34,6 +34,8 @@ export type UserManagementTableProps = {
   readonly?: boolean;
   addButtonLabel?: string;
   addButtonTooltip?: string;
+  addButtonPosition?: 'top' | 'bottom';
+  mtOptions?: MaterialTableProps<BasicUserDetails>['options'];
   compact?: boolean;
   /** Header shown at the top of the invite/selector modal */
   addModalTitle?: string;
@@ -56,6 +58,8 @@ const UserManagementTable = ({
   title,
   addButtonLabel = 'Add',
   addButtonTooltip = 'Add a participant',
+  addButtonPosition = 'bottom',
+  mtOptions,
   compact = false,
   addModalTitle,
   disabled = false,
@@ -233,16 +237,19 @@ const UserManagementTable = ({
     </Box>
   );
 
+  const addButtonAtTop = addButtonPosition === 'top';
   const addButton = (
     <Tooltip title={addButtonTooltip}>
       <Button
         variant="outlined"
         onClick={openModal}
         data-cy="add-participant-button"
-        size="small"
+        size={addButtonAtTop ? 'medium' : 'small'}
         startIcon={<PersonAddIcon />}
         disabled={disabled || !!readonly}
-        sx={compact ? { flexShrink: 0, ml: 'auto' } : undefined}
+        sx={
+          compact && !addButtonAtTop ? { flexShrink: 0, ml: 'auto' } : undefined
+        }
       >
         {addButtonLabel}
       </Button>
@@ -253,19 +260,31 @@ const UserManagementTable = ({
     <Box sx={sx}>
       {modalOpen && InviteComponent}
       <FormControl margin="dense" fullWidth>
-        {compact ? (
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            {title} ({users.length})
-          </Typography>
-        ) : (
-          <Typography sx={{ fontSize: '12px', color: 'grey' }}>
-            {title}
-          </Typography>
-        )}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 1,
+            mb: compact || addButtonAtTop ? 1 : 0,
+          }}
+        >
+          {compact ? (
+            <Typography variant="subtitle2">
+              {title} ({users.length})
+            </Typography>
+          ) : (
+            <Typography sx={{ fontSize: '12px', color: 'grey' }}>
+              {title}
+            </Typography>
+          )}
+          {addButtonAtTop && addButton}
+        </Box>
         <MaterialTable
           data={users}
           columns={columns}
-          options={tableOptions}
+          options={{ ...tableOptions, ...mtOptions }}
           actions={rowActions}
           editable={editable}
           localization={
@@ -290,27 +309,31 @@ const UserManagementTable = ({
           }
         />
         {compact ? (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 2,
-              mt: 1.5,
-            }}
-          >
-            {invitesChips}
-            {addButton}
-          </Box>
+          (invitesChips || !addButtonAtTop) && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 2,
+                mt: 1.5,
+              }}
+            >
+              {invitesChips}
+              {!addButtonAtTop && addButton}
+            </Box>
+          )
         ) : (
           <>
             {invitesChips}
-            <ActionButtonContainer
-              sx={(theme) => ({
-                marginTop: theme.spacing(1),
-              })}
-            >
-              {addButton}
-            </ActionButtonContainer>
+            {!addButtonAtTop && (
+              <ActionButtonContainer
+                sx={(theme) => ({
+                  marginTop: theme.spacing(1),
+                })}
+              >
+                {addButton}
+              </ActionButtonContainer>
+            )}
           </>
         )}
       </FormControl>
