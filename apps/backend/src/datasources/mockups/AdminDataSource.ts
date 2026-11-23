@@ -12,6 +12,11 @@ import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSe
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource } from '../AdminDataSource';
 
+export const pages = [
+  new Page(1, 1, -1, 'Default Page Notice'),
+  new Page(2, 1, 1, 'Derived Page Notice 1'),
+  new Page(3, 1, 2, 'Derived Page Notice 2'),
+];
 export const dummyInstitution = new Institution(1, 'ESS', 1);
 export const dummyCountry = new Country(173, 'Sweden');
 export const dummyApiAccessToken = new Permissions(
@@ -122,11 +127,11 @@ export class AdminDataSourceMock implements AdminDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async get(id: number): Promise<string | null> {
-    return 'HELLO WORLD';
+  async get(id: number, roleIds: number[]): Promise<Page[]> {
+    return pages.filter((p) => roleIds.includes(p.roleId));
   }
-  async setPageText(id: number, text: string) {
-    return new Page(id, text);
+  async setPageText(id: number, text: string, roleIds: number[]) {
+    return true;
   }
   async getFeatures(): Promise<Feature[]> {
     return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
