@@ -1,6 +1,6 @@
-import Box from '@mui/material/Box';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Feature, FeatureId } from 'generated/sdk';
 import { useFeatures } from 'hooks/admin/useFeatures';
 
@@ -22,23 +22,17 @@ export const FeatureContext =
 export const FeatureContextProvider = (props: {
   children: React.ReactNode;
 }) => {
-  const { features, loadingFeatures, setFeatures } = useFeatures();
+  const { features, setFeatures, loadingFeatures } = useFeatures();
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  if (loadingFeatures) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100vw',
-          height: '100vh',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        data-cy="loading"
-      >
-        Loading...
-      </Box>
-    );
+  useEffect(() => {
+    if (!loadingFeatures) {
+      setHasLoaded(true);
+    }
+  }, [loadingFeatures]);
+
+  if (loadingFeatures && !hasLoaded) {
+    return <UOLoader />;
   }
 
   const featuresMap = features?.reduce(function (featuresMap, feature) {
@@ -48,8 +42,8 @@ export const FeatureContextProvider = (props: {
   }, new Map<FeatureId, Feature>());
 
   return (
-    <FeatureContext.Provider value={{ featuresMap, features, setFeatures }}>
+    <FeatureContext value={{ featuresMap, features, setFeatures }}>
       {props.children}
-    </FeatureContext.Provider>
+    </FeatureContext>
   );
 };
