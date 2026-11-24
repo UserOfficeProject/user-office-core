@@ -750,7 +750,10 @@ context('GenericTemplates tests', () => {
         `Value must be at most ${genericTemplateTextMax} characters`
       ).should('not.exist');
 
-      cy.get('body').type('{esc}');
+      cy.get('[data-cy="genericTemplate-declaration-modal"]').type('{esc}');
+      cy.get('[data-cy="genericTemplate-declaration-modal"]').should(
+        'not.exist'
+      );
 
       cy.finishedLoading();
 

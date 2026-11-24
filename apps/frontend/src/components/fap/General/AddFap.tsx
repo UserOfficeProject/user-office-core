@@ -2,7 +2,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Field, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +46,7 @@ const AddFap = ({ close }: AddFapProps) => {
       }}
       validationSchema={createFapValidationSchema}
     >
-      {(): JSX.Element => (
+      {() => (
         <Form>
           <Typography variant="h6" component="h1">
             Create new {t('FAP')}
@@ -133,10 +132,6 @@ const AddFap = ({ close }: AddFapProps) => {
       )}
     </Formik>
   );
-};
-
-AddFap.propTypes = {
-  close: PropTypes.func.isRequired,
 };
 
 export default AddFap;

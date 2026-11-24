@@ -16,6 +16,7 @@ import { Tokens } from '../config/Tokens';
 import {
   basicDummyUser,
   basicDummyUserNotOnProposal,
+  dummyUserOfficerWithDerivedRole,
   dummyProposalMemberWithRole,
   dummySecondVisitorWithRole,
   dummyThirdVisitorWithRole,
@@ -26,6 +27,8 @@ import {
   dummyUserWithRole,
   dummyVisitorWithRole,
   dummyVisitTeamLeadWithRole,
+  roles,
+  tags,
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import {
@@ -33,6 +36,8 @@ import {
   AuthJwtPayload,
   UserJWT,
 } from '../models/User';
+import { resolveBasicUserDetailsReference } from '../resolvers/types/BasicUserDetails';
+import { resolveUserReference } from '../resolvers/types/User';
 import { verifyToken } from '../utils/jwt';
 
 const userQueries = container.resolve(UserQueries);
@@ -78,8 +83,128 @@ describe('UserQueries', () => {
     );
   });
 
+  describe('institution metadata', () => {
+    const user = {
+      ...basicDummyUser,
+      institutionRorId: 'https://ror.org/01wv9cn34',
+      country: 'Sweden',
+      institutionCountry: 'Sweden',
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test('Preserves metadata when fetching basic user details', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUsersInfo')
+        .mockResolvedValue([user]);
+
+      await expect(
+        userQueries.getBasic(dummyUserWithRole, user.id)
+      ).resolves.toMatchObject(user);
+    });
+
+    test('Preserves metadata when fetching basic user details by email', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUserDetailsByEmail')
+        .mockResolvedValue(user);
+
+      await expect(
+        userQueries.getBasicUserDetailsByEmail(dummyUserWithRole, user.email)
+      ).resolves.toMatchObject(user);
+    });
+
+    test('Resolves basic-user federation references with institution metadata', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getBasicUserInfo')
+        .mockResolvedValue(user);
+
+      await expect(
+        resolveBasicUserDetailsReference(
+          { id: user.id },
+          { user: dummyUserWithRole, queries: { user: userQueries } }
+        )
+      ).resolves.toEqual(user);
+    });
+
+    test('Preserves the full user object for User federation references', async () => {
+      jest
+        .spyOn(userQueries.dataSource, 'getUser')
+        .mockResolvedValue(dummyUser);
+
+      await expect(
+        resolveUserReference(
+          { id: dummyUser.id },
+          { user: dummyUserWithRole, queries: { user: userQueries } }
+        )
+      ).resolves.toBe(dummyUser);
+    });
+
+    test.each([resolveUserReference, resolveBasicUserDetailsReference])(
+      'Rejects unauthenticated federation lookups through %p',
+      async (resolveReference) => {
+        const getUser = jest.spyOn(userQueries.dataSource, 'getUser');
+        const getBasicUserInfo = jest.spyOn(
+          userQueries.dataSource,
+          'getBasicUserInfo'
+        );
+
+        await expect(
+          resolveReference(
+            { id: user.id },
+            { user: null, queries: { user: userQueries } }
+          )
+        ).resolves.toBeNull();
+        expect(getUser).not.toHaveBeenCalled();
+        expect(getBasicUserInfo).not.toHaveBeenCalled();
+      }
+    );
+
+    test.each([resolveUserReference, resolveBasicUserDetailsReference])(
+      'Returns null for missing users through %p',
+      async (resolveReference) => {
+        jest.spyOn(userQueries.dataSource, 'getUser').mockResolvedValue(null);
+        jest
+          .spyOn(userQueries.dataSource, 'getBasicUserInfo')
+          .mockResolvedValue(null);
+
+        await expect(
+          resolveReference(
+            { id: user.id },
+            { user: dummyUserWithRole, queries: { user: userQueries } }
+          )
+        ).resolves.toBeNull();
+      }
+    );
+  });
+
   test('A user is not allowed to fetch roles', () => {
     return expect(userQueries.getRoles(dummyUserWithRole)).resolves.toBe(null);
+  });
+
+  test('A base user officer is allowed to fetch all roles', () => {
+    return expect(
+      userQueries.getRolesByTags(dummyUserOfficerWithRole)
+    ).resolves.toBe(roles);
+  });
+
+  test('A derived user officer is not allowed to fetch all roles', () => {
+    return expect(
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole)
+    ).resolves.toStrictEqual([]);
+  });
+
+  test('A derived user officer is allowed to fetch roles with the same tag', () => {
+    return expect(
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole, [tags[0].id])
+    ).resolves.toStrictEqual([roles[1]]);
+  });
+
+  test('A derived user officer is not allowed to fetch roles with a different tag', () => {
+    return expect(
+      userQueries.getRolesByTags(dummyUserOfficerWithDerivedRole, [tags[1].id])
+    ).resolves.toStrictEqual([]);
   });
 
   /*

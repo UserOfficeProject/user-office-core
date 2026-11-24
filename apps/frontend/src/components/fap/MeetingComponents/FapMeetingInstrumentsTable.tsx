@@ -191,9 +191,9 @@ const FapMeetingInstrumentsTable = ({
     }
   };
 
-  const DoneAllIcon = (): JSX.Element => <DoneAll />;
-  const RemoveDoneIcon = (): JSX.Element => <RemoveDone />;
-  const AddTimeIcon = (): JSX.Element => <AddAlarmIcon />;
+  const DoneAllIcon = () => <DoneAll />;
+  const RemoveDoneIcon = () => <RemoveDone />;
+  const AddTimeIcon = () => <AddAlarmIcon />;
 
   const accessDependentActions = [];
 
