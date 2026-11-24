@@ -120,7 +120,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     active: boolean,
     files: string | null,
     reviewVisibility: number,
-    editInstrumentAvailabilityTime: boolean
+    editInstrumentAvailabilityTime: boolean | undefined
   ) {
     return database
       .update(
@@ -133,7 +133,9 @@ export default class PostgresFapDataSource implements FapDataSource {
           active,
           files,
           review_visibility: reviewVisibility,
-          edit_instrument_availability_time: editInstrumentAvailabilityTime,
+          ...(typeof editInstrumentAvailabilityTime === 'boolean' && {
+            edit_instrument_availability_time: editInstrumentAvailabilityTime,
+          }),
         },
         ['*']
       )

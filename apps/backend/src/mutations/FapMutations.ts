@@ -115,7 +115,7 @@ export default class FapMutations {
         args.active,
         args.files,
         args.reviewVisibility,
-        args.editInstrumentAvailabilityTime ?? false
+        args.editInstrumentAvailabilityTime
       )
       .catch((err) => {
         return rejection(

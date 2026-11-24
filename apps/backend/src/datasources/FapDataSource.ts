@@ -46,7 +46,7 @@ export interface FapDataSource {
     active: boolean,
     files: string | null,
     reviewVisibility: number,
-    editInstrumentAvailabilityTime: boolean
+    editInstrumentAvailabilityTime: boolean | undefined
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
