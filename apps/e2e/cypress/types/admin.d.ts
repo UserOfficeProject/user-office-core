@@ -1,6 +1,7 @@
 import {
   GetSettingsQuery,
   PrepareDbMutation,
+  SetPageContentMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -24,6 +25,17 @@ declare global {
        *    cy.getAndStoreAppSettings()
        */
       getAndStoreAppSettings: () => Cypress.Chainable<GetSettingsQuery>;
+      /**
+       * Sets page content with values passed.
+       *
+       * @returns {typeof setPageContent}
+       * @memberof Chainable
+       * @example
+       *    cy.setPageText(setPageContentInput: SetPageContentMutationVariables)
+       */
+      setPageContent: (
+        setPageContentInput: SetPageContentMutationVariables
+      ) => Cypress.Chainable<SetPageContentMutation>;
     }
   }
 }

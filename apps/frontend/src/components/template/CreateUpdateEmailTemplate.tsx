@@ -101,6 +101,7 @@ const CreateUpdateEmailTemplate = ({
         useTemplateFile: false,
         subject: '',
         body: '',
+        updateComment: '',
       };
 
   return (
@@ -111,7 +112,10 @@ const CreateUpdateEmailTemplate = ({
           try {
             const { updateEmailTemplate } = await api({
               toastSuccessMessage: 'Email template updated successfully!',
-            }).updateEmailTemplate({ id: emailTemplate.id, ...values });
+            }).updateEmailTemplate({
+              id: emailTemplate.id,
+              ...values,
+            });
 
             close(updateEmailTemplate);
           } catch {
@@ -215,6 +219,18 @@ const CreateUpdateEmailTemplate = ({
                     </Box>
                   )}
                 </Field>
+                <Field
+                  name="updateComment"
+                  id="updateComment"
+                  label="Update comment (optional)"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  inputProps={{ maxLength: '200' }}
+                  variant="outlined"
+                  data-cy="update-comment"
+                  disabled={isExecutingCall || values.useTemplateFile}
+                />
               </Box>
 
               <EmailTemplatePreview
@@ -243,10 +259,12 @@ const CreateUpdateEmailTemplate = ({
                       <MenuItem
                         key={version.versionNumber}
                         value={version.versionNumber}
+                        data-cy={`version-select-${version.versionNumber}`}
                       >
-                        {version.versionNumber +
-                          ': ' +
-                          version.createdTimeStamp}
+                        {`${version.versionNumber}  : ${version.createdTimeStamp}`}
+                        {version.updateComment
+                          ? `     :     ${version.updateComment}`
+                          : ``}
                       </MenuItem>
                     ))}
                   </Select>

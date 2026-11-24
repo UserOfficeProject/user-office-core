@@ -363,10 +363,13 @@ export interface TemplateVersionRecord {
   readonly version_number: number;
   readonly template: string;
   readonly created_at: Date;
+  readonly update_comment: string;
 }
 
 export interface PageTextRecord {
   readonly pagetext_id: number;
+  readonly page_id: number;
+  readonly role_id: number;
   readonly content: string;
 }
 
@@ -374,7 +377,7 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly country_id: number;
-  readonly ror_id: string;
+  readonly ror_id: string | null;
 }
 
 export interface UnitRecord {
@@ -672,7 +675,12 @@ export interface SettingsRecord {
 }
 
 export const createPageObject = (record: PageTextRecord) => {
-  return new Page(record.pagetext_id, record.content);
+  return new Page(
+    record.pagetext_id,
+    record.page_id,
+    record.role_id,
+    record.content
+  );
 };
 
 export interface TokensAndPermissionsRecord {
@@ -981,7 +989,8 @@ export const createBasicUserObject = (
     user.email,
     user.country,
     user.user_title,
-    user.oidc_sub
+    user.oidc_sub,
+    user.ror_id
   );
 };
 
@@ -1063,7 +1072,8 @@ export const createEmailVersionsObject = (
     template,
     templateVersions.version_number,
     templateVersions.template_type,
-    templateVersions.created_at.toUTCString()
+    templateVersions.created_at.toUTCString(),
+    templateVersions.update_comment
   );
 };
 
@@ -1284,7 +1294,7 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
     institution.institution_id,
     institution.institution,
     institution.country_id,
-    institution.ror_id
+    institution.ror_id ?? undefined
   );
 };
 

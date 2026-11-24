@@ -5,7 +5,10 @@ fragment basicUserDetails on BasicUserDetails {
   preferredname
   userTitle
   institution
+  institutionName
   institutionId
+  institutionRorId
+  institutionCountry
   created
   email
   country

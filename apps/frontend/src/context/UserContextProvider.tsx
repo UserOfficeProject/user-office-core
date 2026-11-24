@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jwtDecode } from 'jwt-decode';
-import PropTypes from 'prop-types';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { Role, UserRole, SettingsId, UserJwt } from 'generated/sdk';
-import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { getAuthorizedApi, useUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
 import { SettingsContext } from './SettingsContextProvider';
@@ -21,7 +20,7 @@ interface UserContextData {
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => Promise<void>;
   handleSessionExpired: () => Promise<void>;
-  handleRole: React.Dispatch<string | null | undefined>;
+  handleRole: (role: string) => void;
 }
 
 interface DecodedTokenData
@@ -41,6 +40,7 @@ enum ActionType {
   SETTOKEN = 'setToken',
   SELECTROLE = 'selectRole',
   LOGOFFUSER = 'logOffUser',
+  SETUSERDETAILS = 'setUserDetails',
 }
 
 const initUserData: UserContextData = {
@@ -192,20 +192,59 @@ const reducer = (
       return {
         ...initUserData,
       };
+    case ActionType.SETUSERDETAILS:
+      if (state.user.id !== action.payload.id) {
+        return state;
+      }
+
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload.details },
+      };
 
     default:
       return state;
   }
 };
 
-export const UserContextProvider = (props: {
-  children: React.ReactNode;
-}): JSX.Element => {
+export const UserContextProvider = (props: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const unauthorizedApi = useUnauthorizedApi();
   const settingsContext = useContext(SettingsContext);
 
   checkLocalStorage(dispatch, state);
+
+  const userId = state.user.id;
+  useEffect(() => {
+    const token = localStorage.token;
+    if (!userId || !token) {
+      return;
+    }
+
+    getAuthorizedApi(token)
+      .getUserMe()
+      .then(({ me }) => {
+        if (!me) {
+          return;
+        }
+
+        dispatch({
+          type: ActionType.SETUSERDETAILS,
+          payload: {
+            id: userId,
+            details: {
+              firstname: me.firstname,
+              lastname: me.lastname,
+              preferredname: me.preferredname,
+              email: me.email,
+            },
+          },
+        });
+      })
+      .catch(() => {
+        // Keep the details from the JWT if the request fails
+      });
+  }, [userId]); // id will change when impersonate
 
   async function userLogoutHandler() {
     const token = localStorage.getItem('token');
@@ -246,7 +285,7 @@ export const UserContextProvider = (props: {
   }
 
   return (
-    <UserContext.Provider
+    <UserContext
       value={{
         ...state,
         handleLogin: (data): void =>
@@ -262,8 +301,6 @@ export const UserContextProvider = (props: {
       }}
     >
       {props.children}
-    </UserContext.Provider>
+    </UserContext>
   );
 };
-
-UserContextProvider.propTypes = { children: PropTypes.node.isRequired };

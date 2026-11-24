@@ -5,6 +5,7 @@ mutation updateEmailTemplate(
   $useTemplateFile: Boolean!
   $subject: String
   $body: String
+  $updateComment: String
 ) {
   updateEmailTemplate(
     updateEmailTemplateInput: {
@@ -14,6 +15,7 @@ mutation updateEmailTemplate(
       useTemplateFile: $useTemplateFile
       subject: $subject
       body: $body
+      updateComment: $updateComment
     }
   ) {
     ...emailTemplate
