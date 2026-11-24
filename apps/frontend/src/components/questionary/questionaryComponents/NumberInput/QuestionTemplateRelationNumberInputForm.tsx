@@ -88,7 +88,9 @@ export const QuestionTemplateRelationNumberForm = (
               type="text"
               component={TextField}
               fullWidth
-              inputProps={{ 'data-cy': 'small-label' }}
+              slotProps={{
+                htmlInput: { 'data-cy': 'small-label' },
+              }}
             />
             <TitledContainer label="Constraints">
               <Field
@@ -98,7 +100,9 @@ export const QuestionTemplateRelationNumberForm = (
                 Label={{
                   label: 'Is required',
                 }}
-                InputProps={{ 'data-cy': 'required' }}
+                slotProps={{
+                  input: { 'data-cy': 'required' },
+                }}
               />
 
               <Autocomplete
@@ -152,7 +156,6 @@ export const QuestionTemplateRelationNumberForm = (
                 type="number"
                 component={TextField}
                 fullWidth
-                inputProps={{ 'data-cy': 'numberMin' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value =
                     e.target.value === '' ? null : Number(e.target.value);
@@ -167,6 +170,9 @@ export const QuestionTemplateRelationNumberForm = (
                       false
                     );
                 }}
+                slotProps={{
+                  htmlInput: { 'data-cy': 'numberMin' },
+                }}
               />
               {(formikProps.values.config as NumberInputConfig).numberMin !==
                 null && (
@@ -178,7 +184,9 @@ export const QuestionTemplateRelationNumberForm = (
                   Label={{
                     label: 'Minimum is inclusive',
                   }}
-                  inputProps={{ 'data-cy': 'numberMinInclusive' }}
+                  slotProps={{
+                    input: { 'data-cy': 'numberMinInclusive' },
+                  }}
                 />
               )}
               <Field
@@ -188,7 +196,6 @@ export const QuestionTemplateRelationNumberForm = (
                 type="number"
                 component={TextField}
                 fullWidth
-                inputProps={{ 'data-cy': 'numberMax' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value =
                     e.target.value === '' ? null : Number(e.target.value);
@@ -201,6 +208,9 @@ export const QuestionTemplateRelationNumberForm = (
                       false
                     );
                 }}
+                slotProps={{
+                  htmlInput: { 'data-cy': 'numberMax' },
+                }}
               />
               {(formikProps.values.config as NumberInputConfig).numberMax !==
                 null && (
@@ -212,7 +222,9 @@ export const QuestionTemplateRelationNumberForm = (
                   Label={{
                     label: 'Maximum is inclusive',
                   }}
-                  inputProps={{ 'data-cy': 'numberMaxInclusive' }}
+                  slotProps={{
+                    input: { 'data-cy': 'numberMaxInclusive' },
+                  }}
                 />
               )}
             </TitledContainer>

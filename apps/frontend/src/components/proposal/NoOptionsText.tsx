@@ -1,4 +1,4 @@
-import { MenuItem, Typography } from '@mui/material';
+import { ListItemButton, Typography } from '@mui/material';
 import React, { useContext } from 'react';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -41,9 +41,9 @@ function NoOptionsText({
 
   if (exactEmailMatch) {
     return (
-      <MenuItem onClick={() => onAddUser(exactEmailMatch)}>
+      <ListItemButton onClick={() => onAddUser(exactEmailMatch)}>
         {getFullUserNameWithInstitution(exactEmailMatch)}
-      </MenuItem>
+      </ListItemButton>
     );
   }
 

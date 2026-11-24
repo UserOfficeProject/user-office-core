@@ -88,6 +88,18 @@ declare global {
       ) => Chainable<JQuery<HTMLElement>>;
 
       /**
+       * Clear the value of a Date or DateTime picker fetched by selector.
+       *
+       * @returns {typeof clearDatePickerValue}
+       * @memberof Chainable
+       * @example
+       *    cy.clearDatePickerValue('selector')
+       */
+      clearDatePickerValue: (
+        selector: string
+      ) => Chainable<JQuery<HTMLElement>>;
+
+      /**
        * Get content from TinyMCE editor fetched by editor id.
        *
        * @returns {typeof getTinyMceContent}

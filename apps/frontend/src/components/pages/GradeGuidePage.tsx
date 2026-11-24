@@ -20,7 +20,11 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
   );
 
   const noContents = (
-    <Stack alignItems="center">
+    <Stack
+      sx={{
+        alignItems: 'center',
+      }}
+    >
       <MenuBookIcon
         sx={(theme) => ({
           width: '100px',
@@ -35,7 +39,11 @@ const GradeGuidePage = ({ fap }: GradeGuidePageProps) => {
 
   if (loadingPage) {
     return (
-      <Box textAlign="center">
+      <Box
+        sx={{
+          textAlign: 'center',
+        }}
+      >
         <UOLoader />
       </Box>
     );

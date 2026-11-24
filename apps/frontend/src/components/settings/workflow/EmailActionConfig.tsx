@@ -1,4 +1,4 @@
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlined';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
@@ -204,8 +204,19 @@ const EmailActionConfig = ({
               getRecipientIndexByName(recipient.name);
 
             return (
-              <Grid key={index} container paddingX={1} columnSpacing={2}>
-                <Grid item sm={5}>
+              <Grid
+                key={index}
+                container
+                columnSpacing={2}
+                sx={{
+                  paddingX: 1,
+                }}
+              >
+                <Grid
+                  size={{
+                    sm: 5,
+                  }}
+                >
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -227,10 +238,12 @@ const EmailActionConfig = ({
                             );
                           }
                         }}
-                        inputProps={{
-                          'aria-label': 'primary checkbox',
-                        }}
                         required={isRecipientRequired}
+                        slotProps={{
+                          input: {
+                            'aria-label': 'primary checkbox',
+                          },
+                        }}
                       />
                     }
                     label={recipient.name}
@@ -246,10 +259,11 @@ const EmailActionConfig = ({
                   </Box>
                 </Grid>
                 <Grid
-                  item
-                  sm={getEmailTemplateColumnWidth(
-                    foundRecipientWithEmailTemplateIndex
-                  )}
+                  size={{
+                    sm: getEmailTemplateColumnWidth(
+                      foundRecipientWithEmailTemplateIndex
+                    ),
+                  }}
                 >
                   {foundRecipientWithEmailTemplateIndex !== -1 && (
                     <>
@@ -339,7 +353,11 @@ const EmailActionConfig = ({
                   recipientsWithEmailTemplate[
                     foundRecipientWithEmailTemplateIndex
                   ].recipient.name !== EmailStatusActionRecipients.OTHER && (
-                    <Grid item sm={3}>
+                    <Grid
+                      size={{
+                        sm: 3,
+                      }}
+                    >
                       <FormControlLabel
                         control={
                           <Checkbox

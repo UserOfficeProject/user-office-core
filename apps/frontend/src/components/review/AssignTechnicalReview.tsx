@@ -50,8 +50,13 @@ function AssignTechnicalReview({
     usersData.find((user) => user.id === userId);
 
   return (
-    <Grid container alignItems="center">
-      <Grid item xs={3}>
+    <Grid
+      container
+      sx={{
+        alignItems: 'center',
+      }}
+    >
+      <Grid size={3}>
         <Autocomplete
           id="user-list"
           options={usersData}
@@ -70,10 +75,12 @@ function AssignTechnicalReview({
           disabled={
             (!isUserOfficer && technicalReview?.submitted) || isInternalReviewer
           }
-          ListboxProps={{ title: 'user-list-options' }}
+          slotProps={{
+            listbox: { title: 'user-list-options' },
+          }}
         />
       </Grid>
-      <Grid item xs={1}>
+      <Grid size={1}>
         <Button
           onClick={() => {
             if (selectedUser) {

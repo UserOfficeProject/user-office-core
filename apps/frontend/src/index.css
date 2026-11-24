@@ -169,22 +169,22 @@ h6 {
   background-color: var(--PALETTE_PRIMARY_LIGHT);
 }
 
-.MuiButton-containedPrimary {
+.MuiButton-contained.MuiButton-colorPrimary:not(.Mui-disabled) {
   color: var(--PALETTE_SECONDARY_CONTRAST);
   background-color: var(--PALETTE_SECONDARY_MAIN);
 }
 
-.MuiButton-containedPrimary:hover {
+.MuiButton-contained.MuiButton-colorPrimary:not(.Mui-disabled):hover {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_SECONDARY_DARK);
 }
 
-.MuiButton-containedSecondary {
+.MuiButton-contained.MuiButton-colorSecondary:not(.Mui-disabled) {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_PRIMARY_MAIN);
 }
 
-.MuiButton-containedSecondary:hover {
+.MuiButton-contained.MuiButton-colorSecondary:not(.Mui-disabled):hover {
   color: var(--PALETTE_PRIMARY_CONTRAST);
   background-color: var(--PALETTE_PRIMARY_LIGHT);
 }

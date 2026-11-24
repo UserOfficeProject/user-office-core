@@ -49,9 +49,6 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
           label="Question text"
           data-cy="search-text"
           fullWidth
-          InputLabelProps={{
-            shrink: true,
-          }}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const newFilter = {
               ...filter,
@@ -68,6 +65,11 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
             );
           }}
           autoFocus
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+          }}
         />
       </FormControl>
       <FormControl

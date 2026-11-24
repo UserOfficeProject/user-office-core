@@ -52,14 +52,15 @@ const ProposalAttachmentDownload = ({
       >
         Download attachment on proposal/s
       </Typography>
-
       <Grid
         container
         spacing={1}
-        justifyContent="center"
-        alignItems="flex-start"
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
       >
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Autocomplete
             id="attachment-question-select"
             aria-labelledby="attachment-question-select-label"
@@ -99,7 +100,7 @@ const ProposalAttachmentDownload = ({
             loading={loading}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <Button
             fullWidth
             sx={(theme) => ({

@@ -4,7 +4,7 @@ import MaterialTable, {
   MaterialTableProps,
 } from '@material-table/core';
 import { ScheduleSend } from '@mui/icons-material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
 import { Chip, Tooltip } from '@mui/material';

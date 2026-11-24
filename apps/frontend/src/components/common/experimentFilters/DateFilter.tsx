@@ -70,7 +70,12 @@ function DateFilter(props: DateFilterProps) {
   return (
     <Grid container spacing={2}>
       <LocalizationProvider dateAdapter={DateAdapter}>
-        <Grid item sm={4} xs={12}>
+        <Grid
+          size={{
+            sm: 4,
+            xs: 12,
+          }}
+        >
           <DatePicker
             format={inputDateFormat}
             label="From"
@@ -104,7 +109,12 @@ function DateFilter(props: DateFilterProps) {
           />
         </Grid>
 
-        <Grid item sm={4} xs={12}>
+        <Grid
+          size={{
+            sm: 4,
+            xs: 12,
+          }}
+        >
           <DatePicker
             format={inputDateFormat}
             label="To"
@@ -147,10 +157,11 @@ function DateFilter(props: DateFilterProps) {
           />
         </Grid>
         <Grid
-          item
-          sm={4}
-          xs={12}
           sx={{ display: 'flex', justifyContent: 'center' }}
+          size={{
+            sm: 4,
+            xs: 12,
+          }}
         >
           <PresetDateSelector
             value={presetValue}

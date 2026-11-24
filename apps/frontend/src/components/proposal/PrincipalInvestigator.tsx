@@ -49,7 +49,6 @@ export default function PrincipalInvestigator(
           allowInviteByEmail={false}
         />
       )}
-
       <FormControl
         sx={{
           flexDirection: 'row',
@@ -61,13 +60,16 @@ export default function PrincipalInvestigator(
         <TextField
           label="Principal Investigator"
           value={getFullUserNameWithInstitution(proposer)}
-          InputLabelProps={{ shrink: true }}
-          InputProps={{
-            readOnly: true,
-          }}
           data-cy="principal-investigator"
           required
           fullWidth
+          slotProps={{
+            input: {
+              readOnly: true,
+            },
+
+            inputLabel: { shrink: true },
+          }}
         />
 
         <Tooltip title="Edit Principal Investigator">
