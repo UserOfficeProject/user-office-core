@@ -31,7 +31,7 @@ declare global {
        * @returns {typeof setPageContent}
        * @memberof Chainable
        * @example
-       *    cy.setPageText(setPageContentInput: SetPageContentMutationVariables)
+       *    cy.setPageContent({ pageId: PageName.HOMEPAGE, text: '<p>Notice</p>', roleIds: [-1] })
        */
       setPageContent: (
         setPageContentInput: SetPageContentMutationVariables

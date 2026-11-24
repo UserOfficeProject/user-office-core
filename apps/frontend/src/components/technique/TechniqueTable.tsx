@@ -1,6 +1,6 @@
 import { Column } from '@material-table/core';
 import { AssignmentInd } from '@mui/icons-material';
-import { Dialog, DialogContent, Typography } from '@mui/material';
+import { DialogContent, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +8,7 @@ import i18n from 'i18n';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
+import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import PeopleSelectorModal from 'components/proposal/PeopleSelectorModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -270,9 +271,7 @@ const TechniqueTable = () => {
           invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
         />
       )}
-      <Dialog
-        aria-labelledby="instrument-select-title"
-        aria-describedby="instrument-select-description"
+      <StyledDialog
         open={openTechniqueAssignment}
         onClose={(): void => setOpenTechniqueAssignment(false)}
         maxWidth="xs"
@@ -288,7 +287,7 @@ const TechniqueTable = () => {
             removeInstrumentsFromTechnique={removeInstrumentsFromTechnique}
           />
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
       <div data-cy="techniques-table">
         <SuperMaterialTable
           delete={onTechniqueDelete}

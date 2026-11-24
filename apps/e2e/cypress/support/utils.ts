@@ -140,13 +140,15 @@ const closeModal = () => {
 };
 
 const finishedLoading = () => {
-  cy.get('[role="progressbar"]')
+  cy.get('[role="progressbar"]:not([data-cy="questionary-progress"])')
     .should('not.exist')
     .get('[data-cy="loading"]')
     .should('not.exist')
     .get('[data-cy="UO-loader"]')
     .should('not.exist')
-    .get('.MuiPaper-root [role="progressbar"]')
+    .get(
+      '.MuiPaper-root [role="progressbar"]:not([data-cy="questionary-progress"])'
+    )
     .should('not.exist');
 };
 
