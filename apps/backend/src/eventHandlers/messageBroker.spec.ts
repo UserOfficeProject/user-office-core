@@ -1,11 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import {
-  getExperimentMessageData,
-  getProposalMessageData,
-  getVisitMessageData,
-} from './messageBroker';
+import { getProposalMessageData, getVisitMessageData } from './messageBroker';
 import { Tokens } from '../config/Tokens';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
@@ -39,6 +35,7 @@ import {
   VisitRegistration,
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
+import { getExperimentMessageData } from './proposals/experiment';
 
 describe('messageBroker', () => {
   describe('getProposalMessageData', () => {
