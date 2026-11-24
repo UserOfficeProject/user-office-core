@@ -10,6 +10,15 @@ Please consider these guidelines when filing a pull request:
 - 2 spaces indentation
 - Features and bug fixes should be covered by test cases
 
+## AI assisted contributions
+
+AI coding assistants are welcome and the following rules apply.
+- You are responsible for every line you submit and must be able to explain it.
+- Disclose in the PR description that AI was used and add ai:assisted label.
+- Never share secrets, personal data or production data with AI tools.
+- Every PR needs approval from a human maintainer.
+- Codex, Cursor, GitHub Copilot and most other agents read `AGENTS.md` natively. Claude Code loads it through `CLAUDE.md`. Copilot also uses `.github/copilot-instructions.md` and `.github/instructions/`. Make changes to project rules in `AGENTS.md` only, so that every tool stays in sync.
+
 ## Creating releases
 
 To create a release, you must create a pull request from the develop branch into 'master' using the 'Create a merge commit' option. Once this has been approved it will automatically run the pipeline to generate a new release. [example](https://github.com/UserOfficeProject/user-office-core/pull/1621)
