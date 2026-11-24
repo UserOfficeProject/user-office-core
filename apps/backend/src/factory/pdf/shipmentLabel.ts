@@ -2,180 +2,80 @@ import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
-import { DataType, Question } from '../../models/Template';
-import { Unit } from '../../models/Unit';
+import { TemplateDataSource } from '../../datasources/TemplateDataSource';
+import { UserDataSource } from '../../datasources/UserDataSource';
+import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
+import { Answer, QuestionaryStep } from '../../models/Questionary';
+import { DataType } from '../../models/Template';
 import { UserWithRole } from '../../models/User';
-import { CallDataSource } from './../../datasources/CallDataSource';
-import { InstrumentDataSource } from './../../datasources/InstrumentDataSource';
-import { TemplateDataSource } from './../../datasources/TemplateDataSource';
-import { UserDataSource } from './../../datasources/UserDataSource';
-import { AnswerBasic } from './../../models/Questionary';
-import {
-  HEIGHT_KEY,
-  IS_DANGEROUS_GOODS_KEY,
-  LENGTH_KEY,
-  Shipment,
-  WEIGHT_KEY,
-  WIDTH_KEY,
-  STORAGE_TEMPERATURE_KEY,
-} from './../../models/Shipment';
 
 export type ShipmentPDFData = {
-  shipment: Shipment & {
-    proposalId: string;
-    callShortCode: string;
-    instrumentShortCodes: string;
-    weight: number;
-    width: number;
-    height: number;
-    length: number;
-    storageTemperature: string;
-    localContact: string;
-    isDangerousGoods: boolean;
+  shipment: {
+    id: number;
+    title: string;
+    externalRef: string;
+    proposalId?: string;
+    callShortCode?: string;
+    instrumentShortCodes?: string;
+    localContact?: string;
   };
+  answers: Record<string, string>;
+  pdfTemplate: string | null;
 };
 
-const formatAnswer = ({ answer }: AnswerBasic, question: Question) => {
+const isPrintableValue = (value: unknown): value is string | number =>
+  (typeof value === 'string' && value.trim() !== '') ||
+  (typeof value === 'number' && Number.isFinite(value));
+
+function formatAnswer({ value, question }: Answer): string | undefined {
   switch (question.dataType) {
     case DataType.BOOLEAN:
-      return answer.value ? 'Yes' : 'No';
+      return typeof value === 'boolean' ? (value ? 'Yes' : 'No') : undefined;
     case DataType.NUMBER_INPUT:
-      const value = answer.value.value;
-      const unit = (answer.value.unit as Unit).symbol;
+      if (!isPrintableValue(value?.value)) {
+        return undefined;
+      }
 
-      return `${value} ${unit ? unit : ''}`;
+      return [value.value, value.unit?.symbol]
+        .filter(isPrintableValue)
+        .join(' ');
+    case DataType.DATE:
+    case DataType.TEXT_INPUT:
+    case DataType.RICH_TEXT_INPUT:
+      return isPrintableValue(value) ? String(value) : undefined;
     case DataType.SELECTION_FROM_OPTIONS:
-      return answer.value.join(', ');
+    case DataType.DYNAMIC_MULTIPLE_CHOICE:
+      return Array.isArray(value)
+        ? value.filter(isPrintableValue).join(', ') || undefined
+        : undefined;
     default:
-      return answer.value;
+      return undefined;
   }
-};
+}
 
-const getAnswer = async (questionaryId: number, naturalKey: string) => {
-  const questionaryDB = container.resolve<QuestionaryDataSource>(
-    Tokens.QuestionaryDataSource
-  );
-  const templateDB = container.resolve<TemplateDataSource>(
-    Tokens.TemplateDataSource
-  );
+export function collectShipmentLabelAnswers(steps: QuestionaryStep[]) {
+  return Object.fromEntries(
+    steps.flatMap(({ fields }) =>
+      fields.flatMap((field) => {
+        const answer = formatAnswer(field);
 
-  const question = await templateDB.getQuestionByNaturalKey(naturalKey);
-  if (question === null) {
-    throw new Error(`Question not found for naturalKey: ${naturalKey}`);
-  }
-
-  const answer = await questionaryDB.getAnswer(questionaryId, naturalKey);
-  if (answer === null) {
-    throw new Error(
-      `Answer not found for questionaryId: ${questionaryId}, naturalKey: ${naturalKey}`
-    );
-  }
-
-  return formatAnswer(answer, question);
-};
-
-const getQuestionaryData = async (questionaryId: number) => {
-  const weight = await getAnswer(questionaryId, WEIGHT_KEY);
-  const width = await getAnswer(questionaryId, WIDTH_KEY);
-  const height = await getAnswer(questionaryId, HEIGHT_KEY);
-  const length = await getAnswer(questionaryId, LENGTH_KEY);
-  const storageTemperature = await getAnswer(
-    questionaryId,
-    STORAGE_TEMPERATURE_KEY
-  );
-  const isDangerousGoods = await getAnswer(
-    questionaryId,
-    IS_DANGEROUS_GOODS_KEY
-  );
-
-  return {
-    weight,
-    width,
-    height,
-    length,
-    storageTemperature,
-    isDangerousGoods,
-  };
-};
-
-const getProposalData = async (proposalPk: number) => {
-  const dataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-  const proposal = await dataSource.get(proposalPk);
-  if (proposal === null) {
-    throw new Error(`Proposal not found for proposalPk: ${proposalPk}`);
-  }
-
-  return {
-    proposalId: proposal.proposalId,
-    proposalPk: proposal.primaryKey,
-    callId: proposal.callId,
-  };
-};
-
-const getCallData = async (callId: number) => {
-  const calDataSource = container.resolve<CallDataSource>(
-    Tokens.CallDataSource
-  );
-  const call = await calDataSource.getCall(callId);
-  if (!call) {
-    throw new Error('Call not found');
-  }
-
-  return {
-    callShortCode: call.shortCode,
-  };
-};
-
-const getInstrumentData = async (proposalPk: number) => {
-  const dataSource = container.resolve<InstrumentDataSource>(
-    Tokens.InstrumentDataSource
-  );
-
-  const instruments = await dataSource.getInstrumentsByProposalPk(proposalPk);
-  if (!instruments?.length) {
-    throw new Error(`Instruments not found for proposalPk: ${proposalPk}`);
-  }
-
-  return {
-    instrumentShortCodes: instruments
-      .map((instrument) => instrument.shortCode)
-      .join(', '),
-  };
-};
-
-const getUser = async (userId: number) => {
-  const dataSource = container.resolve<UserDataSource>(Tokens.UserDataSource);
-
-  const user = await dataSource.getUser(userId);
-  if (!user) {
-    throw new Error(`User not found for userId: ${userId}`);
-  }
-
-  return user;
-};
-
-const getExperiment = async (experimentPk: number) => {
-  const dataSource = container.resolve<ExperimentDataSource>(
-    Tokens.ExperimentDataSource
-  );
-
-  const experiment = await dataSource.getExperiment(experimentPk);
-  if (!experiment) {
-    throw new Error(`Experiment not found for experimentPk: ${experimentPk}`);
-  }
-
-  return experiment;
-};
+        return answer === undefined
+          ? []
+          : [[field.question.naturalKey, answer]];
+      })
+    )
+  ) as Record<string, string>;
+}
 
 export async function collectShipmentPDFData(
   shipmentId: number,
   user: UserWithRole,
-  notify?: CallableFunction
+  notify?: (filename: string) => void
 ): Promise<ShipmentPDFData> {
   const shipment = await baseContext.queries.shipment.getShipment(
     user,
@@ -183,32 +83,74 @@ export async function collectShipmentPDFData(
   );
   if (!shipment) {
     throw new Error(
-      `shipment with ID '${shipmentId}' not found, or the user has insufficient rights`
+      `Shipment with ID '${shipmentId}' not found, or the user has insufficient rights`
     );
   }
 
   notify?.(`shipment_${shipment.id}.pdf`);
 
-  const experiment = await getExperiment(shipment.experimentPk);
-  if (experiment.localContactId === null) {
-    throw new Error(`Shipment with ID '${shipmentId}' has no local contact`);
-  }
-  const proposalData = await getProposalData(shipment.proposalPk);
-  const questionaryData = await getQuestionaryData(shipment.questionaryId);
-  const callData = await getCallData(proposalData.callId);
-  const instrumentData = await getInstrumentData(proposalData.proposalPk);
-  const localContact = await getUser(experiment.localContactId);
+  const questionaryDB = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+  const [questionary, steps, experiment, proposal, instruments] =
+    await Promise.all([
+      questionaryDB.getQuestionary(shipment.questionaryId),
+      questionaryDB.getQuestionarySteps(shipment.questionaryId),
+      container
+        .resolve<ExperimentDataSource>(Tokens.ExperimentDataSource)
+        .getExperiment(shipment.experimentPk),
+      container
+        .resolve<ProposalDataSource>(Tokens.ProposalDataSource)
+        .get(shipment.proposalPk),
+      container
+        .resolve<InstrumentDataSource>(Tokens.InstrumentDataSource)
+        .getInstrumentsByProposalPk(shipment.proposalPk),
+    ]);
 
-  const out = {
+  const localContactId = experiment?.localContactId;
+  const [template, call, localContact] = await Promise.all([
+    questionary
+      ? container
+          .resolve<TemplateDataSource>(Tokens.TemplateDataSource)
+          .getTemplate(questionary.templateId)
+      : null,
+    proposal
+      ? container
+          .resolve<CallDataSource>(Tokens.CallDataSource)
+          .getCall(proposal.callId)
+      : null,
+    localContactId == null
+      ? null
+      : container
+          .resolve<UserDataSource>(Tokens.UserDataSource)
+          .getUser(localContactId),
+  ]);
+  const printableSteps =
+    baseContext.queries.questionary.filterQuestionaryForReadPermissions(
+      user,
+      steps
+        .filter(({ topic }) => topic.isEnabled)
+        .map((step) => ({
+          ...step,
+          fields: getTopicActiveAnswers(steps, step.topic.id),
+        }))
+    );
+
+  return {
     shipment: {
-      ...shipment,
-      ...proposalData,
-      ...questionaryData,
-      ...callData,
-      ...instrumentData,
-      localContact: `${localContact.preferredname} ${localContact.lastname}`,
+      id: shipment.id,
+      title: shipment.title,
+      externalRef: shipment.externalRef,
+      proposalId: proposal?.proposalId,
+      callShortCode: call?.shortCode,
+      instrumentShortCodes: instruments
+        ?.map(({ shortCode }) => shortCode)
+        .join(', '),
+      localContact: localContact
+        ? `${localContact.preferredname} ${localContact.lastname}`
+        : undefined,
     },
+    answers: collectShipmentLabelAnswers(printableSteps),
+    pdfTemplate: template?.shipmentLabelTemplate ?? null,
   };
-
-  return out;
 }

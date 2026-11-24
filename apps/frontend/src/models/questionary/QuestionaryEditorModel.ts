@@ -60,6 +60,7 @@ export default function QuestionaryEditorModel(
     steps: [],
     templateId: 0,
     isArchived: false,
+    shipmentLabelTemplate: null,
     name: 'blank',
     complementaryQuestions: [],
     description: '',

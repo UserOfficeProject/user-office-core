@@ -64,7 +64,7 @@ import {
   populateStfcRow,
 } from '../factory/xlsx/stfc/StfcFapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
+
 mapClass(Tokens.RoleDataSource, PostgresRoleDataSource);
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
@@ -124,8 +124,6 @@ mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-
-mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SMTPMailService);
 

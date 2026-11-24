@@ -60,7 +60,6 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { isDevelopment } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
@@ -128,8 +127,6 @@ mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-
-mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
 if (isDevelopment) {
   mapClass(Tokens.MailService, SMTPMailService);

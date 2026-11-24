@@ -37,6 +37,9 @@ export class Template implements Partial<TemplateOrigin> {
 
   @Field()
   public isArchived: boolean;
+
+  @Field(() => String, { nullable: true })
+  public shipmentLabelTemplate?: string | null;
 }
 
 @Resolver((of) => Template)

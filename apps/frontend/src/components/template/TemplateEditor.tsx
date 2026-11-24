@@ -3,6 +3,7 @@ import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import React, { useState } from 'react';
 
+import { DataType, TemplateGroupId } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import { useTemplateEditorSelection } from 'hooks/questionary/useTemplateEditorSelection';
 import QuestionaryEditorModel, {
@@ -12,6 +13,7 @@ import { handleTemplateDragEnd } from 'models/questionary/templateEditorDragHand
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import ShipmentLabelEditor from './pdf/ShipmentLabelEditor';
 import PreviewTemplateModal from './PreviewTemplateModal';
 import QuestionEditor from './QuestionEditor';
 import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
@@ -42,6 +44,16 @@ export default function TemplateEditor() {
   ]);
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
+  const [showShipmentLabelEditor, setShowShipmentLabelEditor] = useState(false);
+  const labelAnswerTypes = [
+    DataType.BOOLEAN,
+    DataType.NUMBER_INPUT,
+    DataType.DATE,
+    DataType.TEXT_INPUT,
+    DataType.RICH_TEXT_INPUT,
+    DataType.SELECTION_FROM_OPTIONS,
+    DataType.DYNAMIC_MULTIPLE_CHOICE,
+  ];
 
   const getContainerStyle = (): React.CSSProperties =>
     isLoading || state.templateId === 0
@@ -62,6 +74,22 @@ export default function TemplateEditor() {
         />
       )}
       <TemplateMetadataEditor dispatch={dispatch} template={state} />
+      {state.groupId === TemplateGroupId.SHIPMENT && state.templateId > 0 && (
+        <Button onClick={() => setShowShipmentLabelEditor(true)}>
+          Edit shipment label PDF
+        </Button>
+      )}
+      {showShipmentLabelEditor && (
+        <ShipmentLabelEditor
+          templateId={state.templateId}
+          questions={state.steps.flatMap(({ fields }) =>
+            fields
+              .map(({ question }) => question)
+              .filter(({ dataType }) => labelAnswerTypes.includes(dataType))
+          )}
+          onClose={() => setShowShipmentLabelEditor(false)}
+        />
+      )}
       <StyledPaper style={getContainerStyle()}>
         {isLoading && <LinearProgress />}
         <TemplateEditorToolbar

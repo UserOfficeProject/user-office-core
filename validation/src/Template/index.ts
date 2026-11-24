@@ -73,6 +73,7 @@ export const updateTemplateValidationSchema = Yup.object().shape({
   name: Yup.string().notRequired(),
   description: Yup.string().notRequired(),
   isArchived: Yup.bool().notRequired(),
+  shipmentLabelTemplate: Yup.string().nullable().trim().min(1).max(64_000),
 });
 
 export const createQuestionTemplateRelationValidationSchema =

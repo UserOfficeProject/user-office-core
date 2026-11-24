@@ -24,6 +24,9 @@ export class UpdateTemplateArgs {
 
   @Field({ nullable: true })
   public isArchived: boolean;
+
+  @Field(() => String, { nullable: true })
+  public shipmentLabelTemplate?: string | null;
 }
 
 @Resolver()

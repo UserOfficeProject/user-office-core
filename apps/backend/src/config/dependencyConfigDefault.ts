@@ -68,7 +68,6 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
-import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 
 async function skipEmailHandler(event: ApplicationEvent) {
   logger.logInfo('Skip email sending', { event });
@@ -134,8 +133,6 @@ mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
-
-mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapClass(Tokens.MailService, SkipSendMailService);
 
