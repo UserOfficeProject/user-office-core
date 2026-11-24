@@ -12,15 +12,15 @@ async function setELIColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_DARK,
-    settingsValue: '#1A1A1A',
+    settingsValue: '#000000',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
-    settingsValue: '#F26722',
+    settingsValue: '#ff6600',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,
-    settingsValue: '#BEF202',
+    settingsValue: '#ffbe8a',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_ACCENT,
@@ -32,23 +32,23 @@ async function setELIColourTheme() {
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_SECONDARY_DARK,
-    settingsValue: '#1B676B',
+    settingsValue: '#bbbddc',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_SECONDARY_MAIN,
-    settingsValue: '#1B676B',
+    settingsValue: '#ebedf9',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_SECONDARY_LIGHT,
-    settingsValue: '#1B676B',
-  });
-  await db.updateSettings({
-    settingsId: SettingsId.PALETTE_SECONDARY_CONTRAST,
     settingsValue: '#ffffff',
   });
   await db.updateSettings({
+    settingsId: SettingsId.PALETTE_SECONDARY_CONTRAST,
+    settingsValue: '#000000',
+  });
+  await db.updateSettings({
     settingsId: SettingsId.PALETTE_ERROR_MAIN,
-    settingsValue: '#f44336',
+    settingsValue: '#eb2f1e',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_SUCCESS_MAIN,
@@ -56,11 +56,11 @@ async function setELIColourTheme() {
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_WARNING_MAIN,
-    settingsValue: '#ff9800',
+    settingsValue: '#e09f00',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_INFO_MAIN,
-    settingsValue: '#2196f3',
+    settingsValue: '#47a6e3',
   });
   await db.updateSettings({
     settingsId: SettingsId.HEADER_LOGO_FILENAME,
