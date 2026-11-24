@@ -78,8 +78,6 @@ const getTechnicalReviewHumanReadableStatus = (
   switch (status) {
     case TechnicalReviewStatus.FEASIBLE:
       return 'Feasible';
-    case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
-      return 'Partially feasible';
     case TechnicalReviewStatus.UNFEASIBLE:
       return 'Unfeasible';
     default:
