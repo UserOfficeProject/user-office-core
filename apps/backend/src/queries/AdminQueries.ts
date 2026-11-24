@@ -123,6 +123,15 @@ export default class AdminQueries {
     return await this.adminDataSource.getAllTokensAndPermissions();
   }
 
+  async getOAuthClientById(clientId: string) {
+    return await this.dataSource.getOAuthClient(clientId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getAllOAuthClients(agent: UserWithRole | null) {
+    return await this.dataSource.getAllOAuthClients();
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async getAllQueryMutationAndServicesMethods(
     agent: UserWithRole | null,
