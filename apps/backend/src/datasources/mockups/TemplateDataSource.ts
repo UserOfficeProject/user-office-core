@@ -1,3 +1,8 @@
+import {
+  dummyQuestionFactory,
+  dummyQuestionTemplateRelationFactory,
+  dummyTemplateHasQuestionRelationFactory,
+} from './QuestionaryDataSource';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import {
   DataType,
@@ -14,6 +19,8 @@ import {
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
+  TemplateExport,
+  TemplateValidationData,
 } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/template/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/template/CreateTopicMutation';
@@ -21,21 +28,16 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/te
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/template/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/template/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
+import {
+  TemplatesPage,
+  TemplatesPageArgs,
+} from '../../resolvers/queries/TemplatesPageQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import {
   DynamicMultipleChoiceConfig,
   SampleDeclarationConfig,
 } from '../../resolvers/types/FieldConfig';
 import { TemplateDataSource } from '../TemplateDataSource';
-import {
-  TemplateExport,
-  TemplateValidationData,
-} from './../../models/Template';
-import {
-  dummyQuestionFactory,
-  dummyQuestionTemplateRelationFactory,
-  dummyTemplateHasQuestionRelationFactory,
-} from './QuestionaryDataSource';
 
 export let dummyProposalTemplate: Template;
 export let dummyTemplateSteps: TemplateStep[];
@@ -313,6 +315,29 @@ export class TemplateDataSourceMock implements TemplateDataSource {
         args?.filter?.isArchived || false
       ),
     ];
+  }
+  async getTemplatesPage(args: TemplatesPageArgs): Promise<TemplatesPage> {
+    const templates = (await this.getTemplates({ filter: args }))
+      .filter((template) => {
+        const searchText = args.searchText?.trim().toLowerCase();
+
+        return (
+          !searchText ||
+          template.name.toLowerCase().includes(searchText) ||
+          template.description?.toLowerCase().includes(searchText)
+        );
+      })
+      .map((template) => ({
+        ...template,
+        groupId: args.group,
+        questionaryCount: 0,
+        callCount: 0,
+      }));
+
+    return {
+      totalCount: templates.length,
+      templates: templates.slice(args.offset, args.offset + args.first),
+    };
   }
   async isNaturalKeyPresent(_naturalKey: string): Promise<boolean> {
     return true;

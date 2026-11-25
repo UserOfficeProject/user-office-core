@@ -1,6 +1,23 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
+import database from './database';
+import {
+  createProposalTemplateObject,
+  createQuestionObject,
+  createQuestionTemplateRelationObject,
+  createTemplateCategoryObject,
+  createTemplateGroupObject,
+  createTopicObject,
+  QuestionDependencyRecord,
+  QuestionRecord,
+  QuestionTemplateRelRecord,
+  TemplateCategoryRecord,
+  TemplateGroupRecord,
+  TemplateRecord,
+  TopicRecord,
+} from './records';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   ComparisonStatus,
   ConflictResolutionStrategy,
@@ -32,6 +49,10 @@ import {
   AllQuestionsFilterArgs,
   QuestionsFilter,
 } from '../../resolvers/queries/QuestionsQuery';
+import {
+  TemplatesPage,
+  TemplatesPageArgs,
+} from '../../resolvers/queries/TemplatesPageQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../../resolvers/types/ConflictResolution';
 import {
@@ -42,23 +63,6 @@ import {
 import { deepEqual } from '../../utils/json';
 import { isAboveVersion, isBelowVersion } from '../../utils/version';
 import { TemplateDataSource } from '../TemplateDataSource';
-import database from './database';
-import {
-  createProposalTemplateObject,
-  createQuestionObject,
-  createQuestionTemplateRelationObject,
-  createTemplateCategoryObject,
-  createTemplateGroupObject,
-  createTopicObject,
-  QuestionDependencyRecord,
-  QuestionRecord,
-  QuestionTemplateRelRecord,
-  TemplateCategoryRecord,
-  TemplateGroupRecord,
-  TemplateRecord,
-  TopicRecord,
-} from './records';
-import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 
 const EXPORT_VERSION = '1.2.0';
 const MIN_SUPPORTED_VERSION = '1.2.0';
@@ -269,6 +273,96 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
         return resultSet.map((value) => createProposalTemplateObject(value));
       });
+  }
+
+  async getTemplatesPage(args: TemplatesPageArgs): Promise<TemplatesPage> {
+    if (
+      !Number.isInteger(args.first) ||
+      args.first < 1 ||
+      !Number.isInteger(args.offset) ||
+      args.offset < 0
+    ) {
+      throw new GraphQLError('Invalid template pagination');
+    }
+    const sortFields: Record<string, string> = {
+      name: 'templates.name',
+      description: 'templates.description',
+      questionaryCount: 'questionary_count',
+      callCount: 'call_count',
+    };
+    if (
+      args.sortField &&
+      !Object.prototype.hasOwnProperty.call(sortFields, args.sortField)
+    ) {
+      throw new GraphQLError(`Bad sort field given: ${args.sortField}`);
+    }
+
+    const callTemplateColumns: Partial<Record<TemplateGroupId, string>> = {
+      [TemplateGroupId.PROPOSAL]: 'template_id',
+      [TemplateGroupId.PROPOSAL_ESI]: 'esi_template_id',
+      [TemplateGroupId.FAP_REVIEW]: 'fap_review_template_id',
+      [TemplateGroupId.TECHNICAL_REVIEW]: 'technical_review_template_id',
+      [TemplateGroupId.PROPOSAL_PDF]: 'proposal_pdf_template_id',
+      [TemplateGroupId.EXPERIMENT_SAFETY_PDF]:
+        'experiment_safety_pdf_template_id',
+    };
+    const callTemplateColumn = callTemplateColumns[args.group];
+    const query = database('templates')
+      .where('templates.group_id', args.group)
+      .where('templates.is_archived', args.isArchived);
+    const searchText = args.searchText?.trim();
+    if (searchText) {
+      query.andWhere((query) =>
+        query
+          .whereILike('templates.name', `%${searchText}%`)
+          .orWhereILike('templates.description', `%${searchText}%`)
+      );
+    }
+
+    const count = await query
+      .clone()
+      .count<{ count: string }>('template_id')
+      .first();
+    const records = await query
+      .select<
+        (TemplateRecord & { questionary_count: string; call_count: string })[]
+      >('templates.*')
+      .select(
+        database('questionaries')
+          .count('*')
+          .where(
+            'questionaries.template_id',
+            database.ref('templates.template_id')
+          )
+          .as('questionary_count')
+      )
+      .select(
+        callTemplateColumn
+          ? database('call')
+              .count('*')
+              .where(
+                `call.${callTemplateColumn}`,
+                database.ref('templates.template_id')
+              )
+              .as('call_count')
+          : database.raw('0 AS call_count')
+      )
+      .orderBy(
+        sortFields[args.sortField || 'name'],
+        args.sortDirection || 'ASC'
+      )
+      .orderBy('templates.template_id', 'asc')
+      .limit(args.first)
+      .offset(args.offset);
+
+    return {
+      totalCount: Number(count?.count ?? 0),
+      templates: records.map((record) => ({
+        ...createProposalTemplateObject(record),
+        questionaryCount: Number(record.questionary_count),
+        callCount: Number(record.call_count),
+      })),
+    };
   }
 
   async getTemplate(templateId: number) {

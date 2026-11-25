@@ -6,11 +6,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
-import {
-  TechnicalReview,
-  TechnicalReviewTemplate,
-  TemplateGroupId,
-} from 'generated/sdk';
+import { TechnicalReview, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useTechnicalReviewsData } from 'hooks/technicalReview/useTechnicalReviewsData';
@@ -140,17 +136,7 @@ export type TechnicalReviewTemplateRowDataType = TemplateRowDataType & {
 };
 
 type ReviewTemplatesTableProps = {
-  dataProvider: () => Promise<
-    Pick<
-      TechnicalReviewTemplate,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'callCount'
-      | 'questionaryCount'
-    >[]
-  >;
+  isArchived: boolean;
 };
 
 function TechnicalReviewTemplatesTable(props: ReviewTemplatesTableProps) {
@@ -222,7 +208,7 @@ function TechnicalReviewTemplatesTable(props: ReviewTemplatesTableProps) {
             technicalReviewTemplateRowData.questionaryCount === 0
           );
         }}
-        dataProvider={props.dataProvider}
+        isArchived={props.isArchived}
       />
 
       <CallsModal

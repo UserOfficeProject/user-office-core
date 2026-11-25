@@ -1,0 +1,32 @@
+query getTemplatesPage(
+  $group: TemplateGroupId!
+  $isArchived: Boolean!
+  $first: Int!
+  $offset: Int!
+  $searchText: String
+  $sortField: String
+  $sortDirection: PaginationSortDirection
+) {
+  templatesPage(
+    group: $group
+    isArchived: $isArchived
+    first: $first
+    offset: $offset
+    searchText: $searchText
+    sortField: $sortField
+    sortDirection: $sortDirection
+  ) {
+    totalCount
+    templates {
+      templateId
+      name
+      description
+      isArchived
+      questionaryCount
+      callCount
+      proposalESICallCount: callCount
+      proposalPdfCallCount: callCount
+      experimentSafetyPdfCallCount: callCount
+    }
+  }
+}

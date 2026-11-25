@@ -10,6 +10,18 @@ Templates :material-text-box-multiple: are used to save and re-utilize predefine
 
 There are several different types of templates utilized within Calls:
 
+## Finding templates
+
+Template lists use server-side pagination. Search matches template names and
+descriptions across the whole selected category and Current or Archived tab,
+not just the visible page. Column sorting is also applied on the server.
+
+The URL preserves the search text, page, page size, sorting, and selected tab.
+Reloading the page, sharing its URL, or returning with the browser's Back button
+restores that view. Changing the search, sorting, or page size starts at the
+first page. If archiving or deleting the last item removes a page, the list
+moves to the last available page.
+
 ### Types of templates
 
 ??? info "FAP review templates :material-file-pdf-box:" 
