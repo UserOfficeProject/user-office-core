@@ -35,8 +35,8 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isFapReviewer = useCheckAccess([
-    UserRole.FAP_REVIEWER,
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
+  const isChairOrSecretary = useCheckAccess([
     UserRole.FAP_CHAIR,
     UserRole.FAP_SECRETARY,
   ]);
@@ -75,7 +75,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
     ) {
       submissionDisabled = false; // allow submit for intenal users if the call ended
     }
-    if (isFapReviewer) {
+    if (isFapReviewer && !isChairOrSecretary) {
       //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
       submissionDisabled = fapReview.reviewer?.id !== user.id ? true : false;
     }

@@ -58,7 +58,9 @@ const mockFapMeetingDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  5 // fapProposalId
 );
 
 const mockRejectedFapMeetingDecision = new FapMeetingDecision(
@@ -70,7 +72,9 @@ const mockRejectedFapMeetingDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   3, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  5 // fapProposalId
 );
 
 const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
@@ -82,7 +86,9 @@ const mockAcceptedOtherInstrumentDecision = new FapMeetingDecision(
   true, // submitted
   456, // submittedBy
   789, // instrumentId
-  1 // fapId
+  1, // fapId
+  1, // recommendedTimeAllocation
+  3 // fapProposalId
 );
 
 const mockFapReview: FapReviewsRecord = {
@@ -101,6 +107,7 @@ const mockFapReview: FapReviewsRecord = {
   average_grade: 4.5,
   questionary_id: 4,
   comment: 'FAP review comment',
+  fap_proposal_id: 5,
 };
 
 describe('addDecreasingInstrumentAvailTime test', () => {
@@ -178,7 +185,7 @@ describe('addDecreasingInstrumentAvailTime test', () => {
 });
 
 describe('generateManagementDecisionData tests', () => {
-  test('Test working basic reqquest', async () => {
+  test('Test working basic request', async () => {
     jest
       .spyOn(baseContext.queries.proposal, 'get')
       .mockResolvedValue(mockProposal);

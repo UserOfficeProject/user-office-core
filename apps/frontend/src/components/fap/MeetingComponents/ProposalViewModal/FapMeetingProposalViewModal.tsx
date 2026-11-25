@@ -69,8 +69,6 @@ const FapMeetingProposalViewModal = ({
     setProposalViewModalOpen(false);
   };
 
-  const fapTimeAllocation = fapProposalData?.fapTimeAllocation ?? null;
-
   const getInstrumentTechnicalReview = () =>
     proposalData.technicalReviews?.find(
       (technicalReview) => technicalReview.instrumentId === instrumentId
@@ -127,6 +125,7 @@ const FapMeetingProposalViewModal = ({
                       closeModal={handleClose}
                       hasWriteAccess={finalHasWriteAccess}
                       proposalData={proposalData}
+                      fapProposalId={fapProposalData.fapProposalId}
                       meetingSubmitted={(data) => {
                         setFapProposalData({
                           ...fapProposalData,
@@ -134,7 +133,10 @@ const FapMeetingProposalViewModal = ({
                             ...proposalData,
                             fapMeetingDecisions:
                               proposalData.fapMeetingDecisions?.map((fmd) => {
-                                if (fmd.instrumentId === data.instrumentId) {
+                                if (
+                                  fmd.recommendedInstrumentId ===
+                                  data.recommendedInstrumentId
+                                ) {
                                   return data;
                                 }
 
@@ -152,15 +154,7 @@ const FapMeetingProposalViewModal = ({
                       faps={proposalData.faps}
                     />
                     <TechnicalReviewInfo
-                      hasWriteAccess={finalHasWriteAccess}
                       technicalReview={getInstrumentTechnicalReview()}
-                      fapTimeAllocation={fapTimeAllocation}
-                      onFapTimeAllocationEdit={(fapTimeAllocation) =>
-                        setFapProposalData({
-                          ...fapProposalData,
-                          fapTimeAllocation,
-                        })
-                      }
                       proposal={proposalData}
                       fapId={fapId}
                       instrument={getInstrumentDetails()}
