@@ -390,6 +390,22 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('An instrument cannot be assigned if it does not belong to the technique of the proposal', () => {
+      // @ts-ignore skip type error for testing purposes
+      jest.spyOn(proposalDataSource, 'get').mockResolvedValue({
+        primaryKey: 1,
+        workflowStatusId: 2,
+      });
+
+      jest
+        .spyOn(statusDataSource, 'getStatusByWorkflowStatusId')
+        .mockResolvedValue({
+          id: 'UNDER_REVIEW',
+          name: 'UNDER_REVIEW',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        });
+
       jest
         .spyOn(techniqueDataSource, 'getInstrumentsByTechniqueIds')
         .mockResolvedValue([
