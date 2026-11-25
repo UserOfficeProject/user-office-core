@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Call } from 'generated/sdk';
 
 type CallFilterProps = {
-  calls?: Pick<Call, 'shortCode' | 'id'>[];
+  calls?: (Pick<Call, 'shortCode' | 'id'> & Partial<Pick<Call, 'title'>>)[];
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
@@ -35,6 +35,7 @@ const CallFilter = ({
   type CallOption = {
     id: number;
     shortCode: string;
+    title?: Call['title'];
   };
 
   const allOption: CallOption = {
@@ -74,7 +75,9 @@ const CallFilter = ({
               });
               onChange?.(call?.id as number);
             }}
-            getOptionLabel={(option) => option.shortCode}
+            getOptionLabel={(option) =>
+              option.shortCode || option.title || String(option.id)
+            }
             isOptionEqualToValue={(option, value) => option.id === value.id}
             options={options}
             value={
