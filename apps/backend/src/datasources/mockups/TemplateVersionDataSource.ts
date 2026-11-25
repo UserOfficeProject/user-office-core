@@ -9,6 +9,7 @@ export const dummyTemplateVersion = {
   versionNumber: 1,
   templateType: 'EMAIL',
   createdTimeStamp: '2026-07-17 08:25:12.23043+00',
+  updateComment: '',
 };
 
 export class TemplateVersionDataSourceMock
@@ -32,7 +33,8 @@ export class TemplateVersionDataSourceMock
   async createNewVersion(
     emailTemplateId: number,
     templateType: string,
-    template?: string | null
+    template?: string | null,
+    updateComment?: string
   ): Promise<TemplateVersion | void> {
     return dummyTemplateVersion;
   }

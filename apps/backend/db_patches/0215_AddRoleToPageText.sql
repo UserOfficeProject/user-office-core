@@ -16,7 +16,7 @@ BEGIN
         UPDATE pagetext SET page_id = pagetext_id;
 
         ALTER TABLE pagetext
-          ADD CONSTRAINT page_id_not_null NOT NULL page_id,
+          ALTER COLUMN page_id SET NOT NULL,
           ADD CONSTRAINT unique_role_pages UNIQUE NULLS NOT DISTINCT (page_id, role_id);
 
         PERFORM setval(

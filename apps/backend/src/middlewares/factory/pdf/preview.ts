@@ -3,8 +3,11 @@ import { container } from 'tsyringe';
 
 import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
 import { FullProposalPDFData } from '../../../factory/pdf/proposal';
-import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
-import callFactoryService from '../../../factory/service';
+import callFactoryService, {
+  PDFType,
+  MetaBase,
+  DownloadType,
+} from '../../../factory/service';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
@@ -66,6 +69,10 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       );
       if (!pdfTemplate) {
         throw new Error('Could not get pdf template');
+      }
+
+      if (!pdfTemplate.dummyData.trim()) {
+        return res.status(400).send('PDF template has no dummy data');
       }
 
       const dummyData = JSON.parse(pdfTemplate.dummyData) as {
@@ -130,6 +137,10 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
       );
       if (!pdfTemplate) {
         throw new Error('Could not get pdf template');
+      }
+
+      if (!pdfTemplate.dummyData.trim()) {
+        return res.status(400).send('PDF template has no dummy data');
       }
 
       const dummyData = JSON.parse(pdfTemplate.dummyData) as {
