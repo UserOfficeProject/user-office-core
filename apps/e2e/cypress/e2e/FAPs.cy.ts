@@ -86,7 +86,7 @@ function readWriteReview(
   cy.get('@dialog').should('not.exist');
 }
 
-function editFinalRankingForm() {
+function editFinalRankingForm(isUserOfficer = false) {
   cy.get('[role="dialog"] > header + div').scrollTo('top');
 
   cy.setTinyMceContent('commentForUser', faker.lorem.words(3));
@@ -94,7 +94,20 @@ function editFinalRankingForm() {
 
   cy.contains('External reviews').parent().find('table').as('reviewsTable');
 
-  cy.get('@reviewsTable').contains(fapMembers.reviewer.lastName);
+  cy.get('@reviewsTable')
+    .find('tr')
+    .first()
+    .find('td')
+    .last()
+    .should('have.text', 'FAP');
+  cy.get('@reviewsTable').contains(fapMembers.reviewer.lastName).as('reviewer');
+  if (isUserOfficer) {
+    cy.get('@reviewer')
+      .should('have.prop', 'tagName', 'A')
+      .and('have.attr', 'href', `/People/${fapMembers.reviewer.id}`);
+  } else {
+    cy.get('@reviewer').should('not.have.prop', 'tagName', 'A');
+  }
 
   cy.get('[data-cy="save"]').click();
 
@@ -2791,7 +2804,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="View proposal details"]').click();
 
-      editFinalRankingForm();
+      editFinalRankingForm(true);
     });
 
     it('Officer should be able to see calculated availability time on instrument per Fap inside meeting components', () => {
@@ -3526,7 +3539,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="View proposal details"]').click();
 
-      editFinalRankingForm();
+      editFinalRankingForm(true);
     });
 
     it('Download Fap is working with dialog window showing up', () => {
