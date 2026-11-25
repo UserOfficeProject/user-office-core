@@ -345,6 +345,12 @@ export class ProposalBasisConfig {
 
   @Field(() => [String])
   readPermissions: string[];
+
+  @Field(() => Int)
+  maxTitleLength: number;
+
+  @Field(() => Int)
+  maxAbstractLength: number;
 }
 
 @ObjectType()

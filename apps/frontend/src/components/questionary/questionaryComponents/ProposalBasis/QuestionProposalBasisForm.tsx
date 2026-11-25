@@ -6,6 +6,10 @@ import TextField from 'components/common/FormikUITextField';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
+import {
+  proposalBasisLengthConfigSchema,
+  ProposalBasisLengthFields,
+} from './ProposalBasisLengthFields';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionProposalBasisForm = (props: QuestionFormProps) => {
@@ -20,6 +24,7 @@ export const QuestionProposalBasisForm = (props: QuestionFormProps) => {
         question: Yup.string()
           .required('Question is required')
           .max(256, 'There is a 256 max character limit'),
+        config: proposalBasisLengthConfigSchema,
       })}
     >
       {() => (
@@ -42,6 +47,7 @@ export const QuestionProposalBasisForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
+          <ProposalBasisLengthFields />
         </>
       )}
     </QuestionFormShell>

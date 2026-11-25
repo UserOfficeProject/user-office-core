@@ -1,13 +1,23 @@
+import {
+  DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH,
+  DEFAULT_PROPOSAL_TITLE_MAX_LENGTH,
+  PROPOSAL_TITLE_DB_MAX_LENGTH,
+} from '@user-office-software/duo-validation';
 import * as Yup from 'yup';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { getCurrentUser } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
+import { ProposalBasisConfig, UserRole } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
-  () => {
-    const MAX_TITLE_LEN = 175;
-    const MAX_ABSTRACT_LEN = 1500;
+  (answer) => {
+    const config = answer.config as ProposalBasisConfig;
+    const MAX_TITLE_LEN = Math.min(
+      config.maxTitleLength ?? DEFAULT_PROPOSAL_TITLE_MAX_LENGTH,
+      PROPOSAL_TITLE_DB_MAX_LENGTH
+    );
+    const MAX_ABSTRACT_LEN =
+      config.maxAbstractLength ?? DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH;
     const currentUser = getCurrentUser();
     const isUserOfficer =
       currentUser?.roles

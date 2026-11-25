@@ -68,6 +68,8 @@ fragment fieldConfig on FieldConfig {
   ... on ProposalBasisConfig {
     tooltip
     readPermissions
+    maxTitleLength
+    maxAbstractLength
   }
 
   ... on ProposalEsiBasisConfig {

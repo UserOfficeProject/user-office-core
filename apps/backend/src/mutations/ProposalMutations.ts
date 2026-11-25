@@ -5,6 +5,7 @@ import {
   createProposalValidationSchema,
   deleteProposalScientistCommentValidationSchema,
   deleteProposalValidationSchema,
+  PROPOSAL_TITLE_DB_MAX_LENGTH,
   proposalNotifyValidationSchema,
   submitProposalValidationSchema,
   updateProposalScientistCommentValidationSchema,
@@ -38,6 +39,7 @@ import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { DataType } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
@@ -48,6 +50,7 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
+import { ProposalBasisConfig } from '../resolvers/types/FieldConfig';
 import {
   ProposalScientistComment,
   ProposalRejectionComment,
@@ -163,7 +166,64 @@ export default class ProposalMutations {
       });
     }
 
+    const lengthRejection = await this.validateTitleAndAbstractLength(
+      proposal,
+      args
+    );
+
+    if (lengthRejection) {
+      return lengthRejection;
+    }
+
     return await this.updateProposal(agent, { proposal, args });
+  }
+
+  private async validateTitleAndAbstractLength(
+    proposal: Proposal,
+    { title, abstract }: UpdateProposalArgs
+  ): Promise<Rejection | null> {
+    if (title === undefined && abstract === undefined) {
+      return null;
+    }
+
+    const steps = await this.questionaryDataSource.getQuestionarySteps(
+      proposal.questionaryId
+    );
+    const config = steps
+      .flatMap((step) => step.fields)
+      .find((field) => field.question.dataType === DataType.PROPOSAL_BASIS)
+      ?.config as ProposalBasisConfig | undefined;
+
+    if (!config) {
+      return null;
+    }
+
+    const maxTitleLength = Math.min(
+      config.maxTitleLength,
+      PROPOSAL_TITLE_DB_MAX_LENGTH
+    );
+
+    if (title !== undefined && title.trim().length > maxTitleLength) {
+      return rejection(`Title must be at most ${maxTitleLength} characters`, {
+        proposalPk: proposal.primaryKey,
+        maxTitleLength,
+      });
+    }
+
+    if (
+      abstract !== undefined &&
+      abstract.trim().length > config.maxAbstractLength
+    ) {
+      return rejection(
+        `Abstract must be at most ${config.maxAbstractLength} characters`,
+        {
+          proposalPk: proposal.primaryKey,
+          maxAbstractLength: config.maxAbstractLength,
+        }
+      );
+    }
+
+    return null;
   }
 
   private async updateProposal(

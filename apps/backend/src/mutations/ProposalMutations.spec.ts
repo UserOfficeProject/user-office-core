@@ -9,6 +9,10 @@ import {
   dummyProposalWithNotActiveCall,
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
+import {
+  dummyQuestionTemplateRelationFactory,
+  QuestionaryDataSourceMock,
+} from '../datasources/mockups/QuestionaryDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
   dummyInstrumentScientist,
@@ -20,10 +24,14 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import { Proposal } from '../models/Proposal';
+import { Answer, QuestionaryStep } from '../models/Questionary';
+import { createConfig } from '../models/questionTypes/QuestionRegistry';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Status } from '../models/Status';
+import { DataType, Topic } from '../models/Template';
 import { WorkflowType } from '../models/Workflow';
 import { WorkflowStatus } from '../models/WorkflowStatus';
+import { ProposalBasisConfig } from '../resolvers/types/FieldConfig';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
@@ -70,6 +78,97 @@ test('A user can not create a proposal with blank title and abstract', () => {
       abstract: newAbstract,
     })
   ).resolves.toBeInstanceOf(Rejection);
+});
+
+const mockProposalBasisConfig = (config: Partial<ProposalBasisConfig>) => {
+  const questionaryDataSource = container.resolve<QuestionaryDataSourceMock>(
+    Tokens.QuestionaryDataSource
+  );
+  const proposalBasisConfig = createConfig<ProposalBasisConfig>(
+    DataType.PROPOSAL_BASIS,
+    config
+  );
+
+  jest.spyOn(questionaryDataSource, 'getQuestionarySteps').mockResolvedValue([
+    new QuestionaryStep(1, new Topic(1, 'General', 1, 0, true), false, [
+      new Answer(
+        1,
+        dummyQuestionTemplateRelationFactory({
+          question: { dataType: DataType.PROPOSAL_BASIS },
+          config: proposalBasisConfig,
+        }),
+        null
+      ),
+    ]),
+  ]);
+};
+
+describe('Proposal title and abstract length', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  test('A user can update a proposal within the default limits', async () => {
+    mockProposalBasisConfig({});
+
+    const result = await proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'x'.repeat(175),
+      abstract: 'y'.repeat(1500),
+    });
+
+    expect(result).toHaveProperty('title', 'x'.repeat(175));
+  });
+
+  test('A user can not exceed the default title limit', async () => {
+    mockProposalBasisConfig({});
+
+    const result = await proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'x'.repeat(176),
+      abstract: 'Abstract',
+    });
+
+    expect(result).toBeInstanceOf(Rejection);
+  });
+
+  test('A user can not exceed the configured title limit', async () => {
+    mockProposalBasisConfig({ maxTitleLength: 10 });
+
+    const result = await proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'x'.repeat(11),
+      abstract: 'Abstract',
+    });
+
+    expect((result as Rejection).reason).toBe(
+      'Title must be at most 10 characters'
+    );
+  });
+
+  test('A user can not exceed the configured abstract limit', async () => {
+    mockProposalBasisConfig({ maxAbstractLength: 20 });
+
+    const result = await proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'Title',
+      abstract: 'y'.repeat(21),
+    });
+
+    expect((result as Rejection).reason).toBe(
+      'Abstract must be at most 20 characters'
+    );
+  });
+
+  test('The title limit can not exceed the DB column size', async () => {
+    mockProposalBasisConfig({ maxTitleLength: 1000 });
+
+    const result = await proposalMutations.update(dummyUserWithRole, {
+      proposalPk: 1,
+      title: 'x'.repeat(351),
+      abstract: 'Abstract',
+    });
+
+    expect(result).toBeInstanceOf(Rejection);
+  });
 });
 
 test('A user on the proposal can not update its title if it is not in edit mode', async () => {

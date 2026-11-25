@@ -1,12 +1,21 @@
 import * as Yup from 'yup';
 
+export const PROPOSAL_TITLE_DB_MAX_LENGTH = 350;
+export const DEFAULT_PROPOSAL_TITLE_MAX_LENGTH = 175;
+export const DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH = 1500;
+
 export const createProposalValidationSchema = Yup.object().shape({
   callId: Yup.number().required(),
 });
 
 export const updateProposalValidationSchema = Yup.object().shape({
   proposalPk: Yup.number().required(),
-  title: Yup.string().required(),
+  title: Yup.string()
+    .max(
+      PROPOSAL_TITLE_DB_MAX_LENGTH,
+      `Title must be at most ${PROPOSAL_TITLE_DB_MAX_LENGTH} characters`
+    )
+    .required(),
   abstract: Yup.string().required(),
   answers: Yup.array().notRequired(),
   topicsCompleted: Yup.array().notRequired(),
@@ -42,15 +51,18 @@ export const administrationProposalValidationSchema = Yup.object().shape({
   managementDecisionSubmitted: Yup.bool().nullable(),
 });
 
-const MAX_TITLE_LEN = 175;
-const MAX_ABSTRACT_LEN = 1500;
-
 export const generalInfoUpdateValidationSchema = Yup.object().shape({
   title: Yup.string()
-    .max(MAX_TITLE_LEN, 'Title must be at most 175 characters')
+    .max(
+      DEFAULT_PROPOSAL_TITLE_MAX_LENGTH,
+      `Title must be at most ${DEFAULT_PROPOSAL_TITLE_MAX_LENGTH} characters`
+    )
     .required('Title is required'),
   abstract: Yup.string()
-    .max(MAX_ABSTRACT_LEN, 'Abstract must be at most 1500 characters')
+    .max(
+      DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH,
+      `Abstract must be at most ${DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH} characters`
+    )
     .required('Abstract is required'),
 });
 
