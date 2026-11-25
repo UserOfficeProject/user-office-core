@@ -387,6 +387,50 @@ context('Proposal tests', () => {
       cy.get('[aria-label="View proposal"]').should('exist');
     });
 
+    it('Should enforce configured title and abstract length limits', () => {
+      const configuredMaxTitleLen = 10;
+      const configuredMaxAbstractLen = 20;
+
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: 'proposal_basis',
+        templateId: initialDBData.template.id,
+        config: JSON.stringify({
+          tooltip: '',
+          readPermissions: [],
+          maxTitleLength: configuredMaxTitleLen,
+          maxAbstractLength: configuredMaxAbstractLen,
+        }),
+        dependencies: [],
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title] input').type(
+        'x'.repeat(configuredMaxTitleLen + 1)
+      );
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type('y'.repeat(configuredMaxAbstractLen + 1));
+
+      cy.contains(
+        `Characters: ${configuredMaxAbstractLen + 1}/${configuredMaxAbstractLen}`
+      );
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+
+      cy.contains(
+        `Please make title at most ${configuredMaxTitleLen} characters long`
+      );
+      cy.contains(
+        `Please make abstract at most ${configuredMaxAbstractLen} characters long`
+      );
+    });
+
     it('Officer should be able to edit proposal', () => {
       cy.login('officer');
       cy.visit('/');

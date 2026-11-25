@@ -32,7 +32,9 @@
                 "tooltip": "",
                 "required": false,
                 "small_label": "",
-                "readPermissions": []
+                "readPermissions": [],
+                "maxTitleLength": 175,
+                "maxAbstractLength": 1500
               }
             },
             "topicId": 1,
@@ -42,7 +44,9 @@
               "tooltip": "",
               "required": false,
               "small_label": "",
-              "readPermissions": []
+              "readPermissions": [],
+              "maxTitleLength": 175,
+              "maxAbstractLength": 1500
             },
             "dependencies": [],
             "dependenciesOperator": "AND"

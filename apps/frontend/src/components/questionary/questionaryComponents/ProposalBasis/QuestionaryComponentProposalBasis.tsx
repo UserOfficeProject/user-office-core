@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useTheme } from '@mui/material/styles';
+import { DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH } from '@user-office-software/duo-validation';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useState } from 'react';
 
@@ -15,7 +16,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { BasicUserDetails, Invite, ProposalBasisConfig } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
@@ -25,6 +26,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const {
     answer: {
       question: { id },
+      config,
     },
     formikProps,
   } = props;
@@ -82,7 +84,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         .concat(proposer as BasicUserDetails)
     );
   };
-  const counter = `Characters: ${textLen}/1500`;
+  const maxAbstractLength =
+    (config as ProposalBasisConfig).maxAbstractLength ??
+    DEFAULT_PROPOSAL_ABSTRACT_MAX_LENGTH;
+  const counter = `Characters: ${textLen}/${maxAbstractLength}`;
 
   return (
     <div>

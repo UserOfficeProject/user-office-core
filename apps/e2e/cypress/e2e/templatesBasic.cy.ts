@@ -1522,6 +1522,30 @@ context('Template Basic tests', () => {
       cy.get('[data-cy=max_files] input').clear().type('-1');
       cy.get('[data-cy=submit]').should('be.disabled');
     });
+
+    it('should validate proposal basis length limits', () => {
+      cy.login('officer');
+      cy.visit('/ProposalTemplates');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.contains('Proposal basic information').click();
+
+      cy.get('[data-cy=max-title-length]').clear().type('200');
+      cy.get('[data-cy=max-abstract-length]').clear().type('3000');
+      cy.get('[data-cy=submit]').should('not.be.disabled');
+
+      cy.get('[data-cy=max-title-length]').clear().type('351');
+      cy.get('[data-cy=submit]').should('be.disabled');
+      cy.contains('Must be at most 350');
+
+      cy.get('[data-cy=max-title-length]').clear().type('0');
+      cy.get('[data-cy=submit]').should('be.disabled');
+    });
   });
 
   describe('Dynamic multiple choice external api call tests', () => {
