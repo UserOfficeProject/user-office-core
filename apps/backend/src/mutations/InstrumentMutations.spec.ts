@@ -4,14 +4,20 @@ import { container } from 'tsyringe';
 import InstrumentMutations from './InstrumentMutations';
 import { Tokens } from '../config/Tokens';
 import {
+  dummyFap,
+  FapDataSourceMock,
+} from '../datasources/mockups/FapDataSource';
+import {
   dummyInstrument,
   dummyInstrumentHasProposals,
+  InstrumentDataSourceMock,
 } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
   dummyInstrumentScientist,
+  dummyFapSecretaryWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -20,6 +26,8 @@ import { WorkflowType } from '../models/Workflow';
 let proposalDataSource: ProposalDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
+let fapDataSource: FapDataSourceMock;
+let instrumentDataSource: InstrumentDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
@@ -33,9 +41,17 @@ beforeEach(() => {
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
   );
+  fapDataSource = container.resolve<FapDataSourceMock>(Tokens.FapDataSource);
+  instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
+    Tokens.InstrumentDataSource
+  );
 });
 
 describe('Test Instrument Mutations', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   test('A user can not create an instrument', () => {
     return expect(
       instrumentMutations.create(dummyUserWithRole, {
@@ -193,6 +209,109 @@ describe('Test Instrument Mutations', () => {
     ).resolves.toBe(true);
   });
 
+  test('A FAP secretary can set availability time when assigned to an enabled FAP for the call', async () => {
+    jest.spyOn(fapDataSource, 'getFapsByCallId').mockResolvedValue([
+      {
+        ...dummyFap,
+        editInstrumentAvailabilityTime: true,
+        fapSecretariesUserIds: [dummyFapSecretaryWithRole.id],
+      },
+    ]);
+    const setAvailabilityTimeSpy = jest.spyOn(
+      instrumentDataSource,
+      'setAvailabilityTimeOnInstrument'
+    );
+
+    await expect(
+      instrumentMutations.setAvailabilityTimeOnInstrument(
+        dummyFapSecretaryWithRole,
+        {
+          callId: 1,
+          instrumentId: 1,
+          availabilityTime: 10,
+        }
+      )
+    ).resolves.toBe(true);
+
+    expect(setAvailabilityTimeSpy).toHaveBeenCalledWith(1, 1, 10);
+  });
+
+  test('A FAP secretary cannot set availability time when the FAP setting is disabled', async () => {
+    jest.spyOn(fapDataSource, 'getFapsByCallId').mockResolvedValue([dummyFap]);
+    const setAvailabilityTimeSpy = jest.spyOn(
+      instrumentDataSource,
+      'setAvailabilityTimeOnInstrument'
+    );
+
+    await expect(
+      instrumentMutations.setAvailabilityTimeOnInstrument(
+        dummyFapSecretaryWithRole,
+        {
+          callId: 1,
+          instrumentId: 1,
+          availabilityTime: 10,
+        }
+      )
+    ).resolves.toHaveProperty(
+      'reason',
+      'Setting instrument availability time is not permitted'
+    );
+
+    expect(setAvailabilityTimeSpy).not.toHaveBeenCalled();
+  });
+
+  test('A FAP secretary cannot set availability time when not assigned to the enabled FAP', async () => {
+    jest.spyOn(fapDataSource, 'getFapsByCallId').mockResolvedValue([
+      {
+        ...dummyFap,
+        editInstrumentAvailabilityTime: true,
+        fapSecretariesUserIds: [dummyFapSecretaryWithRole.id + 1],
+      },
+    ]);
+    const setAvailabilityTimeSpy = jest.spyOn(
+      instrumentDataSource,
+      'setAvailabilityTimeOnInstrument'
+    );
+
+    await expect(
+      instrumentMutations.setAvailabilityTimeOnInstrument(
+        dummyFapSecretaryWithRole,
+        {
+          callId: 1,
+          instrumentId: 1,
+          availabilityTime: 10,
+        }
+      )
+    ).resolves.toHaveProperty(
+      'reason',
+      'Setting instrument availability time is not permitted'
+    );
+
+    expect(setAvailabilityTimeSpy).not.toHaveBeenCalled();
+  });
+
+  test('Availability time cannot be set when the instrument is not assigned to the call', async () => {
+    const setAvailabilityTimeSpy = jest
+      .spyOn(instrumentDataSource, 'setAvailabilityTimeOnInstrument')
+      .mockResolvedValue(true);
+    jest
+      .spyOn(instrumentDataSource, 'getCallsByInstrumentId')
+      .mockResolvedValue([]);
+
+    await expect(
+      instrumentMutations.setAvailabilityTimeOnInstrument(
+        dummyUserOfficerWithRole,
+        {
+          callId: 1,
+          instrumentId: 1,
+          availabilityTime: 10,
+        }
+      )
+    ).resolves.toHaveProperty('reason', 'Instrument is not assigned to call');
+
+    expect(setAvailabilityTimeSpy).not.toHaveBeenCalled();
+  });
+
   test('A logged in user officer can submit instrument attached to a call from a Fap', () => {
     return expect(
       instrumentMutations.submitInstrumentInFap(dummyUserOfficerWithRole, {
@@ -271,6 +390,22 @@ describe('Test Instrument Mutations', () => {
     });
 
     test('An instrument cannot be assigned if it does not belong to the technique of the proposal', () => {
+      // @ts-ignore skip type error for testing purposes
+      jest.spyOn(proposalDataSource, 'get').mockResolvedValue({
+        primaryKey: 1,
+        workflowStatusId: 2,
+      });
+
+      jest
+        .spyOn(statusDataSource, 'getStatusByWorkflowStatusId')
+        .mockResolvedValue({
+          id: 'UNDER_REVIEW',
+          name: 'UNDER_REVIEW',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        });
+
       jest
         .spyOn(techniqueDataSource, 'getInstrumentsByTechniqueIds')
         .mockResolvedValue([
