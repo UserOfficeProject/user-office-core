@@ -11,9 +11,9 @@ import { Status } from 'generated/sdk';
 type ExperimentSafetyStatusFilterProps = {
   statuses?: Status[];
   isLoading?: boolean;
-  onChange?: Dispatch<number>;
+  onChange?: Dispatch<string>;
   shouldShowAll?: boolean;
-  statusId?: number;
+  statusId?: string | null;
   hiddenStatuses: string[];
 };
 
@@ -55,7 +55,7 @@ const ExperimentSafetyStatusFilter = ({
             onChange={(status) => {
               setSearchParams((searchParams) => {
                 searchParams.delete('experimentSafetyStatus');
-                if (status.target.value && !!shouldShowAll) {
+                if (status.target.value) {
                   searchParams.set(
                     'experimentSafetyStatus',
                     status.target.value.toString()
@@ -64,13 +64,13 @@ const ExperimentSafetyStatusFilter = ({
 
                 return searchParams;
               });
-              onChange?.(status.target.value as number);
+              onChange?.(status.target.value);
             }}
-            value={statusId || 0}
-            defaultValue={0}
+            value={statusId || ''}
+            displayEmpty
             data-cy="safety-status-filter"
           >
-            {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value="">All</MenuItem>}
             {statuses.map(
               (status) =>
                 isStatusVisible(hiddenStatuses, status) && (
