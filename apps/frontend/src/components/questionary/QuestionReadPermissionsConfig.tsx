@@ -36,8 +36,8 @@ export const QuestionReadPermissionsConfig = ({
         data-cy="read-permissions"
         options={
           rolesData?.map((role) => ({
-            text: role.shortCode,
-            value: role.shortCode,
+            text: role.title,
+            value: role.isRootRole ? role.shortCode : String(role.id),
           })) ?? []
         }
         isMultiSelect={true}
