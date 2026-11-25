@@ -1,7 +1,4 @@
-import {
-  ProposalBasisConfig,
-  ProposalEsiBasisConfig,
-} from '../../resolvers/types/FieldConfig';
+import { ProposalEsiBasisConfig } from '../../resolvers/types/FieldConfig';
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -9,7 +6,7 @@ export const proposalEsiBasisDefinition: Question<DataType.PROPOSAL_ESI_BASIS> =
   {
     dataType: DataType.PROPOSAL_ESI_BASIS,
     createBlankConfig: (): ProposalEsiBasisConfig => {
-      const config = new ProposalBasisConfig();
+      const config = new ProposalEsiBasisConfig();
       config.tooltip = '';
 
       return config;
