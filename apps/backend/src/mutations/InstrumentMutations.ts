@@ -385,19 +385,62 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: InstrumentAvailabilityTimeArgs
   ): Promise<boolean | Rejection> {
-    return this.dataSource
-      .setAvailabilityTimeOnInstrument(
+    try {
+      const callsWithInstrument = await this.dataSource.getCallsByInstrumentId(
+        args.instrumentId,
+        [args.callId]
+      );
+      const instrumentIsAssignedToCall = callsWithInstrument.some(
+        ({ callId, instrumentId }) =>
+          callId === args.callId && instrumentId === args.instrumentId
+      );
+
+      if (!instrumentIsAssignedToCall) {
+        return rejection('Instrument is not assigned to call', {
+          agent,
+          args,
+        });
+      }
+
+      if (!this.userAuth.isUserOfficer(agent)) {
+        const faps = await this.fapDataSource.getFapsByCallId(args.callId);
+        let canEditAvailabilityTime = false;
+
+        for (const fap of faps) {
+          if (
+            fap.editInstrumentAvailabilityTime &&
+            agent?.id !== undefined &&
+            fap.fapSecretariesUserIds?.includes(agent.id)
+          ) {
+            canEditAvailabilityTime = true;
+            break;
+          }
+        }
+
+        if (!canEditAvailabilityTime) {
+          return rejection(
+            'Setting instrument availability time is not permitted',
+            {
+              code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+              agent,
+              args,
+            }
+          );
+        }
+      }
+
+      return await this.dataSource.setAvailabilityTimeOnInstrument(
         args.callId,
         args.instrumentId,
         args.availabilityTime
-      )
-      .catch((error) => {
-        return rejection(
-          'Could not set availability time on instrument',
-          { agent, args },
-          error
-        );
-      });
+      );
+    } catch (error) {
+      return rejection(
+        'Could not set availability time on instrument',
+        { agent, args },
+        error
+      );
+    }
   }
 
   @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
