@@ -46,7 +46,7 @@ export const TagDetailsPanel = ({
       icon: () => <Delete />,
       tooltip: `Remove ${t('instrument')}`,
       onClick: (
-        event: React.MouseEvent<JSX.Element>,
+        event: React.MouseEvent<HTMLElement>,
         rowData: InstrumentMinimalFragment | InstrumentMinimalFragment[]
       ) => {
         const instrument = rowData as InstrumentMinimalFragment;
