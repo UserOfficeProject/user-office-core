@@ -10,6 +10,7 @@ fragment experiment on Experiment {
   instrumentId
   createdAt
   updatedAt
+  notes
 
   instrument {
     id

@@ -67,6 +67,9 @@ export class Experiment implements ExperimentOrigin {
 
   @Field(() => Number, { nullable: true })
   public referenceNumberSequence: number | null;
+
+  @Field(() => String, { nullable: true })
+  public notes: string | null;
 }
 
 /**
