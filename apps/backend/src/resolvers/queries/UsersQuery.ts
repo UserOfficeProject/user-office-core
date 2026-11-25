@@ -14,11 +14,21 @@ import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
 import { PaginationSortDirection } from '../../utils/pagination';
 import { BasicUserDetails } from '../types/BasicUserDetails';
+import { BasicUserDetailsWithRoles } from '../types/BasicUserDetailsWithRoles';
 
 @ObjectType()
 class UserQueryResult {
   @Field(() => [BasicUserDetails])
   public users: BasicUserDetails[];
+
+  @Field(() => Int)
+  public totalCount: number;
+}
+
+@ObjectType()
+class UserWithRolesQueryResult {
+  @Field(() => [BasicUserDetailsWithRoles])
+  public users: BasicUserDetailsWithRoles[];
 
   @Field(() => Int)
   public totalCount: number;
@@ -85,5 +95,10 @@ export class UsersQuery {
       userRole,
       subtractUsers
     );
+  }
+
+  @Query(() => UserWithRolesQueryResult, { nullable: true })
+  usersWithRoles(@Args() args: UsersArgs, @Ctx() context: ResolverContext) {
+    return context.queries.user.getAll(context.user, args);
   }
 }
