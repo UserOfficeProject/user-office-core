@@ -2533,6 +2533,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Officer should be able to reorder proposal with drag and drop', () => {
+      const largeInstrumentAvailableTime = 27;
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
@@ -2569,6 +2570,12 @@ context('Fap meeting components tests', () => {
             workflowStatusId: fapReviewWorkflowStatusId,
             proposalPks: [createdProposal.primaryKey],
           });
+
+          cy.setInstrumentAvailabilityTime({
+            callId: initialDBData.call.id,
+            instrumentId: createdInstrumentId,
+            availabilityTime: largeInstrumentAvailableTime,
+          });
         }
       });
       cy.login('officer');
@@ -2582,11 +2589,11 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
-        .contains(proposal1.title);
+        .contains(proposal2.title);
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .last()
-        .contains(proposal2.title);
+        .contains(proposal1.title);
 
       cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
       cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
@@ -2607,21 +2614,23 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
-        .contains(proposal2.title);
+        .contains(proposal1.title);
 
+      // 27 available time, subtract 25 from proposal 1.
+      // the 5 from proposal 2 is not subtracted because 30 > 27
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
         .should(
           'have.attr',
           'unallocated-time-information',
           `Unallocated time: ${
-            instrumentAvailabilityTime - secondProposalTimeAllocation
+            largeInstrumentAvailableTime - firstProposalTimeAllocation
           } ${initialDBData.call.allocationTimeUnit}s`
         );
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .last()
-        .contains(proposal1.title);
+        .contains(proposal2.title);
     });
 
     it('Proposals in Fap meeting components should be ordered by standard deviation as second order parameter if there is no ranking', () => {
@@ -2735,14 +2744,14 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      // NOTE: Proposal with higher standard deviation but same average score should be shown first on initial sort
+      // NOTE: Proposal with lower standard deviation but same average score should be shown first on initial sort
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .first()
-        .contains(proposal2.title);
+        .contains(proposal1.title);
 
       cy.get('[data-cy="fap-instrument-proposals-table"] tbody tr')
         .last()
-        .contains(proposal1.title);
+        .contains(proposal2.title);
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
