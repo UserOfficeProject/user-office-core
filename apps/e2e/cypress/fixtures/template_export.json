@@ -584,7 +584,9 @@
           "tooltip": "",
           "required": false,
           "small_label": "",
-          "readPermissions": []
+          "readPermissions": [],
+          "maxTitleLength": 175,
+          "maxAbstractLength": 1500
         }
       },
       {
