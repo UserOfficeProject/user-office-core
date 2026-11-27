@@ -10,12 +10,13 @@ import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from '../resolvers/queries/InstitutionsQuery';
-import { getContextKeys } from '../utils/helperFunctions';
+import { defaultPageNoticeId, getContextKeys } from '../utils/helperFunctions';
 
 type GetPageTextArgs = {
   pageId: number;
   agent: UserWithRole | null;
   roleIds: number[];
+  useDefaultIfNotFound?: boolean;
 };
 
 @injectable()
@@ -26,14 +27,16 @@ export default class AdminQueries {
   ) {}
 
   async getPageText({
-    pageId,
     agent,
+    pageId,
     roleIds,
+    useDefaultIfNotFound = true,
   }: GetPageTextArgs): Promise<Page[]> {
     if (agent == null || !agent.currentRole) {
       return [];
     }
 
+    let retrievedPageNotices: Page[] = [];
     const userRole = agent.currentRole;
     const userRoleTagIds = (
       await this.roleDataSource.getTagsByRoleId(userRole.id)
@@ -41,16 +44,13 @@ export default class AdminQueries {
 
     const isUserOfficer = userRole.shortCode === Roles.USER_OFFICER;
     const isBaseUserOfficer = isUserOfficer && userRole.isRootRole;
-
-    if (isBaseUserOfficer) {
-      return this.adminDataSource.get(pageId, roleIds);
-    }
-
-    const requestedRoleIds = roleIds.filter((roleId) => roleId !== -1);
+    const requestedRoleIds = roleIds.filter(
+      (roleId) => roleId !== defaultPageNoticeId
+    );
 
     const canReadRoleNotice = async (roleId: number) => {
       const isOwnRoleNotice = userRole.id === roleId;
-      if (isOwnRoleNotice) {
+      if (isOwnRoleNotice || isBaseUserOfficer) {
         return true;
       }
 
@@ -79,7 +79,16 @@ export default class AdminQueries {
       return [];
     }
 
-    return this.adminDataSource.get(pageId, roleIds);
+    retrievedPageNotices = await this.adminDataSource.get(pageId, roleIds);
+
+    //if no page notices specific to the requested roles were found, return the default one
+    if (!retrievedPageNotices.length && useDefaultIfNotFound) {
+      retrievedPageNotices = await this.adminDataSource.get(pageId, [
+        defaultPageNoticeId,
+      ]);
+    }
+
+    return retrievedPageNotices;
   }
 
   async getCountries() {

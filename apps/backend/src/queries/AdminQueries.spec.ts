@@ -15,6 +15,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { defaultPageNoticeId } from '../utils/helperFunctions';
 
 const adminQueries = container.resolve(AdminQueries);
 
@@ -27,8 +28,9 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
-        roleIds: [-1],
+        roleIds: [defaultPageNoticeId],
       })
     ).resolves.toStrictEqual([pages[0]]);
   });
@@ -37,6 +39,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleIds: [1],
       })
@@ -47,6 +50,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleIds: [2],
       })
@@ -57,6 +61,7 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserOfficerWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
         roleIds: [1],
       })
@@ -67,8 +72,9 @@ describe('Test Admin Queries', () => {
     return expect(
       adminQueries.getPageText({
         agent: dummyUserOfficerWithRole,
+        useDefaultIfNotFound: false,
         pageId: 1,
-        roleIds: [-1, 1, 2],
+        roleIds: [defaultPageNoticeId, 1, 2],
       })
     ).resolves.toStrictEqual(pages);
   });
@@ -79,6 +85,7 @@ describe('Test Admin Queries', () => {
         agent: dummyUserOfficerWithDerivedRole,
         pageId: 1,
         roleIds: [1],
+        useDefaultIfNotFound: false,
       })
     ).resolves.toStrictEqual([pages[1]]);
   });
@@ -89,6 +96,7 @@ describe('Test Admin Queries', () => {
         agent: dummyUserOfficerWithDerivedRole,
         pageId: 1,
         roleIds: [2],
+        useDefaultIfNotFound: false,
       })
     ).resolves.toStrictEqual([]);
   });
@@ -99,6 +107,7 @@ describe('Test Admin Queries', () => {
         agent: dummyUserWithRole,
         pageId: 1,
         roleIds: [1, 2],
+        useDefaultIfNotFound: false,
       })
     ).resolves.toStrictEqual([]);
   });

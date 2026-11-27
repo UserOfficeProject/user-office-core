@@ -10,11 +10,14 @@ export class PageContentQuery {
   pageContent(
     @Ctx() context: ResolverContext,
     @Arg('pageId', () => PageName) pageId: PageName,
-    @Arg('roleIds', () => [Int]) roleIds: number[]
+    @Arg('roleIds', () => [Int]) roleIds: number[],
+    @Arg('useDefaultIfNotFound', () => Boolean, { nullable: true })
+    useDefaultIfNotFound?: boolean
   ) {
     return context.queries.admin.getPageText({
       pageId,
       agent: context.user,
+      useDefaultIfNotFound,
       roleIds,
     });
   }

@@ -10,10 +10,11 @@ import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstituti
 import { UpdateFeaturesInput } from '../../resolvers/mutations/settings/UpdateFeaturesMutation';
 import { UpdateSettingsInput } from '../../resolvers/mutations/settings/UpdateSettingMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
+import { defaultPageNoticeId } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 
 export const pages = [
-  new Page(1, 1, -1, 'Default Page Notice'),
+  new Page(1, 1, defaultPageNoticeId, 'Default Page Notice'),
   new Page(2, 1, 1, 'Derived Page Notice 1'),
   new Page(3, 1, 2, 'Derived Page Notice 2'),
 ];

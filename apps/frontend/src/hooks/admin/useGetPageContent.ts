@@ -7,7 +7,8 @@ export const FALLBACK_ROLE_FOR_PAGE_CONTENT = -1;
 
 export function useGetPageContents(
   pageName: PageName,
-  roleIds?: number | number[]
+  roleIds?: number | number[],
+  useDefaultIfNotFound: boolean = true
 ) {
   const [pageContent, setPageContent] = useState<string | string[]>('');
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,6 +29,7 @@ export function useGetPageContents(
       .getPageContent({
         pageId: pageName,
         roleIds: sanitisedRoleIds,
+        useDefaultIfNotFound: useDefaultIfNotFound,
       })
       .then((data) => {
         if (unmounted) {

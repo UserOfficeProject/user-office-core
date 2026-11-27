@@ -1,5 +1,5 @@
-query getPageContent($pageId: PageName!, $roleIds: [Int!]!) {
-  pageContent(pageId: $pageId, roleIds: $roleIds) {
+query getPageContent($pageId: PageName!, $roleIds: [Int!]!, $useDefaultIfNotFound: Boolean) {
+  pageContent(pageId: $pageId, roleIds: $roleIds, useDefaultIfNotFound: $useDefaultIfNotFound) {
     content
   }
 }

@@ -7,6 +7,7 @@ context('Page tests', () => {
   let derivedUserOfficerRoleId: number;
   const sharedFaqContents = faker.lorem.words(2);
   const uniqueFaqContents = faker.lorem.words(2);
+  const defaultPageNoticeId = -1;
 
   beforeEach(() => {
     cy.resetDB();
@@ -35,7 +36,7 @@ context('Page tests', () => {
           cy.setPageContent({
             pageId: PageName.HOMEPAGE,
             text: sharedFaqContents,
-            roleIds: [-1, derivedUserOfficerRoleId],
+            roleIds: [defaultPageNoticeId, derivedUserOfficerRoleId],
           });
           cy.setPageContent({
             pageId: PageName.HOMEPAGE,
@@ -110,7 +111,9 @@ context('Page tests', () => {
 
     cy.get('[data-cy="role-filter"]').click();
     cy.get('[role="listbox"]').contains('Default').click();
-    cy.get('[role="listbox"]').contains('User Officer').click();
+    cy.get('[role="listbox"]')
+      .contains(/^User Officer$/)
+      .click();
     cy.get('body').type('{esc}');
 
     cy.getTinyMceContent('HOMEPAGE').then((content) =>
@@ -185,5 +188,40 @@ context('Page tests', () => {
     cy.get('[role="listbox"]').contains('Derived User Officer').click();
 
     cy.contains('Change selected roles notices');
+  });
+
+  it('Should be able update FAQ', () => {
+    cy.login('officer', initialDBData.roles.userOfficer);
+    cy.visit('/');
+    cy.contains('Configuration Settings').click();
+    cy.contains('Pages').click();
+
+    cy.contains('Set user homepage');
+    cy.contains('Help').click();
+
+    cy.get('[data-cy="role-filter"]').click();
+    cy.get('[role="listbox"]')
+      .contains(/^User Officer$/)
+      .click();
+    cy.get('body').type('{esc}');
+
+    cy.setTinyMceContent('HELPPAGE', faqContents);
+
+    cy.contains('Update').click();
+
+    cy.notification({ text: 'Updated Page', variant: 'success' });
+
+    cy.getTinyMceContent('HELPPAGE').then((content) =>
+      expect(content).to.have.string(faqContents)
+    );
+
+    cy.reload();
+    cy.contains('Proposals').click();
+    cy.contains('FAQ').click();
+
+    cy.get('[role="presentation"]').should('exist');
+
+    cy.contains(faqContents);
+    cy.contains('Close').click();
   });
 });

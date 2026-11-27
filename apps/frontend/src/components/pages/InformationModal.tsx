@@ -5,8 +5,9 @@ import MuiDialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
 import parse from 'html-react-parser';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { UserContext } from 'context/UserContextProvider';
 import { PageName } from 'generated/sdk';
 import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 
@@ -36,10 +37,11 @@ type InformationDialogProps = {
 const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [dialogText, setDialogText] = React.useState<string | null>(null);
-  const [, helpPageContent] = useGetPageContents(props.pageName);
+  const { currentRoleId } = useContext(UserContext);
+  const [, helpPageContent] = useGetPageContents(props.pageName, currentRoleId);
 
   const handleClickOpen = async () => {
-    setDialogText(helpPageContent as string);
+    setDialogText(Array.isArray(helpPageContent) ? '' : helpPageContent);
 
     setOpen(true);
   };

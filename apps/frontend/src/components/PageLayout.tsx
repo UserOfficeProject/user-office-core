@@ -58,7 +58,7 @@ const PageLayout = ({
       : !isTabletOrMobile
   );
 
-  const { currentRole } = useContext(UserContext);
+  const { currentRole, currentRoleId } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
   const drawer = {
@@ -112,7 +112,10 @@ const PageLayout = ({
       ?.settingsValue === 'true';
   const displayFAQLink =
     settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
-  const [, footerContent] = useGetPageContents(PageName.FOOTERCONTENT);
+  const [, footerContent] = useGetPageContents(
+    PageName.FOOTERCONTENT,
+    currentRoleId
+  );
 
   return (
     <div className="App">
@@ -194,7 +197,7 @@ const PageLayout = ({
           >
             {children}
           </Suspense>
-          {parse(footerContent as string)}
+          {parse(Array.isArray(footerContent) ? '' : footerContent)}
           <BottomNavigation
             sx={{
               display: 'flex',
