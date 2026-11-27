@@ -363,10 +363,13 @@ export interface TemplateVersionRecord {
   readonly version_number: number;
   readonly template: string;
   readonly created_at: Date;
+  readonly update_comment: string;
 }
 
 export interface PageTextRecord {
   readonly pagetext_id: number;
+  readonly page_id: number;
+  readonly role_id: number;
   readonly content: string;
 }
 
@@ -672,7 +675,12 @@ export interface SettingsRecord {
 }
 
 export const createPageObject = (record: PageTextRecord) => {
-  return new Page(record.pagetext_id, record.content);
+  return new Page(
+    record.pagetext_id,
+    record.page_id,
+    record.role_id,
+    record.content
+  );
 };
 
 export interface TokensAndPermissionsRecord {
@@ -1064,7 +1072,8 @@ export const createEmailVersionsObject = (
     template,
     templateVersions.version_number,
     templateVersions.template_type,
-    templateVersions.created_at.toUTCString()
+    templateVersions.created_at.toUTCString(),
+    templateVersions.update_comment
   );
 };
 

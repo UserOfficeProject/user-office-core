@@ -5,6 +5,7 @@ export class TemplateVersion {
     public template: string,
     public versionNumber: number,
     public templateType: string,
-    public createdTimeStamp: string
+    public createdTimeStamp: string,
+    public updateComment: string
   ) {}
 }

@@ -3,35 +3,48 @@ import { useEffect, useState } from 'react';
 import { PageName } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useGetPageContent(pageName: PageName) {
-  const [pageContent, setPageContent] = useState<string>('');
+export const FALLBACK_ROLE_FOR_PAGE_CONTENT = -1;
+
+export function useGetPageContents(
+  pageName: PageName,
+  roleIds?: number | number[]
+) {
+  const [pageContent, setPageContent] = useState<string | string[]>('');
   const [loading, setLoading] = useState<boolean>(true);
+  const sanitisedRoleIds =
+    roleIds == null
+      ? [FALLBACK_ROLE_FOR_PAGE_CONTENT]
+      : Array.isArray(roleIds)
+        ? roleIds
+        : [roleIds];
 
   const api = useDataApi();
 
   useEffect(() => {
     let unmounted = false;
-
     setLoading(true);
+
     api()
       .getPageContent({
         pageId: pageName,
+        roleIds: sanitisedRoleIds,
       })
       .then((data) => {
         if (unmounted) {
           return;
         }
-
-        if (data.pageContent) {
-          setPageContent(data.pageContent);
-        }
+        setPageContent(
+          data.pageContent.length === 1
+            ? data.pageContent[0].content
+            : data.pageContent.map((p) => p.content)
+        );
         setLoading(false);
       });
 
     return () => {
       unmounted = true;
     };
-  }, [pageName, api]);
+  }, [pageName, roleIds, api]);
 
   return [loading, pageContent] as const;
 }

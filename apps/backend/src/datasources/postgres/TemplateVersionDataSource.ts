@@ -46,7 +46,8 @@ export default class PostgresTemplateVersionDataSource
   async createNewVersion(
     emailTemplateId: number,
     templateType: string,
-    template?: string
+    template?: string,
+    updateComment?: string
   ): Promise<TemplateVersion | void> {
     if (template === null) {
       return;
@@ -63,6 +64,7 @@ export default class PostgresTemplateVersionDataSource
           template: template,
           version_number: newVersionNumber,
           template_type: templateType,
+          update_comment: updateComment,
         },
         ['*']
       )
