@@ -1,0 +1,43 @@
+name: AI usage labels
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label-ai-usage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add AI usage labels
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const prDetails = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            };
+            const labels = pr.labels.map((label) => label.name);
+
+            if (pr.user.login === 'dependabot[bot]') {
+              if (!labels.includes('ai:generated')) {
+                await github.rest.issues.addLabels({ ...prDetails, labels: ['ai:generated'] });
+              }
+              return;
+            }
+
+            // Check if the "AI contributed meaningfully" checkbox in the AI Usage section is ticked.
+            const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '');
+            const aiUsed = /^\s*[-*]\s+\[[xX]\]\s+AI contributed meaningfully/m.test(body);
+
+            // Never remove the label
+            if (aiUsed && !labels.includes('ai:assisted')) {
+              await github.rest.issues.addLabels({ ...prDetails, labels: ['ai:assisted'] });
+            }
