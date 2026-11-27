@@ -111,7 +111,9 @@ context('Page tests', () => {
 
     cy.get('[data-cy="role-filter"]').click();
     cy.get('[role="listbox"]').contains('Default').click();
-    cy.get('[role="listbox"]').contains('User Officer').click();
+    cy.get('[role="listbox"]')
+      .contains(/^User Officer$/)
+      .click();
     cy.get('body').type('{esc}');
 
     cy.getTinyMceContent('HOMEPAGE').then((content) =>
@@ -198,7 +200,9 @@ context('Page tests', () => {
     cy.contains('Help').click();
 
     cy.get('[data-cy="role-filter"]').click();
-    cy.get('[role="listbox"]').contains('User Officer').click();
+    cy.get('[role="listbox"]')
+      .contains(/^User Officer$/)
+      .click();
     cy.get('body').type('{esc}');
 
     cy.setTinyMceContent('HELPPAGE', faqContents);
