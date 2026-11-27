@@ -504,6 +504,7 @@ export default function ExperimentsTable({
           <ExperimentReviewContent
             experimentPk={experimentPkToReview}
             tabNames={experimentReviewTabs}
+            isUserOfficeView={true}
             isInsideModal={true}
           />
         </ExperimentReviewModal>
