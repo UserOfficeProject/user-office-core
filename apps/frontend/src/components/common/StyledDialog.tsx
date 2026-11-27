@@ -43,7 +43,7 @@ const DialogHeader = styled('div')({
 type StyledDialogProps = {
   title?: string;
   error?: boolean;
-  extra?: JSX.Element;
+  extra?: React.ReactNode;
   tooltip?: React.ReactNode;
 } & DialogProps;
 

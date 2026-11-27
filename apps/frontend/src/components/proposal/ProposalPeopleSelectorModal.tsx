@@ -89,8 +89,8 @@ function ProposalPeopleSelectorModal({
   )?.isEnabled;
 
   const labelText = isEmailSearchOnly
-    ? 'Enter a full email address'
-    : 'ex. Nathalie or john@gmail.com';
+    ? 'Search users by email address: ex. john@gmail.com'
+    : 'Search users by name or email address: ex. John or john@gmail.com';
 
   const fetchUserSearchResults = useCallback(async () => {
     setExactEmailMatch(undefined);
@@ -314,7 +314,11 @@ function ProposalPeopleSelectorModal({
     >
       <DialogContent
         dividers
-        sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 2,
+        }}
       >
         <Autocomplete
           multiple={multiple}
@@ -345,8 +349,14 @@ function ProposalPeopleSelectorModal({
           renderInput={(params) => (
             <TextField
               {...params}
-              label={labelText}
+              label={
+                isEmailSearchOnly
+                  ? 'Search by email address'
+                  : 'Search by name or email address'
+              }
+              helperText={labelText}
               variant="outlined"
+              margin="none"
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Backspace') {
                   event.stopPropagation();
@@ -400,7 +410,11 @@ function ProposalPeopleSelectorModal({
         <Button
           variant="contained"
           onClick={handleSubmit}
-          sx={{ margin: '16px 0 8px 0' }}
+          sx={{
+            marginBottom: 1,
+            minHeight: { sm: 56 },
+            alignSelf: { xs: 'flex-end', sm: 'flex-start' },
+          }}
           startIcon={<AddIcon />}
           disabled={
             !selectedItems.length ||

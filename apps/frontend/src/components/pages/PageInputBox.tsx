@@ -5,19 +5,48 @@ import React, { useState, useEffect } from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useGetPageContents } from 'hooks/admin/useGetPageContent';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export default function PageInputBox(props: {
   pageName: PageName;
   heading: string;
+  roleIds: number[];
+  setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [loading, pageContent] = useGetPageContent(props.pageName);
+  const [loading, pageContent] = useGetPageContents(
+    props.pageName,
+    props.roleIds
+  );
   const [content, setPageContent] = useState('');
   const { api } = useDataApiWithFeedback();
 
+  const doAllPageContentsMatch = () => {
+    //if a single value was returned and only one was requested everything matches, otherwise one of the requested pages is empty
+    if (!Array.isArray(pageContent)) {
+      return props.roleIds.length === 1 ? true : false;
+    }
+
+    return (
+      //if the number of returned pages is the number of requested ones and all pages match the first one
+      pageContent.length === props.roleIds.length &&
+      !pageContent.slice(1).filter((pc) => pc !== pageContent[0]).length
+    );
+  };
+
+  const getPageContent = () => {
+    return Array.isArray(pageContent) ? pageContent[0] : pageContent;
+  };
+
+  const initialValue = doAllPageContentsMatch() ? getPageContent() : '';
+
   useEffect(() => {
-    setPageContent(pageContent);
+    if (doAllPageContentsMatch()) {
+      setPageContent(getPageContent());
+    } else {
+      setPageContent('');
+    }
+    props.setIsDirty(false);
   }, [pageContent]);
 
   return (
@@ -27,7 +56,7 @@ export default function PageInputBox(props: {
       </Typography>
       {loading ? null : (
         <Editor
-          initialValue={pageContent}
+          initialValue={initialValue}
           init={{
             skin: false,
             content_css: false,
@@ -36,7 +65,10 @@ export default function PageInputBox(props: {
             branding: false,
           }}
           id={props.pageName}
-          onEditorChange={(content) => setPageContent(content)}
+          onEditorChange={(content) => {
+            props.setIsDirty(content !== initialValue);
+            setPageContent(content);
+          }}
         />
       )}
       <Box
@@ -46,16 +78,20 @@ export default function PageInputBox(props: {
         }}
       >
         <Button
+          disabled={!props.roleIds.length}
           sx={{
             marginTop: '25px',
             marginLeft: '10px',
           }}
-          onClick={() =>
-            api({ toastSuccessMessage: 'Updated Page' }).setPageContent({
-              id: props.pageName,
-              text: content,
-            })
-          }
+          onClick={() => {
+            api({ toastSuccessMessage: 'Updated Page' })
+              .setPageContent({
+                pageId: props.pageName,
+                text: content,
+                roleIds: props.roleIds,
+              })
+              .then(() => props.setIsDirty(false));
+          }}
         >
           Update
         </Button>

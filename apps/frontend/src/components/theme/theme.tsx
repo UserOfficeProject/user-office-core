@@ -13,6 +13,24 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
   const { settingsMap } = useContext(SettingsContext);
   const defaultTheme = useTheme();
 
+  const updateCssPalette = useCallback(
+    async function () {
+      settingsMap.forEach((setting) => {
+        if (setting.id.startsWith('PALETTE')) {
+          document.documentElement.style.setProperty(
+            '--' + setting.id,
+            setting.settingsValue
+          );
+        }
+      });
+    },
+    [settingsMap]
+  );
+
+  useEffect(() => {
+    updateCssPalette();
+  }, [updateCssPalette]);
+
   const palette = {
     primary: {
       dark:
@@ -94,24 +112,6 @@ const ThemeWrapper = (props: { children: React.ReactNode }) => {
       },
     })
   );
-
-  const updateCssPalette = useCallback(
-    async function () {
-      settingsMap.forEach((setting) => {
-        if (setting.id.startsWith('PALETTE')) {
-          document.documentElement.style.setProperty(
-            '--' + setting.id,
-            setting.settingsValue
-          );
-        }
-      });
-    },
-    [settingsMap]
-  );
-
-  useEffect(() => {
-    updateCssPalette();
-  }, [updateCssPalette]);
 
   return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
 };

@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, AgentTags } from '../decorators';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { Roles } from '../models/Role';
 import {
@@ -13,6 +13,7 @@ import {
   AuthJwtPayload,
   UserRole,
   AuthJwtApiTokenPayload,
+  User,
 } from '../models/User';
 import { UsersArgs } from '../resolvers/queries/UsersQuery';
 import { verifyToken } from '../utils/jwt';
@@ -48,8 +49,16 @@ export default class UserQueries {
   }
 
   @Authorized()
-  async byRef(agent: UserWithRole | null, id: number) {
+  async byRef(agent: UserWithRole | null, id: number): Promise<User | null> {
     return this.dataSource.getUser(id);
+  }
+
+  @Authorized()
+  async basicByRef(
+    agent: UserWithRole | null,
+    id: number
+  ): Promise<BasicUserDetails | null> {
+    return this.dataSource.getBasicUserInfo(id);
   }
 
   @Authorized()
@@ -73,7 +82,8 @@ export default class UserQueries {
         user.email,
         user.country,
         user.userTitle,
-        user.oidcSub
+        user.oidcSub,
+        user.institutionRorId
       );
     } else {
       return null;
@@ -106,7 +116,8 @@ export default class UserQueries {
       user.email,
       user.country,
       user.userTitle,
-      user.oidcSub
+      user.oidcSub,
+      user.institutionRorId
     );
   }
 
@@ -166,6 +177,26 @@ export default class UserQueries {
   @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: UserWithRole | null) {
     return this.dataSource.getRoles();
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getRolesByTags(
+    agent: UserWithRole | null,
+    tagIds?: number[],
+    @AgentTags tags?: number[]
+  ) {
+    if (
+      agent?.currentRole?.isRootRole ||
+      (tags && tagIds && tagIds.every((t) => tags.includes(t)))
+    ) {
+      return this.dataSource.getRolesByTags(tagIds);
+    }
+    logger.logWarn(
+      'User does not have permission to fetch requested roles with tags',
+      { agent, tagIds }
+    );
+
+    return [];
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
