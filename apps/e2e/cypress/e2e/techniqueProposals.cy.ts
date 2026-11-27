@@ -2114,8 +2114,8 @@ context('Technique Proposal tests', () => {
 
       /*
       An experiment should have been created for the approved proposal.
-      The experiment's scheduledEventId equals the proposal primary key, so it
-      is the only experiment referencing this proposal.
+      Its scheduledEventId is null, so it is identified by the proposal it
+      references (the only experiment for this proposal).
       */
       cy.getExperiments().then(({ allExperiments }) => {
         const experiments = allExperiments?.experiments ?? [];
@@ -2128,7 +2128,7 @@ context('Technique Proposal tests', () => {
 
         const experiment = proposalExperiments[0];
 
-        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.scheduledEventId).to.eq(null);
         expect(experiment.instrumentId).to.eq(createdInstrumentId1);
         expect(experiment.localContactId).to.eq(null);
         expect(experiment.status).to.eq('DRAFT');
@@ -2260,7 +2260,7 @@ context('Technique Proposal tests', () => {
 
         const experiment = proposalExperiments[0];
 
-        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.scheduledEventId).to.eq(null);
         expect(experiment.instrumentId).to.eq(createdInstrumentId1);
         expect(experiment.status).to.eq('DRAFT');
       });
@@ -2320,7 +2320,7 @@ context('Technique Proposal tests', () => {
 
         const experiment = proposalExperiments[0];
 
-        expect(experiment.scheduledEventId).to.eq(createdProposalPk1);
+        expect(experiment.scheduledEventId).to.eq(null);
         expect(experiment.instrumentId).to.eq(createdInstrumentId1);
         expect(experiment.status).to.eq('DRAFT');
       });

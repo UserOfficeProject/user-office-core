@@ -873,7 +873,9 @@ export default class ProposalMutations {
       const experimentToAdd = {
         startsAt,
         endsAt,
-        scheduledEventId: proposal.primaryKey,
+        // No time slot is booked at approval time yet, so there is no
+        // scheduled event to reference (the column is nullable for this reason).
+        scheduledEventId: null,
         proposalPk: proposal.primaryKey,
         status: ExperimentStatus.DRAFT,
         localContactId: null,

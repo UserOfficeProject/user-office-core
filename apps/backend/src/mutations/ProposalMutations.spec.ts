@@ -906,7 +906,7 @@ describe('Test technique proposal change status', () => {
       expect(createdExperiment).toEqual(
         expect.objectContaining({
           proposalPk: 1,
-          scheduledEventId: 1,
+          scheduledEventId: null,
           status: ExperimentStatus.DRAFT,
           localContactId: null,
           instrumentId: dummyInstrumentWithManagementTime.id,
